@@ -24,17 +24,4 @@ namespace risk.control.system.Models
         public PinCode? PinCode { get; set; }
 
     }
-    public class Address
-    {
-        public string AddressId { get; set; } = string.Empty;
-        public string Branch { get; set; } = string.Empty;
-        public string Addressline { get; set; } = string.Empty;
-        public string City { get; set; } = string.Empty;
-        public string? StateId { get; set; }
-        public State? State { get; set; }
-        public string? CountryId { get; set; }
-        public Country? Country { get; set; }
-        public string? PinCodeId { get; set; }
-        public PinCode? PinCode { get; set; }
-    }
 }
