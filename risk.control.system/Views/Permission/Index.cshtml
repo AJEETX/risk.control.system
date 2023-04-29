@@ -30,7 +30,7 @@
                 <tbody>
                     @foreach (var m in Model.PermissionViewModels)
                     {
-                        var startIndex = ApplicationOption.PERMISSION.Length + 1;
+                        var startIndex = Applicationsettings.PERMISSION.Length + 1;
                         var contentLength = @m.RoleClaims[0].Value.IndexOf(".", startIndex) - startIndex;
                         var roleClaimValue = @m.RoleClaims[0]?.Value;
                         var roleValue = roleClaimValue.Substring(startIndex, contentLength);

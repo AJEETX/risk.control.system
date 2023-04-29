@@ -604,29 +604,29 @@ namespace risk.control.system.Seeds
 
                 //ADD PERMISSIONS
 
-                var allPermissions = Permissions.GeneratePermissionsForModule(nameof(Permissions.Products));
-                foreach (var permission in allPermissions)
-                {
-                    if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == permission))
-                    {
-                        await roleManager.AddClaimAsync(adminRole, new Claim(Applicationsettings.PERMISSION, permission));
-                    }
-                }
-
-                //var moduleList = new List<string> { nameof(Permissions.Products) };
-
-                //foreach (var module in moduleList)
+                //var allPermissions = Permissions.GeneratePermissionsForModule(nameof(Permissions.Products));
+                //foreach (var permission in allPermissions)
                 //{
-                //    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
-
-                //    foreach (var modulePermission in modulePermissions)
+                //    if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == permission))
                 //    {
-                //        if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == modulePermission))
-                //        {
-                //            await roleManager.AddClaimAsync(adminRole, new Claim(Applicationsettings.PERMISSION, modulePermission));
-                //        }
+                //        await roleManager.AddClaimAsync(adminRole, new Claim(Applicationsettings.PERMISSION, permission));
                 //    }
                 //}
+
+                var moduleList = new List<string> { nameof(Products), nameof(CaseClaims) };
+
+                foreach (var module in moduleList)
+                {
+                    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
+
+                    foreach (var modulePermission in modulePermissions)
+                    {
+                        if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == modulePermission))
+                        {
+                            await roleManager.AddClaimAsync(adminRole, new Claim(Applicationsettings.PERMISSION, modulePermission));
+                        }
+                    }
+                }
             }
             
             //Seed client admin

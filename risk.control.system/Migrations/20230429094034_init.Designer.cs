@@ -11,11 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:risk.control.system/Migrations/20230429045409_init.Designer.cs
-    [Migration("20230429045409_init")]
-========
-    [Migration("20230429090104_init")]
->>>>>>>> just-b4-permissions:risk.control.system/Migrations/20230429090104_init.Designer.cs
+    [Migration("20230429094034_init")]
     partial class init
     {
         /// <inheritdoc />

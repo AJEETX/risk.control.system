@@ -23,6 +23,13 @@ namespace risk.control.system.Helpers
             public static string Edit = ModuleManager.GetModule(nameof(Products), Applicationsettings.EDIT);
             public static string Delete = ModuleManager.GetModule(nameof(Products), Applicationsettings.DELETE);
         }
+        public static class CaseClaims
+        {
+            public static string View = ModuleManager.GetModule(nameof(CaseClaims), Applicationsettings.VIEW);
+            public static string Create = ModuleManager.GetModule(nameof(CaseClaims), Applicationsettings.CREATE);
+            public static string Edit = ModuleManager.GetModule(nameof(CaseClaims), Applicationsettings.EDIT);
+            public static string Delete = ModuleManager.GetModule(nameof(CaseClaims), Applicationsettings.DELETE);
+        }
         public static class ModuleManager
         {
             public static string GetModule(string module, string action)

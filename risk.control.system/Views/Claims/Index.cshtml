@@ -3,19 +3,19 @@
 @inject IAuthorizationService AuthorizationService
 <h1>claims page access management</h1>
 <br />
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Claims.Create)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.Create)).Result.Succeeded)
 {
     <button class="btn btn-success">Create</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Claims.View)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.View)).Result.Succeeded)
 {
     <button class="btn btn-info">View</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Claims.Edit)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.Edit)).Result.Succeeded)
 {
     <button class="btn btn-warning">Modify</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Claims.Delete)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.Delete)).Result.Succeeded)
 {
     <button class="btn btn-danger">Delete</button>
 }

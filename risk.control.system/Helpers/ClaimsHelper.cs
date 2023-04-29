@@ -15,16 +15,16 @@ namespace risk.control.system.Helpers
 
             foreach (FieldInfo fi in fields)
             {
-                allPermissions.Add(new RoleClaimsViewModel { Value = fi.GetValue(null).ToString(), Type = ApplicationOption.PERMISSION });
+                allPermissions.Add(new RoleClaimsViewModel { Value = fi.GetValue(null).ToString(), Type = Applicationsettings.PERMISSION });
             }
         }
 
         public static async Task AddPermissionClaim(this RoleManager<ApplicationRole> roleManager, ApplicationRole role, string permission)
         {
             var allClaims = await roleManager.GetClaimsAsync(role);
-            if (!allClaims.Any(a => a.Type == ApplicationOption.PERMISSION && a.Value == permission))
+            if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == permission))
             {
-                await roleManager.AddClaimAsync(role, new Claim(ApplicationOption.PERMISSION, permission));
+                await roleManager.AddClaimAsync(role, new Claim(Applicationsettings.PERMISSION, permission));
             }
         }
     }

@@ -19,7 +19,7 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
         {
             return;
         }
-            var permissionss = context.User.Claims.Where(x => x.Type == ApplicationOption.PERMISSION &&
+            var permissionss = context.User.Claims.Where(x => x.Type == Applicationsettings.PERMISSION &&
                                                             x.Value == requirement.Permission &&
                                                             x.Issuer == "LOCAL AUTHORITY");
         if (permissionss.Any())

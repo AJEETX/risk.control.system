@@ -6,6 +6,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Seeds;
+using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Controllers
 {
@@ -103,7 +104,7 @@ namespace risk.control.system.Controllers
         private async static Task SeedClaimsForSuperAdmin(RoleManager<ApplicationRole> roleManager)
         {
             var adminRole = await roleManager.FindByNameAsync(AppRoles.PortalAdmin.ToString());
-            await AddPermissionClaim(roleManager, adminRole, "Products");
+            await AddPermissionClaim(roleManager, adminRole, nameof(Products));
         }
 
         public static async Task AddPermissionClaim(RoleManager<ApplicationRole> roleManager, ApplicationRole role, string module)
@@ -112,9 +113,9 @@ namespace risk.control.system.Controllers
             var allPermissions = Permissions.GeneratePermissionsForModule(module);
             foreach (var permission in allPermissions)
             {
-                if (!allClaims.Any(a => a.Type == "Permission" && a.Value == permission))
+                if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == permission))
                 {
-                    await roleManager.AddClaimAsync(role, new Claim("Permission", permission));
+                    await roleManager.AddClaimAsync(role, new Claim(Applicationsettings.PERMISSION, permission));
                 }
             }
         }
