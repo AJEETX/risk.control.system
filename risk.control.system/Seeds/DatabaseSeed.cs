@@ -3,6 +3,7 @@ using System.Security.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Seeds
 {
@@ -498,6 +499,7 @@ namespace risk.control.system.Seeds
             await context.InvestigationCase.AddAsync(claimDiscreetCase);
 
 
+            #region CLIENT/ VENDOR COMPANY
             //CREATE CLIENT COMPANY
 
             var TataAig = new ClientCompany
@@ -521,7 +523,7 @@ namespace risk.control.system.Seeds
 
             var tataAigCompany = await context.ClientCompany.AddAsync(TataAig);
 
-            //CREATE CLIENT COMPANY
+            //CREATE VENDOR COMPANY
 
             var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
             {
@@ -557,6 +559,8 @@ namespace risk.control.system.Seeds
 
             var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
 
+            #endregion
+
             await context.SaveChangesAsync();
 
             #region APPLICATION USERS ROLES
@@ -568,7 +572,7 @@ namespace risk.control.system.Seeds
                 Email = "portal-admin@admin.com",
                 FirstName = "Portal",
                 LastName = "Admin",
-                Password = ApplicationUserOptions.Password,
+                Password = ApplicationOption.Password,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 State = upState.Entity,
@@ -581,7 +585,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(portalAdmin.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(portalAdmin, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(portalAdmin, ApplicationOption.Password);
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.PortalAdmin.ToString());
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientAdmin.ToString());
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientCreator.ToString());
@@ -591,14 +595,27 @@ namespace risk.control.system.Seeds
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.VendorSupervisor.ToString());
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.VendorAgent.ToString());
                 }
+
+                ////////PERMISSIONS TO MODULES
+
                 var adminRole = await roleManager.FindByNameAsync(AppRoles.PortalAdmin.ToString());
                 var allClaims = await roleManager.GetClaimsAsync(adminRole);
-                var allPermissions = Permissions.GeneratePermissionsForModule("Products");
-                foreach (var permission in allPermissions)
+
+                ////////PERMISSIONS TO PRODUCT MODULES
+                ///
+
+                var moduleList = new List<string> { nameof(Permissions.Claims), nameof(Permissions.Products) };
+
+                foreach (var module in moduleList)
                 {
-                    if (!allClaims.Any(a => a.Type == "Permission" && a.Value == permission))
+                    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
+
+                    foreach (var modulePermission in modulePermissions)
                     {
-                        await roleManager.AddClaimAsync(adminRole, new Claim("Permission", permission));
+                        if (!allClaims.Any(a => a.Type == ApplicationOption.PERMISSION && a.Value == modulePermission))
+                        {
+                            await roleManager.AddClaimAsync(adminRole, new Claim(ApplicationOption.PERMISSION, modulePermission));
+                        }
                     }
                 }
             }
@@ -612,7 +629,7 @@ namespace risk.control.system.Seeds
                 LastName = "Admin",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Password = ApplicationUserOptions.Password,
+                Password = ApplicationOption.Password,
                 isSuperAdmin = true,
                 State = ontarioState.Entity,
                 Country = canadaCountry.Entity,
@@ -624,7 +641,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(clientAdmin.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(clientAdmin, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(clientAdmin, ApplicationOption.Password);
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAdmin.ToString());
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientCreator.ToString());
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssigner.ToString());
@@ -643,7 +660,7 @@ namespace risk.control.system.Seeds
                 FirstName = "Client",
                 LastName = "Creator",
                 EmailConfirmed = true,
-                Password = ApplicationUserOptions.Password,
+                Password = ApplicationOption.Password,
                 PhoneNumberConfirmed = true,
                 isSuperAdmin = true,
                 State = upState.Entity,
@@ -656,7 +673,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(clientCreator.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(clientCreator, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(clientCreator, ApplicationOption.Password);
                     await userManager.AddToRoleAsync(clientCreator, AppRoles.ClientCreator.ToString());
                 }
             }
@@ -670,7 +687,7 @@ namespace risk.control.system.Seeds
                 LastName = "Assigner",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Password = ApplicationUserOptions.Password,
+                Password = ApplicationOption.Password,
                 isSuperAdmin = true,
                 PinCode = northDelhiPinCode.Entity,
                 State = delhiState.Entity,
@@ -682,7 +699,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(clientAssigner.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(clientAssigner, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(clientAssigner, ApplicationOption.Password);
                     await userManager.AddToRoleAsync(clientAssigner, AppRoles.ClientAssigner.ToString());
                 }
             }
@@ -696,7 +713,7 @@ namespace risk.control.system.Seeds
                 LastName = "Assessor",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Password = ApplicationUserOptions.Password,
+                Password = ApplicationOption.Password,
                 isSuperAdmin = true,
                 PinCode = northDelhiPinCode.Entity,
                 State = delhiState.Entity,
@@ -708,7 +725,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(clientAssessor.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(clientAssessor, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(clientAssessor, ApplicationOption.Password);
                     await userManager.AddToRoleAsync(clientAssessor, AppRoles.ClientAssessor.ToString());
                 }
             }
@@ -722,7 +739,7 @@ namespace risk.control.system.Seeds
                 LastName = "Admin",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Password = ApplicationUserOptions.Password,
+                Password = ApplicationOption.Password,
                 isSuperAdmin = true,
                 PinCode = indiraPuramPinCode.Entity,
                 State = upState.Entity,
@@ -734,7 +751,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(vendorAdmin.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(vendorAdmin, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(vendorAdmin, ApplicationOption.Password);
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAdmin.ToString());
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorSupervisor.ToString());
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAgent.ToString());
@@ -750,7 +767,7 @@ namespace risk.control.system.Seeds
                 LastName = "Supervisor",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Password = ApplicationUserOptions.Password,
+                Password = ApplicationOption.Password,
                 isSuperAdmin = true,
                 PinCode = indiraPuramPinCode.Entity,
                 State = upState.Entity,
@@ -762,7 +779,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(vendorSupervisor.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(vendorSupervisor, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(vendorSupervisor, ApplicationOption.Password);
                     await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorSupervisor.ToString());
                     await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorAgent.ToString());
                 }
@@ -777,7 +794,7 @@ namespace risk.control.system.Seeds
                 LastName = "Agent",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Password = ApplicationUserOptions.Password,
+                Password = ApplicationOption.Password,
                 isSuperAdmin = true,
                 PinCode = indiraPuramPinCode.Entity,
                 State = upState.Entity,
@@ -789,7 +806,7 @@ namespace risk.control.system.Seeds
                 var user = await userManager.FindByEmailAsync(vendorAgent.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(vendorAgent, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(vendorAgent, ApplicationOption.Password);
                     await userManager.AddToRoleAsync(vendorAgent, AppRoles.VendorAgent.ToString());
                 }
             }

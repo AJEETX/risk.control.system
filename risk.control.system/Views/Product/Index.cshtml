@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @using risk.control.system.Helpers;
 @inject IAuthorizationService AuthorizationService
-<h1>page access management</h1>
+<h1>sample module page access management</h1>
 <br />
 @if ((AuthorizationService.AuthorizeAsync(User, Permissions.Products.Create)).Result.Succeeded)
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using risk.control.system.Seeds;
 using System;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ internal class PermissionPolicyProvider : IAuthorizationPolicyProvider
     // The policy name must match the permission that is needed.
     public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
     {
-        if (policyName.StartsWith("Permission", StringComparison.OrdinalIgnoreCase))
+        if (policyName.StartsWith(ApplicationOption.PERMISSION, StringComparison.OrdinalIgnoreCase))
         {
             var policy = new AuthorizationPolicyBuilder();
             policy.AddRequirements(new PermissionRequirement(policyName));

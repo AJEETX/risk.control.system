@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using risk.control.system.Seeds;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,7 +19,7 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
         {
             return;
         }
-            var permissionss = context.User.Claims.Where(x => x.Type == "Permission" &&
+            var permissionss = context.User.Claims.Where(x => x.Type == ApplicationOption.PERMISSION &&
                                                             x.Value == requirement.Permission &&
                                                             x.Issuer == "LOCAL AUTHORITY");
         if (permissionss.Any())

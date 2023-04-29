@@ -17,28 +17,46 @@ namespace risk.control.system.Controllers
 
         public async Task<ActionResult> Index(string Id)
         {
-            var model = new PermissionViewModel();
-            var allPermissions = new List<RoleClaimsViewModel>();
-            allPermissions.GetPermissions(typeof(Permissions.Products), Id);
+            var model = new PermissionsViewModel();
+
+            var models = new List<PermissionViewModel>();
+
+            var moduleList = new List<Type> { typeof(Permissions.Claims), typeof(Permissions.Products) };
+
             var role = await _roleManager.FindByIdAsync(Id);
+
+            foreach (var module in moduleList)
+            {
+                var permission = new PermissionViewModel
+                {
+                    RoleId = Id,
+                    RoleName = role.Name,
+                    RoleClaims = await GetModulePermission(module, role)
+                };
+                models.Add(permission);
+            }
+            model.PermissionViewModels= models;
             model.RoleName = role.Name;
             model.RoleId = Id;
+            return View(model);
+        }
+        private async Task<List<RoleClaimsViewModel>> GetModulePermission(Type type, ApplicationRole role)
+        {
             var claims = await _roleManager.GetClaimsAsync(role);
-            var allClaimValues = allPermissions.Select(a => a.Value).ToList();
+            var modulePermissions = new List<RoleClaimsViewModel>();
+            modulePermissions.GetPermissions(type);
+            var allClaimValues = modulePermissions.Select(a => a.Value).ToList();
             var roleClaimValues = claims.Select(a => a.Value).ToList();
             var authorizedClaims = allClaimValues.Intersect(roleClaimValues).ToList();
-            foreach (var permission in allPermissions)
+            foreach (var permission in modulePermissions)
             {
                 if (authorizedClaims.Any(a => a == permission.Value))
                 {
                     permission.Selected = true;
                 }
             }
-            
-            model.RoleClaims = allPermissions;
-            return View(model);
+            return modulePermissions;
         }
-
         public async Task<IActionResult> Update(PermissionViewModel model)
         {
             var role = await _roleManager.FindByIdAsync(model.RoleId);
@@ -47,6 +65,8 @@ namespace risk.control.system.Controllers
             {
                 await _roleManager.RemoveClaimAsync(role, claim);
             }
+
+
             var selectedClaims = model.RoleClaims.Where(a => a.Selected).ToList();
             foreach (var claim in selectedClaims)
             {
