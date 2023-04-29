@@ -1,6 +1,7 @@
 ﻿@model List<State>
 
-<div>
+<div class="card">
+    <div id="viewAll" class="card-body table-responsive">
     <h4>Manage State</h4>
     <form method="post" action="State/create"  asp-antiforgery="true">
         <div class="input-group col-8" style="padding:0px;">
@@ -39,4 +40,5 @@
 
         </tbody>
     </table>
+    </div>
 </div>

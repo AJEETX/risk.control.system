@@ -1,6 +1,7 @@
 ﻿@model List<ApplicationRole>
 
-<div>
+<div class="card">
+    <div id="viewAll" class="card-body table-responsive">
     <h4>Roles Manager</h4>
     <form method="post" action="roles/create"  asp-antiforgery="true">
         <div class="input-group col-4" style="padding:0px;">
@@ -36,4 +37,5 @@
 
         </tbody>
     </table>
+    </div>
 </div>

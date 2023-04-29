@@ -1,6 +1,9 @@
 ﻿@using risk.control.system.Models.ViewModel;
 @model List<UsersViewModel>
 
+
+<div class="card">
+    <div id="viewAll" class="card-body table-responsive">
 <div id="checkboxes">
     <h4>User</h4>
     <form method="post" action="roles/create" enctype="multipart/form-data">
@@ -84,4 +87,6 @@
             }
         </tbody>
     </table>
+        </div>
+    </div>
 </div>

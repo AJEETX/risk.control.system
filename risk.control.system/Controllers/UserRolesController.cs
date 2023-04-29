@@ -7,12 +7,12 @@ namespace risk.control.system.Controllers
 {
     public class UserRolesController : Controller
     {
-    private readonly SignInManager<Models.ApplicationUser> signInManager;
-        private readonly UserManager<Models.ApplicationUser> userManager;
+    private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
 
-        public UserRolesController(UserManager<Models.ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
-            SignInManager<Models.ApplicationUser> signInManager)
+        public UserRolesController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
@@ -22,7 +22,7 @@ namespace risk.control.system.Controllers
         {
             var userRoles = new List<UserRoleViewModel>();
             //ViewBag.userId = userId;
-            Models.ApplicationUser user = await userManager.FindByIdAsync(userId);
+            var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
@@ -33,9 +33,9 @@ namespace risk.control.system.Controllers
                 var userRoleViewModel = new UserRoleViewModel
                 {
                     RoleId = role.Id.ToString(),
-                    RoleName = role.Name
+                    RoleName = role?.Name
                 };
-                if (await userManager.IsInRoleAsync(user, role.Name))
+                if (await userManager.IsInRoleAsync(user, role?.Name))
                 {
                     userRoleViewModel.Selected = true;
                 }

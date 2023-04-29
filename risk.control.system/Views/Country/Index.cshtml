@@ -1,6 +1,6 @@
 ﻿@model List<Country>
-
-<div>
+<div class="card">
+    <div id="viewAll" class="card-body table-responsive">
     <h4>Manage Country</h4>
     <form method="post" action="country/create"  asp-antiforgery="true">
         <div class="input-group col-8" style="padding:0px;">
@@ -35,4 +35,5 @@
 
         </tbody>
     </table>
+    </div>
 </div>

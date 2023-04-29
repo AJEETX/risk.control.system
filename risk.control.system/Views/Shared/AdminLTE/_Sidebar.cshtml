@@ -80,7 +80,7 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-header">INVESTIGATION <span class="badge badge-danger">*</span></li>
+                <li class="nav-header">INVESTIGATION <span class="badge badge-danger">:</span></li>
                 <li class="nav-item">
                     <a is-active-page asp-area="" asp-controller="InvestigationCase" asp-action="Index" class="nav-link">
                         <i class="nav-icon fas fa-users-cog"></i>
@@ -116,7 +116,14 @@
                     if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
                         {
                         <li class="nav-header"><i class="fa fa-unlock"></i> SETTINGS</li>
- 
+                        <li class="nav-item">
+                            <a is-active-page asp-area="" asp-controller="User" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-user-lock"></i>
+                                <p>
+                                    users
+                                </p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a is-active-page asp-area="" asp-controller="Roles" asp-action="Index" class="nav-link">
                                 <i class="nav-icon fas fa-user-lock"></i>
@@ -126,10 +133,10 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                                    <a is-active-page asp-area="" asp-controller="User" asp-action="Index" class="nav-link">
+                            <a is-active-page asp-area="" asp-controller="Claims" asp-action="Index" class="nav-link">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
-                                    user roles
+                                    claims
                                 </p>
                             </a>
                         </li>
@@ -137,15 +144,7 @@
                             <a is-active-page asp-area="" asp-controller="Product" asp-action="Index" class="nav-link">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
-                                     product permission
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="Claims" asp-action="Index" class="nav-link">
-                                <i class="nav-icon fas fa-user-lock"></i>
-                                <p>
-                                    claim permission
+                                     products
                                 </p>
                             </a>
                         </li>

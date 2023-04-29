@@ -3,10 +3,10 @@
 @{
     ViewData["Title"] = "Index";
 }
-<section class="content pt-2">
-    <div class="container-fluid ">
-        <h4>Client Company</h4>
+<div class="card">
+    <div id="viewAll" class="card-body table-responsive">
         <form asp-action="index">
+            <h4>Client Company</h4>
             <div class="input-group col-5" style="padding:0px;">
                 <a class="btn btn-success" asp-action="Create"><i class="fas fa-plus"></i> Create</a>
                 @*            <input autocomplete="off" name="SearchString" type="text" class="form-control" />
@@ -108,4 +108,4 @@
             </tbody>
         </table>
     </div>
-</section>
+</div>

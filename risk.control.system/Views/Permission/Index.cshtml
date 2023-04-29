@@ -1,10 +1,10 @@
 ﻿@using risk.control.system.Models.ViewModel;
 @using risk.control.system.Seeds;
 @model PermissionsViewModel
-<h1>Permissions for role name : @Model.RoleName</h1>
 <br />
 <div class="card">
     <div id="viewAll" class="card-body table-responsive">
+        <h4>Permissions for role name :<i> @Model.RoleName</i></h4>
         <form asp-controller="permission" method="post" asp-action="Update" class="d-inline">
             <input asp-for="@Model.RoleId" type="hidden" />
             <input asp-for="@Model.RoleName" type="hidden" />
@@ -12,7 +12,7 @@
                 <thead>
                     <tr>
                         <th>
-                            Permission section
+                            Module name
                         </th>
                         <th>
                            VIEW 
