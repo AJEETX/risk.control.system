@@ -9,8 +9,6 @@
 
     public class PermissionViewModel
     {
-        public string? RoleName { get; set; }
-        public string? RoleId { get; set; }
         public List<RoleClaimsViewModel> RoleClaims { get; set; } = new List<RoleClaimsViewModel>();
     }
 

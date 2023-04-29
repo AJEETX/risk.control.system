@@ -29,8 +29,6 @@ namespace risk.control.system.Controllers
             {
                 var permission = new PermissionViewModel
                 {
-                    RoleId = Id,
-                    RoleName = role.Name,
                     RoleClaims = await GetModulePermission(module, role)
                 };
                 models.Add(permission);
