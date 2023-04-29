@@ -51,7 +51,7 @@
                     </div>
                     <div class="mb-3">
                         <div class="mb-3 input-group"><input name="password" placeholder="Password" type="password"
-                                   id="password" class="form-control" value="@ApplicationOption.Password">
+                                   id="password" class="form-control" value="@Applicationsettings.Password">
                             <div class="input-group-append"><span class="input-group-text"><i
                                         class="fas fa-lock"></i></span></div>
                         </div>
@@ -66,10 +66,16 @@
         <!-- /.login-card-body -->
         <div style="text-align: -webkit-center;">
             
+            @if (Model?.Error != null)
+            {
+                <div class="alert alert-warning">
+                    @Model?.Error
+                </div>
+            }
             <br />
-            <br />
-            <div class="alert alert-light">
-                designer <a style="color:darkblue;text-decoration:none;" href="http://itsaby.com.au">its aby</a>
+            <div class="alert">
+                
+                design by: <a style="color:darkblue" href="http://itsaby.com.au">its aby</a>
             </div>
         </div>
     </div>
