@@ -1,7 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Authorization
 @using risk.control.system.Helpers;
 @inject IAuthorizationService AuthorizationService
-<h1>claims page access management</h1>
+
+<div class="card">
+    <div id="viewAll" class="card-body table-responsive">
+<h4>claims permissions</h4>
 <br />
 @if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.Create)).Result.Succeeded)
 {
@@ -19,3 +22,5 @@
 {
     <button class="btn btn-danger">Delete</button>
 }
+    </div>
+</div>
