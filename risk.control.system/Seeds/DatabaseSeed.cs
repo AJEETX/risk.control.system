@@ -3,6 +3,7 @@ using System.Security.Claims;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using Microsoft.Identity.Client;
 
 namespace risk.control.system.Seeds
 {
@@ -596,16 +597,31 @@ namespace risk.control.system.Seeds
 
                 //ADD PERMISSIONS
 
-                var allPermissions = Permissions.GeneratePermissionsForModule("Products");
+                var allPermissions = Permissions.GeneratePermissionsForModule(nameof(Permissions.Products));
                 foreach (var permission in allPermissions)
                 {
-                    if (!allClaims.Any(a => a.Type == "Permission" && a.Value == permission))
+                    if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == permission))
                     {
-                        await roleManager.AddClaimAsync(adminRole, new Claim("Permission", permission));
+                        await roleManager.AddClaimAsync(adminRole, new Claim(Applicationsettings.PERMISSION, permission));
                     }
                 }
-            }
 
+                //var moduleList = new List<string> { nameof(Permissions.Products) };
+
+                //foreach (var module in moduleList)
+                //{
+                //    var modulePermissions = Permissions.GeneratePermissionsForModule(module);
+
+                //    foreach (var modulePermission in modulePermissions)
+                //    {
+                //        if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == modulePermission))
+                //        {
+                //            await roleManager.AddClaimAsync(adminRole, new Claim(Applicationsettings.PERMISSION, modulePermission));
+                //        }
+                //    }
+                //}
+            }
+            
             //Seed client admin
             var clientAdmin = new ApplicationUser()
             {

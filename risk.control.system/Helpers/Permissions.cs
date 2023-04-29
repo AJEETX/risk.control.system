@@ -1,24 +1,34 @@
-﻿namespace risk.control.system.Helpers
+﻿using Microsoft.Identity.Client;
+using risk.control.system.Seeds;
+
+namespace risk.control.system.Helpers
 {
     public static class Permissions
     {
         public static List<string> GeneratePermissionsForModule(string module)
         {
             return new List<string>()
-        {
-            $"Permissions.{module}.Create",
-            $"Permissions.{module}.View",
-            $"Permissions.{module}.Edit",
-            $"Permissions.{module}.Delete",
-        };
+            {
+                ModuleManager.GetModule(module, Applicationsettings.CREATE),
+                ModuleManager.GetModule(module, Applicationsettings.VIEW),
+                ModuleManager.GetModule(module, Applicationsettings.EDIT),
+                ModuleManager.GetModule(module, Applicationsettings.DELETE),
+            };
         }
 
         public static class Products
         {
-            public const string View = "Permissions.Products.View";
-            public const string Create = "Permissions.Products.Create";
-            public const string Edit = "Permissions.Products.Edit";
-            public const string Delete = "Permissions.Products.Delete";
+            public static string View = ModuleManager.GetModule(nameof(Products), Applicationsettings.VIEW);
+            public static string Create = ModuleManager.GetModule(nameof(Products), Applicationsettings.CREATE);
+            public static string Edit = ModuleManager.GetModule(nameof(Products), Applicationsettings.EDIT);
+            public static string Delete = ModuleManager.GetModule(nameof(Products), Applicationsettings.DELETE);
+        }
+        public static class ModuleManager
+        {
+            public static string GetModule(string module, string action)
+            {
+                return $"{Applicationsettings.PERMISSION}.{module}.{action}";
+            }
         }
     }
 }
