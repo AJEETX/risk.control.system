@@ -21,7 +21,7 @@ namespace risk.control.system.Controllers
 
             var models = new List<PermissionViewModel>();
 
-            var moduleList = new List<Type> { typeof(Permissions.Claims), typeof(Permissions.Products) };
+            var moduleList = new List<Type> { /*typeof(Permissions.Claims),*/ typeof(Permissions.Products) };
 
             var role = await _roleManager.FindByIdAsync(Id);
 
@@ -57,7 +57,7 @@ namespace risk.control.system.Controllers
             }
             return modulePermissions;
         }
-        public async Task<IActionResult> Update(PermissionViewModel model)
+        public async Task<IActionResult> Update(PermissionsViewModel model)
         {
             var role = await _roleManager.FindByIdAsync(model.RoleId);
             var claims = await _roleManager.GetClaimsAsync(role);
@@ -66,12 +66,15 @@ namespace risk.control.system.Controllers
                 await _roleManager.RemoveClaimAsync(role, claim);
             }
 
-
-            var selectedClaims = model.RoleClaims.Where(a => a.Selected).ToList();
-            foreach (var claim in selectedClaims)
+            foreach (var item in model.PermissionViewModels)
             {
-                await _roleManager.AddPermissionClaim(role, claim.Value);
+                var selectedClaims = item.RoleClaims.Where(a => a.Selected).ToList();
+                foreach (var claim in selectedClaims)
+                {
+                    await _roleManager.AddPermissionClaim(role, claim.Value);
+                }
             }
+
             return RedirectToAction("Index","Roles", new { Id = model.RoleId });
         }
     }
