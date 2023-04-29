@@ -3,106 +3,109 @@
 @{
     ViewData["Title"] = "Index";
 }
-<div>
-    <h4>Client Company</h4>
-    <form asp-action="index">
-        <div class="input-group col-5" style="padding:0px;">
-            <a class="btn btn-success" asp-action="Create"><i class="fas fa-plus"></i> Create</a>
-@*            <input autocomplete="off" name="SearchString" type="text" class="form-control" />
-            <span class="input-group-append">
+<section class="content pt-2">
+    <div class="container-fluid ">
+        <h4>Client Company</h4>
+        <form asp-action="index">
+            <div class="input-group col-5" style="padding:0px;">
+                <a class="btn btn-success" asp-action="Create"><i class="fas fa-plus"></i> Create</a>
+                @*            <input autocomplete="off" name="SearchString" type="text" class="form-control" />
+                <span class="input-group-append">
                 <button type="submit" class="btn btn-info"> <i class="fa fa-search"></i> Search...</button>
-            </span>*@
-        </div>
-    </form>
-    <br />
-    <table class="table table-striped fixed-with-height">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhoneNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Branch)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Addressline)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.City)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.State)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Country)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PinCode)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Branch)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Addressline)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.City)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.State.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Country.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PinCode.Code)
-            </td>
-                    <td>
-                        <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClientCompanyId">
-                            <i class="fa fa-search"></i> View
-                        </a> &nbsp;
-                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClientCompanyId">
-                            <i class="fas fa-pen"></i> Edit
-                        </a> &nbsp;
-                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClientCompanyId">
-                            <i class="fas fa-trash"></i> Delete
-                        </a>
-                    </td>
-        </tr>
-}
-    </tbody>
-</table>
-</div>
+                </span>*@
+            </div>
+        </form>
+        <br />
+        <table class="table table-striped fixed-with-height">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Code)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Description)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PhoneNumber)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Email)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Branch)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Addressline)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.City)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.State)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Country)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PinCode)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Code)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PhoneNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Branch)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Addressline)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.City)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.State.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Country.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PinCode.Code)
+                        </td>
+                        <td>
+                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClientCompanyId">
+                                <i class="fa fa-search"></i> View
+                            </a> &nbsp;
+                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClientCompanyId">
+                                <i class="fas fa-pen"></i> Edit
+                            </a> &nbsp;
+                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClientCompanyId">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
