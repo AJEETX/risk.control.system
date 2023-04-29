@@ -88,7 +88,7 @@ namespace risk.control.system.Controllers
                 var user = await userManager.FindByEmailAsync(portalAdmin.Email);
                 if (user == null)
                 {
-                    await userManager.CreateAsync(portalAdmin, ApplicationUserOptions.Password);
+                    await userManager.CreateAsync(portalAdmin, Applicationsettings.Password);
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.PortalAdmin.ToString());
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientAdmin.ToString());
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientCreator.ToString());
