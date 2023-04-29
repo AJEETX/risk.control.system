@@ -1,4 +1,5 @@
 ﻿@using risk.control.system.Models.ViewModel;
+@using risk.control.system.Seeds;
 @model PermissionsViewModel
 <h1>Permissions for role name : @Model.RoleName</h1>
 <br />
@@ -10,36 +11,41 @@
                 <thead>
                     <tr>
                         <th>
-                            Type
+                            Permission section
                         </th>
                         <th>
-                            Permission
+                           VIEW 
                         </th>
                         <th>
-                            Status
+                            CREATE
+                        </th>
+                        <th>
+                            EDIT
+                        </th>
+                        <th>
+                            DELETE
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach(var m in Model.PermissionViewModels)
+                    @foreach (var m in Model.PermissionViewModels)
                     {
+                        var startIndex = ApplicationOption.PERMISSION.Length + 1;
+                        var contentLength = @m.RoleClaims[0].Value.IndexOf(".", startIndex) - startIndex;
+                        var roleClaimValue = @m.RoleClaims[0]?.Value;
+                        var roleValue = roleClaimValue.Substring(startIndex, contentLength);
                         <tr>
-                                @for(var i =0;i < m.RoleClaims.Count;i++)
-                                {
-                                            <td>
-                                                <input asp-for="@m.RoleClaims[i].Type" type="hidden" />
-                                                @m.RoleClaims[i].Type
-                                            </td>
-                                            <td>
-                                                <input asp-for="@m.RoleClaims[i].Value" type="hidden" />
-                                                @m.RoleClaims[i].Value
-                                            </td>
-                                            <td>
-                                                <div class="form-check m-1">
-                                                    <input asp-for="@m.RoleClaims[i].Selected" class="form-check-input" />
-                                                </div>
-                                            </td>
-                                }
+                            <td>
+                                @roleValue
+                            </td>
+                            @for (var i = 0; i < m.RoleClaims.Count; i++)
+                            {
+                                <td>
+                                    <div class="form-check m-1">
+                                        <input asp-for="@m.RoleClaims[i].Selected" class="form-check-input" />
+                                    </div>
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>
