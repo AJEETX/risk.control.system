@@ -11,6 +11,10 @@ namespace risk.control.system.Controllers
         {
             this.webHostEnvironment = webHostEnvironment;
         }
+        public async Task<IActionResult> Index()
+        {
+            return View();
+        }
         [HttpPost]
         public async Task<IActionResult> Index(IFormFile postedFile)
         {
