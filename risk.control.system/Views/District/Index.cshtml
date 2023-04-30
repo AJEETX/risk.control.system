@@ -3,51 +3,104 @@
 @{
     ViewData["Title"] = "Index";
 }
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-header">
+                        <h3 class="card-title">District List</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.ActionLink("Name", "Index", new { sortOrder =ViewBag.NameSortParm })
+                                    </th>
+                                     <th>
+                                        @Html.ActionLink("State", "Index", new { sortOrder = ViewBag.StateSortParm })
+                                    </th>
+                                    <th>
+                                        @Html.ActionLink("Country", "Index", new { sortOrder = ViewBag.CountrySortParm })
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.State.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Country.Name)
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.DistrictId">
+                                                <i class="fa fa-search"></i> View
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.DistrictId">
+                                                <i class="fas fa-pen"></i> Edit
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.DistrictId">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <br />
+                        <br />
+                        @{
+                            var PageNumber = (int)@ViewBag.PageNumber;
 
-<h1>Index</h1>
+                            var PageSize = (int)@ViewBag.PageSize;
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.State)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Country)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.State.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Country.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.DistrictId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.DistrictId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.DistrictId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                            var TotalPages = (int)@ViewBag.TotalPages;
+
+                            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
+
+                            var ShowNext = (bool)@ViewBag.ShowNext;
+
+                            var ShowFirst = (bool)@ViewBag.ShowFirst;
+
+                            var ShowLast = (bool)@ViewBag.ShowLast;
+                        }
+                        <ul class="pagination">
+                            <li class="page-item @(!ShowFirst? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
+                                    <i class="fas fa-fast-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item @(!ShowPrevious? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
+                                    <i class="fas fa-step-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item  @(!ShowNext? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
+                                    <i class="fas fa-step-forward"></i>
+                                </a>
+                            </li>
+
+                            <li class="page-item  @(!ShowLast? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
+                                    <i class="fas fa-fast-forward"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

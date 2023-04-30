@@ -70,15 +70,28 @@ namespace risk.control.system.Controllers
             return Json(states);
         }
 
-        [HttpPost, ActionName("GetPinCodesByStateId")]
-        public async Task<JsonResult> GetPinCodesByStateId(string stateId) {
+        [HttpPost, ActionName("GetDistrictByStateId")]
+        public async Task<JsonResult> GetDistrictByStateId(string stateId) {
             string sId;
-            var pinCodes = new List <PinCode> ();
+            var districts = new List <District> ();
             if (!string.IsNullOrEmpty(stateId)) {
                 sId = stateId;
-                pinCodes = await context.PinCode.Where(s => s.StateId.Equals(sId)).ToListAsync();
+                districts = await context.District.Where(s => s.State.StateId.Equals(sId)).ToListAsync();
             }
-            return Json(pinCodes);
+            return Json(districts);
+        }
+
+        [HttpPost, ActionName("GetPinCodesByDistrictId")]
+        public async Task<JsonResult> GetPinCodesByDistrictId(string districtId)
+        {
+            string sId;
+            var pincodes = new List<PinCode>();
+            if (!string.IsNullOrEmpty(districtId))
+            {
+                sId = districtId;
+                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
+            }
+            return Json(pincodes);
         }
 
         [HttpPost]

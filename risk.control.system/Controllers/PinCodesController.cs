@@ -65,6 +65,7 @@ namespace risk.control.system.Controllers
             ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
 
             var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             return View(applicationDbContextResult);
         }
