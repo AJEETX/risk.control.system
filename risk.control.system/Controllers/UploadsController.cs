@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using risk.control.system.Models.ViewModel;
 using System.Data;
+using System.Globalization;
+using CsvHelper;
 
 namespace risk.control.system.Controllers
 {
@@ -32,6 +35,7 @@ namespace risk.control.system.Controllers
                 {
                     postedFile.CopyTo(stream);
                 }
+
                 string csvData = await System.IO.File.ReadAllTextAsync(filePath);
                 DataTable dt = new DataTable();
                 bool firstRow = true;
@@ -63,7 +67,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 
-                return View(dt);
+                return View(new PinCodeDetails { DataTable = dt });
             }
             return Problem();
         }

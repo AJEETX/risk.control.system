@@ -1,23 +1,25 @@
-﻿@{
-    ViewData["Title"] = "Category List";
+﻿@using System.Data;
+@model risk.control.system.Models.ViewModel.PinCodeDetails
+
+@{
+    ViewData["Title"] = "Pincode List";
 }
 
 <section class="content pt-2">
     <div class="container-fluid">
-        <div class="row">
+        <form asp-controller="Uploads" asp-action="Index" method="post" enctype="multipart/form-data">
+            <div class="row">
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title">Search</h3>
+                        <h3 class="card-title">Upload</h3>
                     </div>
                     <div class="card-body dataTable-search-form">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <form asp-controller="Product" asp-action="Upload" method="post" enctype="multipart/form-data">
                                         <div style="display: inline-block;">  <input type="file" name="postedFile" /></div>
-                                        <div style="display: inline-block;"> <input type="submit" class="btn btn-danger" value="Bulk upload cases" /></div>
-                                    </form>
+                                        <div style="display: inline-block;"> <input type="submit" class="btn btn-danger" value="upload pincodes" /></div>
                                 </div>
                             </div>
                             <div class="col-md-6 text-right">
@@ -30,5 +32,39 @@
                 </div>
             </div>
         </div>
-</div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Pincode List</h3>
+                    </div>
+                    <div class="card-body">
+                        @if (Model?.DataTable != null)
+                        {
+                            <hr />
+                                <table class="table table-striped  fixed-with-height">
+                                <tr>
+                                    @foreach (DataColumn dc in Model.DataTable.Columns)
+                                    {
+                                        <th>@dc.ColumnName</th>
+                                    }
+                                </tr>
+                                @foreach (DataRow dr in Model.DataTable.Rows)
+                                {
+                                    <tr>
+                                        @foreach (DataColumn dc in Model.DataTable.Columns)
+                                        {
+                                            <td>@dr[dc.ColumnName]</td>
+                                        }
+                                    </tr>
+                                }
+                            </table>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
 </section>
