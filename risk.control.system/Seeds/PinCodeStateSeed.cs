@@ -10,7 +10,7 @@ namespace risk.control.system.Seeds
 {
     public static class PinCodeStateSeed
     {
-        private static string stateWisePincodeFilePath = @"pincode-dataset.csv";
+        private static string stateWisePincodeFilePath = @"pincode-sample.csv";
         public static async Task SeedPincode(ApplicationDbContext context, Country country)
         {
 
@@ -20,16 +20,22 @@ namespace risk.control.system.Seeds
             var states = pincodes.GroupBy(g => g.State);
             foreach (var state in states)
             {
+                var recordState = new State { Code = state.Key, Name = state.Key, CountryId = country.CountryId };
+                var stateAdded = await context.State.AddAsync(recordState);
+
+                var districts = state.GroupBy(g => g.District);
+
                 var pinCodeList = new List<PinCode> { };
+                foreach (var district in districts)
                 {
-                    var recordState = new State { Code = state.Key, Name = state.Key, Country = country };
-                    var stateAdded = await context.State.AddAsync(recordState);
-                    foreach (var pincode in state)
+                    var districtDetail = new District {  Code = district.Key, Name = district.Key, StateId = stateAdded.Entity.StateId, CountryId = country.CountryId };
+                    var districtAdded = await context.District.AddAsync(districtDetail);
+                    foreach (var pinCode in district)
                     {
                         var pincodeState = new PinCode
                         {
-                            Name = pincode.Name,
-                            Code = pincode.Code,
+                            Name = pinCode.Code,
+                            DistrictId = districtAdded.Entity.DistrictId,
                             StateId = stateAdded.Entity.StateId,
                             CountryId = country.CountryId,
                         };
@@ -38,9 +44,6 @@ namespace risk.control.system.Seeds
                 }
                 await context.PinCode.AddRangeAsync(pinCodeList);
             }
-
-
-
         }
         private static async Task<List<PinCodeState>> CsvRead()
         {
@@ -63,9 +66,9 @@ namespace risk.control.system.Seeds
                             var rowData = row.Split(',');
                             var pincodeState = new PinCodeState
                             {
-                                Name = rowData[1],
                                 Code = rowData[0],
-                                State = rowData[2]
+                                District = rowData[1],
+                                State = rowData[2].Substring(0, rowData[2].Length - 1)
                             };
                             pincodes.Add(pincodeState);
                         }

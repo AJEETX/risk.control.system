@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.Data;
@@ -22,8 +18,9 @@ namespace risk.control.system.Controllers
         // GET: PinCodes
         public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
-            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.CodeSortParm = String.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.DistrictSortParm = string.IsNullOrEmpty(sortOrder) ? "district_desc" : "";
+            ViewBag.StateSortParm = string.IsNullOrEmpty(sortOrder) ? "state_desc" : "";
             if (searchString != null)
             {
                 currentPage = 1;
@@ -35,11 +32,11 @@ namespace risk.control.system.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var applicationDbContext = _context.PinCode.Include(p => p.Country).Include(p => p.State).AsQueryable();
-            if (!String.IsNullOrEmpty(searchString))
+            var applicationDbContext = _context.PinCode.Include(p => p.Country).Include(p => p.District).Include(p => p.State).AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
             {
                 applicationDbContext = applicationDbContext.Where(a =>
-                a.Code.ToLower().Contains(searchString.Trim().ToLower()) ||
+                a.District.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
                 a.Name.ToLower().Contains(searchString.Trim().ToLower()));
             }
 
@@ -48,11 +45,14 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
-                case "code_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
+                case "district_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.District.Name);
+                    break;
+                case "state_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.State.Name);
                     break;
                 default: 
-                    applicationDbContext .OrderByDescending(s => s.Code);
+                    applicationDbContext .OrderByDescending(s => s.State.Name);
                     break;
             }
             int pageNumber = (currentPage ?? 1);
@@ -80,6 +80,7 @@ namespace risk.control.system.Controllers
             var pinCode = await _context.PinCode
                 .Include(p => p.Country)
                 .Include(p => p.State)
+                .Include(p => p.District)
                 .FirstOrDefaultAsync(m => m.PinCodeId == id);
             if (pinCode == null)
             {
@@ -123,6 +124,7 @@ namespace risk.control.system.Controllers
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", pinCode.CountryId);
             ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == pinCode.CountryId ), "StateId", "Name", pinCode?.StateId);
+            ViewData["DistrictId"] = new SelectList(_context.District.Where(s => s.StateId == pinCode.StateId ), "DistrictId", "Name", pinCode?.DistrictId);
             return View(pinCode);
         }
 
@@ -164,9 +166,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var pinCode = await _context.PinCode
-                .Include(p => p.Country)
-                .Include(p => p.State)
+            var pinCode = await _context.PinCode.Include(p => p.Country).Include(p => p.State).Include(p => p.District)
                 .FirstOrDefaultAsync(m => m.PinCodeId == id);
             if (pinCode == null)
             {

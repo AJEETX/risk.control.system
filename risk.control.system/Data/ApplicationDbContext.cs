@@ -23,6 +23,7 @@ namespace risk.control.system.Data
         public virtual DbSet<InvestigationCaseStatus> InvestigationCaseStatus { get; set; }
         public virtual DbSet<Country> Country { get; set; }
         public virtual DbSet<State> State { get; set; }
+        public virtual DbSet<District> District { get; set; }
         public virtual DbSet<PinCode> PinCode { get; set; }
         public virtual DbSet<ClientCompany> ClientCompany { get; set; }
         public virtual DbSet<InvestigationServiceType> InvestigationServiceType { get; set; }

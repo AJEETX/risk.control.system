@@ -46,8 +46,7 @@ namespace risk.control.system.Seeds
             };
             var indiaCountry = await context.Country.AddAsync(india);
 
-            var currentPinCode = "110001";
-            var currentState = "Delhi";
+
             await PinCodeStateSeed.SeedPincode(context, indiaCountry.Entity);
 
             #region COUNTRY STATE PINCODE
@@ -542,10 +541,12 @@ namespace risk.control.system.Seeds
 
             #region CLIENT/ VENDOR COMPANY
             //CREATE CLIENT COMPANY
-
+            var currentPinCode = "110001";
+            var currentDistrict = "New Delhi";
+            var currentState = "Delhi";
             try
             {
-                var state = context.State.FirstOrDefault(s => s.Code.StartsWith(currentPinCode));
+                var state = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode);
             }
             catch (Exception ex)
             {
@@ -560,12 +561,9 @@ namespace risk.control.system.Seeds
                 Branch = "FOREST HILL CHASE",
                 City = "FOREST HILL",
                 Code = "TA001",
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 Description = "CORPORATE OFFICE ",
                 Email = "tata-aig@mail.com",
                 PhoneNumber = "(03) 88004739",
@@ -582,7 +580,7 @@ namespace risk.control.system.Seeds
                     { 
                         new ServicedPinCode 
                         { 
-                            Pincode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).Code 
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).Name
                         } 
                     } 
                 }
@@ -595,12 +593,9 @@ namespace risk.control.system.Seeds
                 Branch = "MAHATTAN",
                 City = "FOREST HILL",
                 Code = "VA001",
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = "abc@vendor.com",
                 PhoneNumber = "(04) 123 234",
@@ -625,12 +620,9 @@ namespace risk.control.system.Seeds
                 Password = Applicationsettings.Password,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/superadmin.jpg"
             };
             if (userManager.Users.All(u => u.Id != portalAdmin.Id))
@@ -692,12 +684,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/admin.png"
             };
             if (userManager.Users.All(u => u.Id != clientAdmin.Id))
@@ -727,12 +716,9 @@ namespace risk.control.system.Seeds
                 Password = Applicationsettings.Password,
                 PhoneNumberConfirmed = true,
                 isSuperAdmin = true,
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/creator.jpg"
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
@@ -756,12 +742,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/assigner.png"
             };
             if (userManager.Users.All(u => u.Id != clientAssigner.Id))
@@ -785,12 +768,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/assessor.png"
             };
             if (userManager.Users.All(u => u.Id != clientAssessor.Id))
@@ -814,12 +794,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/vendor-admin.png"
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
@@ -845,12 +822,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/supervisor.png"
             };
             if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
@@ -875,12 +849,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
-                Country = indiaCountry.Entity,
                 CountryId = indiaCountry.Entity.CountryId,
-                State = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)),
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
-                PinCode = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode),
-                PinCodeId = context.PinCode.FirstOrDefault(s => (s.StateId == context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId) && s.Code == currentPinCode).PinCodeId,
+                StateId = context.State.FirstOrDefault(s => s.Name.StartsWith(currentState)).StateId,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Name == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/agent.jpg"
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))

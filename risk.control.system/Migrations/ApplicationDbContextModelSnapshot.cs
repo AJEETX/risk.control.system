@@ -116,43 +116,6 @@ namespace risk.control.system.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("risk.control.system.Models.Address", b =>
-                {
-                    b.Property<string>("AddressId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Addressline")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Branch")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CountryId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PinCodeId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("StateId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("AddressId");
-
-                    b.HasIndex("CountryId");
-
-                    b.HasIndex("PinCodeId");
-
-                    b.HasIndex("StateId");
-
-                    b.ToTable("Address");
-                });
-
             modelBuilder.Entity("risk.control.system.Models.ApplicationRole", b =>
                 {
                     b.Property<Guid>("Id")
@@ -414,6 +377,37 @@ namespace risk.control.system.Migrations
                     b.ToTable("Country");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.District", b =>
+                {
+                    b.Property<string>("DistrictId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CountryId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StateId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("DistrictId");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("StateId");
+
+                    b.ToTable("District");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.InvestigationCase", b =>
                 {
                     b.Property<string>("InvestigationId")
@@ -534,11 +528,11 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Code")
+                    b.Property<string>("CountryId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CountryId")
+                    b.Property<string>("DistrictId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -553,6 +547,8 @@ namespace risk.control.system.Migrations
                     b.HasKey("PinCodeId");
 
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("DistrictId");
 
                     b.HasIndex("StateId");
 
@@ -756,27 +752,6 @@ namespace risk.control.system.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("risk.control.system.Models.Address", b =>
-                {
-                    b.HasOne("risk.control.system.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId");
-
-                    b.HasOne("risk.control.system.Models.PinCode", "PinCode")
-                        .WithMany()
-                        .HasForeignKey("PinCodeId");
-
-                    b.HasOne("risk.control.system.Models.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId");
-
-                    b.Navigation("Country");
-
-                    b.Navigation("PinCode");
-
-                    b.Navigation("State");
-                });
-
             modelBuilder.Entity("risk.control.system.Models.ApplicationUser", b =>
                 {
                     b.HasOne("risk.control.system.Models.Country", "Country")
@@ -844,6 +819,25 @@ namespace risk.control.system.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.District", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+
+                    b.Navigation("State");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.InvestigationCase", b =>
                 {
                     b.HasOne("risk.control.system.Models.InvestigationCaseStatus", "InvestigationCaseStatus")
@@ -894,6 +888,12 @@ namespace risk.control.system.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("risk.control.system.Models.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("risk.control.system.Models.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId")
@@ -901,6 +901,8 @@ namespace risk.control.system.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+
+                    b.Navigation("District");
 
                     b.Navigation("State");
                 });

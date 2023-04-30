@@ -1,18 +1,17 @@
-﻿@model risk.control.system.Models.PinCode
+﻿@model risk.control.system.Models.District
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Create";
 }
 
-<h1>Edit</h1>
+<h1>Create</h1>
 
-<h4>PinCode</h4>
+<h4>District</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="PinCodeId" />
             <div class="form-group">
                 <label asp-for="CountryId" class="control-label"></label>
                 <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
@@ -33,13 +32,12 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="District" class="control-label"></label>
-                <input asp-for="District" class="form-control" />
-                <span asp-validation-for="District" class="text-danger"></span>
+                <label asp-for="Code" class="control-label"></label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a> &nbsp;
-                <button type="submit" class="btn btn-warning"> <i class="fas fa-pen"></i> Edit</button>
+                <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>

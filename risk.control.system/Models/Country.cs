@@ -31,6 +31,29 @@ public class State
     [Display(Name = "Country name")]
     public Country Country { get; set; }
 }
+
+public class District
+{
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public string DistrictId { get; set; } = Guid.NewGuid().ToString();
+    [Display(Name = "District name")]
+    public string Name { get; set; }
+    [Display(Name = "District code")]
+    [Required]
+    public string Code { get; set; }
+    [Required]
+    [Display(Name = "State name")]
+    public string StateId { get; set; }
+    [Display(Name = "State name")]
+    public State State { get; set; }
+    [Required]
+    [Display(Name = "Country name")]
+    public string CountryId { get; set; }
+    [Display(Name = "Country name")]
+    public Country Country { get; set; }
+}
+
 public class PinCode
 {
     [Key]
@@ -38,9 +61,11 @@ public class PinCode
     public string PinCodeId { get; set; } = Guid.NewGuid().ToString();
     [Display(Name = "PinCode name")]
     public string Name { get; set; }
-    [Display(Name = "PinCode")]
+    [Display(Name = "District")]
+    public string DistrictId { get; set; }
+    [Display(Name = "District")]
     [Required]
-    public string Code { get; set; }      
+    public District District { get; set; }      
     [Required]
     [Display(Name = "State name")]
     public  string StateId { get; set; }
