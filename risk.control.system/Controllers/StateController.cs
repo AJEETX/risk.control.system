@@ -21,11 +21,56 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
+            ViewBag.CountrySortParm = String.IsNullOrEmpty(sortOrder) ? "country_desc" : "";
+            ViewBag.StateSortParm = sortOrder == "State" ? "state_desc" : "State";
+            if (searchString != null)
+            {
+                currentPage = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+            var states = _context.State.Include(s => s.Country).AsQueryable();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                states = states.Where(s =>
+                 s.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
+                 s.Country.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
+                 s.Code.ToLower().Contains(searchString.Trim().ToLower())
+                 );
+            }
+
+            switch (sortOrder)
+            {
+                case "country_desc":
+                    states = states.OrderByDescending(s => s.Country.Name);
+                    break;
+                case "state_desc":
+                    states = states.OrderBy(s => s.Name);
+                    break;
+                default:
+                    states = states.OrderBy(s => s.Name);
+                    break;
+            }
+            int pageNumber = (currentPage ?? 1);
+            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(states.Count(), pageSize));
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.ShowPrevious = pageNumber > 1;
+            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(states.Count(), pageSize));
+            ViewBag.ShowFirst = pageNumber != 1;
+            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(states.Count(), pageSize));
+
+            var statesResult = await states.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             return _context.State != null ?
-                        View(await _context.State.Include(s => s.Country).ToListAsync()) :
+                        View(statesResult) :
                         Problem("Entity set 'ApplicationDbContext.State'  is null.");
         }
 

@@ -4,7 +4,7 @@
     <div id="viewAll" class="card-body table-responsive">
     <h4>Manage State</h4>
     <form method="post" action="State/create"  asp-antiforgery="true">
-        <div class="input-group col-8" style="padding:0px;">
+        <div class="input-group col-5" style="padding:0px;">
             <select name="CountryId"  class="form-control" asp-items="ViewBag.CountryId">
                                     <option>
                                        --- SELECT COUNTRY ---
@@ -16,12 +16,21 @@
             </span>
         </div>
     </form>
+        <form asp-action="index">
+            <div class="input-group col-5" style="padding:0px;">
+                <input autocomplete="off" name="SearchString" type="text" class="form-control" />
+                <span class="input-group-append">
+                    <button type="submit" class="btn btn-info"> <i class="fa fa-search"></i> Search...</button>
+                </span>
+            </div>
+        </form>
     <br />
-    <table class="table table-striped">
+        <table class="table table-striped  fixed-with-height">
         <thead>
             <tr>
-                <th>Country name</th>
-                <th>State name</th>
+                    <th>@Html.ActionLink("Country name", "Index", new { sortOrder = ViewBag.CountrySortParm })</th>
+                    
+                    <th>@Html.ActionLink("State name", "Index", new { sortOrder = ViewBag.StateSortParm })</th>
             </tr>
         </thead>
         <tbody>
@@ -40,5 +49,44 @@
 
         </tbody>
     </table>
+        <br />
+        @{
+            var PageNumber = (int)@ViewBag.PageNumber;
+
+            var PageSize = (int)@ViewBag.PageSize;
+
+            var TotalPages = (int)@ViewBag.TotalPages;
+
+            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
+
+            var ShowNext = (bool)@ViewBag.ShowNext;
+
+            var ShowFirst = (bool)@ViewBag.ShowFirst;
+
+            var ShowLast = (bool)@ViewBag.ShowLast;
+        }
+        <ul class="pagination">
+            <li class="page-item @(!ShowFirst? "disabled":"")">
+                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
+                    <i class="fas fa-fast-backward"></i>
+                </a>
+            </li>
+            <li class="page-item @(!ShowPrevious? "disabled":"")">
+                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
+                    <i class="fas fa-step-backward"></i>
+                </a>
+            </li>
+            <li class="page-item  @(!ShowNext? "disabled":"")">
+                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
+                    <i class="fas fa-step-forward"></i>
+                </a>
+            </li>
+
+            <li class="page-item  @(!ShowLast? "disabled":"")">
+                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
+                    <i class="fas fa-fast-forward"></i>
+                </a>
+            </li>
+        </ul>
     </div>
 </div>

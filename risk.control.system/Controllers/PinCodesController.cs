@@ -20,10 +20,53 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
-            var applicationDbContext = _context.PinCode.Include(p => p.Country).Include(p => p.State);
-            return View(await applicationDbContext.ToListAsync());
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.CodeSortParm = String.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
+            if (searchString != null)
+            {
+                currentPage = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var applicationDbContext = _context.PinCode.Include(p => p.Country).Include(p => p.State).AsQueryable();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                applicationDbContext = applicationDbContext.Where(a =>
+                a.Code.ToLower().Contains(searchString.Trim().ToLower()) ||
+                a.Name.ToLower().Contains(searchString.Trim().ToLower()));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+                case "code_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
+                    break;
+                default: 
+                    applicationDbContext .OrderByDescending(s => s.Code);
+                    break;
+            }
+            int pageNumber = (currentPage ?? 1);
+            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.ShowPrevious = pageNumber > 1;
+            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.ShowFirst = pageNumber != 1;
+            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+
+            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return View(applicationDbContextResult);
         }
 
         // GET: PinCodes/Details/5
