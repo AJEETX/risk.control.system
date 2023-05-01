@@ -1,5 +1,4 @@
-﻿using Microsoft.Identity.Client;
-using risk.control.system.Seeds;
+﻿using risk.control.system.Seeds;
 
 namespace risk.control.system.Helpers
 {
@@ -16,19 +15,19 @@ namespace risk.control.system.Helpers
             };
         }
 
-        public static class Products
+        public static class Underwriting
         {
-            public static string View = ModuleManager.GetModule(nameof(Products), Applicationsettings.VIEW);
-            public static string Create = ModuleManager.GetModule(nameof(Products), Applicationsettings.CREATE);
-            public static string Edit = ModuleManager.GetModule(nameof(Products), Applicationsettings.EDIT);
-            public static string Delete = ModuleManager.GetModule(nameof(Products), Applicationsettings.DELETE);
+            public static string View = ModuleManager.GetModule(nameof(Underwriting), Applicationsettings.VIEW);
+            public static string Create = ModuleManager.GetModule(nameof(Underwriting), Applicationsettings.CREATE);
+            public static string Edit = ModuleManager.GetModule(nameof(Underwriting), Applicationsettings.EDIT);
+            public static string Delete = ModuleManager.GetModule(nameof(Underwriting), Applicationsettings.DELETE);
         }
-        public static class CaseClaims
+        public static class Claim
         {
-            public static string View = ModuleManager.GetModule(nameof(CaseClaims), Applicationsettings.VIEW);
-            public static string Create = ModuleManager.GetModule(nameof(CaseClaims), Applicationsettings.CREATE);
-            public static string Edit = ModuleManager.GetModule(nameof(CaseClaims), Applicationsettings.EDIT);
-            public static string Delete = ModuleManager.GetModule(nameof(CaseClaims), Applicationsettings.DELETE);
+            public static string View = ModuleManager.GetModule(nameof(Claim), Applicationsettings.VIEW);
+            public static string Create = ModuleManager.GetModule(nameof(Claim), Applicationsettings.CREATE);
+            public static string Edit = ModuleManager.GetModule(nameof(Claim), Applicationsettings.EDIT);
+            public static string Delete = ModuleManager.GetModule(nameof(Claim), Applicationsettings.DELETE);
         }
         public static class ModuleManager
         {

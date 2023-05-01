@@ -4,21 +4,21 @@
 
 <div class="card">
     <div id="viewAll" class="card-body table-responsive">
-<h4>product permission</h4>
+<h4>underwriting permission</h4>
 <br />
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Products.Create)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Underwriting.Create)).Result.Succeeded)
 {
     <button class="btn btn-success">Create</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Products.View)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Underwriting.View)).Result.Succeeded)
 {
     <button class="btn btn-info">View</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Products.Edit)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Underwriting.Edit)).Result.Succeeded)
 {
     <button class="btn btn-warning">Modify</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Products.Delete)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Underwriting.Delete)).Result.Succeeded)
 {
     <button class="btn btn-danger">Delete</button>
 }

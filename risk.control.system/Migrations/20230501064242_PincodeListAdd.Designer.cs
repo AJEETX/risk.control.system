@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230501000830_PincodeListAdd")]
+    [Migration("20230501064242_PincodeListAdd")]
     partial class PincodeListAdd
     {
         /// <inheritdoc />

@@ -2,7 +2,7 @@
 
 namespace risk.web.MVC.Controllers
 {
-public class ClaimsController : Controller
+public class UnderwritingController : Controller
 {
     public IActionResult Index()
     {

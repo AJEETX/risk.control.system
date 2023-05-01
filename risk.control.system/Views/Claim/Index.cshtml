@@ -4,21 +4,21 @@
 
 <div class="card">
     <div id="viewAll" class="card-body table-responsive">
-<h4>claims permissions</h4>
+<h4>claim permissions</h4>
 <br />
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.Create)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Claim.Create)).Result.Succeeded)
 {
     <button class="btn btn-success">Create</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.View)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Claim.View)).Result.Succeeded)
 {
     <button class="btn btn-info">View</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.Edit)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Claim.Edit)).Result.Succeeded)
 {
     <button class="btn btn-warning">Modify</button>
 }
-@if ((AuthorizationService.AuthorizeAsync(User, Permissions.CaseClaims.Delete)).Result.Succeeded)
+@if ((AuthorizationService.AuthorizeAsync(User, Permissions.Claim.Delete)).Result.Succeeded)
 {
     <button class="btn btn-danger">Delete</button>
 }

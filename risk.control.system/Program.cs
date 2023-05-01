@@ -13,7 +13,7 @@ builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite("Data Source=risk-contro-unit.db"));
+                options.UseSqlite("Data Source=risk-control-unit.db"));
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
@@ -46,13 +46,16 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Home/Error");
+//    app.UseHsts();
+//}
 app.UseHttpsRedirection();
-await DatabaseSeed.SeedDatabase(app);
+if(app.Environment.IsDevelopment())
+{
+    await DatabaseSeed.SeedDatabase(app);
+}
 app.UseStaticFiles();
 
 app.UseRouting();

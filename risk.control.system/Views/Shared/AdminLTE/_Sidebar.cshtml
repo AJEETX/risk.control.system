@@ -114,7 +114,7 @@
                 @{
                     if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
                         {
-                        <li class="nav-header"><i class="fa fa-unlock"></i> SETTINGS</li>
+                        <li class="nav-header"><i class="fa fa-unlock"></i> USER / ROLES</li>
                         <li class="nav-item">
                             <a is-active-page asp-area="" asp-controller="User" asp-action="Index" class="nav-link">
                                 <i class="nav-icon fas fa-user-lock"></i>
@@ -131,22 +131,26 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-header"><i class="fa fa-unlock"></i> ROLE ACCESS</li>
+
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="Claims" asp-action="Index" class="nav-link">
-                                <i class="nav-icon fas fa-user-lock"></i>
+                            <a is-active-page asp-area="" asp-controller="Claim" asp-action="Index" class="nav-link">
+                                <i class="fas fa-rupee-sign"></i>
                                 <p>
-                                    claims
+                                    claim
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="Product" asp-action="Index" class="nav-link">
-                                <i class="nav-icon fas fa-user-lock"></i>
+                            <a is-active-page asp-area="" asp-controller="Underwriting" asp-action="Index" class="nav-link">
+                                <i class="fas fa-rupee-sign"></i>
                                 <p>
-                                     products
+                                     underwriting
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-header"><i class="fa fa-unlock"></i> SETTINGS</li>
+
                         <li class="nav-item">
                             <a is-active-page asp-area="" asp-controller="ClientCompany" asp-action="Index" class="nav-link">
                                 <i class="nav-icon fas fa-user-lock"></i>
@@ -159,7 +163,7 @@
                             <a is-active-page asp-area="" asp-controller="Vendors" asp-action="Index" class="nav-link">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
-                                    vendors
+                                    vendor
                                 </p>
                             </a>
                         </li>

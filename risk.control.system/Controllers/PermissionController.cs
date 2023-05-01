@@ -21,7 +21,7 @@ namespace risk.control.system.Controllers
 
             var models = new List<PermissionViewModel>();
 
-            var moduleList = new List<Type> { typeof(Permissions.CaseClaims), typeof(Permissions.Products) };
+            var moduleList = new List<Type> { typeof(Permissions.Claim), typeof(Permissions.Underwriting) };
 
             var role = await _roleManager.FindByIdAsync(Id);
 

@@ -9,6 +9,7 @@ using risk.control.system.Models.ViewModel;
 using CsvHelper.Configuration;
 using System.Globalization;
 using CsvHelper;
+using Claim = System.Security.Claims.Claim;
 
 namespace risk.control.system.Seeds
 {
@@ -648,16 +649,7 @@ namespace risk.control.system.Seeds
 
                 //ADD PERMISSIONS
 
-                //var allPermissions = Permissions.GeneratePermissionsForModule(nameof(Permissions.Products));
-                //foreach (var permission in allPermissions)
-                //{
-                //    if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == permission))
-                //    {
-                //        await roleManager.AddClaimAsync(adminRole, new Claim(Applicationsettings.PERMISSION, permission));
-                //    }
-                //}
-
-                var moduleList = new List<string> { nameof(Products), nameof(CaseClaims) };
+                var moduleList = new List<string> { nameof(Underwriting), nameof(Claim) };
 
                 foreach (var module in moduleList)
                 {
@@ -667,7 +659,7 @@ namespace risk.control.system.Seeds
                     {
                         if (!allClaims.Any(a => a.Type == Applicationsettings.PERMISSION && a.Value == modulePermission))
                         {
-                            await roleManager.AddClaimAsync(adminRole, new Claim(Applicationsettings.PERMISSION, modulePermission));
+                            await roleManager.AddClaimAsync(adminRole, new System.Security.Claims.Claim(Applicationsettings.PERMISSION, modulePermission));
                         }
                     }
                 }
