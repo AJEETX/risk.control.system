@@ -3,39 +3,49 @@
 @{
     ViewData["Title"] = "Edit";
 }
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-header">
+                        <h3 class="card-title">Add service type</h3>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Edit">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="InvestigationServiceTypeId" />
+                            <div class="form-group">
+                                <label asp-for="LineOfBusinessId" class="control-label"></label>
+                                <select asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId"></select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label"></label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Code" class="control-label"></label>
+                                <input asp-for="Code" class="form-control" />
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
 
-<h1>Edit</h1>
-
-<h4>InvestigationServiceType</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="InvestigationServiceTypeId" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                            <div class="card-footer text-right">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fa fa-window-close"></i>
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Edit
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Code" class="control-label"></label>
-                <input asp-for="Code" class="form-control" />
-                <span asp-validation-for="Code" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LineOfBusinessId" class="control-label"></label>
-                <select asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId"></select>
-                <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a> &nbsp;
-                <button type="submit" class="btn btn-warning"> <i class="fas fa-pen"></i> Edit</button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
+</section>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

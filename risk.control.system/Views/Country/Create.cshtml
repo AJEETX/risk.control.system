@@ -1,7 +1,6 @@
-﻿@model risk.control.system.Models.LineOfBusiness
-
+﻿@model risk.control.system.Models.Country
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Create";
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -9,12 +8,11 @@
             <div class="col-12">
                 <div class="card card-light">
                     <div class="card-header">
-                        <h3 class="card-title">Edit line of business</h3>
+                        <h3 class="card-title">Add country</h3>
                     </div>
                     <div class="card-body">
                         <form asp-action="Create">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="hidden" asp-for="LineOfBusinessId" />
                             <div class="form-group">
                                 <label asp-for="Name" class="control-label"></label>
                                 <input asp-for="Name" class="form-control" />
@@ -25,19 +23,9 @@
                                 <input asp-for="Code" class="form-control" />
                                 <span asp-validation-for="Code" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
-                                <label asp-for="Created" class="control-label"></label>
-                                <input asp-for="Created" class="form-control" />
-                                <span asp-validation-for="Created" class="text-danger"></span>
-                            </div>
                             <div class="card-footer text-right">
-                                <a asp-action="Index" class="btn btn-secondary">
-                                    <i class="fa fa-window-close"></i>
-                                    Cancel
-                                </a>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-plus"></i> Edit
-                                </button>
+                                <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a> &nbsp;
+                                <button type="submit" class="btn btn-warning"> <i class="fas fa-pen"></i> Create</button>
                             </div>
                         </form>
                     </div>
@@ -46,7 +34,6 @@
         </div>
     </div>
 </section>
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

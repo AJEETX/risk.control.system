@@ -89,14 +89,15 @@ namespace risk.control.system.Controllers
 
             return View(country);
         }
-
+        public IActionResult Create()
+        {
+            return View();
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string countryName, string countryCode)
+        public async Task<IActionResult> Create(Country country)
         {
-            _context.Add(new Country { 
-                Name = countryName.Trim().ToUpper(),
-                Code = countryCode.Trim().ToUpper()} );
+            _context.Add(country );
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
