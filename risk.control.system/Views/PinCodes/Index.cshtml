@@ -16,7 +16,7 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter pincode or pincode name">
+                                        <input autocomplete="off" name="searchString" type="text" class="form-control" placeholder="enter pincode or pincode name">
                                     </div>
                                 </div>
                             </div>
@@ -39,7 +39,7 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        @Html.ActionLink("Pincode", "Index", new { sortOrder =ViewBag.NameSortParm })
+                                        @Html.ActionLink("Pincode", "Index", new { sortOrder =ViewBag.CodeSortParm })
                                     </th>
                                     <th>
                                         @Html.ActionLink("Pincode name", "Index", new { sortOrder =ViewBag.NameSortParm })

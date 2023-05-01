@@ -40,6 +40,8 @@ namespace risk.control.system.Controllers
             if (!string.IsNullOrEmpty(searchString))
             {
                 applicationDbContext = applicationDbContext.Where(a =>
+                a.Code.ToLower().Contains(searchString.Trim().ToLower()) ||
+                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
                 a.State.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
                 a.Country.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
                 a.Name.ToLower().Contains(searchString.Trim().ToLower()));

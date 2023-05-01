@@ -18,6 +18,7 @@ namespace risk.control.system.Controllers
         // GET: PinCodes
         public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
+            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewBag.DistrictSortParm = string.IsNullOrEmpty(sortOrder) ? "district_desc" : "";
             ViewBag.StateSortParm = string.IsNullOrEmpty(sortOrder) ? "state_desc" : "";
@@ -36,12 +37,17 @@ namespace risk.control.system.Controllers
             if (!string.IsNullOrEmpty(searchString))
             {
                 applicationDbContext = applicationDbContext.Where(a =>
+                a.Code.ToLower().Contains(searchString.Trim().ToLower()) ||
+                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
                 a.District.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
                 a.Name.ToLower().Contains(searchString.Trim().ToLower()));
             }
 
             switch (sortOrder)
             {
+                case "code_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
+                    break;
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;

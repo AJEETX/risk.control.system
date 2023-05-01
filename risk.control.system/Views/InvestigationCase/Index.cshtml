@@ -11,12 +11,12 @@
                     <div class="card-header">
                         <h3 class="card-title">investigation case</h3>
                     </div>
-                    <form method="post" action="roles/create" asp-antiforgery="true">
+                    <form asp-action="index">
                         <div class="card-body dataTable-search-form">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <input autocomplete="off" name="roleCode" type="text" class="form-control" placeholder="enter role code or role name">
+                                        <input autocomplete="off" name="searchString" type="text" class="form-control" placeholder="enter investigation case name or any detail">
                                     </div>
                                 </div>
                             </div>
