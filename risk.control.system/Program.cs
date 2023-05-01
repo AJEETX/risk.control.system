@@ -46,16 +46,15 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Home/Error");
-//    app.UseHsts();
-//}
-app.UseHttpsRedirection();
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    await DatabaseSeed.SeedDatabase(app);
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
+app.UseHttpsRedirection();
+
+await DatabaseSeed.SeedDatabase(app);
+
 app.UseStaticFiles();
 
 app.UseRouting();
