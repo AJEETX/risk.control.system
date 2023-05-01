@@ -8,8 +8,10 @@ namespace risk.control.system.Models.ViewModel
     }
     public class PinCodeState
     {
+        public string Name { get; set; }
         public string Code { get; set; }
         public string District { get; set; }
-        public string State { get; set; }
+        public string StateName { get; set; }
+        public string StateCode { get; set; }
     }
 }

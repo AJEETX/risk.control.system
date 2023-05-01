@@ -61,6 +61,8 @@ public class PinCode
     public string PinCodeId { get; set; } = Guid.NewGuid().ToString();
     [Display(Name = "PinCode name")]
     public string Name { get; set; }
+    [Display(Name = "PinCode")]
+    public string Code { get; set; }
     [Display(Name = "District")]
     public string DistrictId { get; set; }
     [Display(Name = "District")]

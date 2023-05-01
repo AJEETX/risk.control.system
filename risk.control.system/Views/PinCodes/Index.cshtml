@@ -25,6 +25,9 @@
                         @Html.ActionLink("Pincode", "Index", new { sortOrder =ViewBag.NameSortParm })
                     </th>
                     <th>
+                        @Html.ActionLink("Pincode name", "Index", new { sortOrder =ViewBag.NameSortParm })
+                    </th>
+                    <th>
                         @Html.ActionLink("District", "Index", new { sortOrder = ViewBag.DistrictSortParm })
                     </th>
                     <th>
@@ -40,6 +43,9 @@
                 @foreach (var item in Model)
                 {
                     <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Code)
+                        </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>

@@ -5,22 +5,25 @@ using System.Globalization;
 using CsvHelper;
 using risk.control.system.Data;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.RegularExpressions;
 
 namespace risk.control.system.Seeds
 {
     public static class PinCodeStateSeed
     {
-        private static string stateWisePincodeFilePath = @"pincode-sample.csv";
+        private static string stateWisePincodeFilePath = @"pincode.csv";
+        private static string NO_DATA = " NO - DATA ";
+        private static Regex regex = new Regex("\\\"(.*?)\\\"");
         public static async Task SeedPincode(ApplicationDbContext context, Country country)
         {
 
             var pincodes = await CsvRead();
 
             // add the states with pincodes
-            var states = pincodes.GroupBy(g => g.State);
+            var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
             foreach (var state in states)
             {
-                var recordState = new State { Code = state.Key, Name = state.Key, CountryId = country.CountryId };
+                var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, CountryId = country.CountryId };
                 var stateAdded = await context.State.AddAsync(recordState);
 
                 var districts = state.GroupBy(g => g.District);
@@ -34,7 +37,8 @@ namespace risk.control.system.Seeds
                     {
                         var pincodeState = new PinCode
                         {
-                            Name = pinCode.Code,
+                            Name = pinCode.Name,
+                            Code = pinCode.Code,
                             DistrictId = districtAdded.Entity.DistrictId,
                             StateId = stateAdded.Entity.StateId,
                             CountryId = country.CountryId,
@@ -48,7 +52,7 @@ namespace risk.control.system.Seeds
         private static async Task<List<PinCodeState>> CsvRead()
         {
             var pincodes = new List<PinCodeState>();
-            string csvData = await System.IO.File.ReadAllTextAsync(stateWisePincodeFilePath);
+            string csvData = await File.ReadAllTextAsync(stateWisePincodeFilePath);
 
             bool firstRow = true;
             foreach (string row in csvData.Split('\n'))
@@ -63,19 +67,26 @@ namespace risk.control.system.Seeds
                         }
                         else
                         {
-                            var rowData = row.Split(',');
+                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                            var rowData = output.Split(',').ToList();
                             var pincodeState = new PinCodeState
                             {
-                                Code = rowData[0],
-                                District = rowData[1],
-                                State = rowData[2].Substring(0, rowData[2].Length - 1)
+                                Name = rowData[3] ?? NO_DATA,
+                                Code = rowData[4] ?? NO_DATA,
+                                District = rowData[7] ?? NO_DATA,
+                                StateName = rowData[8] ?? NO_DATA,
+                                StateCode = rowData[9] ?? NO_DATA,
                             };
-                            pincodes.Add(pincodeState);
+                            var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
+                            if (isDupicate is null )
+                            {
+                                pincodes.Add(pincodeState);
+                            }
                         }
                     }
                 }
             }
-            return pincodes;
+            return pincodes.Distinct()?.ToList();
         }
     }
 }

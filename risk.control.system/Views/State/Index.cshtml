@@ -28,18 +28,19 @@
         <table class="table table-striped  fixed-with-height">
         <thead>
             <tr>
-                    <th>@Html.ActionLink("Country name", "Index", new { sortOrder = ViewBag.CountrySortParm })</th>
-                    
                     <th>@Html.ActionLink("State name", "Index", new { sortOrder = ViewBag.StateSortParm })</th>
-            </tr>
+                    <th>@Html.ActionLink("State code", "Index", new { sortOrder = ViewBag.StateSortParm })</th>
+                    <th>@Html.ActionLink("Country name", "Index", new { sortOrder = ViewBag.CountrySortParm })</th>
+                </tr>
         </thead>
         <tbody>
             @foreach (var state in Model)
             {
                 <tr>
-                    <td>@state.Country.Name</td>
-                    <td>@state.Name</td>
-                    <td>
+                        <td>@state.Name</td>
+                        <td>@state.Code</td>
+                        <td>@state.Country.Name</td>
+                        <td>
                         <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@state.StateId"><i class="fas fa-pen"></i> Edit</a> &nbsp;
                         <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@state.StateId"><i class="fas fa-trash"></i> Delete</a>
                         <input type="hidden" value="@state.StateId" />
