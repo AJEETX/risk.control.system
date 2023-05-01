@@ -30,9 +30,57 @@ namespace risk.control.system.Controllers
             this.context = context;
             UserList = new List<UsersViewModel>();
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
-            var users = await userManager.Users.Include(u => u.Country).Include(u => u.State).Include(u => u.PinCode).ToListAsync();
+            ViewBag.EmailSortParm = String.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.PincodeSortParm = String.IsNullOrEmpty(sortOrder) ? "pincode_desc" : "";
+            if (searchString != null)
+            {
+                currentPage = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var applicationDbContext = userManager.Users.Include(u => u.Country).Include(u => u.State).Include(u => u.PinCode).AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                applicationDbContext = applicationDbContext.Where(a =>
+                a.FirstName.ToLower().Contains(searchString.Trim().ToLower()) ||
+                a.LastName.ToLower().Contains(searchString.Trim().ToLower()));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => new { s.FirstName, s.LastName });
+                    break;
+                case "email_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Email);
+                    break;
+                case "pincode_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.PinCode.Code);
+                    break;
+                default:
+                    applicationDbContext.OrderByDescending(s => s.Email);
+                    break;
+            }
+            int pageNumber = (currentPage ?? 1);
+            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.ShowPrevious = pageNumber > 1;
+            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.ShowFirst = pageNumber != 1;
+            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+
+            var users = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
             foreach (Models.ApplicationUser user in users)
             {
                 var thisViewModel = new UsersViewModel();

@@ -19,14 +19,18 @@ namespace risk.control.system.Controllers
 
             return View(roles);
         }
+        public IActionResult Create()
+        {
+            return View();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string roleName, string roleCode)
+        public async Task<IActionResult> Create(ApplicationRole role)
         {
-            if (roleName != null)
+            if (role != null)
             {
-                await _roleManager.CreateAsync(new ApplicationRole(roleCode, roleName.Trim()));
+                await _roleManager.CreateAsync(role);
             }
             return RedirectToAction(nameof(Index));
         }

@@ -39,7 +39,9 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="DistrictId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <div class="form-group">
+            <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel </a> &nbsp;
+            <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
+        </div>
     </form>
 </div>

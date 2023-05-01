@@ -91,17 +91,16 @@ namespace risk.control.system.Controllers
 
             return View(state);
         }
-
+        public IActionResult Create()
+        {
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            return View();
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(string countryId, string stateName, string stateCode)
+        public async Task<IActionResult> Create(State state)
         {
-            _context.Add(new State
-            {
-                Name = stateName.Trim().ToUpper(),
-                CountryId = countryId,
-                Code = stateCode.Trim().ToUpper()
-            });
+            _context.Add(state);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -119,7 +118,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", state.CountryId);
 
             return View(state);
         }

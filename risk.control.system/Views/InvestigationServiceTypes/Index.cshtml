@@ -3,61 +3,84 @@
 @{
     ViewData["Title"] = "Index";
 }
-<div class="card">
-    <div id="viewAll" class="card-body table-responsive">
-    <h4>Investigation service type</h4>
-    <form method="post" action="roles/create">
-        <div class="input-group col-5" style="padding:0px;">
-            <a class="btn btn-success" asp-action="Create"><i class="fas fa-plus"></i> Create</a>
-@*
-            <input autocomplete="off" name="roleName" type="text" class="form-control">
-            <span class="input-group-append">
-                <button type="submit" class="btn btn-info"> <i class="fa fa-search"></i> Search...</button>
-            </span>*@
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-header">
+                        <h3 class="card-title">services types</h3>
+                    </div>
+                    <form method="post" action="roles/create" asp-antiforgery="true">
+                        <div class="card-body dataTable-search-form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <input autocomplete="off" name="roleCode" type="text" class="form-control" placeholder="enter role code or role name">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button id="btnFilter" type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+                                    <a class="btn btn-info btn-sm" href="/InvestigationServiceTypes/Create"><i class="fas fa-plus"></i> Create</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
-    <br />
-    <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LineOfBusiness)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-            </td>
-                    <td>
-                        <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationServiceTypeId">
-                            <i class="fa fa-search"></i> View
-                        </a> &nbsp;
-                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationServiceTypeId">
-                            <i class="fas fa-pen"></i> Edit
-                        </a> &nbsp;
-                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationServiceTypeId">
-                            <i class="fas fa-trash"></i> Delete
-                        </a>
-                    </td>
-        </tr>
-}
-    </tbody>
-</table>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Name)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Code)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationServiceTypeId">
+                                                <i class="fa fa-search"></i> View
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationServiceTypeId">
+                                                <i class="fas fa-pen"></i> Edit
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationServiceTypeId">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>

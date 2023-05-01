@@ -3,114 +3,136 @@
 @{
     ViewData["Title"] = "Index";
 }
-
-<div class="card">
-    <div id="viewAll" class="card-body table-responsive">
-        <h4>Pincode</h4>
-        <form asp-action="Index">
-            <div class="input-group col-5" style="padding:0px;">
-                <a class="btn btn-success" asp-action="Create"><i class="fas fa-plus"></i> Create</a>
-
-                <input autocomplete="off" name="SearchString" type="text" class="form-control">
-                <span class="input-group-append">
-                    <button type="submit" class="btn btn-info"> <i class="fa fa-search"></i> Search...</button>
-                </span>
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-header">
+                        <h3 class="card-title">pincode</h3>
+                    </div>
+                    <form asp-action="index">
+                        <div class="card-body dataTable-search-form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter pincode or pincode name">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button id="btnFilter" type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+                                    <a class="btn btn-info btn-sm" href="/Pincodes/Create"><i class="fas fa-plus"></i> Create</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
-        <br />
-        <table class="table table-striped fixed-with-height">
-            <thead>
-                <tr>
-                    <th>
-                        @Html.ActionLink("Pincode", "Index", new { sortOrder =ViewBag.NameSortParm })
-                    </th>
-                    <th>
-                        @Html.ActionLink("Pincode name", "Index", new { sortOrder =ViewBag.NameSortParm })
-                    </th>
-                    <th>
-                        @Html.ActionLink("District", "Index", new { sortOrder = ViewBag.DistrictSortParm })
-                    </th>
-                    <th>
-                        @Html.ActionLink("State", "Index", new { sortOrder = ViewBag.StateSortParm })
-                    </th>
-                    <th>
-                        @Html.ActionLink("Country", "Index", new { sortOrder = ViewBag.NameSortParm })
-                    </th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Code)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.District.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.State.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Country.Name)
-                        </td>
-                        <td>
-                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.PinCodeId">
-                                <i class="fa fa-search"></i> View
-                            </a> &nbsp;
-                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.PinCodeId">
-                                <i class="fas fa-pen"></i> Edit
-                            </a> &nbsp;
-                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.PinCodeId">
-                                <i class="fas fa-trash"></i> Delete
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <br />
-        @{
-            var PageNumber = (int)@ViewBag.PageNumber;
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-body">
+                        <table class="table table-striped fixed-with-height">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.ActionLink("Pincode", "Index", new { sortOrder =ViewBag.NameSortParm })
+                                    </th>
+                                    <th>
+                                        @Html.ActionLink("Pincode name", "Index", new { sortOrder =ViewBag.NameSortParm })
+                                    </th>
+                                    <th>
+                                        @Html.ActionLink("District", "Index", new { sortOrder = ViewBag.DistrictSortParm })
+                                    </th>
+                                    <th>
+                                        @Html.ActionLink("State", "Index", new { sortOrder = ViewBag.StateSortParm })
+                                    </th>
+                                    <th>
+                                        @Html.ActionLink("Country", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.District.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.State.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Country.Name)
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.PinCodeId">
+                                                <i class="fa fa-search"></i> View
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.PinCodeId">
+                                                <i class="fas fa-pen"></i> Edit
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.PinCodeId">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <br />
+                        <br />
+                        @{
+                            var PageNumber = (int)@ViewBag.PageNumber;
 
-            var PageSize = (int)@ViewBag.PageSize;
+                            var PageSize = (int)@ViewBag.PageSize;
 
-            var TotalPages = (int)@ViewBag.TotalPages;
+                            var TotalPages = (int)@ViewBag.TotalPages;
 
-            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
+                            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
 
-            var ShowNext = (bool)@ViewBag.ShowNext;
+                            var ShowNext = (bool)@ViewBag.ShowNext;
 
-            var ShowFirst = (bool)@ViewBag.ShowFirst;
+                            var ShowFirst = (bool)@ViewBag.ShowFirst;
 
-            var ShowLast = (bool)@ViewBag.ShowLast;
-        }
-        <ul class="pagination">
-            <li class="page-item @(!ShowFirst? "disabled":"")">
-                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
-                    <i class="fas fa-fast-backward"></i>
-                </a>
-            </li>
-            <li class="page-item @(!ShowPrevious? "disabled":"")">
-                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
-                    <i class="fas fa-step-backward"></i>
-                </a>
-            </li>
-            <li class="page-item  @(!ShowNext? "disabled":"")">
-                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
-                    <i class="fas fa-step-forward"></i>
-                </a>
-            </li>
+                            var ShowLast = (bool)@ViewBag.ShowLast;
+                        }
+                        <ul class="pagination">
+                            <li class="page-item @(!ShowFirst? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
+                                    <i class="fas fa-fast-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item @(!ShowPrevious? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
+                                    <i class="fas fa-step-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item  @(!ShowNext? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
+                                    <i class="fas fa-step-forward"></i>
+                                </a>
+                            </li>
 
-            <li class="page-item  @(!ShowLast? "disabled":"")">
-                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
-                    <i class="fas fa-fast-forward"></i>
-                </a>
-            </li>
-        </ul>
+                            <li class="page-item  @(!ShowLast? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
+                                    <i class="fas fa-fast-forward"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>

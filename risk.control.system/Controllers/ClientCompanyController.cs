@@ -20,10 +20,53 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
-            var applicationDbContext = _context.ClientCompany.Include(c => c.Country).Include(c => c.PinCode).Include(c => c.State);
-            return View(await applicationDbContext.ToListAsync());
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
+            if (searchString != null)
+            {
+                currentPage = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var applicationDbContext = _context.ClientCompany.Include(c => c.Country).Include(c => c.PinCode).Include(c => c.State).AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                applicationDbContext = applicationDbContext.Where(a =>
+                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
+                a.Code.ToLower().Contains(searchString.Trim().ToLower()));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+                case "code_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
+                    break;
+                default:
+                    applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+            }
+            int pageNumber = (currentPage ?? 1);
+            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.ShowPrevious = pageNumber > 1;
+            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.ShowFirst = pageNumber != 1;
+            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+
+            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return View(applicationDbContextResult);
         }
 
         // GET: ClientCompanies/Details/5
@@ -67,10 +110,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", clientCompany.CountryId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", clientCompany.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", clientCompany.StateId);
-            return View(clientCompany);
+            return Problem();
         }
 
         // GET: ClientCompanies/Edit/5

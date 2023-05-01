@@ -1,92 +1,159 @@
 ﻿@using risk.control.system.Models.ViewModel;
 @model List<UsersViewModel>
 
-
-<div class="card">
-    <div id="viewAll" class="card-body table-responsive">
-<div id="checkboxes">
-    <h4>User</h4>
-    <form method="post" action="roles/create" enctype="multipart/form-data">
-        <div class="input-group col-5" style="padding:0px;">
-            <a class="btn btn-success" asp-action="Create"><i class="fas fa-plus"></i> Create</a>
-@*            <input autocomplete="off" name="roleName" type="text" class="form-control">
-            <span class="input-group-append">
-                <button type="submit" class="btn btn-info"> <i class="fa fa-search"></i> Search...</button>
-            </span>*@
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-header">
+                        <h3 class="card-title">user</h3>
+                    </div>
+                    <form asp-action="index">
+                        <div class="card-body dataTable-search-form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter user name">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button id="btnFilter" type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+                                    <a class="btn btn-info btn-sm" href="/User/Create"><i class="fas fa-plus"></i> Create</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
-    <br />
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Email</th>
-                <th>Name</th>
-                <th>Pincode</th>
-                <th>State</th>
-                <th>Country</th>
-                <th>Roles</th>
-                <th>Code</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
-                <tr>
-                    <td>
-                        <img src="@user.ProfileImage" height="30" alt="No image" />
-                    </td>
-                    <td style="width: 10%;">@user.Email</td>
-                    <td>@user.FirstName @user.LastName</td>
-                    <td>@user.PinCode</td>
-                    <td>@user.State</td>
-                    <td>@user.Country</td>
-                    <td style="width:20%">
-                        @foreach (var role in user.Roles)
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>
+                                        @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.EmailSortParm })
+                                    </th>
+                                    <th>
+                                        @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                    </th>
+                                    <th>
+                                        @Html.ActionLink("Pincode", "Index", new { sortOrder = ViewBag.PincodeSortParm })
+                                    </th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                    <th>Roles</th>
+                                    <th>Code</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <img src="@user.ProfileImage" height="30" alt="No image" />
+                                        </td>
+                                        <td style="width: 10%;">@user.Email</td>
+                                        <td>@user.FirstName @user.LastName</td>
+                                        <td>@user.PinCode</td>
+                                        <td>@user.State</td>
+                                        <td>@user.Country</td>
+                                        <td style="width:20%">
+                                            @foreach (var role in user.Roles)
 
-                        {
-                            <span class="badge badge-light">@role</span>
-                        }
-                    </td>
-                    <td>
+                                            {
+                                                <span class="badge badge-light">@role</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                if (user.Roles.Contains(AppRoles.PortalAdmin.ToString()))
+
+                                                {
+                                                    <span class="badge badge-danger">PA</span>
+                                                }
+
+                                                else if (user.Roles.Contains(AppRoles.ClientAdmin.ToString()))
+
+                                                {
+                                                    <span class="badge badge-danger">CA</span>
+                                                }
+
+                                                else if (user.Roles.Contains(AppRoles.VendorAdmin.ToString()))
+
+                                                {
+                                                    <span class="badge badge-warning">VA</span>
+                                                }
+
+                                                else
+
+                                                {
+                                                    <span class="badge badge-success">ST</span>
+                                                }
+
+                                            }
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-userId="@user.UserId">
+                                                <i class="fas fa-pen"></i> User
+                                            </a>&nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-controller="UserRoles" asp-action="Index"
+                                           asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> Role</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <br />
+                        <br />
                         @{
-                            if (user.Roles.Contains(AppRoles.PortalAdmin.ToString()))
+                            var PageNumber = (int)@ViewBag.PageNumber;
 
-                            {
-                                <span class="badge badge-danger">PA</span>
-                            }
+                            var PageSize = (int)@ViewBag.PageSize;
 
-                            else if (user.Roles.Contains(AppRoles.ClientAdmin.ToString()))
+                            var TotalPages = (int)@ViewBag.TotalPages;
 
-                            {
-                                <span class="badge badge-danger">CA</span>
-                            }
+                            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
 
-                            else if (user.Roles.Contains(AppRoles.VendorAdmin.ToString()))
+                            var ShowNext = (bool)@ViewBag.ShowNext;
 
-                            {
-                                <span class="badge badge-warning">VA</span>
-                            }
+                            var ShowFirst = (bool)@ViewBag.ShowFirst;
 
-                            else
-
-                            {
-                                <span class="badge badge-success">ST</span>
-                            }
-
+                            var ShowLast = (bool)@ViewBag.ShowLast;
                         }
-                    </td>
-                    <td>
-                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-userId="@user.UserId"> <i
-                                class="fas fa-pen"></i> User </a>&nbsp;
-                        <a class="btn btn-xs btn-danger" asp-controller="UserRoles" asp-action="Index"
-                        asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> Role</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                        <ul class="pagination">
+                            <li class="page-item @(!ShowFirst? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
+                                    <i class="fas fa-fast-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item @(!ShowPrevious? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
+                                    <i class="fas fa-step-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item  @(!ShowNext? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
+                                    <i class="fas fa-step-forward"></i>
+                                </a>
+                            </li>
+
+                            <li class="page-item  @(!ShowLast? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
+                                    <i class="fas fa-fast-forward"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</section>

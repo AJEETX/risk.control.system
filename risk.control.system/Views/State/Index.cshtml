@@ -1,93 +1,106 @@
 ﻿@model List<State>
 
-<div class="card">
-    <div id="viewAll" class="card-body table-responsive">
-    <h4>Manage State</h4>
-    <form method="post" action="State/create"  asp-antiforgery="true">
-        <div class="input-group col-5" style="padding:0px;">
-            <select name="CountryId"  class="form-control" asp-items="ViewBag.CountryId">
-                                    <option>
-                                       --- SELECT COUNTRY ---
-                                    </option></select>
-            <input autocomplete="off" name="stateName" type="text" class="form-control" placeholder="state name">
-            <input autocomplete="off" name="stateCode" type="text" class="form-control" placeholder="state code">
-            <span class="input-group-append">
-                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> State</button>
-            </span>
-        </div>
-    </form>
-        <form asp-action="index">
-            <div class="input-group col-5" style="padding:0px;">
-                <input autocomplete="off" name="SearchString" type="text" class="form-control" />
-                <span class="input-group-append">
-                    <button type="submit" class="btn btn-info"> <i class="fa fa-search"></i> Search...</button>
-                </span>
+<section class="content pt-2">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-header">
+                        <h3 class="card-title">state</h3>
+                    </div>
+                    <form asp-action="index">
+                        <div class="card-body dataTable-search-form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter state name or state code ">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button id="btnFilter" type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+                                    <a class="btn btn-info btn-sm" href="/State/Create"><i class="fas fa-plus"></i> Create</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
-    <br />
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-body">
         <table class="table table-striped  fixed-with-height">
-        <thead>
-            <tr>
+            <thead>
+                <tr>
                     <th>@Html.ActionLink("State name", "Index", new { sortOrder = ViewBag.StateSortParm })</th>
                     <th>@Html.ActionLink("State code", "Index", new { sortOrder = ViewBag.StateSortParm })</th>
                     <th>@Html.ActionLink("Country name", "Index", new { sortOrder = ViewBag.CountrySortParm })</th>
                 </tr>
-        </thead>
-        <tbody>
-            @foreach (var state in Model)
-            {
-                <tr>
+            </thead>
+            <tbody>
+                @foreach (var state in Model)
+                {
+                    <tr>
                         <td>@state.Name</td>
                         <td>@state.Code</td>
                         <td>@state.Country.Name</td>
                         <td>
-                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@state.StateId"><i class="fas fa-pen"></i> Edit</a> &nbsp;
-                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@state.StateId"><i class="fas fa-trash"></i> Delete</a>
-                        <input type="hidden" value="@state.StateId" />
-                    </td>
-                </tr>
-            }
+                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@state.StateId"><i class="fas fa-pen"></i> Edit</a> &nbsp;
+                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@state.StateId"><i class="fas fa-trash"></i> Delete</a>
+                            <input type="hidden" value="@state.StateId" />
+                        </td>
+                    </tr>
+                }
 
-        </tbody>
-    </table>
-        <br />
-        @{
-            var PageNumber = (int)@ViewBag.PageNumber;
+            </tbody>
+        </table>
+                        <br />
+                        <br />
+                        @{
+                            var PageNumber = (int)@ViewBag.PageNumber;
 
-            var PageSize = (int)@ViewBag.PageSize;
+                            var PageSize = (int)@ViewBag.PageSize;
 
-            var TotalPages = (int)@ViewBag.TotalPages;
+                            var TotalPages = (int)@ViewBag.TotalPages;
 
-            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
+                            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
 
-            var ShowNext = (bool)@ViewBag.ShowNext;
+                            var ShowNext = (bool)@ViewBag.ShowNext;
 
-            var ShowFirst = (bool)@ViewBag.ShowFirst;
+                            var ShowFirst = (bool)@ViewBag.ShowFirst;
 
-            var ShowLast = (bool)@ViewBag.ShowLast;
-        }
-        <ul class="pagination">
-            <li class="page-item @(!ShowFirst? "disabled":"")">
-                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
-                    <i class="fas fa-fast-backward"></i>
-                </a>
-            </li>
-            <li class="page-item @(!ShowPrevious? "disabled":"")">
-                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
-                    <i class="fas fa-step-backward"></i>
-                </a>
-            </li>
-            <li class="page-item  @(!ShowNext? "disabled":"")">
-                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
-                    <i class="fas fa-step-forward"></i>
-                </a>
-            </li>
+                            var ShowLast = (bool)@ViewBag.ShowLast;
+                        }
+                        <ul class="pagination">
+                            <li class="page-item @(!ShowFirst? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
+                                    <i class="fas fa-fast-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item @(!ShowPrevious? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
+                                    <i class="fas fa-step-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item  @(!ShowNext? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
+                                    <i class="fas fa-step-forward"></i>
+                                </a>
+                            </li>
 
-            <li class="page-item  @(!ShowLast? "disabled":"")">
-                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
-                    <i class="fas fa-fast-forward"></i>
-                </a>
-            </li>
-        </ul>
+                            <li class="page-item  @(!ShowLast? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
+                                    <i class="fas fa-fast-forward"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</section>

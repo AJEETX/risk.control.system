@@ -9,8 +9,31 @@
             <div class="col-12">
                 <div class="card card-light">
                     <div class="card-header">
-                        <h3 class="card-title">District List</h3>
+                        <h3 class="card-title">district</h3>
                     </div>
+                    <form asp-action="index">
+                    <div class="card-body dataTable-search-form">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter district name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <button id="btnFilter" type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+                                <a class="btn btn-info btn-sm" href="/District/Create"><i class="fas fa-plus"></i> Create</a>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
                     <div class="card-body">
                         <table class="table">
                             <thead>
