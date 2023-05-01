@@ -1,6 +1,5 @@
 ﻿@inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-@inject risk.control.system.Data.ApplicationDbContext Context
 @{
     ApplicationUser appUser = UserManager.GetUserAsync(User).Result;
 }
@@ -58,5 +57,6 @@
     </div>
     <partial name="AdminLTE/_Scripts" />
     @RenderSection("Scripts", required: false)
+    @await Component.InvokeAsync("NToastNotify")
 </body>
 </html>

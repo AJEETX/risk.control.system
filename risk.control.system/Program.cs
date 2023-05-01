@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Permission;
@@ -11,7 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 // Add services to the container.
-builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+builder.Services.AddControllersWithViews()
+    .AddRazorRuntimeCompilation()
+    .AddNToastNotifyNoty(new NotyOptions
+    {
+        ProgressBar = true,
+        Timeout = 5000
+    });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=risk-control-unit.db"));
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

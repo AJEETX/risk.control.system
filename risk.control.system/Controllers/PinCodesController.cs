@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -9,14 +10,16 @@ namespace risk.control.system.Controllers
     public class PinCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IToastNotification toastNotification;
 
-        public PinCodesController(ApplicationDbContext context)
+        public PinCodesController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
+            this.toastNotification = toastNotification;
         }
 
         // GET: PinCodes
-        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -57,8 +60,8 @@ namespace risk.control.system.Controllers
                 case "state_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.State.Name);
                     break;
-                default: 
-                    applicationDbContext .OrderByDescending(s => s.State.Name);
+                default:
+                    applicationDbContext.OrderByDescending(s => s.State.Name);
                     break;
             }
             int pageNumber = (currentPage ?? 1);
@@ -81,6 +84,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.PinCode == null)
             {
+                toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
 
@@ -91,6 +95,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.PinCodeId == id);
             if (pinCode == null)
             {
+                toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
 
@@ -111,9 +116,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PinCode pinCode)
         {
-                _context.Add(pinCode);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            _context.Add(pinCode);
+            await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("pincode created successfully!");
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: PinCodes/Edit/5
@@ -121,17 +127,19 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.PinCode == null)
             {
+                toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
 
             var pinCode = await _context.PinCode.FindAsync(id);
             if (pinCode == null)
             {
+                toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", pinCode.CountryId);
-            ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == pinCode.CountryId ), "StateId", "Name", pinCode?.StateId);
-            ViewData["DistrictId"] = new SelectList(_context.District.Where(s => s.StateId == pinCode.StateId ), "DistrictId", "Name", pinCode?.DistrictId);
+            ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == pinCode.CountryId), "StateId", "Name", pinCode?.StateId);
+            ViewData["DistrictId"] = new SelectList(_context.District.Where(s => s.StateId == pinCode.StateId), "DistrictId", "Name", pinCode?.DistrictId);
             return View(pinCode);
         }
 
@@ -144,6 +152,7 @@ namespace risk.control.system.Controllers
         {
             if (id != pinCode.PinCodeId)
             {
+                toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
             try
@@ -162,6 +171,7 @@ namespace risk.control.system.Controllers
                     throw;
                 }
             }
+            toastNotification.AddSuccessToastMessage("pincode edited successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -170,6 +180,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.PinCode == null)
             {
+                toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
 
@@ -177,6 +188,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.PinCodeId == id);
             if (pinCode == null)
             {
+                toastNotification.AddErrorToastMessage("pincode not found!");
                 return NotFound();
             }
 
@@ -190,6 +202,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.PinCode == null)
             {
+                toastNotification.AddErrorToastMessage("pincode not found!");
                 return Problem("Entity set 'ApplicationDbContext.PinCode'  is null.");
             }
             var pinCode = await _context.PinCode.FindAsync(id);
@@ -197,14 +210,15 @@ namespace risk.control.system.Controllers
             {
                 _context.PinCode.Remove(pinCode);
             }
-            
+
             await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("pincode deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
         private bool PinCodeExists(string id)
         {
-          return (_context.PinCode?.Any(e => e.PinCodeId == id)).GetValueOrDefault();
+            return (_context.PinCode?.Any(e => e.PinCodeId == id)).GetValueOrDefault();
         }
     }
 }

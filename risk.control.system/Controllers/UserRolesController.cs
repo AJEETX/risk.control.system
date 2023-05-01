@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NToastNotify;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -10,12 +11,14 @@ namespace risk.control.system.Controllers
     private readonly SignInManager<ApplicationUser> signInManager;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly IToastNotification toastNotification;
 
-        public UserRolesController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
+        public UserRolesController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IToastNotification toastNotification,
             SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
+            this.toastNotification = toastNotification;
             this.signInManager = signInManager;
         }
         public async Task<IActionResult> Index(string userId)
@@ -25,6 +28,7 @@ namespace risk.control.system.Controllers
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
+                toastNotification.AddErrorToastMessage("user not found!");
                 return NotFound();
             }
             //ViewBag.UserName = user.UserName;
@@ -64,6 +68,7 @@ namespace risk.control.system.Controllers
             var currentUser = await userManager.GetUserAsync(User);
             await signInManager.RefreshSignInAsync(currentUser);
 
+            toastNotification.AddSuccessToastMessage("roles updated successfully!");
             return RedirectToAction("Index", new { userId = id });
         }
     }

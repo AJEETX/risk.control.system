@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NToastNotify;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers
@@ -10,15 +11,18 @@ namespace risk.control.system.Controllers
     {
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
+        private readonly IToastNotification toastNotification;
         private readonly ILogger _logger;
 
         public AccountController(
             UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
+            IToastNotification toastNotification,
             ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            this.toastNotification = toastNotification;
             _logger = logger;
         }
 
@@ -47,6 +51,7 @@ namespace risk.control.system.Controllers
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    toastNotification.AddSuccessToastMessage("login successful!");
                     return RedirectToLocal(returnUrl);
                 }
  
@@ -57,6 +62,7 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
+                    toastNotification.AddErrorToastMessage("invalid login attempt!");
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     model.Error = "Invalid login attempt.";
                     return View(model);

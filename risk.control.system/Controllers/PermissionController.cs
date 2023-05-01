@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NToastNotify;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -9,10 +10,12 @@ namespace risk.control.system.Controllers
     public class PermissionController : Controller
     {
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IToastNotification toastNotification;
 
-        public PermissionController(RoleManager<ApplicationRole> roleManager)
+        public PermissionController(RoleManager<ApplicationRole> roleManager, IToastNotification toastNotification)
         {
             _roleManager = roleManager;
+            this.toastNotification = toastNotification;
         }
 
         public async Task<ActionResult> Index(string Id)
@@ -33,7 +36,7 @@ namespace risk.control.system.Controllers
                 };
                 models.Add(permission);
             }
-            model.PermissionViewModels= models;
+            model.PermissionViewModels = models;
             model.RoleName = role.Name;
             model.RoleId = Id;
             return View(model);
@@ -73,7 +76,8 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            return RedirectToAction("Index","Roles", new { Id = model.RoleId });
+            toastNotification.AddSuccessToastMessage("roles updated successfully!");
+            return RedirectToAction("Index", "Roles", new { Id = model.RoleId });
         }
     }
 }

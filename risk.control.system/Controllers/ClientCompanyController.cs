@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -13,10 +14,12 @@ namespace risk.control.system.Controllers
     public class ClientCompanyController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IToastNotification toastNotification;
 
-        public ClientCompanyController(ApplicationDbContext context)
+        public ClientCompanyController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
+            this.toastNotification = toastNotification;
         }
 
         // GET: ClientCompanies
@@ -74,6 +77,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.ClientCompany == null)
             {
+                toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
 
@@ -84,6 +88,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClientCompanyId == id);
             if (clientCompany == null)
             {
+                toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
 
@@ -108,8 +113,10 @@ namespace risk.control.system.Controllers
             {
                 _context.Add(clientCompany);
                 await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("client company created successfully!");
                 return RedirectToAction(nameof(Index));
             }
+                toastNotification.AddErrorToastMessage("client company not found!");
             return Problem();
         }
 
@@ -118,12 +125,14 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.ClientCompany == null)
             {
+                toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
 
             var clientCompany = await _context.ClientCompany.FindAsync(id);
             if (clientCompany == null)
             {
+                toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", clientCompany.CountryId);
@@ -141,6 +150,7 @@ namespace risk.control.system.Controllers
         {
             if (id != clientCompany.ClientCompanyId)
             {
+                toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
 
@@ -162,8 +172,10 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
+                toastNotification.AddSuccessToastMessage("client company edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
+                toastNotification.AddErrorToastMessage("Error to edit client company!");
             return Problem();
         }
 
@@ -172,6 +184,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.ClientCompany == null)
             {
+                toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
 
@@ -182,6 +195,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClientCompanyId == id);
             if (clientCompany == null)
             {
+                toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
 
@@ -195,6 +209,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.ClientCompany == null)
             {
+                toastNotification.AddErrorToastMessage("client company not found!");
                 return Problem("Entity set 'ApplicationDbContext.ClientCompany'  is null.");
             }
             var clientCompany = await _context.ClientCompany.FindAsync(id);
@@ -202,14 +217,15 @@ namespace risk.control.system.Controllers
             {
                 _context.ClientCompany.Remove(clientCompany);
             }
-            
+
             await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("client company deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
         private bool ClientCompanyExists(string id)
         {
-          return (_context.ClientCompany?.Any(e => e.ClientCompanyId == id)).GetValueOrDefault();
+            return (_context.ClientCompany?.Any(e => e.ClientCompanyId == id)).GetValueOrDefault();
         }
     }
 }

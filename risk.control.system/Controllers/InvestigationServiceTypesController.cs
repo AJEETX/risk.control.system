@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -13,10 +10,12 @@ namespace risk.control.system.Controllers
     public class InvestigationServiceTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IToastNotification toastNotification;
 
-        public InvestigationServiceTypesController(ApplicationDbContext context)
+        public InvestigationServiceTypesController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
+            this.toastNotification = toastNotification;
         }
 
         // GET: InvestigationServiceTypes
@@ -31,6 +30,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.InvestigationServiceType == null)
             {
+                toastNotification.AddErrorToastMessage("service type not found!");
                 return NotFound();
             }
 
@@ -57,15 +57,17 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( InvestigationServiceType investigationServiceType)
+        public async Task<IActionResult> Create(InvestigationServiceType investigationServiceType)
         {
             if (investigationServiceType is not null)
             {
                 _context.Add(investigationServiceType);
                 await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("service type created successfully!");
                 return RedirectToAction(nameof(Index));
             }
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", investigationServiceType.LineOfBusinessId);
+            toastNotification.AddErrorToastMessage("Error to create service type!");
             return View(investigationServiceType);
         }
 
@@ -74,12 +76,14 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.InvestigationServiceType == null)
             {
+                toastNotification.AddErrorToastMessage("service type not found!");
                 return NotFound();
             }
 
             var investigationServiceType = await _context.InvestigationServiceType.FindAsync(id);
             if (investigationServiceType == null)
             {
+                toastNotification.AddErrorToastMessage("service type not found!");
                 return NotFound();
             }
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", investigationServiceType.LineOfBusinessId);
@@ -91,10 +95,11 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id,InvestigationServiceType investigationServiceType)
+        public async Task<IActionResult> Edit(string id, InvestigationServiceType investigationServiceType)
         {
             if (id != investigationServiceType.InvestigationServiceTypeId)
             {
+                toastNotification.AddErrorToastMessage("service type not found!");
                 return NotFound();
             }
 
@@ -116,9 +121,11 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
+                toastNotification.AddSuccessToastMessage("service type edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", investigationServiceType.LineOfBusinessId);
+                toastNotification.AddErrorToastMessage("Error to edit service type!");
             return View(investigationServiceType);
         }
 
@@ -127,6 +134,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.InvestigationServiceType == null)
             {
+                toastNotification.AddErrorToastMessage("service type not found!");
                 return NotFound();
             }
 
@@ -135,6 +143,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.InvestigationServiceTypeId == id);
             if (investigationServiceType == null)
             {
+                toastNotification.AddErrorToastMessage("service type not found!");
                 return NotFound();
             }
 
@@ -148,6 +157,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.InvestigationServiceType == null)
             {
+                toastNotification.AddErrorToastMessage("service type not found!");
                 return Problem("Entity set 'ApplicationDbContext.InvestigationServiceType'  is null.");
             }
             var investigationServiceType = await _context.InvestigationServiceType.FindAsync(id);
@@ -155,14 +165,15 @@ namespace risk.control.system.Controllers
             {
                 _context.InvestigationServiceType.Remove(investigationServiceType);
             }
-            
+
             await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("service type deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
         private bool InvestigationServiceTypeExists(string id)
         {
-          return (_context.InvestigationServiceType?.Any(e => e.InvestigationServiceTypeId == id)).GetValueOrDefault();
+            return (_context.InvestigationServiceType?.Any(e => e.InvestigationServiceTypeId == id)).GetValueOrDefault();
         }
     }
 }

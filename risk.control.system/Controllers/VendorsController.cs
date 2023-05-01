@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -13,10 +10,12 @@ namespace risk.control.system.Controllers
     public class VendorsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IToastNotification toastNotification;
 
-        public VendorsController(ApplicationDbContext context)
+        public VendorsController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
+            this.toastNotification = toastNotification;
         }
 
         // GET: Vendors
@@ -74,6 +73,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.Vendor == null)
             {
+                toastNotification.AddErrorToastMessage("vendor not found!");
                 return NotFound();
             }
 
@@ -108,8 +108,10 @@ namespace risk.control.system.Controllers
             {
                 _context.Add(vendor);
                 await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("vendor created successfully!");
                 return RedirectToAction(nameof(Index));
             }
+            toastNotification.AddErrorToastMessage("Error to create vendor!");
             return Problem();
         }
 
@@ -141,6 +143,7 @@ namespace risk.control.system.Controllers
         {
             if (id != vendor.VendorId)
             {
+                toastNotification.AddErrorToastMessage("vendor not found!");
                 return NotFound();
             }
 
@@ -162,6 +165,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
+                toastNotification.AddSuccessToastMessage("vendor edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
             return Problem();
@@ -195,6 +199,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.Vendor == null)
             {
+                toastNotification.AddErrorToastMessage("vendor not found!");
                 return Problem("Entity set 'ApplicationDbContext.Vendor'  is null.");
             }
             var vendor = await _context.Vendor.FindAsync(id);
@@ -202,14 +207,15 @@ namespace risk.control.system.Controllers
             {
                 _context.Vendor.Remove(vendor);
             }
-            
+
             await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("vendor deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
         private bool VendorExists(string id)
         {
-          return (_context.Vendor?.Any(e => e.VendorId == id)).GetValueOrDefault();
+            return (_context.Vendor?.Any(e => e.VendorId == id)).GetValueOrDefault();
         }
     }
 }

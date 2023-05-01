@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -10,16 +11,18 @@ namespace risk.control.system.Controllers
     public class InvestigationCaseController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IToastNotification toastNotification;
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public InvestigationCaseController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+        public InvestigationCaseController(ApplicationDbContext context, IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.toastNotification = toastNotification;
             this.webHostEnvironment = webHostEnvironment;
         }
 
         // GET: RiskCases
-        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
@@ -34,9 +37,9 @@ namespace risk.control.system.Controllers
 
             ViewBag.CurrentFilter = searchString;
             var cases = _context.InvestigationCase.Include(r => r.InvestigationCaseStatus).Include(r => r.LineOfBusiness).AsQueryable();
-             if (!String.IsNullOrEmpty(searchString))
+            if (!String.IsNullOrEmpty(searchString))
             {
-                cases = cases.Where(s => 
+                cases = cases.Where(s =>
                  s.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
                  s.InvestigationCaseStatus.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
                  s.InvestigationCaseStatus.Code.ToLower().Contains(searchString.Trim().ToLower()) ||
@@ -60,17 +63,17 @@ namespace risk.control.system.Controllers
                     cases = cases.OrderBy(s => s.Created);
                     break;
             }
-            
+
             int pageNumber = (currentPage ?? 1);
             ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(cases.Count(), pageSize));
             ViewBag.PageNumber = pageNumber;
             ViewBag.PageSize = pageSize;
             ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber  < (int)Math.Ceiling(decimal.Divide(cases.Count(), pageSize));
+            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(cases.Count(), pageSize));
             ViewBag.ShowFirst = pageNumber != 1;
             ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(cases.Count(), pageSize));
 
-            var caseResult = await cases.Skip((pageNumber - 1)*pageSize).Take(pageSize).ToListAsync();
+            var caseResult = await cases.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
             return View(caseResult);
         }
 
@@ -111,6 +114,7 @@ namespace risk.control.system.Controllers
         {
             _context.Add(investigationCase);
             await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("case created successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -119,12 +123,14 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.InvestigationCase == null)
             {
+                toastNotification.AddErrorToastMessage("case not found!");
                 return NotFound();
             }
 
             var investigationCase = await _context.InvestigationCase.FindAsync(id);
             if (investigationCase == null)
             {
+                toastNotification.AddErrorToastMessage("case not found!");
                 return NotFound();
             }
             ViewBag.InvestigationCaseStatusId = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", investigationCase.InvestigationCaseStatusId);
@@ -141,6 +147,7 @@ namespace risk.control.system.Controllers
         {
             if (id != investigationCase.InvestigationId)
             {
+                toastNotification.AddErrorToastMessage("case not found!");
                 return NotFound();
             }
 
@@ -160,6 +167,7 @@ namespace risk.control.system.Controllers
                     throw;
                 }
             }
+            toastNotification.AddSuccessToastMessage("district edited successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -168,6 +176,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.InvestigationCase == null)
             {
+                toastNotification.AddErrorToastMessage("case not found!");
                 return NotFound();
             }
 
@@ -177,6 +186,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.InvestigationId == id);
             if (investigationCase == null)
             {
+                toastNotification.AddErrorToastMessage("case not found!");
                 return NotFound();
             }
 
@@ -190,6 +200,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.InvestigationCase == null)
             {
+                toastNotification.AddErrorToastMessage("case not found!");
                 return Problem("Entity set 'ApplicationDbContext.RiskCase'  is null.");
             }
             var investigationCase = await _context.InvestigationCase.FindAsync(id);
@@ -199,6 +210,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("district deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -250,9 +262,11 @@ namespace risk.control.system.Controllers
                     }
                 }
 
+                toastNotification.AddSuccessToastMessage("upload successfull!");
                 return View(new { DataTable = dt });
             }
-             return View();
+                toastNotification.AddErrorToastMessage("Error in upload!");
+            return View();
         }
 
         [HttpPost]

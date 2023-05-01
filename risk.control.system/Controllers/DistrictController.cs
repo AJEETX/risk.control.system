@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -13,10 +10,12 @@ namespace risk.control.system.Controllers
     public class DistrictController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IToastNotification toastNotification;
 
-        public DistrictController(ApplicationDbContext context)
+        public DistrictController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
+            this.toastNotification = toastNotification;
         }
 
         // GET: District
@@ -81,6 +80,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.District == null)
             {
+                toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
 
@@ -90,6 +90,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.DistrictId == id);
             if (district == null)
             {
+                toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
 
@@ -114,8 +115,10 @@ namespace risk.control.system.Controllers
             {
                 _context.Add(district);
                 await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("district created successfully!");
                 return RedirectToAction(nameof(Index));
             }
+                toastNotification.AddErrorToastMessage("district not found!");
             return Problem();
         }
 
@@ -124,12 +127,14 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.District == null)
             {
+                toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
 
             var district = await _context.District.FindAsync(id);
             if (district == null)
             {
+                toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", district.CountryId);
@@ -146,6 +151,7 @@ namespace risk.control.system.Controllers
         {
             if (id != district.DistrictId)
             {
+                toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
 
@@ -167,8 +173,10 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
+                toastNotification.AddSuccessToastMessage("district edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
+                toastNotification.AddErrorToastMessage("Error to edit district!");
             return Problem();
         }
 
@@ -177,6 +185,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.District == null)
             {
+                toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
 
@@ -186,6 +195,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.DistrictId == id);
             if (district == null)
             {
+                toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
             }
 
@@ -199,6 +209,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.District == null)
             {
+                toastNotification.AddErrorToastMessage("district not found!");
                 return Problem("Entity set 'ApplicationDbContext.District'  is null.");
             }
             var district = await _context.District.FindAsync(id);
@@ -208,6 +219,7 @@ namespace risk.control.system.Controllers
             }
             
             await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("district deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
