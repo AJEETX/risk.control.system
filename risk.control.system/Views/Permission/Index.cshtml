@@ -8,33 +8,10 @@
             <div class="col-12">
                 <div class="card card-light">
                     <div class="card-header">
-                        <h3 class="card-title">pincode</h3>
+                        <h3 class="card-title">Permissions for role name :<i> <b> @Model.RoleName</b></i></h3>
                     </div>
-                    <form asp-action="index">
-                        <div class="card-body dataTable-search-form">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter pincode or pincode name">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <button id="btnFilter" type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
-                                    <a class="btn btn-info btn-sm" href="/Pincodes/Create"><i class="fas fa-plus"></i> Create</a>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card card-light">
                     <div class="card-body contained-width">
-                        <h4>Permissions for role name :<i> @Model.RoleName</i></h4>
+                        <h4></h4>
                         <form asp-controller="permission" method="post" asp-action="Update" class="d-inline">
                             <input asp-for="@Model.RoleId" type="hidden" />
                             <input asp-for="@Model.RoleName" type="hidden" />
