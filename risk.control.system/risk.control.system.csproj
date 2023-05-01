@@ -168,4 +168,10 @@
     <Folder Include="wwwroot\upload\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="pincode.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
