@@ -26,12 +26,12 @@
     });   
 
     //get the selectedmember from the hidden field.
-    var selectedmembers = $("#selectedmemebers").val().split(",");
+    //var selectedmembers = $("#selectedmemebers").val().split(",");
     //set the value in the dropdownlist.
-    $("#Members").select2({
-        multiple: true,
-    });
-    $('#Members').val(selectedmembers).trigger('change'); 
+    //$("#Members").select2({
+    //    multiple: true,
+    //});
+    //$('#Members').val(selectedmembers).trigger('change'); 
 
 
     //$("select").each(function () {
