@@ -7,7 +7,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card card-light">
+                <div class="card card-success">
                     <div class="card-header">
                         <h3 class="card-title">client company</h3>
                     </div>
@@ -60,7 +60,7 @@
                                         @Html.DisplayNameFor(model => model.Addressline)
                                     </th>
                                     <th>
-                                        @Html.DisplayNameFor(model => model.City)
+                                        @Html.DisplayNameFor(model => model.District)
                                     </th>
                                     <th>
                                         @Html.DisplayNameFor(model => model.State)
@@ -100,7 +100,7 @@
                                             @Html.DisplayFor(modelItem => item.Addressline)
                                         </td>
                                         <td>
-                                            @Html.DisplayFor(modelItem => item.City)
+                                            @Html.DisplayFor(modelItem => item.District.Name)
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.State.Name)

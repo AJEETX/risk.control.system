@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class PincodeListAdd : Migration
+    public partial class dbUpdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,7 +32,10 @@ namespace risk.control.system.Migrations
                 {
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false)
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,7 +49,9 @@ namespace risk.control.system.Migrations
                     InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,7 +65,9 @@ namespace risk.control.system.Migrations
                     LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -95,7 +102,10 @@ namespace risk.control.system.Migrations
                     StateId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false)
+                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -118,7 +128,7 @@ namespace risk.control.system.Migrations
                     LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
                     InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -146,7 +156,10 @@ namespace risk.control.system.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: false),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false)
+                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -173,7 +186,10 @@ namespace risk.control.system.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimsInvestigationCaseId = table.Column<string>(type: "TEXT", nullable: true)
+                    ClaimsInvestigationCaseId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -200,7 +216,10 @@ namespace risk.control.system.Migrations
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     DistrictId = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: false),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false)
+                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -235,7 +254,9 @@ namespace risk.control.system.Migrations
                     LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
                     InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
                     InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -272,10 +293,13 @@ namespace risk.control.system.Migrations
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Branch = table.Column<string>(type: "TEXT", nullable: false),
                     Addressline = table.Column<string>(type: "TEXT", nullable: false),
-                    City = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true)
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -285,6 +309,11 @@ namespace risk.control.system.Migrations
                         column: x => x.CountryId,
                         principalTable: "Country",
                         principalColumn: "CountryId");
+                    table.ForeignKey(
+                        name: "FK_ClientCompany_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
                         name: "FK_ClientCompany_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
@@ -312,7 +341,11 @@ namespace risk.control.system.Migrations
                     City = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true)
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -322,6 +355,11 @@ namespace risk.control.system.Migrations
                         column: x => x.CountryId,
                         principalTable: "Country",
                         principalColumn: "CountryId");
+                    table.ForeignKey(
+                        name: "FK_Vendor_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
                         name: "FK_Vendor_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
@@ -347,12 +385,16 @@ namespace risk.control.system.Migrations
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: false),
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
                     Password = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     Discriminator = table.Column<string>(type: "TEXT", nullable: false),
                     ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
                     Comments = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    VendorUser_Comments = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -383,6 +425,11 @@ namespace risk.control.system.Migrations
                         principalColumn: "CountryId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_AspNetUsers_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
+                    table.ForeignKey(
                         name: "FK_AspNetUsers_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
                         principalTable: "PinCode",
@@ -394,6 +441,11 @@ namespace risk.control.system.Migrations
                         principalTable: "State",
                         principalColumn: "StateId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Vendor_VendorId",
+                        column: x => x.VendorId,
+                        principalTable: "Vendor",
+                        principalColumn: "VendorId");
                 });
 
             migrationBuilder.CreateTable(
@@ -401,8 +453,13 @@ namespace risk.control.system.Migrations
                 columns: table => new
                 {
                     VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
                     InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: true)
+                    StateId = table.Column<string>(type: "TEXT", nullable: false),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -412,6 +469,18 @@ namespace risk.control.system.Migrations
                         column: x => x.InvestigationServiceTypeId,
                         principalTable: "InvestigationServiceType",
                         principalColumn: "InvestigationServiceTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_LineOfBusiness_LineOfBusinessId",
+                        column: x => x.LineOfBusinessId,
+                        principalTable: "LineOfBusiness",
+                        principalColumn: "LineOfBusinessId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_State_StateId",
+                        column: x => x.StateId,
+                        principalTable: "State",
+                        principalColumn: "StateId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_VendorInvestigationServiceType_Vendor_VendorId",
@@ -511,8 +580,12 @@ namespace risk.control.system.Migrations
                 {
                     ServicedPinCodeId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: true)
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -566,6 +639,11 @@ namespace risk.control.system.Migrations
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_DistrictId",
+                table: "AspNetUsers",
+                column: "DistrictId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_PinCodeId",
                 table: "AspNetUsers",
                 column: "PinCodeId");
@@ -574,6 +652,11 @@ namespace risk.control.system.Migrations
                 name: "IX_AspNetUsers_StateId",
                 table: "AspNetUsers",
                 column: "StateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_VendorId",
+                table: "AspNetUsers",
+                column: "VendorId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -595,6 +678,11 @@ namespace risk.control.system.Migrations
                 name: "IX_ClientCompany_CountryId",
                 table: "ClientCompany",
                 column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClientCompany_DistrictId",
+                table: "ClientCompany",
+                column: "DistrictId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClientCompany_PinCodeId",
@@ -672,6 +760,11 @@ namespace risk.control.system.Migrations
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Vendor_DistrictId",
+                table: "Vendor",
+                column: "DistrictId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Vendor_PinCodeId",
                 table: "Vendor",
                 column: "PinCodeId");
@@ -685,6 +778,16 @@ namespace risk.control.system.Migrations
                 name: "IX_VendorInvestigationServiceType_InvestigationServiceTypeId",
                 table: "VendorInvestigationServiceType",
                 column: "InvestigationServiceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorInvestigationServiceType_LineOfBusinessId",
+                table: "VendorInvestigationServiceType",
+                column: "LineOfBusinessId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorInvestigationServiceType_StateId",
+                table: "VendorInvestigationServiceType",
+                column: "StateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VendorInvestigationServiceType_VendorId",

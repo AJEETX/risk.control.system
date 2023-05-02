@@ -32,9 +32,17 @@ namespace risk.control.system.Models
         public string CountryId { get; set; }
         [Display(Name = "Country name")]
         public Country Country { get; set; }
+        [Display(Name = "District name")]
+        public string? DistrictId { get; set; }
+        [Display(Name = "District name")]
+        public District? District { get; set; }
 
         [Required]
         public string? Password { get; set; }
+
+        public DateTime Created { get; set; } = DateTime.Now;
+        public DateTime? Updated { get; set; }
+        public string? UpdatedBy { get; set; }
     }
     public class ApplicationRole : IdentityRole<Guid>
     {

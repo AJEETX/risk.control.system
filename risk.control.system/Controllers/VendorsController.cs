@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers
 {
@@ -79,8 +80,9 @@ namespace risk.control.system.Controllers
 
             var vendor = await _context.Vendor
                 .Include(v => v.Country)
-                .Include(v => v.PinCode)
                 .Include(v => v.State)
+                .Include(v => v.District)
+                .Include(v => v.PinCode)
                 .FirstOrDefaultAsync(m => m.VendorId == id);
             if (vendor == null)
             {
@@ -120,16 +122,19 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.Vendor == null)
             {
+                toastNotification.AddErrorToastMessage("vendor not found!");
                 return NotFound();
             }
 
             var vendor = await _context.Vendor.FindAsync(id);
             if (vendor == null)
             {
+                toastNotification.AddErrorToastMessage("vendor not found!");
                 return NotFound();
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", vendor.CountryId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", vendor.PinCodeId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendor.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendor.StateId);
             return View(vendor);
         }
@@ -176,16 +181,19 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.Vendor == null)
             {
+                toastNotification.AddErrorToastMessage("vendor not found!");
                 return NotFound();
             }
 
             var vendor = await _context.Vendor
                 .Include(v => v.Country)
+                .Include(v => v.District)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
                 .FirstOrDefaultAsync(m => m.VendorId == id);
             if (vendor == null)
             {
+                toastNotification.AddErrorToastMessage("vendor not found!");
                 return NotFound();
             }
 
@@ -213,6 +221,18 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        public async Task<IActionResult> Services(string id)
+        {
+            if (id == null || _context.Vendor == null)
+            {
+                toastNotification.AddErrorToastMessage("vendor not found!");
+                return NotFound();
+            }
+            var select2model = new VendorServiceViewModel();
+            select2model.selectedmembers = "tom,johnn,david"; //set the default selected members  
+            return View(select2model);
+        }
         private bool VendorExists(string id)
         {
             return (_context.Vendor?.Any(e => e.VendorId == id)).GetValueOrDefault();

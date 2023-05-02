@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class InvestigationCase
+    public class InvestigationCase : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -22,10 +22,9 @@ namespace risk.control.system.Models
         public string InvestigationCaseStatusId { get; set; }
         [Display(Name = "Case status")]
         public InvestigationCaseStatus InvestigationCaseStatus { get; set; }
-        public DateTime Created { get; set; } = DateTime.Now;
     }
 
-    public class ClaimsInvestigation
+    public class ClaimsInvestigation : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -43,9 +42,6 @@ namespace risk.control.system.Models
         public string InvestigationCaseStatusId { get; set; }
         [Display(Name = "Case status")]
         public InvestigationCaseStatus InvestigationCaseStatus { get; set; }
-        public DateTime Created { get; set; } = DateTime.Now;
-        public DateTime Updated { get; set; }
-        public string UpdatedBy { get; set; }
 
     }
 }

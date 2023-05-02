@@ -413,7 +413,6 @@ namespace risk.control.system.Seeds
             var currentCaseStatus15 = await context.InvestigationCaseStatus.AddAsync(clientAsssessorReturnRejected);
             #endregion
 
-
             #region INVESTIGATION CASES
 
             var claimComprehensiveCase = new InvestigationCase
@@ -423,7 +422,6 @@ namespace risk.control.system.Seeds
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = claimComprehensiveService.Entity.InvestigationServiceTypeId,
                 InvestigationCaseStatusId = currentCaseStatus1.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
             };
             var claimComprehensiveCase2 = new InvestigationCase
             {
@@ -432,7 +430,6 @@ namespace risk.control.system.Seeds
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = claimComprehensiveService.Entity.InvestigationServiceTypeId,
                 InvestigationCaseStatusId = currentCaseStatus1.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
             };
             var claimComprehensiveCase3 = new InvestigationCase
             {
@@ -440,8 +437,7 @@ namespace risk.control.system.Seeds
                 Description = "TEST CLAIM CASE DESCRIPTION comprehensive service 3",
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = claimComprehensiveService.Entity.InvestigationServiceTypeId,
-                InvestigationCaseStatusId = currentCaseStatus1.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
+                InvestigationCaseStatusId = currentCaseStatus1.Entity.InvestigationCaseStatusId
             };
 
             var claimNonComprehensiveCase = new InvestigationCase
@@ -451,7 +447,6 @@ namespace risk.control.system.Seeds
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = claimNonComprehensiveService.Entity.InvestigationServiceTypeId,
                 InvestigationCaseStatusId = currentCaseStatus2.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
             };
 
             var claimNonComprehensiveCase2 = new InvestigationCase
@@ -460,8 +455,7 @@ namespace risk.control.system.Seeds
                 Description = "TEST CLAIM CASE DESCRIPTION non-comprehensive service 2",
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = claimNonComprehensiveService.Entity.InvestigationServiceTypeId,
-                InvestigationCaseStatusId = currentCaseStatus2.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
+                InvestigationCaseStatusId = currentCaseStatus2.Entity.InvestigationCaseStatusId
             };
 
             var underwritingPreCase = new InvestigationCase
@@ -471,7 +465,6 @@ namespace risk.control.system.Seeds
                 LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = underWritingPreVerificationService.Entity.InvestigationServiceTypeId,
                 InvestigationCaseStatusId = currentCaseStatus3.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
             };
 
             var underwritingPreCase2 = new InvestigationCase
@@ -480,8 +473,7 @@ namespace risk.control.system.Seeds
                 Description = "UNDER-WRITING PRE CASE DESCRIPTION 2",
                 LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = underWritingPreVerificationService.Entity.InvestigationServiceTypeId,
-                InvestigationCaseStatusId = currentCaseStatus3.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
+                InvestigationCaseStatusId = currentCaseStatus3.Entity.InvestigationCaseStatusId
             };
 
             var claimDocumentCollectionCase = new InvestigationCase
@@ -490,8 +482,7 @@ namespace risk.control.system.Seeds
                 Description = "TEST CLAIM DOCUMENT COLLECTION CASE DESCRIPTION",
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = claimDocumentCollectionService.Entity.InvestigationServiceTypeId,
-                InvestigationCaseStatusId = currentCaseStatus4.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
+                InvestigationCaseStatusId = currentCaseStatus4.Entity.InvestigationCaseStatusId
             };
 
             var claimDocumentCollectionCase2 = new InvestigationCase
@@ -500,8 +491,7 @@ namespace risk.control.system.Seeds
                 Description = "TEST CLAIM DOCUMENT COLLECTION CASE DESCRIPTION 2",
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = claimDocumentCollectionService.Entity.InvestigationServiceTypeId,
-                InvestigationCaseStatusId = currentCaseStatus4.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
+                InvestigationCaseStatusId = currentCaseStatus4.Entity.InvestigationCaseStatusId
             };
 
             var underwritingPostCase = new InvestigationCase
@@ -510,8 +500,7 @@ namespace risk.control.system.Seeds
                 Description = "TEST CLAIM POST CASE DESCRIPTION",
                 LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = underWritingPostVerificationService.Entity.InvestigationServiceTypeId,
-                InvestigationCaseStatusId = currentCaseStatus5.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
+                InvestigationCaseStatusId = currentCaseStatus5.Entity.InvestigationCaseStatusId
             };
 
             var claimDiscreetCase = new InvestigationCase
@@ -520,8 +509,7 @@ namespace risk.control.system.Seeds
                 Description = "TEST CLAIM DISCREET CASE DESCRIPTION",
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
                 InvestigationServiceTypeId = claimDiscreetService.Entity.InvestigationServiceTypeId,
-                InvestigationCaseStatusId = currentCaseStatus4.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
+                InvestigationCaseStatusId = currentCaseStatus4.Entity.InvestigationCaseStatusId
             };
 
             #endregion
@@ -559,11 +547,11 @@ namespace risk.control.system.Seeds
                 ClientCompanyId = Guid.NewGuid().ToString(),
                 Name = "TATA AIG INSURANCE",
                 Addressline = "100 GOOD STREET ",
-                Branch = "FOREST HILL CHASE",
-                City = "FOREST HILL",
+                Branch = "MAHANAGAR COLONY",
                 Code = "TA001",
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 Description = "CORPORATE OFFICE ",
                 Email = "tata-aig@mail.com",
@@ -576,12 +564,16 @@ namespace risk.control.system.Seeds
 
             var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
             {
-                new VendorInvestigationServiceType{ InvestigationServiceType = underWritingPostVerification , 
-                    PincodeServices = new List<ServicedPinCode>
+                new VendorInvestigationServiceType{ 
+                    InvestigationServiceType = underWritingPostVerification , 
+                    LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                    ServicedPinCodes = new List<ServicedPinCode>
                     { 
                         new ServicedPinCode 
                         { 
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).Name
+                            Code = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).Code,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).Name,
                         } 
                     } 
                 }
@@ -596,6 +588,7 @@ namespace risk.control.system.Seeds
                 Code = "VA001",
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = "abc@vendor.com",
@@ -623,6 +616,7 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/superadmin.jpg"
             };
@@ -666,7 +660,7 @@ namespace risk.control.system.Seeds
             }
             
             //Seed client admin
-            var clientAdmin = new ApplicationUser()
+            var clientAdmin = new ClientCompanyUser()
             {
                 UserName = "client-admin@admin.com",
                 Email = "client-admin@admin.com",
@@ -677,7 +671,9 @@ namespace risk.control.system.Seeds
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
                 CountryId = indiaCountry.Entity.CountryId,
+                ClientCompanyId = tataAigCompany.Entity.ClientCompanyId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/admin.png"
             };
@@ -698,7 +694,7 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client creator
-            var clientCreator = new ApplicationUser()
+            var clientCreator = new ClientCompanyUser()
             {
                 UserName = "client-creator@admin.com",
                 Email = "client-creator@admin.com",
@@ -708,8 +704,10 @@ namespace risk.control.system.Seeds
                 Password = Applicationsettings.Password,
                 PhoneNumberConfirmed = true,
                 isSuperAdmin = true,
+                ClientCompanyId = tataAigCompany.Entity.ClientCompanyId,
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/creator.jpg"
             };
@@ -724,7 +722,7 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client assigner
-            var clientAssigner = new ApplicationUser()
+            var clientAssigner = new ClientCompanyUser()
             {
                 UserName = "client-assigner@admin.com",
                 Email = "client-assigner@admin.com",
@@ -734,8 +732,10 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
+                ClientCompanyId = tataAigCompany.Entity.ClientCompanyId,
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/assigner.png"
             };
@@ -750,7 +750,7 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client assessor
-            var clientAssessor = new ApplicationUser()
+            var clientAssessor = new ClientCompanyUser()
             {
                 UserName = "client-assessor@admin.com",
                 Email = "client-assessor@admin.com",
@@ -760,8 +760,10 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
+                ClientCompanyId = tataAigCompany.Entity.ClientCompanyId,
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/assessor.png"
             };
@@ -776,7 +778,7 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Admin
-            var vendorAdmin = new ApplicationUser()
+            var vendorAdmin = new VendorUser()
             {
                 UserName = "vendor-admin@admin.com",
                 Email = "vendor-admin@admin.com",
@@ -786,8 +788,10 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
+                VendorId = abcVendorCompany.Entity.VendorId,
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/vendor-admin.png"
             };
@@ -804,7 +808,7 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Admin
-            var vendorSupervisor = new ApplicationUser()
+            var vendorSupervisor = new VendorUser()
             {
                 UserName = "vendor-supervisor@admin.com",
                 Email = "vendor-supervisor@admin.com",
@@ -814,8 +818,10 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
+                VendorId = abcVendorCompany.Entity.VendorId,
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/supervisor.png"
             };
@@ -831,7 +837,7 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Admin
-            var vendorAgent = new ApplicationUser()
+            var vendorAgent = new VendorUser()
             {
                 UserName = "vendor-agent@admin.com",
                 Email = "vendor-agent@admin.com",
@@ -841,8 +847,10 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Applicationsettings.Password,
                 isSuperAdmin = true,
+                VendorId = abcVendorCompany.Entity.VendorId,
                 CountryId = indiaCountry.Entity.CountryId,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState)).StateId,
+                DistrictId = context.District.FirstOrDefault(s => s.Code.StartsWith(currentDistrict)).DistrictId,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode).PinCodeId,
                 ProfilePictureUrl = "img/agent.jpg"
             };

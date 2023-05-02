@@ -7,11 +7,11 @@
         <form asp-action="Create" asp-antiforgery="true" enctype="multipart/form-data">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <div class="card card-primary">
+                    <div class="card card-success">
                         <div class="card-header">
                             <h3 class="card-title">Create user</h3>
                         </div>
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <div class="card-body">
                             <input type="hidden" asp-for="Id" />
                             <div class="form-group">
@@ -56,16 +56,23 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="StateId" class="control-label"></label>
-                                <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId"  onchange="loadPinCode(this)">
+                                <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
                                     <option>--- SELECT STATE ---</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DistrictId" class="control-label"></label>
+                                <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId">
+                                    <option>--- SELECT DISTRICT ---</option>
+                                </select>
+                                <span asp-validation-for="DistrictId" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="PinCodeId" class="control-label"></label>
                                 <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                     <option>--- SELECT PINCODE ---</option>
                                 </select>
-                            </div>                            
+                            </div>
                             <div class="form-group">
                                 <label asp-for="Password" class="control-label"></label>
                                 <input type="password" asp-for="Password" class="form-control" />
@@ -75,9 +82,12 @@
                                 <input asp-for="ProfileImage" type="file" class="form-control" />
                             </div>
                             <div class="card-footer text-right">
-                                <a asp-action="Index" class="btn btn-secondary"> <i class="fa fa-window-close"></i>
-                                    Cancel</a>
-                                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Create
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fa fa-window-close"></i>
+                                    Cancel
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Create
                                 </button>
                             </div>
                         </div>

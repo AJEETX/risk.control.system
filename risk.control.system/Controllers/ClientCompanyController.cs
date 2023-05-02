@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
@@ -116,7 +112,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddSuccessToastMessage("client company created successfully!");
                 return RedirectToAction(nameof(Index));
             }
-                toastNotification.AddErrorToastMessage("client company not found!");
+            toastNotification.AddErrorToastMessage("client company not found!");
             return Problem();
         }
 
@@ -136,6 +132,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", clientCompany.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", clientCompany.DistrictId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", clientCompany.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", clientCompany.StateId);
             return View(clientCompany);
@@ -175,7 +172,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddSuccessToastMessage("client company edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-                toastNotification.AddErrorToastMessage("Error to edit client company!");
+            toastNotification.AddErrorToastMessage("Error to edit client company!");
             return Problem();
         }
 
@@ -219,7 +216,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("client company deleted successfully!");
+            toastNotification.AddSuccessToastMessage("client company deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

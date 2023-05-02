@@ -62,7 +62,6 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    toastNotification.AddErrorToastMessage("invalid login attempt!");
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     model.Error = "Invalid login attempt.";
                     return View(model);
