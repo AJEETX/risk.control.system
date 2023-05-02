@@ -165,6 +165,7 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Api\" />
+    <Folder Include="wwwroot\upload-pincodes\" />
     <Folder Include="wwwroot\upload\" />
   </ItemGroup>
 
