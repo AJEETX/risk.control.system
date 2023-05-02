@@ -1,0 +1,33 @@
+﻿@using risk.control.system.Models.ViewModel;
+@model VendorServiceViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+<section class="content pt-2">
+    <div class="container-fluid ">
+        <form asp-action="Create" asp-antiforgery="true">
+            <div class="row mb-2">
+                <div class="col-sm-12">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">Create Services</h3>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" id="selectedmemebers" value="@Model.selectedmembers" />
+                            @Html.DropDownListFor(x => x.members, Model.memberList, new { @id="Members", @class= "select2 form-select",  multiple =
+                            "multiple", tabindex="3" })
+                            <span asp-validation-for="members" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

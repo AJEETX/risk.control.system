@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-    public class ClientCompany
+    public class ClientCompany :BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -15,13 +15,21 @@ namespace risk.control.system.Models
         public string Email { get; set; } = string.Empty;
         public string Branch { get; set; } = string.Empty;
         public string Addressline { get; set; } = string.Empty;
-        public string City { get; set; } = string.Empty;
+        [Display(Name = "State name")]
+
         public string? StateId { get; set; }
+        [Display(Name = "State name")]
         public State? State { get; set; }
+        [Display(Name = "Country name")]
         public string? CountryId { get; set; }
+        [Display(Name = "Country name")]
         public Country? Country { get; set; }
+        [Display(Name = "Pincode")]
         public string? PinCodeId { get; set; }
         public PinCode? PinCode { get; set; }
-
+        [Display(Name = "District")]
+        public string? DistrictId { get; set; }
+        public District? District { get; set; }
+        public List<ClientCompanyUser>? ClientCompanyUsers { get; set; }
     }
 }

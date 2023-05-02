@@ -24,6 +24,16 @@
     $('#DistrictId').change(function () {
         loadPinCode($(this));
     });   
+
+    //get the selectedmember from the hidden field.
+    //var selectedmembers = $("#selectedmemebers").val().split(",");
+    //set the value in the dropdownlist.
+    //$("#Members").select2({
+    //    multiple: true,
+    //});
+    //$('#Members').val(selectedmembers).trigger('change'); 
+
+
     //$("select").each(function () {
     //    if ($(this).find("option").length <= 1) {
     //        $(this).attr("disabled", "disabled");

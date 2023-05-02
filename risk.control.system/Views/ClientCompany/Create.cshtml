@@ -8,7 +8,7 @@
         <form asp-action="Create">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <div class="card card-primary">
+                    <div class="card card-success">
                         <div class="card-header">
                             <h3 class="card-title">Add Client company</h3>
                         </div>
@@ -70,6 +70,13 @@
                                 <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
                                     <option>--- SELECT STATE ---</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DistrictId" class="control-label"></label>
+                                <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId">
+                                    <option>--- SELECT DISTRICT ---</option>
+                                </select>
+                                <span asp-validation-for="DistrictId" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="PinCodeId" class="control-label"></label>
