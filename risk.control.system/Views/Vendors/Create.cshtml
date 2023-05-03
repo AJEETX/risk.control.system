@@ -5,97 +5,97 @@
 }
 <section class="content pt-2">
     <div class="container-fluid ">
-    <form asp-action="Create">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Create Investigating agency</h3>
-                    </div>
-                    <div class="card-body">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <div class="form-group">
-                            <label asp-for="Name" class="control-label"></label>
-                            <input asp-for="Name" class="form-control" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+        <form asp-action="Create">
+            <div class="row mb-2">
+                <div class="col-sm-12">
+                    <div class="card card-success">
+                        <div class="card-header">
+                            <h3 class="card-title">Create Investigating agency</h3>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="Code" class="control-label"></label>
-                            <input asp-for="Code" class="form-control" />
-                            <span asp-validation-for="Code" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Description" class="control-label"></label>
-                            <input asp-for="Description" class="form-control" />
-                            <span asp-validation-for="Description" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="PhoneNumber" class="control-label"></label>
-                            <input asp-for="PhoneNumber" class="form-control" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Email" class="control-label"></label>
-                            <input asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                            <div class="form-group">
-                                <label asp-for="Branch" class="control-label"></label>
-                                <input asp-for="Branch" class="form-control" />
-                                <span asp-validation-for="Branch" class="text-danger"></span>
-                            </div>
-                    </div>
-                </div>
-            </div>
-        <div class="col-sm-6">
-            <div class="card card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">...</h3>
-                </div>
-                <div class="card-body">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-6">
 
-                    <div class="form-group">
-                        <label asp-for="Addressline" class="control-label"></label>
-                        <input asp-for="Addressline" class="form-control" />
-                        <span asp-validation-for="Addressline" class="text-danger"></span>
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="control-label"></label>
+                                        <input asp-for="Name" class="form-control" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Code" class="control-label"></label>
+                                        <input asp-for="Code" class="form-control" />
+                                        <span asp-validation-for="Code" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Description" class="control-label"></label>
+                                        <input asp-for="Description" class="form-control" />
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="PhoneNumber" class="control-label"></label>
+                                        <input asp-for="PhoneNumber" class="form-control" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="control-label"></label>
+                                        <input asp-for="Email" class="form-control" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Branch" class="control-label"></label>
+                                        <input asp-for="Branch" class="form-control" />
+                                        <span asp-validation-for="Branch" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6">
+
+                                    <div class="form-group">
+                                        <label asp-for="Addressline" class="control-label"></label>
+                                        <input asp-for="Addressline" class="form-control" />
+                                        <span asp-validation-for="Addressline" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="City" class="control-label"></label>
+                                        <input asp-for="City" class="form-control" />
+                                        <span asp-validation-for="City" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="CountryId" class="control-label"></label>
+                                        <select asp-for="CountryId" class="form-control" tex asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                            <option>--- SELECT COUNTRY ---</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="StateId" class="control-label"></label>
+                                        <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
+                                            <option>--- SELECT STATE ---</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="PinCodeId" class="control-label"></label>
+                                        <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                            <option>--- SELECT PINCODE ---</option>
+                                        </select>
+                                    </div>
+                                    <div class="card-footer text-right">
+                                        <a asp-action="Index" class="btn btn-secondary">
+                                            <i class="fa fa-window-close"></i>
+                                            Cancel
+                                        </a>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-plus"></i> Create
+                                        </button>
+                                    </div>
+                                    </>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="City" class="control-label"></label>
-                        <input asp-for="City" class="form-control" />
-                        <span asp-validation-for="City" class="text-danger"></span>
-                    </div>
-                        <div class="form-group">
-                            <label asp-for="CountryId" class="control-label"></label>
-                            <select asp-for="CountryId" class="form-control" tex asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                <option>--- SELECT COUNTRY ---</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="StateId" class="control-label"></label>
-                            <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
-                                <option>--- SELECT STATE ---</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="PinCodeId" class="control-label"></label>
-                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                <option>--- SELECT PINCODE ---</option>
-                            </select>
-                        </div>
-                        <div class="card-footer text-right">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="fa fa-window-close"></i>
-                                Cancel
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-plus"></i> Create
-                            </button>
-                        </div>
                 </div>
             </div>
-        </div>
-        </div>
-    </form>
+        </form>
     </div>
 </section>
 
