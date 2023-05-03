@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models;
-public class Country
+public class Country : BaseEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -15,7 +15,7 @@ public class Country
     public string Code { get; set; }
 
 }
-public class State
+public class State :BaseEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -32,7 +32,7 @@ public class State
     public Country Country { get; set; }
 }
 
-public class District
+public class District : BaseEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -54,7 +54,7 @@ public class District
     public Country Country { get; set; }
 }
 
-public class PinCode
+public class PinCode : BaseEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

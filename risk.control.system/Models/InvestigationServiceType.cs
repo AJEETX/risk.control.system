@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-    public class InvestigationServiceType
+    public class InvestigationServiceType :BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -14,6 +14,7 @@ namespace risk.control.system.Models
         [Display(Name = "InvestigationService Type code")]
         [Required]
         public string Code { get; set; }
+        [Display(Name = "Line Of Business")]
         public string LineOfBusinessId { get; set; }
         public LineOfBusiness LineOfBusiness { get; set; }
 

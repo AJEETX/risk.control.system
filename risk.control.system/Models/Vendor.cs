@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-    public class Vendor
+    public class Vendor : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,24 +17,33 @@ namespace risk.control.system.Models
         public string Addressline { get; set; } = string.Empty;
         public List<VendorInvestigationServiceType> VendorInvestigationServiceTypes { get; set; }
         public string City { get; set; } = string.Empty;
+        [Display(Name = "State name")]
         public string? StateId { get; set; }
         public State? State { get; set; }
+        [Display(Name = "Country name")]
         public string? CountryId { get; set; }
         public Country? Country { get; set; }
+        [Display(Name = "Pincode")]
         public string? PinCodeId { get; set; }
         public PinCode? PinCode { get; set; }
+        [Display(Name = "District")]
+        public string DistrictId { get; set; }
+        [Display(Name = "District")]
+        [Required]
+        public District District { get; set; }
     }
 
-    public class VendorInvestigationServiceType
+    public class VendorInvestigationServiceType : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VendorInvestigationServiceTypeId { get; set; } = Guid.NewGuid().ToString();
+        [Display(Name = "Investigation service type")]
         public InvestigationServiceType InvestigationServiceType { get; set; }
         public List<ServicedPinCode> PincodeServices { get; set; }
     }
 
-    public class ServicedPinCode
+    public class ServicedPinCode : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
