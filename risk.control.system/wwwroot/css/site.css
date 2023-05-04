@@ -112,3 +112,8 @@ table td {
 .login-box{
     width:400px;
 }
+#documentImage {
+    width: 250px;
+    height: 150px;
+    object-fit: cover
+}

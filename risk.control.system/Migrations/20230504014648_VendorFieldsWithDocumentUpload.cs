@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class VendorFields : Migration
+    public partial class VendorFieldsWithDocumentUpload : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -354,6 +354,7 @@ namespace risk.control.system.Migrations
                     Status = table.Column<int>(type: "INTEGER", nullable: true),
                     DelistReason = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)

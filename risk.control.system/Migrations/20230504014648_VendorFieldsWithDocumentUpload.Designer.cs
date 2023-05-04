@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230503235518_VendorFieldsWithDocumentUpload")]
+    [Migration("20230504014648_VendorFieldsWithDocumentUpload")]
     partial class VendorFieldsWithDocumentUpload
     {
         /// <inheritdoc />
