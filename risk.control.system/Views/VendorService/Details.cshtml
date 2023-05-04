@@ -3,42 +3,41 @@
 @{
     ViewData["Title"] = "Details";
 }
-
-<h1>Details</h1>
-
-<div>
-    <h4>VendorInvestigationServiceType</h4>
-    <hr />
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">investigation services of vendor: @Model.Vendor.Name</h3>
+                    </div>
+                 </div>
+            </div>
+        </div>
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.InvestigationServiceType)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.InvestigationServiceType.InvestigationServiceTypeId)
+            @Html.DisplayFor(model => model.InvestigationServiceType.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.LineOfBusiness)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LineOfBusiness.LineOfBusinessId)
+            @Html.DisplayFor(model => model.LineOfBusiness.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.State)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.State.StateId)
+            @Html.DisplayFor(model => model.State.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Price)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Vendor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Vendor.VendorId)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Created)
@@ -64,3 +63,4 @@
     <a asp-action="Edit" asp-route-id="@Model.VendorInvestigationServiceTypeId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+</section>
