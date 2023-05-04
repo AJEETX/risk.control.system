@@ -60,10 +60,7 @@
                                     <th>
                                         @Html.DisplayNameFor(model => model.State)
                                     </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.PinCode)
-                                    </th>
-                                    <th></th>
+                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -98,9 +95,6 @@
                                         </td>
                                          <td>
                                             @Html.DisplayFor(modelItem => item.State.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.PinCode.Name)
                                         </td>
                                         <td>
                                             <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.VendorId">
