@@ -73,7 +73,19 @@ function loadPinCode(obj) {
     });
 }
 
-
+function loadInvestigationServices(obj) {
+    var value = obj.value;
+    $.post("/VendorService/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
+        PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--SELECT TYPE OF INVESTIGATION--</option>");
+    });
+}
+function PopulateInvestigationServices(dropDownId, list, option) {
+    $(dropDownId).empty();
+    $(dropDownId).append(option)
+    $.each(list, function (index, row) {
+        $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>")
+    });
+}
 function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, pincodeOption, districtOption) {
     $(pinCodedropDownId).empty();
     $(pinCodedropDownId).append(pincodeOption)

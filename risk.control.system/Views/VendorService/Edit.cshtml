@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Edit";
 }
+
 <section class="content pt-2">
     <div class="container-fluid ">
         <form asp-action="Edit" enctype="multipart/form-data">
@@ -10,7 +11,7 @@
                 <div class="col-sm-12">
                     <div class="card card-success">
                         <div class="card-header">
-                            <h3 class="card-title">Edit vendor service</h3>
+                            <h3 class="card-title">Edit vendor services for: @Model.Vendor.Name </h3>
                         </div>
                         <div class="card-body">
                             <form asp-action="Edit">
@@ -19,35 +20,54 @@
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
                                         <div class="form-group">
-                                            <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
-                                            <select asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId"></select>
-                                            <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
                                             <label asp-for="LineOfBusinessId" class="control-label"></label>
-                                            <select asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId"></select>
+                                            <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
+                                                <option>--SELECT LINE OF BUSINESS--</option>
+                                            </select>
                                             <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
                                         </div>
-                                       
+                                        <div class="form-group">
+                                            <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
+                                            <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                                <option>--SELECT TYPE OF INVESTIGATION--</option>
+                                            </select>
+                                            <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
+                                        </div>
+
+
                                     </div>
                                     <div class="col-md-6">
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                        <div class="form-group">
-                                            <label asp-for="StateId" class="control-label"></label>
-                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId"></select>
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
-                                        </div>
+
                                         <div class="form-group">
                                             <label asp-for="Price" class="control-label"></label>
                                             <input asp-for="Price" class="form-control" />
                                             <span asp-validation-for="Price" class="text-danger"></span>
                                         </div>
+                                        <div class="form-group">
+                                            <label asp-for="StateId" class="control-label"></label>
+                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId">
+                                                <option>--SELECT STATE--</option>
+
+                                            </select>
+                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label asp-for="PincodeServices" class="control-label"></label>
+                                            <input asp-for="PincodeServices" class="form-control" />
+                                            <span asp-validation-for="PincodeServices" class="text-danger"></span>
+                                        </div>
                                         <div class="text-right">
-                                            <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary">
+                                            <a asp-controller="Vendors" asp-action="details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                                 <i class="fa fa-window-close"></i>
                                                 Cancel
                                             </a>
-                                            <button type="submit" class="btn btn-warning">
+                                            <button disabled type="submit" class="btn btn-warning">
                                                 <i class="fas fa-pen"></i> Edit
                                             </button>
                                         </div>

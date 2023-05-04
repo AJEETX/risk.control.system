@@ -42,6 +42,7 @@ namespace risk.control.system.Controllers
             var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                 .Include(v => v.InvestigationServiceType)
                 .Include(v => v.LineOfBusiness)
+                .Include(v => v.PincodeServices)
                 .Include(v => v.State)
                 .Include(v => v.Vendor)
                 .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
@@ -54,12 +55,13 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Create
-        public IActionResult Create(string vendorId)
+        public IActionResult Create(string id)
         {
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name");
+            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name");
+            ViewBag.VendorName = vendor.Name;
+            ViewBag.VendorId = vendor.VendorId;
             return View();
         }
 
@@ -82,7 +84,18 @@ namespace risk.control.system.Controllers
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
             return View(vendorInvestigationServiceType);
         }
-
+        [HttpPost, ActionName("GetInvestigationServicesByLineOfBusinessId")]
+        public async Task<JsonResult> GetInvestigationServicesByLineOfBusinessId(string LineOfBusinessId)
+        {
+            string lId;
+            var services = new List<InvestigationServiceType>();
+            if (!string.IsNullOrEmpty(LineOfBusinessId))
+            {
+                lId = LineOfBusinessId;
+                services = await _context.InvestigationServiceType.Where(s => s.LineOfBusiness.LineOfBusinessId.Equals(lId)).ToListAsync();
+            }
+            return Json(services);
+        }
         // GET: VendorService/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
@@ -96,11 +109,13 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+            var services = _context.VendorInvestigationServiceType.Include(v => v.Vendor).First(v => v.VendorInvestigationServiceTypeId == id);
+
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
-            return View(vendorInvestigationServiceType);
+            return View(services);
         }
 
         // POST: VendorService/Edit/5
