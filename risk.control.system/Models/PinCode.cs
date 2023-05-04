@@ -13,10 +13,9 @@ namespace risk.control.system.Models
         [Display(Name = "PinCode")]
         public string Code { get; set; } = default!;
         [Display(Name = "District")]
-        public string DistrictId { get; set; } = default!;
+        public string? DistrictId { get; set; } = default!;
         [Display(Name = "District")]
-        [Required]
-        public District District { get; set; } = default!;
+        public District? District { get; set; } = default!;
         [Required]
         [Display(Name = "State name")]
         public string StateId { get; set; } = default!;

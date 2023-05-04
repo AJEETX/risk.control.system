@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class VendorFieldsWithDocumentUpload : Migration
+    public partial class RemovedDistrict : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -214,7 +214,7 @@ namespace risk.control.system.Migrations
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: false),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
                     StateId = table.Column<string>(type: "TEXT", nullable: false),
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -234,8 +234,7 @@ namespace risk.control.system.Migrations
                         name: "FK_PinCode_District_DistrictId",
                         column: x => x.DistrictId,
                         principalTable: "District",
-                        principalColumn: "DistrictId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
                         name: "FK_PinCode_State_StateId",
                         column: x => x.StateId,
@@ -297,7 +296,7 @@ namespace risk.control.system.Migrations
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: true),
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: false),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -314,8 +313,7 @@ namespace risk.control.system.Migrations
                         name: "FK_ClientCompany_District_DistrictId",
                         column: x => x.DistrictId,
                         principalTable: "District",
-                        principalColumn: "DistrictId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
                         name: "FK_ClientCompany_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
@@ -344,7 +342,7 @@ namespace risk.control.system.Migrations
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: true),
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: false),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
                     BankName = table.Column<string>(type: "TEXT", nullable: false),
                     BankAccountNumber = table.Column<string>(type: "TEXT", nullable: false),
                     IFSCCode = table.Column<string>(type: "TEXT", nullable: false),
@@ -371,8 +369,7 @@ namespace risk.control.system.Migrations
                         name: "FK_Vendor_District_DistrictId",
                         column: x => x.DistrictId,
                         principalTable: "District",
-                        principalColumn: "DistrictId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
                         name: "FK_Vendor_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
@@ -398,7 +395,6 @@ namespace risk.control.system.Migrations
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: false),
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
@@ -436,12 +432,6 @@ namespace risk.control.system.Migrations
                         column: x => x.CountryId,
                         principalTable: "Country",
                         principalColumn: "CountryId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_District_DistrictId",
-                        column: x => x.DistrictId,
-                        principalTable: "District",
-                        principalColumn: "DistrictId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AspNetUsers_PinCode_PinCodeId",
@@ -650,11 +640,6 @@ namespace risk.control.system.Migrations
                 name: "IX_AspNetUsers_CountryId",
                 table: "AspNetUsers",
                 column: "CountryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_DistrictId",
-                table: "AspNetUsers",
-                column: "DistrictId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_PinCodeId",

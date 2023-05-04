@@ -341,7 +341,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DistrictId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -608,7 +607,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DistrictId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -752,7 +750,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DistrictId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<byte[]>("DocumentImage")
@@ -992,9 +989,7 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.District", "District")
                         .WithMany()
-                        .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DistrictId");
 
                     b.HasOne("risk.control.system.Models.PinCode", "PinCode")
                         .WithMany()
@@ -1084,9 +1079,7 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.District", "District")
                         .WithMany()
-                        .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DistrictId");
 
                     b.HasOne("risk.control.system.Models.State", "State")
                         .WithMany()
@@ -1127,9 +1120,7 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.District", "District")
                         .WithMany()
-                        .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DistrictId");
 
                     b.HasOne("risk.control.system.Models.PinCode", "PinCode")
                         .WithMany()

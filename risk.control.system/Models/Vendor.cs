@@ -27,10 +27,9 @@ namespace risk.control.system.Models
         public string? PinCodeId { get; set; } = default!;
         public PinCode? PinCode { get; set; } = default!;
         [Display(Name = "District")]
-        public string DistrictId { get; set; } = default!;
+        public string? DistrictId { get; set; } = default!;
         [Display(Name = "District")]
-        [Required]
-        public District District { get; set; } = default!;
+        public District? District { get; set; } = default!;
         [Display(Name = "Bank Name")]
         public string BankName { get; set; } = default!;
         [Display(Name = "Bank Account Number")]

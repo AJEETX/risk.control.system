@@ -11,24 +11,21 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
-            var currentPinCode = "515631";
-            var currentDistrict = "ANANTAPUR";
-            var currentState = "AD";
             //Seed portal admin
             var portalAdmin = new ApplicationUser()
             {
-                UserName = "portal-admin@admin.com",
-                Email = "portal-admin@admin.com",
-                FirstName = "Portal",
-                LastName = "Admin",
+                UserName = Applicationsettings.PORTAL_ADMIN.USERNAME,
+                Email = Applicationsettings.PORTAL_ADMIN.EMAIL,
+                FirstName = Applicationsettings.PORTAL_ADMIN.FIRST_NAME,
+                LastName = Applicationsettings.PORTAL_ADMIN.LAST_NAME,
                 Password = Applicationsettings.Password,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 CountryId = indiaCountry.Entity.CountryId,
                 //DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-                ProfilePictureUrl = "img/superadmin.jpg"
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                ProfilePictureUrl =Applicationsettings.PORTAL_ADMIN.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != portalAdmin.Id))
             {
