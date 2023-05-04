@@ -545,84 +545,84 @@ namespace risk.control.system.Seeds
             var currentPinCode = "515631";
             var currentDistrict = "ANANTAPUR";
             var currentState = "AD";
-            //try
-            //{
-            //    var pin = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode);
-            //}
-            //catch (Exception ex)
-            //{
+            try
+            {
+                var pin = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode);
+            }
+            catch (Exception ex)
+            {
 
-            //    throw;
-            //}
-            //var TataAig = new ClientCompany
-            //{
-            //    ClientCompanyId = Guid.NewGuid().ToString(),
-            //    Name = "TATA AIG INSURANCE",
-            //    Addressline = "100 GOOD STREET ",
-            //    Branch = "FOREST HILL CHASE",
-            //    City = "FOREST HILL",
-            //    Code = "TA001",
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    Description = "CORPORATE OFFICE ",
-            //    Email = "tata-aig@mail.com",
-            //    PhoneNumber = "(03) 88004739",
-            //};
+                throw;
+            }
+            var TataAig = new ClientCompany
+            {
+                ClientCompanyId = Guid.NewGuid().ToString(),
+                Name = "TATA AIG INSURANCE",
+                Addressline = "100 GOOD STREET ",
+                Branch = "FOREST HILL CHASE",
+                City = "FOREST HILL",
+                Code = "TA001",
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                Description = "CORPORATE OFFICE ",
+                Email = "tata-aig@mail.com",
+                PhoneNumber = "(03) 88004739",
+            };
 
-            //var tataAigCompany = await context.ClientCompany.AddAsync(TataAig);
+            var tataAigCompany = await context.ClientCompany.AddAsync(TataAig);
 
-            ////CREATE VENDOR COMPANY
+            //CREATE VENDOR COMPANY
 
-            //var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
-            //{
-            //    new VendorInvestigationServiceType{
-            //        InvestigationServiceTypeId = claimNonComprehensiveService.Entity.InvestigationServiceTypeId,
-            //        Price = 99,
-            //        StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //        LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
-            //        PincodeServices = new List<ServicedPinCode>
-            //        {
-            //            new ServicedPinCode
-            //            {
-            //                Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
-            //            }
-            //        }
-            //    }
-            //};
+            var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            {
+                new VendorInvestigationServiceType{
+                    InvestigationServiceTypeId = claimNonComprehensiveService.Entity.InvestigationServiceTypeId,
+                    Price = 99,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                }
+            };
 
-            //var abcVendor = new Vendor
-            //{
-            //    Name = "abc investigation agency",
-            //    Addressline = "1, Main Road  ",
-            //    Branch = "MAHATTAN",
-            //    City = "FOREST HILL",
-            //    Code = "VA001",
-            //    ActivatedDate = DateTime.Now,
-            //    AgreementDate = DateTime.Now,
-            //    BankName = "WESTPAC",
-            //    BankAccountNumber = "1234567",
-            //    IFSCCode = "IFSC100",
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    Description = "HEAD OFFICE ",
-            //    Email = "abc@vendor.com",
-            //    PhoneNumber = "(04) 123 234",
-            //    VendorInvestigationServiceTypes = listOfSericesWithPinCodes
-            //};
+            var abcVendor = new Vendor
+            {
+                Name = "abc investigation agency",
+                Addressline = "1, Main Road  ",
+                Branch = "MAHATTAN",
+                City = "FOREST HILL",
+                Code = "VA001",
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "WESTPAC",
+                BankAccountNumber = "1234567",
+                IFSCCode = "IFSC100",
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                Description = "HEAD OFFICE ",
+                Email = "abc@vendor.com",
+                PhoneNumber = "(04) 123 234",
+                VendorInvestigationServiceTypes = listOfSericesWithPinCodes
+            };
 
-            //var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
+            var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
 
             #endregion
 
             await context.SaveChangesAsync();
 
-            //#region APPLICATION USERS ROLES
+            #region APPLICATION USERS ROLES
 
-            ////Seed portal admin
+            //Seed portal admin
             var portalAdmin = new ApplicationUser()
             {
                 UserName = "portal-admin@admin.com",
@@ -677,204 +677,204 @@ namespace risk.control.system.Seeds
                 }
             }
 
-            ////Seed client admin
-            //var clientAdmin = new ApplicationUser()
-            //{
-            //    UserName = "client-admin@admin.com",
-            //    Email = "client-admin@admin.com",
-            //    FirstName = "Client",
-            //    LastName = "Admin",
-            //    EmailConfirmed = true,
-            //    PhoneNumberConfirmed = true,
-            //    Password = Applicationsettings.Password,
-            //    isSuperAdmin = true,
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    ProfilePictureUrl = "img/admin.png"
-            //};
-            //if (userManager.Users.All(u => u.Id != clientAdmin.Id))
-            //{
-            //    var user = await userManager.FindByEmailAsync(clientAdmin.Email);
-            //    if (user == null)
-            //    {
-            //        await userManager.CreateAsync(clientAdmin, Applicationsettings.Password);
-            //        await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAdmin.ToString());
-            //        await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientCreator.ToString());
-            //        await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssigner.ToString());
-            //        await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssessor.ToString());
-            //        await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAdmin.ToString());
-            //        await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorSupervisor.ToString());
-            //        await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAgent.ToString());
-            //    }
-            //}
+            //Seed client admin
+            var clientAdmin = new ApplicationUser()
+            {
+                UserName = "client-admin@admin.com",
+                Email = "client-admin@admin.com",
+                FirstName = "Client",
+                LastName = "Admin",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Password = Applicationsettings.Password,
+                isSuperAdmin = true,
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                ProfilePictureUrl = "img/admin.png"
+            };
+            if (userManager.Users.All(u => u.Id != clientAdmin.Id))
+            {
+                var user = await userManager.FindByEmailAsync(clientAdmin.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(clientAdmin, Applicationsettings.Password);
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAdmin.ToString());
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientCreator.ToString());
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssigner.ToString());
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssessor.ToString());
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAdmin.ToString());
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorSupervisor.ToString());
+                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAgent.ToString());
+                }
+            }
 
-            ////Seed client creator
-            //var clientCreator = new ApplicationUser()
-            //{
-            //    UserName = "client-creator@admin.com",
-            //    Email = "client-creator@admin.com",
-            //    FirstName = "Client",
-            //    LastName = "Creator",
-            //    EmailConfirmed = true,
-            //    Password = Applicationsettings.Password,
-            //    PhoneNumberConfirmed = true,
-            //    isSuperAdmin = true,
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    ProfilePictureUrl = "img/creator.jpg"
-            //};
-            //if (userManager.Users.All(u => u.Id != clientCreator.Id))
-            //{
-            //    var user = await userManager.FindByEmailAsync(clientCreator.Email);
-            //    if (user == null)
-            //    {
-            //        await userManager.CreateAsync(clientCreator, Applicationsettings.Password);
-            //        await userManager.AddToRoleAsync(clientCreator, AppRoles.ClientCreator.ToString());
-            //    }
-            //}
+            //Seed client creator
+            var clientCreator = new ApplicationUser()
+            {
+                UserName = "client-creator@admin.com",
+                Email = "client-creator@admin.com",
+                FirstName = "Client",
+                LastName = "Creator",
+                EmailConfirmed = true,
+                Password = Applicationsettings.Password,
+                PhoneNumberConfirmed = true,
+                isSuperAdmin = true,
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                ProfilePictureUrl = "img/creator.jpg"
+            };
+            if (userManager.Users.All(u => u.Id != clientCreator.Id))
+            {
+                var user = await userManager.FindByEmailAsync(clientCreator.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(clientCreator, Applicationsettings.Password);
+                    await userManager.AddToRoleAsync(clientCreator, AppRoles.ClientCreator.ToString());
+                }
+            }
 
-            ////Seed client assigner
-            //var clientAssigner = new ApplicationUser()
-            //{
-            //    UserName = "client-assigner@admin.com",
-            //    Email = "client-assigner@admin.com",
-            //    FirstName = "Client",
-            //    LastName = "Assigner",
-            //    EmailConfirmed = true,
-            //    PhoneNumberConfirmed = true,
-            //    Password = Applicationsettings.Password,
-            //    isSuperAdmin = true,
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    ProfilePictureUrl = "img/assigner.png"
-            //};
-            //if (userManager.Users.All(u => u.Id != clientAssigner.Id))
-            //{
-            //    var user = await userManager.FindByEmailAsync(clientAssigner.Email);
-            //    if (user == null)
-            //    {
-            //        await userManager.CreateAsync(clientAssigner, Applicationsettings.Password);
-            //        await userManager.AddToRoleAsync(clientAssigner, AppRoles.ClientAssigner.ToString());
-            //    }
-            //}
+            //Seed client assigner
+            var clientAssigner = new ApplicationUser()
+            {
+                UserName = "client-assigner@admin.com",
+                Email = "client-assigner@admin.com",
+                FirstName = "Client",
+                LastName = "Assigner",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Password = Applicationsettings.Password,
+                isSuperAdmin = true,
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                ProfilePictureUrl = "img/assigner.png"
+            };
+            if (userManager.Users.All(u => u.Id != clientAssigner.Id))
+            {
+                var user = await userManager.FindByEmailAsync(clientAssigner.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(clientAssigner, Applicationsettings.Password);
+                    await userManager.AddToRoleAsync(clientAssigner, AppRoles.ClientAssigner.ToString());
+                }
+            }
 
-            ////Seed client assessor
-            //var clientAssessor = new ApplicationUser()
-            //{
-            //    UserName = "client-assessor@admin.com",
-            //    Email = "client-assessor@admin.com",
-            //    FirstName = "Client",
-            //    LastName = "Assessor",
-            //    EmailConfirmed = true,
-            //    PhoneNumberConfirmed = true,
-            //    Password = Applicationsettings.Password,
-            //    isSuperAdmin = true,
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    ProfilePictureUrl = "img/assessor.png"
-            //};
-            //if (userManager.Users.All(u => u.Id != clientAssessor.Id))
-            //{
-            //    var user = await userManager.FindByEmailAsync(clientAssessor.Email);
-            //    if (user == null)
-            //    {
-            //        await userManager.CreateAsync(clientAssessor, Applicationsettings.Password);
-            //        await userManager.AddToRoleAsync(clientAssessor, AppRoles.ClientAssessor.ToString());
-            //    }
-            //}
+            //Seed client assessor
+            var clientAssessor = new ApplicationUser()
+            {
+                UserName = "client-assessor@admin.com",
+                Email = "client-assessor@admin.com",
+                FirstName = "Client",
+                LastName = "Assessor",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Password = Applicationsettings.Password,
+                isSuperAdmin = true,
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                ProfilePictureUrl = "img/assessor.png"
+            };
+            if (userManager.Users.All(u => u.Id != clientAssessor.Id))
+            {
+                var user = await userManager.FindByEmailAsync(clientAssessor.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(clientAssessor, Applicationsettings.Password);
+                    await userManager.AddToRoleAsync(clientAssessor, AppRoles.ClientAssessor.ToString());
+                }
+            }
 
-            ////Seed Vendor Admin
-            //var vendorAdmin = new ApplicationUser()
-            //{
-            //    UserName = "vendor-admin@admin.com",
-            //    Email = "vendor-admin@admin.com",
-            //    FirstName = "Vendor",
-            //    LastName = "Admin",
-            //    EmailConfirmed = true,
-            //    PhoneNumberConfirmed = true,
-            //    Password = Applicationsettings.Password,
-            //    isSuperAdmin = true,
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    ProfilePictureUrl = "img/vendor-admin.png"
-            //};
-            //if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
-            //{
-            //    var user = await userManager.FindByEmailAsync(vendorAdmin.Email);
-            //    if (user == null)
-            //    {
-            //        await userManager.CreateAsync(vendorAdmin, Applicationsettings.Password);
-            //        await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAdmin.ToString());
-            //        await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorSupervisor.ToString());
-            //        await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAgent.ToString());
-            //    }
-            //}
+            //Seed Vendor Admin
+            var vendorAdmin = new ApplicationUser()
+            {
+                UserName = "vendor-admin@admin.com",
+                Email = "vendor-admin@admin.com",
+                FirstName = "Vendor",
+                LastName = "Admin",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Password = Applicationsettings.Password,
+                isSuperAdmin = true,
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                ProfilePictureUrl = "img/vendor-admin.png"
+            };
+            if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
+            {
+                var user = await userManager.FindByEmailAsync(vendorAdmin.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(vendorAdmin, Applicationsettings.Password);
+                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAdmin.ToString());
+                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorSupervisor.ToString());
+                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAgent.ToString());
+                }
+            }
 
-            ////Seed Vendor Admin
-            //var vendorSupervisor = new ApplicationUser()
-            //{
-            //    UserName = "vendor-supervisor@admin.com",
-            //    Email = "vendor-supervisor@admin.com",
-            //    FirstName = "Vendor",
-            //    LastName = "Supervisor",
-            //    EmailConfirmed = true,
-            //    PhoneNumberConfirmed = true,
-            //    Password = Applicationsettings.Password,
-            //    isSuperAdmin = true,
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    ProfilePictureUrl = "img/supervisor.png"
-            //};
-            //if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
-            //{
-            //    var user = await userManager.FindByEmailAsync(vendorSupervisor.Email);
-            //    if (user == null)
-            //    {
-            //        await userManager.CreateAsync(vendorSupervisor, Applicationsettings.Password);
-            //        await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorSupervisor.ToString());
-            //        await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorAgent.ToString());
-            //    }
-            //}
+            //Seed Vendor Admin
+            var vendorSupervisor = new ApplicationUser()
+            {
+                UserName = "vendor-supervisor@admin.com",
+                Email = "vendor-supervisor@admin.com",
+                FirstName = "Vendor",
+                LastName = "Supervisor",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Password = Applicationsettings.Password,
+                isSuperAdmin = true,
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                ProfilePictureUrl = "img/supervisor.png"
+            };
+            if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
+            {
+                var user = await userManager.FindByEmailAsync(vendorSupervisor.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(vendorSupervisor, Applicationsettings.Password);
+                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorSupervisor.ToString());
+                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorAgent.ToString());
+                }
+            }
 
-            ////Seed Vendor Admin
-            //var vendorAgent = new ApplicationUser()
-            //{
-            //    UserName = "vendor-agent@admin.com",
-            //    Email = "vendor-agent@admin.com",
-            //    FirstName = "Vendor",
-            //    LastName = "Agent",
-            //    EmailConfirmed = true,
-            //    PhoneNumberConfirmed = true,
-            //    Password = Applicationsettings.Password,
-            //    isSuperAdmin = true,
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
-            //    ProfilePictureUrl = "img/agent.jpg"
-            //};
-            //if (userManager.Users.All(u => u.Id != vendorAgent.Id))
-            //{
-            //    var user = await userManager.FindByEmailAsync(vendorAgent.Email);
-            //    if (user == null)
-            //    {
-            //        await userManager.CreateAsync(vendorAgent, Applicationsettings.Password);
-            //        await userManager.AddToRoleAsync(vendorAgent, AppRoles.VendorAgent.ToString());
-            //    }
-            //}
-            //#endregion
+            //Seed Vendor Admin
+            var vendorAgent = new ApplicationUser()
+            {
+                UserName = "vendor-agent@admin.com",
+                Email = "vendor-agent@admin.com",
+                FirstName = "Vendor",
+                LastName = "Agent",
+                EmailConfirmed = true,
+                PhoneNumberConfirmed = true,
+                Password = Applicationsettings.Password,
+                isSuperAdmin = true,
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
+                ProfilePictureUrl = "img/agent.jpg"
+            };
+            if (userManager.Users.All(u => u.Id != vendorAgent.Id))
+            {
+                var user = await userManager.FindByEmailAsync(vendorAgent.Email);
+                if (user == null)
+                {
+                    await userManager.CreateAsync(vendorAgent, Applicationsettings.Password);
+                    await userManager.AddToRoleAsync(vendorAgent, AppRoles.VendorAgent.ToString());
+                }
+            }
+            #endregion
         }
     }
 }

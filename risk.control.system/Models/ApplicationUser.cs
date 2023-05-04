@@ -33,10 +33,10 @@ namespace risk.control.system.Models
         [Display(Name = "Country name")]
         public Country Country { get; set; } = default!;
         [Display(Name = "District")]
-        public string DistrictId { get; set; } = default!;
+        public string? DistrictId { get; set; } = default!;
         [Display(Name = "District")]
         [Required]
-        public District District { get; set; } = default!;
+        public District? District { get; set; } = default!;
         public DateTime Created { get; set; } = DateTime.Now;
         public DateTime? Updated { get; set; }
         public string? UpdatedBy { get; set; } = default!;
