@@ -34,6 +34,7 @@ namespace risk.control.system.Models
         [Display(Name = "Bank Account Number")]
         public string BankAccountNumber { get; set; } = default!;
         public string IFSCCode { get; set; } = default!;
+        public string City { get; set; } = "KANPUR CITY";
         public DateTime? AgreementDate { get; set; } =DateTime.Now;
         public DateTime? ActivatedDate { get; set; } =DateTime.Now;
         public DateTime? DeListedDate { get; set; }

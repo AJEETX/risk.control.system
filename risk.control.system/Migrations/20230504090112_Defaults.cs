@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class RemovedCity : Migration
+    public partial class Defaults : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -406,6 +406,7 @@ namespace risk.control.system.Migrations
                     BankName = table.Column<string>(type: "TEXT", nullable: false),
                     BankAccountNumber = table.Column<string>(type: "TEXT", nullable: false),
                     IFSCCode = table.Column<string>(type: "TEXT", nullable: false),
+                    City = table.Column<string>(type: "TEXT", nullable: false),
                     AgreementDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ActivatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     DeListedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
