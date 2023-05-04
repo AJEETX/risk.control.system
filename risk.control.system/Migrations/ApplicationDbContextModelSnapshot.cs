@@ -167,8 +167,7 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
+                    b.Property<string>("DistrictId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -236,6 +235,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
@@ -246,6 +248,8 @@ namespace risk.control.system.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("DistrictId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -259,10 +263,6 @@ namespace risk.control.system.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
@@ -845,42 +845,6 @@ namespace risk.control.system.Migrations
                     b.ToTable("VendorInvestigationServiceType");
                 });
 
-            modelBuilder.Entity("risk.control.system.Models.ClientCompanyUser", b =>
-                {
-                    b.HasBaseType("risk.control.system.Models.ApplicationUser");
-
-                    b.Property<string>("ClientCompanyId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Comments")
-                        .HasColumnType("TEXT");
-
-                    b.HasIndex("ClientCompanyId");
-
-                    b.HasDiscriminator().HasValue("ClientCompanyUser");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.VendorUser", b =>
-                {
-                    b.HasBaseType("risk.control.system.Models.ApplicationUser");
-
-                    b.Property<string>("Comments")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("VendorId")
-                        .HasColumnType("TEXT");
-
-                    b.HasIndex("VendorId");
-
-                    b.ToTable("AspNetUsers", t =>
-                        {
-                            t.Property("Comments")
-                                .HasColumnName("VendorUser_Comments");
-                        });
-
-                    b.HasDiscriminator().HasValue("VendorUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("risk.control.system.Models.ApplicationRole", null)
@@ -940,6 +904,10 @@ namespace risk.control.system.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("risk.control.system.Models.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId");
+
                     b.HasOne("risk.control.system.Models.PinCode", "PinCode")
                         .WithMany()
                         .HasForeignKey("PinCodeId")
@@ -953,6 +921,8 @@ namespace risk.control.system.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+
+                    b.Navigation("District");
 
                     b.Navigation("PinCode");
 
@@ -1165,24 +1135,6 @@ namespace risk.control.system.Migrations
                     b.Navigation("LineOfBusiness");
 
                     b.Navigation("State");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.ClientCompanyUser", b =>
-                {
-                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
-                        .WithMany()
-                        .HasForeignKey("ClientCompanyId");
-
-                    b.Navigation("ClientCompany");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.VendorUser", b =>
-                {
-                    b.HasOne("risk.control.system.Models.Vendor", "Vendor")
-                        .WithMany()
-                        .HasForeignKey("VendorId");
-
-                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
