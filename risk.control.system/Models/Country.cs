@@ -9,73 +9,9 @@ public class Country : BaseEntity
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public string CountryId { get; set; } = Guid.NewGuid().ToString();
     [Display(Name = "Country name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
     [Display(Name = "Country code")]
     [Required]
-    public string Code { get; set; }
+    public string Code { get; set; } = default!;
 
-}
-public class State :BaseEntity
-{
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string StateId { get; set; } = Guid.NewGuid().ToString();
-    [Display(Name = "State name")]
-    public string Name { get; set; }
-    [Display(Name = "State code")]
-    [Required]
-    public string Code { get; set; }      
-    [Required]
-    [Display(Name = "Country name")]
-    public  string CountryId { get; set; }
-    [Display(Name = "Country name")]
-    public Country Country { get; set; }
-}
-
-public class District : BaseEntity
-{
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string DistrictId { get; set; } = Guid.NewGuid().ToString();
-    [Display(Name = "District name")]
-    public string Name { get; set; }
-    [Display(Name = "District code")]
-    [Required]
-    public string Code { get; set; }
-    [Required]
-    [Display(Name = "State name")]
-    public string StateId { get; set; }
-    [Display(Name = "State name")]
-    public State State { get; set; }
-    [Required]
-    [Display(Name = "Country name")]
-    public string CountryId { get; set; }
-    [Display(Name = "Country name")]
-    public Country Country { get; set; }
-}
-
-public class PinCode : BaseEntity
-{
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public string PinCodeId { get; set; } = Guid.NewGuid().ToString();
-    [Display(Name = "PinCode name")]
-    public string Name { get; set; }
-    [Display(Name = "PinCode")]
-    public string Code { get; set; }
-    [Display(Name = "District")]
-    public string DistrictId { get; set; }
-    [Display(Name = "District")]
-    [Required]
-    public District District { get; set; }      
-    [Required]
-    [Display(Name = "State name")]
-    public  string StateId { get; set; }
-    [Display(Name = "State name")]
-    public State State { get; set; }
-    [Required]
-    [Display(Name = "Country name")]
-    public string CountryId { get; set; }
-    [Display(Name = "Country name")]
-    public Country Country { get; set; }
 }

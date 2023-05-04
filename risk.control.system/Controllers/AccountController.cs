@@ -20,9 +20,9 @@ namespace risk.control.system.Controllers
             IToastNotification toastNotification,
             ILogger<AccountController> logger)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            this.toastNotification = toastNotification;
+            _userManager = userManager ?? throw new ArgumentNullException();
+            _signInManager = signInManager ?? throw new ArgumentNullException();
+            this.toastNotification = toastNotification ?? throw new ArgumentNullException();
             _logger = logger;
         }
 
@@ -62,7 +62,6 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    toastNotification.AddErrorToastMessage("invalid login attempt!");
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     model.Error = "Invalid login attempt.";
                     return View(model);

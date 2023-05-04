@@ -38,6 +38,10 @@
                         <table class="table table-striped fixed-with-height">
                             <thead>
                                 <tr>
+                                    
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Document)
+                                    </th>
                                     <th>
                                         @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.CodeSortParm })
                                     </th>
@@ -45,16 +49,10 @@
                                         @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
                                     </th>
                                     <th>
-                                        @Html.DisplayNameFor(model => model.Description)
-                                    </th>
-                                    <th>
                                         @Html.DisplayNameFor(model => model.PhoneNumber)
                                     </th>
                                     <th>
                                         @Html.DisplayNameFor(model => model.Email)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Branch)
                                     </th>
                                     <th>
                                         @Html.DisplayNameFor(model => model.Addressline)
@@ -66,9 +64,6 @@
                                         @Html.DisplayNameFor(model => model.State)
                                     </th>
                                     <th>
-                                        @Html.DisplayNameFor(model => model.Country)
-                                    </th>
-                                    <th>
                                         @Html.DisplayNameFor(model => model.PinCode)
                                     </th>
                                     <th></th>
@@ -78,6 +73,17 @@
                                 @foreach (var item in Model)
                                 {
                                     <tr>
+                                        
+                                        <td>
+                                            @if (item?.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" style="width:150px;height:50px; object-fit:cover" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" style="width:150px;height:50px; object-fit:cover" src="~/img//no-image.png">
+                                            }
+                                        </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Name)
                                         </td>
@@ -85,16 +91,10 @@
                                             @Html.DisplayFor(modelItem => item.Code)
                                         </td>
                                         <td>
-                                            @Html.DisplayFor(modelItem => item.Description)
-                                        </td>
-                                        <td>
                                             @Html.DisplayFor(modelItem => item.PhoneNumber)
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Email)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Branch)
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Addressline)
@@ -104,9 +104,6 @@
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.State.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Country.Name)
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.PinCode.Name)
@@ -121,8 +118,8 @@
                                             <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.VendorId">
                                                 <i class="fas fa-trash"></i> Delete
                                             </a>
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.VendorId">
-                                                <i class="fa fa-cog"></i> Services
+                                            <a class="btn btn-xs btn-success" asp-action="Delete" asp-route-id="@item.VendorId">
+                                                <i class="fa fa-cog"></i> More ...
                                             </a>
                                         </td>
                                     </tr>

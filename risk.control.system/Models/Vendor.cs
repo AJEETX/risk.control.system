@@ -15,39 +15,44 @@ namespace risk.control.system.Models
         public string Email { get; set; } = string.Empty;
         public string Branch { get; set; } = string.Empty;
         public string Addressline { get; set; } = string.Empty;
-        public List<VendorInvestigationServiceType> VendorInvestigationServiceTypes { get; set; }
-        public string City { get; set; } = string.Empty;
+        public List<VendorInvestigationServiceType>? VendorInvestigationServiceTypes { get; set; } = default!;
+        public string City { get; set; } = default!;
         [Display(Name = "State name")]
-        public string? StateId { get; set; }
-        public State? State { get; set; }
+        public string? StateId { get; set; } = default!;
+        public State? State { get; set; } = default!;
         [Display(Name = "Country name")]
-        public string? CountryId { get; set; }
-        public Country? Country { get; set; }
+        public string? CountryId { get; set; } = default!;
+        public Country? Country { get; set; } = default!;
         [Display(Name = "Pincode")]
-        public string? PinCodeId { get; set; }
-        public PinCode? PinCode { get; set; }
+        public string? PinCodeId { get; set; } = default!;
+        public PinCode? PinCode { get; set; } = default!;
         [Display(Name = "District")]
-        public string DistrictId { get; set; }
+        public string DistrictId { get; set; } = default!;
         [Display(Name = "District")]
         [Required]
-        public District District { get; set; }
-    }
+        public District District { get; set; } = default!;
+        [Display(Name = "Bank Name")]
+        public string BankName { get; set; } = default!;
+        [Display(Name = "Bank Account Number")]
+        public string BankAccountNumber { get; set; } = default!;
+        public string IFSCCode { get; set; } = default!;
+        public DateTime? AgreementDate { get; set; }
+        public DateTime? ActivatedDate { get; set; }
+        public DateTime? DeListedDate { get; set; }
+        public VendorStatus? Status { get; set; } = default!;
+        public string? DelistReason { get; set; } = default!;
 
-    public class VendorInvestigationServiceType : BaseEntity
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VendorInvestigationServiceTypeId { get; set; } = Guid.NewGuid().ToString();
-        [Display(Name = "Investigation service type")]
-        public InvestigationServiceType InvestigationServiceType { get; set; }
-        public List<ServicedPinCode> PincodeServices { get; set; }
+        public string? DocumentUrl { get; set; } = default!;
+        [Display(Name = "Document")]
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [Display(Name = "Document url")]
+        public byte[]? DocumentImage { get; set; } = default!;
     }
-
-    public class ServicedPinCode : BaseEntity
+    public enum VendorStatus
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ServicedPinCodeId { get; set; }
-        public string Pincode { get; set; }
+        ACTIVE,
+        INACTIVE,
+        DELIST
     }
 }

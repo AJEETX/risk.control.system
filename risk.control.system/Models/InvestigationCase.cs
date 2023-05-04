@@ -9,20 +9,20 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string InvestigationId { get; set; } = Guid.NewGuid().ToString(); 
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = default!;
+        public string Description { get; set; } = default!;
         [Required]
         [Display(Name = "Line of Business")]
-        public string LineOfBusinessId { get; set; }
+        public string LineOfBusinessId { get; set; } = default!;
         [Display(Name = "Line of Business")]
-        public LineOfBusiness LineOfBusiness { get; set; }
-        public string InvestigationServiceTypeId { get; set; }
-        public InvestigationServiceType InvestigationServiceType { get; set; }
+        public LineOfBusiness LineOfBusiness { get; set; } = default!;
+        public string InvestigationServiceTypeId { get; set; } = default!;
+        public InvestigationServiceType InvestigationServiceType { get; set; } = default!;
         [Required]
         [Display(Name = "Case status")]
-        public string InvestigationCaseStatusId { get; set; }
+        public string InvestigationCaseStatusId { get; set; } = default!;
         [Display(Name = "Case status")]
-        public InvestigationCaseStatus InvestigationCaseStatus { get; set; }
+        public InvestigationCaseStatus InvestigationCaseStatus { get; set; } = default!;
     }
 
     public class ClaimsInvestigation :BaseEntity
@@ -30,19 +30,19 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ClaimsInvestigationCaseId { get; set; } = Guid.NewGuid().ToString();
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = default!;
+        public string Description { get; set; } = default!;
         [Required]
         [Display(Name = "Line of Business")]
-        public string LineOfBusinessId { get; set; }
+        public string LineOfBusinessId { get; set; } = default!;
         [Display(Name = "Line of Business")]
-        public LineOfBusiness LineOfBusiness { get; set; }
-        public List<InvestigationServiceType>? InvestigationServiceTypes { get; set; }
+        public LineOfBusiness LineOfBusiness { get; set; } = default!;
+        public List<InvestigationServiceType>? InvestigationServiceTypes { get; set; } = default!;
         [Required]
         [Display(Name = "Case status")]
-        public string InvestigationCaseStatusId { get; set; }
+        public string InvestigationCaseStatusId { get; set; } = default!;
         [Display(Name = "Case status")]
-        public InvestigationCaseStatus InvestigationCaseStatus { get; set; }
+        public InvestigationCaseStatus InvestigationCaseStatus { get; set; } = default!;
 
     }
 }

@@ -10,13 +10,13 @@ namespace risk.control.system.Models
         public string InvestigationServiceTypeId { get; set; } = Guid.NewGuid().ToString();
         [Display(Name = "InvestigationService Type")]
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
         [Display(Name = "InvestigationService Type code")]
         [Required]
-        public string Code { get; set; }
+        public string Code { get; set; } = default!;
         [Display(Name = "Line Of Business")]
-        public string LineOfBusinessId { get; set; }
-        public LineOfBusiness LineOfBusiness { get; set; }
+        public string LineOfBusinessId { get; set; } = default!;
+        public LineOfBusiness LineOfBusiness { get; set; } = default!;
 
     }
 }

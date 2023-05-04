@@ -17,7 +17,7 @@ builder.Services.AddControllersWithViews()
     .AddNToastNotifyNoty(new NotyOptions
     {
         ProgressBar = true,
-        Timeout = 5000
+        Timeout = 3000
     });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source=risk-control-unit.db"));

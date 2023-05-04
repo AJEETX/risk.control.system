@@ -11,11 +11,13 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IToastNotification toastNotification;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public VendorsController(ApplicationDbContext context, IToastNotification toastNotification)
+        public VendorsController(ApplicationDbContext context, IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.toastNotification = toastNotification;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Vendors
@@ -106,6 +108,15 @@ namespace risk.control.system.Controllers
         {
             if (vendor is not null)
             {
+                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
+                if (vendorDocument is not null)
+                {
+                    vendor.Document = vendorDocument;
+                    using var dataStream = new MemoryStream();
+                    await vendor.Document.CopyToAsync(dataStream);
+                    vendor.DocumentImage = dataStream.ToArray();
+                }
+                
                 _context.Add(vendor);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("vendor created successfully!");
@@ -129,6 +140,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", vendor.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name");
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", vendor.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendor.StateId);
             return View(vendor);
@@ -151,6 +163,14 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
+                    if (vendorDocument is not null)
+                    {
+                        vendor.Document = vendorDocument;
+                        using var dataStream = new MemoryStream();
+                        await vendor.Document.CopyToAsync(dataStream);
+                        vendor.DocumentImage = dataStream.ToArray();
+                    }
                     _context.Update(vendor);
                     await _context.SaveChangesAsync();
                 }

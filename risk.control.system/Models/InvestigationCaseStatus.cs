@@ -10,10 +10,10 @@ namespace risk.control.system.Models
         public string InvestigationCaseStatusId { get; set; } = Guid.NewGuid().ToString();
         [Display(Name = "Case status")]
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = default!;
         [Display(Name = "Case status")]
         [Required]
-        public string Code { get; set; }
+        public string Code { get; set; } = default!;
 
     }
 }

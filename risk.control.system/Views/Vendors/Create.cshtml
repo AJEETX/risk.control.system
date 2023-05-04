@@ -5,12 +5,12 @@
 }
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data">
             <div class="row mb-2">
                 <div class="col-sm-12">
                     <div class="card card-success">
                         <div class="card-header">
-                            <h3 class="card-title">Create Investigating agency</h3>
+                            <h3 class="card-title">Create vendor</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -47,10 +47,6 @@
                                         <input asp-for="Branch" class="form-control" />
                                         <span asp-validation-for="Branch" class="text-danger"></span>
                                     </div>
-                                </div>
-
-                                <div class="col-sm-6">
-
                                     <div class="form-group">
                                         <label asp-for="Addressline" class="control-label"></label>
                                         <input asp-for="Addressline" class="form-control" />
@@ -63,21 +59,79 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="CountryId" class="control-label"></label>
-                                        <select asp-for="CountryId" class="form-control" tex asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                        <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
                                             <option>--- SELECT COUNTRY ---</option>
                                         </select>
+                                        <span asp-validation-for="CountryId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="StateId" class="control-label"></label>
-                                        <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
+                                        <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
                                             <option>--- SELECT STATE ---</option>
                                         </select>
+                                        <span asp-validation-for="StateId" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DistrictId" class="control-label"></label>
+                                        <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                            <option>--- SELECT DISTRICT ---</option>
+                                        </select>
+                                        <span asp-validation-for="DistrictId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="PinCodeId" class="control-label"></label>
                                         <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                             <option>--- SELECT PINCODE ---</option>
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label asp-for="BankName" class="control-label"></label>
+                                        <input asp-for="BankName" class="form-control" />
+                                        <span asp-validation-for="BankName" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="BankAccountNumber" class="control-label"></label>
+                                        <input asp-for="BankAccountNumber" class="form-control" />
+                                        <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="IFSCCode" class="control-label"></label>
+                                        <input asp-for="IFSCCode" class="form-control" />
+                                        <span asp-validation-for="IFSCCode" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="AgreementDate" class="control-label"></label>
+                                        <input asp-for="AgreementDate" class="form-control" />
+                                        <span asp-validation-for="AgreementDate" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="ActivatedDate" class="control-label"></label>
+                                        <input asp-for="ActivatedDate" class="form-control" />
+                                        <span asp-validation-for="ActivatedDate" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DeListedDate" class="control-label"></label>
+                                        <input asp-for="DeListedDate" class="form-control" />
+                                        <span asp-validation-for="DeListedDate" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Status" class="control-label"></label>
+                                        <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<VendorStatus>()">
+                                            <option>--- SELECT STATUS ---</option>
+                                        </select>
+                                        <span asp-validation-for="Status" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DelistReason" class="control-label"></label>
+                                        <textarea asp-for="DelistReason" class="form-control"></textarea>
+                                        <span asp-validation-for="DelistReason" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DocumentImage" class="control-label"></label>
+                                        <img id="documentImage" style="width:150px;height:50px; object-fit:cover" src="../img/no-image.png">
+                                        <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                     <div class="card-footer text-right">
                                         <a asp-action="Index" class="btn btn-secondary">
