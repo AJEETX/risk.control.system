@@ -16,7 +16,6 @@ namespace risk.control.system.Models
         public string Branch { get; set; } = string.Empty;
         public string Addressline { get; set; } = string.Empty;
         public List<VendorInvestigationServiceType>? VendorInvestigationServiceTypes { get; set; } = default!;
-        public string City { get; set; } = default!;
         [Display(Name = "State name")]
         public string? StateId { get; set; } = default!;
         public State? State { get; set; } = default!;

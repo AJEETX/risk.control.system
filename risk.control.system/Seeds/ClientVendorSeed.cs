@@ -64,7 +64,6 @@ namespace risk.control.system.Seeds
                 Name = "abc investigation agency",
                 Addressline = "1, Main Road  ",
                 Branch = "MAHATTAN",
-                City = "FOREST HILL",
                 Code = "VA001",
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,

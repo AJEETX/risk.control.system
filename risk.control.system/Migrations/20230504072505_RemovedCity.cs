@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class RemovedOtherthanApplicationUser : Migration
+    public partial class RemovedCity : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -399,7 +399,6 @@ namespace risk.control.system.Migrations
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Branch = table.Column<string>(type: "TEXT", nullable: false),
                     Addressline = table.Column<string>(type: "TEXT", nullable: false),
-                    City = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: true),
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
