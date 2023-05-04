@@ -168,6 +168,7 @@ namespace risk.control.system.Controllers
             var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
                 .Include(v => v.InvestigationServiceType)
                 .Include(v => v.LineOfBusiness)
+                .Include(v => v.PincodeServices)
                 .Include(v => v.State)
                 .Include(v => v.Vendor)
                 .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
