@@ -25,7 +25,7 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
+                //DistrictId = context.District.FirstOrDefault(s => s.Name == currentDistrict)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.PinCodeId ?? default!,
                 ProfilePictureUrl = "img/superadmin.jpg"
