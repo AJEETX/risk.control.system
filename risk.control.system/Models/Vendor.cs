@@ -34,10 +34,10 @@ namespace risk.control.system.Models
         [Display(Name = "Bank Account Number")]
         public string BankAccountNumber { get; set; } = default!;
         public string IFSCCode { get; set; } = default!;
-        public DateTime? AgreementDate { get; set; }
-        public DateTime? ActivatedDate { get; set; }
+        public DateTime? AgreementDate { get; set; } =DateTime.Now;
+        public DateTime? ActivatedDate { get; set; } =DateTime.Now;
         public DateTime? DeListedDate { get; set; }
-        public VendorStatus? Status { get; set; } = default!;
+        public VendorStatus? Status { get; set; } = VendorStatus.ACTIVE;
         public string? DelistReason { get; set; } = default!;
 
         public string? DocumentUrl { get; set; } = default!;

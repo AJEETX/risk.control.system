@@ -106,24 +106,32 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Vendor vendor)
         {
-            if (vendor is not null)
+            try
             {
-                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-                if (vendorDocument is not null)
+                if (vendor is not null)
                 {
-                    vendor.Document = vendorDocument;
-                    using var dataStream = new MemoryStream();
-                    await vendor.Document.CopyToAsync(dataStream);
-                    vendor.DocumentImage = dataStream.ToArray();
+                    IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
+                    if (vendorDocument is not null)
+                    {
+                        vendor.Document = vendorDocument;
+                        using var dataStream = new MemoryStream();
+                        await vendor.Document.CopyToAsync(dataStream);
+                        vendor.DocumentImage = dataStream.ToArray();
+                    }
+
+                    _context.Add(vendor);
+                    await _context.SaveChangesAsync();
+                    toastNotification.AddSuccessToastMessage("vendor created successfully!");
+                    return RedirectToAction(nameof(Index));
                 }
-                
-                _context.Add(vendor);
-                await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("vendor created successfully!");
-                return RedirectToAction(nameof(Index));
+                toastNotification.AddErrorToastMessage("Error to create vendor!");
+                return Problem();
             }
-            toastNotification.AddErrorToastMessage("Error to create vendor!");
-            return Problem();
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         // GET: Vendors/Edit/5
