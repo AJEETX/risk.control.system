@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230504054013_RemovedDistrict")]
+    [Migration("20230504062014_RemovedDistrict")]
     partial class RemovedDistrict
     {
         /// <inheritdoc />
@@ -237,9 +237,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserName")

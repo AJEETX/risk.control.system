@@ -38,7 +38,6 @@ namespace risk.control.system.Models
         //public District? District { get; set; } = default!;
         public DateTime Created { get; set; } = DateTime.Now;
         public DateTime? Updated { get; set; }
-        public string? UpdatedBy { get; set; } = default!;
         [Required]
         public string? Password { get; set; }
     }

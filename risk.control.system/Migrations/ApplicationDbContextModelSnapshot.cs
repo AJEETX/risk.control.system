@@ -236,9 +236,6 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
