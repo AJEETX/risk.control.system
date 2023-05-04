@@ -81,13 +81,32 @@
                 </li>
                 <li class="nav-header">INVESTIGATION <span class="badge badge-danger">:</span></li>
                 <li class="nav-item">
+                    <a is-active-page asp-area="" asp-controller="Claim" asp-action="Index" class="nav-link">
+                        <i class="fas fa-rupee-sign"></i>
+                        <p>
+                            claim
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-area="" asp-controller="Underwriting" asp-action="Index" class="nav-link">
+                        <i class="fas fa-rupee-sign"></i>
+                        <p>
+                            underwriting
+                        </p>
+                    </a>
+                </li>
+@*
+                <li class="nav-item">
                     <a is-active-page asp-area="" asp-controller="InvestigationCase" asp-action="Index" class="nav-link">
                         <i class="nav-icon fas fa-users-cog"></i>
                         <p>
                             investigation cases
                         </p>
                     </a>
-                </li>
+                </li>*@
+                <li class="nav-header"><i class="fa fa-unlock"></i> INVESTIGATION SETTINGS</li>
+
                 <li class="nav-item">
                     <a is-active-page asp-area="" asp-controller="LineOfBusiness" asp-action="Index" class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
@@ -100,7 +119,7 @@
                     <a is-active-page asp-area="" asp-controller="InvestigationServiceTypes" asp-action="Index" class="nav-link">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>
-                            line of business services
+                            type of services
                         </p>
                     </a>
                 </li>
@@ -131,25 +150,7 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-header"><i class="fa fa-unlock"></i> ROLE ACCESS</li>
-
-                        <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="Claim" asp-action="Index" class="nav-link">
-                                <i class="fas fa-rupee-sign"></i>
-                                <p>
-                                    claim
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="Underwriting" asp-action="Index" class="nav-link">
-                                <i class="fas fa-rupee-sign"></i>
-                                <p>
-                                     underwriting
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-header"><i class="fa fa-unlock"></i> SETTINGS</li>
+                        <li class="nav-header"><i class="fa fa-unlock"></i>ADMIN SETTINGS</li>
 
                         <li class="nav-item">
                             <a is-active-page asp-area="" asp-controller="ClientCompany" asp-action="Index" class="nav-link">

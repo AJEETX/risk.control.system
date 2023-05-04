@@ -4,88 +4,170 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Vendor</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DocumentUrl)
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model?.DocumentImage is not null)
-            {
-                <img id="documentImage" style="width:350px;height:150px; object-fit:cover" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
-            }
-            else
-            {
-                <img id="documentImage" style="width:350px;height:150px; object-fit:cover" src="~/img//no-image.png">
-            }
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Code)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Code)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Branch)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Branch)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Addressline)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Addressline)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.State)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.State.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Country)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Country.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PinCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PinCode.Name)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a> &nbsp;
-    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.VendorId"><i class="fas fa-pen"></i> Edit</a>
-</div>
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">vendor services of : @Model.Name</h3>
+                    </div>
+                    <form asp-action="index">
+                        <div class="card-body dataTable-search-form">
+                            <div class="row">
+                                <div class="col-md-12 text-left">
+                                    <a asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i> Add Service</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.DocumentUrl)
+                    </div>
+                    <div class="col-sm-10">
+                        @if (Model?.DocumentImage is not null)
+                        {
+                            <img id="documentImage" style="width:350px;height:150px; object-fit:cover" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                        }
+                        else
+                        {
+                            <img id="documentImage" style="width:350px;height:150px; object-fit:cover" src="~/img//no-image.png">
+                        }
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.Name)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Code)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.Code)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Description)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.Description)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.PhoneNumber)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.PhoneNumber)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Email)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.Email)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Branch)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.Branch)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Addressline)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.Addressline)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.State)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.State.Name)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Country)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.Country.Name)
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.PinCode)
+                    </div>
+                    <div class="col-sm-10">
+                        @Html.DisplayFor(model => model.PinCode.Name)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-body contained-width">
+                        <table class="table  table-striped fixed-with-height">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Line of Business
+                                    </th>
+                                    <th>
+                                        Type of Investigation Service
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.State)
+                                    </th>
+                                    <th>
+                                        Price
+                                    </th>
+                                    
+                                    <th>
+                                        Pincode Services
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.UpdatedBy)
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.VendorInvestigationServiceTypes)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
+                                        </td>
+                                        
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.State.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Price)
+                                        </td>
+                                        <td>
+                                            @foreach (var svc in item?.PincodeServices)
+                                            {
+                                                var pinCodeDetail = svc.Pincode + "- " + svc.Name;
+                                                @Html.DisplayFor(modelItem => pinCodeDetail)
+                                                ;
+                                            }
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.UpdatedBy)
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-info" asp-controller="VendorService" asp-action="Details" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fa fa-search"></i>  Details</a>&nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-controller="VendorService" asp-action="Edit" asp-route-id="@item.VendorInvestigationServiceTypeId"><i class="fas fa-pen"></i>  Edit</a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-controller="VendorService" asp-action="Delete" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fas fa-trash"></i>  Delete</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

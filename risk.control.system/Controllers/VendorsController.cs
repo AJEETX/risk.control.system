@@ -36,7 +36,7 @@ namespace risk.control.system.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var applicationDbContext = _context.Vendor.Include(v => v.Country).Include(v => v.PinCode).Include(v => v.State).AsQueryable();
+            var applicationDbContext = _context.Vendor.Include(v => v.Country).Include(v => v.PinCode).Include(v => v.State).Include(v => v.VendorInvestigationServiceTypes).AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
             {
                 applicationDbContext = applicationDbContext.Where(a =>
@@ -83,6 +83,12 @@ namespace risk.control.system.Controllers
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
                 .FirstOrDefaultAsync(m => m.VendorId == id);
             if (vendor == null)
             {
@@ -129,7 +135,6 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

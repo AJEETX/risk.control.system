@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230504090112_Defaults")]
-    partial class Defaults
+    [Migration("20230504114857_vService")]
+    partial class vService
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -643,6 +643,10 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Pincode")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -654,6 +658,7 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VendorInvestigationServiceTypeId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("ServicedPinCodeId");
@@ -833,6 +838,7 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VendorId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("VendorInvestigationServiceTypeId");
@@ -1066,9 +1072,13 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ServicedPinCode", b =>
                 {
-                    b.HasOne("risk.control.system.Models.VendorInvestigationServiceType", null)
+                    b.HasOne("risk.control.system.Models.VendorInvestigationServiceType", "VendorInvestigationServiceType")
                         .WithMany("PincodeServices")
-                        .HasForeignKey("VendorInvestigationServiceTypeId");
+                        .HasForeignKey("VendorInvestigationServiceTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("VendorInvestigationServiceType");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.State", b =>
@@ -1129,15 +1139,19 @@ namespace risk.control.system.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("risk.control.system.Models.Vendor", null)
+                    b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany("VendorInvestigationServiceTypes")
-                        .HasForeignKey("VendorId");
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("InvestigationServiceType");
 
                     b.Navigation("LineOfBusiness");
 
                     b.Navigation("State");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>

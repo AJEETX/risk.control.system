@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class Defaults : Migration
+    public partial class vService : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -537,7 +537,7 @@ namespace risk.control.system.Migrations
                     LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: false),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -567,7 +567,8 @@ namespace risk.control.system.Migrations
                         name: "FK_VendorInvestigationServiceType_Vendor_VendorId",
                         column: x => x.VendorId,
                         principalTable: "Vendor",
-                        principalColumn: "VendorId");
+                        principalColumn: "VendorId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -575,8 +576,9 @@ namespace risk.control.system.Migrations
                 columns: table => new
                 {
                     ServicedPinCodeId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
                     Pincode = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: true),
+                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -588,7 +590,8 @@ namespace risk.control.system.Migrations
                         name: "FK_ServicedPinCode_VendorInvestigationServiceType_VendorInvestigationServiceTypeId",
                         column: x => x.VendorInvestigationServiceTypeId,
                         principalTable: "VendorInvestigationServiceType",
-                        principalColumn: "VendorInvestigationServiceTypeId");
+                        principalColumn: "VendorInvestigationServiceTypeId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

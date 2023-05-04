@@ -21,5 +21,8 @@ namespace risk.control.system.Models
 
         public decimal Price { get; set; }
         public List<ServicedPinCode> PincodeServices { get; set; } = default!;
+
+        public string VendorId { get; set; }
+        public Vendor Vendor { get; set; }
     }
 }

@@ -53,7 +53,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
                         }
                     }
                 }
