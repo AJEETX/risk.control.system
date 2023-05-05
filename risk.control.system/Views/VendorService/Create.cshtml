@@ -72,7 +72,6 @@
                                             <div class="form-group">
                                                 <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
                                                 <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control" asp-items="ViewBag.PinCodeId" multiple>
-                                                    <option>--SELECT PINCODES--</option>
                                                 </select>
                                                 <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
                                             </div>
@@ -108,7 +107,7 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 @*    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">*@
-@*    <script>
+    <script>
         $(document).ready(function () {
             $('#PinCodeId').attr('data-live-search', true);
 
@@ -116,15 +115,15 @@
             $('#PinCodeId').attr('multiple', true);
             $('#PinCodeId').attr('data-selected-text-format', 'count');
 
-            $('.selectPincode').selectpicker(
-                {
-                    width: '100%',
-                    title: '- [Choose Multiple Pincodes] -',
-                    style: 'btn-warning',
-                    size: 6,
-                    iconBase: 'fa',
-                    tickIcon: 'fa-check'
-                });
+            //$('.selectPincode').selectpicker(
+            //    {
+            //        width: '100%',
+            //        title: '- [Choose Multiple Pincodes] -',
+            //        style: 'btn-warning',
+            //        size: 6,
+            //        iconBase: 'fa',
+            //        tickIcon: 'fa-check'
+            //    });
         });
-    </script>*@
+    </script>
 }

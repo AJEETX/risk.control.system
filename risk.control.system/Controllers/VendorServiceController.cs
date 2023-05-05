@@ -134,8 +134,15 @@ namespace risk.control.system.Controllers
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendorInvestigationServiceType.StateId), "PinCodeId", "Name");
+            ViewData["DistrictId"] = new SelectList(_context.District.Where(d => d.State.StateId == vendorInvestigationServiceType.StateId), "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
+
+            var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
+            services.SelectedMultiPincodeId = selected;
+
+            //ViewData["PinCodeId"] = _context.PinCode.Select(p => new SelectListItem { Text = p.Code, Value = p.PinCodeId }).ToList();
+
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendorInvestigationServiceType.StateId), "PinCodeId", "Code", selected);
+
 
             return View(services);
         }
@@ -152,7 +159,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (vendorInvestigationServiceType is not null)
             {
                 try
                 {

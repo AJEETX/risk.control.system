@@ -54,11 +54,11 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="DistrictId" class="control-label"></label>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                                 <option>--SELECT DISTRICT--</option>
 
                                             </select>
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                            <span asp-validation-for="DistrictId" class="text-danger"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -66,12 +66,11 @@
                                     <div class="col-md-12">
                                         <div class="form-group">
                                             <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
-                                            <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                                <option> -- SELECT PINCODES -- </option>
-
+                                            <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control selectPincode show-tick form-control input-md" asp-items="ViewBag.PinCodeId">
                                             </select>
                                             <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
                                         </div>
+
                                         @*                                       <div class="form-group">
                                         <div class="input-group">
                                         <span class="input-group-addon icon-custom"><i class="fa fa-flag"></i> pincodes</span>
@@ -87,7 +86,7 @@
                                                 <i class="fa fa-window-close"></i>
                                                 Cancel
                                             </a>
-                                            <button disabled type="submit" class="btn btn-warning">
+                                            <button type="submit" class="btn btn-warning">
                                                 <i class="fas fa-pen"></i> Edit
                                             </button>
                                         </div>
@@ -105,26 +104,25 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        //<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        //<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
-        //<script>
-        //    $(document).ready(function () {
-        //        $('#PinCodeId').attr('data-live-search', true);
+        
+        <script>
+            $(document).ready(function () {
+                $('.selectPincode').attr('data-live-search', true);
 
-        //        //// Enable multiple select.
-        //        $('#PinCodeId').attr('multiple', true);
-        //        $('#PinCodeId').attr('data-selected-text-format', 'count');
+                //// Enable multiple select.
+                $('.selectPincode').attr('multiple', true);
+                $('.selectPincode').attr('data-selected-text-format', 'count');
 
-        //        $('.selectPincode').selectpicker(
-        //            {
-        //                width: '100%',
-        //                title: '- [Choose Multiple Pincodes] -',
-        //                style: 'btn-warning',
-        //                size: 6,
-        //                iconBase: 'fa',
-        //                tickIcon: 'fa-check'
-        //            });
-        //    });
-        //</script>
+                //$('.selectPincode').selectpicker(
+                //    {
+                //        width: '100%',
+                //        title: '- [Choose Multiple Pincodes] -',
+                //        style: 'btn-info',
+                //        size: 6,
+                //        iconBase: 'fa',
+                //        tickIcon: 'fa-check'
+                //    });
+            });
+        </script>
     }
 }

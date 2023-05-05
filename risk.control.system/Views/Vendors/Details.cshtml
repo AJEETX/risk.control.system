@@ -16,7 +16,7 @@
                         <div class="card-body dataTable-search-form">
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a>
+                                    <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Back</a>
                                     <a asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i> Add Service</a>
                                 </div>
                             </div>
@@ -79,7 +79,7 @@
                                         <td>
                                             @foreach (var svc in item?.PincodeServices)
                                             {
-                                                var pinCodeDetail = svc.Pincode +" ";
+                                                var pinCodeDetail = svc.Pincode;
                                                 <span class="badge badge-light">@Html.DisplayFor(modelItem => pinCodeDetail)</span>
                                             }
                                         </td>
