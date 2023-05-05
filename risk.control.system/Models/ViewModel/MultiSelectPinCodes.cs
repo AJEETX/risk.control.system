@@ -7,7 +7,7 @@ namespace risk.control.system.Models.ViewModel
 
         [Required]
         [Display(Name = "Choose Multiple Pincodes")]
-        public List<int> SelectedMultiPincodeId { get; set; } = default!;
+        public List<string> SelectedMultiPincodeId { get; set; } = default!;
 
         /// <summary>  
         /// Gets or sets selected pincodes property.  

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -13,10 +11,12 @@ namespace risk.control.system.Controllers
     public class VendorServiceController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IToastNotification toastNotification;
 
-        public VendorServiceController(ApplicationDbContext context)
+        public VendorServiceController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
+            this.toastNotification = toastNotification;
         }
 
         // GET: VendorService
@@ -62,9 +62,11 @@ namespace risk.control.system.Controllers
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name");
             ViewBag.VendorName = vendor.Name;
             ViewBag.VendorId = vendor.VendorId;
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendor.State.StateId), "PinCodeId", "Name");
+            //ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendor.State.StateId), "PinCodeId", "Name");
             //ViewData["ServicedPinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendor.State.StateId), "PinCodeId", "Name");
-            return View();
+
+            var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<string>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+            return View(model);
         }
 
         // POST: VendorService/Create
@@ -76,15 +78,28 @@ namespace risk.control.system.Controllers
         {
             if (vendorInvestigationServiceType is not null)
             {
+                var pincodesServiced = await _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
+                var servicePinCodes = pincodesServiced.Select(p =>
+                new ServicedPinCode
+                {
+                    Name = p.Name,
+                    Pincode = p.Code,
+                    VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId,
+                    VendorInvestigationServiceType = vendorInvestigationServiceType,
+                }).ToList();
+                vendorInvestigationServiceType.PincodeServices = servicePinCodes;
+                //var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
+
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                toastNotification.AddSuccessToastMessage("service created successfully!");
+
+                return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
             }
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
-            ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name");
+            toastNotification.AddErrorToastMessage("Error to create vendor service!");
 
             return View(vendorInvestigationServiceType);
         }
@@ -119,6 +134,7 @@ namespace risk.control.system.Controllers
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendorInvestigationServiceType.StateId), "PinCodeId", "Name");
 
             return View(services);
@@ -154,7 +170,8 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                toastNotification.AddSuccessToastMessage("service edited successfully!");
+                return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
             }
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
@@ -202,7 +219,8 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            toastNotification.AddSuccessToastMessage("service deleted successfully!");
+            return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
         }
 
         private bool VendorInvestigationServiceTypeExists(string id)

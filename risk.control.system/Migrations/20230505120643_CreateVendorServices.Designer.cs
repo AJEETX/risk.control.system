@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230505040556_CreateServiceWithDistrict")]
-    partial class CreateServiceWithDistrict
+    [Migration("20230505120643_CreateVendorServices")]
+    partial class CreateVendorServices
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

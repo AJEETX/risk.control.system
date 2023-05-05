@@ -15,7 +15,8 @@
                     <form asp-action="index">
                         <div class="card-body dataTable-search-form">
                             <div class="row">
-                                <div class="col-md-12 text-left">
+                                <div class="col-md-12 text-right">
+                                    <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a>
                                     <a asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i> Add Service</a>
                                 </div>
                             </div>
@@ -26,7 +27,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <div class="card card-light">
+                <div class="card card-success">
                     <div class="card-body contained-width">
                         <table class="table  table-striped fixed-with-height">
                             <thead>
@@ -38,10 +39,13 @@
                                         Type of Investigation Service
                                     </th>
                                     <th>
-                                        @Html.DisplayNameFor(model => model.State)
+                                        District
                                     </th>
                                     <th>
-                                        Price
+                                        State
+                                    </th>
+                                    <th>
+                                        Rate
                                     </th>
                                     
                                     <th>
@@ -63,7 +67,9 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
                                         </td>
-                                        
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.District.Name)
+                                        </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.State.Name)
                                         </td>
@@ -73,9 +79,8 @@
                                         <td>
                                             @foreach (var svc in item?.PincodeServices)
                                             {
-                                                var pinCodeDetail = svc.Pincode + "- " + svc.Name;
-                                                @Html.DisplayFor(modelItem => pinCodeDetail)
-                                                ;
+                                                var pinCodeDetail = svc.Pincode +" ";
+                                                <span class="badge badge-light">@Html.DisplayFor(modelItem => pinCodeDetail)</span>
                                             }
                                         </td>
                                         <td>

@@ -29,21 +29,21 @@
     //        $(this).attr("disabled", "disabled");
     //    }
     //});
-    $('#PinCodeId').attr('data-live-search', true);
+    //$('#PinCodeId').attr('data-live-search', true);
 
-    //// Enable multiple select.  
-    $('#PinCodeId').attr('multiple', true);
-    $('#PinCodeId').attr('data-selected-text-format', 'count');
+    ////// Enable multiple select.  
+    //$('#PinCodeId').attr('multiple', true);
+    //$('#PinCodeId').attr('data-selected-text-format', 'count');
 
-    $('.selectPincode').selectpicker(
-        {
-            width: '100%',
-            title: '- [Choose Multiple Pincodes] -',
-            style: 'btn-warning',
-            size: 6,
-            iconBase: 'fa',
-            tickIcon: 'fa-check'
-        });  
+    //$('.selectPincode').selectpicker(
+    //    {
+    //        width: '100%',
+    //        title: '- [Choose Multiple Pincodes] -',
+    //        style: 'btn-warning',
+    //        size: 6,
+    //        iconBase: 'fa',
+    //        tickIcon: 'fa-check'
+    //    });  
     $("#btnDeleteImage").click(function () {
         var id = $(this).attr("data-id");
         $.ajax({
@@ -69,6 +69,7 @@
         });
     });
 });
+
 function loadState(obj) {
     var value = obj.value;
     $.post("/User/GetStatesByCountryId", { countryId: value }, function (data) {
@@ -98,7 +99,7 @@ function PopulateInvestigationServices(dropDownId, list, option) {
     $(dropDownId).empty();
     $(dropDownId).append(option)
     $.each(list, function (index, row) {
-        $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>")
+        $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.code + "</option>")
     });
 }
 function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, pincodeOption, districtOption) {
