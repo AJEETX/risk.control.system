@@ -11,13 +11,13 @@
                 <div class="col-sm-12">
                     <div class="card card-success">
                         <div class="card-header">
-                            <h3 class="card-title">Add vendor services for : @ViewBag.VendorName </h3>
+                            <h3 class="card-title">Add @ViewBag.VendorName services</h3>
                         </div>
                         <div class="card-body">
                             <form asp-action="Create">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
                                         <div class="form-group">
                                             <label asp-for="LineOfBusinessId" class="control-label"></label>
@@ -34,20 +34,26 @@
                                             <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
                                         </div>
 
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                       
                                         <div class="form-group">
                                             <label asp-for="Price" class="control-label"></label>
                                             <input asp-for="Price" class="form-control" />
                                             <span asp-validation-for="Price" class="text-danger"></span>
                                         </div>
+                                    </div>
+                                    <br />
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label asp-for="StateId" class="control-label"></label>
-                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId">
+                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
                                                 <option>--SELECT STATE--</option>
+
+                                            </select>
+                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="DistrictId" class="control-label"></label>
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
+                                                <option>--SELECT DISTRICT--</option>
 
                                             </select>
                                             <span asp-validation-for="StateId" class="text-danger"></span>
@@ -58,9 +64,14 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label asp-for="PincodeServices" class="control-label"></label>
-                                            <input asp-for="PincodeServices" class="form-control" />
-                                            <span asp-validation-for="PincodeServices" class="text-danger"></span>
+                                            <div class="input-group">
+                                                <span class="input-group-addon icon-custom"><i class="fa fa-flag"></i> pincodes</span>
+
+                                                @{
+                                                    var selectedPinCodes = this.ViewBag.ServicedPinCodeId as SelectList;
+                                                }
+                                                @Html.ListBoxFor(m =>  selectedPinCodes, this.ViewBag.PinCodeId as SelectList, new { id = "PinCodeId", @class = "selectPincode show-tick form-control input-md" })
+                                            </div>
                                         </div>
                                         <div class="text-right">
                                             <a asp-controller="Vendors" asp-action="details" asp-route-id="@ViewBag.VendorId" class="btn btn-secondary">

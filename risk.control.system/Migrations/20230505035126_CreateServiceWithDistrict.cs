@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class vService : Migration
+    public partial class CreateServiceWithDistrict : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -536,6 +536,7 @@ namespace risk.control.system.Migrations
                     InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
                     LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: false),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
                     VendorId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -545,6 +546,11 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_VendorInvestigationServiceType", x => x.VendorInvestigationServiceTypeId);
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
                         name: "FK_VendorInvestigationServiceType_InvestigationServiceType_InvestigationServiceTypeId",
                         column: x => x.InvestigationServiceTypeId,
@@ -760,6 +766,11 @@ namespace risk.control.system.Migrations
                 name: "IX_Vendor_StateId",
                 table: "Vendor",
                 column: "StateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorInvestigationServiceType_DistrictId",
+                table: "VendorInvestigationServiceType",
+                column: "DistrictId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VendorInvestigationServiceType_InvestigationServiceTypeId",

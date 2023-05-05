@@ -20,15 +20,30 @@
     //});
     //$('#StateId').change(function(){
     //    loadDistrict($(this));
-    //});   
+    //});
     //$('#DistrictId').change(function () {
     //    loadPinCode($(this));
-    //});   
+    //});
     //$("select").each(function () {
     //    if ($(this).find("option").length <= 1) {
     //        $(this).attr("disabled", "disabled");
     //    }
     //});
+    $('#PinCodeId').attr('data-live-search', true);
+
+    //// Enable multiple select.  
+    $('#PinCodeId').attr('multiple', true);
+    $('#PinCodeId').attr('data-selected-text-format', 'count');
+
+    $('.selectPincode').selectpicker(
+        {
+            width: '100%',
+            title: '- [Choose Multiple Pincodes] -',
+            style: 'btn-warning',
+            size: 6,
+            iconBase: 'fa',
+            tickIcon: 'fa-check'
+        });  
     $("#btnDeleteImage").click(function () {
         var id = $(this).attr("data-id");
         $.ajax({

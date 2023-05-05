@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230504114857_vService")]
-    partial class vService
+    [Migration("20230505035126_CreateServiceWithDistrict")]
+    partial class CreateServiceWithDistrict
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -816,6 +816,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DistrictId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("InvestigationServiceTypeId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -842,6 +845,8 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("VendorInvestigationServiceTypeId");
+
+                    b.HasIndex("DistrictId");
 
                     b.HasIndex("InvestigationServiceTypeId");
 
@@ -1121,6 +1126,10 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.VendorInvestigationServiceType", b =>
                 {
+                    b.HasOne("risk.control.system.Models.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId");
+
                     b.HasOne("risk.control.system.Models.InvestigationServiceType", "InvestigationServiceType")
                         .WithMany()
                         .HasForeignKey("InvestigationServiceTypeId")
@@ -1144,6 +1153,8 @@ namespace risk.control.system.Migrations
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("District");
 
                     b.Navigation("InvestigationServiceType");
 

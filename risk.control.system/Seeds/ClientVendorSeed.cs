@@ -48,6 +48,7 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
                     Price = 99,
                     StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     PincodeServices = new List<ServicedPinCode>
                     {

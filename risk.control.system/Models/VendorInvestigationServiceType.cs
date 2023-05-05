@@ -19,8 +19,11 @@ namespace risk.control.system.Models
         public string StateId { get; set; } = default!;
         public State State { get; set; } = default!;
 
+        public string? DistrictId { get; set; } = default!;
+        public District? District { get; set; } = default!;
+
         public decimal Price { get; set; }
-        public List<ServicedPinCode> PincodeServices { get; set; } = default!;
+        public List<ServicedPinCode> PincodeServices { get; set; } = new List<ServicedPinCode> { new ServicedPinCode { } };
 
         public string VendorId { get; set; }
         public Vendor Vendor { get; set; }

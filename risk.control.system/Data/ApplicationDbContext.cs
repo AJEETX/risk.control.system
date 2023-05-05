@@ -28,7 +28,7 @@ namespace risk.control.system.Data
         public virtual DbSet<ClientCompany> ClientCompany { get; set; }
         public virtual DbSet<InvestigationServiceType> InvestigationServiceType { get; set; }
         public virtual DbSet<Vendor> Vendor { get; set; } = default!;
-        public DbSet<risk.control.system.Models.VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
+        public DbSet<VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
         //public virtual DbSet<VendorUser> VendorUser { get; set; } = default!;
     }
 }

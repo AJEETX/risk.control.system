@@ -62,6 +62,8 @@ namespace risk.control.system.Controllers
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name");
             ViewBag.VendorName = vendor.Name;
             ViewBag.VendorId = vendor.VendorId;
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendor.State.StateId), "PinCodeId", "Name");
+            //ViewData["ServicedPinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendor.State.StateId), "PinCodeId", "Name");
             return View();
         }
 
@@ -82,6 +84,8 @@ namespace risk.control.system.Controllers
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name");
+
             return View(vendorInvestigationServiceType);
         }
         [HttpPost, ActionName("GetInvestigationServicesByLineOfBusinessId")]
@@ -109,12 +113,14 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var services = _context.VendorInvestigationServiceType.Include(v => v.Vendor).First(v => v.VendorInvestigationServiceTypeId == id);
+            var services = _context.VendorInvestigationServiceType.Include(v => v.Vendor).Include(v => v.PincodeServices).First(v => v.VendorInvestigationServiceTypeId == id);
 
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendorInvestigationServiceType.StateId), "PinCodeId", "Name");
+
             return View(services);
         }
 
