@@ -20,7 +20,7 @@ builder.Services.AddControllersWithViews()
         Timeout = 3000
     });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite("Data Source=risk-control-0011.db"));
+                options.UseSqlite("Data Source=risk-control-00112.db"));
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
