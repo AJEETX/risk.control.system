@@ -49,5 +49,61 @@
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "img/superadmin.jpg";
         }
+        public static class CLIENT_ADMIN
+        {
+            public const string USERNAME = "client-admin@admin.com";
+            public const string EMAIL = "client-admin@admin.com";
+            public const string FIRST_NAME = "Amit";
+            public const string LAST_NAME = "Kumar";
+            public const string PROFILE_IMAGE = "img/admin.jpg";
+        }
+        public static class CLIENT_CREATOR
+        {
+            public const string USERNAME = "client-creator@admin.com";
+            public const string EMAIL = "client-creator@admin.com";
+            public const string FIRST_NAME = "Rashmi";
+            public const string LAST_NAME = "Kumar";
+            public const string PROFILE_IMAGE = "img/creator.jpg";
+        }
+        public static class CLIENT_ASSIGNER
+        {
+            public const string USERNAME = "client-assigner@admin.com";
+            public const string EMAIL = "client-assigner@admin.com";
+            public const string FIRST_NAME = "Christian";
+            public const string LAST_NAME = "Kumar";
+            public const string PROFILE_IMAGE = "img/assigner.jpg";
+        }
+        public static class CLIENT_ASSESSOR
+        {
+            public const string USERNAME = "client-assessor@admin.com";
+            public const string EMAIL = "client-assessor@admin.com";
+            public const string FIRST_NAME = "Damien";
+            public const string LAST_NAME = "Kumar";
+            public const string PROFILE_IMAGE = "img/assessor.jpg";
+        }
+        public static class VENDOR_ADMIN
+        {
+            public const string USERNAME = "vendor-admin@admin.com";
+            public const string EMAIL = "vendor-admin@admin.com";
+            public const string FIRST_NAME = "Gopal";
+            public const string LAST_NAME = "Kumar";
+            public const string PROFILE_IMAGE = "img/vendor-admin.jpg";
+        }
+        public static class VENDOR_SUPERVISOR
+        {
+            public const string USERNAME = "vendor-supervisor@admin.com";
+            public const string EMAIL = "vendor-supervisor@admin.com";
+            public const string FIRST_NAME = "Lala";
+            public const string LAST_NAME = "Kumar";
+            public const string PROFILE_IMAGE = "img/supervisor.jpg";
+        }
+        public static class VENDOR_AGENT
+        {
+            public const string USERNAME = "vendor-agent@admin.com";
+            public const string EMAIL = "vendor-agent@admin.com";
+            public const string FIRST_NAME = "Gogo";
+            public const string LAST_NAME = "Kumar";
+            public const string PROFILE_IMAGE = "img/agent.jpg";
+        }
     }
 }
