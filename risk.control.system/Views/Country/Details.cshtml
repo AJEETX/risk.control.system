@@ -1,12 +1,10 @@
 ﻿@model risk.control.system.Models.Country
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = @Applicationsettings.DETAILS;
 }
 
-<h1>Details</h1>
-
-<h4>Country</h4>
+<h4>@Applicationsettings.COUNTRY</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -27,8 +25,8 @@
     </div>
 </div>
 <div>
-     <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a> &nbsp;
-    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.CountryId"><i class="fas fa-pen"></i> Edit</a>
+    <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
+    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.CountryId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
 </div>
 
 @section Scripts {

@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<risk.control.system.Models.ClientCompany>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = @Applicationsettings.CLIENT_COMPANY;
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -9,7 +9,7 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">client company</h3>
+                        <h3 class="card-title">@Applicationsettings.CLIENT_COMPANY</h3>
                     </div>
                     <form asp-action="index">
                         <div class="card-body dataTable-search-form">
@@ -22,8 +22,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
-                                    <a class="btn btn-success" href="/ClientCompany/Create"><i class="fas fa-plus"></i> Create</a>
+                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> @Applicationsettings.SEARCH</button>
+                                    <a class="btn btn-success" href="/ClientCompany/Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                                 </div>
                             </div>
                         </div>
@@ -113,19 +113,20 @@
                                         </td>
                                         <td>
                                             <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClientCompanyId">
-                                                <i class="fa fa-search"></i> View
+                                                <i class="fa fa-search"></i>  @Applicationsettings.VIEW
                                             </a> &nbsp;
                                             <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClientCompanyId">
-                                                <i class="fas fa-pen"></i> Edit
+                                                <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
                                             </a> &nbsp;
                                             <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClientCompanyId">
-                                                <i class="fas fa-trash"></i> Delete
+                                                <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
                                             </a>
                                         </td>
                                     </tr>
                                 }
                             </tbody>
-                        </table>                        <br />
+                        </table>                        
+                        <br />
                         <br />
                         @{
                             var PageNumber = (int)@ViewBag.PageNumber;

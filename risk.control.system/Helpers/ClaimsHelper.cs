@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Security.Claims;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Seeds;
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Helpers
 {

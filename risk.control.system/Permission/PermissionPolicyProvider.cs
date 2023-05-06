@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-using risk.control.system.Seeds;
+using risk.control.system.AppConstant;
 using System;
 using System.Threading.Tasks;
 
 namespace risk.control.system.Permission
 {
-internal class PermissionPolicyProvider : IAuthorizationPolicyProvider
+    internal class PermissionPolicyProvider : IAuthorizationPolicyProvider
 {
     public DefaultAuthorizationPolicyProvider FallbackPolicyProvider { get; }
 

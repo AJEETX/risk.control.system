@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.Vendor
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = @Applicationsettings.DETAILS;
 }
 
 <section class="content pt-2">
@@ -10,14 +10,15 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header">
-                         <h3 class="card-title">@Model.Name services</h3>
+                         <h3 class="card-title">@Model.Name</h3>
                     </div>
                     <form asp-action="index">
                         <div class="card-body dataTable-search-form">
                             <div class="row">
                                 <div class="col-md-12 text-right">
                                     <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Back</a>
-                                    <a asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i> Add Service</a>
+                                    <a class="btn btn-success" href="/User/Create"><i class="fas fa-plus"></i>  @Applicationsettings.USER</a>
+                                    <a asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i>  @Applicationsettings.SERVICE_TYPES</a>
                                 </div>
                             </div>
                         </div>
@@ -87,9 +88,9 @@
                                             @Html.DisplayFor(modelItem => item.UpdatedBy)
                                         </td>
                                         <td>
-                                            <a class="btn btn-xs btn-info" asp-controller="VendorService" asp-action="Details" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fa fa-search"></i>  Details</a>&nbsp;
-                                            <a class="btn btn-xs btn-warning" asp-controller="VendorService" asp-action="Edit" asp-route-id="@item.VendorInvestigationServiceTypeId"><i class="fas fa-pen"></i>  Edit</a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-controller="VendorService" asp-action="Delete" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fas fa-trash"></i>  Delete</a>
+                                            <a class="btn btn-xs btn-info" asp-controller="VendorService" asp-action="Details" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-controller="VendorService" asp-action="Edit" asp-route-id="@item.VendorInvestigationServiceTypeId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-controller="VendorService" asp-action="Delete" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fas fa-trash"></i>   @Applicationsettings.DELETE</a>
                                         </td>
                                     </tr>
                                 }

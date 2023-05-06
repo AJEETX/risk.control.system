@@ -1,12 +1,10 @@
 ﻿@model ApplicationRole
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = @Applicationsettings.EDIT;
 }
 
-<h1>Edit</h1>
-
-<h4>Roles</h4>
+<h4><i class="fas fa-pen"></i> @Applicationsettings.ROLE</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -19,8 +17,8 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
              <div class="form-group">
-                <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a> &nbsp;
-                <button type="submit" class="btn btn-warning"> <i class="fas fa-pen"></i> Edit</button>
+                <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
+                <button type="submit" class="btn btn-warning"> <i class="fas fa-pen"></i> @Applicationsettings.EDIT</button>
             </div>
         </form>
     </div>

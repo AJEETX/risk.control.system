@@ -1,6 +1,6 @@
 ﻿namespace risk.control.system.Models
 {
-    public class ClientCompanyUser : ApplicationUser
+    public class ClientCompanyApplicationUser : ApplicationUser
     {
         public string? ClientCompanyId { get; set; } = default!;
         public ClientCompany? ClientCompany { get; set; } = default!;

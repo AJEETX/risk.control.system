@@ -1,6 +1,6 @@
 ﻿@model risk.control.system.Models.Country
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = @Applicationsettings.EDIT;
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -8,7 +8,7 @@
             <div class="col-12">
                 <div class="card card-warning">
                     <div class="card-header">
-                        <h3 class="card-title">Add country</h3>
+                        <h3 class="card-title"><i class="fas fa-pen"></i> @Applicationsettings.COUNTRY</h3>
                     </div>
                     <div class="card-body">
                         <form asp-action="Edit">
@@ -25,8 +25,8 @@
                                 <span asp-validation-for="Code" class="text-danger"></span>
                             </div>
                             <div class="card-footer text-right">
-                                <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel</a> &nbsp;
-                                <button type="submit" class="btn btn-warning"> <i class="fas fa-pen"></i> Edit</button>
+                                <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
+                                <button type="submit" class="btn btn-warning"> <i class="fas fa-pen"></i> @Applicationsettings.EDIT</button>
                             </div>
                         </form>
                     </div>

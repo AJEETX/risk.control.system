@@ -1,6 +1,6 @@
 ﻿@model ApplicationUser
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = @Applicationsettings.CREATE;
 }
 <section class="content pt-2">
     <div class="container-fluid ">
@@ -9,7 +9,7 @@
                 <div class="col-sm-6">
                     <div class="card card-success">
                         <div class="card-header">
-                            <h3 class="card-title">Create user</h3>
+                            <h3 class="card-title"><i class="fas fa-plus"></i> @Applicationsettings.USER</h3>
                         </div>
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <div class="card-body">
@@ -76,8 +76,9 @@
                             </div>
                             <div class="card-footer text-right">
                                 <a asp-action="Index" class="btn btn-secondary"> <i class="fa fa-window-close"></i>
-                                    Cancel</a>
-                                <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Create
+                                    @Applicationsettings.CANCEL</a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> @Applicationsettings.CREATE
                                 </button>
                             </div>
                         </div>

@@ -154,28 +154,25 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser user)
         {
-            user.Id = Guid.NewGuid();
+            if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                if (user.ProfileImage != null && user.ProfileImage.Length > 0)
-                {
-                    string newFileName = Guid.NewGuid().ToString();
-                    string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
-                    newFileName += fileExtension;
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
-                    user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                    user.ProfilePictureUrl = "upload/" + newFileName;
-                }
+                string newFileName = Guid.NewGuid().ToString();
+                string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
+                newFileName += fileExtension;
+                var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                user.ProfilePictureUrl = "upload/" + newFileName;
+            }
 
-                IdentityResult result = await userManager.CreateAsync(user, user.Password);
+            IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
-                if (result.Succeeded)
-                    return RedirectToAction(nameof(Index));
-                else
-                {
-                    toastNotification.AddErrorToastMessage("Error to create user!");
-                    foreach (IdentityError error in result.Errors)
-                        ModelState.AddModelError("", error.Description);
-                }
+            if (result.Succeeded)
+                return RedirectToAction(nameof(Index));
+            else
+            {
+                toastNotification.AddErrorToastMessage("Error to create user!");
+                foreach (IdentityError error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
             }
             GetCountryStateEdit(user);
             toastNotification.AddSuccessToastMessage("user created successfully!");

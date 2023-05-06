@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using risk.control.system.Seeds;
+using risk.control.system.AppConstant;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace risk.control.system.Permission
 {
-internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
+    internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
 {
         
     public PermissionAuthorizationHandler()
@@ -20,7 +20,7 @@ internal class PermissionAuthorizationHandler : AuthorizationHandler<PermissionR
             return;
         }
             var permissionss = context.User.Claims.Where(x => x.Type == Applicationsettings.PERMISSION &&
-                                                            x.Value == requirement.Permission &&
+                                                            x.Value.ToLower() == requirement.Permission.ToLower() &&
                                                             x.Issuer == "LOCAL AUTHORITY");
         if (permissionss.Any())
         {

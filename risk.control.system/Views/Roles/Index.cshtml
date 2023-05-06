@@ -5,7 +5,7 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">role</h3>
+                        <h3 class="card-title">@Applicationsettings.ROLE</h3>
                     </div>
                     <form method="post" action="roles/create" asp-antiforgery="true">
                         <div class="card-body dataTable-search-form">
@@ -18,8 +18,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
-                                    <a class="btn btn-success" href="/Roles/Create"><i class="fas fa-plus"></i> Create</a>
+                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> @Applicationsettings.SEARCH</button>
+                                    <a class="btn btn-success" href="/Roles/Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                                 </div>
                             </div>
                         </div>
@@ -44,9 +44,9 @@
                                     <tr>
                                         <td>@role.Name</td>
                                         <td>
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@role.Id"><i class="fas fa-pen"></i> Edit</a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@role.Id"><i class="fas fa-trash"></i> Delete</a>
-                                            <a class="btn btn-xs btn-success" asp-controller="Permission" asp-action="Index" asp-route-id="@role.Id"><i class="fa-solid fa-house-lock"></i> Permissions</a>
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@role.Id"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@role.Id"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
+                                            <a class="btn btn-xs btn-success" asp-controller="Permission" asp-action="Index" asp-route-id="@role.Id"><i class="fa-solid fa-house-lock"></i> @Applicationsettings.PERMISSION</a>
                                             <input type="hidden" value="@role.Id" />
                                         </td>
                                     </tr>

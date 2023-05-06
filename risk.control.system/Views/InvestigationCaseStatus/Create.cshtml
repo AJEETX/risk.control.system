@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.InvestigationCaseStatus
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = @Applicationsettings.CREATE;
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -9,7 +9,7 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">Add status</h3>
+                        <h3 class="card-title"><i class="fas fa-plus"></i> @Applicationsettings.CASE_STATUS</h3>
                     </div>
                     <div class="card-body">
                         <form asp-action="Create">
@@ -32,10 +32,10 @@
                             <div class="card-footer text-right">
                                 <a asp-action="Index" class="btn btn-secondary">
                                     <i class="fa fa-window-close"></i>
-                                    Cancel
+                                    @Applicationsettings.CANCEL
                                 </a>
                                 <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-plus"></i> Create
+                                    <i class="fas fa-plus"></i>  @Applicationsettings.CREATE
                                 </button>
                             </div>
                         </form>

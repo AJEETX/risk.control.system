@@ -5,7 +5,7 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">country</h3>
+                        <h3 class="card-title">@Applicationsettings.COUNTRY</h3>
                     </div>
                     <form asp-action="index">
                         <div class="card-body dataTable-search-form">
@@ -18,8 +18,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
-                                    <a class="btn btn-success" href="/Country/Create"><i class="fas fa-plus"></i> Create</a>
+                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> @Applicationsettings.SEARCH</button>
+                                    <a class="btn btn-success" href="/Country/Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                                 </div>
                             </div>
                         </div>
@@ -50,8 +50,8 @@
                                         <td>@country.Code</td>
                                         <td>@country.Name</td>
                                         <td>
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@country.CountryId"><i class="fas fa-pen"></i> Edit</a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@country.CountryId"><i class="fas fa-trash"></i> Delete</a>
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@country.CountryId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@country.CountryId"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
                                             <input type="hidden" value="@country.CountryId" />
                                         </td>
                                     </tr>

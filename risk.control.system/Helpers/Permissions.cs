@@ -1,4 +1,4 @@
-﻿using risk.control.system.Seeds;
+﻿using risk.control.system.AppConstant;
 
 namespace risk.control.system.Helpers
 {

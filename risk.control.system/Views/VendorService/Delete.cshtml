@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = @Applicationsettings.DELETE;
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -9,7 +9,7 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">investigation services of vendor: @Model.Vendor.Name</h3>
+                        <h3 class="card-title">@Model.Vendor.Name service</h3>
                     </div>
                 </div>
             </div>
@@ -77,7 +77,7 @@
             <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
             <a asp-controller="Vendors" asp-action="details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
-                Cancel
+                @Applicationsettings.CANCEL
             </a> &nbsp;
             <input type="submit" value="Delete" class="btn btn-danger" />
         </form>

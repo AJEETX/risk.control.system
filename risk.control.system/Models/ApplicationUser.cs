@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public partial class ApplicationUser : IdentityUser<Guid>
+    public partial class ApplicationUser : IdentityUser<long>
     {
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         public string? ProfilePictureUrl { get; set; }
@@ -40,7 +40,7 @@ namespace risk.control.system.Models
         [Required]
         public string? Password { get; set; }
     }
-    public class ApplicationRole : IdentityRole<Guid>
+    public class ApplicationRole : IdentityRole<long>
     {
         public ApplicationRole(string code, string name)
         {

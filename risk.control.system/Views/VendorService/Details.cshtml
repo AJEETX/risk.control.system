@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.VendorInvestigationServiceType
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Applicationsettings.DETAILS;
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -9,7 +9,7 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title">investigation services of vendor: @Model.Vendor.Name</h3>
+                        <h3 class="card-title">@Model.Vendor.Name @Applicationsettings.SERVICE_TYPES</h3>
                     </div>
                 </div>
             </div>
@@ -75,8 +75,8 @@
     <div class="text-right">
         <a asp-controller="Vendors" asp-action="details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
             <i class="fa fa-window-close"></i>
-            Cancel
+            @Applicationsettings.CANCEL
         </a>
-        <a asp-action="Edit" class="btn btn-warning" asp-route-id="@Model.VendorInvestigationServiceTypeId"><i class="fas fa-pen"></i> Edit</a>
+        <a asp-action="Edit" class="btn btn-warning" asp-route-id="@Model.VendorInvestigationServiceTypeId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
     </div>
 </section>
