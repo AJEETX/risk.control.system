@@ -102,6 +102,36 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
+        public async Task<IActionResult> Service(string id)
+        {
+            if (id == null || _context.Vendor == null)
+            {
+                toastNotification.AddErrorToastMessage("vendor not found!");
+                return NotFound();
+            }
+
+            var vendor = await _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .FirstOrDefaultAsync(m => m.VendorId == id);
+            if (vendor == null)
+            {
+                return NotFound();
+            }
+
+            return View(vendor);
+        }
         // GET: Vendors/Create
         public IActionResult Create()
         {

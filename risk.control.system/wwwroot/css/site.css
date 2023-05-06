@@ -1,6 +1,7 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+@import url('site.css');
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -116,4 +117,12 @@ table td {
     width: 250px;
     height: 150px;
     object-fit: cover
+}
+.btn-right-bottom {
+    right:-75rem;
+}
+.card tbody a{
+    display:inline-block;
+    width:4rem;
+    height:1.5rem;
 }

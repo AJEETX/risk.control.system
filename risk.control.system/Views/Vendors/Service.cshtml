@@ -1,7 +1,7 @@
 ﻿@model risk.control.system.Models.Vendor
 
 @{
-    ViewData["Title"] = @Applicationsettings.DETAILS;
+    ViewData["Title"] = @Applicationsettings.SERVICE;
 }
 
 <section class="content pt-2">
@@ -9,23 +9,13 @@
         <div class="row">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">@Applicationsettings.MANAGE_VENDOR</h3>
+                    <h3 class="card-title">@Applicationsettings.MANAGE_SERVICE</h3>
                 </div>
                 <div class="card-body">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
-                                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.VendorId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT_VENDOR </a>
-                                <a class="btn btn-success" href="#"><i class="fas fa-user-plus"></i>  @Applicationsettings.MANAGE_USERS</a>
-                                <a asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i>  @Applicationsettings.ADD_SERVICE</a>
-                            </div>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="card card-light">
                             <div class="card-header">
-                                <h3 class="card-title">@Applicationsettings.PROFILE</h3>
+                                <h3 class="card-title">@Model.Name</h3>
                             </div>
                             <div class="card-body">
                                 <div class="row">
@@ -67,12 +57,6 @@
                                             <dd class="col-sm-8">
                                                 @Html.DisplayFor(model => model.Branch)
                                             </dd>
-                                            <dt class="col-sm-3">
-                                                @Html.DisplayNameFor(model => model.Addressline)
-                                            </dt>
-                                            <dd class="col-sm-8">
-                                                @Html.DisplayFor(model => model.Addressline)
-                                            </dd>
 
                                         </dl>
                                     </div>
@@ -111,9 +95,8 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="row">
-                        <div class="col-12">
+                        <div class="col-md-12">
                             <div class="card card-light">
                                 <div class="card-header">
                                     <h3 class="card-title">@Applicationsettings.SERVICE</h3>

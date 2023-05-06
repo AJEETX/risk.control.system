@@ -20,13 +20,21 @@
         public const string COUNTRY = "country";
         public const string DISTRICT = "district";
         public const string CASE_STATUS = "case status";
-        public const string SERVICE_TYPES = "service type";
+        public const string SERVICE = "service";
         public const string LINE_OF_BUSINESS = "line of business";
         public const string PINCODE = "pincode";
         public const string ROLE = "role";
         public const string STATE = "state";
         public const string USER = "user";
         public const string VENDOR = "vendor";
+        public const string VENDORS = "vendors";
+        public const string MANAGE_VENDOR = "manage vendor";
+        public const string EDIT_VENDOR = "edit vendor";
+        public const string MANAGE_USERS = "manage users";
+
+        public const string MANAGE_SERVICE = "manage service";
+        public const string ADD_SERVICE = "add service";
+        public const string PROFILE = "profile";
 
 
         public const string CURRENT_PINCODE = "515631";
