@@ -70,22 +70,22 @@
     });
 });
 
-function loadState(obj) {
+function loadState(obj, showDefaultOption = true) {
     var value = obj.value;
     $.post("/User/GetStatesByCountryId", { countryId: value }, function (data) {
-        PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option>--SELECT STATE--</option>", "<option>--SELECT DISTRICT--</option>", "<option>--SELECT PINCODE--</option>");
+        PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option>--SELECT STATE--</option>", "<option>--SELECT DISTRICT--</option>", "<option>--SELECT PINCODE--</option>", showDefaultOption);
     });
 }
-function loadDistrict(obj) {
+function loadDistrict(obj, showDefaultOption = true) {
     var value = obj.value;
     $.post("/User/GetDistrictByStateId", { stateId: value }, function (data) {
-        PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option>--SELECT PINCODE--</option>", "<option>--SELECT DISTRICT--</option>");
+        PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option>--SELECT PINCODE--</option>", "<option>--SELECT DISTRICT--</option>", showDefaultOption);
     });
 }
-function loadPinCode(obj) {
+function loadPinCode(obj, showDefaultOption= true) {
     var value = obj.value;
     $.post("/User/GetPinCodesByDistrictId", { districtId: value }, function (data) {
-        PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", "<option>--SELECT DISTRICT--</option>");
+        PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
     });
 }
 
@@ -102,9 +102,11 @@ function PopulateInvestigationServices(dropDownId, list, option) {
         $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.code + "</option>")
     });
 }
-function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, pincodeOption, districtOption) {
+function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, pincodeOption, districtOption, showDefaultOption) {
     $(pinCodedropDownId).empty();
-    $(pinCodedropDownId).append(pincodeOption)
+    if (showDefaultOption){
+        $(pinCodedropDownId).append(pincodeOption)
+    }
 
     $(districtDropdownId).empty();
     $(districtDropdownId).append(districtOption)
@@ -113,21 +115,24 @@ function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, p
         $(districtDropdownId).append("<option value='" + row.districtId + "'>" + row.name + "</option>")
     });
 }
-function PopulatePinCodeDropDown(dropDownId, list, option) {
+function PopulatePinCodeDropDown(dropDownId, list, option, showDefaultOption) {
     $(dropDownId).empty();
+    if (showDefaultOption)
     $(dropDownId).append(option)
     $.each(list, function (index, row) {
         $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>")
     });
 }
-function PopulateStateDropDown(pinCodedropDownId, districtDropDownId, stateDropDownId, list, stateOption, districtOption, pincodeOption) {
+function PopulateStateDropDown(pinCodedropDownId, districtDropDownId, stateDropDownId, list, stateOption, districtOption, pincodeOption, showDefaultOption) {
     $(stateDropDownId).empty();
     $(districtDropDownId).empty();
     $(pinCodedropDownId).empty();
 
     $(stateDropDownId).append(stateOption);
     $(districtDropDownId).append(districtOption);
-    $(pinCodedropDownId).append(pincodeOption);
+    if (showDefaultOption) {
+        $(pinCodedropDownId).append(pincodeOption);
+    }
 
     $.each(list, function (index, row) {
         $(stateDropDownId).append("<option value='" + row.stateId + "'>" + row.name + "</option>")

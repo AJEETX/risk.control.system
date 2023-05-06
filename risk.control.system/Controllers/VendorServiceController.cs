@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace risk.control.system.Controllers
 {
@@ -87,8 +88,8 @@ namespace risk.control.system.Controllers
                     VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId,
                     VendorInvestigationServiceType = vendorInvestigationServiceType,
                 }).ToList();
+                vendorInvestigationServiceType.PincodeServices = null;
                 vendorInvestigationServiceType.PincodeServices = servicePinCodes;
-                //var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
 
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
@@ -137,12 +138,18 @@ namespace risk.control.system.Controllers
             ViewData["DistrictId"] = new SelectList(_context.District.Where(d => d.State.StateId == vendorInvestigationServiceType.StateId), "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
 
             var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
-            services.SelectedMultiPincodeId = selected;
+            services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
 
             //ViewData["PinCodeId"] = _context.PinCode.Select(p => new SelectListItem { Text = p.Code, Value = p.PinCodeId }).ToList();
 
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendorInvestigationServiceType.StateId), "PinCodeId", "Code", selected);
+            //ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendorInvestigationServiceType.StateId), "PinCodeId", "Code", selected);
 
+            ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
+                .Select(x => new SelectListItem
+                {
+                    Text = x.Name + " - " + x.Code,
+                    Value = x.PinCodeId.ToString()
+                }).ToList();
 
             return View(services);
         }
@@ -163,10 +170,29 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    _context.Update(vendorInvestigationServiceType);
-                    await _context.SaveChangesAsync();
+                    if (vendorInvestigationServiceType.SelectedMultiPincodeId.Count > 0)
+                    {
+                        var existingServicedPincodes = _context.ServicedPinCode.Where(s => s.VendorInvestigationServiceTypeId == vendorInvestigationServiceType.VendorInvestigationServiceTypeId);
+                        _context.ServicedPinCode.RemoveRange(existingServicedPincodes);
+
+                        var pinCodeDetails = _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId));
+
+                        var pinCodesWithId = pinCodeDetails.Select(p => new ServicedPinCode
+                        {
+                            Pincode = p.Code,
+                            Name = p.Name,
+                            VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId
+                        }).ToList();
+                        _context.ServicedPinCode.AddRange(pinCodesWithId);
+
+                        vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
+
+                        _context.Update(vendorInvestigationServiceType);
+                        await _context.SaveChangesAsync();
+                    }
+
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException ex)
                 {
                     if (!VendorInvestigationServiceTypeExists(vendorInvestigationServiceType.VendorInvestigationServiceTypeId))
                     {

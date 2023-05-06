@@ -13,22 +13,22 @@ namespace risk.control.system.Models
         [Display(Name = "Investigation service type")]
         public InvestigationServiceType InvestigationServiceType { get; set; } = default!;
         [Display(Name = "Line of busuness")]
-        public string LineOfBusinessId { get; set; } = default!;
-        public LineOfBusiness LineOfBusiness { get; set; } = default!;
+        public string? LineOfBusinessId { get; set; } = default!;
+        public LineOfBusiness? LineOfBusiness { get; set; } = default!;
 
         [Display(Name = "State")]
-        public string StateId { get; set; } = default!;
-        public State State { get; set; } = default!;
+        public string? StateId { get; set; } = default!;
+        public State? State { get; set; } = default!;
 
         [Display(Name = "District")]
         public string? DistrictId { get; set; } = default!;
         public District? District { get; set; } = default!;
-
+        [Column(TypeName = "decimal(10,2)")]
         public decimal Price { get; set; }
         [NotMapped]
         [Display(Name = "Choose Multiple Pincodes")]
-        public List<string> SelectedMultiPincodeId { get; set; } = default!;
-        public List<ServicedPinCode> PincodeServices { get; set; } = new List<ServicedPinCode> { new ServicedPinCode { } };
+        public List<string> SelectedMultiPincodeId { get; set; } = new List<string> { }!;
+        public List<ServicedPinCode> PincodeServices { get; set; } = default!;
 
         public string VendorId { get; set; }
         public Vendor Vendor { get; set; }

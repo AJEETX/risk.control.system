@@ -17,16 +17,14 @@ namespace risk.control.system.Models
         public string FirstName { get; set; } = default!;
         [Required]
         public string LastName { get; set; } = default!;
-        [Required]
         [Display(Name = "PinCode name")]
-        public string PinCodeId { get; set; } = default!;
+        public string? PinCodeId { get; set; } = default!;
         [Display(Name = "PinCode name")]
-        public PinCode PinCode { get; set; } = default!;
-        [Required]
+        public PinCode? PinCode { get; set; } = default!;
         [Display(Name = "State name")]
-        public string StateId { get; set; } = default!;
+        public string? StateId { get; set; } = default!;
         [Display(Name = "State name")]
-        public State State { get; set; } = default!;
+        public State? State { get; set; } = default!;
         [Required]
         [Display(Name = "Country name")]
         public string CountryId { get; set; } = default!;
@@ -49,6 +47,7 @@ namespace risk.control.system.Models
             Name = name;
             Code = code;
         }
+        [StringLength(20)]
         public string Code { get; set; }
     }
 }

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Create";
 }
+<link href="~/css/bootstrap-multiselect.css" rel="stylesheet" />
 
 <section class="content pt-2">
     <div class="container-fluid ">
@@ -49,7 +50,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label asp-for="StateId" class="control-label"></label>
-                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
                                                 <option>--SELECT STATE--</option>
 
                                             </select>
@@ -57,7 +58,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="DistrictId" class="control-label"></label>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this, false)">
                                                 <option>--SELECT DISTRICT--</option>
 
                                             </select>
@@ -105,6 +106,8 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/css/bootstrap-multiselect.js"></script>
+
 @*    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">*@
     <script>

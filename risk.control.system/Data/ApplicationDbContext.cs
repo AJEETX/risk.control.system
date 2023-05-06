@@ -18,7 +18,7 @@ namespace risk.control.system.Data
         //public virtual DbSet<ClientCompanyUser> ClientApplicationUser { get; set; }
         public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
         public virtual DbSet<InvestigationCase> InvestigationCase { get; set; }
-        public virtual DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; }
+        //public virtual DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; }
         public virtual DbSet<LineOfBusiness> LineOfBusiness { get; set; }
         public virtual DbSet<InvestigationCaseStatus> InvestigationCaseStatus { get; set; }
         public virtual DbSet<Country> Country { get; set; }
@@ -27,6 +27,7 @@ namespace risk.control.system.Data
         public virtual DbSet<PinCode> PinCode { get; set; }
         public virtual DbSet<ClientCompany> ClientCompany { get; set; }
         public virtual DbSet<InvestigationServiceType> InvestigationServiceType { get; set; }
+        public virtual DbSet<ServicedPinCode> ServicedPinCode { get; set; }
         public virtual DbSet<Vendor> Vendor { get; set; } = default!;
         public DbSet<VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
         //public virtual DbSet<VendorUser> VendorUser { get; set; } = default!;

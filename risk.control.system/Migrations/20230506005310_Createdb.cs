@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateVendorServices : Migration
+    public partial class Createdb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,7 @@ namespace risk.control.system.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
@@ -119,29 +119,22 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClaimsInvestigation",
+                name: "InvestigationServiceType",
                 columns: table => new
                 {
-                    ClaimsInvestigationCaseId = table.Column<string>(type: "TEXT", nullable: false),
+                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
                     LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClaimsInvestigation", x => x.ClaimsInvestigationCaseId);
+                    table.PrimaryKey("PK_InvestigationServiceType", x => x.InvestigationServiceTypeId);
                     table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_InvestigationCaseStatus_InvestigationCaseStatusId",
-                        column: x => x.InvestigationCaseStatusId,
-                        principalTable: "InvestigationCaseStatus",
-                        principalColumn: "InvestigationCaseStatusId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_LineOfBusiness_LineOfBusinessId",
+                        name: "FK_InvestigationServiceType_LineOfBusiness_LineOfBusinessId",
                         column: x => x.LineOfBusinessId,
                         principalTable: "LineOfBusiness",
                         principalColumn: "LineOfBusinessId",
@@ -155,7 +148,7 @@ namespace risk.control.system.Migrations
                     DistrictId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: false),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -174,37 +167,41 @@ namespace risk.control.system.Migrations
                         name: "FK_District_State_StateId",
                         column: x => x.StateId,
                         principalTable: "State",
-                        principalColumn: "StateId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "StateId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "InvestigationServiceType",
+                name: "InvestigationCase",
                 columns: table => new
                 {
-                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
+                    InvestigationId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimsInvestigationCaseId = table.Column<string>(type: "TEXT", nullable: true),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: true),
+                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: true),
+                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InvestigationServiceType", x => x.InvestigationServiceTypeId);
+                    table.PrimaryKey("PK_InvestigationCase", x => x.InvestigationId);
                     table.ForeignKey(
-                        name: "FK_InvestigationServiceType_ClaimsInvestigation_ClaimsInvestigationCaseId",
-                        column: x => x.ClaimsInvestigationCaseId,
-                        principalTable: "ClaimsInvestigation",
-                        principalColumn: "ClaimsInvestigationCaseId");
+                        name: "FK_InvestigationCase_InvestigationCaseStatus_InvestigationCaseStatusId",
+                        column: x => x.InvestigationCaseStatusId,
+                        principalTable: "InvestigationCaseStatus",
+                        principalColumn: "InvestigationCaseStatusId");
                     table.ForeignKey(
-                        name: "FK_InvestigationServiceType_LineOfBusiness_LineOfBusinessId",
+                        name: "FK_InvestigationCase_InvestigationServiceType_InvestigationServiceTypeId",
+                        column: x => x.InvestigationServiceTypeId,
+                        principalTable: "InvestigationServiceType",
+                        principalColumn: "InvestigationServiceTypeId");
+                    table.ForeignKey(
+                        name: "FK_InvestigationCase_LineOfBusiness_LineOfBusinessId",
                         column: x => x.LineOfBusinessId,
                         principalTable: "LineOfBusiness",
-                        principalColumn: "LineOfBusinessId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "LineOfBusinessId");
                 });
 
             migrationBuilder.CreateTable(
@@ -215,7 +212,7 @@ namespace risk.control.system.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: false),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -239,45 +236,7 @@ namespace risk.control.system.Migrations
                         name: "FK_PinCode_State_StateId",
                         column: x => x.StateId,
                         principalTable: "State",
-                        principalColumn: "StateId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "InvestigationCase",
-                columns: table => new
-                {
-                    InvestigationId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_InvestigationCase", x => x.InvestigationId);
-                    table.ForeignKey(
-                        name: "FK_InvestigationCase_InvestigationCaseStatus_InvestigationCaseStatusId",
-                        column: x => x.InvestigationCaseStatusId,
-                        principalTable: "InvestigationCaseStatus",
-                        principalColumn: "InvestigationCaseStatusId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_InvestigationCase_InvestigationServiceType_InvestigationServiceTypeId",
-                        column: x => x.InvestigationServiceTypeId,
-                        principalTable: "InvestigationServiceType",
-                        principalColumn: "InvestigationServiceTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_InvestigationCase_LineOfBusiness_LineOfBusinessId",
-                        column: x => x.LineOfBusinessId,
-                        principalTable: "LineOfBusiness",
-                        principalColumn: "LineOfBusinessId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "StateId");
                 });
 
             migrationBuilder.CreateTable(
@@ -290,8 +249,8 @@ namespace risk.control.system.Migrations
                     ProfilePicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: false),
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
                     DistrictId = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -331,14 +290,12 @@ namespace risk.control.system.Migrations
                         name: "FK_AspNetUsers_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
                         principalTable: "PinCode",
-                        principalColumn: "PinCodeId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "PinCodeId");
                     table.ForeignKey(
                         name: "FK_AspNetUsers_State_StateId",
                         column: x => x.StateId,
                         principalTable: "State",
-                        principalColumn: "StateId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "StateId");
                 });
 
             migrationBuilder.CreateTable(
@@ -534,10 +491,10 @@ namespace risk.control.system.Migrations
                 {
                     VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
                     InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: true),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
                     DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    Price = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     VendorId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -561,14 +518,12 @@ namespace risk.control.system.Migrations
                         name: "FK_VendorInvestigationServiceType_LineOfBusiness_LineOfBusinessId",
                         column: x => x.LineOfBusinessId,
                         principalTable: "LineOfBusiness",
-                        principalColumn: "LineOfBusinessId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "LineOfBusinessId");
                     table.ForeignKey(
                         name: "FK_VendorInvestigationServiceType_State_StateId",
                         column: x => x.StateId,
                         principalTable: "State",
-                        principalColumn: "StateId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "StateId");
                     table.ForeignKey(
                         name: "FK_VendorInvestigationServiceType_Vendor_VendorId",
                         column: x => x.VendorId,
@@ -658,16 +613,6 @@ namespace risk.control.system.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClaimsInvestigation_InvestigationCaseStatusId",
-                table: "ClaimsInvestigation",
-                column: "InvestigationCaseStatusId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClaimsInvestigation_LineOfBusinessId",
-                table: "ClaimsInvestigation",
-                column: "LineOfBusinessId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ClientCompany_CountryId",
                 table: "ClientCompany",
                 column: "CountryId");
@@ -711,11 +656,6 @@ namespace risk.control.system.Migrations
                 name: "IX_InvestigationCase_LineOfBusinessId",
                 table: "InvestigationCase",
                 column: "LineOfBusinessId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_InvestigationServiceType_ClaimsInvestigationCaseId",
-                table: "InvestigationServiceType",
-                column: "ClaimsInvestigationCaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InvestigationServiceType_LineOfBusinessId",
@@ -827,6 +767,9 @@ namespace risk.control.system.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "InvestigationCaseStatus");
+
+            migrationBuilder.DropTable(
                 name: "VendorInvestigationServiceType");
 
             migrationBuilder.DropTable(
@@ -836,16 +779,10 @@ namespace risk.control.system.Migrations
                 name: "Vendor");
 
             migrationBuilder.DropTable(
-                name: "ClaimsInvestigation");
+                name: "LineOfBusiness");
 
             migrationBuilder.DropTable(
                 name: "PinCode");
-
-            migrationBuilder.DropTable(
-                name: "InvestigationCaseStatus");
-
-            migrationBuilder.DropTable(
-                name: "LineOfBusiness");
 
             migrationBuilder.DropTable(
                 name: "District");

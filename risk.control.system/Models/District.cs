@@ -13,11 +13,10 @@ namespace risk.control.system.Models
         [Display(Name = "District code")]
         [Required]
         public string Code { get; set; } = default!;
-        [Required]
         [Display(Name = "State name")]
-        public string StateId { get; set; } = default!;
+        public string? StateId { get; set; } = default!;
         [Display(Name = "State name")]
-        public State State { get; set; } = default!;
+        public State? State { get; set; } = default!;
         [Required]
         [Display(Name = "Country name")]
         public string CountryId { get; set; } = default!;

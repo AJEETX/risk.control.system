@@ -18,9 +18,26 @@ builder.Services.AddControllersWithViews()
     {
         ProgressBar = true,
         Timeout = 3000
+
     });
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite("Data Source=risk-control.db"));
+                    options.UseSqlite("Data Source=add-vendor-service.db"));
+
+
+//if (builder.Build().Environment.EnvironmentName == "Development")
+//{
+//    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//}
+//else
+//{
+//    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//                    options.UseSqlite("Data Source=risk-control.db"));
+//}
+
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;

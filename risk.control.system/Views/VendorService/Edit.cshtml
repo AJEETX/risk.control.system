@@ -20,6 +20,11 @@
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
                                         <div class="form-group">
+                                            <div style="display:none" class="form-group">
+                                                <label asp-for="VendorId" class="control-label"></label>
+                                                <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
+                                                <span asp-validation-for="VendorId" class="text-danger"></span>
+                                            </div>
                                             <label asp-for="LineOfBusinessId" class="control-label"></label>
                                             <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
                                                 <option>--SELECT LINE OF BUSINESS--</option>
@@ -46,7 +51,7 @@
 
                                         <div class="form-group">
                                             <label asp-for="StateId" class="control-label"></label>
-                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
                                                 <option>--SELECT STATE--</option>
 
                                             </select>
@@ -54,7 +59,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="DistrictId" class="control-label"></label>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this, false)">
                                                 <option>--SELECT DISTRICT--</option>
 
                                             </select>
@@ -64,12 +69,25 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
+                                       @* <div class="form-group">
+                                            <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
+                                            <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control" asp-items="ViewBag.PinCodeId" multiple>
+                                            </select>
+                                            <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
+                                        </div>*@
                                         <div class="form-group">
+                                            @Html.LabelFor(model => model.SelectedMultiPincodeId, new { @class = "col-sm-2 col-form-label" })
+                                                @{
+                                                    var pincodes = ViewBag.PinCodeId as List<SelectListItem>;
+                                                }
+                                                @Html.ListBoxFor(model => model.SelectedMultiPincodeId, new MultiSelectList(pincodes, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "PinCodeId" })
+                                        </div>
+@*                                        <div class="form-group">
                                             <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
                                             <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control selectPincode show-tick form-control input-md" asp-items="ViewBag.PinCodeId">
                                             </select>
                                             <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
-                                        </div>
+                                        </div>*@
 
                                         @*                                       <div class="form-group">
                                         <div class="input-group">
@@ -109,19 +127,20 @@
             $(document).ready(function () {
                 $('.selectPincode').attr('data-live-search', true);
 
-                //// Enable multiple select.
+                // Enable multiple select.
                 $('.selectPincode').attr('multiple', true);
                 $('.selectPincode').attr('data-selected-text-format', 'count');
 
-                //$('.selectPincode').selectpicker(
-                //    {
-                //        width: '100%',
-                //        title: '- [Choose Multiple Pincodes] -',
-                //        style: 'btn-info',
-                //        size: 6,
-                //        iconBase: 'fa',
-                //        tickIcon: 'fa-check'
-                //    });
+                $('.selectPincode').selectpicker(
+                    {
+                        width: '100%',
+                        title: '- [Choose Multiple Pincodes] -',
+                        style: 'btn-info',
+                        size: 6,
+                        iconBase: 'fa',
+                        tickIcon: 'fa-check'
+                    });
+                $('#PinCodeId').attr('multiple', true);
             });
         </script>
     }
