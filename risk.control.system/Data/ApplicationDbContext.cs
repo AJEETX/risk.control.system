@@ -30,6 +30,6 @@ namespace risk.control.system.Data
         public virtual DbSet<ServicedPinCode> ServicedPinCode { get; set; }
         public virtual DbSet<Vendor> Vendor { get; set; } = default!;
         public DbSet<VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
-        //public virtual DbSet<VendorApplicationUser> VendorApplicationUser { get; set; } = default!;
+        public virtual DbSet<VendorApplicationUser> VendorApplicationUser { get; set; } = default!;
     }
 }

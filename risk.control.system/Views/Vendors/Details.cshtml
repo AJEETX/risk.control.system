@@ -17,7 +17,7 @@
                             <div class="col-md-12 text-right">
                                 <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
                                 <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.VendorId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT_VENDOR </a>
-                                <a class="btn btn-success" href="#"><i class="fas fa-user-plus"></i>  @Applicationsettings.MANAGE_USERS</a>
+                                <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-plus"></i>  @Applicationsettings.MANAGE_USERS</a>
                                 <a asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i>  @Applicationsettings.ADD_SERVICE</a>
                             </div>
                         </div>

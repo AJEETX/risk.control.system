@@ -9,7 +9,7 @@ using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Seeds
 {
-    public static class UserSeed
+    public static class ClientApplicationUserSeed
     {
         public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
@@ -211,7 +211,7 @@ namespace risk.control.system.Seeds
                 }
             }
 
-            //Seed Vendor Admin
+            //Seed Vendor Supervisor
             var vendorSupervisor = new ApplicationUser()
             {
                 UserName = VENDOR_SUPERVISOR.USERNAME,
@@ -239,8 +239,8 @@ namespace risk.control.system.Seeds
                 }
             }
 
-            //Seed Vendor Admin
-            var vendorAgent = new ApplicationUser()
+            //Seed Vendor Agent
+            var vendorAgent = new VendorApplicationUser()
             {
                 UserName = VENDOR_AGENT.USERNAME,
                 Email = VENDOR_AGENT.EMAIL,
@@ -254,7 +254,7 @@ namespace risk.control.system.Seeds
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
-                ProfilePictureUrl = "img/agent.jpg"
+                ProfilePictureUrl = VENDOR_AGENT.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))
             {

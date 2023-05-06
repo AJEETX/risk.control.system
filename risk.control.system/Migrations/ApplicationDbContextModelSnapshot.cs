@@ -168,6 +168,10 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("DistrictId")
                         .HasColumnType("TEXT");
 
@@ -262,6 +266,10 @@ namespace risk.control.system.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
@@ -803,6 +811,21 @@ namespace risk.control.system.Migrations
                     b.ToTable("VendorInvestigationServiceType");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.VendorApplicationUser", b =>
+                {
+                    b.HasBaseType("risk.control.system.Models.ApplicationUser");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VendorId")
+                        .HasColumnType("TEXT");
+
+                    b.HasIndex("VendorId");
+
+                    b.HasDiscriminator().HasValue("VendorApplicationUser");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
                 {
                     b.HasOne("risk.control.system.Models.ApplicationRole", null)
@@ -1068,6 +1091,15 @@ namespace risk.control.system.Migrations
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.VendorApplicationUser", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Vendor", "Vendor")
+                        .WithMany("VendorApplicationUser")
+                        .HasForeignKey("VendorId");
+
+                    b.Navigation("Vendor");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.LineOfBusiness", b =>
                 {
                     b.Navigation("InvestigationServiceTypes");
@@ -1075,6 +1107,8 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>
                 {
+                    b.Navigation("VendorApplicationUser");
+
                     b.Navigation("VendorInvestigationServiceTypes");
                 });
 

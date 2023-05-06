@@ -14,6 +14,7 @@
         public string? Country { get; set; }
         public string? CountryId { get; set; }
         public string Email { get; set; }
+        public string VendorName { get; set; }
         public IEnumerable<string> Roles { get; set; }
     }
 }

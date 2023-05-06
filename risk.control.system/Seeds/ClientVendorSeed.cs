@@ -7,22 +7,13 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
+        public static async Task<string> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
         {
             //CREATE CLIENT COMPANY
             var currentPinCode = "515631";
             var currentDistrict = "ANANTAPUR";
             var currentState = "AD";
-            try
-            {
-                var pin = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode);
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-            var TataAig = new ClientCompany
+             var TataAig = new ClientCompany
             {
                 ClientCompanyId = Guid.NewGuid().ToString(),
                 Name = "TATA AIG INSURANCE",
@@ -87,6 +78,7 @@ namespace risk.control.system.Seeds
 
 
             await context.SaveChangesAsync();
+            return abcVendorCompany.Entity.VendorId;
         }
     }
 }

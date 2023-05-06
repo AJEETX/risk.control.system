@@ -11,6 +11,7 @@ namespace risk.control.system.Seeds
             using var scope = app.Services.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             context.Database.EnsureCreated();
 
@@ -532,13 +533,15 @@ namespace risk.control.system.Seeds
 
             #region CLIENT/ VENDOR COMPANY
 
-            await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
+            var vendorId = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
 
             #endregion
 
             #region APPLICATION USERS ROLES
 
-            await UserSeed.Seed(context, indiaCountry, userManager, roleManager);
+            await PortalAdminSeed.Seed(context, indiaCountry, userManager, roleManager);
+
+            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, vendorId);
 
             #endregion
         }

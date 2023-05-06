@@ -47,6 +47,8 @@ namespace risk.control.system.Models
         public IFormFile? Document { get; set; }
         [Display(Name = "Document url")]
         public byte[]? DocumentImage { get; set; } = default!;
+
+        public List<VendorApplicationUser>? VendorApplicationUser { get; set; }
     }
     public enum VendorStatus
     {

@@ -45,8 +45,8 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-//builder.Services.AddIdentityCore<VendorApplicationUser>().AddEntityFrameworkStores<ApplicationDbContext>();
-//builder.Services.AddIdentityCore<ClientCompanyApplicationUser>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentityCore<VendorApplicationUser>(o => o.User.RequireUniqueEmail = true).AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+//builder.Services.AddIdentityCore<ClientCompanyApplicationUser>(o => o.User.RequireUniqueEmail = true).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
