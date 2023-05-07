@@ -23,7 +23,7 @@
                 @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
                 {
                     <div class="image">
-                        <img class="img-circle elevation-0 sidebar-profile" src="~/@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
+                        <img class="img-circle elevation-0 sidebar-profile" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
                     </div>
                 }
                 <div class="info">

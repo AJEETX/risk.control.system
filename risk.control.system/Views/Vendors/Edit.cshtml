@@ -127,11 +127,11 @@
                                         <label asp-for="DocumentImage" class="control-label"></label>
                                         @if (Model?.DocumentImage is not null)
                                         {
-                                            <img id="documentImage" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
                                         }
                                         else
                                         {
-                                            <img id="documentImage" src="~/img//no-image.png">
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                         }
                                         <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>

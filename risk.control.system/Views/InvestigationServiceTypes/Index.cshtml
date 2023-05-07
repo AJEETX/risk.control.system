@@ -1,7 +1,8 @@
-﻿@model IEnumerable<risk.control.system.Models.InvestigationServiceType>
+﻿@using risk.control.system.AppConstant;
+@model IEnumerable<risk.control.system.Models.InvestigationServiceType>
 
 @{
-    ViewData["Title"] = @Applicationsettings.SERVICE_TYPES;
+    ViewData["Title"] = @Applicationsettings.SERVICE;
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -9,7 +10,7 @@
             <div class="col-12">
                 <div class="card card-success">
                     <div class="card-header">
-                        <h3 class="card-title"> @Applicationsettings.SERVICE_TYPES</h3>
+                        <h3 class="card-title"> @Applicationsettings.SERVICE</h3>
                     </div>
                     <form method="post" action="roles/create" asp-antiforgery="true">
                         <div class="card-body dataTable-search-form">

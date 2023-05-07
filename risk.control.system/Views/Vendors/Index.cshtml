@@ -71,11 +71,11 @@
                                         <td>
                                             @if (item?.DocumentImage is not null)
                                             {
-                                                <img id="documentImage" style="width:150px;height:50px; object-fit:cover" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                                <img id="documentImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
                                             }
                                             else
                                             {
-                                                <img id="documentImage" style="width:150px;height:50px; object-fit:cover" src="~/img//no-image.png">
+                                                <img id="documentImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
                                             }
                                         </td>
                                         <td>

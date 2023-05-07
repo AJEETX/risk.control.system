@@ -42,6 +42,9 @@
         public const string CURRENT_DISTRICT = "ANANTAPUR";
         public const string CURRENT_STATE = "AD";
 
+
+
+        public const string NO_IMAGE = "/img/no-image.png";
         public static class PORTAL_ADMIN
         {
             public const string USERNAME = "portal-admin@admin.com";
