@@ -102,7 +102,7 @@
                                         }
                                         else
                                         {
-                                            <img id="documentImage" class="form-icon" src="@Applicationsettings.NO_IMAGE">
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                         }
                                     </dd>
                                     <dt class="col-sm-3">
@@ -136,9 +136,9 @@
                         <div class="row">
                             <div class="col-md-12 text-right">
                                 <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
-                                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.VendorId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT_VENDOR </a>
-                                <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-plus"></i>  @Applicationsettings.MANAGE_USERS</a>
-                                <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i>  @Applicationsettings.MANAGE_SERVICE</a>
+                                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.VendorId"><i class="fas fa-pen"></i> @Applicationsettings.VENDOR </a>
+                                <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-plus"></i>  @Applicationsettings.USER</a>
+                                <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i>  @Applicationsettings.SERVICE</a>
                             </div>
                         </div>
                     </div>
