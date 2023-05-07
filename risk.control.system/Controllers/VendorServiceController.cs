@@ -61,7 +61,7 @@ namespace risk.control.system.Controllers
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name");
-             var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<string>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+            var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<string>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
             return View(model);
         }
 
@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("service created successfully!");
 
-                return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = vendorInvestigationServiceType.VendorId });
+                return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = vendorInvestigationServiceType.VendorId });
             }
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);

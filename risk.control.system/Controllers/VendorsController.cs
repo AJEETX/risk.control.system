@@ -115,6 +115,7 @@ namespace risk.control.system.Controllers
                 .Include(i => i.District)
                 .Include(i => i.InvestigationServiceType)
                 .Include(i => i.State)
+                .Include(i => i.Vendor)
                 .Include(i => i.PincodeServices)
                 .Where(a => a.VendorId == id);
             return View(await applicationDbContext.ToListAsync());

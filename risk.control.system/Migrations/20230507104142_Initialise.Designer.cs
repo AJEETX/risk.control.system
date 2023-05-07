@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230506172109_VendorUserListPage")]
-    partial class VendorUserListPage
+    [Migration("20230507104142_Initialise")]
+    partial class Initialise
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

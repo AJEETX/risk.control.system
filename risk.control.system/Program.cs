@@ -24,7 +24,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=add-vendor-user-051106052023.db"));
+                    options.UseSqlite("Data Source=add-vendor-user-051107052023.db"));
 
 
 //if (builder.Build().Environment.EnvironmentName == "Development")
