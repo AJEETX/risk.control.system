@@ -12,6 +12,7 @@ namespace risk.control.system.Seeds
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
+            var clientUserManager = scope.ServiceProvider.GetRequiredService<UserManager<ClientCompanyApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
             context.Database.EnsureCreated();
 
@@ -37,7 +38,6 @@ namespace risk.control.system.Seeds
                 Code = "IND",
             };
             var indiaCountry = await context.Country.AddAsync(india);
-
 
             await PinCodeStateSeed.SeedPincode(context, indiaCountry.Entity);
 
@@ -533,13 +533,15 @@ namespace risk.control.system.Seeds
 
             #region CLIENT/ VENDOR COMPANY
 
-            var vendorId = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
+            var (vendorId, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
 
             #endregion
 
             #region APPLICATION USERS ROLES
 
             await PortalAdminSeed.Seed(context, indiaCountry, userManager, roleManager);
+
+            await ClientApplicationUserSeed.Seed(context, indiaCountry, clientUserManager, clientCompanyId);
 
             await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, vendorId);
 

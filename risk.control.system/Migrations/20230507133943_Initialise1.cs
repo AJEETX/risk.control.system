@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialise : Migration
+    public partial class Initialise1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -252,11 +252,19 @@ namespace risk.control.system.Migrations
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Branch = table.Column<string>(type: "TEXT", nullable: false),
                     Addressline = table.Column<string>(type: "TEXT", nullable: false),
-                    City = table.Column<string>(type: "TEXT", nullable: false),
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: true),
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
                     DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    City = table.Column<string>(type: "TEXT", nullable: false),
+                    BankName = table.Column<string>(type: "TEXT", nullable: false),
+                    BankAccountNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    IFSCCode = table.Column<string>(type: "TEXT", nullable: false),
+                    AgreementDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ActivatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: true),
+                    DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -362,8 +370,10 @@ namespace risk.control.system.Migrations
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     Password = table.Column<string>(type: "TEXT", nullable: false),
                     Discriminator = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
                     Comments = table.Column<string>(type: "TEXT", nullable: true),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    VendorApplicationUser_Comments = table.Column<string>(type: "TEXT", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -382,6 +392,11 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_ClientCompany_ClientCompanyId",
+                        column: x => x.ClientCompanyId,
+                        principalTable: "ClientCompany",
+                        principalColumn: "ClientCompanyId");
                     table.ForeignKey(
                         name: "FK_AspNetUsers_Country_CountryId",
                         column: x => x.CountryId,
@@ -597,6 +612,11 @@ namespace risk.control.system.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_ClientCompanyId",
+                table: "AspNetUsers",
+                column: "ClientCompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_CountryId",
                 table: "AspNetUsers",
                 column: "CountryId");
@@ -767,9 +787,6 @@ namespace risk.control.system.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "ClientCompany");
-
-            migrationBuilder.DropTable(
                 name: "InvestigationCase");
 
             migrationBuilder.DropTable(
@@ -786,6 +803,9 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "VendorInvestigationServiceType");
+
+            migrationBuilder.DropTable(
+                name: "ClientCompany");
 
             migrationBuilder.DropTable(
                 name: "InvestigationServiceType");

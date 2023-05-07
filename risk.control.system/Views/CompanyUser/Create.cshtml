@@ -1,7 +1,7 @@
-﻿@model risk.control.system.Models.VendorApplicationUser
+﻿@model risk.control.system.Models.ClientCompanyApplicationUser
 
 @{
-    ViewData["Title"] = Applicationsettings.CREATE;
+    ViewData["Title"] = "Create";
 }
 <section class="content pt-2">
     <div class="container-fluid ">
@@ -10,16 +10,16 @@
                 <div class="col-sm-12">
                     <div class="card card-success">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-plus"></i>  @Applicationsettings.VENDOR @Model.Vendor.Name @Applicationsettings.USER</h3>
+                            <h3 class="card-title"><i class="fas fa-plus"></i>  @Applicationsettings.VENDOR @Model.ClientCompany.Name @Applicationsettings.USER</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <div class="form-group hide-id">
-                                        <label asp-for="VendorId" class="control-label"></label>
-                                        <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
-                                        <span asp-validation-for="VendorId" class="text-danger"></span>
+                                        <label asp-for="ClientCompanyId" class="control-label"></label>
+                                        <input asp-for="ClientCompanyId" class="form-control" value="@Model.ClientCompany.ClientCompanyId" />
+                                        <span asp-validation-for="ClientCompanyId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="UserName" class="control-label"></label>
@@ -100,7 +100,7 @@
                                         <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                         <div class="card-footer text-right">
-                                        <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                                        <a asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompany.ClientCompanyId" class="btn btn-secondary">
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
                                         </a>

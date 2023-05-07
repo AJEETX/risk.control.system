@@ -24,7 +24,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=add-vendor-user-051107052023.db"));
+                    options.UseSqlite("Data Source=add-vendor-user-051108052023.db"));
 
 
 //if (builder.Build().Environment.EnvironmentName == "Development")
@@ -45,8 +45,14 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddIdentityCore<VendorApplicationUser>(o => o.User.RequireUniqueEmail = true).AddRoles<ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>();
-//builder.Services.AddIdentityCore<ClientCompanyApplicationUser>(o => o.User.RequireUniqueEmail = true).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentityCore<VendorApplicationUser>(o => o.User.RequireUniqueEmail = true)
+    .AddRoles<ApplicationRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+builder.Services.AddIdentityCore<ClientCompanyApplicationUser>(o => o.User.RequireUniqueEmail = true)
+    .AddRoles<ApplicationRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

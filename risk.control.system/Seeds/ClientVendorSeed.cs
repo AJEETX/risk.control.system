@@ -7,13 +7,13 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task<string> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
+        public static async Task<(string vendorId, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
         {
             //CREATE CLIENT COMPANY
             var currentPinCode = "515631";
             var currentDistrict = "ANANTAPUR";
             var currentState = "AD";
-             var TataAig = new ClientCompany
+            var TataAig = new ClientCompany
             {
                 ClientCompanyId = Guid.NewGuid().ToString(),
                 Name = "TATA AIG INSURANCE",
@@ -21,6 +21,11 @@ namespace risk.control.system.Seeds
                 Branch = "FOREST HILL CHASE",
                 City = "FOREST HILL",
                 Code = "TA001",
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "WESTPAC",
+                BankAccountNumber = "1234567",
+                IFSCCode = "IFSC100",
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
@@ -76,9 +81,8 @@ namespace risk.control.system.Seeds
 
             var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
 
-
             await context.SaveChangesAsync();
-            return abcVendorCompany.Entity.VendorId;
+            return (abcVendorCompany.Entity.VendorId, tataAigCompany.Entity.ClientCompanyId);
         }
     }
 }

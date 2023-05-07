@@ -1,0 +1,40 @@
+﻿@using risk.control.system.Models.ViewModel;
+@model CompanyUserRolesViewModel
+<section class="content pt-2">
+    <div class="container-fluid ">
+        <form method="post" action="CompanyUserRoles/update">
+            <div class="row mb-2">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h4>Roles for User: <i> @Model.UserName </i></h4>
+                    </div>
+                    <div class="card-body">
+                        <input hidden asp-for="@Model.UserId" />
+                        <input hidden asp-for="@Model.CompanyId" />
+                        @for (int i = 0; i < Model.CompanyUserRoleViewModel.Count; i++)
+
+                        {
+                            <div class="form-check m-1">
+                                <input type="hidden" asp-for="@Model.CompanyUserRoleViewModel[i].RoleId" />
+                                <input type="hidden" asp-for="@Model.CompanyUserRoleViewModel[i].RoleName" />
+                                <input asp-for="@Model.CompanyUserRoleViewModel[i].Selected" class="form-check-input" />
+                                <label class="form-check-label" asp-for="@Model.CompanyUserRoleViewModel[i].Selected">
+                                    @Model.CompanyUserRoleViewModel[i].RoleName
+                                </label>
+                            </div>
+                        }
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <a asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.CompanyId"  class="btn btn-secondary"> <i
+                                class="fa fa-window-close"></i>
+                            Cancel</a>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Edit
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</section>

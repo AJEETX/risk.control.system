@@ -19,6 +19,8 @@ namespace risk.control.system.Models.ViewModel
         public string Email { get; set; }
         public string VendorId { get; set; }
         public string VendorName { get; set; }
+        public string CompanyId { get; set; }
+        public string CompanyName { get; set; }
         public IEnumerable<string> Roles { get; set; }
 
         [Display(Name = "Profile")]

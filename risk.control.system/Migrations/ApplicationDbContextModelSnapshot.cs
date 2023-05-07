@@ -278,7 +278,21 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("ActivatedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Addressline")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("AgreementDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BankAccountNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BankName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -307,7 +321,17 @@ namespace risk.control.system.Migrations
                     b.Property<string>("DistrictId")
                         .HasColumnType("TEXT");
 
+                    b.Property<byte[]>("DocumentImage")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("DocumentUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IFSCCode")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -324,6 +348,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");
@@ -811,6 +838,21 @@ namespace risk.control.system.Migrations
                     b.ToTable("VendorInvestigationServiceType");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.ClientCompanyApplicationUser", b =>
+                {
+                    b.HasBaseType("risk.control.system.Models.ApplicationUser");
+
+                    b.Property<string>("ClientCompanyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("TEXT");
+
+                    b.HasIndex("ClientCompanyId");
+
+                    b.HasDiscriminator().HasValue("ClientCompanyApplicationUser");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.VendorApplicationUser", b =>
                 {
                     b.HasBaseType("risk.control.system.Models.ApplicationUser");
@@ -822,6 +864,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasIndex("VendorId");
+
+                    b.ToTable("AspNetUsers", t =>
+                        {
+                            t.Property("Comments")
+                                .HasColumnName("VendorApplicationUser_Comments");
+                        });
 
                     b.HasDiscriminator().HasValue("VendorApplicationUser");
                 });
@@ -1091,6 +1139,15 @@ namespace risk.control.system.Migrations
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.ClientCompanyApplicationUser", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
+                        .WithMany("VendorApplicationUser")
+                        .HasForeignKey("ClientCompanyId");
+
+                    b.Navigation("ClientCompany");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.VendorApplicationUser", b =>
                 {
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
@@ -1098,6 +1155,11 @@ namespace risk.control.system.Migrations
                         .HasForeignKey("VendorId");
 
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
+                {
+                    b.Navigation("VendorApplicationUser");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.LineOfBusiness", b =>

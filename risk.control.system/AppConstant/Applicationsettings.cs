@@ -16,7 +16,8 @@
         public const string VIEW = "view";
         public const string DETAILS = "details";
 
-        public const string CLIENT_COMPANY = "companies";
+        public const string CLIENT_COMPANIES = "companies";
+        public const string CLIENT_COMPANY = "company";
         public const string COUNTRY = "countries";
         public const string DISTRICT = "districts";
         public const string CASE_STATUS = "case statuses";
@@ -29,6 +30,7 @@
         public const string VENDOR = "vendor";
         public const string VENDORS = "vendors";
         public const string MANAGE_VENDOR = "manage vendor";
+        public const string MANAGE_CLIENT_COMPANY = "manage client company";
         public const string MANAGE_VENDOR_USER = "manage vendor user";
         public const string EDIT_VENDOR = "edit vendor";
         public const string MANAGE_USERS = "manage users";

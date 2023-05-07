@@ -4,79 +4,116 @@
     ViewData["Title"] = @Applicationsettings.DETAILS;
 }
 
-<div>
-    <h4>@Applicationsettings.CLIENT_COMPANY</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Code)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Code)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Branch)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Branch)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Addressline)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Addressline)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.City)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.City)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.State)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.State.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Country)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Country.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PinCode)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PinCode.District)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
-    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.ClientCompanyId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
-</div>
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">@Applicationsettings.MANAGE_CLIENT_COMPANY</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.Name)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.Name)
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.Code)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.Code)
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.Description)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.Description)
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.PhoneNumber)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.PhoneNumber)
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.Email)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.Email)
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.Branch)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.Branch)
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.Addressline)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.Addressline)
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-3">
+                                        Document
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @if (Model?.DocumentImage is not null)
+                                        {
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                        }
+                                        else
+                                        {
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.District)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.District.Name)
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.State)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.State.Name)
+                                    </dd>
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.PinCode)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.PinCode.Name)
+                                    </dd>
+
+                                    <dt class="col-sm-3">
+                                        @Html.DisplayNameFor(model => model.Country)
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        @Html.DisplayFor(model => model.Country.Name)
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <a asp-controller="ClientCompany" asp-action="Index" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
+                                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.ClientCompanyId"><i class="fas fa-pen"></i> @Applicationsettings.CLIENT_COMPANY </a>
+                                <a asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-plus"></i>  @Applicationsettings.USER</a>
+                                <a asp-controller="Vendors" asp-route-id="@Model.ClientCompanyId" class="btn btn-success disabled"><i class="fas fa-plus"></i>  @Applicationsettings.VENDOR</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
