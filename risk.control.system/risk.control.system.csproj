@@ -7,21 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\lib\lib\**" />
-    <Content Remove="wwwroot\lib\lib\**" />
-    <EmbeddedResource Remove="wwwroot\lib\lib\**" />
-    <None Remove="wwwroot\lib\lib\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Views\InvestigationServiceTypes\Create.cshtml" />
-    <Content Remove="Views\InvestigationServiceTypes\Delete.cshtml" />
-    <Content Remove="Views\InvestigationServiceTypes\Details.cshtml" />
-    <Content Remove="Views\InvestigationServiceTypes\Edit.cshtml" />
-    <Content Remove="Views\InvestigationServiceTypes\Index.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.5" />
@@ -175,14 +160,6 @@
     <Folder Include="Controllers\Api\" />
     <Folder Include="wwwroot\vendor-document\" />
     <Folder Include="wwwroot\upload\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Views\InvestigationServiceTypes\Create.cshtml" />
-    <None Include="Views\InvestigationServiceTypes\Delete.cshtml" />
-    <None Include="Views\InvestigationServiceTypes\Details.cshtml" />
-    <None Include="Views\InvestigationServiceTypes\Edit.cshtml" />
-    <None Include="Views\InvestigationServiceTypes\Index.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

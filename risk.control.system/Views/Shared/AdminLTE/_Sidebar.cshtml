@@ -82,7 +82,7 @@
                 </li>
                 <li class="nav-header">INVESTIGATION <span class="badge badge-danger">:</span></li>
                 <li class="nav-item">
-                    <a is-active-page asp-area="" asp-controller="Claim" asp-action="Index" class="nav-link @Url.MakeActiveClass("Claim","index")">
+                    <a is-active-page asp-controller="Claim" asp-action="Index" class="nav-link @Url.MakeActiveClass("Claim","index")">
                         <i class="fas fa-rupee-sign"></i>
                         <p>
                             claim
@@ -99,7 +99,7 @@
                 </li>
 @*
                 <li class="nav-item">
-                    <a is-active-page asp-area="" asp-controller="InvestigationCase" asp-action="Index" class="nav-link">
+                    <a is-active-page asp-controller="InvestigationCase" asp-action="Index" class="nav-link">
                         <i class="nav-icon fas fa-users-cog"></i>
                         <p>
                             investigation cases
@@ -109,7 +109,7 @@
                 <li class="nav-header"><i class="fa fa-unlock"></i> INVESTIGATION SETTINGS</li>
 
                 <li class="nav-item">
-                    <a is-active-page asp-area="" asp-controller="LineOfBusiness" asp-action="Index" class="nav-link @Url.MakeActiveClass("LineOfBusiness","index")">
+                    <a is-active-page asp-controller="LineOfBusiness" asp-action="Index" class="nav-link @Url.MakeActiveClass("LineOfBusiness","")">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>
                             line of business
@@ -117,7 +117,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page asp-area="" asp-controller="InvestigationServiceTypes" asp-action="Index" class="nav-link @Url.MakeActiveClass("InvestigationServiceTypes","index")">
+                    <a is-active-page asp-controller="InvestigationServiceTypes" asp-action="Index" class="nav-link @Url.MakeActiveClass("InvestigationServiceTypes","")">
                         <i class="nav-icon fas fa-cogs"></i>
                         <p>
                             type of services
@@ -125,7 +125,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page asp-area="" asp-controller="InvestigationCaseStatus" asp-action="Index" class="nav-link @Url.MakeActiveClass("InvestigationCaseStatus","index")">
+                    <a is-active-page asp-controller="InvestigationCaseStatus" asp-action="Index" class="nav-link @Url.MakeActiveClass("InvestigationCaseStatus","")">
                         <i class="far fa-circle nav-icon"></i>
                         <p>case status</p>
                     </a>
@@ -136,7 +136,7 @@
                         {
                         <li class="nav-header"><i class="fa fa-unlock"></i> USER / ROLES</li>
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="User" asp-action="Index" class="nav-link @Url.MakeActiveClass("User","index")">
+                            <a is-active-page asp-controller="User" asp-action="Index" class="nav-link @Url.MakeActiveClass("User","")">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
                                     users
@@ -144,7 +144,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="Roles" asp-action="Index" class="nav-link @Url.MakeActiveClass("Roles","index")">
+                            <a is-active-page asp-controller="Roles" asp-action="Index" class="nav-link @Url.MakeActiveClass("Roles","")">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
                                     roles
@@ -154,7 +154,7 @@
                         <li class="nav-header"><i class="fa fa-unlock"></i>ADMIN SETTINGS</li>
 
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="ClientCompany" asp-action="Index" class="nav-link @Url.MakeActiveClass("ClientCompany","index")">
+                            <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="nav-link @Url.MakeActiveClass("ClientCompany","")">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
                                     client company
@@ -162,7 +162,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="Vendors" asp-action="Index" class="nav-link @Url.MakeActiveClass("Vendors","index")">
+                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="nav-link @Url.MakeActiveClass("Vendors","")">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
                                     vendor
@@ -170,7 +170,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="Country" asp-action="Index" class="nav-link @Url.MakeActiveClass("Country","index")">
+                            <a is-active-page asp-controller="Country" asp-action="Index" class="nav-link @Url.MakeActiveClass("Country","")">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
                                     country
@@ -178,7 +178,7 @@
                             </a>
                         </li> 
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="State" asp-action="Index" class="nav-link @Url.MakeActiveClass("State","index")">
+                            <a is-active-page asp-controller="State" asp-action="Index" class="nav-link @Url.MakeActiveClass("State","")">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
                                     state
@@ -186,7 +186,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="District" asp-action="Index" class="nav-link @Url.MakeActiveClass("District","index")">
+                            <a is-active-page asp-controller="District" asp-action="Index" class="nav-link @Url.MakeActiveClass("District","")">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
                                     district
@@ -194,7 +194,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-area="" asp-controller="PinCodes" asp-action="Index" class="nav-link @Url.MakeActiveClass("PinCodes","index")">
+                            <a is-active-page asp-controller="PinCodes" asp-action="Index" class="nav-link @Url.MakeActiveClass("PinCodes","")">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
                                     pincode
@@ -202,7 +202,7 @@
                             </a>
                         </li>
                         //<li class="nav-item">
-                        //    <a is-active-page asp-area="" asp-controller="Uploads" asp-action="Index" class="nav-link">
+                        //    <a is-active-page asp-controller="Uploads" asp-action="Index" class="nav-link">
                         //        <i class="nav-icon fas fa-user-lock"></i>
                         //        <p>
                         //            upload pincodes

@@ -14,7 +14,7 @@ namespace risk.control.system.Helpers
                 if (string.IsNullOrEmpty(controllerName)) return null;
                 if (controllerName.Equals(controller, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (methodName.Equals(action, StringComparison.OrdinalIgnoreCase))
+                    if (string.IsNullOrWhiteSpace(action) || methodName.Equals(action, StringComparison.OrdinalIgnoreCase))
                     {
                         return result;
                     }
