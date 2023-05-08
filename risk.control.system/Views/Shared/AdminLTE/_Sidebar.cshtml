@@ -74,7 +74,7 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                 <li class="nav-item ">
-                    <a asp-controller="Home" asp-action="Index" class="nav-link @Url.MakeActiveClass("home","index")">
+                    <a asp-controller="Home" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("home","index")">
                         <i class="nav-icon fas fa-home"></i>
                         <p class="sidebar-menu-header-label">
                             Home
@@ -83,7 +83,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a is-active-page class="nav-link @Url.MakeActiveClass("Claim","") @Url.MakeActiveClass("Underwriting","")">
+                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Claim","") @Url.MakeActiveClass("Underwriting","")">
                         <i class="nav-icon fas fa-search"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.INVESTIGATION_MAIN
@@ -120,7 +120,7 @@
                 </a>
                 </li>*@
                 <li class="nav-item">
-                    <a is-active-page class="nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","") @Url.MakeActiveClass("InvestigationCaseStatus","")">
+                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","") @Url.MakeActiveClass("InvestigationCaseStatus","")">
                         <i class="nav-icon fas fa-cog"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.INVESTIGATION_CASE_SETTINGS
@@ -159,7 +159,7 @@
                     if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page class="nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
                                 <i class="nav-icon fas fa-user-cog"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.USER_ROLES
@@ -190,7 +190,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a is-active-page class="nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","")">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.ADMIN_SETTINGS
@@ -218,7 +218,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page class="nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","")">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","")">
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.GENERAL_SETUP
