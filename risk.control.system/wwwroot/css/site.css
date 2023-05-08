@@ -29,7 +29,8 @@ a {
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
 }
 
 @media (min-width: 768px) {
@@ -138,6 +139,13 @@ table td {
 .sidebar-menu-header-label{
     font-weight:bold;
 }
-.navlink-border{
-    border:1px solid #ccc;
+.navlink-border {
+    border: 1px solid #28a745;
+}
+.sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
+    background-color: #28a745 !important;
+}
+
+nav > .mt2 {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
 }

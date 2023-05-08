@@ -88,6 +88,8 @@ app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);
 
+app.UseHttpLogging();
+
 app.UseStaticFiles();
 
 app.UseRouting();

@@ -19,38 +19,38 @@
         public const string DETAILS = "details";
 
         // LABELS / ACTIONS
-        public const string CLIENT_COMPANIES = "companies";
-        public const string CLIENT_COMPANY = "company";
-        public const string COUNTRY = "countries";
-        public const string DISTRICT = "districts";
-        public const string CASE_STATUS = "case statuses";
-        public const string SERVICE = "service";
-        public const string INVESTIGATION_SERVICE = "type of service";
-        public const string LINE_OF_BUSINESS = "line of businesses";
-        public const string PINCODE = "pincodes";
-        public const string ROLE = "roles";
-        public const string STATE = "states";
-        public const string USER = "users";
-        public const string VENDOR = "vendor";
-        public const string VENDORS = "vendors";
-        public const string MANAGE_VENDOR = "manage vendor";
-        public const string MANAGE_CLIENT_COMPANY = "manage client company";
-        public const string MANAGE_VENDOR_USER = "manage vendor user";
-        public const string EDIT_VENDOR = "edit vendor";
-        public const string MANAGE_USERS = "manage users";
+        public const string CLIENT_COMPANIES = "Companies";
+        public const string CLIENT_COMPANY = "Company";
+        public const string COUNTRY = "Countries";
+        public const string DISTRICT = "Districts";
+        public const string CASE_STATUS = "Case statuses";
+        public const string SERVICE = "Service";
+        public const string INVESTIGATION_SERVICE = "Type of service";
+        public const string LINE_OF_BUSINESS = "Line of businesses";
+        public const string PINCODE = "Pincodes";
+        public const string ROLE = "Roles";
+        public const string STATE = "States";
+        public const string USER = "Users";
+        public const string VENDOR = "Vendor";
+        public const string VENDORS = "Vendors";
+        public const string MANAGE_VENDOR = "Manage vendor";
+        public const string MANAGE_CLIENT_COMPANY = "Manage client company";
+        public const string MANAGE_VENDOR_USER = "Manage vendor user";
+        public const string EDIT_VENDOR = "Edit vendor";
+        public const string MANAGE_USERS = "Manage users";
 
-        public const string MANAGE_SERVICE = "manage service";
-        public const string ADD_SERVICE = "add service";
-        public const string PROFILE = "profile";
+        public const string MANAGE_SERVICE = "Manage service";
+        public const string ADD_SERVICE = "Add service";
+        public const string PROFILE = "Profile";
 
 
         // MENUS / SUBMENUS
 
         public const string INVESTIGATION_MAIN = "INVESTIGATIONS";
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
-        public const string INVESTIGATION_CASE_STATUS = "case statuses";
-        public const string INVESTIGATION_CLAIMS = "claims";
-        public const string INVESTIGATION_UNDERWRITINGS = "underwritings";
+        public const string INVESTIGATION_CASE_STATUS = "Case statuses";
+        public const string INVESTIGATION_CLAIMS = "Claims";
+        public const string INVESTIGATION_UNDERWRITINGS = "Underwritings";
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";
         public const string GENERAL_SETUP = "GENERAL SETUP";

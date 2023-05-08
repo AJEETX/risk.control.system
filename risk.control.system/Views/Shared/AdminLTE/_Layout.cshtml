@@ -1,4 +1,5 @@
-﻿@inject SignInManager<ApplicationUser> SignInManager
+﻿@using risk.control.system.Helpers;
+@inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @{
     ApplicationUser appUser = UserManager.GetUserAsync(User).Result;
@@ -26,14 +27,28 @@
             <partial name="AdminLTE/_Sidebar" />
         }
         <div class="content-wrapper content-wrapper-main">
-            @RenderBody()
+           @* <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">@ViewData["Title"]</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            @Html.BuildBreadcrumbNavigation((List<BreadcrumbItem>)ViewBag.BreadcrumbExtras)
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+            <div class="content">
+                @RenderBody()
+            </div>
         </div>
         <partial name="AdminLTE/_Footer" />
         <aside class="control-sidebar control-sidebar-dark">
         </aside>
         <!-- Logout Modal-->
         <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
+             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -58,5 +73,7 @@
     <partial name="AdminLTE/_Scripts" />
     @RenderSection("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")
+ @*       <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">*@
 </body>
 </html>

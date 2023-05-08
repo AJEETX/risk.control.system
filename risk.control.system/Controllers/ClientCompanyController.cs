@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 
 namespace risk.control.system.Controllers
 {
+        [Breadcrumb("Company")]
     public class ClientCompanyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,6 +25,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies
+        [Breadcrumb("Home")]
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -73,6 +76,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.ClientCompany == null)
@@ -96,6 +100,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Create
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
