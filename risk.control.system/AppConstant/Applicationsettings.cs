@@ -6,6 +6,8 @@
         public const string TestPassword = "R1$kcontrol";
         public const string PERMISSION = "Permission";
 
+        // BUTTONS / ACTIONS
+
         public const string BACK = "back";
         public const string CANCEL = "cancel";
         public const string APPROVE = "approve";
@@ -16,12 +18,14 @@
         public const string VIEW = "view";
         public const string DETAILS = "details";
 
+        // LABELS / ACTIONS
         public const string CLIENT_COMPANIES = "companies";
         public const string CLIENT_COMPANY = "company";
         public const string COUNTRY = "countries";
         public const string DISTRICT = "districts";
         public const string CASE_STATUS = "case statuses";
         public const string SERVICE = "service";
+        public const string INVESTIGATION_SERVICE = "type of service";
         public const string LINE_OF_BUSINESS = "line of businesses";
         public const string PINCODE = "pincodes";
         public const string ROLE = "roles";
@@ -38,6 +42,18 @@
         public const string MANAGE_SERVICE = "manage service";
         public const string ADD_SERVICE = "add service";
         public const string PROFILE = "profile";
+
+
+        // MENUS / SUBMENUS
+
+        public const string INVESTIGATION_MAIN = "INVESTIGATIONS";
+        public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
+        public const string INVESTIGATION_CASE_STATUS = "case statuses";
+        public const string INVESTIGATION_CLAIMS = "claims";
+        public const string INVESTIGATION_UNDERWRITINGS = "underwritings";
+        public const string USER_ROLES = "USERS/ROLES";
+        public const string ADMIN_SETTINGS = "ADMIN SETTINGS";
+        public const string GENERAL_SETUP = "GENERAL SETUP";
 
 
         public const string CURRENT_PINCODE = "515631";

@@ -1,4 +1,18 @@
 ﻿$(document).ready(function () {
+
+    /** add active class and stay opened when selected */
+    var url = window.location;
+    const allLinks = document.querySelectorAll('.nav-item a');
+    const currentLink = [...allLinks].filter(e => {
+        return e.href == url;
+    });
+
+    if (currentLink.length > 0) { //this filter because some links are not from menu
+        currentLink[0].classList.add("active");
+        if (currentLink[0].closest(".nav-treeview")) {
+            currentLink[0].closest(".nav-treeview").style.display = "block";
+        }
+    }
     $('#checkboxes').on('input change', function() {
         var ele = $(this).val();
         if( ele != '') {

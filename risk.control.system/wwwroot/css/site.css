@@ -134,3 +134,7 @@ table td {
     height: 50px;
     object-fit: cover
 }
+
+.sidebar-menu-header-label{
+    font-weight:bold;
+}
