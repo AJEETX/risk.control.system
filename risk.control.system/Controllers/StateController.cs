@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -19,7 +21,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus
-        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.CountrySortParm = String.IsNullOrEmpty(sortOrder) ? "country_desc" : "";
             ViewBag.StateSortParm = sortOrder == "State" ? "state_desc" : "State";
@@ -162,7 +164,7 @@ namespace risk.control.system.Controllers
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
-                toastNotification.AddErrorToastMessage("Error to edit state!");
+            toastNotification.AddErrorToastMessage("Error to edit state!");
             return View(state);
         }
 
