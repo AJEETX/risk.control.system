@@ -94,19 +94,18 @@
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
-                        <i class="far fa-circle nav-icon"></i>
+                        <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
                             @Applicationsettings.INVESTIGATION_CLAIMS
-                        </p> <i class="fas fa-rupee-sign"></i>
+                        </p>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
-                        <i class="far fa-circle nav-icon"></i>
+                        <i class="fas fa-handshake nav-icon"></i>
                         <p>
                             @Applicationsettings.INVESTIGATION_UNDERWRITINGS
                         </p>
-                        <i class="fas fa-handshake"></i>
                     </a>
                 </li>
                 @*
@@ -129,7 +128,7 @@
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="LineOfBusiness" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("LineOfBusiness","")">
-                        <i class="far fa-circle nav-icon"></i>
+                        <i class="fas fa-business-time nav-icon"></i>
                         <p>
                             @Applicationsettings.LINE_OF_BUSINESS
                         </p>
@@ -137,7 +136,7 @@
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="InvestigationServiceTypes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationServiceTypes","")">
-                        <i class="far fa-circle nav-icon"></i>
+                        <i class="fas fa-tools nav-icon"></i>
                         <p>
                             @Applicationsettings.INVESTIGATION_SERVICE
                         </p>
@@ -145,7 +144,7 @@
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="InvestigationCaseStatus" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationCaseStatus","")">
-                        <i class="far fa-circle nav-icon"></i>
+                        <i class="fas fa-clipboard-check nav-icon"></i>
                         <p>
                             @Applicationsettings.INVESTIGATION_CASE_STATUS
                         </p>
@@ -166,21 +165,19 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="User" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("User","")">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     @Applicationsettings.USER
                                 </p>
-                                <i class="nav-icon fas fa-user-lock"></i>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="Roles" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Roles","")">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="fas fa-user-lock nav-icon"></i>
                                 <p>
                                     @Applicationsettings.ROLE
 
                                 </p>
-                                <i class="nav-icon fas fa-user-lock"></i>
                             </a>
                         </li>
 
@@ -229,7 +226,7 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="State" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("State","")">
-                                <i class="nav-icon fas fa-user-lock"></i>
+                                <i class="nav-icon fas fa-map-marker-alt"></i>
                                 <p>
                                     @Applicationsettings.STATE
                                 </p>

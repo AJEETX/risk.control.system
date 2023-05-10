@@ -19,25 +19,25 @@
         public const string DETAILS = "details";
 
         // LABELS / ACTIONS
-        public const string CLIENT_COMPANIES = "Companies";
+        public const string CLIENT_COMPANIES = "Company";
         public const string CLIENT_COMPANY = "Company";
-        public const string COUNTRY = "Countries";
-        public const string DISTRICT = "Districts";
-        public const string CASE_STATUS = "Case statuses";
+        public const string COUNTRY = "Country";
+        public const string DISTRICT = "District";
+        public const string CASE_STATUS = "Case status";
         public const string SERVICE = "Service";
         public const string INVESTIGATION_SERVICE = "Type of service";
-        public const string LINE_OF_BUSINESS = "Line of businesses";
-        public const string PINCODE = "Pincodes";
-        public const string ROLE = "Roles";
-        public const string STATE = "States";
-        public const string USER = "Users";
+        public const string LINE_OF_BUSINESS = "Line of business";
+        public const string PINCODE = "Pincode";
+        public const string ROLE = "Role";
+        public const string STATE = "State";
+        public const string USER = "User";
         public const string VENDOR = "Vendor";
-        public const string VENDORS = "Vendors";
+        public const string VENDORS = "Vendor";
         public const string MANAGE_VENDOR = "Manage vendor";
         public const string MANAGE_CLIENT_COMPANY = "Manage client company";
         public const string MANAGE_VENDOR_USER = "Manage vendor user";
         public const string EDIT_VENDOR = "Edit vendor";
-        public const string MANAGE_USERS = "Manage users";
+        public const string MANAGE_USERS = "Manage user";
 
         public const string MANAGE_SERVICE = "Manage service";
         public const string ADD_SERVICE = "Add service";
@@ -50,9 +50,9 @@
         public const string INVESTIGATION_MAIN = "INVESTIGATIONS";
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
         public const string COMPANY_SETTINGS = "COMPANYSETTINGS";
-        public const string INVESTIGATION_CASE_STATUS = "Case statuses";
-        public const string INVESTIGATION_CLAIMS = "Claims";
-        public const string INVESTIGATION_UNDERWRITINGS = "Underwritings";
+        public const string INVESTIGATION_CASE_STATUS = "Case status";
+        public const string INVESTIGATION_CLAIMS = "Claim";
+        public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";
         public const string GENERAL_SETUP = "GENERAL SETUP";
