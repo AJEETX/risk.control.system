@@ -42,6 +42,7 @@
         public const string MANAGE_SERVICE = "Manage service";
         public const string ADD_SERVICE = "Add service";
         public const string PROFILE = "Profile";
+        public const string UPLOAD = "Upload";
 
 
         // MENUS / SUBMENUS
@@ -55,7 +56,7 @@
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";
         public const string GENERAL_SETUP = "GENERAL SETUP";
-        public const string UPLOAD = "UPLOAD";
+        public const string UPLOAD_FILE = "UPLOAD FILE";
 
 
         public const string CURRENT_PINCODE = "515631";
