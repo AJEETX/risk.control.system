@@ -34,35 +34,35 @@
                     @UserManager.GetUserAsync(User).Result?.FirstName @UserManager.GetUserAsync(User).Result?.LastName
                     @if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                     {
-                        <span class="badge badge-danger">PA</span>
+                        <span class="badge badge-danger">@Applicationsettings.PORTAL_ADMIN.CODE</span>
                     }
                     else if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
                     {
-                        <span class="badge badge-warning">CA</span>
+                        <span class="badge badge-warning">@Applicationsettings.CLIENT_ADMIN.CODE</span>
                     }
                     else if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
                     {
-                        <span class="badge badge-info">VA</span>
+                        <span class="badge badge-info">@Applicationsettings.VENDOR_ADMIN.CODE</span>
                     }
                     else if (User.IsInRole(AppRoles.ClientCreator.ToString()))
                     {
-                        <span class="badge badge-primary">CC</span>
+                        <span class="badge badge-primary">@Applicationsettings.CLIENT_CREATOR.CODE</span>
                     }
                     else if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
                     {
-                        <span class="badge badge-secondary">CAS</span>
+                        <span class="badge badge-secondary">@Applicationsettings.CLIENT_ASSIGNER.CODE</span>
                     }
                     else if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
                     {
-                        <span class="badge badge-secondary">CSS</span>
+                        <span class="badge badge-secondary">@Applicationsettings.CLIENT_ASSESSOR.CODE</span>
                     }
                     else if (User.IsInRole(AppRoles.VendorSupervisor.ToString()))
                     {
-                        <span class="badge badge-dark">VS</span>
+                        <span class="badge badge-dark">@Applicationsettings.VENDOR_SUPERVISOR.CODE</span>
                     }
                     else if (User.IsInRole(AppRoles.VendorAgent.ToString()))
                     {
-                        <span class="badge badge-dark">VAG</span>
+                        <span class="badge badge-dark">@Applicationsettings.VENDOR_AGENT.CODE</span>
                     }
                 </a>
             </div>
@@ -152,7 +152,7 @@
                 </li>
 
                 @{
-                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
@@ -180,7 +180,9 @@
                                 </p>
                             </a>
                         </li>
-
+                    }
+                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>

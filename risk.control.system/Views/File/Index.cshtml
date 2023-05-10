@@ -65,8 +65,8 @@
                                                 <td>@file.FileType</td>
                                                 <td>@file.CreatedOn</td>
                                                 <td>
-                                                    <a type="button" class="btn btn-primary" asp-controller="File" asp-action="DownloadFileFromFileSystem" asp-route-id="@file.Id">Download</a>
-                                                    <a type="button" class="btn btn-danger" asp-controller="File" asp-action="DeleteFileFromFileSystem" asp-route-id="@file.Id">Delete</a>
+                                                    <a type="button" class="btn  btn-xs btn-primary" asp-controller="File" asp-action="DownloadFileFromFileSystem" asp-route-id="@file.Id"><i class="nav-icon fa fa-download"></i>@Applicationsettings.DOWNLOAD</a>
+                                                    <a type="button" class="btn  btn-xs btn-danger" asp-controller="File" asp-action="DeleteFileFromFileSystem" asp-route-id="@file.Id"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
                                                 </td>
                                             </tr>
                                         }
@@ -104,8 +104,8 @@
                                                 <td>@file.FileType</td>
                                                 <td>@file.CreatedOn</td>
                                                 <td>
-                                                    <a type="button" class="btn btn-primary" asp-controller="File" asp-action="DownloadFileFromDatabase" asp-route-id="@file.Id">Download</a>
-                                                    <a type="button" class="btn btn-danger" asp-controller="File" asp-action="DeleteFileFromDatabase" asp-route-id="@file.Id">Delete</a>
+                                                    <a type="button" class="btn btn-xs btn-primary" asp-controller="File" asp-action="DownloadFileFromDatabase" asp-route-id="@file.Id">Download</a>
+                                                    <a type="button" class="btn btn-xs btn-danger" asp-controller="File" asp-action="DeleteFileFromDatabase" asp-route-id="@file.Id">Delete</a>
                                                 </td>
                                             </tr>
                                         }

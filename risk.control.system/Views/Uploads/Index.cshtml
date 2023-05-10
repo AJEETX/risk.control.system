@@ -15,80 +15,11 @@
                             <h3 class="card-title">@Applicationsettings.UPLOAD</h3>
                         </div>
                         <div class="card-body dataTable-search-form">
-                            <h4>@Applicationsettings.PINCODE_SAMPLE</h4>
                             <div class="row">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                officename
-                                            </th>
-                                            <th>
-                                                pincode
-                                            </th>
-                                            <th>
-                                                officeType
-                                            </th>
-                                            <th>
-                                                Deliverystatus
-                                            </th>
-                                            <th>
-                                                divisionname
-                                            </th>
-                                            <th>
-                                                regionname
-                                            </th>
-                                            <th>
-                                                circlename
-                                            </th>
-
-                                            <th>
-                                                Taluk
-                                            </th>
-                                            <th>
-                                                Districtname
-                                            </th>
-                                            <th>
-                                                statename
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                Ada B.O
-                                            </td>
-                                            <td>
-                                                504293
-                                            </td>
-                                            <td>
-                                                B.O
-                                            </td>
-                                            <td>
-                                                Delivery
-                                            </td>
-                                            <td>
-                                                Adilabad
-                                            </td>
-                                            <td>
-                                                Hyderabad
-                                            </td>
-                                            <td>
-                                                Andhra Pradesh
-                                            </td>
-                                            <td>
-                                                Asifabad
-                                            </td>
-                                            <td>
-                                                Adilabad
-                                            </td>
-
-                                            <td>
-                                                ANDHRA PRADESH
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <div class="form-group">
+                                    <a type="button" class="btn btn-primary" asp-controller="File" asp-action="DownloadSampleFileFromFileSystem"><i class="nav-icon fa fa-download"></i>@Applicationsettings.DOWNLOAD @Applicationsettings.SAMPLE_PINCODE_FILE</a>
+                                </div>
+                                
                             </div>
 
                             <div class="row">

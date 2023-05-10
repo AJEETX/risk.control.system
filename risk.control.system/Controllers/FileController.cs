@@ -97,6 +97,20 @@ namespace risk.control.system.Controllers
             if (file == null) return null;
             return File(file.Data, file.FileType, file.Name + file.Extension);
         }
+
+        public async Task<IActionResult> DownloadSampleFileFromFileSystem()
+        {
+
+            var file = await context.FilesOnFileSystem.FirstOrDefaultAsync();
+            if (file == null) return null;
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(file.FilePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+            return File(memory, file.FileType, file.Name + file.Extension);
+        }
         public async Task<IActionResult> DownloadFileFromFileSystem(int id)
         {
 

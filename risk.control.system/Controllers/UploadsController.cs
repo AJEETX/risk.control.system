@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Data;
+
+using Microsoft.AspNetCore.Mvc;
+
 using risk.control.system.Models.ViewModel;
-using System.Data;
-using System.Globalization;
-using CsvHelper;
 
 namespace risk.control.system.Controllers
 {
@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers
                         }
                     }
                 }
-                
+
                 return View(new PinCodeDetails { DataTable = dt });
             }
             return Problem();

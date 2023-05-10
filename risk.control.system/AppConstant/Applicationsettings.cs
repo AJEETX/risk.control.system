@@ -55,6 +55,9 @@
         public const string NO_RECORDS_FOUND = "No Records Found";
 
         public const string UPLOAD = "Upload";
+        public const string SAMPLE_PINCODE_FILE_TYPE = "csv";
+        public const string DOWNLOAD = "Download";
+        public static string SAMPLE_PINCODE_FILE = $"Sample csv file for pincode upload";
 
 
         // MENUS / SUBMENUS
@@ -83,6 +86,7 @@
         public const string NO_IMAGE = "/img/no-image.png";
         public static class PORTAL_ADMIN
         {
+            public const string CODE = "pa";
             public const string USERNAME = "portal-admin@admin.com";
             public const string EMAIL = "portal-admin@admin.com";
             public const string FIRST_NAME = "Ajeet";
@@ -91,6 +95,7 @@
         }
         public static class CLIENT_ADMIN
         {
+            public const string CODE = "ca";
             public const string USERNAME = "client-admin@admin.com";
             public const string EMAIL = "client-admin@admin.com";
             public const string FIRST_NAME = "Amit";
@@ -99,6 +104,7 @@
         }
         public static class CLIENT_CREATOR
         {
+            public const string CODE = "cc";
             public const string USERNAME = "client-creator@admin.com";
             public const string EMAIL = "client-creator@admin.com";
             public const string FIRST_NAME = "Rashmi";
@@ -107,6 +113,7 @@
         }
         public static class CLIENT_ASSIGNER
         {
+            public const string CODE = "cs";
             public const string USERNAME = "client-assigner@admin.com";
             public const string EMAIL = "client-assigner@admin.com";
             public const string FIRST_NAME = "Christian";
@@ -115,6 +122,7 @@
         }
         public static class CLIENT_ASSESSOR
         {
+            public const string CODE = "co";
             public const string USERNAME = "client-assessor@admin.com";
             public const string EMAIL = "client-assessor@admin.com";
             public const string FIRST_NAME = "Damien";
@@ -123,6 +131,7 @@
         }
         public static class VENDOR_ADMIN
         {
+            public const string CODE = "va";
             public const string USERNAME = "vendor-admin@admin.com";
             public const string EMAIL = "vendor-admin@admin.com";
             public const string FIRST_NAME = "Gopal";
@@ -131,6 +140,7 @@
         }
         public static class VENDOR_SUPERVISOR
         {
+            public const string CODE = "vs";
             public const string USERNAME = "vendor-supervisor@admin.com";
             public const string EMAIL = "vendor-supervisor@admin.com";
             public const string FIRST_NAME = "Lala";
@@ -139,6 +149,7 @@
         }
         public static class VENDOR_AGENT
         {
+            public const string CODE = "vf";
             public const string USERNAME = "vendor-agent@admin.com";
             public const string EMAIL = "vendor-agent@admin.com";
             public const string FIRST_NAME = "Gogo";
