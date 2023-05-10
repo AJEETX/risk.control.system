@@ -65,6 +65,7 @@
         public const string GENERAL_SETUP = "GENERAL SETUP";
         public const string UPLOAD_FILE = "UPLOAD FILE";
         public const string UPLOAD_DATABASE = "UPLOAD DB";
+        public const string AUDIT_LOGS = "AUDIT LOGS";
 
 
         public const string CURRENT_PINCODE = "515631";

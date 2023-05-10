@@ -361,6 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/risk.control.system/add-vendor-user-051110052023.db
-/risk.control.system/add-vendor-user-051110052023.db-shm
-/risk.control.system/add-vendor-user-051110052023.db-wal
+/risk.control.system/*.db
+/risk.control.system/*-shm
+/risk.control.system/*.db-wal

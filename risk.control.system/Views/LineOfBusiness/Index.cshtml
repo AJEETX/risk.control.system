@@ -11,7 +11,7 @@
                     <div class="card-header">
                         <h3 class="card-title"> @Applicationsettings.LINE_OF_BUSINESS</h3>
                     </div>
-                    <form method="post" action="roles/create" asp-antiforgery="true">
+                    <form asp-action="index" asp-antiforgery="true">
                         <div class="card-body dataTable-search-form">
                             <div class="row">
                                 <div class="col-sm-12">
@@ -23,7 +23,7 @@
                             <div class="row">
                                 <div class="col-md-12 text-right">
                                     <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i>  @Applicationsettings.SEARCH</button>
-                                    <a class="btn btn-success" href="/LineOfbusiness/Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
+                                    <a class="btn btn-success" as-controller="LineOfbusiness" asp-action="Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
                                 </div>
                             </div>
                         </div>

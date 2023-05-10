@@ -7,7 +7,7 @@ namespace risk.control.system.Data
 {
     public class ApplicationDbContext : AuditableIdentityContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor context) : base(options, context)
         {
         }
         protected override void OnModelCreating(ModelBuilder builder)

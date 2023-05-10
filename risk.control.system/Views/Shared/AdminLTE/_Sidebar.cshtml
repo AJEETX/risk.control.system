@@ -208,7 +208,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","")">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")">
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.GENERAL_SETUP
@@ -263,6 +263,14 @@
                                 <i class="nav-icon fa fa-upload"></i>
                                 <p>
                                     @Applicationsettings.PINCODE_UPLOAD
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
+                                <i class="nav-icon fa fa-align-center"></i>
+                                <p>
+                                    @Applicationsettings.AUDIT_LOGS
                                 </p>
                             </a>
                         </li>

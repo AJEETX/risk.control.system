@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using System.Security.Claims;
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -8,8 +10,10 @@ namespace risk.control.system.Data
 {
     public abstract class AuditableIdentityContext : IdentityDbContext<ApplicationUser, ApplicationRole, long>
     {
-        public AuditableIdentityContext(DbContextOptions options) : base(options)
+        public IHttpContextAccessor httpContext;
+        public AuditableIdentityContext(DbContextOptions options, IHttpContextAccessor context) : base(options)
         {
+            this.httpContext = context;
         }
 
         public DbSet<Audit> AuditLogs { get; set; }
@@ -23,6 +27,7 @@ namespace risk.control.system.Data
 
         private void OnBeforeSaveChanges(string userId)
         {
+            userId = httpContext?.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
             ChangeTracker.DetectChanges();
             var auditEntries = new List<AuditEntry>();
             foreach (var entry in ChangeTracker.Entries())

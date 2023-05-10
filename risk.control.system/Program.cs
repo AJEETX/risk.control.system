@@ -25,7 +25,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=add-vendor-user-15-00-10-May.db"));
+                    options.UseSqlite("Data Source=add-vendor-user-14-00-10-May.db"));
 
 
 //if (builder.Build().Environment.EnvironmentName == "Development")
@@ -39,6 +39,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //                    options.UseSqlite("Data Source=risk-control.db"));
 //}
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
