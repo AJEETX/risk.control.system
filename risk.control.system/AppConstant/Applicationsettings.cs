@@ -47,6 +47,7 @@
 
         // MENUS / SUBMENUS
 
+        public const string DASHBOARD = "Dashboard";
         public const string INVESTIGATION_MAIN = "INVESTIGATIONS";
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
         public const string COMPANY_SETTINGS = "COMPANYSETTINGS";
