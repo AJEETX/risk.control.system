@@ -139,6 +139,7 @@ table td {
 .sidebar-menu-header-label{
     font-size:14px;
     color:rgb(51,51,51);
+    font-weight:bold;
 }
 .navlink-border {
     border: 1px solid #28a745;

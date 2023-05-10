@@ -2,69 +2,145 @@
 @model risk.control.system.Models.ViewModel.PinCodeDetails
 
 @{
-    ViewData["Title"] = "Pincode List";
+    ViewData["Title"] = Applicationsettings.UPLOAD;
 }
 
 <section class="content pt-2">
     <div class="container-fluid">
         <form asp-controller="Uploads" asp-action="Index" method="post" enctype="multipart/form-data">
             <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title">Upload</h3>
-                    </div>
-                    <div class="card-body dataTable-search-form">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                        <div style="display: inline-block;">  <input type="file" name="postedFile" /></div>
-                                        <div style="display: inline-block;"> <input type="submit" class="btn btn-danger" value="upload pincodes" /></div>
-                                </div>
+                <div class="col-md-12">
+                    <div class="card card-success">
+                        <div class="card-header">
+                            <h3 class="card-title">@Applicationsettings.UPLOAD</h3>
+                        </div>
+                        <div class="card-body dataTable-search-form">
+                            <h4>@Applicationsettings.PINCODE_SAMPLE</h4>
+                            <div class="row">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                officename
+                                            </th>
+                                            <th>
+                                                pincode
+                                            </th>
+                                            <th>
+                                                officeType
+                                            </th>
+                                            <th>
+                                                Deliverystatus
+                                            </th>
+                                            <th>
+                                                divisionname
+                                            </th>
+                                            <th>
+                                                regionname
+                                            </th>
+                                            <th>
+                                                circlename
+                                            </th>
+
+                                            <th>
+                                                Taluk
+                                            </th>
+                                            <th>
+                                                Districtname
+                                            </th>
+                                            <th>
+                                                statename
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                Ada B.O
+                                            </td>
+                                            <td>
+                                                504293
+                                            </td>
+                                            <td>
+                                                B.O
+                                            </td>
+                                            <td>
+                                                Delivery
+                                            </td>
+                                            <td>
+                                                Adilabad
+                                            </td>
+                                            <td>
+                                                Hyderabad
+                                            </td>
+                                            <td>
+                                                Andhra Pradesh
+                                            </td>
+                                            <td>
+                                                Asifabad
+                                            </td>
+                                            <td>
+                                                Adilabad
+                                            </td>
+
+                                            <td>
+                                                ANDHRA PRADESH
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="col-md-6 text-right">
-                                <button id="btnClear" type="button" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i> Clear</button>
-                                <button id="btnFilter" type="button" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="file" name="postedFile" required />
+                                        <input type="text" autocomplete="off" placeholder="Enter File Description" name="description" required />
+                                        <button type="submit" class="btn btn-danger" asp-controller="Uploads" asp-action="Index"><i class="nav-icon fa fa-upload"></i> @Applicationsettings.PINCODE</button>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title">Pincode List</h3>
-                    </div>
-                    <div class="card-body">
-                        @if (Model?.DataTable != null)
-                        {
-                            <hr />
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-success">
+                        <div class="card-header">
+                            <h3 class="card-title">@Applicationsettings.PINCODE_UPLOADED_SAMPLE</h3>
+                        </div>
+                        <div class="card-body">
+                            @if (Model?.DataTable != null)
+                            {
+                                <hr />
                                 <table class="table table-striped  fixed-with-height">
-                                <tr>
-                                    @foreach (DataColumn dc in Model.DataTable.Columns)
-                                    {
-                                        <th>@dc.ColumnName</th>
-                                    }
-                                </tr>
-                                @foreach (DataRow dr in Model.DataTable.Rows)
-                                {
                                     <tr>
                                         @foreach (DataColumn dc in Model.DataTable.Columns)
                                         {
-                                            <td>@dr[dc.ColumnName]</td>
+                                            <th>@dc.ColumnName</th>
                                         }
                                     </tr>
-                                }
-                            </table>
-                        }
-
+                                    @foreach (DataRow dr in Model.DataTable.Rows)
+                                    {
+                                        <tr>
+                                            @foreach (DataColumn dc in Model.DataTable.Columns)
+                                            {
+                                                <td>@dr[dc.ColumnName]</td>
+                                            }
+                                        </tr>
+                                    }
+                                </table>
+                            }
+                            else
+                            {
+                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         </form>
     </div>
 </section>

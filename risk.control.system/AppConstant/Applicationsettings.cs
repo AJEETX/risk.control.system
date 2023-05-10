@@ -42,6 +42,12 @@
         public const string MANAGE_SERVICE = "Manage service";
         public const string ADD_SERVICE = "Add service";
         public const string PROFILE = "Profile";
+        public const string MULTIPLE_UPLOAD = "Multi-Upload";
+        public const string PINCODE_UPLOAD = "Pincode upload";
+        public const string PINCODE_SAMPLE = "Upload sample file to upload in csv format";
+        public const string PINCODE_UPLOADED_SAMPLE = "Uploaded Pincodes";
+        public const string NO_RECORDS_FOUND = "No Records Found";
+
         public const string UPLOAD = "Upload";
 
 
@@ -50,7 +56,7 @@
         public const string DASHBOARD = "Dashboard";
         public const string INVESTIGATION_MAIN = "INVESTIGATIONS";
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
-        public const string COMPANY_SETTINGS = "COMPANYSETTINGS";
+        public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
         public const string INVESTIGATION_CASE_STATUS = "Case status";
         public const string INVESTIGATION_CLAIMS = "Claim";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
@@ -58,6 +64,7 @@
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";
         public const string GENERAL_SETUP = "GENERAL SETUP";
         public const string UPLOAD_FILE = "UPLOAD FILE";
+        public const string UPLOAD_DATABASE = "UPLOAD DB";
 
 
         public const string CURRENT_PINCODE = "515631";
