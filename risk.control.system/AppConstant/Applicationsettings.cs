@@ -6,6 +6,11 @@
         public const string TestPassword = "R1$kcontrol";
         public const string PERMISSION = "Permission";
 
+        //WEBSITE SETTINGS
+
+        public const string WEBSITE_SIDE_MENU_BRAND = "ABY";
+        public const string WEBSITE_SIDE_MENU_LOGO = "/img/logo.png";
+
         // BUTTONS / ACTIONS
 
         public const string BACK = "back";
@@ -38,6 +43,7 @@
         public const string MANAGE_VENDOR_USER = "Manage vendor user";
         public const string EDIT_VENDOR = "Edit vendor";
         public const string MANAGE_USERS = "Manage user";
+        public const string AUDIT_LOG = "Audit log";
 
         public const string MANAGE_SERVICE = "Manage service";
         public const string ADD_SERVICE = "Add service";

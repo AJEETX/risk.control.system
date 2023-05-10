@@ -178,3 +178,10 @@ sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
 .content{
     font-size:14px;
 }
+.d-block{
+    margin-top:.5em;
+    margin-left:1em;
+}
+.sidebar-profile {
+    border-radius:0px;
+}

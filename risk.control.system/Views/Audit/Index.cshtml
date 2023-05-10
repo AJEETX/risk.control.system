@@ -56,12 +56,6 @@
                                     <th>
                                         @Html.DisplayNameFor(model => model.NewValues)
                                     </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.AffectedColumns)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.PrimaryKey)
-                                    </th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -86,12 +80,6 @@
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.NewValues)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.AffectedColumns)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.PrimaryKey)
                                         </td>
                                         <td>
                                             <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.Id"><i class="fa fa-search"></i> @Applicationsettings.DETAILS</a>

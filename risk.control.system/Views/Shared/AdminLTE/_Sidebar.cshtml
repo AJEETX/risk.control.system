@@ -5,9 +5,9 @@
 <aside class="main-sidebar elevation-2 sidebar-light-primary">
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
-        <img src="~/img/logo.png" alt="aby Logo" class="brand-image img-circle elevation-0" style="opacity: .8">
+        <img src="@Applicationsettings.WEBSITE_SIDE_MENU_LOGO" alt="aby Logo" class="brand-image elevation-0" style="opacity: .8">
         <div>
-            <span class="brand-text font-weight-light">TALIC </span>
+            <span class="brand-text font-weight-light">@Applicationsettings.WEBSITE_SIDE_MENU_BRAND </span>
         </div>
     </a>
     <!-- Sidebar -->
@@ -21,13 +21,13 @@
                 @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
                 {
                     <div class="image">
-                        <img class="img-circle elevation-0 sidebar-profile" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
+                        <img class="elevation-0 sidebar-profile" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
                     </div>
                 }
                 else
                 {
                     <div class="image">
-                        <img class="img-circle elevation-0 sidebar-profile" src="@Applicationsettings.NO_IMAGE">
+                        <img class="elevation-0 sidebar-profile" src="@Applicationsettings.NO_IMAGE">
                     </div>
                 }
                 <a href="#" class="d-block">
@@ -270,7 +270,7 @@
                             <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
                                 <i class="nav-icon fa fa-align-center"></i>
                                 <p>
-                                    @Applicationsettings.AUDIT_LOGS
+                                    @Applicationsettings.AUDIT_LOG
                                 </p>
                             </a>
                         </li>
