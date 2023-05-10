@@ -122,7 +122,7 @@
                     <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","") @Url.MakeActiveClass("InvestigationCaseStatus","")">
                         <i class="nav-icon fas fa-cog"></i>
                         <p class="sidebar-menu-header-label">
-                            @Applicationsettings.INVESTIGATION_CASE_SETTINGS
+                            @Applicationsettings.COMPANY_SETTINGS
                             <i class="right fas fa-angle-right"></i>
                         </p>
                     </a>
@@ -185,7 +185,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","")">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.ADMIN_SETTINGS
@@ -195,7 +195,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","")">
+                            <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","")">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>
                                     @Applicationsettings.CLIENT_COMPANIES
@@ -203,7 +203,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","")">
+                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
                                 <i class="nav-icon fa fa-binoculars"></i>
                                 <p>
                                     @Applicationsettings.VENDORS
@@ -252,6 +252,14 @@
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="File" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("PinCodes","")">
+                                <i class="nav-icon fas fa-file"></i>
+                                <p>
+                                    @Applicationsettings.PINCODE
+                                </p>
+                            </a>
+                        </li>
 
                         @*<li class="nav-item">
                 //        <a is-active-page asp-controller="Uploads" asp-action="Index" class="nav-link">

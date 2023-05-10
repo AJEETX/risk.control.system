@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Data
 {
@@ -31,5 +33,10 @@ namespace risk.control.system.Data
         public virtual DbSet<Vendor> Vendor { get; set; } = default!;
         public virtual DbSet<VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
         public virtual DbSet<VendorApplicationUser> VendorApplicationUser { get; set; } = default!;
+
+
+
+        public virtual DbSet<FileOnDatabaseModel> FilesOnDatabase { get; set; }
+        public virtual DbSet<FileOnFileSystemModel> FilesOnFileSystem { get; set; }
     }
 }

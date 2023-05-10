@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Permission;
@@ -18,13 +20,12 @@ builder.Services.AddControllersWithViews()
     {
         ProgressBar = true,
         Timeout = 3000
-
     });
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=add-vendor-user-051108052023.db"));
+                    options.UseSqlite("Data Source=add-vendor-user-051109052023.db"));
 
 
 //if (builder.Build().Environment.EnvironmentName == "Development")

@@ -48,12 +48,14 @@
 
         public const string INVESTIGATION_MAIN = "INVESTIGATIONS";
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
+        public const string COMPANY_SETTINGS = "COMPANYSETTINGS";
         public const string INVESTIGATION_CASE_STATUS = "Case statuses";
         public const string INVESTIGATION_CLAIMS = "Claims";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwritings";
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";
         public const string GENERAL_SETUP = "GENERAL SETUP";
+        public const string UPLOAD = "UPLOAD";
 
 
         public const string CURRENT_PINCODE = "515631";

@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using System.Reflection;
+
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
+
 using risk.control.system.Models.ViewModel;
-using System.Reflection;
 
 namespace risk.control.system.Helpers
 {
@@ -36,14 +38,10 @@ namespace risk.control.system.Helpers
         {
             var cssClass = "active";
 
-
             string currentAction = (string)html.ViewContext.RouteData.Values["action"];
             string[] actionarr = !String.IsNullOrEmpty(actions) ? actions.Split(',') : new string[] { };
 
-
             bool result = (actionarr.Contains<string>(currentAction));
-
-
 
             return result ?
                 cssClass : String.Empty;
@@ -152,7 +150,7 @@ namespace risk.control.system.Helpers
             string link = "<li class='breadcrumb-item'>";
 
             if (!string.IsNullOrEmpty(bs.ActionName) && !string.IsNullOrEmpty(bs.ControllerName))
-                link += $"<a href='{urlHelper.AbsoluteAction(bs.ActionName, bs.ControllerName)} " +
+                link += $"<a href='{urlHelper.AbsoluteAction(bs.ActionName, bs.ControllerName)}" +
                         $"{(bs.PassArguments ? parameters : string.Empty)}'>{bs.Label}</a>";
             else
                 link += bs.Label;

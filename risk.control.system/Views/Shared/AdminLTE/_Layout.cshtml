@@ -2,7 +2,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @{
-    ApplicationUser appUser = UserManager.GetUserAsync(User).Result;
+    ApplicationUser appUser = (await UserManager.GetUserAsync(User));
 }
 <!DOCTYPE html>
 <html>
@@ -23,18 +23,15 @@
     <div class="wrapper">
         @if (SignInManager.IsSignedIn(User))
         {
-            @Html.Partial("AdminLTE/_TopNavigation", appUser)
+            <partial name="AdminLTE/_TopNavigation" model="@appUser" />
             <partial name="AdminLTE/_Sidebar" />
         }
         <div class="content-wrapper content-wrapper-main">
-           @* <div class="content-header">
+@*            <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0">@ViewData["Title"]</h1>
-                        </div>
-                        <div class="col-sm-6">
-                            @Html.BuildBreadcrumbNavigation((List<BreadcrumbItem>)ViewBag.BreadcrumbExtras)
+                        <div class="col-sm-12">
+                           @Html.BuildBreadcrumbNavigation((List<BreadcrumbItem>)ViewBag.BreadcrumbExtras)
                         </div>
                     </div>
                 </div>
