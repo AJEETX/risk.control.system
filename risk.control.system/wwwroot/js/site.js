@@ -13,19 +13,19 @@
             currentLink[0].closest(".nav-treeview").style.display = "block";
         }
     }
-    $('#checkboxes').on('input change', function() {
-        var ele = $(this).val();
-        if( ele != '') {
-            $('#broadcast').prop('disabled', true);
-        } else {
-            $('#broadcast').prop('disabled', false);
-        }
-    });
+    //$('#checkboxes').on('input change', function() {
+    //    var ele = $(this).val();
+    //    if( ele != '') {
+    //        $('#broadcast').prop('disabled', true);
+    //    } else {
+    //        $('#broadcast').prop('disabled', false);
+    //    }
+    //});
     // Attach the call to toggleChecked to the
     // click event of the global checkbox:
     $("#checkall").click(function () {
         var status = $("#checkall").prop('checked');
-        $('#broadcast').prop('disabled', !status)
+        $('#add-vendors').prop('disabled', !status)
         toggleChecked(status);
     });
 

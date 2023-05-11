@@ -246,12 +246,33 @@ namespace risk.control.system.Controllers
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+
                 .AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
             {
                 applicationDbContext = applicationDbContext.Where(a =>
-                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.Code.ToLower().Contains(searchString.Trim().ToLower()));
+                    a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Addressline.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.BankAccountNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.BankName.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Branch.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.City.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Email.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.IFSCCode.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.District.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.LineOfBusiness.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.InvestigationServiceType.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.PincodeServices.Any(p => p.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Code.ToLower().Contains(searchString.Trim().ToLower())));
             }
 
             switch (sortOrder)
@@ -302,12 +323,33 @@ namespace risk.control.system.Controllers
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+
                 .AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
             {
                 applicationDbContext = applicationDbContext.Where(a =>
-                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.Code.ToLower().Contains(searchString.Trim().ToLower()));
+                    a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Addressline.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.BankAccountNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.BankName.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Branch.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.City.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Email.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.IFSCCode.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.District.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.LineOfBusiness.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.InvestigationServiceType.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.PincodeServices.Any(p => p.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Code.ToLower().Contains(searchString.Trim().ToLower())));
             }
 
             switch (sortOrder)
@@ -334,6 +376,20 @@ namespace risk.control.system.Controllers
             var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
             ViewBag.CompanyId = id;
             return View(applicationDbContextResult);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AvailableVendors(string id, List<Vendor> vendors)
+        {
+            if (vendors is not null && vendors.Count() > 0)
+            {
+                var company = await _context.ClientCompany.FindAsync(id);
+                company.EmpanelledVendors.AddRange(vendors);
+                _context.ClientCompany.Update(company);
+                var savedRows = await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("Vendor(s) empanelled sucessful!");
+                RedirectToAction("EmpanelledVendors", "ClientCompany");
+            }
+            return Problem();
         }
         private bool ClientCompanyExists(string id)
         {

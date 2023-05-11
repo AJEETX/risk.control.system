@@ -13,6 +13,7 @@
                         <h3 class="card-title">@Applicationsettings.AVAILABLE_VENDORS</h3>
                     </div>
                     <form asp-action="AvailableVendors">
+                        <input type="hidden" id="@ViewBag.CompanyId" />
                         <div class="card-body dataTable-search-form">
                             <div class="row">
                                 <div class="col-sm-12">
@@ -131,8 +132,8 @@
                                                 <i class="fa fa-window-close"></i>
                                                 @Applicationsettings.CANCEL
                                             </a>
-                                            <button id="broadcast" disabled type="submit" class="btn btn-danger">
-                                                <i class="fa fa-paper-plane" aria-hidden="true"></i> @Applicationsettings.EMPANEL
+                                            <button id="add-vendors" disabled type="submit" class="btn btn-success">
+                                                <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.EMPANEL
                                             </button>
                                         </div>
                                     </div>

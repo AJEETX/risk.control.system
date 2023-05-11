@@ -46,7 +46,7 @@ namespace risk.control.system.Models
         public byte[]? DocumentImage { get; set; } = default!;
         public List<ClientCompanyApplicationUser>? VendorApplicationUser { get; set; }
 
-        public List<Vendor>? EmpanelledVendors { get; set; }
+        public List<Vendor>? EmpanelledVendors { get; set; } = new();
     }
     public enum CompanyStatus
     {
