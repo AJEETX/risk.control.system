@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class ClientCompany :BaseEntity
+    public class ClientCompany : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -22,9 +22,9 @@ namespace risk.control.system.Models
         public string? CountryId { get; set; } = default!;
         public Country? Country { get; set; } = default!;
         [Display(Name = "Pincode")]
-        public string? PinCodeId { get; set; }= default!;
+        public string? PinCodeId { get; set; } = default!;
         public PinCode? PinCode { get; set; } = default!;
-        [Display(Name = "District")] 
+        [Display(Name = "District")]
         public string? DistrictId { get; set; } = default!;
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
@@ -46,11 +46,12 @@ namespace risk.control.system.Models
         public byte[]? DocumentImage { get; set; } = default!;
         public List<ClientCompanyApplicationUser>? VendorApplicationUser { get; set; }
 
+        public List<Vendor>? EmpanelledVendors { get; set; }
     }
     public enum CompanyStatus
     {
         ACTIVE,
         INACTIVE,
-        
+
     }
 }

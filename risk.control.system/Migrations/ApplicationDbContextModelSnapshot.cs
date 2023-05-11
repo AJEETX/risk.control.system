@@ -751,6 +751,9 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ClientCompanyId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -812,6 +815,8 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("VendorId");
+
+                    b.HasIndex("ClientCompanyId");
 
                     b.HasIndex("CountryId");
 
@@ -1189,6 +1194,10 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>
                 {
+                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
+                        .WithMany("EmpanelledVendors")
+                        .HasForeignKey("ClientCompanyId");
+
                     b.HasOne("risk.control.system.Models.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId");
@@ -1204,6 +1213,8 @@ namespace risk.control.system.Migrations
                     b.HasOne("risk.control.system.Models.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId");
+
+                    b.Navigation("ClientCompany");
 
                     b.Navigation("Country");
 
@@ -1271,6 +1282,8 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
                 {
+                    b.Navigation("EmpanelledVendors");
+
                     b.Navigation("VendorApplicationUser");
                 });
 

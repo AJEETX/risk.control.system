@@ -22,8 +22,8 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
-                                    <a class="btn btn-success" asp-controller="InvestigationCase" asp-action="Create"><i class="fas fa-plus"></i> Create</a>
+                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> @Applicationsettings.SEARCH</button>
+                                    <a class="btn btn-success" asp-controller="InvestigationCase" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                                 </div>
                             </div>
                         </div>
@@ -36,67 +36,93 @@
                 <div class="card card-light">
                     <div class="card-body contained-width">
                         <form asp-action="Broadcast" id="checkboxes" enctype="multipart/form-data">
-                            <table class="table table-striped fixed-with-height">
-                                <thead>
-                                    <tr>
-                                        <th><input type="checkbox" id="checkall" /></th>
-                                        <th>
-                                            @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm })
-                                        </th>
-                                        <th>
-                                            @Html.ActionLink("Description", "Index", new { sortOrder = ViewBag.NameSortParm })
-                                        </th>
-                                        <th>
-                                            @Html.ActionLink("Line of Business", "Index", new { sortOrder = ViewBag.NameSortParm })
-                                        </th>
-                                        <th>
-                                            @Html.ActionLink("Case status", "Index", new { sortOrder = ViewBag.NameSortParm })
-                                        </th>
-                                        <th>
-                                            @Html.ActionLink("Created", "Index", new { sortOrder = ViewBag.DateSortParm })
-                                        </th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-
+                            <div class="row">
+                                <div class="col-12">
+                                    @if (Model == null || Model.Count() == 0)
                                     {
-                                        <tr>
-                                            <td>
-                                                <input name="cbxcase" type="checkbox" />
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Description)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Created)
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationId">
-                                                    <i class="fa fa-search"></i> View
-                                                </a> &nbsp;
-                                                <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationId">
-                                                    <i class="fas fa-pen"></i> Edit
-                                                </a> &nbsp;
-                                                <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationId">
-                                                    <i class="fas fa-trash"></i> Delete
-                                                </a>
-                                            </td>
-                                        </tr>
+                                        <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
                                     }
-                                </tbody>
-                            </table>
+                                    else
+                                    {
+                                        <table class="table table-striped fixed-with-height">
+                                            <thead>
+                                                <tr>
+                                                    <th><input type="checkbox" id="checkall" /></th>
+                                                    <th>
+                                                        @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                                    </th>
+                                                    <th>
+                                                        @Html.ActionLink("Description", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                                    </th>
+                                                    <th>
+                                                        @Html.ActionLink("Line of Business", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                                    </th>
+                                                    <th>
+                                                        @Html.ActionLink("Case status", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                                    </th>
+                                                    <th>
+                                                        @Html.ActionLink("Created", "Index", new { sortOrder = ViewBag.DateSortParm })
+                                                    </th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model)
 
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <input name="cbxcase" type="checkbox" />
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.Name)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.Description)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.Created)
+                                                        </td>
+                                                        <td>
+                                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationId">
+                                                                <i class="fa fa-search"></i> View
+                                                            </a> &nbsp;
+                                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationId">
+                                                                <i class="fas fa-pen"></i> Edit
+                                                            </a> &nbsp;
+                                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationId">
+                                                                <i class="fas fa-trash"></i> Delete
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                </div>
+                            </div>
+                            @if (Model != null && Model?.Count() > 0)
+                            {
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card-footer text-right">
+                                            <a asp-action="Index" class="btn btn-secondary">
+                                                <i class="fa fa-window-close"></i>
+                                                @Applicationsettings.CANCEL
+                                            </a>
+                                            <button id="broadcast" disabled type="submit" class="btn btn-success">
+                                                <i class="fa fa-paper-plane" aria-hidden="true"></i> @Applicationsettings.BROADCAST
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         </form>
                     </div>
 
@@ -141,16 +167,7 @@
                     </a>
                 </li>
             </ul>
-            <div class="card-footer text-right">
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="fa fa-window-close"></i>
-                    Cancel
-                </a>
-                <button id="broadcast" disabled type="submit" class="btn btn-success">
-                    <i class="fa fa-paper-plane"
-                       aria-hidden="true"></i> BROADCAST
-                </button>
-            </div>
+
         </div>
     </div>
 </section>

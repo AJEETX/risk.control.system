@@ -2,7 +2,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 
 @{
-    ViewData["Title"] = "Log in: risk.control.unit";
+    ViewData["Title"] = @Applicationsettings.WEBSITE_LOGIN;
 
     Layout = null;
 }
@@ -12,7 +12,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Log in to risk.control.unit</title>
+    <title> @Applicationsettings.WEBSITE_LOGIN</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <partial name="AdminLTE/_Styles" />
@@ -23,7 +23,7 @@
         <div style="text-align: -webkit-center;">
             <div class="alert">
                 <div class="login-logo">
-                    <i class="fas fa-bug"></i> risk.control.unit
+                    <i class="fas fa-bug"></i> @Applicationsettings.WEBSITE_TITLE
                 </div>
             </div>
             <br />
@@ -32,7 +32,7 @@
         <!-- /.login-logo -->
         <div class="card">
             <div class="card-body login-card-body">
-                <p class="login-box-msg">Sign in </p>
+                <p class="login-box-msg">@Applicationsettings.WEBSITE_SIGNIN </p>
                 <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
                     <div class="mb-3">
                         <div class="mb-3 input-group">
@@ -51,8 +51,7 @@
                         </div>
                     </div>
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-key"></i>&nbsp; Sign
-                            in</button>
+                        <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-key"></i>&nbsp; @Applicationsettings.WEBSITE_SIGNIN</button>
                     </div>
                 </form>
             </div>
@@ -68,8 +67,7 @@
             }
             <br />
             <div class="alert">
-                
-                design by: <a style="color:darkblue" href="http://itsaby.com.au">its aby</a>
+                design by: <a style="color:darkblue" href="@Applicationsettings.WEBSITE_SITE_DESIGNER_URL">@Applicationsettings.WEBSITE_SITE_DESIGNER</a>
             </div>
         </div>
     </div>
@@ -80,5 +78,4 @@
 </html>
 @section Scripts{
     @await Html.PartialAsync("_ValidationScriptsPartial")
-    </script>
 }

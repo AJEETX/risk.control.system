@@ -8,8 +8,17 @@
 
         //WEBSITE SETTINGS
 
-        public const string WEBSITE_SIDE_MENU_BRAND = "ABY";
-        public const string WEBSITE_SIDE_MENU_LOGO = "/img/logo.png";
+        public const string WEBSITE_SITE_MENU_BRAND = "ABY";
+        public const string WEBSITE_TITLE = "risk.control.unit";
+        public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
+        public const string WEBSITE_SITE_DESIGNER = "its aby";
+        public const string WEBSITE_SITE_DESIGNER_URL = "http://itsaby.com.au";
+
+        //LOGIN
+        public const string WEBSITE_LOGIN = "Log in: risk.control.unit";
+        public const string WEBSITE_SIGNIN = "Sign in";
+
+
 
         // BUTTONS / ACTIONS
 
@@ -40,6 +49,12 @@
         public const string VENDORS = "Vendor";
         public const string MANAGE_VENDOR = "Manage vendor";
         public const string MANAGE_CLIENT_COMPANY = "Manage client company";
+        public const string EMPANEL = "Empanel";
+        public const string BROADCAST = "Broadcast";
+
+        public const string MANAGE_COMPANY_VENDOR = "Manage company vendor";
+        public const string AVAILABLE_VENDORS = "Available vendors";
+        public const string DEPANEL_VENDORS = "Depanel vendors";
         public const string MANAGE_VENDOR_USER = "Manage vendor user";
         public const string EDIT_VENDOR = "Edit vendor";
         public const string MANAGE_USERS = "Manage user";

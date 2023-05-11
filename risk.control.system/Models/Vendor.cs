@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
@@ -35,8 +35,8 @@ namespace risk.control.system.Models
         public string BankAccountNumber { get; set; } = default!;
         public string IFSCCode { get; set; } = default!;
         public string City { get; set; } = "KANPUR CITY";
-        public DateTime? AgreementDate { get; set; } =DateTime.Now;
-        public DateTime? ActivatedDate { get; set; } =DateTime.Now;
+        public DateTime? AgreementDate { get; set; } = DateTime.Now;
+        public DateTime? ActivatedDate { get; set; } = DateTime.Now;
         public DateTime? DeListedDate { get; set; }
         public VendorStatus? Status { get; set; } = VendorStatus.ACTIVE;
         public string? DelistReason { get; set; } = default!;
@@ -49,6 +49,8 @@ namespace risk.control.system.Models
         public byte[]? DocumentImage { get; set; } = default!;
 
         public List<VendorApplicationUser>? VendorApplicationUser { get; set; }
+        public string? ClientCompanyId { get; set; }
+        public ClientCompany? ClientCompany { get; set; }
     }
     public enum VendorStatus
     {

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class Initialise1 : Migration
+    public partial class EmpanelVendor : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,6 +28,26 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuditLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<string>(type: "TEXT", nullable: true),
+                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    TableName = table.Column<string>(type: "TEXT", nullable: true),
+                    DateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    OldValues = table.Column<string>(type: "TEXT", nullable: true),
+                    NewValues = table.Column<string>(type: "TEXT", nullable: true),
+                    AffectedColumns = table.Column<string>(type: "TEXT", nullable: true),
+                    PrimaryKey = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Country",
                 columns: table => new
                 {
@@ -41,6 +61,44 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Country", x => x.CountryId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FilesOnDatabase",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Data = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    FileType = table.Column<string>(type: "TEXT", nullable: false),
+                    Extension = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    UploadedBy = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FilesOnDatabase", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FilesOnFileSystem",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FilePath = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    FileType = table.Column<string>(type: "TEXT", nullable: false),
+                    Extension = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    UploadedBy = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FilesOnFileSystem", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -321,6 +379,7 @@ namespace risk.control.system.Migrations
                     DelistReason = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -328,6 +387,11 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Vendor", x => x.VendorId);
+                    table.ForeignKey(
+                        name: "FK_Vendor_ClientCompany_ClientCompanyId",
+                        column: x => x.ClientCompanyId,
+                        principalTable: "ClientCompany",
+                        principalColumn: "ClientCompanyId");
                     table.ForeignKey(
                         name: "FK_Vendor_Country_CountryId",
                         column: x => x.CountryId,
@@ -723,6 +787,11 @@ namespace risk.control.system.Migrations
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Vendor_ClientCompanyId",
+                table: "Vendor",
+                column: "ClientCompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Vendor_CountryId",
                 table: "Vendor",
                 column: "CountryId");
@@ -787,6 +856,15 @@ namespace risk.control.system.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "AuditLogs");
+
+            migrationBuilder.DropTable(
+                name: "FilesOnDatabase");
+
+            migrationBuilder.DropTable(
+                name: "FilesOnFileSystem");
+
+            migrationBuilder.DropTable(
                 name: "InvestigationCase");
 
             migrationBuilder.DropTable(
@@ -805,9 +883,6 @@ namespace risk.control.system.Migrations
                 name: "VendorInvestigationServiceType");
 
             migrationBuilder.DropTable(
-                name: "ClientCompany");
-
-            migrationBuilder.DropTable(
                 name: "InvestigationServiceType");
 
             migrationBuilder.DropTable(
@@ -815,6 +890,9 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "LineOfBusiness");
+
+            migrationBuilder.DropTable(
+                name: "ClientCompany");
 
             migrationBuilder.DropTable(
                 name: "PinCode");

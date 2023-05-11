@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230509153345_FileUpload")]
-    partial class FileUpload
+    [Migration("20230511024122_EmpanelVendor")]
+    partial class EmpanelVendor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -273,6 +273,42 @@ namespace risk.control.system.Migrations
                     b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.Audit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AffectedColumns")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrimaryKey")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TableName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
@@ -718,6 +754,9 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ClientCompanyId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -779,6 +818,8 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("VendorId");
+
+                    b.HasIndex("ClientCompanyId");
 
                     b.HasIndex("CountryId");
 
@@ -1156,6 +1197,10 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>
                 {
+                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
+                        .WithMany("EmpanelledVendors")
+                        .HasForeignKey("ClientCompanyId");
+
                     b.HasOne("risk.control.system.Models.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId");
@@ -1171,6 +1216,8 @@ namespace risk.control.system.Migrations
                     b.HasOne("risk.control.system.Models.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId");
+
+                    b.Navigation("ClientCompany");
 
                     b.Navigation("Country");
 
@@ -1238,6 +1285,8 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
                 {
+                    b.Navigation("EmpanelledVendors");
+
                     b.Navigation("VendorApplicationUser");
                 });
 

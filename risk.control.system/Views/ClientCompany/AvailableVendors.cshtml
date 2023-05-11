@@ -1,0 +1,187 @@
+﻿@model IEnumerable<risk.control.system.Models.Vendor>
+
+@{
+    ViewData["Title"] = @Applicationsettings.SERVICE;
+}
+
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">@Applicationsettings.AVAILABLE_VENDORS</h3>
+                    </div>
+                    <form asp-action="AvailableVendors">
+                        <div class="card-body dataTable-search-form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter any detail to search available vendor">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <a asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
+                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> @Applicationsettings.SEARCH</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-body contained-width">
+                        <form id="checkboxes" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-12">
+                        @if (Model == null || Model.Count() == 0)
+                        {
+                            <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+
+                        }
+                        else
+                        {
+                            <table class="table table-striped fixed-with-height">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="checkall" /></th>
+
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Document)
+                                        </th>
+                                        <th>
+                                            @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.CodeSortParm })
+                                        </th>
+                                        <th>
+                                            @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.PhoneNumber)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Email)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Addressline)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.State)
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input name="cbxcase" type="checkbox" />
+                                            </td>
+                                            <td>
+                                                @if (item?.DocumentImage is not null)
+                                                {
+                                                    <img id="documentImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                                }
+                                                else
+                                                {
+                                                    <img id="documentImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
+                                                }
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Code)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Email)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Addressline)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.State.Name)
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-xs btn-info" asp-controller="Vendors" asp-action="Details" asp-route-id="@item.VendorId">
+                                                    <i class="fa fa-search"></i> @Applicationsettings.DETAILS
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                                </div>
+                            </div>
+                            @if (Model != null && Model?.Count() > 0)
+                            {
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card-footer text-right">
+                                            <a asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary">
+                                                <i class="fa fa-window-close"></i>
+                                                @Applicationsettings.CANCEL
+                                            </a>
+                                            <button id="broadcast" disabled type="submit" class="btn btn-danger">
+                                                <i class="fa fa-paper-plane" aria-hidden="true"></i> @Applicationsettings.EMPANEL
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </form>
+                        <br />
+                        <br />
+                        @{
+                            var PageNumber = (int)@ViewBag.PageNumber;
+
+                            var PageSize = (int)@ViewBag.PageSize;
+
+                            var TotalPages = (int)@ViewBag.TotalPages;
+
+                            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
+
+                            var ShowNext = (bool)@ViewBag.ShowNext;
+
+                            var ShowFirst = (bool)@ViewBag.ShowFirst;
+
+                            var ShowLast = (bool)@ViewBag.ShowLast;
+                        }
+                        <ul class="pagination">
+                            <li class="page-item @(!ShowFirst? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
+                                    <i class="fas fa-fast-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item @(!ShowPrevious? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
+                                    <i class="fas fa-step-backward"></i>
+                                </a>
+                            </li>
+                            <li class="page-item  @(!ShowNext? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
+                                    <i class="fas fa-step-forward"></i>
+                                </a>
+                            </li>
+
+                            <li class="page-item  @(!ShowLast? "disabled":"")">
+                                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
+                                    <i class="fas fa-fast-forward"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

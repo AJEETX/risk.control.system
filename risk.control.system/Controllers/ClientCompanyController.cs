@@ -176,7 +176,6 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies
-        [Breadcrumb("Home")]
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -223,6 +222,117 @@ namespace risk.control.system.Controllers
 
             var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
+            return View(applicationDbContextResult);
+        }
+
+        public async Task<IActionResult> EmpanelledVendors(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        {
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
+            if (searchString != null)
+            {
+                currentPage = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var applicationDbContext = _context.Vendor
+                .Where(v => v.VendorId == id)
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                applicationDbContext = applicationDbContext.Where(a =>
+                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
+                a.Code.ToLower().Contains(searchString.Trim().ToLower()));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+                case "code_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
+                    break;
+                default:
+                    applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+            }
+            int pageNumber = (currentPage ?? 1);
+            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.ShowPrevious = pageNumber > 1;
+            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.ShowFirst = pageNumber != 1;
+            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+
+            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            ViewBag.CompanyId = id;
+
+            return View(applicationDbContextResult);
+        }
+
+        public async Task<IActionResult> AvailableVendors(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        {
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
+            if (searchString != null)
+            {
+                currentPage = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            var applicationDbContext = _context.Vendor
+                .Where(v => v.VendorId != id)
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                applicationDbContext = applicationDbContext.Where(a =>
+                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
+                a.Code.ToLower().Contains(searchString.Trim().ToLower()));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+                case "code_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
+                    break;
+                default:
+                    applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+            }
+            int pageNumber = (currentPage ?? 1);
+            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.ShowPrevious = pageNumber > 1;
+            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.ShowFirst = pageNumber != 1;
+            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+
+            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            ViewBag.CompanyId = id;
             return View(applicationDbContextResult);
         }
         private bool ClientCompanyExists(string id)
