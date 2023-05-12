@@ -21,11 +21,21 @@
     //        $('#broadcast').prop('disabled', false);
     //    }
     //});
+
+
+
     // Attach the call to toggleChecked to the
     // click event of the global checkbox:
     $("#checkall").click(function () {
         var status = $("#checkall").prop('checked');
-        $('#add-vendors').prop('disabled', !status)
+        $('#manage-vendors').prop('disabled', !status)
+        toggleChecked(status);
+    });
+
+    $("input.vendors").click(function () {
+        var ele = $(this).val();
+        var status = $(this).prop('checked');
+        $('#manage-vendors').prop('disabled', !status)
         toggleChecked(status);
     });
 

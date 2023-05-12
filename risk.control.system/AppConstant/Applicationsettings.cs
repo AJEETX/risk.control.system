@@ -101,6 +101,7 @@
         public const string NO_IMAGE = "/img/no-image.png";
         public static class PORTAL_ADMIN
         {
+            public const string DISPLAY_NAME = "PORTAL ADMIN";
             public const string CODE = "pa";
             public const string USERNAME = "portal-admin@admin.com";
             public const string EMAIL = "portal-admin@admin.com";
@@ -110,6 +111,7 @@
         }
         public static class CLIENT_ADMIN
         {
+            public const string DISPLAY_NAME = "CLIENT ADMIN";
             public const string CODE = "ca";
             public const string USERNAME = "client-admin@admin.com";
             public const string EMAIL = "client-admin@admin.com";
@@ -119,6 +121,7 @@
         }
         public static class CLIENT_CREATOR
         {
+            public const string DISPLAY_NAME = "CLIENT CREATOR";
             public const string CODE = "cc";
             public const string USERNAME = "client-creator@admin.com";
             public const string EMAIL = "client-creator@admin.com";
@@ -128,6 +131,7 @@
         }
         public static class CLIENT_ASSIGNER
         {
+            public const string DISPLAY_NAME = "CLIENT ASSIGNER";
             public const string CODE = "cs";
             public const string USERNAME = "client-assigner@admin.com";
             public const string EMAIL = "client-assigner@admin.com";
@@ -137,6 +141,7 @@
         }
         public static class CLIENT_ASSESSOR
         {
+            public const string DISPLAY_NAME = "CLIENT ASSESSOR";
             public const string CODE = "co";
             public const string USERNAME = "client-assessor@admin.com";
             public const string EMAIL = "client-assessor@admin.com";
@@ -146,6 +151,7 @@
         }
         public static class VENDOR_ADMIN
         {
+            public const string DISPLAY_NAME = "VENDOR ADMIN";
             public const string CODE = "va";
             public const string USERNAME = "vendor-admin@admin.com";
             public const string EMAIL = "vendor-admin@admin.com";
@@ -155,6 +161,7 @@
         }
         public static class VENDOR_SUPERVISOR
         {
+            public const string DISPLAY_NAME = "VENDOR SUPERVISOR";
             public const string CODE = "vs";
             public const string USERNAME = "vendor-supervisor@admin.com";
             public const string EMAIL = "vendor-supervisor@admin.com";
@@ -164,6 +171,7 @@
         }
         public static class VENDOR_AGENT
         {
+            public const string DISPLAY_NAME = "VENDOR AGENT";
             public const string CODE = "vf";
             public const string USERNAME = "vendor-agent@admin.com";
             public const string EMAIL = "vendor-agent@admin.com";

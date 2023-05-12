@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using Microsoft.AspNetCore.Identity;
 
 namespace risk.control.system.Models
 {
@@ -11,11 +12,13 @@ namespace risk.control.system.Models
         public bool isSuperAdmin { get; set; } = false;
         public byte[]? ProfilePicture { get; set; }
         [Display(Name = "Image")]
-        [NotMapped] 
+        [NotMapped]
         public IFormFile? ProfileImage { get; set; }
         [Required]
+        [Display(Name = "First name")]
         public string FirstName { get; set; } = default!;
         [Required]
+        [Display(Name = "Last name")]
         public string LastName { get; set; } = default!;
         [Display(Name = "PinCode name")]
         public string? PinCodeId { get; set; } = default!;

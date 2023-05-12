@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -533,7 +534,7 @@ namespace risk.control.system.Seeds
 
             #region CLIENT/ VENDOR COMPANY
 
-            var (vendorId, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
+            var (abcVendorId, xyzVendorId, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
 
             #endregion
 
@@ -543,7 +544,9 @@ namespace risk.control.system.Seeds
 
             await ClientApplicationUserSeed.Seed(context, indiaCountry, clientUserManager, clientCompanyId);
 
-            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, vendorId);
+            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, abcVendorId);
+
+            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, xyzVendorId);
 
             #endregion
         }

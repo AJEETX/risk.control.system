@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
@@ -28,6 +28,7 @@ namespace risk.control.system.Models
         [NotMapped]
         [Display(Name = "Choose Multiple Pincodes")]
         public List<string> SelectedMultiPincodeId { get; set; } = new List<string> { }!;
+        [Display(Name = "Serviced pincodes")]
         public List<ServicedPinCode> PincodeServices { get; set; } = default!;
 
         public string VendorId { get; set; }

@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230511024122_EmpanelVendor")]
-    partial class EmpanelVendor
+    [Migration("20230512014122_EmpanelSelected")]
+    partial class EmpanelSelected
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -46,6 +46,7 @@
                                     <th>
                                         @Html.ActionLink("Pincode", "Index", new { sortOrder = ViewBag.PincodeSortParm })
                                     </th>
+                                    <th>Vendor</th>
                                     <th>State</th>
                                     <th>Country</th>
                                     <th>Roles</th>
@@ -63,6 +64,7 @@
                                         <td style="width: 10%;">@user.Email</td>
                                         <td>@user.FirstName @user.LastName</td>
                                         <td>@user.PinCode</td>
+                                        <td>@user.FirstName @user?.VendorName</td>
                                         <td>@user.State</td>
                                         <td>@user.Country</td>
                                         <td style="width:20%">

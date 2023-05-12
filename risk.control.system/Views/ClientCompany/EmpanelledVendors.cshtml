@@ -37,7 +37,7 @@
             <div class="col-12">
                 <div class="card card-light">
                     <div class="card-body contained-width">
-                        <form id="checkboxes" enctype="multipart/form-data">
+                        <form id="checkboxes" method="post" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-12">
 
@@ -81,7 +81,7 @@
                                             {
                                                 <tr>
                                                     <td>
-                                                        <input name="cbxcase" type="checkbox" />
+                                                            <input id="@item.VendorId" class="vendors" name="vendors" type="checkbox" value="@item.VendorId" checked="@item.SelectedByCompany" />
                                                     </td>
                                                     <td>
                                                         @if (item?.DocumentImage is not null)
@@ -112,7 +112,7 @@
                                                         @Html.DisplayFor(modelItem => item.State.Name)
                                                     </td>
                                                     <td>
-                                                        <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.VendorId">
+                                                            <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
                                                             <i class="fa fa-search"></i> @Applicationsettings.DETAILS
                                                         </a>
                                                     </td>
@@ -128,11 +128,11 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="card-footer text-right">
-                                            <a asp-action="Index" class="btn btn-secondary">
+                                            <a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary">
                                                 <i class="fa fa-window-close"></i>
                                                 @Applicationsettings.CANCEL
                                             </a>
-                                            <button id="broadcast" disabled type="submit" class="btn btn-danger">
+                                            <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-danger">
                                                 <i class="fas fa-thumbs-down" aria-hidden="true"></i> @Applicationsettings.DEPANEL_VENDORS
                                             </button>
                                         </div>

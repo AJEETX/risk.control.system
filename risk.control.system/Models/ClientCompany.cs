@@ -8,9 +8,12 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ClientCompanyId { get; set; } = Guid.NewGuid().ToString();
+        [Display(Name = "Company name")]
         public string Name { get; set; } = default!;
+        [Display(Name = "Company code")]
         public string Code { get; set; } = default!;
         public string Description { get; set; } = default!;
+        [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = default!;
         public string Email { get; set; } = default!;
         public string Branch { get; set; } = default!;

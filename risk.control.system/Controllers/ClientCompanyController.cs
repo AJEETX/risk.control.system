@@ -225,6 +225,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContextResult);
         }
 
+        [HttpGet]
         public async Task<IActionResult> EmpanelledVendors(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -241,7 +242,7 @@ namespace risk.control.system.Controllers
             ViewBag.CurrentFilter = searchString;
 
             var applicationDbContext = _context.Vendor
-                .Where(v => v.VendorId == id)
+                .Where(v => v.ClientCompanyId == id)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
@@ -302,6 +303,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContextResult);
         }
 
+        [HttpGet]
         public async Task<IActionResult> AvailableVendors(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -318,7 +320,7 @@ namespace risk.control.system.Controllers
             ViewBag.CurrentFilter = searchString;
 
             var applicationDbContext = _context.Vendor
-                .Where(v => v.VendorId != id)
+                .Where(v => v.ClientCompanyId != id)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
@@ -378,18 +380,125 @@ namespace risk.control.system.Controllers
             return View(applicationDbContextResult);
         }
         [HttpPost]
-        public async Task<IActionResult> AvailableVendors(string id, List<Vendor> vendors)
+        public async Task<IActionResult> AvailableVendors(string id, List<string> vendors)
         {
             if (vendors is not null && vendors.Count() > 0)
             {
                 var company = await _context.ClientCompany.FindAsync(id);
-                company.EmpanelledVendors.AddRange(vendors);
-                _context.ClientCompany.Update(company);
-                var savedRows = await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("Vendor(s) empanelled sucessful!");
-                RedirectToAction("EmpanelledVendors", "ClientCompany");
+                if (company != null)
+                {
+                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
+                    .Where(v => v.VendorId != id)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.LineOfBusiness)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.InvestigationServiceType)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices);
+                    company.EmpanelledVendors.AddRange(empanelledVendors);
+                    _context.ClientCompany.Update(company);
+                    var savedRows = await _context.SaveChangesAsync();
+                    toastNotification.AddSuccessToastMessage("Vendor(s) empanel sucessful!");
+                    try
+                    {
+                        return RedirectToAction("Details", new { id = company.ClientCompanyId });
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw;
+                    }
+                }
             }
+            ViewBag.CompanyId = id;
             return Problem();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EmpanelledVendors(string id, List<string> vendors)
+        {
+            if (vendors is not null && vendors.Count() > 0)
+            {
+                var company = await _context.ClientCompany.FindAsync(id);
+                if (company != null)
+                {
+                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
+                    .Where(v => v.VendorId != id)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.LineOfBusiness)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.InvestigationServiceType)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices);
+                    foreach (var v in empanelledVendors)
+                    {
+                        company.EmpanelledVendors.Remove(v);
+                    }
+                    _context.ClientCompany.Update(company);
+                    var savedRows = await _context.SaveChangesAsync();
+                    toastNotification.AddSuccessToastMessage("Vendor(s) depanel sucessful!");
+                    try
+                    {
+                        if (savedRows > 0)
+                        {
+                            return RedirectToAction("Details", new { id = company.ClientCompanyId });
+                        }
+                        else
+                        {
+                            return Problem();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw;
+                    }
+                }
+            }
+            ViewBag.CompanyId = id;
+            return Problem();
+        }
+        public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
+        {
+            if (id == null || _context.Vendor == null)
+            {
+                toastNotification.AddErrorToastMessage("vendor not found!");
+                return NotFound();
+            }
+
+            var vendor = await _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .FirstOrDefaultAsync(m => m.VendorId == id);
+            if (vendor == null)
+            {
+                return NotFound();
+            }
+            ViewBag.CompanyId = companyId;
+            ViewBag.Backurl = backurl;
+
+            return View(vendor);
         }
         private bool ClientCompanyExists(string id)
         {
