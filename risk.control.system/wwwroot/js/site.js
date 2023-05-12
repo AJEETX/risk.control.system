@@ -13,17 +13,6 @@
             currentLink[0].closest(".nav-treeview").style.display = "block";
         }
     }
-    //$('#checkboxes').on('input change', function() {
-    //    var ele = $(this).val();
-    //    if( ele != '') {
-    //        $('#broadcast').prop('disabled', true);
-    //    } else {
-    //        $('#broadcast').prop('disabled', false);
-    //    }
-    //});
-
-
-
     // Attach the call to toggleChecked to the
     // click event of the global checkbox:
     $("#checkall").click(function () {
@@ -33,17 +22,18 @@
     });
 
     $("input.vendors").click(function () {
-        var ele = $(this).val();
-        var status = $(this).prop('checked');
-        $('#manage-vendors').prop('disabled', !status)
-        toggleChecked(status);
+        //var status = $(this).prop('checked');
+
+        //$(this).prop('checked', status);
+        //$('#manage-vendors').prop('disabled', !status);
+
+        var checkboxes = $("input[type='checkbox'].vendors");
+        var anyChecked = checkIfAnyChecked(checkboxes);
+
+        $('#checkall').prop('checked', anyChecked);
+        $('#manage-vendors').prop('disabled', !anyChecked)
     });
 
-    //$("select").each(function () {
-    //    if ($(this).find("option").length <= 1) {
-    //        $(this).attr("disabled", "disabled");
-    //    }
-    //});
     $("#btnDeleteImage").click(function () {
         var id = $(this).attr("data-id");
         $.ajax({
@@ -70,6 +60,16 @@
     });
 });
 
+function checkIfAnyChecked(elements) {
+    var hasAnyCheckboxChecked = false;
+
+    $.each(elements, function (index, element) {
+        if (element.checked === true) {
+            hasAnyCheckboxChecked= true;
+        }
+    });
+    return hasAnyCheckboxChecked;
+}
 function loadState(obj, showDefaultOption = true) {
     var value = obj.value;
     $.post("/User/GetStatesByCountryId", { countryId: value }, function (data) {
