@@ -40,6 +40,11 @@
         public const string CASE_STATUS = "Case status";
         public const string SERVICE = "Service";
         public const string INVESTIGATION_SERVICE = "Type of service";
+        public const string BENEFICIARY_RELATION = "Beneficiary relation";
+        public const string CASE_ENABLER = "Case enabler";
+        public const string COST_CENTRE = "Cost centre";
+        public const string CASE_OUTCOME = "Case outcome";
+        public const string CASE_SUBSTATUS = "Case sub status";
         public const string LINE_OF_BUSINESS = "Line of business";
         public const string PINCODE = "Pincode";
         public const string ROLE = "Role";
@@ -83,6 +88,7 @@
         public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
         public const string INVESTIGATION_CASE_STATUS = "Case status";
         public const string INVESTIGATION_CLAIMS = "Claim";
+        public const string INBOX = "Inbox";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";

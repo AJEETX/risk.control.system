@@ -1,0 +1,104 @@
+﻿@model IEnumerable<risk.control.system.Models.InvestigationCaseSubStatus>
+
+@{
+    ViewData["Title"] = @Applicationsettings.SERVICE;
+}
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title"> @Applicationsettings.CASE_SUBSTATUS</h3>
+                    </div>
+                    <form asp-action="index" asp-antiforgery="true">
+                        <div class="card-body dataTable-search-form">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <input autocomplete="off" name="searchString" type="text" class="form-control" placeholder="enter investigation type name">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i>  @Applicationsettings.SEARCH</button>
+                                    <a class="btn btn-success" asp-action="Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-light">
+                    <div class="card-body contained-width">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Name)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Code)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Created)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Updated)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.UpdatedBy)
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Created)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Updated)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.UpdatedBy)
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationCaseSubStatusId">
+                                                <i class="fa fa-search"></i>  @Applicationsettings.VIEW
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationCaseSubStatusId">
+                                                <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationCaseSubStatusId">
+                                                <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -22,6 +22,11 @@ namespace risk.control.system.Data
         //public virtual DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; }
         public virtual DbSet<LineOfBusiness> LineOfBusiness { get; set; }
         public virtual DbSet<InvestigationCaseStatus> InvestigationCaseStatus { get; set; }
+        public virtual DbSet<InvestigationCaseSubStatus> InvestigationCaseSubStatus { get; set; }
+        public virtual DbSet<InvestigationCaseOutcome> InvestigationCaseOutcome { get; set; }
+        public virtual DbSet<CostCentre> CostCentre { get; set; }
+        public virtual DbSet<CaseEnabler> CaseEnabler { get; set; }
+        public virtual DbSet<BeneficiaryRelation> BeneficiaryRelation { get; set; }
         public virtual DbSet<Country> Country { get; set; }
         public virtual DbSet<State> State { get; set; }
         public virtual DbSet<District> District { get; set; }

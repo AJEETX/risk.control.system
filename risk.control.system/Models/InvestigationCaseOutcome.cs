@@ -3,18 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class InvestigationCaseStatus : BaseEntity
+    public class InvestigationCaseOutcome : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string InvestigationCaseStatusId { get; set; } = Guid.NewGuid().ToString();
-        [Display(Name = "Case status")]
+        public string InvestigationCaseOutcomeId { get; set; } = Guid.NewGuid().ToString();
+        [Display(Name = "Case outcome")]
         [Required]
         public string Name { get; set; } = default!;
-        [Display(Name = "Case status")]
+        [Display(Name = "Case outcome")]
         [Required]
         public string Code { get; set; } = default!;
-        public List<InvestigationCaseSubStatus>? InvestigationCaseSubStatuses { get; set; } = default!;
-
     }
 }

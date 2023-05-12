@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using risk.control.system.Data;
 
@@ -10,9 +11,11 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230512121031_substatus")]
+    partial class substatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -308,62 +311,6 @@ namespace risk.control.system.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("risk.control.system.Models.BeneficiaryRelation", b =>
-                {
-                    b.Property<string>("BeneficiaryRelationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("BeneficiaryRelationId");
-
-                    b.ToTable("BeneficiaryRelation");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.CaseEnabler", b =>
-                {
-                    b.Property<string>("CaseEnablerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("CaseEnablerId");
-
-                    b.ToTable("CaseEnabler");
-                });
-
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
                 {
                     b.Property<string>("ClientCompanyId")
@@ -461,34 +408,6 @@ namespace risk.control.system.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("ClientCompany");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.CostCentre", b =>
-                {
-                    b.Property<string>("CostCentreId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("CostCentreId");
-
-                    b.ToTable("CostCentre");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.Country", b =>
@@ -599,34 +518,6 @@ namespace risk.control.system.Migrations
                     b.HasIndex("LineOfBusinessId");
 
                     b.ToTable("InvestigationCase");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.InvestigationCaseOutcome", b =>
-                {
-                    b.Property<string>("InvestigationCaseOutcomeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("InvestigationCaseOutcomeId");
-
-                    b.ToTable("InvestigationCaseOutcome");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationCaseStatus", b =>
@@ -1284,7 +1175,7 @@ namespace risk.control.system.Migrations
             modelBuilder.Entity("risk.control.system.Models.InvestigationCaseSubStatus", b =>
                 {
                     b.HasOne("risk.control.system.Models.InvestigationCaseStatus", "InvestigationCaseStatus")
-                        .WithMany("InvestigationCaseSubStatuses")
+                        .WithMany()
                         .HasForeignKey("InvestigationCaseStatusId");
 
                     b.Navigation("InvestigationCaseStatus");
@@ -1439,11 +1330,6 @@ namespace risk.control.system.Migrations
                     b.Navigation("EmpanelledVendors");
 
                     b.Navigation("VendorApplicationUser");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.InvestigationCaseStatus", b =>
-                {
-                    b.Navigation("InvestigationCaseSubStatuses");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.LineOfBusiness", b =>
