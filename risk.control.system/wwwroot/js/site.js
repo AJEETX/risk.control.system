@@ -29,8 +29,8 @@
 
         var checkboxes = $("input[type='checkbox'].vendors");
         var anyChecked = checkIfAnyChecked(checkboxes);
-
-        $('#checkall').prop('checked', anyChecked);
+        var allChecked = checkIfAllChecked(checkboxes);
+        $('#checkall').prop('checked', allChecked);
         $('#manage-vendors').prop('disabled', !anyChecked)
     });
 
@@ -59,6 +59,12 @@
         });
     });
 });
+
+function checkIfAllChecked(elements) {
+    var totalElmentCount = elements.length;
+    var totalCheckedElements = elements.filter(":checked").length;
+    return (totalElmentCount == totalCheckedElements)
+}
 
 function checkIfAnyChecked(elements) {
     var hasAnyCheckboxChecked = false;
