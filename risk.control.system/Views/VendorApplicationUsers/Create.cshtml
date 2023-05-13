@@ -99,7 +99,7 @@
                                         <img class="form-Image" id="profilePicture" src="@Applicationsettings.NO_IMAGE">
                                         <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
-                                        <div class="card-footer text-right">
+                                    <div class="form-group text-right">
                                         <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
