@@ -89,6 +89,8 @@
         public const string INVESTIGATION_CASE_STATUS = "Case status";
         public const string INVESTIGATION_CLAIMS = "Claim";
         public const string INBOX = "Inbox";
+        public const string COMPOSE = "Compose";
+        public const string READ_MAIL = "Read mail";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";

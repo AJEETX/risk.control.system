@@ -75,7 +75,7 @@
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
 
                 <li class="nav-item ">
-                    <a asp-controller="Home" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("home","") @Url.MakeActiveClass("Inbox","")">
+                    <a asp-controller="Home" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("home","") @Url.MakeActiveClass("ContactMessage","")">
                         <i class="nav-icon fas fa-home"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.DASHBOARD
@@ -83,10 +83,26 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","")">
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Index")">
                         <i class="fas fa-envelope nav-icon"></i>
                         <p>
                             @Applicationsettings.INBOX
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Create")">
+                        <i class="fas fa-pen nav-icon"></i>
+                        <p>
+                            @Applicationsettings.COMPOSE
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Details" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Details")">
+                        <i class="fas fa-pen nav-icon"></i>
+                        <p>
+                            @Applicationsettings.READ_MAIL
                         </p>
                     </a>
                 </li>

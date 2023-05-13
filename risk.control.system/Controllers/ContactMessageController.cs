@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -29,20 +26,20 @@ namespace risk.control.system.Controllers
         // GET: ContactMessage/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null || _context.ContactUsMessage == null)
-            {
-                return NotFound();
-            }
+            //if (id == null || _context.ContactUsMessage == null)
+            //{
+            //    return NotFound();
+            //}
 
-            var contactMessage = await _context.ContactUsMessage
-                .Include(c => c.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.ContactMessageId == id);
-            if (contactMessage == null)
-            {
-                return NotFound();
-            }
+            //var contactMessage = await _context.ContactUsMessage
+            //    .Include(c => c.ApplicationUser)
+            //    .FirstOrDefaultAsync(m => m.ContactMessageId == id);
+            //if (contactMessage == null)
+            //{
+            //    return NotFound();
+            //}
 
-            return View(contactMessage);
+            return View(new ContactMessage { });
         }
 
         // GET: ContactMessage/Create
@@ -155,14 +152,14 @@ namespace risk.control.system.Controllers
             {
                 _context.ContactUsMessage.Remove(contactMessage);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ContactMessageExists(string id)
         {
-          return (_context.ContactUsMessage?.Any(e => e.ContactMessageId == id)).GetValueOrDefault();
+            return (_context.ContactUsMessage?.Any(e => e.ContactMessageId == id)).GetValueOrDefault();
         }
     }
 }
