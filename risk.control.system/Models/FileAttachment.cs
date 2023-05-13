@@ -17,5 +17,8 @@ namespace risk.control.system.Models
 
         public string? ContactMessageId { get; set; }
         public ContactMessage? ContactMessage { get; set; }
+
+        public string? ClaimsInvestigationId { get; set; }
+        public ClaimsInvestigation? ClaimsInvestigation { get; set; }
     }
 }

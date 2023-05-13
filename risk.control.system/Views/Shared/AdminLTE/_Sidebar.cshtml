@@ -115,7 +115,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Claim","") @Url.MakeActiveClass("Underwriting","")">
+                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Claim","") @Url.MakeActiveClass("Underwriting","") @Url.MakeActiveClass("ClaimsInvestigation","")">
                         <i class="nav-icon fas fa-search"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.INVESTIGATION_MAIN
@@ -125,6 +125,14 @@
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
+                        <i class="fas fa-rupee-sign nav-icon"></i>
+                        <p>
+                            @Applicationsettings.INVESTIGATION_CLAIMS
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
                             @Applicationsettings.INVESTIGATION_CLAIMS

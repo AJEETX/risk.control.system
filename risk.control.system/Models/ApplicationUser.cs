@@ -37,6 +37,8 @@ namespace risk.control.system.Models
         public string? DistrictId { get; set; } = default!;
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
+        [Display(Name = "Address line")]
+        public string? Addressline { get; set; }
         public DateTime Created { get; set; } = DateTime.Now;
         public DateTime? Updated { get; set; }
         public string? UpdatedBy { get; set; } = default!;
