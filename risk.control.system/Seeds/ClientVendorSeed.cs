@@ -40,25 +40,6 @@ namespace risk.control.system.Seeds
 
             //CREATE VENDOR COMPANY
 
-            var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
-            {
-                new VendorInvestigationServiceType{
-                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
-                    Price = 99,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
-                        }
-                    }
-                }
-            };
-
             var abcVendor = new Vendor
             {
                 Name = "abc investigation agency",
@@ -77,7 +58,6 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = "abc@vendor.com",
                 PhoneNumber = "(04) 123 234",
-                VendorInvestigationServiceTypes = listOfSericesWithPinCodes
             };
 
             var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
@@ -100,10 +80,30 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = "abc@vendor.com",
                 PhoneNumber = "(04) 123 234",
-                VendorInvestigationServiceTypes = listOfSericesWithPinCodes
             };
 
             var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);
+
+            var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            {
+                new VendorInvestigationServiceType{
+                    VendorId = abcVendorCompany.Entity.VendorId,
+                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
+                    Price = 99,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                }
+            };
+
 
             await context.SaveChangesAsync();
             return (abcVendorCompany.Entity.VendorId, xyzVendorCompany.Entity.VendorId, tataAigCompany.Entity.ClientCompanyId);

@@ -31,33 +31,40 @@
             <div class="col-12">
                 <div class="card card-light">
                     <div class="card-body contained-width">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
-
-                                    </th>
-                                    <th>
-                                        @Html.ActionLink("Country", "Index", new { sortOrder = ViewBag.NameSortParm })
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var country in Model)
-                                {
+                        @if (Model.Count() == 0)
+                        {
+                            <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                        }
+                        else
+                        {
+                            <table class="table table-striped">
+                                <thead>
                                     <tr>
-                                        <td>@country.Code</td>
-                                        <td>@country.Name</td>
-                                        <td>
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@country.CountryId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@country.CountryId"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
-                                            <input type="hidden" value="@country.CountryId" />
-                                        </td>
+                                        <th>
+                                            @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
+
+                                        </th>
+                                        <th>
+                                            @Html.ActionLink("Country", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                        </th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>                        
+                                </thead>
+                                <tbody>
+                                    @foreach (var country in Model)
+                                    {
+                                        <tr>
+                                            <td>@country.Code</td>
+                                            <td>@country.Name</td>
+                                            <td>
+                                                <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@country.CountryId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a> &nbsp;
+                                                <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@country.CountryId"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
+                                                <input type="hidden" value="@country.CountryId" />
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
                         <br />
                         <br />
                         @{

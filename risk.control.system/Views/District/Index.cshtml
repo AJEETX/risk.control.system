@@ -35,7 +35,13 @@
             <div class="col-12">
                 <div class="card card-light">
                     <div class="card-body contained-width">
-                        <table class="table">
+                        @if (Model.Count() == 0)
+                        {
+                            <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                        }
+                        else
+                        {
+                            <table class="table table-striped">
                             <thead>
                                 <tr>
                                     <th>
@@ -78,6 +84,7 @@
                                 }
                             </tbody>
                         </table>
+                        }
                         <br />
                         <br />
                         @{

@@ -30,8 +30,13 @@
         <div class="row">
             <div class="col-12">
                 <div class="card card-light">
-                    <div class="card-body contained-width">
-                        <table class="table table-striped">
+                    <div class="card-body contained-width">@if (Model.Count() == 0)
+                        {
+                            <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                        }
+                        else
+                        {
+                            <table class="table table-striped">
                             <thead>
                                 <tr>
                                     @*<th>Id</th>*@
@@ -54,6 +59,7 @@
 
                             </tbody>
                         </table>
+                        }
                     </div>
                 </div>
             </div>

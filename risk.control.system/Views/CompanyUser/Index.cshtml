@@ -18,7 +18,7 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter user name">
+                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter company user name">
                                     </div>
                                 </div>
                             </div>
@@ -38,6 +38,12 @@
             <div class="col-12">
                 <div class="card card-light">
                     <div class="card-body contained-width">
+                        @if (Model.Count() == 0)
+                        {
+                            <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                        }
+                        else
+                        {
                         <table class="table table-striped">
                             <thead>
                                 <tr>
@@ -124,6 +130,7 @@
                             </tbody>
                         </table>
                         <br />
+                        }
                         <br />
                         @{
                             var PageNumber = (int)@ViewBag.PageNumber;

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -110,15 +112,22 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var applicationDbContext = _context.VendorInvestigationServiceType
-                .Include(i => i.LineOfBusiness)
+            var applicationDbContext = _context.Vendor
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(i => i.LineOfBusiness)
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                 .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.State)
                 .Include(i => i.District)
-                .Include(i => i.InvestigationServiceType)
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(i => i.InvestigationServiceType)
                 .Include(i => i.State)
-                .Include(i => i.Vendor)
-                .Include(i => i.PincodeServices)
-                .Where(a => a.VendorId == id);
-            return View(await applicationDbContext.ToListAsync());
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(i => i.PincodeServices)
+                .FirstOrDefault(a => a.VendorId == id);
+
+            return View(applicationDbContext);
         }
         // GET: Vendors/Create
         public IActionResult Create()

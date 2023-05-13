@@ -28,8 +28,8 @@
                     <div class="card-footer text-right">
                         <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId"  class="btn btn-secondary"> <i
                                 class="fa fa-window-close"></i>
-                            Cancel</a>
-                        <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Edit
+                            @Applicationsettings.CANCEL</a>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> @Applicationsettings.EDIT
                         </button>
                     </div>
                 </div>
