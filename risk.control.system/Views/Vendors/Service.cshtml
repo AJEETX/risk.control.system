@@ -8,9 +8,9 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card card-success">
+                <div class="card card-success card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">@Model.Name @Applicationsettings.SERVICE</h3>
+                        <h3 class="card-title">@Applicationsettings.SERVICE</h3>
                     </div>
                     <form asp-action="index">
                         <div class="card-body dataTable-search-form">
@@ -38,79 +38,79 @@
                 <div class="card card-light">
                     <div class="card-body contained-width">
                         @if (Model.VendorInvestigationServiceTypes.Count == 0)
-                            {
-                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                            }
-                            else
-                            {
-                        <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Line of Business
-                                                </th>
-                                                <th>
-                                                    Type of Investigation Service
-                                                </th>
-                                                <th>
-                                                    District
-                                                </th>
-                                                <th>
-                                                    State
-                                                </th>
-                                                <th>
-                                                    Rate
-                                                </th>
+                        {
+                            <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                        }
+                        else
+                        {
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Line of Business
+                                        </th>
+                                        <th>
+                                            Type of Investigation Service
+                                        </th>
+                                        <th>
+                                            District
+                                        </th>
+                                        <th>
+                                            State
+                                        </th>
+                                        <th>
+                                            Rate
+                                        </th>
 
-                                                <th>
-                                                    Pincode Services
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.UpdatedBy)
-                                                </th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var item in Model.VendorInvestigationServiceTypes)
-                                            {
-                                                <tr>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.District.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.State.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Price)
-                                                    </td>
-                                                    <td>
-                                                        @foreach (var svc in item?.PincodeServices)
-                                                        {
-                                                            var pinCodeDetail = svc.Pincode;
-                                                            <span class="badge badge-light">@Html.DisplayFor(modelItem => pinCodeDetail)</span>
-                                                        }
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.UpdatedBy)
-                                                    </td>
-                                                    <td>
-                                                        <a class="btn btn-xs btn-info" asp-controller="VendorService" asp-action="Details" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;
-                                                        <a class="btn btn-xs btn-warning" asp-controller="VendorService" asp-action="Edit" asp-route-id="@item.VendorInvestigationServiceTypeId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
-                                                        <a class="btn btn-xs btn-danger" asp-controller="VendorService" asp-action="Delete" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fas fa-trash"></i>   @Applicationsettings.DELETE</a>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                        <th>
+                                            Pincode Services
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.UpdatedBy)
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.VendorInvestigationServiceTypes)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.District.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.State.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Price)
+                                            </td>
+                                            <td>
+                                                @foreach (var svc in item?.PincodeServices)
+                                                {
+                                                    var pinCodeDetail = svc.Pincode;
+                                                    <span class="badge badge-light">@Html.DisplayFor(modelItem => pinCodeDetail)</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.UpdatedBy)
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-xs btn-info" asp-controller="VendorService" asp-action="Details" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;
+                                                <a class="btn btn-xs btn-warning" asp-controller="VendorService" asp-action="Edit" asp-route-id="@item.VendorInvestigationServiceTypeId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
+                                                <a class="btn btn-xs btn-danger" asp-controller="VendorService" asp-action="Delete" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fas fa-trash"></i>   @Applicationsettings.DELETE</a>
+                                            </td>
+                                        </tr>
                                     }
- 
+                                </tbody>
+                            </table>
+                        }
+
                     </div>
                 </div>
             </div>

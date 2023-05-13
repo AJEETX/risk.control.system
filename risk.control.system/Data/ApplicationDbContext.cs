@@ -28,7 +28,8 @@ namespace risk.control.system.Data
         public virtual DbSet<CaseEnabler> CaseEnabler { get; set; }
         public virtual DbSet<BeneficiaryRelation> BeneficiaryRelation { get; set; }
         public virtual DbSet<Country> Country { get; set; }
-        public virtual DbSet<ContactUsMessage> ContactUsMessage { get; set; }
+        public virtual DbSet<ContactMessage> ContactUsMessage { get; set; }
+        public virtual DbSet<FileAttachment> FileAttachment { get; set; }
         public virtual DbSet<State> State { get; set; }
         public virtual DbSet<District> District { get; set; }
         public virtual DbSet<PinCode> PinCode { get; set; }

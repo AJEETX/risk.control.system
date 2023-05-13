@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class EmpanelSelected : Migration
+    public partial class Mailbox : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,6 +45,54 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AuditLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BeneficiaryRelation",
+                columns: table => new
+                {
+                    BeneficiaryRelationId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BeneficiaryRelation", x => x.BeneficiaryRelationId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CaseEnabler",
+                columns: table => new
+                {
+                    CaseEnablerId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseEnabler", x => x.CaseEnablerId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CostCentre",
+                columns: table => new
+                {
+                    CostCentreId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CostCentre", x => x.CostCentreId);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,6 +147,22 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FilesOnFileSystem", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InvestigationCaseOutcome",
+                columns: table => new
+                {
+                    InvestigationCaseOutcomeId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvestigationCaseOutcome", x => x.InvestigationCaseOutcomeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -175,6 +239,28 @@ namespace risk.control.system.Migrations
                         principalTable: "Country",
                         principalColumn: "CountryId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InvestigationCaseSubStatus",
+                columns: table => new
+                {
+                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvestigationCaseSubStatus", x => x.InvestigationCaseSubStatusId);
+                    table.ForeignKey(
+                        name: "FK_InvestigationCaseSubStatus_InvestigationCaseStatus_InvestigationCaseStatusId",
+                        column: x => x.InvestigationCaseStatusId,
+                        principalTable: "InvestigationCaseStatus",
+                        principalColumn: "InvestigationCaseStatusId");
                 });
 
             migrationBuilder.CreateTable(
@@ -622,6 +708,34 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ContactUsMessage",
+                columns: table => new
+                {
+                    ContactMessageId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContactUsMessage", x => x.ContactMessageId);
+                    table.ForeignKey(
+                        name: "FK_ContactUsMessage_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ServicedPinCode",
                 columns: table => new
                 {
@@ -642,6 +756,25 @@ namespace risk.control.system.Migrations
                         principalTable: "VendorInvestigationServiceType",
                         principalColumn: "VendorInvestigationServiceTypeId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FileAttachment",
+                columns: table => new
+                {
+                    FileAttachmentId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    AttachedDocument = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ContactMessageId = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FileAttachment", x => x.FileAttachmentId);
+                    table.ForeignKey(
+                        name: "FK_FileAttachment_ContactUsMessage_ContactMessageId",
+                        column: x => x.ContactMessageId,
+                        principalTable: "ContactUsMessage",
+                        principalColumn: "ContactMessageId");
                 });
 
             migrationBuilder.CreateIndex(
@@ -732,6 +865,11 @@ namespace risk.control.system.Migrations
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ContactUsMessage_ApplicationUserId",
+                table: "ContactUsMessage",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_District_CountryId",
                 table: "District",
                 column: "CountryId");
@@ -740,6 +878,11 @@ namespace risk.control.system.Migrations
                 name: "IX_District_StateId",
                 table: "District",
                 column: "StateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FileAttachment_ContactMessageId",
+                table: "FileAttachment",
+                column: "ContactMessageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InvestigationCase_InvestigationCaseStatusId",
@@ -755,6 +898,11 @@ namespace risk.control.system.Migrations
                 name: "IX_InvestigationCase_LineOfBusinessId",
                 table: "InvestigationCase",
                 column: "LineOfBusinessId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvestigationCaseSubStatus_InvestigationCaseStatusId",
+                table: "InvestigationCaseSubStatus",
+                column: "InvestigationCaseStatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InvestigationServiceType_LineOfBusinessId",
@@ -859,6 +1007,18 @@ namespace risk.control.system.Migrations
                 name: "AuditLogs");
 
             migrationBuilder.DropTable(
+                name: "BeneficiaryRelation");
+
+            migrationBuilder.DropTable(
+                name: "CaseEnabler");
+
+            migrationBuilder.DropTable(
+                name: "CostCentre");
+
+            migrationBuilder.DropTable(
+                name: "FileAttachment");
+
+            migrationBuilder.DropTable(
                 name: "FilesOnDatabase");
 
             migrationBuilder.DropTable(
@@ -868,19 +1028,28 @@ namespace risk.control.system.Migrations
                 name: "InvestigationCase");
 
             migrationBuilder.DropTable(
+                name: "InvestigationCaseOutcome");
+
+            migrationBuilder.DropTable(
+                name: "InvestigationCaseSubStatus");
+
+            migrationBuilder.DropTable(
                 name: "ServicedPinCode");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "ContactUsMessage");
 
             migrationBuilder.DropTable(
                 name: "InvestigationCaseStatus");
 
             migrationBuilder.DropTable(
                 name: "VendorInvestigationServiceType");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "InvestigationServiceType");

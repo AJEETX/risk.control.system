@@ -42,6 +42,9 @@ namespace risk.control.system.Models
         public string? UpdatedBy { get; set; } = default!;
         [Required]
         public string? Password { get; set; }
+        [Display(Name = "Mails")]
+
+        public List<ContactMessage>? ContactMessages { get; set; }
     }
     public class ApplicationRole : IdentityRole<long>
     {

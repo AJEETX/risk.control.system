@@ -463,6 +463,59 @@ namespace risk.control.system.Migrations
                     b.ToTable("ClientCompany");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.ContactMessage", b =>
+                {
+                    b.Property<string>("ContactMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("ApplicationUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ReceiveDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SendDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ContactMessageId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("ContactUsMessage");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.CostCentre", b =>
                 {
                     b.Property<string>("CostCentreId")
@@ -556,6 +609,29 @@ namespace risk.control.system.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("District");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.FileAttachment", b =>
+                {
+                    b.Property<string>("FileAttachmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("AttachedDocument")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("ContactMessageId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("FileAttachmentId");
+
+                    b.HasIndex("ContactMessageId");
+
+                    b.ToTable("FileAttachment");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationCase", b =>
@@ -1243,6 +1319,15 @@ namespace risk.control.system.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.ContactMessage", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("ContactMessages")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.District", b =>
                 {
                     b.HasOne("risk.control.system.Models.Country", "Country")
@@ -1258,6 +1343,15 @@ namespace risk.control.system.Migrations
                     b.Navigation("Country");
 
                     b.Navigation("State");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.FileAttachment", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ContactMessage", "ContactMessage")
+                        .WithMany("Attachments")
+                        .HasForeignKey("ContactMessageId");
+
+                    b.Navigation("ContactMessage");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationCase", b =>
@@ -1434,11 +1528,21 @@ namespace risk.control.system.Migrations
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("ContactMessages");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
                 {
                     b.Navigation("EmpanelledVendors");
 
                     b.Navigation("VendorApplicationUser");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ContactMessage", b =>
+                {
+                    b.Navigation("Attachments");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationCaseStatus", b =>

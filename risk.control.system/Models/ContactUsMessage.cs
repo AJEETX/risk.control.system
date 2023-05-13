@@ -3,25 +3,32 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class ContactUsMessage : BaseEntity
+    public class ContactMessage : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
+        public string ContactMessageId { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; }
         public string Email { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
         public bool Read { get; set; }
-        public ContactUSMessagePriority Priority { get; set; } = ContactUSMessagePriority.NORMAL;
+        public ContactMessagePriority Priority { get; set; } = ContactMessagePriority.NORMAL;
+        [Display(Name = "Send date")]
         public DateTime? SendDate { get; set; }
+        [Display(Name = "Received date")]
         public DateTime? ReceiveDate { get; set; }
-        [NotMapped]
-        public IFormFile? Attachment { get; set; }
-        public byte[]? AttachedDocument { get; set; }
+        [Display(Name = "Attachments")]
+        public List<FileAttachment>? Attachments { get; set; }
+
+        [Display(Name = "User")]
+        public long? ApplicationUserId { get; set; }
+
+        public ApplicationUser ApplicationUser { get; set; }
 
     }
-    public enum ContactUSMessagePriority
+
+    public enum ContactMessagePriority
     {
         [Display(Name = "urgent")] URGENT,
         [Display(Name = "important")] IMPORTANT,

@@ -410,8 +410,7 @@ namespace risk.control.system.Controllers
                     }
                     catch (Exception ex)
                     {
-
-                        throw;
+                        throw ex;
                     }
                 }
             }
