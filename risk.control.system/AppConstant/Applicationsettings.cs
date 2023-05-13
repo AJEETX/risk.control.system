@@ -88,6 +88,7 @@
         public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
         public const string INVESTIGATION_CASE_STATUS = "Case status";
         public const string INVESTIGATION_CLAIMS = "Claim";
+        public const string MAILBOX = "Mailbox";
         public const string INBOX = "Inbox";
         public const string COMPOSE = "Compose";
         public const string READ_MAIL = "Read mail";

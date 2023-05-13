@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseEnabler
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
             return _context.CaseEnabler != null ?
                         View(await _context.CaseEnabler.ToListAsync()) :

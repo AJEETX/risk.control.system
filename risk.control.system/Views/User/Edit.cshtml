@@ -4,94 +4,105 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
-<section class="content pt-2">
+<section class="content">
     <div class="container-fluid ">
-        <form asp-action="edit" asp-antiforgery="true" enctype="multipart/form-data">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <div class="card card-warning">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen"></i> @Applicationsettings.USER</h3>
-                        </div>
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-warning card-outline">
+                    <form asp-action="edit" asp-antiforgery="true" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="card card-warning">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fas fa-pen"></i> @Applicationsettings.USER</h3>
+                                    </div>
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="card-body">
 
-                            <input type="hidden" asp-for="Id" />
-                            <div class="form-group">
-                                <label asp-for="UserName" class="control-label"></label>
-                                <input asp-for="UserName" class="form-control" />
-                                <span asp-validation-for="UserName" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="FirstName" class="control-label"></label>
-                                <input asp-for="FirstName" class="form-control" />
-                                <span asp-validation-for="FirstName" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="LastName" class="control-label"></label>
-                                <input asp-for="LastName" class="form-control" />
-                                <span asp-validation-for="LastName" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="PhoneNumber" class="control-label"></label>
-                                <input asp-for="PhoneNumber" class="form-control" />
-                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="Email" class="control-label"></label>
-                                <input asp-for="Email" class="form-control" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">...</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label asp-for="CountryId" class="control-label"></label>
-                                <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                    <option>--- SELECT COUNTRY ---</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="StateId" class="control-label"></label>
-                                <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId">
-                                    <option>--- SELECT STATE ---</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="Password" class="control-label"></label>
-                                <input asp-for="Password" class="form-control" />
-                            </div>
-                            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
-                            {
-                                <div class="form-group" id="delete-image-main">
-                                    <label asp-for="ProfileImage"></label>
-                                    <img class="form-Image" src="@Model.ProfilePictureUrl" />
-                                    <button id="btnDeleteImage" data-id="@Model.Id" type="button"
-                                        class="btn btn-danger">Delete Image</button>
+                                        <input type="hidden" asp-for="Id" />
+                                        <div class="form-group">
+                                            <label asp-for="UserName" class="control-label"></label>
+                                            <input asp-for="UserName" class="form-control" />
+                                            <span asp-validation-for="UserName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="FirstName" class="control-label"></label>
+                                            <input asp-for="FirstName" class="form-control" />
+                                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="LastName" class="control-label"></label>
+                                            <input asp-for="LastName" class="form-control" />
+                                            <span asp-validation-for="LastName" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="PhoneNumber" class="control-label"></label>
+                                            <input asp-for="PhoneNumber" class="form-control" />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="Email" class="control-label"></label>
+                                            <input asp-for="Email" class="form-control" />
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                 </div>
-                            }
-                            <div class="form-group">
-                                <label asp-for="ProfileImage" class="control-label"></label>
-                                <input asp-for="ProfileImage" type="file" class="form-control" />
-                                <input type="hidden" asp-for="ProfilePictureUrl" />
                             </div>
-                            <div class="card-footer text-right">
-                                <a asp-action="Index" class="btn btn-secondary"> <i class="fa fa-window-close"></i>
-                                    @Applicationsettings.CANCEL</a>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                </button>
+                            <div class="col-sm-6">
+                                <div class="card card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">...</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label asp-for="CountryId" class="control-label"></label>
+                                            <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                                <option>--- SELECT COUNTRY ---</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="StateId" class="control-label"></label>
+                                            <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId">
+                                                <option>--- SELECT STATE ---</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="Password" class="control-label"></label>
+                                            <input asp-for="Password" class="form-control" />
+                                        </div>
+                                        @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+                                        {
+                                            <div class="form-group" id="delete-image-main">
+                                                <label asp-for="ProfileImage"></label>
+                                                <img class="form-Image" src="@Model.ProfilePictureUrl" />
+                                                <button id="btnDeleteImage" data-id="@Model.Id" type="button"
+                                                        class="btn btn-danger">
+                                                    Delete Image
+                                                </button>
+                                            </div>
+                                        }
+                                        <div class="form-group">
+                                            <label asp-for="ProfileImage" class="control-label"></label>
+                                            <input asp-for="ProfileImage" type="file" class="form-control" />
+                                            <input type="hidden" asp-for="ProfilePictureUrl" />
+                                        </div>
+                                        <div class="card-footer text-right">
+                                            <a asp-action="Index" class="btn btn-secondary">
+                                                <i class="fa fa-window-close"></i>
+                                                @Applicationsettings.CANCEL
+                                            </a>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-pen"></i> @Applicationsettings.EDIT
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-        </form>
+            </div>
+        </div>
     </div>
 </section>
 

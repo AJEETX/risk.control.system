@@ -4,27 +4,29 @@
 @{
     ViewData["Title"] = @Applicationsettings.VENDOR;
 }
-<section class="content pt-2">
+<section class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
+            <div class="col-md-12">
                 <div class="card card-success card-outline">
-                    <div class="card-header">
-                        <h3 class="card-title">@Model.FirstOrDefault().VendorName @Applicationsettings.USER</h3>
-                    </div>
                     <form asp-action="index">
-                        <div class="card-body dataTable-search-form">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter user name">
+                        <div class="card-header">
+                            <h3 class="card-title">@Model.FirstOrDefault().VendorName @Applicationsettings.USER</h3>
+                            <div class="card-tools">
+                                <div class="input-group input-group-sm">
+                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
+                                    <div class="input-group-append">
+                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
+                                            <i class="fas fa-search"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12 text-right">
                                     <a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.FirstOrDefault().VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
-                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> @Applicationsettings.SEARCH</button>
                                     <a class="btn btn-success" asp-controller="VendorApplicationUsers" asp-action="Create" asp-route-id="@Model.FirstOrDefault().VendorId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                                 </div>
                             </div>
@@ -34,99 +36,100 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
-                <div class="card card-light">
-                    <div class="card-body contained-width">@if (Model.Count() == 0)
+            <div class="col-md-12">
+                <div class="card card-success card-outline">
+                    <div class="card-body p-0">
+                        @if (Model.Count() == 0)
                         {
                             <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
                         }
                         else
                         {
                             <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>
-                                        @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.EmailSortParm })
-                                    </th>
-                                    <th>
-                                        @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm })
-                                    </th>
-                                    <th>
-                                        @Html.ActionLink("Pincode", "Index", new { sortOrder = ViewBag.PincodeSortParm })
-                                    </th>
-                                    <th>State</th>
-                                    <th>Country</th>
-                                    <th>Roles</th>
-                                    <th>Code</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var user in Model)
-                                {
+                                <thead>
                                     <tr>
-                                        <td>
-                                            @if (user?.ProfileImageInByte is not null)
-                                            {
-                                                <img id="profileImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(user?.ProfileImageInByte))">
-                                            }
-                                            else
-                                            {
-                                                <img id="profileImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                        </td>
-                                        <td style="width: 10%;">@user.Email</td>
-                                        <td>@user.FirstName @user.LastName</td>
-                                        <td>@user.PinCode</td>
-                                        <td>@user.State</td>
-                                        <td>@user.Country</td>
-                                        <td style="width:20%">
-                                            @foreach (var role in user.Roles)
-
-                                            {
-                                                <span class="badge badge-light">@role</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            @{
-                                                if (user.Roles.Contains(AppRoles.PortalAdmin.ToString()))
-
-                                                {
-                                                    <span class="badge badge-danger">PA</span>
-                                                }
-
-                                                else if (user.Roles.Contains(AppRoles.ClientAdmin.ToString()))
-
-                                                {
-                                                    <span class="badge badge-danger">CA</span>
-                                                }
-
-                                                else if (user.Roles.Contains(AppRoles.VendorAdmin.ToString()))
-
-                                                {
-                                                    <span class="badge badge-warning">VA</span>
-                                                }
-
-                                                else
-
-                                                {
-                                                    <span class="badge badge-success">ST</span>
-                                                }
-
-                                            }
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-xs btn-warning" asp-controller="VendorApplicationUsers" asp-action="Edit" asp-route-userId="@user.UserId">
-                                                <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                            </a>&nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-controller="VendorUserRoles" asp-action="Index"
-                                           asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> @Applicationsettings.ROLE</a>
-                                        </td>
+                                        <th></th>
+                                        <th>
+                                            @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.EmailSortParm })
+                                        </th>
+                                        <th>
+                                            @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                        </th>
+                                        <th>
+                                            @Html.ActionLink("Pincode", "Index", new { sortOrder = ViewBag.PincodeSortParm })
+                                        </th>
+                                        <th>State</th>
+                                        <th>Country</th>
+                                        <th>Roles</th>
+                                        <th>Code</th>
+                                        <th>Action</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (user?.ProfileImageInByte is not null)
+                                                {
+                                                    <img id="profileImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(user?.ProfileImageInByte))">
+                                                }
+                                                else
+                                                {
+                                                    <img id="profileImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
+                                                }
+                                            </td>
+                                            <td style="width: 10%;">@user.Email</td>
+                                            <td>@user.FirstName @user.LastName</td>
+                                            <td>@user.PinCode</td>
+                                            <td>@user.State</td>
+                                            <td>@user.Country</td>
+                                            <td style="width:20%">
+                                                @foreach (var role in user.Roles)
+
+                                                {
+                                                    <span class="badge badge-light">@role</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @{
+                                                    if (user.Roles.Contains(AppRoles.PortalAdmin.ToString()))
+
+                                                    {
+                                                        <span class="badge badge-danger">PA</span>
+                                                    }
+
+                                                    else if (user.Roles.Contains(AppRoles.ClientAdmin.ToString()))
+
+                                                    {
+                                                        <span class="badge badge-danger">CA</span>
+                                                    }
+
+                                                    else if (user.Roles.Contains(AppRoles.VendorAdmin.ToString()))
+
+                                                    {
+                                                        <span class="badge badge-warning">VA</span>
+                                                    }
+
+                                                    else
+
+                                                    {
+                                                        <span class="badge badge-success">ST</span>
+                                                    }
+
+                                                }
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-xs btn-warning" asp-controller="VendorApplicationUsers" asp-action="Edit" asp-route-userId="@user.UserId">
+                                                    <i class="fas fa-pen"></i> @Applicationsettings.EDIT
+                                                </a>&nbsp;
+                                                <a class="btn btn-xs btn-danger" asp-controller="VendorUserRoles" asp-action="Index"
+                                           asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> @Applicationsettings.ROLE</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         }
                         <br />
                         <br />

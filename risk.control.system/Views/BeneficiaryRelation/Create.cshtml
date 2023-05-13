@@ -2,13 +2,13 @@
 @{
     ViewData["Title"] = @Applicationsettings.CREATE;
 }
-<section class="content pt-2">
+<section class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
+            <div class="col-md-12">
                 <div class="card card-success card-outline">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-pen"></i>  @Applicationsettings.BENEFICIARY_RELATION</h3>
+                        <h3 class="card-title"><i class="fas fa-plus"></i>  @Applicationsettings.BENEFICIARY_RELATION</h3>
                     </div>
                     <div class="card-body">
                         <form asp-action="Create">
@@ -25,7 +25,7 @@
                             </div>
                             <div class="card-footer text-right">
                                 <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
-                                <button type="submit" class="btn btn-warning"> <i class="fas fa-pen"></i> @Applicationsettings.CREATE</button>
+                                <button type="submit" class="btn btn-success"> <i class="fas fa-plus"></i> @Applicationsettings.CREATE</button>
                             </div>
                         </form>
                     </div>

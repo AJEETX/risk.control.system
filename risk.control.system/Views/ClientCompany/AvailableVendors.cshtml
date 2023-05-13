@@ -4,40 +4,42 @@
     ViewData["Title"] = @Applicationsettings.SERVICE;
 }
 
-<section class="content pt-2">
+<section class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
-                <div class="card card-success card-outline">
-                    <div class="card-header">
-                        <h3 class="card-title">@Applicationsettings.AVAILABLE_VENDORS</h3>
-                    </div>
-                    <form asp-action="AvailableVendors">
-                        <input type="hidden" id="@ViewBag.CompanyId" />
-                        <div class="card-body dataTable-search-form">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="enter any detail to search available vendor">
+            <div class="col-md-12">
+                <form asp-action="AvailableVendors">
+                    <div class="card card-success card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.AVAILABLE_VENDORS</h3>
+                            <div class="card-tools">
+                                <div class="input-group input-group-sm">
+                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
+                                    <div class="input-group-append">
+                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
+                                            <i class="fas fa-search"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <input type="hidden" id="@ViewBag.CompanyId" />
+                        <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12 text-right">
                                     <a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
-                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i> @Applicationsettings.SEARCH</button>
                                     <a asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@ViewBag.CompanyId" class="btn btn-success"><i class="fas fa-thumbs-up"></i>  @Applicationsettings.EMPANEL</a>
                                 </div>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
-                <div class="card card-light">
-                    <div class="card-body contained-width">
+            <div class="col-md-12">
+                <div class="card card-success card-outline">
+                    <div class="card-body p-0">
                         <form id="checkboxes" asp-action="AvailableVendors" method="post" asp-route-id="@ViewBag.CompanyId" enctype="multipart/form-data">
                             <input type="hidden" id="@ViewBag.CompanyId" />
                             <div class="row">

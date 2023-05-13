@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
             return _context.CostCentre != null ?
                         View(await _context.CostCentre.ToListAsync()) :

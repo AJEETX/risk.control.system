@@ -75,16 +75,24 @@
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
 
                 <li class="nav-item ">
-                    <a asp-controller="Home" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("home","") @Url.MakeActiveClass("ContactMessage","")">
+                    <a asp-controller="Home" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("home","")">
                         <i class="nav-icon fas fa-home"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.DASHBOARD
                         </p>
                     </a>
                 </li>
+                <li class="nav-item ">
+                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ContactMessage","") @Url.MakeActiveClass("ContactMessage","")">
+                        <i class="nav-icon fas fa-envelope"></i>
+                        <p class="sidebar-menu-header-label">
+                            @Applicationsettings.MAILBOX
+                        </p>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Index")">
-                        <i class="fas fa-envelope nav-icon"></i>
+                        <i class="fas fa-envelope-open nav-icon"></i>
                         <p>
                             @Applicationsettings.INBOX
                         </p>
@@ -100,7 +108,7 @@
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="ContactMessage" asp-action="Details" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Details")">
-                        <i class="fas fa-pen nav-icon"></i>
+                        <i class="fas fa-book-reader nav-icon"></i>
                         <p>
                             @Applicationsettings.READ_MAIL
                         </p>

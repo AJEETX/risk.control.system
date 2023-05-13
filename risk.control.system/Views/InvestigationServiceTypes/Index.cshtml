@@ -4,26 +4,29 @@
 @{
     ViewData["Title"] = @Applicationsettings.SERVICE;
 }
-<section class="content pt-2">
+<section class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
+            <div class="col-md-12">
                 <div class="card card-success card-outline">
-                    <div class="card-header">
-                        <h3 class="card-title"> @Applicationsettings.SERVICE</h3>
-                    </div>
                     <form asp-action="index" asp-antiforgery="true">
-                        <div class="card-body dataTable-search-form">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <input autocomplete="off" name="searchString" type="text" class="form-control" placeholder="enter investigation type name or code">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i>  @Applicationsettings.SERVICE</h3>
+                            <div class="card-tools">
+                                <div class="input-group input-group-sm">
+                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
+                                    <div class="input-group-append">
+                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
+                                            <i class="fas fa-search"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="card-body">
+                            
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <button id="btnFilter" type="submit" class="btn btn-primary"><i class="fas fa-search"></i>  @Applicationsettings.SEARCH</button>
                                     <a class="btn btn-success" asp-controller="InvestigationServiceTypes" asp-action="Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
                                 </div>
                             </div>
@@ -33,57 +36,58 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
-                <div class="card card-light">
-                    <div class="card-body contained-width">@if (Model.Count() == 0)
+            <div class="col-md-12">
+                <div class="card card-success card-outline">
+                    <div class="card-body p-0">
+                        @if (Model.Count() == 0)
                         {
                             <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
                         }
                         else
                         {
                             <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Name)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Code)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.LineOfBusiness)
-                                    </th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
+                                <thead>
                                     <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Code)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationServiceTypeId">
-                                                <i class="fa fa-search"></i>  @Applicationsettings.VIEW
-                                            </a> &nbsp;
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationServiceTypeId">
-                                                <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
-                                            </a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationServiceTypeId">
-                                                <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
-                                            </a>
-                                        </td>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Name)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Code)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                        </th>
+                                        <th></th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Code)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationServiceTypeId">
+                                                    <i class="fa fa-search"></i>  @Applicationsettings.VIEW
+                                                </a> &nbsp;
+                                                <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationServiceTypeId">
+                                                    <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                                </a> &nbsp;
+                                                <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationServiceTypeId">
+                                                    <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         }
                     </div>
                 </div>

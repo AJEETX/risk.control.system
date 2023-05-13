@@ -20,7 +20,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string SearchString)
         {
             return _context.BeneficiaryRelation != null ?
                         View(await _context.BeneficiaryRelation.ToListAsync()) :
