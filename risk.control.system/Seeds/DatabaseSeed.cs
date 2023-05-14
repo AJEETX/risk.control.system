@@ -42,12 +42,38 @@ namespace risk.control.system.Seeds
 
             await PinCodeStateSeed.SeedPincode(context, indiaCountry.Entity);
 
+            await context.SaveChangesAsync(null, false);
+
+            #region LINE OF BUSINESS
+
+            var claims = new LineOfBusiness
+            {
+                Name = "CLAIMS",
+                Code = "CLAIMS",
+                MasterData = true,
+            };
+
+            var claimCaseType = await context.LineOfBusiness.AddAsync(claims);
+
+            var underwriting = new LineOfBusiness
+            {
+                Name = "UNDERWRITING",
+                Code = "UNDERWRITING",
+                MasterData = true,
+            };
+
+            var underwritingCaseType = await context.LineOfBusiness.AddAsync(underwriting);
+
+            #endregion
+
             #region INVESTIGATION SERVICE TYPES
 
             var claimComprehensive = new InvestigationServiceType
             {
                 Name = "COMPREHENSIVE",
                 Code = "COMPREHENSIVE",
+                MasterData = true,
+                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
             };
             var claimComprehensiveService = await context.InvestigationServiceType.AddAsync(claimComprehensive);
 
@@ -56,6 +82,8 @@ namespace risk.control.system.Seeds
             {
                 Name = "NON-COMPREHENSIVE",
                 Code = "NON-COMPREHENSIVE",
+                MasterData = true,
+                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
             };
 
             var claimNonComprehensiveService = await context.InvestigationServiceType.AddAsync(claimNonComprehensive);
@@ -65,6 +93,8 @@ namespace risk.control.system.Seeds
             {
                 Name = "DOCUMENT-COLLECTION",
                 Code = "DOCUMENT-COLLECTION",
+                MasterData = true,
+                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
             };
 
             var claimDocumentCollectionService = await context.InvestigationServiceType.AddAsync(claimDocumentCollection);
@@ -74,6 +104,8 @@ namespace risk.control.system.Seeds
             {
                 Name = "DISCREET",
                 Code = "DISCREET",
+                MasterData = true,
+                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
             };
 
             var claimDiscreetService = await context.InvestigationServiceType.AddAsync(claimDiscreet);
@@ -83,6 +115,8 @@ namespace risk.control.system.Seeds
             {
                 Name = "PRE-ONBOARDING-VERIFICATION",
                 Code = "PRE-ONBOARDING-VERIFICATION",
+                MasterData = true,
+                LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
             };
 
             var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);
@@ -92,6 +126,8 @@ namespace risk.control.system.Seeds
             {
                 Name = "POST-ONBOARDING-VERIFICATION",
                 Code = "POST-ONBOARDING-VERIFICATION",
+                MasterData = true,
+                LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
             };
 
             var underWritingPostVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPostVerification);
@@ -99,33 +135,6 @@ namespace risk.control.system.Seeds
 
             #endregion
 
-            #region BENEFICIARY-RELATION
-
-            await ClientCompanySetupSeed.Seed(context);
-
-            #endregion
-
-            #region LINE OF BUSINESS
-
-            var claims = new LineOfBusiness
-            {
-                Name = "CLAIMS",
-                Code = "CLAIMS",
-                InvestigationServiceTypes = new List<InvestigationServiceType> { claimComprehensiveService.Entity, claimNonComprehensiveService.Entity, claimDocumentCollectionService.Entity, claimDiscreetService.Entity }
-            };
-
-            var claimCaseType = await context.LineOfBusiness.AddAsync(claims);
-
-            var underwriting = new LineOfBusiness
-            {
-                Name = "UNDERWRITING",
-                Code = "UNDERWRITING",
-                InvestigationServiceTypes = new List<InvestigationServiceType> { underWritingPreVerificationService.Entity, underWritingPostVerificationService.Entity }
-            };
-
-            var underwritingCaseType = await context.LineOfBusiness.AddAsync(underwriting);
-
-            #endregion
 
             #region //CREATE RISK CASE DETAILS
 
@@ -133,6 +142,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "INITIATED",
                 Code = "INITIATED",
+                MasterData = true,
             };
 
             var initiatedStatus = await context.InvestigationCaseStatus.AddAsync(initiated);
@@ -141,6 +151,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "IN-PROGRESS",
                 Code = "IN-PROGRESS",
+                MasterData = true,
             };
 
             var inProgressStatus = await context.InvestigationCaseStatus.AddAsync(inProgress);
@@ -149,6 +160,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "FINISHED",
                 Code = "FINISHED",
+                MasterData = true,
             };
 
             var finishedStatus = await context.InvestigationCaseStatus.AddAsync(finished);
@@ -156,6 +168,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "CREATED",
                 Code = "CREATED",
+                MasterData = true,
                 InvestigationCaseStatusId = initiatedStatus.Entity.InvestigationCaseStatusId
             };
             var createdSubStatus = await context.InvestigationCaseSubStatus.AddAsync(created);
@@ -163,6 +176,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "ASSIGNED_TO_ASSIGNER",
                 Code = "ASSIGNED_TO_ASSIGNER",
+                MasterData = true,
                 InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
             };
 
@@ -172,6 +186,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "REJECTED_BY_ASSESSOR",
                 Code = "REJECTED_BY_ASSESSOR",
+                MasterData = true,
                 InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
             };
 
@@ -180,12 +195,14 @@ namespace risk.control.system.Seeds
             {
                 Name = "ACCEPTED_BY_ASSESSOR",
                 Code = "ACCEPTED_BY_ASSESSOR",
+                MasterData = true,
                 InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
             };
             var approved = new InvestigationCaseSubStatus
             {
                 Name = "APPROVED_BY_ASSESSOR",
                 Code = "APPROVED_BY_ASSESSOR",
+                MasterData = true,
                 InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
             };
 
@@ -193,6 +210,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "RELEASED_BY_SUPERVISOR",
                 Code = "RELEASED_BY_SUPERVISOR",
+                MasterData = true,
                 InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
             };
             var acceptedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(released);
@@ -200,6 +218,7 @@ namespace risk.control.system.Seeds
             {
                 Name = "WITHDRAWN",
                 Code = "WITHDRAWN",
+                MasterData = true,
                 InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
             };
 
@@ -207,21 +226,9 @@ namespace risk.control.system.Seeds
 
             #endregion
 
-            #region INVESTIGATION CASES
+            #region BENEFICIARY-RELATION
 
-            var claimComprehensiveCase = new InvestigationCase
-            {
-                Name = "TEST CLAIM CASE 1",
-                Description = "TEST CLAIM CASE DESCRIPTION comprehensive service 1",
-                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId,
-                InvestigationServiceTypeId = claimComprehensiveService.Entity.InvestigationServiceTypeId,
-                InvestigationCaseStatusId = createdSubStatus.Entity.InvestigationCaseStatusId,
-                Created = DateTime.Now
-            };
-
-            await context.InvestigationCase.AddAsync(claimComprehensiveCase);
-
-            await context.SaveChangesAsync();
+            await ClientCompanySetupSeed.Seed(context);
 
             #endregion
 
@@ -241,6 +248,8 @@ namespace risk.control.system.Seeds
             await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, abcVendorId);
 
             await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, xyzVendorId);
+
+            await context.SaveChangesAsync(null, false);
 
             #endregion
         }

@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230513131847_ClaimModels")]
-    partial class ClaimModels
+    [Migration("20230514080839_AddcurrentUser")]
+    partial class AddcurrentUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -376,6 +376,9 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Addressline")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("BeneficiaryContactNumber")
                         .HasColumnType("INTEGER");
 
@@ -397,8 +400,10 @@ namespace risk.control.system.Migrations
                     b.Property<int>("ClaimType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ClientCompanyId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Comments")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<long>("ContactNumber")
@@ -421,6 +426,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CurrentUserId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("CustomerDateOfBirth")
                         .HasColumnType("TEXT");
 
@@ -436,7 +444,7 @@ namespace risk.control.system.Migrations
                     b.Property<string>("CustomerOccupation")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CustomerType")
+                    b.Property<int?>("CustomerType")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("DateOfIncident")
@@ -453,6 +461,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("InvestigationCaseStatusId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InvestigationCaseSubStatusId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InvestigationServiceTypeId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LineOfBusinessId")
@@ -479,6 +493,8 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("CaseEnablerId");
 
+                    b.HasIndex("ClientCompanyId");
+
                     b.HasIndex("CostCentreId");
 
                     b.HasIndex("CountryId");
@@ -486,6 +502,10 @@ namespace risk.control.system.Migrations
                     b.HasIndex("DistrictId");
 
                     b.HasIndex("InvestigationCaseStatusId");
+
+                    b.HasIndex("InvestigationCaseSubStatusId");
+
+                    b.HasIndex("InvestigationServiceTypeId");
 
                     b.HasIndex("LineOfBusinessId");
 
@@ -521,10 +541,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Branch")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -855,6 +871,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("MasterData")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -886,6 +905,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("InvestigationCaseStatusId")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("MasterData")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -909,9 +931,6 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ClaimsInvestigationCaseId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -922,6 +941,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("LineOfBusinessId")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("MasterData")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -934,8 +956,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("InvestigationServiceTypeId");
-
-                    b.HasIndex("ClaimsInvestigationCaseId");
 
                     b.HasIndex("LineOfBusinessId");
 
@@ -954,6 +974,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("MasterData")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -1114,6 +1137,9 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ClaimsInvestigationCaseId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ClientCompanyId")
                         .HasColumnType("TEXT");
 
@@ -1178,6 +1204,8 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("VendorId");
+
+                    b.HasIndex("ClaimsInvestigationCaseId");
 
                     b.HasIndex("ClientCompanyId");
 
@@ -1444,6 +1472,10 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("CaseEnablerId");
 
+                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
+                        .WithMany("ClaimsInvestigations")
+                        .HasForeignKey("ClientCompanyId");
+
                     b.HasOne("risk.control.system.Models.CostCentre", "CostCentre")
                         .WithMany()
                         .HasForeignKey("CostCentreId");
@@ -1462,6 +1494,14 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("InvestigationCaseStatusId");
 
+                    b.HasOne("risk.control.system.Models.InvestigationCaseSubStatus", "InvestigationCaseSubStatus")
+                        .WithMany()
+                        .HasForeignKey("InvestigationCaseSubStatusId");
+
+                    b.HasOne("risk.control.system.Models.InvestigationServiceType", "InvestigationServiceType")
+                        .WithMany()
+                        .HasForeignKey("InvestigationServiceTypeId");
+
                     b.HasOne("risk.control.system.Models.LineOfBusiness", "LineOfBusiness")
                         .WithMany()
                         .HasForeignKey("LineOfBusinessId");
@@ -1478,6 +1518,8 @@ namespace risk.control.system.Migrations
 
                     b.Navigation("CaseEnabler");
 
+                    b.Navigation("ClientCompany");
+
                     b.Navigation("CostCentre");
 
                     b.Navigation("Country");
@@ -1485,6 +1527,10 @@ namespace risk.control.system.Migrations
                     b.Navigation("District");
 
                     b.Navigation("InvestigationCaseStatus");
+
+                    b.Navigation("InvestigationCaseSubStatus");
+
+                    b.Navigation("InvestigationServiceType");
 
                     b.Navigation("LineOfBusiness");
 
@@ -1593,10 +1639,6 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationServiceType", b =>
                 {
-                    b.HasOne("risk.control.system.Models.ClaimsInvestigation", null)
-                        .WithMany("InvestigationServiceTypes")
-                        .HasForeignKey("ClaimsInvestigationCaseId");
-
                     b.HasOne("risk.control.system.Models.LineOfBusiness", "LineOfBusiness")
                         .WithMany("InvestigationServiceTypes")
                         .HasForeignKey("LineOfBusinessId")
@@ -1653,6 +1695,10 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>
                 {
+                    b.HasOne("risk.control.system.Models.ClaimsInvestigation", null)
+                        .WithMany("Vendors")
+                        .HasForeignKey("ClaimsInvestigationCaseId");
+
                     b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
                         .WithMany("EmpanelledVendors")
                         .HasForeignKey("ClientCompanyId");
@@ -1748,11 +1794,13 @@ namespace risk.control.system.Migrations
                 {
                     b.Navigation("Attachments");
 
-                    b.Navigation("InvestigationServiceTypes");
+                    b.Navigation("Vendors");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
                 {
+                    b.Navigation("ClaimsInvestigations");
+
                     b.Navigation("EmpanelledVendors");
 
                     b.Navigation("VendorApplicationUser");

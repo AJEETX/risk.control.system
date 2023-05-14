@@ -18,9 +18,12 @@ namespace risk.control.system.Data
 
         public DbSet<Audit> AuditLogs { get; set; }
 
-        public virtual async Task<int> SaveChangesAsync(string userId = null)
+        public virtual async Task<int> SaveChangesAsync(string userId = null, bool notseed = true)
         {
-            OnBeforeSaveChanges(userId);
+            if (notseed)
+            {
+                OnBeforeSaveChanges(userId);
+            }
             var result = await base.SaveChangesAsync();
             return result;
         }

@@ -31,7 +31,6 @@ namespace risk.control.system.Models
         public string? DistrictId { get; set; } = default!;
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
-        public string City { get; set; } = "KANPUR CITY";
 
         public string BankName { get; set; } = default!;
         [Display(Name = "Bank Account Number")]
@@ -50,6 +49,7 @@ namespace risk.control.system.Models
         public List<ClientCompanyApplicationUser>? VendorApplicationUser { get; set; }
 
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
+        public List<ClaimsInvestigation> ClaimsInvestigations { get; set; } = new();
     }
     public enum CompanyStatus
     {

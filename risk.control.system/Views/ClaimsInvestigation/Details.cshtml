@@ -26,13 +26,13 @@
             @Html.DisplayNameFor(model => model.LineOfBusiness)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.LineOfBusiness.LineOfBusinessId)
+            @Html.DisplayFor(model => model.LineOfBusiness.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.InvestigationCaseStatus.InvestigationCaseStatusId)
+            @Html.DisplayFor(model => model.InvestigationCaseStatus.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ContractIssueDate)
@@ -92,25 +92,25 @@
             @Html.DisplayNameFor(model => model.PinCode)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PinCode.PinCodeId)
+            @Html.DisplayFor(model => model.PinCode.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.State)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.State.StateId)
+            @Html.DisplayFor(model => model.State.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Country)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Country.CountryId)
+            @Html.DisplayFor(model => model.Country.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.District)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.District.DistrictId)
+            @Html.DisplayFor(model => model.District.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.CustomerIncome)
@@ -140,7 +140,7 @@
             @Html.DisplayNameFor(model => model.BeneficiaryRelation)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BeneficiaryRelation.BeneficiaryRelationId)
+            @Html.DisplayFor(model => model.BeneficiaryRelation.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.BeneficiaryContactNumber)
@@ -164,13 +164,13 @@
             @Html.DisplayNameFor(model => model.CostCentre)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CostCentre.CostCentreId)
+            @Html.DisplayFor(model => model.CostCentre.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.CaseEnabler)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CaseEnabler.CaseEnablerId)
+            @Html.DisplayFor(model => model.CaseEnabler.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Comments)
@@ -199,6 +199,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ClaimsInvestigationCaseId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
+    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.ClaimsInvestigationCaseId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
 </div>

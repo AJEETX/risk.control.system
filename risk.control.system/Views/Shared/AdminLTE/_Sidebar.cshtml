@@ -2,6 +2,10 @@
 @using risk.control.system.Models;
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+
+@{
+    var roleCode = string.Empty;
+}
 <aside class="main-sidebar elevation-2 sidebar-light-primary">
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
@@ -15,7 +19,6 @@
         <!-- Sidebar user (optional) -->
         @if (SignInManager.IsSignedIn(User))
         {
-
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
 
                 @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
@@ -34,35 +37,43 @@
                     @UserManager.GetUserAsync(User).Result?.FirstName @UserManager.GetUserAsync(User).Result?.LastName
                     @if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                     {
-                        <span class="badge badge-danger">@Applicationsettings.PORTAL_ADMIN.CODE</span>
+                        roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;
+                        <span class="badge badge-danger">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
                     {
-                        <span class="badge badge-warning">@Applicationsettings.CLIENT_ADMIN.CODE</span>
+                        roleCode = @Applicationsettings.CLIENT_ADMIN.CODE;
+                        <span class="badge badge-warning">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
                     {
-                        <span class="badge badge-info">@Applicationsettings.VENDOR_ADMIN.CODE</span>
+                        roleCode = @Applicationsettings.VENDOR_ADMIN.CODE;
+                        <span class="badge badge-info">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.ClientCreator.ToString()))
                     {
-                        <span class="badge badge-primary">@Applicationsettings.CLIENT_CREATOR.CODE</span>
+                        roleCode = @Applicationsettings.CLIENT_CREATOR.CODE;
+                        <span class="badge badge-primary">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
                     {
-                        <span class="badge badge-secondary">@Applicationsettings.CLIENT_ASSIGNER.CODE</span>
+                        roleCode = @Applicationsettings.CLIENT_ASSIGNER.CODE;
+                        <span class="badge badge-secondary">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
                     {
-                        <span class="badge badge-secondary">@Applicationsettings.CLIENT_ASSESSOR.CODE</span>
+                        roleCode = @Applicationsettings.CLIENT_ASSESSOR.CODE;
+                        <span class="badge badge-secondary">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.VendorSupervisor.ToString()))
                     {
-                        <span class="badge badge-dark">@Applicationsettings.VENDOR_SUPERVISOR.CODE</span>
+                        roleCode = @Applicationsettings.VENDOR_SUPERVISOR.CODE;
+                        <span class="badge badge-dark">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.VendorAgent.ToString()))
                     {
-                        <span class="badge badge-dark">@Applicationsettings.VENDOR_AGENT.CODE</span>
+                        roleCode = @Applicationsettings.VENDOR_AGENT.CODE;
+                        <span class="badge badge-dark">@roleCode</span>
                     }
                 </a>
             </div>
@@ -135,7 +146,7 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS
+                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE @roleCode
                         </p>
                     </a>
                 </li>

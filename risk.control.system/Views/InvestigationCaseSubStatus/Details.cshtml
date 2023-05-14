@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.DETAILS;
+    var masterData = Model.MasterData ? "none" : "";
 }
 <div>
     <h4>@Applicationsettings.CASE_SUBSTATUS</h4>
@@ -29,5 +30,5 @@
 </div>
 <div>
     <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
-    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.InvestigationCaseSubStatusId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
+    <a class="btn btn-warning" style="pointer-events:@masterData" asp-action="Edit" asp-route-id="@Model?.InvestigationCaseSubStatusId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
 </div>

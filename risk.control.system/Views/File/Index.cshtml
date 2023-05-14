@@ -39,7 +39,11 @@
                             <h4>Files on File System</h4>
                             @if (Model.FilesOnFileSystem.Count == 0)
                             {
-                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                                <hr />
+                                <div class="col-md-12 text-center">
+                                    <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                                </div>
+                                <hr />
                             }
                             else
                             {
@@ -78,7 +82,11 @@
                             <h4>Files on Database</h4>
                             @if (Model.FilesOnDatabase.Count == 0)
                             {
-                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                                <hr />
+                                <div class="col-md-12 text-center">
+                                    <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                                </div>
+                                <hr />
                             }
                             else
                             {

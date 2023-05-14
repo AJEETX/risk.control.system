@@ -2,214 +2,280 @@
 
 @{
     ViewData["Title"] = "Index";
+    var hasClientCompany = @ViewBag.HasClientCompany ? "none" : "";
 }
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <form asp-action="index">
+                    <div class="card card-success card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_CASE</h3>
+                            <div class="card-tools">
+                                <div class="input-group input-group-sm">
+                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
+                                    <div class="input-group-append">
+                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-success card-outline">
+                    <div class="card-body p-0 contained-width">
+                        <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
+                            <div class="row">
+                                @if (Model.Count() == 0)
+                                {
+                                    <div class="form-group col-md-12 text-center">
+                                        <p>@Applicationsettings.NO_RECORDS_FOUND</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th><input type="checkbox" id="checkall" /></th>
+                                                <th style="display:@hasClientCompany">
+                                                    @Html.DisplayNameFor(model => model.ClientCompany)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.ContractNumber)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Description)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.ContractIssueDate)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CustomerName)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CustomerDateOfBirth)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.ContactNumber)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.ClaimType)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.DateOfIncident)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CauseOfLoss)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Gender)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.SumAssuredValue)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.PinCode)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.State)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Country)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.District)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CustomerIncome)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CustomerOccupation)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CustomerEducation)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.BeneficiaryName)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.BeneficiaryRelation)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.BeneficiaryContactNumber)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.BeneficiaryIncome)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CustomerType)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CostCentre)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CaseEnabler)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Comments)
+                                                </th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <input id="@item.ClaimsInvestigationCaseId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationCaseId" checked="@item.SelectedToAssign" />
+                                                    </td>
+                                                    <td style="display:@ViewBag.HasClientCompany">
+                                                        @Html.DisplayFor(modelItem => item.ClientCompany.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ContractNumber)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Description)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ContractIssueDate)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CustomerName)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CustomerDateOfBirth)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ContactNumber)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ClaimType)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.DateOfIncident)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CauseOfLoss)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Gender)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.SumAssuredValue)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.PinCode.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.State.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Country.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.District.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CustomerIncome)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CustomerOccupation)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CustomerEducation)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.BeneficiaryName)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.BeneficiaryContactNumber)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.BeneficiaryIncome)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CustomerType)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CostCentre.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CaseEnabler.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Comments)
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationCaseId">
+                                                            <i class="fa fa-search"></i> @Applicationsettings.DETAILS
+                                                        </a> &nbsp;
+                                                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClaimsInvestigationCaseId">
+                                                            <i class="fas fa-pen"></i> @Applicationsettings.EDIT
+                                                        </a> &nbsp;
+                                                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClaimsInvestigationCaseId">
+                                                            <i class="fas fa-trash"></i> @Applicationsettings.DELETE
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td>
 
-<h1>Index</h1>
+                                                </td>
+                                                <td colspan="10">
+                                                    <a asp-action="Index" class="btn btn-secondary">
+                                                        <i class="fa fa-window-close"></i>
+                                                        @Applicationsettings.CANCEL
+                                                    </a>
+                                                    <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
+                                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.BROADCAST
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ContractNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LineOfBusiness)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ContractIssueDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerDateOfBirth)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ContactNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ClaimType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateOfIncident)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CauseOfLoss)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Gender)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SumAssuredValue)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PinCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.State)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Country)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.District)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerIncome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerOccupation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerEducation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BeneficiaryName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BeneficiaryRelation)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BeneficiaryContactNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.BeneficiaryIncome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CostCentre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CaseEnabler)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Comments)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Created)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Updated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ContractNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LineOfBusiness.LineOfBusinessId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.InvestigationCaseStatusId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ContractIssueDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerDateOfBirth)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ContactNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ClaimType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateOfIncident)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CauseOfLoss)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gender)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SumAssuredValue)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PinCode.PinCodeId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.State.StateId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Country.CountryId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.District.DistrictId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerIncome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerOccupation)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerEducation)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BeneficiaryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BeneficiaryRelation.BeneficiaryRelationId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BeneficiaryContactNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BeneficiaryIncome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CostCentre.CostCentreId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CaseEnabler.CaseEnablerId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Comments)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Created)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Updated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ClaimsInvestigationCaseId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ClaimsInvestigationCaseId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ClaimsInvestigationCaseId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                                    </table>
+
+                                }
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

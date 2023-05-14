@@ -15,6 +15,7 @@ namespace risk.control.system.Models
         [Required]
         public string Code { get; set; } = default!;
         public List<InvestigationCaseSubStatus>? InvestigationCaseSubStatuses { get; set; } = default!;
+        public bool MasterData { get; set; } = false;
 
     }
 }

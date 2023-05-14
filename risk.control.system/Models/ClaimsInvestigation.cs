@@ -8,6 +8,15 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ClaimsInvestigationCaseId { get; set; } = Guid.NewGuid().ToString();
+
+        [Display(Name = "Company name")]
+        public string? ClientCompanyId { get; set; }
+        [Display(Name = "Company name")]
+        public ClientCompany? ClientCompany { get; set; }
+
+        [NotMapped]
+        public bool HasClientCompany { get; set; } = true;
+        public List<Vendor>? Vendors { get; set; }
         [Display(Name = "Contract number")]
         public string ContractNumber { get; set; } = default!;
         public string Description { get; set; } = default!;
@@ -15,11 +24,18 @@ namespace risk.control.system.Models
         public string? LineOfBusinessId { get; set; } = default!;
         [Display(Name = "Line of Business")]
         public LineOfBusiness? LineOfBusiness { get; set; } = default!;
-        public List<InvestigationServiceType>? InvestigationServiceTypes { get; set; } = default!;
+        [Display(Name = "Investigation type")]
+        public string? InvestigationServiceTypeId { get; set; } = default!;
+        [Display(Name = "Investigation type")]
+        public InvestigationServiceType? InvestigationServiceType { get; set; } = default!;
         [Display(Name = "Case status")]
         public string? InvestigationCaseStatusId { get; set; } = default!;
         [Display(Name = "Case status")]
         public InvestigationCaseStatus? InvestigationCaseStatus { get; set; } = default!;
+        [Display(Name = "Case sub status")]
+        public string? InvestigationCaseSubStatusId { get; set; } = default!;
+        [Display(Name = "Case sub status")]
+        public InvestigationCaseSubStatus? InvestigationCaseSubStatus { get; set; } = default!;
         [Display(Name = "Case issue date")]
         public DateTime? ContractIssueDate { get; set; }
         [Display(Name = "Customer name")]
@@ -38,6 +54,8 @@ namespace risk.control.system.Models
         public Gender Gender { get; set; }
         [Display(Name = "Sum assured value")]
         public int? SumAssuredValue { get; set; }
+        [Display(Name = "Address line")]
+        public string? Addressline { get; set; }
         [Display(Name = "PinCode name")]
         public string? PinCodeId { get; set; } = default!;
         [Display(Name = "PinCode name")]
@@ -66,21 +84,26 @@ namespace risk.control.system.Models
 
         [Display(Name = "Beneficiary relation")]
         public string? BeneficiaryRelationId { get; set; }
+        [Display(Name = "Beneficiary relation")]
         public BeneficiaryRelation? BeneficiaryRelation { get; set; }
         [Display(Name = "Beneficiary contact number")]
         public int? BeneficiaryContactNumber { get; set; }
+        [Display(Name = "Beneficiary income")]
         public int? BeneficiaryIncome { get; set; }
         [Display(Name = "Customer type")]
-        public CustomerType CustomerType { get; set; }
+        public CustomerType? CustomerType { get; set; }
         [Display(Name = "Cost centre")]
         public string? CostCentreId { get; set; }
+        [Display(Name = "Cost centre")]
         public CostCentre? CostCentre { get; set; }
-
         public string? CaseEnablerId { get; set; }
+        [Display(Name = "Case enabler")]
         public CaseEnabler? CaseEnabler { get; set; }
         public List<FileAttachment>? Attachments { get; set; }
-        public string Comments { get; set; }
-
+        public string? Comments { get; set; }
+        [NotMapped]
+        public bool SelectedToAssign { get; set; }
+        public string? CurrentUserId { get; set; }
     }
 
     public enum ClaimType

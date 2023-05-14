@@ -17,5 +17,6 @@ namespace risk.control.system.Models
         [Display(Name = "Case status")]
         public string? InvestigationCaseStatusId { get; set; }
         public InvestigationCaseStatus? InvestigationCaseStatus { get; set; }
+        public bool MasterData { get; set; } = false;
     }
 }

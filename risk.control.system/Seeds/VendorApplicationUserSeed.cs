@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Seeds
 {
     public static class VendorApplicationUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager,string vendorId)
+        public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, string vendorId)
         {
             //Seed Vendor Admin
             var vendorAdmin = new VendorApplicationUser()

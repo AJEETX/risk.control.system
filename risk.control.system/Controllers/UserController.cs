@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -51,7 +53,11 @@ namespace risk.control.system.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var applicationDbContext = userManager.Users.Include(u => u.Country).Include(u => u.State).Include(u => u.PinCode).AsQueryable();
+            var applicationDbContext = userManager.Users
+                .Include(u => u.Country)
+                .Include(u => u.State)
+                .Include(u => u.District)
+                .Include(u => u.PinCode).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchString))
             {

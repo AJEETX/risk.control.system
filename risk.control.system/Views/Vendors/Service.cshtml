@@ -41,7 +41,11 @@
                     <div class="card-body p-0">
                         @if (Model.VendorInvestigationServiceTypes.Count == 0)
                         {
-                            <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                            <hr />
+                            <div class="col-md-12 text-center">
+                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                            </div>
+                            <hr />
                         }
                         else
                         {

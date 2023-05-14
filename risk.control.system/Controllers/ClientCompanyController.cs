@@ -382,7 +382,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> AvailableVendors(string id, List<string> vendors)
         {
-            if (vendors is not null && vendors.Count() > 0)
+            if (vendors is not null && vendors.Count > 0)
             {
                 var company = await _context.ClientCompany.FindAsync(id);
                 if (company != null)

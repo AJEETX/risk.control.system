@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class InvestigationServiceType :BaseEntity
+    public class InvestigationServiceType : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,6 +17,6 @@ namespace risk.control.system.Models
         [Display(Name = "Line Of Business")]
         public string LineOfBusinessId { get; set; } = default!;
         public LineOfBusiness LineOfBusiness { get; set; } = default!;
-
+        public bool MasterData { get; set; } = false;
     }
 }

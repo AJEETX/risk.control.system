@@ -20,7 +20,6 @@ namespace risk.control.system.Seeds
                 Name = "TATA AIG INSURANCE",
                 Addressline = "100 GOOD STREET ",
                 Branch = "FOREST HILL CHASE",
-                City = "FOREST HILL",
                 Code = "TA001",
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
@@ -105,7 +104,7 @@ namespace risk.control.system.Seeds
             };
 
 
-            await context.SaveChangesAsync();
+            //await context.SaveChangesAsync(null, false);
             return (abcVendorCompany.Entity.VendorId, xyzVendorCompany.Entity.VendorId, tataAigCompany.Entity.ClientCompanyId);
         }
     }
