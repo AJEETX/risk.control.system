@@ -146,7 +146,7 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE @roleCode
+                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-light">@roleCode</span>
                         </p>
                     </a>
                 </li>

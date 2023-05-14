@@ -46,12 +46,12 @@ namespace risk.control.system.Controllers
             if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
             {
                 var status = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("CREATED"));
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseStatusId == status.InvestigationCaseSubStatusId);
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == status.InvestigationCaseSubStatusId);
             }
             else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
             {
                 var status = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("ASSIGNED_TO_ASSIGNER"));
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseStatusId == status.InvestigationCaseSubStatusId);
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == status.InvestigationCaseSubStatusId);
             }
             else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
             {
@@ -65,7 +65,10 @@ namespace risk.control.system.Controllers
             {
                 ViewBag.HasClientCompany = false;
             }
-
+            else
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
+            }
             return View(await applicationDbContext.ToListAsync());
         }
         [HttpPost]
@@ -92,8 +95,9 @@ namespace risk.control.system.Controllers
                 _context.UpdateRange(casesAssigned);
                 toastNotification.AddSuccessToastMessage("case(s) assigned successfully!");
                 await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            return Ok();
+            return Problem();
         }
         // GET: ClaimsInvestigation/Details/5
         public async Task<IActionResult> Details(string id)
