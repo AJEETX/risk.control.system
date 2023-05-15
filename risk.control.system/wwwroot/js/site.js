@@ -1,5 +1,13 @@
 ﻿$(document).ready(function () {
 
+
+    $('.textarea-editor').summernote({
+        height: 350, // set editor height
+        minHeight: null, // set minimum height of editor
+        maxHeight: null, // set maximum height of editor
+        focus: true // set focus to editable area after initializing summernote
+    });
+
     $('tbody tr').on('click', function () {
         let id = $(this).data('url');
         if (typeof id !== 'undefined') {
