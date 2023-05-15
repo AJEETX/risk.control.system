@@ -26,43 +26,47 @@ namespace risk.control.system.Controllers
         // GET: ContactMessage
         public async Task<IActionResult> Index()
         {
-            IQueryable<ContactMessage> applicationDbContext = _context.ContactUsMessage.Where(c => c.MessageStatus == MessageStatus.SENT || c.MessageStatus == MessageStatus.RECEIVED)
-                .Include(c => c.ApplicationUser).OrderByDescending(o => o.SendDate);
-            var currentUserEmail = HttpContext.User.Identity.Name;
-            var currentUser = _context.ApplicationUser.FirstOrDefault(u => u.isSuperAdmin);
-            if (currentUser != null)
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
             {
-                return View(await applicationDbContext.ToListAsync());
+                return NotFound();
             }
-            applicationDbContext = applicationDbContext.Where(u => u.ReceipientEmail == currentUserEmail);
-            return View(await applicationDbContext.ToListAsync());
+            var inboxMessages = _context.ContactUsMessage.Where(c =>
+            c.ReceipientEmail == applicationUser.Email);
+
+            return View(inboxMessages.ToList());
+
         }
         public async Task<IActionResult> Trash()
         {
-            IQueryable<ContactMessage> applicationDbContext = _context.ContactUsMessage.Where(c => c.MessageStatus == MessageStatus.DELETED)
-                .Include(c => c.ApplicationUser).OrderByDescending(o => o.SendDate);
-            var currentUserEmail = HttpContext.User.Identity.Name;
-            var currentUser = _context.ApplicationUser.FirstOrDefault(u => u.isSuperAdmin);
-            if (currentUser != null)
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
             {
-                return View(await applicationDbContext.ToListAsync());
+                return NotFound();
             }
-            applicationDbContext = applicationDbContext.Where(u => u.ReceipientEmail == currentUserEmail);
-            return View(await applicationDbContext.ToListAsync());
+            var trash = _context.ContactUsMessage.Where(c =>
+            c.ReceipientEmail == applicationUser.Email && c.MessageStatus == MessageStatus.DELETED);
+
+            return View(trash.ToList());
         }
 
         public async Task<IActionResult> Sent()
         {
-            IQueryable<ContactMessage> applicationDbContext = _context.ContactUsMessage.Where(c => c.SendDate != null && c.MessageStatus == MessageStatus.SENT)
-                .Include(c => c.ApplicationUser).OrderByDescending(o => o.SendDate);
-            var currentUserEmail = HttpContext.User.Identity.Name;
-            var adminUser = _context.ApplicationUser.FirstOrDefault(u => u.isSuperAdmin && currentUserEmail == u.Email);
-            if (adminUser != null)
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
             {
-                return View(await applicationDbContext.ToListAsync());
+                return NotFound();
             }
-            applicationDbContext = applicationDbContext.Where(u => u.SenderEmail == currentUserEmail);
-            return View(await applicationDbContext.ToListAsync());
+            var inboxMessages = _context.ContactUsMessage.Where(c =>
+            c.SenderEmail == applicationUser.Email);
+
+            return View(inboxMessages.ToList());
         }
 
         // GET: ContactMessage/Details/5
@@ -73,9 +77,15 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var contactMessage = await _context.ContactUsMessage
-                .Include(c => c.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.ContactMessageId == id);
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+            var contactMessage = _context.ContactUsMessage.FirstOrDefault(c => c.ContactMessageId == id);
+
             if (contactMessage == null)
             {
                 return NotFound();
@@ -83,9 +93,14 @@ namespace risk.control.system.Controllers
 
             if (contactMessage.Read == false)
             {
+                applicationUser.ContactMessages.Remove(contactMessage);
+
                 contactMessage.Read = true;
                 contactMessage.MessageStatus = MessageStatus.RECEIVED;
                 contactMessage.ReceiveDate = DateTime.Now;
+
+                applicationUser.ContactMessages.Add(contactMessage);
+                _context.ApplicationUser.Update(applicationUser);
                 _context.ContactUsMessage.Update(contactMessage);
                 await _context.SaveChangesAsync();
             }
@@ -95,16 +110,17 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> DraftIndex()
         {
-            IQueryable<ContactMessage> applicationDbContext = _context.ContactUsMessage.Where(c => c.MessageStatus == MessageStatus.DRAFTED)
-                .Include(c => c.ApplicationUser).OrderByDescending(o => o.SendDate);
             var userEmail = HttpContext.User.Identity.Name;
-            var currentUser = _context.ApplicationUser.FirstOrDefault(u => u.isSuperAdmin);
-            if (currentUser != null)
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
             {
-                return View(await applicationDbContext.ToListAsync());
+                return NotFound();
             }
-            applicationDbContext = applicationDbContext.Where(u => u.SenderEmail == userEmail);
-            return View(await applicationDbContext.ToListAsync());
+            var inboxMessages = _context.ContactUsMessage.Where(c =>
+             c.ReceipientEmail == applicationUser.Email && c.MessageStatus == MessageStatus.DRAFTED);
+
+            return View(inboxMessages.ToList());
         }
 
         // GET: ContactMessage/Edit/5
@@ -115,58 +131,68 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var contactMessage = await _context.ContactUsMessage
-                .Include(c => c.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.ContactMessageId == id);
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+            var contactMessage = applicationUser.ContactMessages.FirstOrDefault(c => c.ContactMessageId == id);
 
             if (contactMessage == null)
             {
                 return NotFound();
             }
+
             ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUser, "Id", "CountryId", contactMessage.ApplicationUserId);
             return View(contactMessage);
         }
         [HttpPost]
         public async Task<IActionResult> Draft(ContactMessage contactMessage)
         {
-            var existingContactMessage = await _context.ContactUsMessage
-                .Include(c => c.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.ContactMessageId == contactMessage.ContactMessageId);
             var userEmail = HttpContext.User.Identity.Name;
-            var userData = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (userData != null)
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
             {
                 return NotFound();
             }
+
+            var existingContactMessage = _context.ContactUsMessage.FirstOrDefault(c => c.ContactMessageId == contactMessage.ContactMessageId);
+
             if (existingContactMessage is null)
             {
-                contactMessage.ApplicationUser = userData;
                 contactMessage.SenderEmail = userEmail;
                 contactMessage.SendDate = DateTime.Now;
                 contactMessage.Priority = 0;
                 contactMessage.Read = false;
-                contactMessage.MessageStatus = MessageStatus.DRAFTED;
-                contactMessage.IsDraft = true;
+                contactMessage.IsDraft = false;
+                contactMessage.MessageStatus = MessageStatus.SENT;
+                contactMessage.ApplicationUserId = applicationUser.Id;
+                applicationUser.ContactMessages.Add(contactMessage);
                 _context.ContactUsMessage.Add(contactMessage);
-                await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("mail drafted successfully!");
-                return RedirectToAction(nameof(Index));
             }
             else
             {
+                applicationUser.ContactMessages.Remove(existingContactMessage);
+
                 existingContactMessage.Subject = contactMessage.Subject;
                 existingContactMessage.Message = contactMessage.Message;
                 existingContactMessage.SenderEmail = userEmail;
                 existingContactMessage.SendDate = DateTime.Now;
                 existingContactMessage.Priority = 0;
                 existingContactMessage.Read = false;
-                contactMessage.MessageStatus = MessageStatus.DRAFTED;
-                existingContactMessage.IsDraft = true;
+                contactMessage.MessageStatus = MessageStatus.SENT;
+                contactMessage.ApplicationUserId = applicationUser.Id;
+                existingContactMessage.IsDraft = false;
+                applicationUser.ContactMessages.Add(existingContactMessage);
                 _context.ContactUsMessage.Update(existingContactMessage);
-                await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("mail drafted successfully!");
-                return RedirectToAction(nameof(Index));
             }
+            _context.ApplicationUser.Update(applicationUser);
+            var rows = await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("mail drafted successfully!");
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: ContactMessage/Create
@@ -182,16 +208,16 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ContactMessage contactMessage)
         {
-            var existingContactMessage = await _context.ContactUsMessage
-                .Include(c => c.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.ContactMessageId == contactMessage.ContactMessageId);
             var userEmail = HttpContext.User.Identity.Name;
 
-            var userData = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (userData == null)
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
             {
                 return NotFound();
             }
+
+            var existingContactMessage = _context.ContactUsMessage.FirstOrDefault(c => c.ContactMessageId == contactMessage.ContactMessageId);
+
             if (existingContactMessage is null)
             {
                 contactMessage.SenderEmail = userEmail;
@@ -200,14 +226,14 @@ namespace risk.control.system.Controllers
                 contactMessage.Read = false;
                 contactMessage.IsDraft = false;
                 contactMessage.MessageStatus = MessageStatus.SENT;
-                contactMessage.ApplicationUser = userData;
+                contactMessage.ApplicationUserId = applicationUser.Id;
+                applicationUser.ContactMessages.Add(contactMessage);
                 _context.ContactUsMessage.Add(contactMessage);
-                await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("mail sent successfully!");
-                return RedirectToAction(nameof(Index));
             }
             else
             {
+                applicationUser.ContactMessages.Remove(existingContactMessage);
+
                 existingContactMessage.Subject = contactMessage.Subject;
                 existingContactMessage.Message = contactMessage.Message;
                 existingContactMessage.SenderEmail = userEmail;
@@ -215,13 +241,15 @@ namespace risk.control.system.Controllers
                 existingContactMessage.Priority = 0;
                 existingContactMessage.Read = false;
                 contactMessage.MessageStatus = MessageStatus.SENT;
-                contactMessage.ApplicationUser = userData;
+                contactMessage.ApplicationUserId = applicationUser.Id;
                 existingContactMessage.IsDraft = false;
+                applicationUser.ContactMessages.Add(existingContactMessage);
                 _context.ContactUsMessage.Update(existingContactMessage);
-                await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("mail sent successfully!");
-                return RedirectToAction(nameof(Index));
             }
+            _context.ApplicationUser.Update(applicationUser);
+            await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("mail sent successfully!");
+            return RedirectToAction(nameof(Index));
         }
 
 
@@ -269,9 +297,15 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var contactMessage = await _context.ContactUsMessage
-                .Include(c => c.ApplicationUser)
-                .FirstOrDefaultAsync(m => m.ContactMessageId == id);
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+            var contactMessage = applicationUser.ContactMessages.FirstOrDefault(c => c.ContactMessageId == id);
+
             if (contactMessage == null)
             {
                 return NotFound();
@@ -290,8 +324,15 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
             var contactMessages = _context.ContactUsMessage
-                .Include(c => c.ApplicationUser)
                 .Where(m => messages.Contains(m.ContactMessageId));
 
             if (contactMessages == null)
@@ -302,6 +343,7 @@ namespace risk.control.system.Controllers
             {
                 contact.MessageStatus = MessageStatus.DELETED;
             }
+            _context.ApplicationUser.Update(applicationUser);
             _context.ContactUsMessage.UpdateRange(contactMessages);
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("mail(s) deleted successfully!");
