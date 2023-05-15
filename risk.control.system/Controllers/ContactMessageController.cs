@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             var inboxMessages = _context.ContactUsMessage.Where(c =>
-            c.ReceipientEmail == applicationUser.Email);
+            c.ReceipientEmail == applicationUser.Email && c.MessageStatus == MessageStatus.SENT && c.MessageStatus != MessageStatus.DELETED && c.MessageStatus != MessageStatus.TRASHDELETED);
 
             return View(inboxMessages.ToList());
 
@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             var trash = _context.ContactUsMessage.Where(c =>
-            c.ApplicationUser.Email == applicationUser.Email && c.MessageStatus == MessageStatus.DELETED);
+            c.ApplicationUser.Email == applicationUser.Email && c.MessageStatus == MessageStatus.DELETED && c.MessageStatus != MessageStatus.TRASHDELETED);
 
             return View(trash.ToList());
         }
@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             var inboxMessages = _context.ContactUsMessage.Where(c =>
-            c.SenderEmail == applicationUser.Email);
+            c.SenderEmail == applicationUser.Email && c.MessageStatus != MessageStatus.DRAFTED && c.MessageStatus != MessageStatus.DELETED && c.MessageStatus != MessageStatus.TRASHDELETED);
 
             return View(inboxMessages.ToList());
         }
@@ -96,7 +96,6 @@ namespace risk.control.system.Controllers
                 applicationUser.ContactMessages.Remove(contactMessage);
 
                 contactMessage.Read = true;
-                contactMessage.MessageStatus = MessageStatus.RECEIVED;
                 contactMessage.ReceiveDate = DateTime.Now;
 
                 applicationUser.ContactMessages.Add(contactMessage);
@@ -347,6 +346,40 @@ namespace risk.control.system.Controllers
             _context.ContactUsMessage.UpdateRange(contactMessages);
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("mail(s) deleted successfully!");
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> TrashDelete(List<string> messages)
+        {
+            if (_context.ContactUsMessage == null)
+            {
+                return NotFound();
+            }
+
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
+            var contactMessages = _context.ContactUsMessage
+                .Where(m => messages.Contains(m.ContactMessageId));
+
+            if (contactMessages == null)
+            {
+                return NotFound();
+            }
+            foreach (var contact in contactMessages)
+            {
+                contact.MessageStatus = MessageStatus.TRASHDELETED;
+            }
+            _context.ApplicationUser.Update(applicationUser);
+            _context.ContactUsMessage.UpdateRange(contactMessages);
+            await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("mail(s) deleted permanently successfully!");
 
             return RedirectToAction(nameof(Index));
         }
