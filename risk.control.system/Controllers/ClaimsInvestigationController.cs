@@ -82,6 +82,47 @@ namespace risk.control.system.Controllers
             }
             return View(await applicationDbContext.ToListAsync());
         }
+
+        public async Task<IActionResult> Open()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State);
+
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()) || userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            {
+                var status = _context.InvestigationCaseStatus.FirstOrDefault(i => !i.Name.Contains("FINISHED"));
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseStatusId == status.InvestigationCaseStatusId);
+            }
+            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            {
+                return View(new List<ClaimsInvestigation> { });
+            }
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            ViewBag.HasClientCompany = true;
+            if (clientCompany == null)
+            {
+                ViewBag.HasClientCompany = false;
+            }
+            else
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
+            }
+            return View(await applicationDbContext.ToListAsync());
+        }
         [HttpPost]
         public async Task<IActionResult> Assign(List<string> claims)
         {
@@ -126,11 +167,11 @@ namespace risk.control.system.Controllers
                 mailboxService.InsertMessage(new ContactMessage
                 {
                     ApplicationUserId = clientCompanyUser.Id,
-                    Email = "",
+                    ReceipientEmail = "",
                     Created = DateTime.UtcNow,
                     Message = JsonSerializer.Serialize(casesAssigned),
-                    Title = "New case created: case Id(s) = " + casesAssigned.Select(c => c.ClaimsInvestigationCaseId),
-                    Name = clientCompanyUser.FirstName + clientCompanyUser.LastName,
+                    Subject = "New case created: case Id(s) = " + casesAssigned.Select(c => c.ClaimsInvestigationCaseId),
+                    SenderEmail = clientCompanyUser.FirstName + clientCompanyUser.LastName,
                     Priority = ContactMessagePriority.HIGH,
                     SendDate = DateTime.UtcNow,
                     Updated = DateTime.UtcNow,
@@ -210,11 +251,11 @@ namespace risk.control.system.Controllers
             mailboxService.InsertMessage(new ContactMessage
             {
                 ApplicationUserId = clientCompanyUser != null ? clientCompanyUser.Id : _context.ApplicationUser.First(u => u.isSuperAdmin).Id,
-                Email = userEmailToSend,
+                ReceipientEmail = userEmailToSend,
                 Created = DateTime.UtcNow,
                 Message = "start",
-                Title = "New case created: case Id = " + userEmailToSend,
-                Name = clientCompanyUser != null ? clientCompanyUser.FirstName : _context.ApplicationUser.First(u => u.isSuperAdmin).FirstName,
+                Subject = "New case created: case Id = " + userEmailToSend,
+                SenderEmail = clientCompanyUser != null ? clientCompanyUser.FirstName : _context.ApplicationUser.First(u => u.isSuperAdmin).FirstName,
                 Priority = ContactMessagePriority.NORMAL,
                 SendDate = DateTime.UtcNow,
                 Updated = DateTime.UtcNow,
@@ -289,11 +330,11 @@ namespace risk.control.system.Controllers
                 mailboxService.InsertMessage(new ContactMessage
                 {
                     ApplicationUserId = clientCompanyUser.Id,
-                    Email = userEmailToSend,
+                    ReceipientEmail = userEmailToSend,
                     Created = DateTime.UtcNow,
                     Message = JsonSerializer.Serialize(claimsInvestigation),
-                    Title = "New case created: case Id = " + claimsInvestigation.ClaimsInvestigationCaseId,
-                    Name = clientCompanyUser.FirstName + clientCompanyUser.LastName,
+                    Subject = "New case created: case Id = " + claimsInvestigation.ClaimsInvestigationCaseId,
+                    SenderEmail = clientCompanyUser.FirstName + clientCompanyUser.LastName,
                     Priority = ContactMessagePriority.NORMAL,
                     SendDate = DateTime.UtcNow,
                     Updated = DateTime.UtcNow,

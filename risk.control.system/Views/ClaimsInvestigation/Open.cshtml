@@ -11,7 +11,7 @@
                 <form asp-action="index">
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_NEW</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_OPEN</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
@@ -51,7 +51,6 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th><input type="checkbox" id="checkall" /></th>
                                                 <th style="display:@hasClientCompany">
                                                     @Html.DisplayNameFor(model => model.ClientCompany)
                                                 </th>
@@ -146,9 +145,6 @@
                                             @foreach (var item in Model)
                                             {
                                                 <tr>
-                                                    <td>
-                                                        <input id="@item.ClaimsInvestigationCaseId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationCaseId" checked="@item.SelectedToAssign" />
-                                                    </td>
                                                     <td style="display:@ViewBag.HasClientCompany">
                                                         @Html.DisplayFor(modelItem => item.ClientCompany.Name)
                                                     </td>

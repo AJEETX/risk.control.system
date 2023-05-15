@@ -195,3 +195,12 @@ sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
 .message-read {
     background-color: #f9f9f9;
 }
+textarea {
+    display: block;
+    width: 100%;
+    overflow-y: auto;
+    resize: both;
+    min-height: 300px;
+    line-height: 20px;
+    border:none;
+}

@@ -12,7 +12,7 @@
                     <form id="checkboxes" asp-controller="ContactMessage" asp-action="Delete" method="post" id="listForm">
 
                         <div class="card-header">
-                            <h3 class="card-title">Inbox</h3>
+                            <h3 class="card-title">Draft</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" placeholder="Search Mail">
@@ -56,7 +56,7 @@
                                                         <input id="@message.ContactMessageId" class="vendors" name="messages" type="checkbox" value="@message.ContactMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Details" asp-route-id="@message.ContactMessageId"><i class="fas fa-star text-warning"></i></a>
+                                                        <a asp-action="Draft" asp-route-id="@message.ContactMessageId"><i class="fas fa-star text-warning"></i></a>
                                                     </td>
                                                     <td>@message.ReceipientEmail</td>
                                                     <td class="message-title text-muted">
@@ -64,7 +64,7 @@
                                                     </td>
                                                     <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.ContactMessageId"><i class="fas fa-paperclip"></i></a></td>
 
-                                                    <td class="mailbox-date">@sentDateTime</td>
+                                                    <td class="mailbox-date">Drafted</td>
                                                 </tr>
                                             }
                                         }
@@ -100,7 +100,7 @@
                                     <i class="fas fa-sync-alt"></i>
                                 </button>
                                 <div class="float-right">
-                                    1-50/@Model.Count()
+                                    1-50/200
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-sm">
                                             <i class="fas fa-chevron-left"></i>

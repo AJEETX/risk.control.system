@@ -118,10 +118,26 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Draft")">
-                        <i class="fas fa-book-reader nav-icon"></i>
+                    <a is-active-page asp-controller="ContactMessage" asp-action="DraftIndex" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","DraftIndex")">
+                        <i class="fas fa-file-upload nav-icon"></i>
                         <p>
                             @Applicationsettings.DRAFT_MAIL
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Sent" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Sent")">
+                        <i class="fas fa-paper-plane nav-icon"></i>
+                        <p>
+                            @Applicationsettings.SENT_MAIL
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Trash" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Trash")">
+                        <i class="fas fa-trash-alt nav-icon"></i>
+                        <p>
+                            @Applicationsettings.TRASH_MAIL
                         </p>
                     </a>
                 </li>
@@ -146,7 +162,15 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-light">@roleCode</span>
+                            @Applicationsettings.INVESTIGATION_CLAIMS_NEW <span class="badge badge-light">@roleCode</span>
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","")">
+                        <i class="fas fa-rupee-sign nav-icon"></i>
+                        <p>
+                            @Applicationsettings.INVESTIGATION_CLAIMS_OPEN <span class="badge badge-light">@roleCode</span>
                         </p>
                     </a>
                 </li>

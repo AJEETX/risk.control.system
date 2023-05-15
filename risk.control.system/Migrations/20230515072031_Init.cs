@@ -6,27 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class AddcurrentUser : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "AspNetRoles",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Code = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "AuditLogs",
                 columns: table => new
@@ -197,27 +181,6 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_LineOfBusiness", x => x.LineOfBusinessId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetRoleClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RoleId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -741,6 +704,28 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoles_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -782,30 +767,6 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserRoles",
-                columns: table => new
-                {
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    RoleId = table.Column<long>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
@@ -830,15 +791,19 @@ namespace risk.control.system.Migrations
                 columns: table => new
                 {
                     ContactMessageId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Title = table.Column<string>(type: "TEXT", nullable: false),
+                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: false),
                     Message = table.Column<string>(type: "TEXT", nullable: false),
                     Read = table.Column<bool>(type: "INTEGER", nullable: false),
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
                     SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: true),
+                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -877,6 +842,51 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    RoleId = table.Column<long>(type: "INTEGER", nullable: false),
+                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    RoleId = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FileAttachment",
                 columns: table => new
                 {
@@ -905,6 +915,11 @@ namespace risk.control.system.Migrations
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoles_ApplicationUserId",
+                table: "AspNetRoles",
+                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",

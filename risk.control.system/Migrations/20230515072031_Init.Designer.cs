@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230514143003_AddUserRole")]
-    partial class AddUserRole
+    [Migration("20230515072031_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -628,17 +628,18 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<bool?>("DeleteTrashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("IsDraft")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("MessageStatus")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
@@ -646,15 +647,26 @@ namespace risk.control.system.Migrations
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ReceipientEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("ReceiveDate")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("SendDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("SenderEmail")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Trashed")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");

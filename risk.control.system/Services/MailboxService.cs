@@ -143,7 +143,7 @@ namespace risk.control.system.Services
 
         public IList<ContactMessage> GetAllMessages(string email)
         {
-            return _contactUsRepository.FindManyByExpression(users => users.Email == email).OrderByDescending(x => x.SendDate).ToList();
+            return _contactUsRepository.FindManyByExpression(users => users.ReceipientEmail == email).OrderByDescending(x => x.SendDate).ToList();
         }
 
         #endregion
