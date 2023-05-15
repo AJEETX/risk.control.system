@@ -86,13 +86,6 @@
 
                     <div class="card-footer">
                         <div class="float-right">
-                            <form asp-area="Admin" asp-controller="ContactUsMessage" asp-action="Send" id="reply-form">
-                                <input type="hidden" name="To" value="@Model.Email" />
-                                <input type="hidden" name="Subject" value="@Model.Title" />
-                                <div class="reply-content">
-                                    <div class="text-muted">click <span id="show-reply" class="clickable-text">here</span> to reply</div>
-                                </div>
-                            </form>
                             <button type="button" class="btn btn-default"><i class="fas fa-reply"></i> Reply</button>
                             <button type="button" class="btn btn-default"><i class="fas fa-share"></i> Forward</button>
                         </div>
