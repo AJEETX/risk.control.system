@@ -8,6 +8,7 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Permission;
 using risk.control.system.Seeds;
+using risk.control.system.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //}
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IMailboxService, MailboxService>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;

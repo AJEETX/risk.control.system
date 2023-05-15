@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System.Data;
+using System.Security.Claims;
+using System.Text.Json;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +11,28 @@ using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
     public class ClaimsInvestigationController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly UserManager<ClientCompanyApplicationUser> userManager;
+        private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly IMailboxService mailboxService;
         private readonly IToastNotification toastNotification;
 
-        public ClaimsInvestigationController(ApplicationDbContext context, UserManager<VendorApplicationUser> userManager, IToastNotification toastNotification)
+        public ClaimsInvestigationController(ApplicationDbContext context,
+            UserManager<ClientCompanyApplicationUser> userManager,
+            RoleManager<ApplicationRole> roleManager,
+            IMailboxService mailboxService,
+            IToastNotification toastNotification)
         {
             _context = context;
             this.userManager = userManager;
+            this.roleManager = roleManager;
+            this.mailboxService = mailboxService;
             this.toastNotification = toastNotification;
         }
 
@@ -95,6 +106,38 @@ namespace risk.control.system.Controllers
                 _context.UpdateRange(casesAssigned);
                 toastNotification.AddSuccessToastMessage("case(s) assigned successfully!");
                 await _context.SaveChangesAsync();
+                var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAssigner.ToString()));
+
+                var assignerClaims = await roleManager.GetClaimsAsync(assignerRole);
+
+                var allcompany = await userManager.GetUsersForClaimAsync(assignerClaims.FirstOrDefault());
+
+
+                var assignerUsers = _context.ApplicationRole.FirstOrDefault(r => r.Name == assignerClaims.FirstOrDefault().Value);
+
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+
+
+                //var companyAssigners = _context.ClientCompanyApplicationUser.Where(u => u.)
+                mailboxService.InsertMessage(new ContactMessage
+                {
+                    ApplicationUserId = clientCompanyUser.Id,
+                    Email = "",
+                    Created = DateTime.UtcNow,
+                    Message = JsonSerializer.Serialize(casesAssigned),
+                    Title = "New case created: case Id(s) = " + casesAssigned.Select(c => c.ClaimsInvestigationCaseId),
+                    Name = clientCompanyUser.FirstName + clientCompanyUser.LastName,
+                    Priority = ContactMessagePriority.HIGH,
+                    SendDate = DateTime.UtcNow,
+                    Updated = DateTime.UtcNow,
+                    Read = false,
+                    UpdatedBy = userEmail.Value
+                });
+
                 return RedirectToAction(nameof(Index));
             }
             return Problem();
@@ -129,21 +172,59 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var userEmailToSend = string.Empty;
             var model = new ClaimsInvestigation { LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId };
 
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            if (clientCompany == null)
+            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (clientCompanyUser == null)
             {
                 model.HasClientCompany = false;
+                userEmailToSend = _context.ApplicationUser.FirstOrDefault(u => u.isSuperAdmin).Email;
             }
             else
             {
-                model.ClientCompanyId = clientCompany.ClientCompanyId;
+                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAssigner.ToString()));
+
+                var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+
+                foreach (var assignedUser in assignerUsers)
+                {
+                    var isTrue = await userManager.IsInRoleAsync(assignedUser, assignerRole.Name);
+                    if (isTrue)
+                    {
+                        userEmailToSend = assignedUser.Email;
+                        break;
+                    }
+                }
+
+
+                model.ClientCompanyId = clientCompanyUser.ClientCompanyId;
             }
+
+
+            mailboxService.InsertMessage(new ContactMessage
+            {
+                ApplicationUserId = clientCompanyUser != null ? clientCompanyUser.Id : _context.ApplicationUser.First(u => u.isSuperAdmin).Id,
+                Email = userEmailToSend,
+                Created = DateTime.UtcNow,
+                Message = "start",
+                Title = "New case created: case Id = " + userEmailToSend,
+                Name = clientCompanyUser != null ? clientCompanyUser.FirstName : _context.ApplicationUser.First(u => u.isSuperAdmin).FirstName,
+                Priority = ContactMessagePriority.NORMAL,
+                SendDate = DateTime.UtcNow,
+                Updated = DateTime.UtcNow,
+                Read = false,
+                UpdatedBy = userEmail.Value
+            });
+
+
+
+            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == model.LineOfBusinessId), "InvestigationServiceTypeId", "Name", model.InvestigationServiceTypeId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
@@ -178,6 +259,47 @@ namespace risk.control.system.Controllers
                 _context.Add(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("case(s) created successfully!");
+
+                var userEmailToSend = string.Empty;
+
+                var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+                if (clientCompanyUser == null)
+                {
+                    userEmailToSend = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.isSuperAdmin).Email;
+                }
+                else
+                {
+                    var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAssigner.ToString()));
+
+                    var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+
+                    foreach (var assignedUser in assignerUsers)
+                    {
+                        var isTrue = await userManager.IsInRoleAsync(assignedUser, assignerRole.Name);
+                        if (isTrue)
+                        {
+                            userEmailToSend = assignedUser.Email;
+                            break;
+                        }
+                    }
+                }
+
+                mailboxService.InsertMessage(new ContactMessage
+                {
+                    ApplicationUserId = clientCompanyUser.Id,
+                    Email = userEmailToSend,
+                    Created = DateTime.UtcNow,
+                    Message = JsonSerializer.Serialize(claimsInvestigation),
+                    Title = "New case created: case Id = " + claimsInvestigation.ClaimsInvestigationCaseId,
+                    Name = clientCompanyUser.FirstName + clientCompanyUser.LastName,
+                    Priority = ContactMessagePriority.NORMAL,
+                    SendDate = DateTime.UtcNow,
+                    Updated = DateTime.UtcNow,
+                    Read = false,
+                    UpdatedBy = userEmail.Value
+                });
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);

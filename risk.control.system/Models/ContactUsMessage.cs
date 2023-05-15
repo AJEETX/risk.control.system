@@ -25,6 +25,8 @@ namespace risk.control.system.Models
         public long? ApplicationUserId { get; set; }
 
         public ApplicationUser ApplicationUser { get; set; }
+        [NotMapped]
+        public bool? SelectedForAction { get; set; }
 
     }
 

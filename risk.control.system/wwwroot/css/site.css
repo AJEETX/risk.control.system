@@ -185,3 +185,13 @@ sidebar-light-primary .nav-sidebar > .nav-item > .actual-link.nav-link {
 .sidebar-profile {
     border-radius:0px;
 }
+
+/*.message-table tbody tr{
+    cursor:pointer;
+}*/
+.message-unread{
+    font-weight:bold;
+}
+.message-read {
+    background-color: #f9f9f9;
+}

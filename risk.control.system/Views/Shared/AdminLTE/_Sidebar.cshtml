@@ -118,10 +118,10 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ContactMessage" asp-action="Details" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Details")">
+                    <a is-active-page class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Draft")">
                         <i class="fas fa-book-reader nav-icon"></i>
                         <p>
-                            @Applicationsettings.READ_MAIL
+                            @Applicationsettings.DRAFT_MAIL
                         </p>
                     </a>
                 </li>

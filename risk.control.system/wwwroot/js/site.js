@@ -1,5 +1,98 @@
 ﻿$(document).ready(function () {
 
+    $('tbody tr').on('click', function () {
+        let id = $(this).data('url');
+        if (typeof id !== 'undefined') {
+            window.location.href = id;
+        }
+    });
+
+    // delete messages
+    $('#delete-messages').on('click', function () {
+        let ids = [];
+        let form = $('#listForm');
+        let checkboxArray = document.getElementsByName('ids');
+
+        // check if checkbox is checked
+        for (let i = 0; i < checkboxArray.length; i++) {
+            if (checkboxArray[i].checked)
+                ids.push(checkboxArray[i].value);
+        }
+
+        // submit form
+        if (ids.length > 0) {
+            if (confirm("Are you sure you want to delete this item(s)?")) {
+                form.submit();
+            }
+        }
+    });
+    $('#reply-form').on('click', '#sendReply', function () {
+        let txtArea = $('#replyMessage');
+        let msgLength = txtArea.val().length;
+
+        if (msgLength === 0) {
+            if (confirm('Send this message without text in the body?')) {
+                $('#reply-form').submit();
+            } else {
+                return;
+            }
+        } else {
+            $('#reply-form').submit();
+        }
+    });
+
+    $('#reply-form').on('click', '#show-reply', function () {
+        let container = $(this).parent().parent();
+        container.empty();
+
+        let template = `
+                <div>
+                    <h5>Reply to: @Model.Email</h5>
+                    <textarea id="replyMessage" name="Reply" style="width: 100%;" rows="7"></textarea>
+                    <button type="button" id="sendReply" class ="btn btn-primary">Send</button>
+                    <button type="button" id="cancelReply" class ="btn btn-danger">Cancel</button>
+                </div>`;
+
+        container.append(template);
+    });
+
+    $('#reply-form').on('click', '#cancelReply', function () {
+        let container = $(this).parent().parent();
+        container.empty();
+        container.append('<div class="text-muted">click <span id="show-reply" class="clickable-text">here</span> to reply</div>');
+    });
+
+    $('#delete-message').on('click', function () {
+        $('#deleteForm').submit();
+    });
+
+
+    // check all or uncheck all
+    $('.checkall-toggle').on('click', function () {
+        var clicks = $(this).data('clicks');
+
+        if (clicks) {
+            $('input[type="checkbox"]').iCheck('uncheck');
+            $('.fa', this).removeClass('fa-check-square-o').addClass('fa-square-o');
+            $('.fa', this).text(' Check all');
+        } else {
+            $('input[type="checkbox"]').iCheck('check');
+            $('.fa', this).removeClass('fa-square-o').addClass('fa-check-square-o');
+            $('.fa', this).text(' Uncheck all');
+        }
+
+        $(this).data('clicks', !clicks);
+    });
+
+    //// iCheck
+    //$('input').iCheck({
+    //    checkboxClass: 'icheckbox_square-blue',
+    //    radioClass: 'iradio_square-blue',
+    //    increaseArea: '20%' // optional
+    //});
+
+
+
     /** add active class and stay opened when selected */
     var url = window.location;
     const allLinks = document.querySelectorAll('.nav-item a');
@@ -92,6 +185,21 @@ function loadPinCode(obj, showDefaultOption= true) {
     var value = obj.value;
     $.post("/User/GetPinCodesByDistrictId", { districtId: value }, function (data) {
         PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
+    });
+}
+
+function loadSubStatus(obj) {
+    var value = obj.value;
+    $.post("/InvestigationCaseSubStatus/GetSubstatusBystatusId", { InvestigationCaseStatusId: value }, function (data) {
+        PopulateSubStatus("#InvestigationCaseSubStatusId", data, "<option>--SELECT SUB STATUS--</option>");
+    });
+}
+
+function PopulateSubStatus(dropDownId, list, option) {
+    $(dropDownId).empty();
+    $(dropDownId).append(option)
+    $.each(list, function (index, row) {
+        $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.code + "</option>")
     });
 }
 

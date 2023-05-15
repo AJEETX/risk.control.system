@@ -23,10 +23,25 @@ namespace risk.control.system.Controllers
         // GET: InvestigationCaseSubStatus
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.InvestigationCaseSubStatus.Include(i => i.InvestigationCaseStatus);
+            var applicationDbContext = _context.InvestigationCaseSubStatus
+                .Include(i => i.InvestigationCaseStatus);
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [HttpPost, ActionName("GetSubstatusBystatusId")]
+        public async Task<JsonResult> GetSubstatusBystatusId(string InvestigationCaseStatusId)
+        {
+            string lId;
+            var subStatuses = new List<InvestigationCaseSubStatus>();
+            if (!string.IsNullOrEmpty(InvestigationCaseStatusId))
+            {
+                lId = InvestigationCaseStatusId;
+                subStatuses = await _context.InvestigationCaseSubStatus
+                    .Include(i => i.InvestigationCaseStatus).Where(s =>
+                    s.InvestigationCaseStatus.InvestigationCaseStatusId.Equals(lId)).ToListAsync();
+            }
+            return Json(subStatuses);
+        }
         // GET: InvestigationCaseSubStatus/Details/5
         public async Task<IActionResult> Details(string id)
         {

@@ -96,6 +96,7 @@
         public const string INBOX = "Inbox";
         public const string COMPOSE = "Compose";
         public const string READ_MAIL = "Read mail";
+        public const string DRAFT_MAIL = "Draft";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
         public const string USER_ROLES = "USERS/ROLES";
         public const string ADMIN_SETTINGS = "ADMIN SETTINGS";

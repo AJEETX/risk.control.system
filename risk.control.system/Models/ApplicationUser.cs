@@ -47,6 +47,8 @@ namespace risk.control.system.Models
         [Display(Name = "Mails")]
 
         public List<ContactMessage>? ContactMessages { get; set; }
+
+        public List<ApplicationRole> ApplicationRoles { get; set; } = new();
     }
     public class ApplicationRole : IdentityRole<long>
     {
@@ -57,5 +59,7 @@ namespace risk.control.system.Models
         }
         [StringLength(20)]
         public string Code { get; set; }
+        public long? ApplicationUserId { get; set; }
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

@@ -2,44 +2,81 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+using NToastNotify;
+
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
     public class ContactMessageController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMailboxService mailboxService;
+        private readonly IToastNotification toastNotification;
 
-        public ContactMessageController(ApplicationDbContext context)
+        public ContactMessageController(ApplicationDbContext context, IMailboxService mailboxService, IToastNotification toastNotification)
         {
             _context = context;
+            this.mailboxService = mailboxService;
+            this.toastNotification = toastNotification;
         }
 
         // GET: ContactMessage
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.ContactUsMessage.Include(c => c.ApplicationUser);
+            IQueryable<ContactMessage> applicationDbContext = _context.ContactUsMessage.Include(c => c.ApplicationUser).OrderByDescending(o => o.SendDate);
+            var user = HttpContext.User.Identity.Name;
+            if (user == Applicationsettings.PORTAL_ADMIN.EMAIL || user == Applicationsettings.CLIENT_ADMIN.EMAIL)
+            {
+                return View(await applicationDbContext.ToListAsync());
+            }
+            applicationDbContext = applicationDbContext.Where(u => u.ApplicationUser.Email == user);
             return View(await applicationDbContext.ToListAsync());
         }
 
+        //public IActionResult Details(string id)
+        //{
+        //    if (id != null)
+        //    {
+        //        var message = mailboxService.GetMessageById(id);
+        //        if (message != null)
+        //        {
+        //            if (message.Read == false)
+        //                mailboxService.MarkAsRead(id);
+
+        //            return View(message);
+        //        }
+        //    }
+
+        //    return RedirectToAction("List");
+        //}
         // GET: ContactMessage/Details/5
         public async Task<IActionResult> Details(string id)
         {
-            //if (id == null || _context.ContactUsMessage == null)
-            //{
-            //    return NotFound();
-            //}
+            if (id == null || _context.ContactUsMessage == null)
+            {
+                return NotFound();
+            }
 
-            //var contactMessage = await _context.ContactUsMessage
-            //    .Include(c => c.ApplicationUser)
-            //    .FirstOrDefaultAsync(m => m.ContactMessageId == id);
-            //if (contactMessage == null)
-            //{
-            //    return NotFound();
-            //}
+            var contactMessage = await _context.ContactUsMessage
+                .Include(c => c.ApplicationUser)
+                .FirstOrDefaultAsync(m => m.ContactMessageId == id);
+            if (contactMessage == null)
+            {
+                return NotFound();
+            }
 
-            return View(new ContactMessage { });
+            if (contactMessage.Read == false)
+            {
+                contactMessage.Read = true;
+                _context.ContactUsMessage.Update(contactMessage);
+                await _context.SaveChangesAsync();
+            }
+
+            return View(contactMessage);
         }
 
         // GET: ContactMessage/Create
@@ -47,6 +84,24 @@ namespace risk.control.system.Controllers
         {
             ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUser, "Id", "CountryId");
             return View();
+        }
+
+        public async Task<IActionResult> Draft(string id)
+        {
+            if (id == null || _context.ContactUsMessage == null)
+            {
+                return NotFound();
+            }
+
+            var contactMessage = await _context.ContactUsMessage
+                .Include(c => c.ApplicationUser)
+                .FirstOrDefaultAsync(m => m.ContactMessageId == id);
+            if (contactMessage == null)
+            {
+                return NotFound();
+            }
+
+            return View(contactMessage);
         }
 
         // POST: ContactMessage/Create
@@ -141,19 +196,26 @@ namespace risk.control.system.Controllers
         // POST: ContactMessage/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(List<string> messages)
         {
             if (_context.ContactUsMessage == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.ContactUsMessage'  is null.");
-            }
-            var contactMessage = await _context.ContactUsMessage.FindAsync(id);
-            if (contactMessage != null)
-            {
-                _context.ContactUsMessage.Remove(contactMessage);
+                return NotFound();
             }
 
+            var contactMessages = _context.ContactUsMessage
+                .Include(c => c.ApplicationUser)
+                .Where(m => messages.Contains(m.ContactMessageId));
+
+            if (contactMessages == null)
+            {
+                return NotFound();
+            }
+
+            _context.ContactUsMessage.RemoveRange(contactMessages);
             await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("mail(s) deleted successfully!");
+
             return RedirectToAction(nameof(Index));
         }
 
