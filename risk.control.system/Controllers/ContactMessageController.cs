@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             var trash = _context.ContactUsMessage.Where(c =>
-            c.ReceipientEmail == applicationUser.Email && c.MessageStatus == MessageStatus.DELETED);
+            c.ApplicationUser.Email == applicationUser.Email && c.MessageStatus == MessageStatus.DELETED);
 
             return View(trash.ToList());
         }
@@ -118,7 +118,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             var inboxMessages = _context.ContactUsMessage.Where(c =>
-             c.ReceipientEmail == applicationUser.Email && c.MessageStatus == MessageStatus.DRAFTED);
+             c.SenderEmail == applicationUser.Email && c.MessageStatus == MessageStatus.DRAFTED);
 
             return View(inboxMessages.ToList());
         }
@@ -138,7 +138,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var contactMessage = applicationUser.ContactMessages.FirstOrDefault(c => c.ContactMessageId == id);
+            var contactMessage = _context.ContactUsMessage.FirstOrDefault(c => c.ContactMessageId == id);
 
             if (contactMessage == null)
             {
@@ -168,7 +168,7 @@ namespace risk.control.system.Controllers
                 contactMessage.Priority = 0;
                 contactMessage.Read = false;
                 contactMessage.IsDraft = false;
-                contactMessage.MessageStatus = MessageStatus.SENT;
+                contactMessage.MessageStatus = MessageStatus.DRAFTED;
                 contactMessage.ApplicationUserId = applicationUser.Id;
                 applicationUser.ContactMessages.Add(contactMessage);
                 _context.ContactUsMessage.Add(contactMessage);
@@ -183,7 +183,7 @@ namespace risk.control.system.Controllers
                 existingContactMessage.SendDate = DateTime.Now;
                 existingContactMessage.Priority = 0;
                 existingContactMessage.Read = false;
-                contactMessage.MessageStatus = MessageStatus.SENT;
+                contactMessage.MessageStatus = MessageStatus.DRAFTED;
                 contactMessage.ApplicationUserId = applicationUser.Id;
                 existingContactMessage.IsDraft = false;
                 applicationUser.ContactMessages.Add(existingContactMessage);
