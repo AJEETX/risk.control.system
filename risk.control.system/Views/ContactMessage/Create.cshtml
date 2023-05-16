@@ -27,11 +27,11 @@
                                                 </textarea>
                             </div>
                             <div class="form-group">
-                                <div class="btn btn-default btn-file">
-                                    <i class="fas fa-paperclip"></i> Attachment
-                                    <input type="file" name="attachment" asp-for="Attachments">
+                                <div class="btn btn-default btn-file"><i class="fas fa-paperclip"></i> Attachment
+                                    <input type="file" name="attachment" asp-for="Attachments" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])">
                                 </div>
                                 <p class="help-block">Max. 10MB</p>
+
                             </div>
                         </div>
 

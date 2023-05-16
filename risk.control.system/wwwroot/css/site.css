@@ -119,6 +119,11 @@ table td {
     height: 150px;
     object-fit: cover
 }
+.attachment-list {
+    width: 250px;
+    height: 50px;
+    object-fit: cover
+}
 .btn-right-bottom {
     right:-75rem;
 }

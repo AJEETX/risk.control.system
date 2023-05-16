@@ -19,7 +19,7 @@ namespace risk.control.system.Models
         [Display(Name = "Received date")]
         public DateTime? ReceiveDate { get; set; }
         [Display(Name = "Attachments")]
-        public List<FileAttachment>? Attachments { get; set; }
+        public List<FileAttachment>? Attachments { get; set; } = new();
 
         [Display(Name = "User")]
         public long? ApplicationUserId { get; set; }

@@ -182,8 +182,8 @@ namespace risk.control.system.Controllers
                 existingContactMessage.SendDate = DateTime.Now;
                 existingContactMessage.Priority = 0;
                 existingContactMessage.Read = false;
-                contactMessage.MessageStatus = MessageStatus.DRAFTED;
-                contactMessage.ApplicationUserId = applicationUser.Id;
+                existingContactMessage.MessageStatus = MessageStatus.DRAFTED;
+                existingContactMessage.ApplicationUserId = applicationUser.Id;
                 existingContactMessage.IsDraft = false;
                 applicationUser.ContactMessages.Add(existingContactMessage);
                 _context.ContactUsMessage.Update(existingContactMessage);
@@ -239,8 +239,8 @@ namespace risk.control.system.Controllers
                 existingContactMessage.SendDate = DateTime.Now;
                 existingContactMessage.Priority = 0;
                 existingContactMessage.Read = false;
-                contactMessage.MessageStatus = MessageStatus.SENT;
-                contactMessage.ApplicationUserId = applicationUser.Id;
+                existingContactMessage.MessageStatus = MessageStatus.SENT;
+                existingContactMessage.ApplicationUserId = applicationUser.Id;
                 existingContactMessage.IsDraft = false;
                 applicationUser.ContactMessages.Add(existingContactMessage);
                 _context.ContactUsMessage.Update(existingContactMessage);
