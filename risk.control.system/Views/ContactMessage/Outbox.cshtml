@@ -12,7 +12,7 @@
                     <form id="checkboxes" asp-controller="ContactMessage" asp-action="Delete" method="post" id="listForm">
 
                         <div class="card-header">
-                            <h3 class="card-title">Outbox</h3>
+                            <h3 class="card-title">Failed</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" placeholder="Search Mail">
@@ -47,16 +47,23 @@
                                             {
                                                 var sentDateTime = message.SendDate.Value.ToString();
                                                 var time = DateTime.Now.Subtract(message.SendDate.Value).Minutes;
-                                                if(time< 60)
+                                                if (time < 60)
                                                 {
                                                     sentDateTime = time.ToString() + " minute(s)";
                                                 }
+                                                else if (time < 24)
+                                                {
+                                                    time = DateTime.Now.Subtract(message.SendDate.Value).Hours;
+                                                    sentDateTime = time.ToString() + " hour(s)";
+                                                }
+                                                var star = message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
+                                                star = message.Read && message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
                                                         <input id="@message.OutboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.OutboxMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Details" asp-route-id="@message.OutboxMessageId"><i class="fas fa-star text-warning"></i></a>
+                                                        <a asp-action="Details" asp-route-id="@message.OutboxMessageId"><i class="@star"></i></a>
                                                     </td>
                                                     <td>@message?.ReceipientEmail</td>
                                                     <td class="message-title text-muted">

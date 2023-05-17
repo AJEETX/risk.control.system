@@ -51,9 +51,9 @@
                                                 {
                                                     sentDateTime = time.ToString() + " minute(s)";
                                                 }
-                                                time = DateTime.Now.Subtract(message.SendDate.Value).Hours;
-                                                if (time < 24)
+                                                else if (time < 24)
                                                 {
+                                                    time = DateTime.Now.Subtract(message.SendDate.Value).Hours;
                                                     sentDateTime = time.ToString() + " hour(s)";
                                                 }
                                                 var star = message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
@@ -64,7 +64,7 @@
                                                         <input id="@message.InboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.InboxMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Details" asp-route-id="@message.InboxMessageId"><i class="fas fa-star text-light"></i></a>
+                                                        <a asp-action="Details" asp-route-id="@message.InboxMessageId"><i class="@star"></i></a>
                                                     </td>
                                                     <td>@message.SenderEmail</td>
                                                     <td class="message-title text-muted">

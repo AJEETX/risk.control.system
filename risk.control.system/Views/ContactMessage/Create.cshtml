@@ -23,11 +23,12 @@
                             </div>
                             <div class="form-group">
                                 <select asp-for="Priority" asp-items="Html.GetEnumSelectList<ContactMessagePriority>()">
-                                    <option selected="selected" value="">-- Please select mail priority -- </option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input class="form-control input-lg textarea-editor" asp-for="Message" style="resize:none;width:400px;" rows="20" />
+                                <textarea id="send-mail" class="form-control textarea-editor" asp-for="Message">
+
+                                </textarea>
                             </div>
                             <div class="form-group">
                                 <div class="btn btn-default btn-file">

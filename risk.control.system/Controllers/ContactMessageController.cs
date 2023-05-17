@@ -17,7 +17,11 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IToastNotification toastNotification;
-
+        JsonSerializerOptions options = new()
+        {
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            WriteIndented = true
+        };
         public ContactMessageController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
@@ -106,12 +110,7 @@ namespace risk.control.system.Controllers
             var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
 
             OutboxMessage outBoxessage = default!;
-            JsonSerializerOptions options = new()
-            {
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                WriteIndented = true
-            };
-
+   
             if (userMessage is not null && userMessage.Read == false)
             {
                 userMessage.Read = true;
@@ -209,11 +208,6 @@ namespace risk.control.system.Controllers
                 .Include(m => m.Draft)
                 .FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            JsonSerializerOptions options = new()
-            {
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                WriteIndented = true
-            };
             var userDraftMessage = userMailbox.Draft.FirstOrDefault(c => c.DraftMessageId == id);
 
             if (userDraftMessage is not null)
@@ -246,7 +240,7 @@ namespace risk.control.system.Controllers
                 contactMessage.Priority = 0;
                 contactMessage.Read = false;
                 contactMessage.MessageStatus = MessageStatus.DRAFTED;
-                var jsonMessage = JsonSerializer.Serialize(contactMessage);
+                var jsonMessage = JsonSerializer.Serialize(contactMessage,options);
                 DraftMessage draftMessage = JsonSerializer.Deserialize<DraftMessage>(jsonMessage);
                 userMailbox.Draft.Add(draftMessage);
                 _context.Mailbox.Attach(userMailbox);
@@ -261,7 +255,7 @@ namespace risk.control.system.Controllers
                 existingContactMessage.Priority = 0;
                 existingContactMessage.Read = false;
                 existingContactMessage.MessageStatus = MessageStatus.DRAFTED;
-                var jsonMessage = JsonSerializer.Serialize(contactMessage);
+                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
                 DraftMessage draftMessage = JsonSerializer.Deserialize<DraftMessage>(jsonMessage);
                 userMailbox.Draft.Add(draftMessage);
                 _context.Mailbox.Attach(userMailbox);
@@ -306,15 +300,15 @@ namespace risk.control.system.Controllers
                 contactMessage.Read = false;
                 contactMessage.IsDraft = false;
  
-                if(recepientMailbox is not null)
+                if(recepientMailbox is not null )
                 {
                     contactMessage.MessageStatus = MessageStatus.SENT;
                     var jsonMessage = JsonSerializer.Serialize(contactMessage);
-                    SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage);
+                    SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
                     userMailbox.Sent.Add(sentMessage);
                     _context.Mailbox.Attach(userMailbox);
                     _context.Mailbox.Update(userMailbox);
-                    InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage);
+                    InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
                     recepientMailbox.Inbox.Add(inboxMessage);
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
@@ -338,11 +332,11 @@ namespace risk.control.system.Controllers
                 {
                     contactMessage.MessageStatus = MessageStatus.SENT;
                     var jsonMessage = JsonSerializer.Serialize(contactMessage);
-                    SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage);
+                    SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
                     userMailbox.Sent.Add(sentMessage);
                     _context.Mailbox.Attach(userMailbox);
                     _context.Mailbox.Update(userMailbox);
-                    InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage);
+                    InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
                     recepientMailbox.Inbox.Add(inboxMessage);
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
