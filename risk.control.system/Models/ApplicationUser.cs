@@ -46,7 +46,7 @@ namespace risk.control.system.Models
         public string? Password { get; set; }
         [Display(Name = "Mails")]
 
-        public List<ContactMessage>? ContactMessages { get; set; } = new List<ContactMessage>();
+        public Mailbox? Mailbox { get; set; } = new();
 
         public List<ApplicationRole> ApplicationRoles { get; set; } = new();
     }

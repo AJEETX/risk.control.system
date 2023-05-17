@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ContactMessage>
+﻿@model IEnumerable<InboxMessage>
 @{
     ViewData["Title"] = ViewData["ContentHeader"] = "Contact us inbox";
 }
@@ -51,18 +51,26 @@
                                                 {
                                                     sentDateTime = time.ToString() + " minute(s)";
                                                 }
+                                                time = DateTime.Now.Subtract(message.SendDate.Value).Hours;
+                                                if (time < 24)
+                                                {
+                                                    sentDateTime = time.ToString() + " hour(s)";
+                                                }
+                                                var star = message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
+                                                star = message.Read && message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
+                                                
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
-                                                        <input id="@message.ContactMessageId" class="vendors" name="messages" type="checkbox" value="@message.ContactMessageId" checked="@message.SelectedForAction" />
+                                                        <input id="@message.InboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.InboxMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Details" asp-route-id="@message.ContactMessageId"><i class="fas fa-star text-warning"></i></a>
+                                                        <a asp-action="Details" asp-route-id="@message.InboxMessageId"><i class="fas fa-star text-light"></i></a>
                                                     </td>
                                                     <td>@message.SenderEmail</td>
                                                     <td class="message-title text-muted">
                                                         <span>@message.Subject</span> - @message.Message
                                                     </td>
-                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.ContactMessageId"><i class="fas fa-paperclip"></i></a></td>
+                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.InboxMessageId"><i class="fas fa-paperclip"></i></a></td>
 
                                                     <td class="mailbox-date">@sentDateTime</td>
                                                 </tr>

@@ -15,7 +15,7 @@ namespace risk.control.system.Migrations
                 name: "AuditLogs",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<string>(type: "TEXT", nullable: true),
                     Type = table.Column<string>(type: "TEXT", nullable: false),
@@ -35,7 +35,8 @@ namespace risk.control.system.Migrations
                 name: "BeneficiaryRelation",
                 columns: table => new
                 {
-                    BeneficiaryRelationId = table.Column<string>(type: "TEXT", nullable: false),
+                    BeneficiaryRelationId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -424,7 +425,7 @@ namespace risk.control.system.Migrations
                     DateOfIncident = table.Column<DateTime>(type: "TEXT", nullable: true),
                     CauseOfLoss = table.Column<string>(type: "TEXT", nullable: true),
                     Gender = table.Column<int>(type: "INTEGER", nullable: false),
-                    SumAssuredValue = table.Column<int>(type: "INTEGER", nullable: true),
+                    SumAssuredValue = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
                     Addressline = table.Column<string>(type: "TEXT", nullable: true),
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
@@ -434,9 +435,9 @@ namespace risk.control.system.Migrations
                     CustomerOccupation = table.Column<string>(type: "TEXT", nullable: true),
                     CustomerEducation = table.Column<string>(type: "TEXT", nullable: true),
                     BeneficiaryName = table.Column<string>(type: "TEXT", nullable: true),
-                    BeneficiaryRelationId = table.Column<string>(type: "TEXT", nullable: true),
-                    BeneficiaryContactNumber = table.Column<int>(type: "INTEGER", nullable: true),
-                    BeneficiaryIncome = table.Column<int>(type: "INTEGER", nullable: true),
+                    BeneficiaryRelationId = table.Column<long>(type: "INTEGER", nullable: true),
+                    BeneficiaryContactNumber = table.Column<long>(type: "INTEGER", nullable: true),
+                    BeneficiaryIncome = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
                     CustomerType = table.Column<int>(type: "INTEGER", nullable: true),
                     CostCentreId = table.Column<string>(type: "TEXT", nullable: true),
                     CaseEnablerId = table.Column<string>(type: "TEXT", nullable: true),
@@ -787,35 +788,26 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ContactUsMessage",
+                name: "Mailbox",
                 columns: table => new
                 {
-                    ContactMessageId = table.Column<string>(type: "TEXT", nullable: false),
-                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    Subject = table.Column<string>(type: "TEXT", nullable: false),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: true),
-                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ContactUsMessage", x => x.ContactMessageId);
+                    table.PrimaryKey("PK_Mailbox", x => x.MailboxId);
                     table.ForeignKey(
-                        name: "FK_ContactUsMessage_AspNetUsers_ApplicationUserId",
+                        name: "FK_Mailbox_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -887,6 +879,210 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DeletedMessage",
+                columns: table => new
+                {
+                    DeletedMessageId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeletedMessage", x => x.DeletedMessageId);
+                    table.ForeignKey(
+                        name: "FK_DeletedMessage_Mailbox_MailboxId",
+                        column: x => x.MailboxId,
+                        principalTable: "Mailbox",
+                        principalColumn: "MailboxId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DraftMessage",
+                columns: table => new
+                {
+                    DraftMessageId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DraftMessage", x => x.DraftMessageId);
+                    table.ForeignKey(
+                        name: "FK_DraftMessage_Mailbox_MailboxId",
+                        column: x => x.MailboxId,
+                        principalTable: "Mailbox",
+                        principalColumn: "MailboxId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InboxMessage",
+                columns: table => new
+                {
+                    InboxMessageId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InboxMessage", x => x.InboxMessageId);
+                    table.ForeignKey(
+                        name: "FK_InboxMessage_Mailbox_MailboxId",
+                        column: x => x.MailboxId,
+                        principalTable: "Mailbox",
+                        principalColumn: "MailboxId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OutboxMessage",
+                columns: table => new
+                {
+                    OutboxMessageId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutboxMessage", x => x.OutboxMessageId);
+                    table.ForeignKey(
+                        name: "FK_OutboxMessage_Mailbox_MailboxId",
+                        column: x => x.MailboxId,
+                        principalTable: "Mailbox",
+                        principalColumn: "MailboxId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SentMessage",
+                columns: table => new
+                {
+                    SentMessageId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SentMessage", x => x.SentMessageId);
+                    table.ForeignKey(
+                        name: "FK_SentMessage_Mailbox_MailboxId",
+                        column: x => x.MailboxId,
+                        principalTable: "Mailbox",
+                        principalColumn: "MailboxId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TrashMessage",
+                columns: table => new
+                {
+                    TrashMessageId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
+                    Subject = table.Column<string>(type: "TEXT", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", nullable: false),
+                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
+                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
+                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
+                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrashMessage", x => x.TrashMessageId);
+                    table.ForeignKey(
+                        name: "FK_TrashMessage_Mailbox_MailboxId",
+                        column: x => x.MailboxId,
+                        principalTable: "Mailbox",
+                        principalColumn: "MailboxId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FileAttachment",
                 columns: table => new
                 {
@@ -894,7 +1090,13 @@ namespace risk.control.system.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     AttachedDocument = table.Column<byte[]>(type: "BLOB", nullable: true),
                     ContactMessageId = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true)
+                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
+                    DeletedMessageId = table.Column<long>(type: "INTEGER", nullable: true),
+                    DraftMessageId = table.Column<long>(type: "INTEGER", nullable: true),
+                    InboxMessageId = table.Column<long>(type: "INTEGER", nullable: true),
+                    OutboxMessageId = table.Column<long>(type: "INTEGER", nullable: true),
+                    SentMessageId = table.Column<long>(type: "INTEGER", nullable: true),
+                    TrashMessageId = table.Column<long>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -905,10 +1107,35 @@ namespace risk.control.system.Migrations
                         principalTable: "ClaimsInvestigation",
                         principalColumn: "ClaimsInvestigationCaseId");
                     table.ForeignKey(
-                        name: "FK_FileAttachment_ContactUsMessage_ContactMessageId",
-                        column: x => x.ContactMessageId,
-                        principalTable: "ContactUsMessage",
-                        principalColumn: "ContactMessageId");
+                        name: "FK_FileAttachment_DeletedMessage_DeletedMessageId",
+                        column: x => x.DeletedMessageId,
+                        principalTable: "DeletedMessage",
+                        principalColumn: "DeletedMessageId");
+                    table.ForeignKey(
+                        name: "FK_FileAttachment_DraftMessage_DraftMessageId",
+                        column: x => x.DraftMessageId,
+                        principalTable: "DraftMessage",
+                        principalColumn: "DraftMessageId");
+                    table.ForeignKey(
+                        name: "FK_FileAttachment_InboxMessage_InboxMessageId",
+                        column: x => x.InboxMessageId,
+                        principalTable: "InboxMessage",
+                        principalColumn: "InboxMessageId");
+                    table.ForeignKey(
+                        name: "FK_FileAttachment_OutboxMessage_OutboxMessageId",
+                        column: x => x.OutboxMessageId,
+                        principalTable: "OutboxMessage",
+                        principalColumn: "OutboxMessageId");
+                    table.ForeignKey(
+                        name: "FK_FileAttachment_SentMessage_SentMessageId",
+                        column: x => x.SentMessageId,
+                        principalTable: "SentMessage",
+                        principalColumn: "SentMessageId");
+                    table.ForeignKey(
+                        name: "FK_FileAttachment_TrashMessage_TrashMessageId",
+                        column: x => x.TrashMessageId,
+                        principalTable: "TrashMessage",
+                        principalColumn: "TrashMessageId");
                 });
 
             migrationBuilder.CreateIndex(
@@ -1064,9 +1291,9 @@ namespace risk.control.system.Migrations
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ContactUsMessage_ApplicationUserId",
-                table: "ContactUsMessage",
-                column: "ApplicationUserId");
+                name: "IX_DeletedMessage_MailboxId",
+                table: "DeletedMessage",
+                column: "MailboxId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_District_CountryId",
@@ -1079,14 +1306,49 @@ namespace risk.control.system.Migrations
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DraftMessage_MailboxId",
+                table: "DraftMessage",
+                column: "MailboxId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FileAttachment_ClaimsInvestigationId",
                 table: "FileAttachment",
                 column: "ClaimsInvestigationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FileAttachment_ContactMessageId",
+                name: "IX_FileAttachment_DeletedMessageId",
                 table: "FileAttachment",
-                column: "ContactMessageId");
+                column: "DeletedMessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FileAttachment_DraftMessageId",
+                table: "FileAttachment",
+                column: "DraftMessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FileAttachment_InboxMessageId",
+                table: "FileAttachment",
+                column: "InboxMessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FileAttachment_OutboxMessageId",
+                table: "FileAttachment",
+                column: "OutboxMessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FileAttachment_SentMessageId",
+                table: "FileAttachment",
+                column: "SentMessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FileAttachment_TrashMessageId",
+                table: "FileAttachment",
+                column: "TrashMessageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InboxMessage_MailboxId",
+                table: "InboxMessage",
+                column: "MailboxId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InvestigationCase_InvestigationCaseStatusId",
@@ -1114,6 +1376,17 @@ namespace risk.control.system.Migrations
                 column: "LineOfBusinessId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Mailbox_ApplicationUserId",
+                table: "Mailbox",
+                column: "ApplicationUserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutboxMessage_MailboxId",
+                table: "OutboxMessage",
+                column: "MailboxId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PinCode_CountryId",
                 table: "PinCode",
                 column: "CountryId");
@@ -1129,6 +1402,11 @@ namespace risk.control.system.Migrations
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SentMessage_MailboxId",
+                table: "SentMessage",
+                column: "MailboxId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ServicedPinCode_VendorInvestigationServiceTypeId",
                 table: "ServicedPinCode",
                 column: "VendorInvestigationServiceTypeId");
@@ -1137,6 +1415,11 @@ namespace risk.control.system.Migrations
                 name: "IX_State_CountryId",
                 table: "State",
                 column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrashMessage_MailboxId",
+                table: "TrashMessage",
+                column: "MailboxId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vendor_ClaimsInvestigationCaseId",
@@ -1237,10 +1520,28 @@ namespace risk.control.system.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "ContactUsMessage");
+                name: "DeletedMessage");
+
+            migrationBuilder.DropTable(
+                name: "DraftMessage");
+
+            migrationBuilder.DropTable(
+                name: "InboxMessage");
+
+            migrationBuilder.DropTable(
+                name: "OutboxMessage");
+
+            migrationBuilder.DropTable(
+                name: "SentMessage");
+
+            migrationBuilder.DropTable(
+                name: "TrashMessage");
 
             migrationBuilder.DropTable(
                 name: "VendorInvestigationServiceType");
+
+            migrationBuilder.DropTable(
+                name: "Mailbox");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

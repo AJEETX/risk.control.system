@@ -40,7 +40,7 @@
         public const string CASE_STATUS = "Case status";
         public const string SERVICE = "Service";
         public const string INVESTIGATION_SERVICE = "Type of service";
-        public const string BENEFICIARY_RELATION = "Beneficiary relation";
+        public const string BENEFICIARY = "Claims beneficiary";
         public const string CASE_ENABLER = "Case enabler";
         public const string COST_CENTRE = "Cost centre";
         public const string CASE_OUTCOME = "Case outcome";
@@ -97,6 +97,7 @@
         public const string INBOX = "Inbox";
         public const string COMPOSE = "Compose";
         public const string SENT_MAIL = "Sent";
+        public const string UNSENT = "Failed";
         public const string TRASH_MAIL = "Trash";
         public const string DRAFT_MAIL = "Draft";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";

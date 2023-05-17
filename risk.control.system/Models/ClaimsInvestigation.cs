@@ -53,7 +53,8 @@ namespace risk.control.system.Models
         public string? CauseOfLoss { get; set; }
         public Gender Gender { get; set; }
         [Display(Name = "Sum assured value")]
-        public int? SumAssuredValue { get; set; }
+        [Column(TypeName = "decimal(15,2)")]
+        public decimal? SumAssuredValue { get; set; }
         [Display(Name = "Address line")]
         public string? Addressline { get; set; }
         [Display(Name = "PinCode name")]
@@ -83,13 +84,15 @@ namespace risk.control.system.Models
         public string? BeneficiaryName { get; set; }
 
         [Display(Name = "Beneficiary relation")]
-        public string? BeneficiaryRelationId { get; set; }
+        public long? BeneficiaryRelationId { get; set; }
         [Display(Name = "Beneficiary relation")]
         public BeneficiaryRelation? BeneficiaryRelation { get; set; }
         [Display(Name = "Beneficiary contact number")]
-        public int? BeneficiaryContactNumber { get; set; }
+        public long? BeneficiaryContactNumber { get; set; }
         [Display(Name = "Beneficiary income")]
-        public int? BeneficiaryIncome { get; set; }
+
+        [Column(TypeName = "decimal(15,2)")]
+        public decimal? BeneficiaryIncome { get; set; }
         [Display(Name = "Customer type")]
         public CustomerType? CustomerType { get; set; }
         [Display(Name = "Cost centre")]

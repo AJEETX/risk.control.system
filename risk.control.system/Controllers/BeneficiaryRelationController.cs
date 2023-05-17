@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)
             {
@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)
             {
@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, BeneficiaryRelation beneficiaryRelation)
+        public async Task<IActionResult> Edit(long id, BeneficiaryRelation beneficiaryRelation)
         {
             if (id != beneficiaryRelation.BeneficiaryRelationId)
             {
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)
             {
@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers
         // POST: BeneficiaryRelation/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.BeneficiaryRelation == null)
             {
@@ -158,7 +158,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BeneficiaryRelationExists(string id)
+        private bool BeneficiaryRelationExists(long id)
         {
             return (_context.BeneficiaryRelation?.Any(e => e.BeneficiaryRelationId == id)).GetValueOrDefault();
         }

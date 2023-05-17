@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,Type,TableName,DateTime,OldValues,NewValues,AffectedColumns,PrimaryKey")] Audit audit)
+        public async Task<IActionResult> Edit(long id, [Bind("Id,UserId,Type,TableName,DateTime,OldValues,NewValues,AffectedColumns,PrimaryKey")] Audit audit)
         {
             if (id != audit.Id)
             {
@@ -183,7 +183,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AuditExists(int id)
+        private bool AuditExists(long id)
         {
             return (_context.AuditLogs?.Any(e => e.Id == id)).GetValueOrDefault();
         }

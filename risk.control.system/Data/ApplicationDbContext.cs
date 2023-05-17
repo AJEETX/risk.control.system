@@ -28,7 +28,12 @@ namespace risk.control.system.Data
         public virtual DbSet<CaseEnabler> CaseEnabler { get; set; }
         public virtual DbSet<BeneficiaryRelation> BeneficiaryRelation { get; set; }
         public virtual DbSet<Country> Country { get; set; }
-        public virtual DbSet<ContactMessage> ContactUsMessage { get; set; }
+        public virtual DbSet<InboxMessage> InboxMessage { get; set; }
+        public virtual DbSet<OutboxMessage> OutboxMessage { get; set; }
+        public virtual DbSet<SentMessage> SentMessage { get; set; }
+        public virtual DbSet<DraftMessage> DraftMessage { get; set; }
+        public virtual DbSet<TrashMessage> TrashMessage { get; set; }
+        public virtual DbSet<DeletedMessage> DeletedMessage { get; set; }
         public virtual DbSet<FileAttachment> FileAttachment { get; set; }
         public virtual DbSet<State> State { get; set; }
         public virtual DbSet<District> District { get; set; }
@@ -39,11 +44,12 @@ namespace risk.control.system.Data
         public virtual DbSet<Vendor> Vendor { get; set; } = default!;
         public virtual DbSet<VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
         public virtual DbSet<VendorApplicationUser> VendorApplicationUser { get; set; } = default!;
+        public virtual DbSet<Mailbox> Mailbox { get; set; } = default!;
 
 
 
         public virtual DbSet<FileOnDatabaseModel> FilesOnDatabase { get; set; }
         public virtual DbSet<FileOnFileSystemModel> FilesOnFileSystem { get; set; }
-        public DbSet<risk.control.system.Models.ClaimsInvestigation> ClaimsInvestigation { get; set; } = default!;
+        public DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; } = default!;
     }
 }

@@ -14,9 +14,14 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
+            var mailBox = new Mailbox
+            {
+                Name = PORTAL_ADMIN.EMAIL
+            };
             //Seed portal admin
             var portalAdmin = new ApplicationUser()
             {
+                Mailbox = mailBox,
                 UserName = PORTAL_ADMIN.USERNAME,
                 Email = PORTAL_ADMIN.EMAIL,
                 FirstName = PORTAL_ADMIN.FIRST_NAME,

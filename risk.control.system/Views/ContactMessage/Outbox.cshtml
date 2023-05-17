@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DraftMessage>
+﻿@model IEnumerable<OutboxMessage>
 @{
     ViewData["Title"] = ViewData["ContentHeader"] = "Contact us inbox";
 }
@@ -12,7 +12,7 @@
                     <form id="checkboxes" asp-controller="ContactMessage" asp-action="Delete" method="post" id="listForm">
 
                         <div class="card-header">
-                            <h3 class="card-title">Draft</h3>
+                            <h3 class="card-title">Outbox</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" placeholder="Search Mail">
@@ -53,18 +53,18 @@
                                                 }
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
-                                                        <input id="@message.DraftMessageId" class="vendors" name="messages" type="checkbox" value="@message.DraftMessageId" checked="@message.SelectedForAction" />
+                                                        <input id="@message.OutboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.OutboxMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Draft" asp-route-id="@message.DraftMessageId"><i class="fas fa-star text-warning"></i></a>
+                                                        <a asp-action="Details" asp-route-id="@message.OutboxMessageId"><i class="fas fa-star text-warning"></i></a>
                                                     </td>
-                                                    <td>@message.ReceipientEmail</td>
+                                                    <td>@message?.ReceipientEmail</td>
                                                     <td class="message-title text-muted">
                                                         <span>@message.Subject</span> - @message.Message
                                                     </td>
-                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.DraftMessageId"><i class="fas fa-paperclip"></i></a></td>
+                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.OutboxMessageId"><i class="fas fa-paperclip"></i></a></td>
 
-                                                    <td class="mailbox-date">Drafted</td>
+                                                    <td class="mailbox-date">@sentDateTime</td>
                                                 </tr>
                                             }
                                         }

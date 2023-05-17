@@ -7,10 +7,10 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
         public Audit()
         {
-            Id = new Random().Next();
+            //Id = new Random().Next();
         }
         public string? UserId { get; set; }
         public string Type { get; set; }

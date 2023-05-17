@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,20 +10,17 @@ using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
-using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
     public class ContactMessageController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMailboxService mailboxService;
         private readonly IToastNotification toastNotification;
 
-        public ContactMessageController(ApplicationDbContext context, IMailboxService mailboxService, IToastNotification toastNotification)
+        public ContactMessageController(ApplicationDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            this.mailboxService = mailboxService;
             this.toastNotification = toastNotification;
         }
 
@@ -33,10 +34,9 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var inboxMessages = _context.ContactUsMessage.Where(c =>
-            c.ReceipientEmail == applicationUser.Email && c.MessageStatus == MessageStatus.SENT && c.MessageStatus != MessageStatus.DELETED && c.MessageStatus != MessageStatus.TRASHDELETED);
+            var userMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            return View(inboxMessages.ToList());
+            return View(userMailbox.Inbox.OrderByDescending(o=>o.SendDate).ToList());
 
         }
         public async Task<IActionResult> Trash()
@@ -48,10 +48,9 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var trash = _context.ContactUsMessage.Where(c =>
-            c.ApplicationUser.Email == applicationUser.Email && c.MessageStatus == MessageStatus.DELETED && c.MessageStatus != MessageStatus.TRASHDELETED);
+            var userMailbox = _context.Mailbox.Include(m => m.Trash).FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            return View(trash.ToList());
+            return View(userMailbox.Trash.OrderByDescending(o => o.SendDate).ToList());
         }
 
         public async Task<IActionResult> Sent()
@@ -63,16 +62,28 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var inboxMessages = _context.ContactUsMessage.Where(c =>
-            c.SenderEmail == applicationUser.Email && c.MessageStatus != MessageStatus.DRAFTED && c.MessageStatus != MessageStatus.DELETED && c.MessageStatus != MessageStatus.TRASHDELETED);
+            var userMailbox = _context.Mailbox.Include(m => m.Sent).FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            return View(inboxMessages.ToList());
+            return View(userMailbox.Sent.OrderByDescending(o => o.SendDate).ToList());
+        }
+        public async Task<IActionResult> Outbox()
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+            var userMailbox = _context.Mailbox.Include(m => m.Outbox).FirstOrDefault(c => c.Name == applicationUser.Email);
+
+            return View(userMailbox.Outbox.OrderByDescending(o => o.SendDate).ToList());
         }
 
         // GET: ContactMessage/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.ContactUsMessage == null)
+            if (id == 0)
             {
                 return NotFound();
             }
@@ -84,27 +95,85 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var contactMessage = _context.ContactUsMessage.FirstOrDefault(c => c.ContactMessageId == id);
+            var userMailbox = _context.Mailbox
+                .Include(m => m.Inbox)
+                .Include(m => m.Outbox)
+                .Include(m => m.Sent)
+                .Include(m => m.Trash)
+                .Include(m => m.Draft)
+                .FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            if (contactMessage == null)
+            var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
+
+            OutboxMessage outBoxessage = default!;
+            JsonSerializerOptions options = new()
             {
-                return NotFound();
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                WriteIndented = true
+            };
+
+            if (userMessage is not null && userMessage.Read == false)
+            {
+                userMessage.Read = true;
+                var jsonMessage = JsonSerializer.Serialize(userMessage, options);
+                outBoxessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage);
+
+            }
+            var userDraftMessage = userMailbox.Draft.FirstOrDefault(c => c.DraftMessageId == id);
+
+            if (userDraftMessage is not null && userDraftMessage.Read == false)
+            {
+                //userMailbox.Draft.Remove(userDraftMessage);
+                userDraftMessage.Read = true;
+                var jsonMessage = JsonSerializer.Serialize(userDraftMessage, options);
+                outBoxessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage);
+                //userMailbox.Draft.Add(userDraftMessage);
+            }
+            var userSentMessage = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == id);
+
+            if (userSentMessage is not null && userSentMessage.Read == false)
+            {
+                //userMailbox.Sent.Remove(userSentMessage);
+                userSentMessage.Read = true;
+                var jsonMessage = JsonSerializer.Serialize(userSentMessage, options);
+                outBoxessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage);
+                //userMailbox.Sent.Add(userSentMessage);
+            }
+            var userOutboxMessage = userMailbox.Outbox.FirstOrDefault(c => c.OutboxMessageId == id);
+
+            if (userOutboxMessage is not null && userOutboxMessage.Read == false)
+            {
+                //userMailbox.Outbox.Remove(userOutboxMessage);
+                userOutboxMessage.Read = true;
+                var jsonMessage = JsonSerializer.Serialize(userOutboxMessage, options);
+                outBoxessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage);
+                //userMailbox.Outbox.Add(userOutboxMessage);
+
+            }
+            var userTrashMessage = userMailbox.Trash.FirstOrDefault(c => c.TrashMessageId == id);
+
+            if (userTrashMessage is not null && userTrashMessage.Read == false)
+            {
+                //userMailbox.Trash.Remove(userTrashMessage);
+                userTrashMessage.Read = true;
+                var jsonMessage = JsonSerializer.Serialize(userTrashMessage, options);
+                outBoxessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage);
+                //userMailbox.Trash.Add(userTrashMessage);
+
             }
 
-            if (contactMessage.Read == false)
+            var userDeletedMessage = userMailbox.Deleted.FirstOrDefault(c => c.DeletedMessageId == id);
+
+            if (userDeletedMessage is not null && userDeletedMessage.Read == false)
             {
-                applicationUser.ContactMessages.Remove(contactMessage);
-
-                contactMessage.Read = true;
-                contactMessage.ReceiveDate = DateTime.Now;
-
-                applicationUser.ContactMessages.Add(contactMessage);
-                _context.ApplicationUser.Update(applicationUser);
-                _context.ContactUsMessage.Update(contactMessage);
-                await _context.SaveChangesAsync();
+                userDeletedMessage.Read = true;
+                var jsonMessage = JsonSerializer.Serialize(userDeletedMessage, options);
+                outBoxessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage);
             }
 
-            return View(contactMessage);
+            _context.Mailbox.Update(userMailbox);
+            var rows = await _context.SaveChangesAsync();
+            return View(outBoxessage);
         }
 
         public async Task<IActionResult> DraftIndex()
@@ -116,16 +185,15 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var inboxMessages = _context.ContactUsMessage.Where(c =>
-             c.SenderEmail == applicationUser.Email && c.MessageStatus == MessageStatus.DRAFTED);
+            var userMailbox = _context.Mailbox.Include(m => m.Draft).FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            return View(inboxMessages.ToList());
+            return View(userMailbox.Draft.OrderByDescending(o => o.SendDate).ToList());
         }
 
         // GET: ContactMessage/Edit/5
-        public async Task<IActionResult> Draft(string id)
+        public async Task<IActionResult> Draft(long id)
         {
-            if (id == null || _context.ContactUsMessage == null)
+            if (id == 0)
             {
                 return NotFound();
             }
@@ -137,18 +205,28 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var contactMessage = _context.ContactUsMessage.FirstOrDefault(c => c.ContactMessageId == id);
+            var userMailbox = _context.Mailbox
+                .Include(m => m.Draft)
+                .FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            if (contactMessage == null)
+            JsonSerializerOptions options = new()
             {
-                return NotFound();
-            }
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                WriteIndented = true
+            };
+            var userDraftMessage = userMailbox.Draft.FirstOrDefault(c => c.DraftMessageId == id);
 
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUser, "Id", "CountryId", contactMessage.ApplicationUserId);
-            return View(contactMessage);
+            if (userDraftMessage is not null)
+            {
+                userDraftMessage.Read = true;
+            }
+ 
+            _context.Mailbox.Update(userMailbox);
+            var rows = await _context.SaveChangesAsync();
+            return View(userDraftMessage);
         }
         [HttpPost]
-        public async Task<IActionResult> Draft(ContactMessage contactMessage)
+        public async Task<IActionResult> Draft(DraftMessage contactMessage)
         {
             var userEmail = HttpContext.User.Identity.Name;
 
@@ -157,8 +235,9 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+            var userMailbox = _context.Mailbox.Include(m => m.Draft).FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            var existingContactMessage = _context.ContactUsMessage.FirstOrDefault(c => c.ContactMessageId == contactMessage.ContactMessageId);
+            var existingContactMessage = userMailbox.Draft.FirstOrDefault(d => d.DraftMessageId == contactMessage.DraftMessageId);
 
             if (existingContactMessage is null)
             {
@@ -166,29 +245,28 @@ namespace risk.control.system.Controllers
                 contactMessage.SendDate = DateTime.Now;
                 contactMessage.Priority = 0;
                 contactMessage.Read = false;
-                contactMessage.IsDraft = false;
                 contactMessage.MessageStatus = MessageStatus.DRAFTED;
-                contactMessage.ApplicationUserId = applicationUser.Id;
-                applicationUser.ContactMessages.Add(contactMessage);
-                _context.ContactUsMessage.Add(contactMessage);
+                var jsonMessage = JsonSerializer.Serialize(contactMessage);
+                DraftMessage draftMessage = JsonSerializer.Deserialize<DraftMessage>(jsonMessage);
+                userMailbox.Draft.Add(draftMessage);
+                _context.Mailbox.Attach(userMailbox);
+                _context.Mailbox.Update(userMailbox);
             }
             else
             {
-                applicationUser.ContactMessages.Remove(existingContactMessage);
-
-                existingContactMessage.Subject = contactMessage.Subject;
-                existingContactMessage.Message = contactMessage.Message;
+                existingContactMessage.Subject = contactMessage?.Subject;
+                existingContactMessage.Message = contactMessage?.Message;
                 existingContactMessage.SenderEmail = userEmail;
                 existingContactMessage.SendDate = DateTime.Now;
                 existingContactMessage.Priority = 0;
                 existingContactMessage.Read = false;
                 existingContactMessage.MessageStatus = MessageStatus.DRAFTED;
-                existingContactMessage.ApplicationUserId = applicationUser.Id;
-                existingContactMessage.IsDraft = false;
-                applicationUser.ContactMessages.Add(existingContactMessage);
-                _context.ContactUsMessage.Update(existingContactMessage);
+                var jsonMessage = JsonSerializer.Serialize(contactMessage);
+                DraftMessage draftMessage = JsonSerializer.Deserialize<DraftMessage>(jsonMessage);
+                userMailbox.Draft.Add(draftMessage);
+                _context.Mailbox.Attach(userMailbox);
+                _context.Mailbox.Update(userMailbox);
             }
-            _context.ApplicationUser.Update(applicationUser);
             var rows = await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("mail drafted successfully!");
             return RedirectToAction(nameof(Index));
@@ -205,7 +283,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ContactMessage contactMessage)
+        public async Task<IActionResult> Create(OutboxMessage contactMessage)
         {
             var userEmail = HttpContext.User.Identity.Name;
 
@@ -215,38 +293,69 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var existingContactMessage = _context.ContactUsMessage.FirstOrDefault(c => c.ContactMessageId == contactMessage.ContactMessageId);
+            var userMailbox = _context.Mailbox.Include(m => m.Draft).FirstOrDefault(c => c.Name == applicationUser.Email);
+        
+            var existingContactMessage = userMailbox.Draft.FirstOrDefault(d => d.DraftMessageId == contactMessage.OutboxMessageId);
+
+            var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
 
             if (existingContactMessage is null)
             {
                 contactMessage.SenderEmail = userEmail;
                 contactMessage.SendDate = DateTime.Now;
-                contactMessage.Priority = 0;
                 contactMessage.Read = false;
                 contactMessage.IsDraft = false;
-                contactMessage.MessageStatus = MessageStatus.SENT;
-                contactMessage.ApplicationUserId = applicationUser.Id;
-                applicationUser.ContactMessages.Add(contactMessage);
-                _context.ContactUsMessage.Add(contactMessage);
+ 
+                if(recepientMailbox is not null)
+                {
+                    contactMessage.MessageStatus = MessageStatus.SENT;
+                    var jsonMessage = JsonSerializer.Serialize(contactMessage);
+                    SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage);
+                    userMailbox.Sent.Add(sentMessage);
+                    _context.Mailbox.Attach(userMailbox);
+                    _context.Mailbox.Update(userMailbox);
+                    InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage);
+                    recepientMailbox.Inbox.Add(inboxMessage);
+                    _context.Mailbox.Attach(recepientMailbox);
+                    _context.Mailbox.Update(recepientMailbox);
+                }
+                else
+                {
+                    userMailbox.Outbox.Add(contactMessage);
+                    _context.Mailbox.Update(userMailbox);
+                }
+ 
+                var rowse = await _context.SaveChangesAsync();
             }
             else
             {
-                applicationUser.ContactMessages.Remove(existingContactMessage);
+                contactMessage.SenderEmail = userEmail;
+                contactMessage.SendDate = DateTime.Now;
+                contactMessage.Read = false;
+                contactMessage.IsDraft = false;
 
-                existingContactMessage.Subject = contactMessage.Subject;
-                existingContactMessage.Message = contactMessage.Message;
-                existingContactMessage.SenderEmail = userEmail;
-                existingContactMessage.SendDate = DateTime.Now;
-                existingContactMessage.Priority = 0;
-                existingContactMessage.Read = false;
-                existingContactMessage.MessageStatus = MessageStatus.SENT;
-                existingContactMessage.ApplicationUserId = applicationUser.Id;
-                existingContactMessage.IsDraft = false;
-                applicationUser.ContactMessages.Add(existingContactMessage);
-                _context.ContactUsMessage.Update(existingContactMessage);
+                if (recepientMailbox is not null)
+                {
+                    contactMessage.MessageStatus = MessageStatus.SENT;
+                    var jsonMessage = JsonSerializer.Serialize(contactMessage);
+                    SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage);
+                    userMailbox.Sent.Add(sentMessage);
+                    _context.Mailbox.Attach(userMailbox);
+                    _context.Mailbox.Update(userMailbox);
+                    InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage);
+                    recepientMailbox.Inbox.Add(inboxMessage);
+                    _context.Mailbox.Attach(recepientMailbox);
+                    _context.Mailbox.Update(recepientMailbox);
+                }
+                else
+                {
+                    userMailbox.Outbox.Add(contactMessage);
+                    _context.Mailbox.Update(userMailbox);
+                }
+
+                var rowse = await _context.SaveChangesAsync();
             }
-            _context.ApplicationUser.Update(applicationUser);
-            await _context.SaveChangesAsync();
+
             toastNotification.AddSuccessToastMessage("mail sent successfully!");
             return RedirectToAction(nameof(Index));
         }
@@ -255,74 +364,13 @@ namespace risk.control.system.Controllers
         // POST: ContactMessage/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("ContactMessageId,Name,Email,Title,Message,Read,Priority,SendDate,ReceiveDate,ApplicationUserId,Created,Updated,UpdatedBy")] ContactMessage contactMessage)
-        {
-            if (id != contactMessage.ContactMessageId)
-            {
-                return NotFound();
-            }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(contactMessage);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ContactMessageExists(contactMessage.ContactMessageId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUser, "Id", "CountryId", contactMessage.ApplicationUserId);
-            return View(contactMessage);
-        }
-
-        // GET: ContactMessage/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null || _context.ContactUsMessage == null)
-            {
-                return NotFound();
-            }
-
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
-            {
-                return NotFound();
-            }
-            var contactMessage = applicationUser.ContactMessages.FirstOrDefault(c => c.ContactMessageId == id);
-
-            if (contactMessage == null)
-            {
-                return NotFound();
-            }
-
-            return View(contactMessage);
-        }
 
         // POST: ContactMessage/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(List<string> messages)
+        public async Task<IActionResult> DeleteConfirmed(List<long> messages)
         {
-            if (_context.ContactUsMessage == null)
-            {
-                return NotFound();
-            }
-
             var userEmail = HttpContext.User.Identity.Name;
 
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
@@ -330,33 +378,64 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+            var userMailbox = _context.Mailbox
+                .Include(m => m.Inbox)
+                .Include(m => m.Outbox)
+                .Include(m => m.Sent)
+                .Include(m => m.Trash)
+                .Include(m => m.Draft)
+                .FirstOrDefault(c => c.ApplicationUserId == applicationUser.Id);
 
-            var contactMessages = _context.ContactUsMessage
-                .Where(m => messages.Contains(m.ContactMessageId));
+            var userInboxMails = userMailbox.Inbox.Where(d => messages.Contains(d.InboxMessageId)).ToList();
+            var userOutboxMails = userMailbox.Outbox.Where(d => messages.Contains(d.OutboxMessageId)).ToList();
+            var userDraftMails = userMailbox.Draft.Where(d => messages.Contains(d.DraftMessageId)).ToList();
+            var userSentMails = userMailbox.Sent.Where(d => messages.Contains(d.SentMessageId)).ToList();
+            var userTrashMails = userMailbox.Trash.Where(d => messages.Contains(d.TrashMessageId)).ToList();
 
-            if (contactMessages == null)
+            if (userInboxMails is not null && userInboxMails.Count > 0)
             {
-                return NotFound();
+                foreach (var message in userInboxMails)
+                {
+                    message.MessageStatus = MessageStatus.DELETED;
+                }
             }
-            foreach (var contact in contactMessages)
+            else if (userOutboxMails is not null && userOutboxMails.Count > 0)
             {
-                contact.MessageStatus = MessageStatus.DELETED;
+                foreach (var message in userOutboxMails)
+                {
+                    message.MessageStatus = MessageStatus.DELETED;
+                }
             }
-            _context.ApplicationUser.Update(applicationUser);
-            _context.ContactUsMessage.UpdateRange(contactMessages);
-            await _context.SaveChangesAsync();
+            else if (userDraftMails is not null && userDraftMails.Count > 0)
+            {
+                foreach (var message in userDraftMails)
+                {
+                    message.MessageStatus = MessageStatus.DELETED;
+                }
+            }
+            else if (userSentMails is not null && userSentMails.Count > 0)
+            {
+                foreach (var message in userSentMails)
+                {
+                    message.MessageStatus = MessageStatus.DELETED;
+                }
+            }
+            else if (userTrashMails is not null && userTrashMails.Count > 0)
+            {
+                foreach (var message in userTrashMails)
+                {
+                    message.MessageStatus = MessageStatus.DELETED;
+                }
+            }
+            _context.Mailbox.Update(userMailbox);
+            var rows = await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("mail(s) deleted successfully!");
 
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> TrashDelete(List<string> messages)
+        public async Task<IActionResult> TrashDelete(List<long> messages)
         {
-            if (_context.ContactUsMessage == null)
-            {
-                return NotFound();
-            }
-
             var userEmail = HttpContext.User.Identity.Name;
 
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
@@ -364,29 +443,61 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+            var userMailbox = _context.Mailbox
+                           .Include(m => m.Inbox)
+                           .Include(m => m.Outbox)
+                           .Include(m => m.Sent)
+                           .Include(m => m.Trash)
+                           .Include(m => m.Draft)
+                           .FirstOrDefault(c => c.ApplicationUserId == applicationUser.Id);
 
-            var contactMessages = _context.ContactUsMessage
-                .Where(m => messages.Contains(m.ContactMessageId));
+            var userInboxMails = userMailbox.Inbox.Where(d => messages.Contains(d.InboxMessageId)).ToList();
+            var userOutboxMails = userMailbox.Outbox.Where(d => messages.Contains(d.OutboxMessageId)).ToList();
+            var userDraftMails = userMailbox.Draft.Where(d => messages.Contains(d.DraftMessageId)).ToList();
 
-            if (contactMessages == null)
+            var userSentMails = userMailbox.Sent.Where(d => messages.Contains(d.SentMessageId)).ToList();
+            var userTrashMails = userMailbox.Trash.Where(d => messages.Contains(d.TrashMessageId)).ToList();
+
+            if (userInboxMails is not null && userInboxMails.Count > 0)
             {
-                return NotFound();
+                foreach (var message in userInboxMails)
+                {
+                    message.MessageStatus = MessageStatus.TRASHDELETED;
+                }
             }
-            foreach (var contact in contactMessages)
+            else if (userOutboxMails is not null && userOutboxMails.Count > 0)
             {
-                contact.MessageStatus = MessageStatus.TRASHDELETED;
+                foreach (var message in userOutboxMails)
+                {
+                    message.MessageStatus = MessageStatus.TRASHDELETED;
+                }
             }
-            _context.ApplicationUser.Update(applicationUser);
-            _context.ContactUsMessage.UpdateRange(contactMessages);
-            await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("mail(s) deleted permanently successfully!");
+            else if (userDraftMails is not null && userDraftMails.Count > 0)
+            {
+                foreach (var message in userDraftMails)
+                {
+                    message.MessageStatus = MessageStatus.TRASHDELETED;
+                }
+            }
+            else if (userSentMails is not null && userSentMails.Count > 0)
+            {
+                foreach (var message in userSentMails)
+                {
+                    message.MessageStatus = MessageStatus.TRASHDELETED;
+                }
+            }
+            else if (userTrashMails is not null && userTrashMails.Count > 0)
+            {
+                foreach (var message in userTrashMails)
+                {
+                    message.MessageStatus = MessageStatus.TRASHDELETED;
+                }
+            }
+            _context.Mailbox.Update(userMailbox);
+            var rows = await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage($" {rows} mail(s) deleted permanently successfully!");
 
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ContactMessageExists(string id)
-        {
-            return (_context.ContactUsMessage?.Any(e => e.ContactMessageId == id)).GetValueOrDefault();
         }
     }
 }

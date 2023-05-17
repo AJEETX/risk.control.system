@@ -7,7 +7,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string BeneficiaryRelationId { get; set; } = Guid.NewGuid().ToString();
+        public long BeneficiaryRelationId { get; set; } = default!;
         [Display(Name = "Beneficiary relation name")]
         [Required]
         public string Name { get; set; } = default!;

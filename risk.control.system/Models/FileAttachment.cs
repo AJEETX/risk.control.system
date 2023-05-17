@@ -16,7 +16,7 @@ namespace risk.control.system.Models
         public byte[]? AttachedDocument { get; set; }
 
         public string? ContactMessageId { get; set; }
-        public ContactMessage? ContactMessage { get; set; }
+        //public MailboxMessage? ContactMessage { get; set; }
 
         public string? ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation? ClaimsInvestigation { get; set; }

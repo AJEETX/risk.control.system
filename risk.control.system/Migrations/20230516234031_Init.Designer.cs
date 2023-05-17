@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230515092709_Init")]
+    [Migration("20230516234031_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -285,7 +285,7 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.Audit", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -321,9 +321,9 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.BeneficiaryRelation", b =>
                 {
-                    b.Property<string>("BeneficiaryRelationId")
+                    b.Property<long>("BeneficiaryRelationId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -384,17 +384,17 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Addressline")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("BeneficiaryContactNumber")
+                    b.Property<long?>("BeneficiaryContactNumber")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("BeneficiaryIncome")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal?>("BeneficiaryIncome")
+                        .HasColumnType("decimal(15,2)");
 
                     b.Property<string>("BeneficiaryName")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("BeneficiaryRelationId")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("BeneficiaryRelationId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("CaseEnablerId")
                         .HasColumnType("TEXT");
@@ -483,8 +483,8 @@ namespace risk.control.system.Migrations
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("SumAssuredValue")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal?>("SumAssuredValue")
+                        .HasColumnType("decimal(15,2)");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");
@@ -616,71 +616,6 @@ namespace risk.control.system.Migrations
                     b.ToTable("ClientCompany");
                 });
 
-            modelBuilder.Entity("risk.control.system.Models.ContactMessage", b =>
-                {
-                    b.Property<string>("ContactMessageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("ApplicationUserId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool?>("DeleteTrashed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool?>("IsDraft")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("MessageStatus")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Read")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ReceipientEmail")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ReceiveDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("SendDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SenderEmail")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool?>("Trashed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ContactMessageId");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("ContactUsMessage");
-                });
-
             modelBuilder.Entity("risk.control.system.Models.CostCentre", b =>
                 {
                     b.Property<string>("CostCentreId")
@@ -737,6 +672,71 @@ namespace risk.control.system.Migrations
                     b.ToTable("Country");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.DeletedMessage", b =>
+                {
+                    b.Property<long>("DeletedMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("DeleteTrashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("IsDraft")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("MailboxId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceipientEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReceiveDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SendDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Trashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("DeletedMessageId");
+
+                    b.HasIndex("MailboxId");
+
+                    b.ToTable("DeletedMessage");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.District", b =>
                 {
                     b.Property<string>("DistrictId")
@@ -776,6 +776,71 @@ namespace risk.control.system.Migrations
                     b.ToTable("District");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.DraftMessage", b =>
+                {
+                    b.Property<long>("DraftMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("DeleteTrashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("IsDraft")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("MailboxId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceipientEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReceiveDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SendDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Trashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("DraftMessageId");
+
+                    b.HasIndex("MailboxId");
+
+                    b.ToTable("DraftMessage");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.FileAttachment", b =>
                 {
                     b.Property<string>("FileAttachmentId")
@@ -791,17 +856,110 @@ namespace risk.control.system.Migrations
                     b.Property<string>("ContactMessageId")
                         .HasColumnType("TEXT");
 
+                    b.Property<long?>("DeletedMessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("DraftMessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("InboxMessageId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<long?>("OutboxMessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("SentMessageId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long?>("TrashMessageId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("FileAttachmentId");
 
                     b.HasIndex("ClaimsInvestigationId");
 
-                    b.HasIndex("ContactMessageId");
+                    b.HasIndex("DeletedMessageId");
+
+                    b.HasIndex("DraftMessageId");
+
+                    b.HasIndex("InboxMessageId");
+
+                    b.HasIndex("OutboxMessageId");
+
+                    b.HasIndex("SentMessageId");
+
+                    b.HasIndex("TrashMessageId");
 
                     b.ToTable("FileAttachment");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.InboxMessage", b =>
+                {
+                    b.Property<long>("InboxMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("DeleteTrashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("IsDraft")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("MailboxId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceipientEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReceiveDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SendDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Trashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("InboxMessageId");
+
+                    b.HasIndex("MailboxId");
+
+                    b.ToTable("InboxMessage");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationCase", b =>
@@ -1010,6 +1168,101 @@ namespace risk.control.system.Migrations
                     b.ToTable("LineOfBusiness");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.Mailbox", b =>
+                {
+                    b.Property<long>("MailboxId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("ApplicationUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("MailboxId");
+
+                    b.HasIndex("ApplicationUserId")
+                        .IsUnique();
+
+                    b.ToTable("Mailbox");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.OutboxMessage", b =>
+                {
+                    b.Property<long>("OutboxMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("DeleteTrashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("IsDraft")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("MailboxId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceipientEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReceiveDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SendDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Trashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("OutboxMessageId");
+
+                    b.HasIndex("MailboxId");
+
+                    b.ToTable("OutboxMessage");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.PinCode", b =>
                 {
                     b.Property<string>("PinCodeId")
@@ -1052,6 +1305,71 @@ namespace risk.control.system.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("PinCode");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
+                {
+                    b.Property<long>("SentMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("DeleteTrashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("IsDraft")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("MailboxId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceipientEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReceiveDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SendDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Trashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("SentMessageId");
+
+                    b.HasIndex("MailboxId");
+
+                    b.ToTable("SentMessage");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ServicedPinCode", b =>
@@ -1120,6 +1438,71 @@ namespace risk.control.system.Migrations
                     b.HasIndex("CountryId");
 
                     b.ToTable("State");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.TrashMessage", b =>
+                {
+                    b.Property<long>("TrashMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("DeleteTrashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("IsDraft")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<long>("MailboxId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MessageStatus")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceipientEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ReceiveDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SendDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Trashed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("TrashMessageId");
+
+                    b.HasIndex("MailboxId");
+
+                    b.ToTable("TrashMessage");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>
@@ -1592,13 +1975,15 @@ namespace risk.control.system.Migrations
                     b.Navigation("State");
                 });
 
-            modelBuilder.Entity("risk.control.system.Models.ContactMessage", b =>
+            modelBuilder.Entity("risk.control.system.Models.DeletedMessage", b =>
                 {
-                    b.HasOne("risk.control.system.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("ContactMessages")
-                        .HasForeignKey("ApplicationUserId");
+                    b.HasOne("risk.control.system.Models.Mailbox", "Mailbox")
+                        .WithMany("Deleted")
+                        .HasForeignKey("MailboxId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("ApplicationUser");
+                    b.Navigation("Mailbox");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.District", b =>
@@ -1618,19 +2003,59 @@ namespace risk.control.system.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.DraftMessage", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Mailbox", "Mailbox")
+                        .WithMany("Draft")
+                        .HasForeignKey("MailboxId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mailbox");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.FileAttachment", b =>
                 {
                     b.HasOne("risk.control.system.Models.ClaimsInvestigation", "ClaimsInvestigation")
                         .WithMany("Attachments")
                         .HasForeignKey("ClaimsInvestigationId");
 
-                    b.HasOne("risk.control.system.Models.ContactMessage", "ContactMessage")
+                    b.HasOne("risk.control.system.Models.DeletedMessage", null)
                         .WithMany("Attachments")
-                        .HasForeignKey("ContactMessageId");
+                        .HasForeignKey("DeletedMessageId");
+
+                    b.HasOne("risk.control.system.Models.DraftMessage", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("DraftMessageId");
+
+                    b.HasOne("risk.control.system.Models.InboxMessage", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("InboxMessageId");
+
+                    b.HasOne("risk.control.system.Models.OutboxMessage", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("OutboxMessageId");
+
+                    b.HasOne("risk.control.system.Models.SentMessage", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("SentMessageId");
+
+                    b.HasOne("risk.control.system.Models.TrashMessage", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("TrashMessageId");
 
                     b.Navigation("ClaimsInvestigation");
+                });
 
-                    b.Navigation("ContactMessage");
+            modelBuilder.Entity("risk.control.system.Models.InboxMessage", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Mailbox", "Mailbox")
+                        .WithMany("Inbox")
+                        .HasForeignKey("MailboxId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mailbox");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationCase", b =>
@@ -1674,6 +2099,28 @@ namespace risk.control.system.Migrations
                     b.Navigation("LineOfBusiness");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.Mailbox", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne("Mailbox")
+                        .HasForeignKey("risk.control.system.Models.Mailbox", "ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.OutboxMessage", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Mailbox", "Mailbox")
+                        .WithMany("Outbox")
+                        .HasForeignKey("MailboxId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mailbox");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.PinCode", b =>
                 {
                     b.HasOne("risk.control.system.Models.Country", "Country")
@@ -1697,6 +2144,17 @@ namespace risk.control.system.Migrations
                     b.Navigation("State");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Mailbox", "Mailbox")
+                        .WithMany("Sent")
+                        .HasForeignKey("MailboxId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mailbox");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.ServicedPinCode", b =>
                 {
                     b.HasOne("risk.control.system.Models.VendorInvestigationServiceType", "VendorInvestigationServiceType")
@@ -1717,6 +2175,17 @@ namespace risk.control.system.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.TrashMessage", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Mailbox", "Mailbox")
+                        .WithMany("Trash")
+                        .HasForeignKey("MailboxId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mailbox");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>
@@ -1815,7 +2284,7 @@ namespace risk.control.system.Migrations
                 {
                     b.Navigation("ApplicationRoles");
 
-                    b.Navigation("ContactMessages");
+                    b.Navigation("Mailbox");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
@@ -1834,7 +2303,17 @@ namespace risk.control.system.Migrations
                     b.Navigation("VendorApplicationUser");
                 });
 
-            modelBuilder.Entity("risk.control.system.Models.ContactMessage", b =>
+            modelBuilder.Entity("risk.control.system.Models.DeletedMessage", b =>
+                {
+                    b.Navigation("Attachments");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.DraftMessage", b =>
+                {
+                    b.Navigation("Attachments");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.InboxMessage", b =>
                 {
                     b.Navigation("Attachments");
                 });
@@ -1847,6 +2326,36 @@ namespace risk.control.system.Migrations
             modelBuilder.Entity("risk.control.system.Models.LineOfBusiness", b =>
                 {
                     b.Navigation("InvestigationServiceTypes");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.Mailbox", b =>
+                {
+                    b.Navigation("Deleted");
+
+                    b.Navigation("Draft");
+
+                    b.Navigation("Inbox");
+
+                    b.Navigation("Outbox");
+
+                    b.Navigation("Sent");
+
+                    b.Navigation("Trash");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.OutboxMessage", b =>
+                {
+                    b.Navigation("Attachments");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
+                {
+                    b.Navigation("Attachments");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.TrashMessage", b =>
+                {
+                    b.Navigation("Attachments");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>

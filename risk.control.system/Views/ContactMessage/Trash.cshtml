@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ContactMessage>
+﻿@model IEnumerable<TrashMessage>
 @{
     ViewData["Title"] = ViewData["ContentHeader"] = "Contact us inbox";
 }
@@ -53,16 +53,16 @@
                                                 }
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
-                                                        <input id="@message.ContactMessageId" class="vendors" name="messages" type="checkbox" value="@message.ContactMessageId" checked="@message.SelectedForAction" />
+                                                        <input id="@message.TrashMessageId" class="vendors" name="messages" type="checkbox" value="@message.TrashMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Draft" asp-route-id="@message.ContactMessageId"><i class="fas fa-star text-warning"></i></a>
+                                                        <a asp-action="Draft" asp-route-id="@message.TrashMessageId"><i class="fas fa-star text-warning"></i></a>
                                                     </td>
                                                     <td>@message.ReceipientEmail</td>
                                                     <td class="message-title text-muted">
                                                         <span>@message.Subject</span> - @message.Message
                                                     </td>
-                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.ContactMessageId"><i class="fas fa-paperclip"></i></a></td>
+                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.Trashed"><i class="fas fa-paperclip"></i></a></td>
 
                                                     <td class="mailbox-date">Drafted</td>
                                                 </tr>

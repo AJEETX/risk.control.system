@@ -11,7 +11,6 @@ using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
-using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
@@ -20,19 +19,16 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly IMailboxService mailboxService;
         private readonly IToastNotification toastNotification;
 
         public ClaimsInvestigationController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
-            IMailboxService mailboxService,
             IToastNotification toastNotification)
         {
             _context = context;
             this.userManager = userManager;
             this.roleManager = roleManager;
-            this.mailboxService = mailboxService;
             this.toastNotification = toastNotification;
         }
 
@@ -164,20 +160,19 @@ namespace risk.control.system.Controllers
 
 
                 //var companyAssigners = _context.ClientCompanyApplicationUser.Where(u => u.)
-                mailboxService.InsertMessage(new ContactMessage
-                {
-                    ApplicationUserId = clientCompanyUser.Id,
-                    ReceipientEmail = "",
-                    Created = DateTime.UtcNow,
-                    Message = JsonSerializer.Serialize(casesAssigned),
-                    Subject = "New case created: case Id(s) = " + casesAssigned.Select(c => c.ClaimsInvestigationCaseId),
-                    SenderEmail = clientCompanyUser.FirstName + clientCompanyUser.LastName,
-                    Priority = ContactMessagePriority.HIGH,
-                    SendDate = DateTime.UtcNow,
-                    Updated = DateTime.UtcNow,
-                    Read = false,
-                    UpdatedBy = userEmail.Value
-                });
+                //mailboxService.InsertMessage(new MailboxMessage
+                //{
+                //    ReceipientEmail = "",
+                //    Created = DateTime.UtcNow,
+                //    Message = JsonSerializer.Serialize(casesAssigned),
+                //    Subject = "New case created: case Id(s) = " + casesAssigned.Select(c => c.ClaimsInvestigationCaseId),
+                //    SenderEmail = clientCompanyUser.FirstName + clientCompanyUser.LastName,
+                //    Priority = ContactMessagePriority.HIGH,
+                //    SendDate = DateTime.UtcNow,
+                //    Updated = DateTime.UtcNow,
+                //    Read = false,
+                //    UpdatedBy = userEmail.Value
+                //});
 
                 return RedirectToAction(nameof(Index));
             }
@@ -248,20 +243,20 @@ namespace risk.control.system.Controllers
             }
 
 
-            mailboxService.InsertMessage(new ContactMessage
-            {
-                ApplicationUserId = clientCompanyUser != null ? clientCompanyUser.Id : _context.ApplicationUser.First(u => u.isSuperAdmin).Id,
-                ReceipientEmail = userEmailToSend,
-                Created = DateTime.UtcNow,
-                Message = "start",
-                Subject = "New case created: case Id = " + userEmailToSend,
-                SenderEmail = clientCompanyUser != null ? clientCompanyUser.FirstName : _context.ApplicationUser.First(u => u.isSuperAdmin).FirstName,
-                Priority = ContactMessagePriority.NORMAL,
-                SendDate = DateTime.UtcNow,
-                Updated = DateTime.UtcNow,
-                Read = false,
-                UpdatedBy = userEmail.Value
-            });
+            //mailboxService.InsertMessage(new ContactMessage
+            //{
+            //    ApplicationUserId = clientCompanyUser != null ? clientCompanyUser.Id : _context.ApplicationUser.First(u => u.isSuperAdmin).Id,
+            //    ReceipientEmail = userEmailToSend,
+            //    Created = DateTime.UtcNow,
+            //    Message = "start",
+            //    Subject = "New case created: case Id = " + userEmailToSend,
+            //    SenderEmail = clientCompanyUser != null ? clientCompanyUser.FirstName : _context.ApplicationUser.First(u => u.isSuperAdmin).FirstName,
+            //    Priority = ContactMessagePriority.NORMAL,
+            //    SendDate = DateTime.UtcNow,
+            //    Updated = DateTime.UtcNow,
+            //    Read = false,
+            //    UpdatedBy = userEmail.Value
+            //});
 
 
 
@@ -303,12 +298,12 @@ namespace risk.control.system.Controllers
 
                 var userEmailToSend = string.Empty;
 
-                var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+                var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userClaim.Value);
                 if (clientCompanyUser == null)
                 {
-                    userEmailToSend = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.isSuperAdmin).Email;
+                    userEmailToSend = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userClaim.Value).Email;
                 }
                 else
                 {
@@ -327,20 +322,19 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                mailboxService.InsertMessage(new ContactMessage
-                {
-                    ApplicationUserId = clientCompanyUser.Id,
-                    ReceipientEmail = userEmailToSend,
-                    Created = DateTime.UtcNow,
-                    Message = JsonSerializer.Serialize(claimsInvestigation),
-                    Subject = "New case created: case Id = " + claimsInvestigation.ClaimsInvestigationCaseId,
-                    SenderEmail = clientCompanyUser.FirstName + clientCompanyUser.LastName,
-                    Priority = ContactMessagePriority.NORMAL,
-                    SendDate = DateTime.UtcNow,
-                    Updated = DateTime.UtcNow,
-                    Read = false,
-                    UpdatedBy = userEmail.Value
-                });
+                //mailboxService.InsertMessage(new MailboxMessage
+                //{
+                //    ReceipientEmail = userEmailToSend,
+                //    Created = DateTime.UtcNow,
+                //    Message = JsonSerializer.Serialize(claimsInvestigation),
+                //    Subject = "New case created: case Id = " + claimsInvestigation.ClaimsInvestigationCaseId,
+                //    SenderEmail = clientCompanyUser.FirstName + clientCompanyUser.LastName,
+                //    Priority = ContactMessagePriority.NORMAL,
+                //    SendDate = DateTime.UtcNow,
+                //    Updated = DateTime.UtcNow,
+                //    Read = false,
+                //    UpdatedBy = userClaim.Value
+                //});
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);

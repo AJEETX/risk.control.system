@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +10,6 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Permission;
 using risk.control.system.Seeds;
-using risk.control.system.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=add-draft-17-11-16-May.db"));
+                    options.UseSqlite("Data Source=add-draft-19-15-16-May.db"));
 
 
 //if (builder.Build().Environment.EnvironmentName == "Development")
@@ -41,8 +42,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //}
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IMailboxService, MailboxService>();
+//builder.Services.AddScoped<IMailboxService, MailboxService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddControllers().AddJsonOptions(x =>
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+
+
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;

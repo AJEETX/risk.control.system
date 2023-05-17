@@ -10,10 +10,14 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<ClientCompanyApplicationUser> userManager, string clientCompanyId)
         {
-
             //Seed client admin
+            var caMailBox = new Mailbox
+            {
+                Name = CLIENT_ADMIN.EMAIL
+            };
             var clientAdmin = new ClientCompanyApplicationUser()
             {
+                Mailbox = caMailBox,
                 UserName = CLIENT_ADMIN.USERNAME,
                 Email = CLIENT_ADMIN.EMAIL,
                 FirstName = CLIENT_ADMIN.FIRST_NAME,
@@ -45,9 +49,15 @@ namespace risk.control.system.Seeds
                 }
             }
 
+
             //Seed client creator
+            var ccMailBox = new Mailbox
+            {
+                Name = CLIENT_CREATOR.EMAIL
+            };
             var clientCreator = new ClientCompanyApplicationUser()
             {
+                Mailbox = ccMailBox,
                 UserName = CLIENT_CREATOR.USERNAME,
                 Email = CLIENT_CREATOR.EMAIL,
                 FirstName = CLIENT_CREATOR.FIRST_NAME,
@@ -74,8 +84,13 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client assigner
+            var asMailBox = new Mailbox
+            {
+                Name = CLIENT_ASSIGNER.EMAIL
+            };
             var clientAssigner = new ClientCompanyApplicationUser()
             {
+                Mailbox = asMailBox,
                 UserName = CLIENT_ASSIGNER.USERNAME,
                 Email = CLIENT_ASSIGNER.EMAIL,
                 FirstName = CLIENT_ASSIGNER.FIRST_NAME,
@@ -102,8 +117,13 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client assessor
+            var ssMailBox = new Mailbox
+            {
+                Name = CLIENT_ASSESSOR.EMAIL
+            };
             var clientAssessor = new ClientCompanyApplicationUser()
             {
+                Mailbox = ssMailBox,
                 UserName = CLIENT_ASSESSOR.USERNAME,
                 Email = CLIENT_ASSESSOR.EMAIL,
                 FirstName = CLIENT_ASSESSOR.FIRST_NAME,

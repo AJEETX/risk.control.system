@@ -13,8 +13,13 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, string vendorId)
         {
             //Seed Vendor Admin
+            var vaMailBox = new Mailbox
+            {
+                Name = VENDOR_ADMIN.EMAIL
+            };
             var vendorAdmin = new VendorApplicationUser()
             {
+                Mailbox = vaMailBox,
                 UserName = VENDOR_ADMIN.USERNAME,
                 Email = VENDOR_ADMIN.EMAIL,
                 FirstName = VENDOR_ADMIN.FIRST_NAME,
@@ -43,8 +48,13 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Supervisor
+            var vsMailBox = new Mailbox
+            {
+                Name = VENDOR_SUPERVISOR.EMAIL
+            };
             var vendorSupervisor = new VendorApplicationUser()
             {
+                Mailbox = vsMailBox,
                 UserName = VENDOR_SUPERVISOR.USERNAME,
                 Email = VENDOR_SUPERVISOR.EMAIL,
                 FirstName = VENDOR_SUPERVISOR.FIRST_NAME,
@@ -72,8 +82,13 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Agent
+            var faMailBox = new Mailbox
+            {
+                Name = VENDOR_AGENT.EMAIL
+            };
             var vendorAgent = new VendorApplicationUser()
             {
+                Mailbox = faMailBox,
                 UserName = VENDOR_AGENT.USERNAME,
                 Email = VENDOR_AGENT.EMAIL,
                 FirstName = VENDOR_AGENT.FIRST_NAME,

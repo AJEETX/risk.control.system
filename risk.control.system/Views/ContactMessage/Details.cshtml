@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.ContactMessage
+﻿@model risk.control.system.Models.OutboxMessage
 
 @{
     ViewData["Title"] = "Details";
@@ -12,7 +12,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <a asp-controller="ContactMessage" asp-action="Index" class="btn btn-default">
-                                <i class="fas fa-level-up-alt"></i> back to inbox
+                                <i class="fas fa-level-up-alt"></i> to inbox
                             </a>
                         </h3>
                         <div class="card-tools">
@@ -25,7 +25,10 @@
                         <div class="mailbox-read-info">
                             <h5>Subject : @Model.Subject</h5>
                             <h6>
-                                From: <a href="#">@Model.ApplicationUser.Email</a>
+                                From: <a href="#">@Model.SenderEmail</a>
+                            </h6>
+                            <h6>
+                                To: <a href="#">@Model.ReceipientEmail</a>
                                 <span class="mailbox-read-time float-right">@Model.SendDate</span>
                             </h6>
                         </div>
@@ -49,11 +52,7 @@
                         </div>
 
                         <div class="mailbox-read-message">
-                            <p>Hello @Model.ApplicationUser.FirstName,</p>
-                            <p>
                                 @Model.Message
-                            </p>
-                            <p>Thanks,<br>@Model.ApplicationUser.FirstName + @Model.ApplicationUser.LastName</p>
                         </div>
 
                     </div>
