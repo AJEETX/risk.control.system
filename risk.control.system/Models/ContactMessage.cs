@@ -179,7 +179,7 @@ namespace risk.control.system.Models
         DRAFTED,
         SENT,
         RECEIVED,
-        DELETED,
+        TRASHED,
         TRASHDELETED
     }
 }

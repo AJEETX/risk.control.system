@@ -386,39 +386,61 @@ namespace risk.control.system.Controllers
             var userSentMails = userMailbox.Sent.Where(d => messages.Contains(d.SentMessageId)).ToList();
             var userTrashMails = userMailbox.Trash.Where(d => messages.Contains(d.TrashMessageId)).ToList();
 
+
+
             if (userInboxMails is not null && userInboxMails.Count > 0)
             {
                 foreach (var message in userInboxMails)
                 {
-                    message.MessageStatus = MessageStatus.DELETED;
+                    message.MessageStatus = MessageStatus.TRASHED;
+                    userMailbox.Inbox.Remove(message);
+                    var jsonMessage = JsonSerializer.Serialize(message);
+                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
+                    userMailbox.Trash.Add(trashMessage);
                 }
             }
             else if (userOutboxMails is not null && userOutboxMails.Count > 0)
             {
                 foreach (var message in userOutboxMails)
                 {
-                    message.MessageStatus = MessageStatus.DELETED;
+                    message.MessageStatus = MessageStatus.TRASHED;
+                    userMailbox.Outbox.Remove(message);
+                    var jsonMessage = JsonSerializer.Serialize(message);
+                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
+                    userMailbox.Trash.Add(trashMessage);
                 }
             }
             else if (userDraftMails is not null && userDraftMails.Count > 0)
             {
                 foreach (var message in userDraftMails)
                 {
-                    message.MessageStatus = MessageStatus.DELETED;
+                    message.MessageStatus = MessageStatus.TRASHED;
+                    userMailbox.Draft.Remove(message);
+                    var jsonMessage = JsonSerializer.Serialize(message);
+                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
+                    userMailbox.Trash.Add(trashMessage);
                 }
             }
             else if (userSentMails is not null && userSentMails.Count > 0)
             {
                 foreach (var message in userSentMails)
                 {
-                    message.MessageStatus = MessageStatus.DELETED;
+                    message.MessageStatus = MessageStatus.TRASHED;
+                    userMailbox.Sent.Remove(message);
+                    var jsonMessage = JsonSerializer.Serialize(message);
+                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
+                    userMailbox.Trash.Add(trashMessage);
                 }
             }
             else if (userTrashMails is not null && userTrashMails.Count > 0)
             {
                 foreach (var message in userTrashMails)
                 {
-                    message.MessageStatus = MessageStatus.DELETED;
+                    message.MessageStatus = MessageStatus.TRASHED;
+                    userMailbox.Trash.Remove(message);
+                    var jsonMessage = JsonSerializer.Serialize(message);
+                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
+                    userMailbox.Trash.Add(trashMessage);
                 }
             }
             _context.Mailbox.Update(userMailbox);
@@ -438,53 +460,21 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             var userMailbox = _context.Mailbox
-                           .Include(m => m.Inbox)
-                           .Include(m => m.Outbox)
-                           .Include(m => m.Sent)
                            .Include(m => m.Trash)
-                           .Include(m => m.Draft)
+                           .Include(m => m.Deleted)
                            .FirstOrDefault(c => c.ApplicationUserId == applicationUser.Id);
 
-            var userInboxMails = userMailbox.Inbox.Where(d => messages.Contains(d.InboxMessageId)).ToList();
-            var userOutboxMails = userMailbox.Outbox.Where(d => messages.Contains(d.OutboxMessageId)).ToList();
-            var userDraftMails = userMailbox.Draft.Where(d => messages.Contains(d.DraftMessageId)).ToList();
-
-            var userSentMails = userMailbox.Sent.Where(d => messages.Contains(d.SentMessageId)).ToList();
             var userTrashMails = userMailbox.Trash.Where(d => messages.Contains(d.TrashMessageId)).ToList();
 
-            if (userInboxMails is not null && userInboxMails.Count > 0)
-            {
-                foreach (var message in userInboxMails)
-                {
-                    message.MessageStatus = MessageStatus.TRASHDELETED;
-                }
-            }
-            else if (userOutboxMails is not null && userOutboxMails.Count > 0)
-            {
-                foreach (var message in userOutboxMails)
-                {
-                    message.MessageStatus = MessageStatus.TRASHDELETED;
-                }
-            }
-            else if (userDraftMails is not null && userDraftMails.Count > 0)
-            {
-                foreach (var message in userDraftMails)
-                {
-                    message.MessageStatus = MessageStatus.TRASHDELETED;
-                }
-            }
-            else if (userSentMails is not null && userSentMails.Count > 0)
-            {
-                foreach (var message in userSentMails)
-                {
-                    message.MessageStatus = MessageStatus.TRASHDELETED;
-                }
-            }
-            else if (userTrashMails is not null && userTrashMails.Count > 0)
+            if (userTrashMails is not null && userTrashMails.Count > 0)
             {
                 foreach (var message in userTrashMails)
                 {
                     message.MessageStatus = MessageStatus.TRASHDELETED;
+                    userMailbox.Trash.Remove(message);
+                    var jsonMessage = JsonSerializer.Serialize(message);
+                    DeletedMessage deletedMessage = JsonSerializer.Deserialize<DeletedMessage>(jsonMessage, options);
+                    userMailbox.Deleted.Add(deletedMessage);
                 }
             }
             _context.Mailbox.Update(userMailbox);
