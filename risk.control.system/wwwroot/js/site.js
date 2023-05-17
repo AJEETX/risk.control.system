@@ -1,6 +1,5 @@
 ﻿$(document).ready(function () {
 
-
     $('.textarea-editor').summernote({
         height: 350, // set editor height
         minHeight: null, // set minimum height of editor
@@ -266,4 +265,19 @@ function toggleChecked(status) {
         // checked status of the check all checkbox:
         $(this).prop("checked", status);        
     });
+}
+function readURL(input) {
+    var url = input.value;
+    var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+    if (input.files && input.files[0] && (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg" || ext == "csv")) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#img').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        $('#img').attr('src', '/img/no-image.png');
+    }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class Initialize : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -514,6 +514,26 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FileAttachment",
+                columns: table => new
+                {
+                    FileAttachmentId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    AttachedDocument = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ContactMessageId = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FileAttachment", x => x.FileAttachmentId);
+                    table.ForeignKey(
+                        name: "FK_FileAttachment_ClaimsInvestigation_ClaimsInvestigationId",
+                        column: x => x.ClaimsInvestigationId,
+                        principalTable: "ClaimsInvestigation",
+                        principalColumn: "ClaimsInvestigationCaseId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Vendor",
                 columns: table => new
                 {
@@ -892,6 +912,7 @@ namespace risk.control.system.Migrations
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
                     SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
                     IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
                     Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
                     DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
@@ -926,6 +947,7 @@ namespace risk.control.system.Migrations
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
                     SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
                     IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
                     Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
                     DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
@@ -960,6 +982,7 @@ namespace risk.control.system.Migrations
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
                     SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
                     IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
                     Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
                     DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
@@ -994,6 +1017,7 @@ namespace risk.control.system.Migrations
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
                     SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
                     IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
                     Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
                     DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
@@ -1028,6 +1052,7 @@ namespace risk.control.system.Migrations
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
                     SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
                     IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
                     Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
                     DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
@@ -1062,6 +1087,7 @@ namespace risk.control.system.Migrations
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),
                     SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
                     IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
                     Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
                     DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
@@ -1080,62 +1106,6 @@ namespace risk.control.system.Migrations
                         principalTable: "Mailbox",
                         principalColumn: "MailboxId",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FileAttachment",
-                columns: table => new
-                {
-                    FileAttachmentId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    AttachedDocument = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    ContactMessageId = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
-                    DeletedMessageId = table.Column<long>(type: "INTEGER", nullable: true),
-                    DraftMessageId = table.Column<long>(type: "INTEGER", nullable: true),
-                    InboxMessageId = table.Column<long>(type: "INTEGER", nullable: true),
-                    OutboxMessageId = table.Column<long>(type: "INTEGER", nullable: true),
-                    SentMessageId = table.Column<long>(type: "INTEGER", nullable: true),
-                    TrashMessageId = table.Column<long>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FileAttachment", x => x.FileAttachmentId);
-                    table.ForeignKey(
-                        name: "FK_FileAttachment_ClaimsInvestigation_ClaimsInvestigationId",
-                        column: x => x.ClaimsInvestigationId,
-                        principalTable: "ClaimsInvestigation",
-                        principalColumn: "ClaimsInvestigationCaseId");
-                    table.ForeignKey(
-                        name: "FK_FileAttachment_DeletedMessage_DeletedMessageId",
-                        column: x => x.DeletedMessageId,
-                        principalTable: "DeletedMessage",
-                        principalColumn: "DeletedMessageId");
-                    table.ForeignKey(
-                        name: "FK_FileAttachment_DraftMessage_DraftMessageId",
-                        column: x => x.DraftMessageId,
-                        principalTable: "DraftMessage",
-                        principalColumn: "DraftMessageId");
-                    table.ForeignKey(
-                        name: "FK_FileAttachment_InboxMessage_InboxMessageId",
-                        column: x => x.InboxMessageId,
-                        principalTable: "InboxMessage",
-                        principalColumn: "InboxMessageId");
-                    table.ForeignKey(
-                        name: "FK_FileAttachment_OutboxMessage_OutboxMessageId",
-                        column: x => x.OutboxMessageId,
-                        principalTable: "OutboxMessage",
-                        principalColumn: "OutboxMessageId");
-                    table.ForeignKey(
-                        name: "FK_FileAttachment_SentMessage_SentMessageId",
-                        column: x => x.SentMessageId,
-                        principalTable: "SentMessage",
-                        principalColumn: "SentMessageId");
-                    table.ForeignKey(
-                        name: "FK_FileAttachment_TrashMessage_TrashMessageId",
-                        column: x => x.TrashMessageId,
-                        principalTable: "TrashMessage",
-                        principalColumn: "TrashMessageId");
                 });
 
             migrationBuilder.CreateIndex(
@@ -1316,36 +1286,6 @@ namespace risk.control.system.Migrations
                 column: "ClaimsInvestigationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FileAttachment_DeletedMessageId",
-                table: "FileAttachment",
-                column: "DeletedMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FileAttachment_DraftMessageId",
-                table: "FileAttachment",
-                column: "DraftMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FileAttachment_InboxMessageId",
-                table: "FileAttachment",
-                column: "InboxMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FileAttachment_OutboxMessageId",
-                table: "FileAttachment",
-                column: "OutboxMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FileAttachment_SentMessageId",
-                table: "FileAttachment",
-                column: "SentMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FileAttachment_TrashMessageId",
-                table: "FileAttachment",
-                column: "TrashMessageId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_InboxMessage_MailboxId",
                 table: "InboxMessage",
                 column: "MailboxId");
@@ -1499,6 +1439,12 @@ namespace risk.control.system.Migrations
                 name: "AuditLogs");
 
             migrationBuilder.DropTable(
+                name: "DeletedMessage");
+
+            migrationBuilder.DropTable(
+                name: "DraftMessage");
+
+            migrationBuilder.DropTable(
                 name: "FileAttachment");
 
             migrationBuilder.DropTable(
@@ -1508,25 +1454,13 @@ namespace risk.control.system.Migrations
                 name: "FilesOnFileSystem");
 
             migrationBuilder.DropTable(
+                name: "InboxMessage");
+
+            migrationBuilder.DropTable(
                 name: "InvestigationCase");
 
             migrationBuilder.DropTable(
                 name: "InvestigationCaseOutcome");
-
-            migrationBuilder.DropTable(
-                name: "ServicedPinCode");
-
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "DeletedMessage");
-
-            migrationBuilder.DropTable(
-                name: "DraftMessage");
-
-            migrationBuilder.DropTable(
-                name: "InboxMessage");
 
             migrationBuilder.DropTable(
                 name: "OutboxMessage");
@@ -1535,7 +1469,13 @@ namespace risk.control.system.Migrations
                 name: "SentMessage");
 
             migrationBuilder.DropTable(
+                name: "ServicedPinCode");
+
+            migrationBuilder.DropTable(
                 name: "TrashMessage");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "VendorInvestigationServiceType");

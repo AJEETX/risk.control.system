@@ -19,7 +19,10 @@ namespace risk.control.system.Models
         [Display(Name = "Received date")]
         public DateTime? ReceiveDate { get; set; }
         [Display(Name = "Attachments")]
-        public List<FileAttachment>? Attachments { get; set; } = new();
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [Display(Name = "Attachments")]
+        public byte[]? Attachment { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -45,7 +48,10 @@ namespace risk.control.system.Models
         [Display(Name = "Received date")]
         public DateTime? ReceiveDate { get; set; }
         [Display(Name = "Attachments")]
-        public List<FileAttachment>? Attachments { get; set; } = new();
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [Display(Name = "Attachments")]
+        public byte[]? Attachment { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -71,7 +77,10 @@ namespace risk.control.system.Models
         [Display(Name = "Received date")]
         public DateTime? ReceiveDate { get; set; }
         [Display(Name = "Attachments")]
-        public List<FileAttachment>? Attachments { get; set; } = new();
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [Display(Name = "Attachments")]
+        public byte[]? Attachment { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -98,7 +107,10 @@ namespace risk.control.system.Models
         [Display(Name = "Received date")]
         public DateTime? ReceiveDate { get; set; }
         [Display(Name = "Attachments")]
-        public List<FileAttachment>? Attachments { get; set; } = new();
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [Display(Name = "Attachments")]
+        public byte[]? Attachment { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -125,7 +137,10 @@ namespace risk.control.system.Models
         [Display(Name = "Received date")]
         public DateTime? ReceiveDate { get; set; }
         [Display(Name = "Attachments")]
-        public List<FileAttachment>? Attachments { get; set; } = new();
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [Display(Name = "Attachments")]
+        public byte[]? Attachment { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -152,7 +167,10 @@ namespace risk.control.system.Models
         [Display(Name = "Received date")]
         public DateTime? ReceiveDate { get; set; }
         [Display(Name = "Attachments")]
-        public List<FileAttachment>? Attachments { get; set; } = new();
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [Display(Name = "Attachments")]
+        public byte[]? Attachment { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }

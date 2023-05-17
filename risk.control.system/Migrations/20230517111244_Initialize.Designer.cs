@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230517040337_Init")]
-    partial class Init
+    [Migration("20230517111244_Initialize")]
+    partial class Initialize
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -678,6 +678,9 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("Attachment")
+                        .HasColumnType("BLOB");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
@@ -782,6 +785,9 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("Attachment")
+                        .HasColumnType("BLOB");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
@@ -856,43 +862,13 @@ namespace risk.control.system.Migrations
                     b.Property<string>("ContactMessageId")
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("DeletedMessageId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long?>("DraftMessageId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long?>("InboxMessageId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("OutboxMessageId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long?>("SentMessageId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<long?>("TrashMessageId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("FileAttachmentId");
 
                     b.HasIndex("ClaimsInvestigationId");
-
-                    b.HasIndex("DeletedMessageId");
-
-                    b.HasIndex("DraftMessageId");
-
-                    b.HasIndex("InboxMessageId");
-
-                    b.HasIndex("OutboxMessageId");
-
-                    b.HasIndex("SentMessageId");
-
-                    b.HasIndex("TrashMessageId");
 
                     b.ToTable("FileAttachment");
                 });
@@ -902,6 +878,9 @@ namespace risk.control.system.Migrations
                     b.Property<long>("InboxMessageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Attachment")
+                        .HasColumnType("BLOB");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
@@ -1204,6 +1183,9 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("Attachment")
+                        .HasColumnType("BLOB");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
@@ -1312,6 +1294,9 @@ namespace risk.control.system.Migrations
                     b.Property<long>("SentMessageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Attachment")
+                        .HasColumnType("BLOB");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
@@ -1445,6 +1430,9 @@ namespace risk.control.system.Migrations
                     b.Property<long>("TrashMessageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Attachment")
+                        .HasColumnType("BLOB");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
@@ -2020,30 +2008,6 @@ namespace risk.control.system.Migrations
                         .WithMany("Attachments")
                         .HasForeignKey("ClaimsInvestigationId");
 
-                    b.HasOne("risk.control.system.Models.DeletedMessage", null)
-                        .WithMany("Attachments")
-                        .HasForeignKey("DeletedMessageId");
-
-                    b.HasOne("risk.control.system.Models.DraftMessage", null)
-                        .WithMany("Attachments")
-                        .HasForeignKey("DraftMessageId");
-
-                    b.HasOne("risk.control.system.Models.InboxMessage", null)
-                        .WithMany("Attachments")
-                        .HasForeignKey("InboxMessageId");
-
-                    b.HasOne("risk.control.system.Models.OutboxMessage", null)
-                        .WithMany("Attachments")
-                        .HasForeignKey("OutboxMessageId");
-
-                    b.HasOne("risk.control.system.Models.SentMessage", null)
-                        .WithMany("Attachments")
-                        .HasForeignKey("SentMessageId");
-
-                    b.HasOne("risk.control.system.Models.TrashMessage", null)
-                        .WithMany("Attachments")
-                        .HasForeignKey("TrashMessageId");
-
                     b.Navigation("ClaimsInvestigation");
                 });
 
@@ -2303,21 +2267,6 @@ namespace risk.control.system.Migrations
                     b.Navigation("VendorApplicationUser");
                 });
 
-            modelBuilder.Entity("risk.control.system.Models.DeletedMessage", b =>
-                {
-                    b.Navigation("Attachments");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.DraftMessage", b =>
-                {
-                    b.Navigation("Attachments");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.InboxMessage", b =>
-                {
-                    b.Navigation("Attachments");
-                });
-
             modelBuilder.Entity("risk.control.system.Models.InvestigationCaseStatus", b =>
                 {
                     b.Navigation("InvestigationCaseSubStatuses");
@@ -2341,21 +2290,6 @@ namespace risk.control.system.Migrations
                     b.Navigation("Sent");
 
                     b.Navigation("Trash");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.OutboxMessage", b =>
-                {
-                    b.Navigation("Attachments");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
-                {
-                    b.Navigation("Attachments");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.TrashMessage", b =>
-                {
-                    b.Navigation("Attachments");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>

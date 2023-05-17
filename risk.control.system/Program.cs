@@ -27,7 +27,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=add-mailbox-trash-delete-14-15-17-May.db"));
+                    options.UseSqlite("Data Source=upload-19-15-17-May.db"));
 
 
 //if (builder.Build().Environment.EnvironmentName == "Development")
@@ -44,8 +44,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddHttpContextAccessor();
 //builder.Services.AddScoped<IMailboxService, MailboxService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddControllers().AddJsonOptions(x =>
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+//builder.Services.AddControllers().AddJsonOptions(x =>
+//                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
