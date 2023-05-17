@@ -50,7 +50,11 @@ namespace risk.control.system.Controllers
             }
             ViewBag.CurrentFilter = searchString;
 
-            var applicationDbContext = userManager.Users.Include(u => u.Country).Include(u => u.State).Include(u => u.PinCode).Include(u => u.ClientCompany).AsQueryable();
+            var applicationDbContext = userManager.Users
+                .Include(u => u.Country)
+                .Include(u => u.State)
+                .Include(u => u.PinCode)
+                .Include(u => u.ClientCompany).AsQueryable();
 
             applicationDbContext = applicationDbContext.Where(u => u.ClientCompanyId == id);
             if (applicationDbContext.Any())
@@ -155,6 +159,7 @@ namespace risk.control.system.Controllers
 
             if (clientCompanyApplicationUser is not null)
             {
+                clientCompanyApplicationUser.Mailbox.Name = clientCompanyApplicationUser.Email;
                 IFormFile? vendorUserProfile = Request.Form?.Files?.FirstOrDefault();
                 if (vendorUserProfile is not null)
                 {
@@ -220,6 +225,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    clientCompanyApplicationUser.Mailbox.Name = clientCompanyApplicationUser.Email;
                     IFormFile? vendorUserProfile = Request.Form?.Files?.FirstOrDefault();
                     if (vendorUserProfile is not null)
                     {
@@ -229,7 +235,7 @@ namespace risk.control.system.Controllers
                         clientCompanyApplicationUser.ProfilePicture = dataStream.ToArray();
                     }
 
-                    _context.Update(clientCompanyApplicationUser);
+                    _context.ClientCompanyApplicationUser.Update(clientCompanyApplicationUser);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

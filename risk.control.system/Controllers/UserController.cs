@@ -170,7 +170,7 @@ namespace risk.control.system.Controllers
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 user.ProfilePictureUrl = "upload/" + newFileName;
             }
-
+            user.Mailbox = new Mailbox { Name = user.Email };
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
@@ -188,6 +188,7 @@ namespace risk.control.system.Controllers
         private void GetCountryStateEdit(ApplicationUser? user)
         {
             ViewData["CountryId"] = new SelectList(context.Country, "CountryId", "Name", user?.CountryId);
+            ViewData["DistrictId"] = new SelectList(context.District, "DistrictId", "Name", user?.DistrictId);
             ViewData["StateId"] = new SelectList(context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
             ViewData["PinCodeId"] = new SelectList(context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
         }

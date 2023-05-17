@@ -459,6 +459,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("DistrictId")
                         .HasColumnType("TEXT");
 
+                    b.Property<byte[]>("DocumentImage")
+                        .HasColumnType("BLOB");
+
                     b.Property<int>("Gender")
                         .HasColumnType("INTEGER");
 
@@ -678,11 +681,23 @@ namespace risk.control.system.Migrations
                     b.Property<byte[]>("Attachment")
                         .HasColumnType("BLOB");
 
+                    b.Property<string>("AttachmentName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("DeleteTrashed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
                         .HasColumnType("INTEGER");
@@ -785,11 +800,23 @@ namespace risk.control.system.Migrations
                     b.Property<byte[]>("Attachment")
                         .HasColumnType("BLOB");
 
+                    b.Property<string>("AttachmentName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("DeleteTrashed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
                         .HasColumnType("INTEGER");
@@ -879,11 +906,23 @@ namespace risk.control.system.Migrations
                     b.Property<byte[]>("Attachment")
                         .HasColumnType("BLOB");
 
+                    b.Property<string>("AttachmentName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("DeleteTrashed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
                         .HasColumnType("INTEGER");
@@ -1183,11 +1222,23 @@ namespace risk.control.system.Migrations
                     b.Property<byte[]>("Attachment")
                         .HasColumnType("BLOB");
 
+                    b.Property<string>("AttachmentName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("DeleteTrashed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
                         .HasColumnType("INTEGER");
@@ -1295,11 +1346,23 @@ namespace risk.control.system.Migrations
                     b.Property<byte[]>("Attachment")
                         .HasColumnType("BLOB");
 
+                    b.Property<string>("AttachmentName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("DeleteTrashed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
                         .HasColumnType("INTEGER");
@@ -1431,11 +1494,23 @@ namespace risk.control.system.Migrations
                     b.Property<byte[]>("Attachment")
                         .HasColumnType("BLOB");
 
+                    b.Property<string>("AttachmentName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("DeleteTrashed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
                         .HasColumnType("INTEGER");
@@ -2002,7 +2077,7 @@ namespace risk.control.system.Migrations
             modelBuilder.Entity("risk.control.system.Models.FileAttachment", b =>
                 {
                     b.HasOne("risk.control.system.Models.ClaimsInvestigation", "ClaimsInvestigation")
-                        .WithMany("Attachments")
+                        .WithMany()
                         .HasForeignKey("ClaimsInvestigationId");
 
                     b.Navigation("ClaimsInvestigation");
@@ -2250,8 +2325,6 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
                 {
-                    b.Navigation("Attachments");
-
                     b.Navigation("Vendors");
                 });
 

@@ -71,6 +71,7 @@ namespace risk.control.system.Controllers
 
             if (vendorApplicationUser is not null)
             {
+                vendorApplicationUser.Mailbox.Name = vendorApplicationUser.Email;
                 IFormFile? vendorUserProfile = Request.Form?.Files?.FirstOrDefault();
                 if (vendorUserProfile is not null)
                 {
@@ -136,6 +137,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    vendorApplicationUser.Mailbox.Name = vendorApplicationUser.Email;
                     IFormFile? vendorUserProfile = Request.Form?.Files?.FirstOrDefault();
                     if (vendorUserProfile is not null)
                     {

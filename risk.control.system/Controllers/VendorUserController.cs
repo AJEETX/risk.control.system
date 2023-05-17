@@ -50,7 +50,11 @@ namespace risk.control.system.Controllers
             }
             ViewBag.CurrentFilter = searchString;
 
-            var applicationDbContext = userManager.Users.Include(u => u.Country).Include(u => u.State).Include(u => u.PinCode).Include(u => u.Vendor).AsQueryable();
+            var applicationDbContext = userManager.Users
+                .Include(u => u.Country)
+                .Include(u => u.State)
+                .Include(u => u.PinCode)
+                .Include(u => u.Vendor).AsQueryable();
 
             applicationDbContext = applicationDbContext.Where(u => u.VendorId == id);
             if (applicationDbContext.Any())

@@ -102,7 +102,11 @@ namespace risk.control.system.Models
         public string? CaseEnablerId { get; set; }
         [Display(Name = "Case enabler")]
         public CaseEnabler? CaseEnabler { get; set; }
-        public List<FileAttachment>? Attachments { get; set; }
+        [Display(Name = "Document")]
+        [NotMapped]
+        public IFormFile? Document { get; set; }
+        [Display(Name = "Document url")]
+        public byte[]? DocumentImage { get; set; } = default!;
         public string? Comments { get; set; }
         [NotMapped]
         public bool SelectedToAssign { get; set; }

@@ -292,6 +292,14 @@ namespace risk.control.system.Controllers
                 claimsInvestigation.CurrentUserId = User?.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)?.Value;
                 claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains("INITIATED")).InvestigationCaseStatusId;
                 claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("CREATED")).InvestigationCaseSubStatusId;
+                IFormFile? claimDocument = Request.Form?.Files?.FirstOrDefault();
+                if (claimDocument is not null)
+                {
+                    claimsInvestigation.Document = claimDocument;
+                    using var dataStream = new MemoryStream();
+                    await claimsInvestigation.Document.CopyToAsync(dataStream);
+                    claimsInvestigation.DocumentImage = dataStream.ToArray();
+                }
                 _context.Add(claimsInvestigation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("case(s) created successfully!");
@@ -397,6 +405,14 @@ namespace risk.control.system.Controllers
                     var user = User?.Claims.FirstOrDefault(u => u.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
                     claimsInvestigation.Updated = DateTime.UtcNow;
                     claimsInvestigation.UpdatedBy = user;
+                    IFormFile? claimDocument = Request.Form?.Files?.FirstOrDefault();
+                    if (claimDocument is not null)
+                    {
+                        claimsInvestigation.Document = claimDocument;
+                        using var dataStream = new MemoryStream();
+                        await claimsInvestigation.Document.CopyToAsync(dataStream);
+                        claimsInvestigation.DocumentImage = dataStream.ToArray();
+                    }
                     _context.Update(claimsInvestigation);
                     await _context.SaveChangesAsync();
                 }

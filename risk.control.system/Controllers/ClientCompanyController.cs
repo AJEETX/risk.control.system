@@ -38,6 +38,14 @@ namespace risk.control.system.Controllers
         {
             if (clientCompany is not null)
             {
+                IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
+                if (companyDocument is not null)
+                {
+                    clientCompany.Document = companyDocument;
+                    using var dataStream = new MemoryStream();
+                    await clientCompany.Document.CopyToAsync(dataStream);
+                    clientCompany.DocumentImage = dataStream.ToArray();
+                }
                 _context.Add(clientCompany);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("client company created successfully!");
@@ -131,6 +139,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", clientCompany.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", clientCompany.DistrictId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", clientCompany.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", clientCompany.StateId);
             return View(clientCompany);
@@ -153,6 +162,14 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
+                    if (companyDocument is not null)
+                    {
+                        clientCompany.Document = companyDocument;
+                        using var dataStream = new MemoryStream();
+                        await clientCompany.Document.CopyToAsync(dataStream);
+                        clientCompany.DocumentImage = dataStream.ToArray();
+                    }
                     _context.Update(clientCompany);
                     await _context.SaveChangesAsync();
                 }

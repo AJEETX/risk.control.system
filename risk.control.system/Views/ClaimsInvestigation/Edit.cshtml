@@ -87,6 +87,15 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
+                                        <label asp-for="DocumentImage" class="control-label"></label>
+                                        <img class="form-Image" id="documentImage" src="../img/no-image.png">
+                                        <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
                                         <label asp-for="CauseOfLoss" class="control-label"></label>
                                         <textarea asp-for="CauseOfLoss" class="form-control"></textarea>
                                         <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
