@@ -215,7 +215,15 @@ namespace risk.control.system.Controllers
                         await vendor.Document.CopyToAsync(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
                     }
-                    _context.Update(vendor);
+                    else
+                    {
+                        var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == id);
+                        if (existingVendor.DocumentImage != null)
+                        {
+                            vendor.DocumentImage = existingVendor.DocumentImage;
+                        }
+                    }
+                    _context.Vendor.Update(vendor);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

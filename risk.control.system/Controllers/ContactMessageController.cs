@@ -291,6 +291,10 @@ namespace risk.control.system.Controllers
                     draftMessage.Extension = extension;
                     draftMessage.AttachmentName = messageDocumentFileName;
                 }
+                else
+                {
+                    draftMessage.Attachment = existingContactMessage.Attachment;
+                }
                 userMailbox.Draft.Add(draftMessage);
                 _context.Mailbox.Attach(userMailbox);
                 _context.Mailbox.Update(userMailbox);
@@ -377,6 +381,10 @@ namespace risk.control.system.Controllers
                 recepientMailbox.Inbox.Add(inboxMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
+                var rowse = await _context.SaveChangesAsync();
+
+                toastNotification.AddSuccessToastMessage("mail sent successfully!");
+                return RedirectToAction(nameof(Index));
             }
             else
             {
@@ -396,12 +404,14 @@ namespace risk.control.system.Controllers
                 }
                 userMailbox.Outbox.Add(contactMessage);
                 _context.Mailbox.Update(userMailbox);
+                var rowse = await _context.SaveChangesAsync();
+
+                toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
+                return RedirectToAction(nameof(Create));
             }
 
-            var rowse = await _context.SaveChangesAsync();
 
-            toastNotification.AddSuccessToastMessage("mail sent successfully!");
-            return RedirectToAction(nameof(Index));
+
         }
 
         public async Task<IActionResult> DownloadFileAttachment(int id)

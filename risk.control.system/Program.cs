@@ -27,7 +27,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=upload-19-15-17-May.db"));
+                    options.UseSqlite("Data Source=upload-19-15-18-May.db"));
 
 
 //if (builder.Build().Environment.EnvironmentName == "Development")

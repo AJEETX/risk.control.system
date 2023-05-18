@@ -26,13 +26,15 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input id="send-mail" asp-for="Message" />
+                                <textarea id="send-mail" class="form-control" asp-for="Message">
+
+                                </textarea>
 
                             </div>
                             <div class="form-group">
                                 <div class="btn btn-default btn-file">
                                     <i class="fas fa-paperclip"></i> Attachment
-                                    <img class="form-Image" id="documentImage" src="../img/no-image.png">
+                                    <img class="file-image" id="documentImage" src="../img/no-image.png">
                                     <input asp-for="Attachment" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                 </div>
                                 <p class="help-block">Max. 10MB</p>
@@ -42,7 +44,7 @@
 
                         <div class="card-footer">
                             <div class="float-right">
-                                <button type="submit" asp-action="Draft" class="btn btn-secondary"><i class="fas fa-pencil-alt"></i> Draft</button>
+                                @*<button type="submit" asp-action="Draft" class="btn btn-secondary"><i class="fas fa-pencil-alt"></i> Draft</button>*@
                                 <button type="submit" asp-action="Create" class="btn btn-success"><i class="far fa-envelope"></i> Send</button>
                             </div>
                             <button type="reset" class="btn btn-secondary"><i class="fas fa-times"></i> @Applicationsettings.CANCEL</button>

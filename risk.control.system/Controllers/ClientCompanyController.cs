@@ -162,6 +162,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+
                     IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                     if (companyDocument is not null)
                     {
@@ -170,7 +171,15 @@ namespace risk.control.system.Controllers
                         await clientCompany.Document.CopyToAsync(dataStream);
                         clientCompany.DocumentImage = dataStream.ToArray();
                     }
-                    _context.Update(clientCompany);
+                    else
+                    {
+                        var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c=>c.ClientCompanyId == id);
+                        if(existingClientCompany.DocumentImage!= null)
+                        {
+                            clientCompany.DocumentImage = existingClientCompany.DocumentImage;
+                        }
+                    }
+                    _context.ClientCompany.Update(clientCompany);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

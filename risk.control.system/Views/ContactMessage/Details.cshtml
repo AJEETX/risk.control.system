@@ -56,15 +56,18 @@
                         </div>
 
                     </div>
-
+                    @{
+                        var fileIcon = (Model.Extension == ".jpg" || Model.Extension == ".png") ? "fa fa-image" : "far fa-file-pdf";
+                        var hasAttachment = (@Model.Attachment != null && @Model.Attachment.Length > 0) ? "" : "none";
+                    }
                     <div class="card-footer bg-white">
                         <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
-                            <li>
-                                <span class="mailbox-attachment-icon"><i class="far fa-file-pdf"></i></span>
+                            <li style="display:@hasAttachment">
+                                <span class="mailbox-attachment-icon"><i class="@fileIcon"></i></span>
                                 <div class="mailbox-attachment-info">
                                     <a asp-controller="ContactMessage" asp-action="DownloadFileAttachment" asp-route-id="@Model.OutboxMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
                                     <span class="mailbox-attachment-size clearfix mt-1">
-                                        <span>1,245 KB</span>
+                                        <span>@Model.Attachment?.Length  KB</span>
                                         <a asp-controller="ContactMessage" asp-action="DownloadFileAttachment" asp-route-id="@Model.OutboxMessageId" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
                                     </span>
                                 </div>

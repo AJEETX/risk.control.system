@@ -23,9 +23,9 @@ namespace risk.control.system.Models
         public IFormFile? Document { get; set; }
         [Display(Name = "Attachments")]
         public byte[]? Attachment { get; set; }
-        public string AttachmentName { get; set; }
-        public string FileType { get; set; }
-        public string Extension { get; set; }
+        public string? AttachmentName { get; set; }
+        public string? FileType { get; set; }
+        public string? Extension { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -55,9 +55,9 @@ namespace risk.control.system.Models
         public IFormFile? Document { get; set; }
         [Display(Name = "Attachments")]
         public byte[]? Attachment { get; set; }
-        public string AttachmentName { get; set; }
-        public string FileType { get; set; }
-        public string Extension { get; set; }
+        public string? AttachmentName { get; set; }
+        public string? FileType { get; set; }
+        public string? Extension { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -87,9 +87,9 @@ namespace risk.control.system.Models
         public IFormFile? Document { get; set; }
         [Display(Name = "Attachments")]
         public byte[]? Attachment { get; set; }
-        public string AttachmentName { get; set; }
-        public string FileType { get; set; }
-        public string Extension { get; set; }
+        public string? AttachmentName { get; set; }
+        public string? FileType { get; set; }
+        public string? Extension { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -119,9 +119,9 @@ namespace risk.control.system.Models
         [NotMapped]
         public IFormFile? Document { get; set; }
         [Display(Name = "Attachments")]
-        public string AttachmentName { get; set; }
-        public string FileType { get; set; }
-        public string Extension { get; set; }
+        public string? AttachmentName { get; set; }
+        public string? FileType { get; set; }
+        public string? Extension { get; set; }
         public byte[]? Attachment { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
@@ -153,9 +153,9 @@ namespace risk.control.system.Models
         public IFormFile? Document { get; set; }
         [Display(Name = "Attachments")]
         public byte[]? Attachment { get; set; }
-        public string AttachmentName { get; set; }
-        public string FileType { get; set; }
-        public string Extension { get; set; }
+        public string? AttachmentName { get; set; }
+        public string? FileType { get; set; }
+        public string? Extension { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }
@@ -186,9 +186,9 @@ namespace risk.control.system.Models
         public IFormFile? Document { get; set; }
         [Display(Name = "Attachments")]
         public byte[]? Attachment { get; set; }
-        public string AttachmentName { get; set; }
-        public string FileType { get; set; }
-        public string Extension { get; set; }
+        public string? AttachmentName { get; set; }
+        public string? FileType { get; set; }
+        public string? Extension { get; set; }
         [NotMapped]
         public bool? SelectedForAction { get; set; }
         public bool? IsDraft { get; set; }

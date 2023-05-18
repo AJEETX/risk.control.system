@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230517150549_Initialize")]
-    partial class Initialize
+    [Migration("20230518095411_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -685,7 +685,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("AttachmentName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -695,11 +694,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Extension")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileType")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
@@ -804,7 +801,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("AttachmentName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -814,11 +810,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Extension")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileType")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
@@ -910,7 +904,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("AttachmentName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -920,11 +913,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Extension")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileType")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
@@ -1226,7 +1217,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("AttachmentName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -1236,11 +1226,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Extension")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileType")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
@@ -1350,7 +1338,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("AttachmentName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -1360,11 +1347,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Extension")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileType")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
@@ -1498,7 +1483,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("AttachmentName")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -1508,11 +1492,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Extension")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FileType")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool?>("IsDraft")
