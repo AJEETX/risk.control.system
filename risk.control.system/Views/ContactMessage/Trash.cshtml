@@ -28,16 +28,24 @@
 
                         <div class="card-body p-0">
                             <div class="table-responsive mailbox-messages">
-                                <table id="dataTbl" class="table message-table">
+                                <table id="dataTbl" class="table message-table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th colspan="5">
+                                            <th colspan="6">
                                                 <input style="margin-right:10px;" type="checkbox" id="checkall" />
                                                 <div class="btn-group">
-                                                    <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default"><i class="fa fa-trash"></i> Permanent Delete</button>
-                                                    <a asp-action="Index" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</a>
+                                                    <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default"><i class="fa fa-trash"></i> Delete</button>
+                                                    <a asp-action="Index" class="btn btn-default"><i class="fas fa-sync-alt"></i> Refresh</a>
                                                 </div>
                                             </th>
+                                        </tr>
+                                        <tr>
+                                            <th>select</th>
+                                            <th>priority</th>
+                                            <th>Sender</th>
+                                            <th>Subject</th>
+                                            <th>Files</th>
+                                            <th>Received</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -58,27 +66,27 @@
                                                 }
                                                 var star = message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
                                                 star = message.Read && message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
+
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
                                                         <input id="@message.TrashMessageId" class="vendors" name="messages" type="checkbox" value="@message.TrashMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Draft" asp-route-id="@message.TrashMessageId"><i class="@star"></i></a>
+                                                        <a asp-action="TrashDetails" asp-route-id="@message.TrashMessageId"><i class="@star"></i></a>
                                                     </td>
-                                                    <td>@message.ReceipientEmail</td>
+                                                    <td>@message.SenderEmail</td>
                                                     <td class="message-title text-muted">
                                                         <span>@message.Subject</span> - @message.Message
                                                     </td>
-                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.Trashed"><i class="fas fa-paperclip"></i></a></td>
-                                                    <td class="mailbox-date">@sentDateTime</td>
+                                                    <td class="mailbox-attachment"><a asp-action="TrashDetails" asp-route-id="@message.TrashMessageId"><i class="fas fa-paperclip"></i></a></td>
 
-                                                    <td class="mailbox-date">Deleted</td>
+                                                    <td class="mailbox-date">@sentDateTime</td>
                                                 </tr>
                                             }
                                         }
                                         else
                                         {
-                                            <tr><td colspan="4">Empty</td></tr>
+                                            <tr><td colspan="6" class="empty-table-message">Empty Inbox</td></tr>
                                         }
 
                                     </tbody>
@@ -108,7 +116,7 @@
                                     <i class="fas fa-sync-alt"></i>
                                 </button>
                                 <div class="float-right">
-                                    1-50/200
+                                    1-50/@Model.Count()
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-sm">
                                             <i class="fas fa-chevron-left"></i>

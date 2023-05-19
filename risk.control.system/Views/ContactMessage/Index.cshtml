@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-success card-outline card-outline">
-                    <form id="checkboxes" asp-controller="ContactMessage" asp-action="Delete" method="post" id="listForm">
+                    <form id="checkboxes" asp-controller="ContactMessage" asp-action="InboxDelete" method="post" id="listForm">
 
                         <div class="card-header">
                             <h3 class="card-title">Inbox</h3>
@@ -28,16 +28,24 @@
 
                         <div class="card-body p-0">
                             <div class="table-responsive mailbox-messages">
-                                <table id="dataTbl" class="table message-table">
+                                <table id="dataTbl" class="table message-table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th colspan="5">
+                                            <th colspan="6">
                                                 <input style="margin-right:10px;" type="checkbox" id="checkall" />
                                                 <div class="btn-group">
                                                     <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default"><i class="fa fa-trash"></i> Delete</button>
-                                                    <a asp-action="Index" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</a>
+                                                    <a asp-action="Index" class="btn btn-default"><i class="fas fa-sync-alt"></i> Refresh</a>
                                                 </div>
                                             </th>
+                                        </tr>
+                                        <tr>
+                                            <th>select</th>
+                                            <th>priority</th>
+                                            <th>Sender</th>
+                                            <th>Subject</th>
+                                            <th>Files</th>
+                                            <th>Received</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -64,13 +72,13 @@
                                                         <input id="@message.InboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.InboxMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Details" asp-route-id="@message.InboxMessageId"><i class="@star"></i></a>
+                                                        <a asp-action="InboxDetails" asp-route-id="@message.InboxMessageId"><i class="@star"></i></a>
                                                     </td>
                                                     <td>@message.SenderEmail</td>
                                                     <td class="message-title text-muted">
                                                         <span>@message.Subject</span> - @message.Message
                                                     </td>
-                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.InboxMessageId"><i class="fas fa-paperclip"></i></a></td>
+                                                    <td class="mailbox-attachment"><a asp-action="InboxDetails" asp-route-id="@message.InboxMessageId"><i class="fas fa-paperclip"></i></a></td>
 
                                                     <td class="mailbox-date">@sentDateTime</td>
                                                 </tr>
@@ -78,7 +86,7 @@
                                         }
                                         else
                                         {
-                                            <tr><td colspan="4">Empty</td></tr>
+                                            <tr><td colspan="6" class="empty-table-message">Empty Inbox</td></tr>
                                         }
 
                                     </tbody>
@@ -89,7 +97,7 @@
                         <div class="card-footer p-0">
                             <div class="mailbox-controls">
 
-                                <button type="button" class="btn btn-default btn-sm checkbox-toggle">
+                                <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default btn-sm">
                                     <i class="far fa-square"></i>
                                 </button>
                                 <div class="btn-group">

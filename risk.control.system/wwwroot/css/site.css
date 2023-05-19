@@ -218,3 +218,13 @@ textarea {
     min-height:300px;
     overflow-y:auto;
 }
+#dataTbl tbody{
+    overflow-y:auto;
+}
+.empty-table-message{
+    text-align:center;
+}
+.card-body.p-0 {
+    min-height: 500px;
+    overflow-y: auto;
+}

@@ -9,10 +9,10 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-success card-outline card-outline">
-                    <form id="checkboxes" asp-controller="ContactMessage" asp-action="Delete" method="post" id="listForm">
+                    <form id="checkboxes" asp-controller="ContactMessage" asp-action="OutboxDelete" method="post" id="listForm">
 
                         <div class="card-header">
-                            <h3 class="card-title">Failed</h3>
+                            <h3 class="card-title">@Applicationsettings.OUTBOX</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input type="text" class="form-control" placeholder="Search Mail">
@@ -28,16 +28,24 @@
 
                         <div class="card-body p-0">
                             <div class="table-responsive mailbox-messages">
-                                <table id="dataTbl" class="table message-table">
+                                <table id="dataTbl" class="table message-table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th colspan="5">
+                                            <th colspan="6">
                                                 <input style="margin-right:10px;" type="checkbox" id="checkall" />
                                                 <div class="btn-group">
                                                     <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default"><i class="fa fa-trash"></i> Delete</button>
-                                                    <a asp-action="Index" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</a>
+                                                    <a asp-action="Index" class="btn btn-default"><i class="fas fa-sync-alt"></i> Refresh</a>
                                                 </div>
                                             </th>
+                                        </tr>
+                                        <tr>
+                                            <th>select</th>
+                                            <th>priority</th>
+                                            <th>Sender</th>
+                                            <th>Subject</th>
+                                            <th>Files</th>
+                                            <th>Received</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -58,18 +66,19 @@
                                                 }
                                                 var star = message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
                                                 star = message.Read && message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
+
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
                                                         <input id="@message.OutboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.OutboxMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="Details" asp-route-id="@message.OutboxMessageId"><i class="@star"></i></a>
+                                                        <a asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId"><i class="@star"></i></a>
                                                     </td>
-                                                    <td>@message?.ReceipientEmail</td>
+                                                    <td>@message.SenderEmail</td>
                                                     <td class="message-title text-muted">
                                                         <span>@message.Subject</span> - @message.Message
                                                     </td>
-                                                    <td class="mailbox-attachment"><a asp-action="Details" asp-route-id="@message.OutboxMessageId"><i class="fas fa-paperclip"></i></a></td>
+                                                    <td class="mailbox-attachment"><a asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId"><i class="fas fa-paperclip"></i></a></td>
 
                                                     <td class="mailbox-date">@sentDateTime</td>
                                                 </tr>
@@ -77,7 +86,7 @@
                                         }
                                         else
                                         {
-                                            <tr><td colspan="4">Empty</td></tr>
+                                            <tr><td colspan="6" class="empty-table-message">Empty Inbox</td></tr>
                                         }
 
                                     </tbody>

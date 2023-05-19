@@ -1,6 +1,7 @@
 ﻿@using risk.control.system.Helpers;
 @using risk.control.system.Models;
 @inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext context
 @inject UserManager<ApplicationUser> UserManager
 
 @{
@@ -137,7 +138,7 @@
                     <a is-active-page asp-controller="ContactMessage" asp-action="Outbox" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Outbox")">
                         <i class="fa fa-exclamation-triangle nav-icon"></i>
                         <p>
-                            @Applicationsettings.UNSENT
+                            @Applicationsettings.OUTBOX
                         </p>
                     </a>
                 </li>

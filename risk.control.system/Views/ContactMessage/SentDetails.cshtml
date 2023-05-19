@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.OutboxMessage
+﻿@model risk.control.system.Models.SentMessage
 
 @{
     ViewData["Title"] = "Details";
@@ -11,8 +11,8 @@
                 <div class="card card-success card-outline">
                     <div class="card-header">
                         <h3 class="card-title">
-                            <a asp-controller="ContactMessage" asp-action="Index" class="btn btn-default">
-                                <i class="fas fa-level-up-alt"></i> to inbox
+                            <a asp-controller="ContactMessage" asp-action="Sent" class="btn btn-default">
+                                <i class="fas fa-level-up-alt"></i> to Sent
                             </a>
                         </h3>
                         <div class="card-tools">
@@ -35,9 +35,9 @@
 
                         <div class="mailbox-controls with-border text-right">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-default btn-sm" data-container="body" title="Delete">
+                                <a asp-action="SentDetailsDelete" asp-route-id="@Model.SentMessageId" class="btn btn-default btn-sm" data-container="body" title="Delete">
                                     <i class="far fa-trash-alt"></i>
-                                </button>
+                                </a>
                                 <button type="button" class="btn btn-default btn-sm" data-container="body" title="Reply">
                                     <i class="fas fa-reply"></i>
                                 </button>
@@ -65,10 +65,10 @@
                             <li style="display:@hasAttachment">
                                 <span class="mailbox-attachment-icon"><i class="@fileIcon"></i></span>
                                 <div class="mailbox-attachment-info">
-                                    <a asp-controller="ContactMessage" asp-action="DownloadFileAttachment" asp-route-id="@Model.OutboxMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
+                                    <a asp-controller="ContactMessage" asp-action="DownloadFileAttachment" asp-route-id="@Model.SentMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
                                     <span class="mailbox-attachment-size clearfix mt-1">
                                         <span>@Model.Attachment?.Length  KB</span>
-                                        <a asp-controller="ContactMessage" asp-action="DownloadFileAttachment" asp-route-id="@Model.OutboxMessageId" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                        <a asp-controller="ContactMessage" asp-action="DownloadFileAttachment" asp-route-id="@Model.SentMessageId" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
                                     </span>
                                 </div>
                             </li>
@@ -77,10 +77,10 @@
 
                     <div class="card-footer">
                         <div class="float-right">
-                            <button type="button" class="btn btn-default"><i class="fas fa-reply"></i> Reply</button>
+                            <button type="button"  class="btn btn-default"><i class="fas fa-reply"></i> Reply</button>
                             <button type="button" class="btn btn-default"><i class="fas fa-share"></i> Forward</button>
                         </div>
-                        <button type="button" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</button>
+                        <a asp-action="SentDetailsDelete" asp-route-id="@Model.SentMessageId" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</a>
                         <button type="button" class="btn btn-default"><i class="fas fa-print"></i> Print</button>
                     </div>
 

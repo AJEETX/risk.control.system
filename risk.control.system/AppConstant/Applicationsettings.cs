@@ -97,7 +97,7 @@
         public const string INBOX = "Inbox";
         public const string COMPOSE = "Compose";
         public const string SENT_MAIL = "Sent";
-        public const string UNSENT = "Failed";
+        public const string OUTBOX = "Outbox";
         public const string TRASH_MAIL = "Trash";
         public const string DRAFT_MAIL = "Draft";
         public const string INVESTIGATION_UNDERWRITINGS = "Underwriting";
