@@ -115,9 +115,7 @@ table td {
     width:400px;
 }
 .form-Image {
-    width: 250px;
-    height: 150px;
-    object-fit: cover
+    height: 40px;
 }
 .attachment-list {
     width: 250px;
@@ -204,14 +202,14 @@ textarea {
     width: 100%;
     overflow-y: auto;
     resize: both;
-    min-height: 300px;
+    min-height: 200px;
     line-height: 20px;
     border:1px solid #ddd;
 }
 .file-image {
     width: 100%;
-    height: 50px;
-    object-fit: cover
+    height: 40px;
+    object-fit: cover;
 }
 .mailbox-read-message{
     min-height:300px;

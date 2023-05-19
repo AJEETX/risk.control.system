@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<InboxMessage>
 @{
-    ViewData["Title"] = ViewData["ContentHeader"] = "Contact us inbox";
+    ViewData["Title"] = "Inbox";
 }
 
 
@@ -45,7 +45,7 @@
                                             <th>From</th>
                                             <th>Subject</th>
                                             <th><i class='fas fa-paperclip'></i></th>
-                                            <th>Received</th>
+                                            <th><i class="fas fa-clock"></i></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -67,9 +67,9 @@
                                                 var star = message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
                                                 star = message.Read && message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
                                                 var fileAttachment = string.Empty;
-                                                if(!string.IsNullOrEmpty(message.AttachmentName))
+                                                if(string.IsNullOrEmpty(message.AttachmentName))
                                                 {
-                                                    fileAttachment = "<i class='fas fa-paperclip'></i>";
+                                                    fileAttachment = "none";
                                                 }
 
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
@@ -86,7 +86,7 @@
 
                                                     <td class="mailbox-attachment">
                                                         <a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId">
-                                                            @fileAttachment
+                                                            <span style="display:@fileAttachment"> <i class='fas fa-paperclip'></i></span>
                                                         </a>
                                                     </td>
 

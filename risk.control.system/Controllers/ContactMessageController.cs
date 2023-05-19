@@ -170,7 +170,7 @@ namespace risk.control.system.Controllers
                     sentMessage.Extension = extension;
                     sentMessage.AttachmentName = messageDocumentFileName;
                 }
-
+                sentMessage.SendDate = DateTime.Now;
                 userMailbox.Sent.Add(sentMessage);
                 _context.Mailbox.Attach(userMailbox);
                 _context.Mailbox.Update(userMailbox);
@@ -188,7 +188,8 @@ namespace risk.control.system.Controllers
                     inboxMessage.Extension = extension;
                     inboxMessage.AttachmentName = messageDocumentFileName;
                 }
-
+                inboxMessage.SendDate = DateTime.Now;
+                inboxMessage.ReceiveDate = DateTime.Now;
                 recepientMailbox.Inbox.Add(inboxMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
@@ -493,7 +494,7 @@ namespace risk.control.system.Controllers
                     sentMessage.Extension = extension;
                     sentMessage.AttachmentName = messageDocumentFileName;
                 }
-
+                sentMessage.SendDate = DateTime.Now;
                 userMailbox.Sent.Add(sentMessage);
                 _context.Mailbox.Attach(userMailbox);
                 _context.Mailbox.Update(userMailbox);
@@ -511,7 +512,7 @@ namespace risk.control.system.Controllers
                     inboxMessage.Extension = extension;
                     inboxMessage.AttachmentName = messageDocumentFileName;
                 }
-
+                inboxMessage.SendDate = DateTime.Now;
                 recepientMailbox.Inbox.Add(inboxMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
@@ -709,7 +710,6 @@ namespace risk.control.system.Controllers
             contactMessage.SenderEmail = userEmail;
             contactMessage.SendDate = DateTime.Now;
             contactMessage.Read = false;
-            contactMessage.IsDraft = false;
 
             if (recepientMailbox is not null)
             {
@@ -732,7 +732,7 @@ namespace risk.control.system.Controllers
                     sentMessage.Extension = extension;
                     sentMessage.AttachmentName = messageDocumentFileName;
                 }
-
+                sentMessage.SendDate = DateTime.Now;
                 userMailbox.Sent.Add(sentMessage);
                 _context.Mailbox.Attach(userMailbox);
                 _context.Mailbox.Update(userMailbox);
@@ -750,7 +750,8 @@ namespace risk.control.system.Controllers
                     inboxMessage.Extension = extension;
                     inboxMessage.AttachmentName = messageDocumentFileName;
                 }
-
+                inboxMessage.SendDate = DateTime.Now;
+                inboxMessage.ReceiveDate = DateTime.Now;
                 recepientMailbox.Inbox.Add(inboxMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);

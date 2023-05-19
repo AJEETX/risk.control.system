@@ -281,15 +281,20 @@ namespace risk.control.system.Controllers
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains("INITIATED"));
             if (status == null)
             {
-
                 return View(claimsInvestigation);
+            }
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
             }
             if (claimsInvestigation is not null)
             {
-                var user = User?.Claims.FirstOrDefault(u => u.Type == ClaimTypes.Email)?.Value;
                 claimsInvestigation.Updated = DateTime.UtcNow;
-                claimsInvestigation.UpdatedBy = user;
-                claimsInvestigation.CurrentUserId = User?.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)?.Value;
+                claimsInvestigation.UpdatedBy = applicationUser.Email;
+                claimsInvestigation.CurrentUserId = applicationUser.Email;
                 claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains("INITIATED")).InvestigationCaseStatusId;
                 claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("CREATED")).InvestigationCaseSubStatusId;
                 IFormFile? claimDocument = Request.Form?.Files?.FirstOrDefault();
