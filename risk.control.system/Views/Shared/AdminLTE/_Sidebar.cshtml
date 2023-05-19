@@ -1,11 +1,42 @@
-﻿@using risk.control.system.Helpers;
+﻿@using Microsoft.EntityFrameworkCore;
+@using risk.control.system.Helpers;
 @using risk.control.system.Models;
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ApplicationDbContext context
 @inject UserManager<ApplicationUser> UserManager
 
 @{
+    var userEmail = User?.Identity?.Name;
+    var applicationUser = context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+    var userMailbox = context.Mailbox
+    .Include(m => m.Inbox)
+    .Include(m => m.Outbox)
+    .Include(m => m.Sent)
+    .FirstOrDefault(c => c.Name == applicationUser.Email);
+
     var roleCode = string.Empty;
+    var newInboxMessgeDisplay = string.Empty;
+    var newOutboxMessgeDisplay = string.Empty;
+    var newSentMessgeDisplay = string.Empty;
+    var newTrashMessgeDisplay = string.Empty;
+
+    
+    var newInboxMessages = userMailbox?.Inbox.Where(i => i.Read == false);
+    if (newInboxMessages is not null && newInboxMessages.Count() > 0)
+    {
+        newInboxMessgeDisplay = "(" + newInboxMessages.Count().ToString() + ")";
+    }
+
+    var newOutboxMessages = userMailbox?.Outbox.Where(i => i.Read == false);
+    if (newOutboxMessages is not null && newOutboxMessages.Count() > 0)
+    {
+        newOutboxMessgeDisplay = "(" + newOutboxMessages.Count().ToString() + ")";
+    }
+    var newSentMessages = userMailbox?.Sent.Where(i => i.Read == false);
+    if (newSentMessages is not null && newSentMessages.Count() > 0)
+    {
+        newSentMessgeDisplay = "(" + newSentMessages.Count().ToString() + ")";
+    }
 }
 <aside class="main-sidebar elevation-2 sidebar-light-primary">
     <!-- Brand Logo -->
@@ -106,7 +137,7 @@
                     <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Index")">
                         <i class="fas fa-envelope-open nav-icon"></i>
                         <p>
-                            @Applicationsettings.INBOX
+                            @Applicationsettings.INBOX <span class="badge badge-danger">@newInboxMessgeDisplay</span>
                         </p>
                     </a>
                 </li>
@@ -130,7 +161,7 @@
                     <a is-active-page asp-controller="ContactMessage" asp-action="Sent" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Sent")">
                         <i class="fas fa-paper-plane nav-icon"></i>
                         <p>
-                            @Applicationsettings.SENT_MAIL
+                            @Applicationsettings.SENT_MAIL <span class="badge badge-light">@newSentMessgeDisplay</span>
                         </p>
                     </a>
                 </li>
@@ -138,7 +169,7 @@
                     <a is-active-page asp-controller="ContactMessage" asp-action="Outbox" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Outbox")">
                         <i class="fa fa-exclamation-triangle nav-icon"></i>
                         <p>
-                            @Applicationsettings.OUTBOX
+                            @Applicationsettings.OUTBOX  <span class="badge badge-warning">@newOutboxMessgeDisplay</span>
                         </p>
                     </a>
                 </li>
