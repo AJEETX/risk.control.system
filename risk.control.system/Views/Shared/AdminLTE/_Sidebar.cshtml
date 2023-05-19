@@ -135,7 +135,7 @@
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link 
-                        @Url.MakeActiveClass("ContactMessage","Index") @Url.MakeActiveClass("ContactMessage","InboxDetails")">
+                        @Url.MakeActiveClass("ContactMessage","Index") @Url.MakeActiveClass("ContactMessage","InboxDetails") @Url.MakeActiveClass("ContactMessage","InboxDetailsReply")">
                         <i class="fas fa-envelope-open nav-icon"></i>
                         <p>
                             @Applicationsettings.INBOX <span class="badge badge-danger">@newInboxMessgeDisplay</span>
@@ -150,16 +150,8 @@
                         </p>
                     </a>
                 </li>
-                @*<li class="nav-item">
-                    <a is-active-page asp-controller="ContactMessage" asp-action="DraftIndex" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","DraftIndex")">
-                        <i class="fas fa-file-export nav-icon"></i>
-                        <p>
-                            @Applicationsettings.DRAFT_MAIL
-                        </p>
-                    </a>
-                </li>*@
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ContactMessage" asp-action="Sent" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Sent") @Url.MakeActiveClass("ContactMessage","Sentdetails")">
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Sent" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Sent") @Url.MakeActiveClass("ContactMessage","Sentdetails") @Url.MakeActiveClass("ContactMessage","SentdetailsReply")">
                         <i class="fas fa-paper-plane nav-icon"></i>
                         <p>
                             @Applicationsettings.SENT_MAIL <span class="badge badge-light">@newSentMessgeDisplay</span>

@@ -123,6 +123,9 @@ namespace risk.control.system.Controllers
                 .FirstOrDefault(c => c.Name == applicationUser.Email);
 
             var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
+
+            userMessage.ReceipientEmail= userMessage.SenderEmail; 
+            userMessage.SenderEmail= applicationUser.Email;
             userMessage.Subject = actiontype + " :" + userMessage.Subject;
             ViewBag.ActionType = actiontype;
             return View(userMessage);
@@ -443,6 +446,10 @@ namespace risk.control.system.Controllers
                 .FirstOrDefault(c => c.Name == applicationUser.Email);
 
             var userMessage = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == id);
+
+            userMessage.ReceipientEmail = userMessage.SenderEmail;
+            userMessage.SenderEmail = applicationUser.Email;
+
             userMessage.Subject = actiontype + " :" + userMessage.Subject;
             ViewBag.ActionType = actiontype;
             return View(userMessage);

@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToAction(nameof(ContactMessageController.Index), "ContactMessage");
         }
         [HttpGet]
         [AllowAnonymous]
@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction(nameof(ContactMessageController.Index), "ContactMessage");
             }
         }
 
