@@ -1,14 +1,31 @@
 ﻿$(document).ready(function () {
+
+    $("#receipient-email").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/User/GetUserBySearch",
+                type: "POST",
+                data: { search: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        return { label: item, value: item };
+                    }))
+
+                }
+            })
+        },
+        messages: {
+            noResults: "",
+            results: function (r) {
+                return r;
+            }
+        }
+    });  
+
+
     $('.row-links').on('click', function () {
         let form = $('#message-detail');
         form.submit();
-    });
-
-    $('#Message').summernote({
-        height: 350, // set editor height
-        minHeight: null, // set minimum height of editor
-        maxHeight: null, // set maximum height of editor
-        focus: true // set focus to editable area after initializing summernote
     });
 
     $('tbody tr').on('click', function () {
@@ -37,86 +54,11 @@
             }
         }
     });
-    $('#reply-form').on('click', '#sendReply', function () {
-        let txtArea = $('#replyMessage');
-        let msgLength = txtArea.val().length;
-
-        if (msgLength === 0) {
-            if (confirm('Send this message without text in the body?')) {
-                $('#reply-form').submit();
-            } else {
-                return;
-            }
-        } else {
-            $('#reply-form').submit();
-        }
-    });
-
-    $('#reply-form').on('click', '#show-reply', function () {
-        let container = $(this).parent().parent();
-        container.empty();
-
-        let template = `
-                <div>
-                    <h5>Reply to: @Model.Email</h5>
-                    <textarea id="replyMessage" name="Reply" style="width: 100%;" rows="7"></textarea>
-                    <button type="button" id="sendReply" class ="btn btn-primary">Send</button>
-                    <button type="button" id="cancelReply" class ="btn btn-danger">Cancel</button>
-                </div>`;
-
-        container.append(template);
-    });
-
-    $('#reply-form').on('click', '#cancelReply', function () {
-        let container = $(this).parent().parent();
-        container.empty();
-        container.append('<div class="text-muted">click <span id="show-reply" class="clickable-text">here</span> to reply</div>');
-    });
 
     $('#delete-message').on('click', function () {
         $('#deleteForm').submit();
     });
 
-
-    // check all or uncheck all
-    $('.checkall-toggle').on('click', function () {
-        var clicks = $(this).data('clicks');
-
-        if (clicks) {
-            $('input[type="checkbox"]').iCheck('uncheck');
-            $('.fa', this).removeClass('fa-check-square-o').addClass('fa-square-o');
-            $('.fa', this).text(' Check all');
-        } else {
-            $('input[type="checkbox"]').iCheck('check');
-            $('.fa', this).removeClass('fa-square-o').addClass('fa-check-square-o');
-            $('.fa', this).text(' Uncheck all');
-        }
-
-        $(this).data('clicks', !clicks);
-    });
-
-    //// iCheck
-    //$('input').iCheck({
-    //    checkboxClass: 'icheckbox_square-blue',
-    //    radioClass: 'iradio_square-blue',
-    //    increaseArea: '20%' // optional
-    //});
-
-
-
-    /** add active class and stay opened when selected */
-    var url = window.location;
-    const allLinks = document.querySelectorAll('.nav-item a');
-    const currentLink = [...allLinks].filter(e => {
-        return e.href == url;
-    });
-
-    if (currentLink.length > 0) { //this filter because some links are not from menu
-        currentLink[0].classList.add("active");
-        if (currentLink[0].closest(".nav-treeview")) {
-            currentLink[0].closest(".nav-treeview").style.display = "block";
-        }
-    }
     // Attach the call to toggleChecked to the
     // click event of the global checkbox:
     $("#checkall").click(function () {
@@ -126,10 +68,6 @@
     });
 
     $("input.vendors").click(function () {
-        //var status = $(this).prop('checked');
-
-        //$(this).prop('checked', status);
-        //$('#manage-vendors').prop('disabled', !status);
 
         var checkboxes = $("input[type='checkbox'].vendors");
         var anyChecked = checkIfAnyChecked(checkboxes);

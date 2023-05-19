@@ -88,7 +88,7 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label asp-for="DocumentImage" class="control-label"></label>
-                                        <img class="form-Image" id="documentImage" src="../img/no-image.png">
+                                        <img class="form-Image" id="documentImage" src="/img/no-image.png">
                                         <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                 </div>

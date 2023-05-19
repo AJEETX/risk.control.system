@@ -157,6 +157,16 @@ namespace risk.control.system.Controllers
             return Json(pincodes);
         }
 
+        [HttpPost, ActionName("GetUserBySearch")]
+        public async Task<JsonResult> GetUserBySearch(string search)
+        {
+            var applicationUsers = new List<ApplicationUser>();
+            if (!string.IsNullOrEmpty(search))
+            {
+                applicationUsers = await context.ApplicationUser.Where(s => s.Email.Contains(search)).ToListAsync();
+            }
+            return Json(applicationUsers?.Select(a=>a.Email).ToList());
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser user)
