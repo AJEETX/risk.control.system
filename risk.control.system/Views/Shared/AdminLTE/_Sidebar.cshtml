@@ -224,6 +224,69 @@
                 </p>
                 </a>
                 </li>*@
+                @{
+                    
+                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    {
+                        <li class="nav-item">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                                <i class="nav-icon fas fa-shield-alt"></i>
+                                <p class="sidebar-menu-header-label">
+                                    @Applicationsettings.ADMIN_SETTINGS
+                                    <i class="right fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                        </li>
+                        if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
+                        {
+                            <li class="nav-item">
+                                <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","")">
+                                    <i class="nav-icon fas fa-building"></i>
+                                    <p>
+                                        @Applicationsettings.CLIENT_COMPANIES
+                                    </p>
+                                </a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                                <i class="nav-icon fa fa-binoculars"></i>
+                                <p>
+                                    @Applicationsettings.VENDORS
+                                </p>
+                            </a>
+                        </li>
+                    }
+                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
+                    {
+                        <li class="nav-item">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
+                                <i class="nav-icon fas fa-user-cog"></i>
+                                <p class="sidebar-menu-header-label">
+                                    @Applicationsettings.USER_ROLES
+                                    <i class="right fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="User" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("User","")">
+                                <i class="fas fa-user-friends nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.USER
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Roles" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Roles","")">
+                                <i class="fas fa-user-lock nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.ROLE
+
+                                </p>
+                            </a>
+                        </li>
+                    }
+                }
                 <li class="nav-item">
                     <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","") 
                     @Url.MakeActiveClass("InvestigationCaseStatus","") @Url.MakeActiveClass("CaseEnabler","") @Url.MakeActiveClass("Costcentre","") @Url.MakeActiveClass("InvestigationCaseOutcome","")
@@ -300,65 +363,8 @@
                     </a>
                 </li>
                 @{
-                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
-                    {
-                        <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("User","") @Url.MakeActiveClass("Roles","")">
-                                <i class="nav-icon fas fa-user-cog"></i>
-                                <p class="sidebar-menu-header-label">
-                                    @Applicationsettings.USER_ROLES
-                                    <i class="right fas fa-angle-right"></i>
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="User" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("User","")">
-                                <i class="fas fa-user-friends nav-icon"></i>
-                                <p>
-                                    @Applicationsettings.USER
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="Roles" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Roles","")">
-                                <i class="fas fa-user-lock nav-icon"></i>
-                                <p>
-                                    @Applicationsettings.ROLE
-
-                                </p>
-                            </a>
-                        </li>
-                    }
                     if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
                     {
-                        <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
-                                <i class="nav-icon fas fa-shield-alt"></i>
-                                <p class="sidebar-menu-header-label">
-                                    @Applicationsettings.ADMIN_SETTINGS
-                                    <i class="right fas fa-angle-right"></i>
-                                </p>
-                            </a>
-                        </li>
-                        if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
-                        {
-                            <li class="nav-item">
-                                <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","")">
-                                    <i class="nav-icon fas fa-building"></i>
-                                    <p>
-                                        @Applicationsettings.CLIENT_COMPANIES
-                                    </p>
-                                </a>
-                            </li>
-                        }
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
-                                <i class="nav-icon fa fa-binoculars"></i>
-                                <p>
-                                    @Applicationsettings.VENDORS
-                                </p>
-                            </a>
-                        </li>
                         if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                         {
                             <li class="nav-item">
