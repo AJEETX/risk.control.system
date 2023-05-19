@@ -38,15 +38,15 @@
                                 <a asp-action="SentDetailsDelete" asp-route-id="@Model.SentMessageId" class="btn btn-default btn-sm" data-container="body" title="Delete">
                                     <i class="far fa-trash-alt"></i>
                                 </a>
-                                <button type="button" class="btn btn-default btn-sm" data-container="body" title="Reply">
+                                <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Reply" class="btn btn-default btn-sm" data-container="body" title="Reply">
                                     <i class="fas fa-reply"></i>
-                                </button>
-                                <button type="button" class="btn btn-default btn-sm" data-container="body" title="Forward">
+                                </a>
+                                <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Forward" class="btn btn-default btn-sm" data-container="body" title="Forward">
                                     <i class="fas fa-share"></i>
-                                </button>
+                                </a>
                             </div>
 
-                            <button type="button" class="btn btn-default btn-sm" title="Print">
+                            <button type="button" onclick="window.print();return false;" class="btn btn-default btn-sm" title="Print">
                                 <i class="fas fa-print"></i>
                             </button>
                         </div>
@@ -77,11 +77,11 @@
 
                     <div class="card-footer">
                         <div class="float-right">
-                            <button type="button"  class="btn btn-default"><i class="fas fa-reply"></i> Reply</button>
-                            <button type="button" class="btn btn-default"><i class="fas fa-share"></i> Forward</button>
+                            <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Reply" class="btn btn-default"><i class="fas fa-reply"></i> Reply</a>
+                            <a sp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Forward" class="btn btn-default"><i class="fas fa-share"></i> Forward</a>
                         </div>
                         <a asp-action="SentDetailsDelete" asp-route-id="@Model.SentMessageId" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</a>
-                        <button type="button" class="btn btn-default"><i class="fas fa-print"></i> Print</button>
+                        <button type="button" onclick="window.print();return false;" class="btn btn-default"><i class="fas fa-print"></i> Print</button>
                     </div>
 
                 </div>

@@ -42,9 +42,9 @@
                                         <tr>
                                             <th>select</th>
                                             <th>priority</th>
-                                            <th>Sender</th>
+                                            <th>From</th>
                                             <th>Subject</th>
-                                            <th>Files</th>
+                                            <th><i class='fas fa-paperclip'></i></th>
                                             <th>Received</th>
                                         </tr>
                                     </thead>
@@ -55,7 +55,7 @@
                                             {
                                                 var sentDateTime = message.SendDate.Value.ToString();
                                                 var time = DateTime.Now.Subtract(message.SendDate.Value).Minutes;
-                                                if(time< 60)
+                                                if (time < 60)
                                                 {
                                                     sentDateTime = time.ToString() + " minute(s)";
                                                 }
@@ -66,21 +66,35 @@
                                                 }
                                                 var star = message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
                                                 star = message.Read && message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
-                                                
+                                                var fileAttachment = string.Empty;
+                                                if(!string.IsNullOrEmpty(message.AttachmentName))
+                                                {
+                                                    fileAttachment = "<i class='fas fa-paperclip'></i>";
+                                                }
+
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
                                                         <input id="@message.InboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.InboxMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="InboxDetails" asp-route-id="@message.InboxMessageId"><i class="@star"></i></a>
+                                                        <a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId"><i class="@star"></i></a>
                                                     </td>
-                                                    <td>@message.SenderEmail</td>
+                                                    <td><a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId">@message.SenderEmail</a></td>
                                                     <td class="message-title text-muted">
-                                                        <span>@message.Subject</span> - @message.Message
+                                                        <a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId"><span>@message.Subject</span> - @message.Message</a>
                                                     </td>
-                                                    <td class="mailbox-attachment"><a asp-action="InboxDetails" asp-route-id="@message.InboxMessageId"><i class="fas fa-paperclip"></i></a></td>
 
-                                                    <td class="mailbox-date">@sentDateTime</td>
+                                                    <td class="mailbox-attachment">
+                                                        <a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId">
+                                                            @fileAttachment
+                                                        </a>
+                                                    </td>
+
+                                                    <td class="mailbox-date">
+                                                        <a class="row-links" asp-action="InboxDetails" asp-route-id="@message.InboxMessageId">
+                                                        @sentDateTime
+                                                        </a>
+                                                        </td>
                                                 </tr>
                                             }
                                         }
@@ -90,6 +104,7 @@
                                         }
 
                                     </tbody>
+                                    
                                 </table>
                             </div>
                         </div>
@@ -97,7 +112,7 @@
                         <div class="card-footer p-0">
                             <div class="mailbox-controls">
 
-                                <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default btn-sm">
+                                @*<button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default btn-sm">
                                     <i class="far fa-square"></i>
                                 </button>
                                 <div class="btn-group">
@@ -114,9 +129,9 @@
 
                                 <button type="button" class="btn btn-default btn-sm">
                                     <i class="fas fa-sync-alt"></i>
-                                </button>
-                                <div class="float-right">
-                                    1-50/@Model.Count()
+                                </button>*@
+                                @*<div class="float-right">
+                                    1-@Model.Count()/@Model.Count()
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-sm">
                                             <i class="fas fa-chevron-left"></i>
@@ -126,7 +141,7 @@
                                         </button>
                                     </div>
 
-                                </div>
+                                </div>*@
 
                             </div>
                         </div>

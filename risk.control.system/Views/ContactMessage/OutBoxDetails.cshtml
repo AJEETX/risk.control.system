@@ -46,7 +46,7 @@
                                 </button>
                             </div>
 
-                            <button type="button" class="btn btn-default btn-sm" title="Print">
+                            <button type="button" onclick="window.print();return false;" class="btn btn-default btn-sm" title="Print">
                                 <i class="fas fa-print"></i>
                             </button>
                         </div>
@@ -81,7 +81,7 @@
                             <button type="button" class="btn btn-default"><i class="fas fa-share"></i> Forward</button>
                         </div>
                         <a  asp-action="OutboxDetailsDelete" asp-route-id="@Model.OutboxMessageId" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</a>
-                        <button type="button" class="btn btn-default"><i class="fas fa-print"></i> Print</button>
+                        <button type="button" onclick="window.print();return false;" class="btn btn-default"><i class="fas fa-print"></i> Print</button>
                     </div>
 
                 </div>

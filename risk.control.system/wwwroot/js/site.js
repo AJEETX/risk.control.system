@@ -1,4 +1,8 @@
 ﻿$(document).ready(function () {
+    $('.row-links').on('click', function () {
+        let form = $('#message-detail');
+        form.submit();
+    });
 
     $('#Message').summernote({
         height: 350, // set editor height

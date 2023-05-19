@@ -1,7 +1,7 @@
-﻿@model risk.control.system.Models.OutboxMessage
+﻿@model risk.control.system.Models.InboxMessage
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Reply";
 }
 
 <section class="content">
@@ -11,15 +11,16 @@
                 <form asp-controller="ContactMessage" id="email-form" method="post" enctype="multipart/form-data">
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title">Compose New Mail</h3>
+                            <h3 class="card-title">@ViewBag.ActionType Mail</h3>
                         </div>
 
+                        <input type="hidden" asp-for="InboxMessageId" />
                         <div class="card-body">
                             <div class="form-group">
-                                <input asp-for="ReceipientEmail" class="form-control" placeholder="To:">
+                                <input class="form-control" asp-for="ReceipientEmail"  value="@Model.ReceipientEmail">
                             </div>
                             <div class="form-group">
-                                <input class="form-control" asp-for="Subject" placeholder="Subject:">
+                                <input class="form-control" asp-for="Subject" value="@Model.Subject">
                             </div>
                             <div style="display:none" class="form-group">
                                 <select asp-for="Priority" asp-items="Html.GetEnumSelectList<ContactMessagePriority>()">
@@ -45,7 +46,7 @@
                         <div class="card-footer">
                             <div class="float-right">
                                 @*<button type="submit" asp-action="Draft" class="btn btn-secondary"><i class="fas fa-pencil-alt"></i> Draft</button>*@
-                                <button type="submit" asp-action="Create" class="btn btn-success"><i class="far fa-envelope"></i> Send</button>
+                                <button type="submit" asp-action="InboxDetailsReply" class="btn btn-success"><i class="far fa-envelope"></i> Reply</button>
                             </div>
                             <button type="reset" class="btn btn-secondary"><i class="fas fa-times"></i> @Applicationsettings.CANCEL</button>
                         </div>

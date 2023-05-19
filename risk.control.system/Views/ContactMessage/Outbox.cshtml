@@ -43,8 +43,9 @@
                                             <th>select</th>
                                             <th>priority</th>
                                             <th>Sender</th>
+                                            <th>Receiver</th>
                                             <th>Subject</th>
-                                            <th>Files</th>
+                                            <th><i class='fas fa-paperclip'></i></th>
                                             <th>Received</th>
                                         </tr>
                                     </thead>
@@ -66,21 +67,32 @@
                                                 }
                                                 var star = message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
                                                 star = message.Read && message.Priority == ContactMessagePriority.IMPORTANT ? "fas fa-star text-warning" : "fas fa-star text-secondary";
-
+                                                var fileAttachment = string.Empty;
+                                                if (!string.IsNullOrEmpty(message.AttachmentName))
+                                                {
+                                                    fileAttachment = "<i class='fas fa-paperclip'></i>";
+                                                }
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
                                                         <input id="@message.OutboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.OutboxMessageId" checked="@message.SelectedForAction" />
                                                     </td>
                                                     <td class="mailbox-star">
-                                                        <a asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId"><i class="@star"></i></a>
+                                                        <a class="row-links" asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId"><i class="@star"></i></a>
                                                     </td>
-                                                    <td>@message.SenderEmail</td>
+                                                    <td><a class="row-links" asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId">@message.SenderEmail</a></td>
+                                                    <td><a class="row-links" asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId">@message.ReceipientEmail</a></td>
                                                     <td class="message-title text-muted">
+                                                        <a class="row-links" asp-action="SentDetails" asp-route-id="@message.OutboxMessageId">
                                                         <span>@message.Subject</span> - @message.Message
+                                                        </a>
                                                     </td>
-                                                    <td class="mailbox-attachment"><a asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId"><i class="fas fa-paperclip"></i></a></td>
+                                                    <td class="mailbox-attachment"><a asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId">
+                                                        @fileAttachment
+                                                        </a></td>
 
-                                                    <td class="mailbox-date">@sentDateTime</td>
+                                                    <td class="mailbox-date">
+                                                        <a class="row-links" asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId">
+                                                        @sentDateTime</a></td>
                                                 </tr>
                                             }
                                         }
@@ -97,7 +109,7 @@
                         <div class="card-footer p-0">
                             <div class="mailbox-controls">
 
-                                <button type="button" class="btn btn-default btn-sm checkbox-toggle">
+                                @*<button type="button" class="btn btn-default btn-sm checkbox-toggle">
                                     <i class="far fa-square"></i>
                                 </button>
                                 <div class="btn-group">
@@ -116,7 +128,7 @@
                                     <i class="fas fa-sync-alt"></i>
                                 </button>
                                 <div class="float-right">
-                                    1-50/200
+                                    1-@Model.Count()/@Model.Count()
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-sm">
                                             <i class="fas fa-chevron-left"></i>
@@ -126,7 +138,7 @@
                                         </button>
                                     </div>
 
-                                </div>
+                                </div>*@
 
                             </div>
                         </div>
