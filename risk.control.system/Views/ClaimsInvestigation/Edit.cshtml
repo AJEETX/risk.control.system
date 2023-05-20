@@ -9,6 +9,7 @@
         <form asp-action="Edit" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
+                    <input type="hidden" asp-for="ClaimsInvestigationCaseId" />
                     <div class="card card-warning card-outline">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-pen"></i>  @Applicationsettings.INVESTIGATION_CLAIMS_NEW</h3>
@@ -17,7 +18,6 @@
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-pen"></i>  @Applicationsettings.INVESTIGATION_CLAIMS_CASE_DETAILS</h3>
                         </div>
-                        <input type="hidden" asp-for="ClaimsInvestigationCaseId" />
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-sm-6">

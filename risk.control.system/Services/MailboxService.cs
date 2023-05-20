@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -16,12 +14,19 @@ namespace risk.control.system.Services
     }
     public class MailboxService : IMailboxService
     {
+        private static string BaseUrl = string.Empty;
         private readonly ApplicationDbContext _context;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
-        public MailboxService(ApplicationDbContext context, UserManager<ClientCompanyApplicationUser> userManager)
+        public MailboxService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<ClientCompanyApplicationUser> userManager)
         {
             this._context = context;
+            this.httpContextAccessor = httpContextAccessor;
+            var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+            var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+
+            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/ClaimsInvestigation/Details/";
             this.userManager = userManager;
         }
 
@@ -64,6 +69,23 @@ namespace risk.control.system.Services
                 Read = false,
                 UpdatedBy = applicationUser.Email
             };
+
+            var claimsInvestigations = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationCaseId));
+            foreach (var claimsInvestigation in claimsInvestigations)
+            {
+                contactMessage.Message += BaseUrl+ claimsInvestigation.ClaimsInvestigationCaseId;
+            }
+
+
+            foreach (var userEmailToSend in userEmailsToSend)
+            {
+                var recepientMailbox = _context.Mailbox.Include(m=>m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend);
+                contactMessage.ReceipientEmail = recepientMailbox.Name;
+                recepientMailbox?.Inbox.Add(contactMessage);
+                _context.Mailbox.Attach(recepientMailbox);
+                _context.Mailbox.Update(recepientMailbox);
+            }
+            var rows = await _context.SaveChangesAsync();
         }
 
         public async Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation)
@@ -91,13 +113,16 @@ namespace risk.control.system.Services
                     }
                 }
             }
+            string claimsUrl = $"<a href={BaseUrl + claimsInvestigation.ClaimsInvestigationCaseId}>url</a>";
+            claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+
 
             var contactMessage = new InboxMessage
             {
                 //ReceipientEmail = userEmailToSend,
                 Created = DateTime.UtcNow,
-                Message = claimsInvestigation.ToString(),
-                Subject = "New case created: case Id = " + claimsInvestigation.ClaimsInvestigationCaseId,
+                Message = claimsUrl,
+                Subject = "New case created: case Id = " + claimsUrl,
                 SenderEmail = clientCompanyUser?.Email,
                 Priority = ContactMessagePriority.NORMAL,
                 SendDate = DateTime.Now,
@@ -126,7 +151,7 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
             }
-            var rowse = await _context.SaveChangesAsync();
+            var rows = await _context.SaveChangesAsync();
         }
     }
 }

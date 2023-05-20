@@ -94,16 +94,6 @@
                                     
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    
-                                </div>
-                            </div>
-                            
                         </div>
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-plus"></i>  @Applicationsettings.CUSTOMER_DETAILS</h3>
@@ -279,4 +269,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $("#InvestigationServiceTypeId").focus();
+    </script>
 }
