@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -28,8 +28,11 @@ namespace risk.control.system.Seeds
                 LastName = PORTAL_ADMIN.LAST_NAME,
                 Password = Password,
                 EmailConfirmed = true,
-                isSuperAdmin = true,
+                IsSuperAdmin = true,
+                IsClientAdmin = true,
+                IsVendorAdmin = true,
                 PhoneNumberConfirmed = true,
+                
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
@@ -48,10 +51,7 @@ namespace risk.control.system.Seeds
                     portalAdmin.ApplicationRoles.Add(portalAdminRole);
 
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientAdmin.ToString());
-
                     var clientAdminRole = new ApplicationRole(AppRoles.ClientAdmin.ToString(), AppRoles.ClientAdmin.ToString());
-
-
                     portalAdmin.ApplicationRoles.Add(clientAdminRole);
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientCreator.ToString());
                     context.ApplicationRole.Add(new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString()));

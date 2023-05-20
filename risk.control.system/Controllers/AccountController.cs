@@ -47,6 +47,14 @@ namespace risk.control.system.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             {
+                var loggedinUser = await _userManager.FindByEmailAsync(model.Email);
+                if (loggedinUser != null)
+                {
+                    // Now user have entered correct username and password.
+                    // Time to change the security stamp
+                    await _userManager.UpdateSecurityStampAsync(loggedinUser);
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {

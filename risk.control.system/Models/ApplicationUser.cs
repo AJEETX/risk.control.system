@@ -9,7 +9,9 @@ namespace risk.control.system.Models
     {
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         public string? ProfilePictureUrl { get; set; }
-        public bool isSuperAdmin { get; set; } = false;
+        public bool IsSuperAdmin { get; set; } = false;
+        public bool IsClientAdmin { get; set; } = false;
+        public bool IsVendorAdmin { get; set; } = false;
         public byte[]? ProfilePicture { get; set; }
         [Display(Name = "Image")]
         [NotMapped]

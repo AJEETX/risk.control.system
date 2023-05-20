@@ -60,10 +60,10 @@
                             <li style="display:@hasAttachment">
                                 <span class="mailbox-attachment-icon"><i class="@fileIcon"></i></span>
                                 <div class="mailbox-attachment-info">
-                                    <a asp-controller="ContactMessage" asp-action="DownloadFileAttachment" asp-route-id="@Model.TrashMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
+                                    <a asp-controller="ContactMessage" asp-action="TrashDetailsDownloadFileAttachment" asp-route-id="@Model.TrashMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
                                     <span class="mailbox-attachment-size clearfix mt-1">
                                         <span>@Model.Attachment?.Length  KB</span>
-                                        <a asp-controller="ContactMessage" asp-action="DownloadFileAttachment" asp-route-id="@Model.TrashMessageId" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
+                                        <a asp-controller="ContactMessage" asp-action="TrashDetailsDownloadFileAttachment" asp-route-id="@Model.TrashMessageId" class="btn btn-default btn-sm float-right"><i class="fas fa-cloud-download-alt"></i></a>
                                     </span>
                                 </div>
                             </li>

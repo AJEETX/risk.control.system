@@ -8,7 +8,7 @@
 
         //WEBSITE SETTINGS
 
-        public const string WEBSITE_SITE_MENU_BRAND = "ABY";
+        public const string WEBSITE_SITE_MENU_BRAND = "aby";
         public const string WEBSITE_TITLE = "risk.control.unit";
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
         public const string WEBSITE_SITE_DESIGNER = "its aby";

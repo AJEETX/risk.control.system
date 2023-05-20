@@ -152,7 +152,7 @@
                                                     <td>
                                                         <input id="@item.ClaimsInvestigationCaseId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationCaseId" checked="@item.SelectedToAssign" />
                                                     </td>
-                                                    <td style="display:@ViewBag.HasClientCompany">
+                                                    <td style="display:@hasClientCompany">
                                                         @Html.DisplayFor(modelItem => item.ClientCompany.Name)
                                                     </td>
                                                     <td>

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using Microsoft.AspNetCore.Mvc;
@@ -7,8 +6,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
-
-using NuGet.Packaging.Signing;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -19,7 +16,7 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IToastNotification toastNotification;
-        JsonSerializerOptions options = new()
+        private readonly JsonSerializerOptions options = new()
         {
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
@@ -785,7 +782,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        public async Task<IActionResult> DownloadFileAttachment(int id)
+        public async Task<IActionResult> InboxDetailsDownloadFileAttachment(int id)
         {
             var userEmail = HttpContext.User.Identity.Name;
 
@@ -795,49 +792,63 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var userMailbox = _context.Mailbox
-                .Include(m => m.Inbox)
-                .Include(m => m.Inbox)
-                .Include(m => m.Sent)
-                .Include(m => m.Trash)
-                .Include(m => m.Draft)
+            var userMailbox = _context.Mailbox.Include(m => m.Inbox)
                 .FirstOrDefault(c => c.Name == applicationUser.Email);
 
             var InboxFile = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
 
-            if (InboxFile != null)
-            {
-                return File(InboxFile.Attachment, InboxFile.FileType, InboxFile.AttachmentName + InboxFile.Extension);
-            }
-            var OutboxFile = userMailbox.Outbox.FirstOrDefault(c => c.OutboxMessageId == id);
-            if (OutboxFile != null)
-            {
-                return File(OutboxFile.Attachment, OutboxFile.FileType, OutboxFile.AttachmentName + OutboxFile.Extension);
-            }
-            var SentFile = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == id);
-            if (SentFile != null)
-            {
-                return File(SentFile.Attachment, SentFile.FileType, SentFile.AttachmentName + SentFile.Extension);
-            }
-
-            var draftFile = userMailbox.Draft.FirstOrDefault(c => c.DraftMessageId == id);
-            if (draftFile != null)
-            {
-                return File(draftFile.Attachment, draftFile.FileType, draftFile.AttachmentName + draftFile.Extension);
-            }
-            var TrashFile = userMailbox.Trash.FirstOrDefault(c => c.TrashMessageId == id);
-            if (TrashFile != null)
-            {
-                return File(TrashFile.Attachment, TrashFile.FileType, TrashFile.AttachmentName + TrashFile.Extension);
-            }
-
-            return Problem();
+            return InboxFile != null ? File(InboxFile.Attachment, InboxFile.FileType, InboxFile.AttachmentName + InboxFile.Extension) : Problem();
         }
-        // POST: ContactMessage/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public async Task<IActionResult> OutboxDetailsDownloadFileAttachment(int id)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
 
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
 
-        // POST: ContactMessage/Delete/5
+            var userMailbox = _context.Mailbox.Include(m => m.Outbox)
+                .FirstOrDefault(c => c.Name == applicationUser.Email);
+
+            OutboxMessage? outBox = userMailbox.Outbox.FirstOrDefault(c => c.OutboxMessageId == id);
+
+            return outBox != null ? File(outBox.Attachment, outBox.FileType, outBox.AttachmentName + outBox.Extension) : Problem();
+        }
+        public async Task<IActionResult> SentDetailsDownloadFileAttachment(int id)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
+            var userMailbox = _context.Mailbox.Include(m => m.Sent)
+                .FirstOrDefault(c => c.Name == applicationUser.Email);
+
+            SentMessage? sentBox = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == id);
+
+            return sentBox != null ? File(sentBox.Attachment, sentBox.FileType, sentBox.AttachmentName + sentBox.Extension) : Problem();
+        }
+        public async Task<IActionResult> TrashDetailsDownloadFileAttachment(int id)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+
+            var userMailbox = _context.Mailbox.Include(m => m.Trash)
+                .FirstOrDefault(c => c.Name == applicationUser.Email);
+
+            TrashMessage? trash = userMailbox.Trash.FirstOrDefault(c => c.TrashMessageId == id);
+
+            return trash != null ? File(trash.Attachment, trash.FileType, trash.AttachmentName + trash.Extension) : Problem();
+        }
     }
 }

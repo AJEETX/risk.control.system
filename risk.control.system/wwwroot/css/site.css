@@ -127,7 +127,6 @@ table td {
 }
 .card tbody a{
     display:inline-block;
-    height:1rem;
 }
 .hide-id{
     display:none;

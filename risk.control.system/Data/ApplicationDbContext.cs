@@ -51,5 +51,6 @@ namespace risk.control.system.Data
         public virtual DbSet<FileOnDatabaseModel> FilesOnDatabase { get; set; }
         public virtual DbSet<FileOnFileSystemModel> FilesOnFileSystem { get; set; }
         public DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; } = default!;
+        public DbSet<risk.control.system.Models.VerificationLocation> VerificationLocation { get; set; } = default!;
     }
 }

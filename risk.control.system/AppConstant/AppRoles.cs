@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-using risk.control.system.AppConstant;
-
-namespace risk.control.system.Models
+namespace risk.control.system.AppConstant
 {
     public enum AppRoles
     {

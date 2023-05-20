@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -138,10 +138,12 @@ namespace risk.control.system.Seeds
 
             #region //CREATE RISK CASE DETAILS
 
+            //CASE STATUS
+
             var initiated = new InvestigationCaseStatus
             {
-                Name = "INITIATED",
-                Code = "INITIATED",
+                Name = CONSTANTS.CASE_STATUS.INITIATED,
+                Code = CONSTANTS.CASE_STATUS.INITIATED,
                 MasterData = true,
             };
 
@@ -149,8 +151,8 @@ namespace risk.control.system.Seeds
 
             var inProgress = new InvestigationCaseStatus
             {
-                Name = "IN-PROGRESS",
-                Code = "IN-PROGRESS",
+                Name = CONSTANTS.CASE_STATUS.INPROGRESS,
+                Code = CONSTANTS.CASE_STATUS.INPROGRESS,
                 MasterData = true,
             };
 
@@ -158,71 +160,112 @@ namespace risk.control.system.Seeds
 
             var finished = new InvestigationCaseStatus
             {
-                Name = "FINISHED",
-                Code = "FINISHED",
+                Name = CONSTANTS.CASE_STATUS.FINISHED,
+                Code = CONSTANTS.CASE_STATUS.FINISHED,
                 MasterData = true,
             };
 
             var finishedStatus = await context.InvestigationCaseStatus.AddAsync(finished);
+
+            //CASE SUBSTATUS
+
             var created = new InvestigationCaseSubStatus
             {
-                Name = "CREATED",
-                Code = "CREATED",
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
                 MasterData = true,
                 InvestigationCaseStatusId = initiatedStatus.Entity.InvestigationCaseStatusId
             };
             var createdSubStatus = await context.InvestigationCaseSubStatus.AddAsync(created);
             var assigned = new InvestigationCaseSubStatus
             {
-                Name = "ASSIGNED_TO_ASSIGNER",
-                Code = "ASSIGNED_TO_ASSIGNER",
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 MasterData = true,
                 InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
             };
 
             var assignedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(assigned);
 
-            var rejected = new InvestigationCaseSubStatus
+            var allocated = new InvestigationCaseSubStatus
             {
-                Name = "REJECTED_BY_ASSESSOR",
-                Code = "REJECTED_BY_ASSESSOR",
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
                 MasterData = true,
                 InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+            };
+
+            var allocatedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(allocated);
+
+            var assignedToAgent = new InvestigationCaseSubStatus
+            {
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
+                MasterData = true,
+                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+            };
+
+            var assignedToAgentSubStatus = await context.InvestigationCaseSubStatus.AddAsync(assignedToAgent);
+
+            var submittedtoSupervisor = new InvestigationCaseSubStatus
+            {
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
+                MasterData = true,
+                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+            };
+
+            var submittedtoSupervisorSubStatus = await context.InvestigationCaseSubStatus.AddAsync(submittedtoSupervisor);
+
+            var submittedToAssessor = new InvestigationCaseSubStatus
+            {
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR,
+                MasterData = true,
+                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+            };
+
+            var submittedToAssessorSubStatus = await context.InvestigationCaseSubStatus.AddAsync(submittedToAssessor);
+
+            var approved = new InvestigationCaseSubStatus
+            {
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR,
+                MasterData = true,
+                InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
+            };
+
+            var approvededSubStatus = await context.InvestigationCaseSubStatus.AddAsync(approved);
+
+
+            var rejected = new InvestigationCaseSubStatus
+            {
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR,
+                MasterData = true,
+                InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
             };
 
             var rejectedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(rejected);
-            var accepted = new InvestigationCaseSubStatus
-            {
-                Name = "ACCEPTED_BY_ASSESSOR",
-                Code = "ACCEPTED_BY_ASSESSOR",
-                MasterData = true,
-                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
-            };
-            var approved = new InvestigationCaseSubStatus
-            {
-                Name = "APPROVED_BY_ASSESSOR",
-                Code = "APPROVED_BY_ASSESSOR",
-                MasterData = true,
-                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
-            };
 
-            var released = new InvestigationCaseSubStatus
+            var reassigned = new InvestigationCaseSubStatus
             {
-                Name = "RELEASED_BY_SUPERVISOR",
-                Code = "RELEASED_BY_SUPERVISOR",
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER,
                 MasterData = true,
                 InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
             };
-            var acceptedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(released);
-            var withdrawn = new InvestigationCaseSubStatus
+            var acceptedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(reassigned);
+
+            var withdrawnByCompany = new InvestigationCaseSubStatus
             {
-                Name = "WITHDRAWN",
-                Code = "WITHDRAWN",
+                Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
+                Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
                 MasterData = true,
                 InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
             };
 
-            var withdrawnSubStatus = await context.InvestigationCaseSubStatus.AddAsync(withdrawn);
+            var withdrawnByCompanySubStatus = await context.InvestigationCaseSubStatus.AddAsync(withdrawnByCompany);
 
             #endregion
 

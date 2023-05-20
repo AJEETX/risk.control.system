@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using static risk.control.system.AppConstant.Applicationsettings;
@@ -25,7 +26,9 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
-                isSuperAdmin = false,
+                IsSuperAdmin = false,
+                IsClientAdmin = true,
+                IsVendorAdmin = false,
                 ClientCompanyId = clientCompanyId,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
@@ -40,12 +43,26 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientAdmin, Password);
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAdmin.ToString());
+                    var clientAdminRole = new ApplicationRole(AppRoles.ClientAdmin.ToString(), AppRoles.ClientAdmin.ToString());
+                    clientAdmin.ApplicationRoles.Add(clientAdminRole);
+
+
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientCreator.ToString());
+                    var clientCreatorRole = new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString());
+                    clientAdmin.ApplicationRoles.Add(clientCreatorRole);
+
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssigner.ToString());
+                    var clientAssignerRole = new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString());
+                    clientAdmin.ApplicationRoles.Add(clientAssignerRole);
+
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssessor.ToString());
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAdmin.ToString());
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorSupervisor.ToString());
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAgent.ToString());
+                    var clientAssessorRole = new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString());
+                    clientAdmin.ApplicationRoles.Add(clientAssessorRole);
+
+                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAdmin.ToString());
+
+                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorSupervisor.ToString());
+                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAgent.ToString());
                 }
             }
 
@@ -66,7 +83,9 @@ namespace risk.control.system.Seeds
                 Password = Password,
                 ClientCompanyId = clientCompanyId,
                 PhoneNumberConfirmed = true,
-                isSuperAdmin = false,
+                IsSuperAdmin = false,
+                IsClientAdmin = false,
+                IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
@@ -80,6 +99,8 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientCreator, Password);
                     await userManager.AddToRoleAsync(clientCreator, AppRoles.ClientCreator.ToString());
+                    var clientCreatorRole = new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString());
+                    clientCreator.ApplicationRoles.Add(clientCreatorRole);
                 }
             }
 
@@ -99,7 +120,9 @@ namespace risk.control.system.Seeds
                 ClientCompanyId = clientCompanyId,
                 PhoneNumberConfirmed = true,
                 Password = Password,
-                isSuperAdmin = false,
+                IsSuperAdmin = false,
+                IsClientAdmin = false,
+                IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
@@ -113,6 +136,8 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientAssigner, Password);
                     await userManager.AddToRoleAsync(clientAssigner, AppRoles.ClientAssigner.ToString());
+                    var clientAssignerRole = new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString());
+                    clientAssigner.ApplicationRoles.Add(clientAssignerRole);
                 }
             }
 
@@ -132,7 +157,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Password,
                 ClientCompanyId = clientCompanyId,
-                isSuperAdmin = false,
+                IsSuperAdmin = false,
+                IsClientAdmin = false,
+                IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
@@ -146,6 +173,8 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientAssessor, Password);
                     await userManager.AddToRoleAsync(clientAssessor, AppRoles.ClientAssessor.ToString());
+                    var clientAssessorRole = new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString());
+                    clientAssigner.ApplicationRoles.Add(clientAssessorRole);
                 }
             }
         }

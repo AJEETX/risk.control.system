@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,25 +9,37 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
-
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
     public class ClaimsInvestigationController : Controller
     {
+        private readonly JsonSerializerOptions options = new()
+        {
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            WriteIndented = true
+        };
         private readonly ApplicationDbContext _context;
+        private readonly IClaimsInvestigationService claimsInvestigationService;
+        private readonly IMailboxService mailboxService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
 
         public ClaimsInvestigationController(ApplicationDbContext context,
+            IClaimsInvestigationService claimsInvestigationService,
+            IMailboxService mailboxService,
             UserManager<ClientCompanyApplicationUser> userManager,
             RoleManager<ApplicationRole> roleManager,
             IToastNotification toastNotification)
         {
             _context = context;
+            this.claimsInvestigationService = claimsInvestigationService;
+            this.mailboxService = mailboxService;
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.toastNotification = toastNotification;
@@ -48,26 +61,28 @@ namespace risk.control.system.Controllers
                 .Include(c => c.LineOfBusiness)
                 .Include(c => c.PinCode)
                 .Include(c => c.State);
+ 
+            ViewBag.HasClientCompany = true;
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("CREATED"));
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("ASSIGNED_TO_ASSIGNER"));
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            {
+                return View(await applicationDbContext.ToListAsync());
+            }
             if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
             {
-                var status = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("CREATED"));
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == status.InvestigationCaseSubStatusId);
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId);
             }
             else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
             {
-                var status = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("ASSIGNED_TO_ASSIGNER"));
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == status.InvestigationCaseSubStatusId);
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
             }
-            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
-            {
-                return View(new List<ClaimsInvestigation> { });
-            }
+
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            ViewBag.HasClientCompany = true;
             if (clientCompany == null)
             {
                 ViewBag.HasClientCompany = false;
@@ -128,54 +143,9 @@ namespace risk.control.system.Controllers
 
                 return RedirectToAction(nameof(Create));
             }
-            if (claims is not null && claims.Count > 0)
-            {
-                var casesAssigned = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationCaseId));
-                var user = User?.Claims.FirstOrDefault(u => u.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
-                foreach (var claimsInvestigation in casesAssigned)
-                {
-                    claimsInvestigation.Updated = DateTime.UtcNow;
-                    claimsInvestigation.UpdatedBy = user;
-                    claimsInvestigation.CurrentUserId = User?.Claims.FirstOrDefault(u => u.Type == ClaimTypes.NameIdentifier)?.Value;
-                    claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains("IN-PROGRESS")).InvestigationCaseStatusId;
-                    claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("ASSIGNED_TO_ASSIGNER")).InvestigationCaseSubStatusId;
-                }
-                _context.UpdateRange(casesAssigned);
-                toastNotification.AddSuccessToastMessage("case(s) assigned successfully!");
-                await _context.SaveChangesAsync();
-                var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            await claimsInvestigationService.Assign(HttpContext.User.Identity.Name,claims);       
+            await mailboxService.NotifyClaimAssignment(HttpContext.User.Identity.Name, claims);
 
-                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAssigner.ToString()));
-
-                var assignerClaims = await roleManager.GetClaimsAsync(assignerRole);
-
-                var allcompany = await userManager.GetUsersForClaimAsync(assignerClaims.FirstOrDefault());
-
-
-                var assignerUsers = _context.ApplicationRole.FirstOrDefault(r => r.Name == assignerClaims.FirstOrDefault().Value);
-
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
-
-
-                //var companyAssigners = _context.ClientCompanyApplicationUser.Where(u => u.)
-                //mailboxService.InsertMessage(new MailboxMessage
-                //{
-                //    ReceipientEmail = "",
-                //    Created = DateTime.UtcNow,
-                //    Message = JsonSerializer.Serialize(casesAssigned),
-                //    Subject = "New case created: case Id(s) = " + casesAssigned.Select(c => c.ClaimsInvestigationCaseId),
-                //    SenderEmail = clientCompanyUser.FirstName + clientCompanyUser.LastName,
-                //    Priority = ContactMessagePriority.HIGH,
-                //    SendDate = DateTime.UtcNow,
-                //    Updated = DateTime.UtcNow,
-                //    Read = false,
-                //    UpdatedBy = userEmail.Value
-                //});
-
-                return RedirectToAction(nameof(Index));
-            }
             return Problem();
         }
         // GET: ClaimsInvestigation/Details/5
@@ -220,7 +190,7 @@ namespace risk.control.system.Controllers
             if (clientCompanyUser == null)
             {
                 model.HasClientCompany = false;
-                userEmailToSend = _context.ApplicationUser.FirstOrDefault(u => u.isSuperAdmin).Email;
+                userEmailToSend = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin).Email;
             }
             else
             {
@@ -285,69 +255,14 @@ namespace risk.control.system.Controllers
             }
             var userEmail = HttpContext.User.Identity.Name;
 
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
-            {
-                return NotFound();
-            }
             if (claimsInvestigation is not null)
             {
-                claimsInvestigation.Updated = DateTime.UtcNow;
-                claimsInvestigation.UpdatedBy = applicationUser.Email;
-                claimsInvestigation.CurrentUserId = applicationUser.Email;
-                claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains("INITIATED")).InvestigationCaseStatusId;
-                claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("CREATED")).InvestigationCaseSubStatusId;
-                IFormFile? claimDocument = Request.Form?.Files?.FirstOrDefault();
-                if (claimDocument is not null)
-                {
-                    claimsInvestigation.Document = claimDocument;
-                    using var dataStream = new MemoryStream();
-                    await claimsInvestigation.Document.CopyToAsync(dataStream);
-                    claimsInvestigation.DocumentImage = dataStream.ToArray();
-                }
-                _context.Add(claimsInvestigation);
-                await _context.SaveChangesAsync();
+                await claimsInvestigationService.Create(userEmail, claimsInvestigation, Request.Form?.Files?.FirstOrDefault());
+
+                await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+         
                 toastNotification.AddSuccessToastMessage("case(s) created successfully!");
 
-                var userEmailToSend = string.Empty;
-
-                var userClaim = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-                var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userClaim.Value);
-                if (clientCompanyUser == null)
-                {
-                    userEmailToSend = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userClaim.Value).Email;
-                }
-                else
-                {
-                    var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAssigner.ToString()));
-
-                    var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
-
-                    foreach (var assignedUser in assignerUsers)
-                    {
-                        var isTrue = await userManager.IsInRoleAsync(assignedUser, assignerRole.Name);
-                        if (isTrue)
-                        {
-                            userEmailToSend = assignedUser.Email;
-                            break;
-                        }
-                    }
-                }
-
-                //mailboxService.InsertMessage(new MailboxMessage
-                //{
-                //    ReceipientEmail = userEmailToSend,
-                //    Created = DateTime.UtcNow,
-                //    Message = JsonSerializer.Serialize(claimsInvestigation),
-                //    Subject = "New case created: case Id = " + claimsInvestigation.ClaimsInvestigationCaseId,
-                //    SenderEmail = clientCompanyUser.FirstName + clientCompanyUser.LastName,
-                //    Priority = ContactMessagePriority.NORMAL,
-                //    SendDate = DateTime.UtcNow,
-                //    Updated = DateTime.UtcNow,
-                //    Read = false,
-                //    UpdatedBy = userClaim.Value
-                //});
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);

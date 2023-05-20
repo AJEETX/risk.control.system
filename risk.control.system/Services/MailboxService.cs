@@ -1,151 +1,132 @@
-﻿//using risk.control.system.Data;
-//using risk.control.system.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
-//namespace risk.control.system.Services
-//{
-//    public interface IMailboxService
-//    {
-//        /// <summary>
-//        /// Get all ContactMessage
-//        /// </summary>
-//        /// <returns>List of ContactMessage entities</returns>
-//        IList<MailboxMessage> GetAllMessages();
-//        IList<MailboxMessage> GetAllMessages(string email);
+using NToastNotify;
 
-//        /// <summary>
-//        /// Get ContactMessage using id
-//        /// </summary>
-//        /// <param name="id">ContactMessage id</param>
-//        /// <returns>ContactMessage entity</returns>
-//        //MailboxMessage GetMessageById(long id);
+using risk.control.system.AppConstant;
+using risk.control.system.Data;
+using risk.control.system.Models;
 
-//        /// <summary>
-//        /// Insert ContactMessage
-//        /// </summary>
-//        /// <param name="message">ContactMessage entity</param>
-//        void InsertMessage(MailboxMessage message);
+namespace risk.control.system.Services
+{
+    public interface IMailboxService
+    {
+        Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation);
+        Task NotifyClaimAssignment(string userEmail, List<string> claims);
+    }
+    public class MailboxService : IMailboxService
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
-//        /// <summary>
-//        /// Update ContactMessage
-//        /// </summary>
-//        /// <param name="message">ContactMessage entity</param>
-//        void UpdateMessage(MailboxMessage message);
+        public MailboxService(ApplicationDbContext context, UserManager<ClientCompanyApplicationUser> userManager)
+        {
+            this._context = context;
+            this.userManager = userManager;
+        }
 
-//        /// <summary>
-//        /// Delete ContactMessage
-//        /// </summary>
-//        /// <param name="ids">List of ContactMessage ids</param>
-//        //void DeleteMessages(IList<string> ids);
+        public async Task NotifyClaimAssignment(string userEmail, List<string> claims)
+        {
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            List<string> userEmailsToSend = new();
 
-//        /// <summary>
-//        /// Mark the ContactMessage as read
-//        /// </summary>
-//        /// <param name="id">ContactMessage id</param>
-//        //void MarkAsRead(string id);
-//    }
-//    public class MailboxService : IMailboxService
-//    {
-//        #region Fields 
-//        private readonly IRepository<MailboxMessage> _contactUsRepository;
+            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == applicationUser.Email);
+            if (clientCompanyUser == null)
+            {
+                userEmailsToSend.Add(userEmail);
+            }
+            else
+            {
+                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAssigner.ToString()));
 
-//        #endregion
+                var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
-//        #region Constructor
+                foreach (var assignedUser in assignerUsers)
+                {
+                    var isTrue = await userManager.IsInRoleAsync(assignedUser, assignerRole?.Name);
+                    if (isTrue)
+                    {
+                        userEmailsToSend.Add(assignedUser.Email);
+                    }
+                }
+            }
 
-//        public MailboxService(IRepository<MailboxMessage> contactUsRepository)
-//        {
-//            _contactUsRepository = contactUsRepository;
-//        }
+            var contactMessage = new InboxMessage
+            {
+                //ReceipientEmail = userEmailToSend,
+                Created = DateTime.UtcNow,
+                Message = "New case(s) assigned:",
+                Subject = "New case(s) assigned:",
+                SenderEmail = clientCompanyUser?.Email,
+                Priority = ContactMessagePriority.NORMAL,
+                SendDate = DateTime.Now,
+                Updated = DateTime.Now,
+                Read = false,
+                UpdatedBy = applicationUser.Email
+            };
+        }
 
-//        #endregion
+        public async Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation)
+        {
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            List<string> userEmailsToSend = new();
 
-//        #region Methods
+            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == applicationUser.Email);
+            if (clientCompanyUser == null)
+            {
+                userEmailsToSend.Add(userEmail);
+            }
+            else
+            {
+                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientCreator.ToString()));
 
-//        /// <summary>
-//        /// Get all ContactMessage
-//        /// </summary>
-//        /// <returns>List of ContactMessage entities</returns>
-//        public IList<MailboxMessage> GetAllMessages()
-//        {
-//            var entities = _contactUsRepository.GetAll()
-//                .OrderByDescending(x => x.SendDate)
-//                .ToList();
+                var creatorUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
-//            return entities;
-//        }
+                foreach (var creatorUser in creatorUsers)
+                {
+                    var isTrue = await userManager.IsInRoleAsync(creatorUser, creatorRole?.Name);
+                    if (isTrue)
+                    {
+                        userEmailsToSend.Add(creatorUser.Email);
+                    }
+                }
+            }
 
-//        /// <summary>
-//        /// Get ContactMessage using id
-//        /// </summary>
-//        /// <param name="id">ContactMessage id</param>
-//        /// <returns>ContactMessage entity</returns>
-//        //public MailboxMessage GetMessageById(long id)
-//        //{
-//        //    return _contactUsRepository.FindByExpression(x => x.ContactMessageId == id);
-//        //}
+            var contactMessage = new InboxMessage
+            {
+                //ReceipientEmail = userEmailToSend,
+                Created = DateTime.UtcNow,
+                Message = claimsInvestigation.ToString(),
+                Subject = "New case created: case Id = " + claimsInvestigation.ClaimsInvestigationCaseId,
+                SenderEmail = clientCompanyUser?.Email,
+                Priority = ContactMessagePriority.NORMAL,
+                SendDate = DateTime.Now,
+                Updated = DateTime.Now,
+                Read = false,
+                UpdatedBy = applicationUser.Email
+            };
+            if (claimsInvestigation.Document is not null)
+            {
+                var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimsInvestigation.Document.FileName);
+                var extension = Path.GetExtension(claimsInvestigation.Document.FileName);
+                contactMessage.Document = claimsInvestigation.Document;
+                using var dataStream = new MemoryStream();
+                await contactMessage.Document.CopyToAsync(dataStream);
+                contactMessage.Attachment = dataStream.ToArray();
+                contactMessage.FileType = claimsInvestigation.Document.ContentType;
+                contactMessage.Extension = extension;
+                contactMessage.AttachmentName = messageDocumentFileName;
+            }
 
-//        /// <summary>
-//        /// Insert ContactMessage
-//        /// </summary>
-//        /// <param name="message">ContactMessage entity</param>
-//        public void InsertMessage(MailboxMessage message)
-//        {
-//            if (message == null)
-//                throw new ArgumentException("message");
-
-//            _contactUsRepository.Insert(message);
-//            _contactUsRepository.SaveChanges();
-//        }
-
-//        /// <summary>
-//        /// Update ContactMessage
-//        /// </summary>
-//        /// <param name="message">ContactMessage entity</param>
-//        public void UpdateMessage(MailboxMessage message)
-//        {
-//            if (message == null)
-//                throw new ArgumentException("message");
-
-//            _contactUsRepository.Update(message);
-//            _contactUsRepository.SaveChanges();
-//        }
-
-//        /// <summary>
-//        /// Delete ContactMessage
-//        /// </summary>
-//        /// <param name="ids">List of ContactMessage ids</param>
-//        //public void DeleteMessages(IList<string> ids)
-//        //{
-//        //    if (ids == null)
-//        //        throw new ArgumentNullException("ids");
-
-//        //    foreach (var id in ids)
-//        //        _contactUsRepository.Delete(GetMessageById(id));
-
-//        //    _contactUsRepository.SaveChanges();
-//        //}
-
-//        /// <summary>
-//        /// Mark the ContactMessage as read
-//        /// </summary>
-//        /// <param name="id">ContactMessage id</param>
-//        //public void MarkAsRead(string id)
-//        //{
-//        //    if (string.IsNullOrWhiteSpace(id))
-//        //        throw new ArgumentNullException("id");
-
-//        //    var message = GetMessageById(id);
-//        //    message.Read = true;
-
-//        //    _contactUsRepository.Update(message);
-//        //    _contactUsRepository.SaveChanges();
-//        //}
-
-//        public IList<MailboxMessage> GetAllMessages(string email)
-//        {
-//            return _contactUsRepository.FindManyByExpression(users => users.ReceipientEmail == email).OrderByDescending(x => x.SendDate).ToList();
-//        }
-
-//        #endregion
-//    }
-//}
+            foreach (var userEmailToSend in userEmailsToSend)
+            {
+                var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == userEmailToSend);
+                contactMessage.ReceipientEmail = recepientMailbox.Name;
+                recepientMailbox?.Inbox.Add(contactMessage);
+                _context.Mailbox.Attach(recepientMailbox);
+                _context.Mailbox.Update(recepientMailbox);
+            }
+            var rowse = await _context.SaveChangesAsync();
+        }
+    }
+}

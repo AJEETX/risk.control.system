@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -27,7 +27,9 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
-                isSuperAdmin = false,
+                IsSuperAdmin = false,
+                IsClientAdmin = false,
+                IsVendorAdmin = true,
                 VendorId = vendorId,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
@@ -42,8 +44,16 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(vendorAdmin, Password);
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAdmin.ToString());
+                    var vendorAdminRole = new ApplicationRole(AppRoles.VendorAdmin.ToString(), AppRoles.VendorAdmin.ToString());
+                    vendorAdmin.ApplicationRoles.Add(vendorAdminRole);
+
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorSupervisor.ToString());
+                    var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
+                    vendorAdmin.ApplicationRoles.Add(vendorSuperVisorRole);
+
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAgent.ToString());
+                    var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    vendorAdmin.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
 
@@ -63,7 +73,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Password,
                 VendorId = vendorId,
-                isSuperAdmin = false,
+                IsSuperAdmin = false,
+                IsClientAdmin = false,
+                IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
@@ -77,7 +89,13 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(vendorSupervisor, Password);
                     await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorSupervisor.ToString());
+                    var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
+                    vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);
+
                     await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorAgent.ToString());
+                    var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    vendorSupervisor.ApplicationRoles.Add(vendorAgentRole);
+
                 }
             }
 
@@ -97,7 +115,9 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Password,
                 VendorId = vendorId,
-                isSuperAdmin = false,
+                IsSuperAdmin = false,
+                IsClientAdmin = false,
+                IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
@@ -111,6 +131,8 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(vendorAgent, Password);
                     await userManager.AddToRoleAsync(vendorAgent, AppRoles.VendorAgent.ToString());
+                    var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    vendorAgent.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
         }

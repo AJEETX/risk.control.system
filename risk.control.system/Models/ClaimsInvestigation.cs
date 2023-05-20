@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace risk.control.system.Models
 {
@@ -111,8 +112,40 @@ namespace risk.control.system.Models
         [NotMapped]
         public bool SelectedToAssign { get; set; }
         public string? CurrentUserId { get; set; }
+        public List<VerificationLocation> VerificationLocations { get; set; }
+        public override string ToString()
+        {
+            return $"Case Id: {ClaimsInvestigationCaseId}, <br /> ClaimType: {ClaimType}";
+        }
     }
 
+    public class VerificationLocation
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string VerificationLocationId { get; set; } = Guid.NewGuid().ToString();
+        public virtual ClaimsInvestigation ClaimsInvestigation { get; set; } = default!;
+        [Display(Name = "Address line")]
+        public string? Addressline { get; set; }
+        [Display(Name = "PinCode name")]
+        public string? PinCodeId { get; set; } = default!;
+        [Display(Name = "PinCode name")]
+        public PinCode? PinCode { get; set; } = default!;
+        [Display(Name = "State name")]
+        public string? StateId { get; set; } = default!;
+        [Display(Name = "State name")]
+        public State? State { get; set; } = default!;
+        [Required]
+        [Display(Name = "Country name")]
+        public string CountryId { get; set; } = default!;
+        [Display(Name = "Country name")]
+        public Country Country { get; set; } = default!;
+        [Display(Name = "District")]
+        public string? DistrictId { get; set; } = default!;
+        [Display(Name = "District")]
+        public District? District { get; set; } = default!;
+
+    }
     public enum ClaimType
     {
         [Display(Name = "Death")]

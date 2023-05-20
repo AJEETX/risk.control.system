@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class Initialize : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -603,13 +603,58 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VerificationLocation",
+                columns: table => new
+                {
+                    VerificationLocationId = table.Column<string>(type: "TEXT", nullable: false),
+                    ClaimsInvestigationCaseId = table.Column<string>(type: "TEXT", nullable: true),
+                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
+                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VerificationLocation", x => x.VerificationLocationId);
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_ClaimsInvestigation_ClaimsInvestigationCaseId",
+                        column: x => x.ClaimsInvestigationCaseId,
+                        principalTable: "ClaimsInvestigation",
+                        principalColumn: "ClaimsInvestigationCaseId");
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_Country_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "Country",
+                        principalColumn: "CountryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_PinCode_PinCodeId",
+                        column: x => x.PinCodeId,
+                        principalTable: "PinCode",
+                        principalColumn: "PinCodeId");
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_State_StateId",
+                        column: x => x.StateId,
+                        principalTable: "State",
+                        principalColumn: "StateId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ProfilePictureUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    isSuperAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsSuperAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsClientAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsVendorAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
                     ProfilePicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     FirstName = table.Column<string>(type: "TEXT", nullable: false),
                     LastName = table.Column<string>(type: "TEXT", nullable: false),
@@ -1434,6 +1479,31 @@ namespace risk.control.system.Migrations
                 name: "IX_VendorInvestigationServiceType_VendorId",
                 table: "VendorInvestigationServiceType",
                 column: "VendorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerificationLocation_ClaimsInvestigationCaseId",
+                table: "VerificationLocation",
+                column: "ClaimsInvestigationCaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerificationLocation_CountryId",
+                table: "VerificationLocation",
+                column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerificationLocation_DistrictId",
+                table: "VerificationLocation",
+                column: "DistrictId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerificationLocation_PinCodeId",
+                table: "VerificationLocation",
+                column: "PinCodeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerificationLocation_StateId",
+                table: "VerificationLocation",
+                column: "StateId");
         }
 
         /// <inheritdoc />
@@ -1492,6 +1562,9 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "TrashMessage");
+
+            migrationBuilder.DropTable(
+                name: "VerificationLocation");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
