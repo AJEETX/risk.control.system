@@ -3,7 +3,7 @@
     $("#receipient-email").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: "/User/GetUserBySearch",
+                url: "/MasterData/GetUserBySearch",
                 type: "POST",
                 data: { search: request.term },
                 success: function (data) {
@@ -19,7 +19,8 @@
             results: function (r) {
                 return r;
             }
-        }
+        },
+        minLength:3
     });  
 
 
@@ -120,19 +121,19 @@ function checkIfAnyChecked(elements) {
 }
 function loadState(obj, showDefaultOption = true) {
     var value = obj.value;
-    $.post("/User/GetStatesByCountryId", { countryId: value }, function (data) {
+    $.post("/MasterData/GetStatesByCountryId", { countryId: value }, function (data) {
         PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option>--SELECT STATE--</option>", "<option>--SELECT DISTRICT--</option>", "<option>--SELECT PINCODE--</option>", showDefaultOption);
     });
 }
 function loadDistrict(obj, showDefaultOption = true) {
     var value = obj.value;
-    $.post("/User/GetDistrictByStateId", { stateId: value }, function (data) {
+    $.post("/MasterData/GetDistrictByStateId", { stateId: value }, function (data) {
         PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option>--SELECT PINCODE--</option>", "<option>--SELECT DISTRICT--</option>", showDefaultOption);
     });
 }
 function loadPinCode(obj, showDefaultOption= true) {
     var value = obj.value;
-    $.post("/User/GetPinCodesByDistrictId", { districtId: value }, function (data) {
+    $.post("/MasterData/GetPinCodesByDistrictId", { districtId: value }, function (data) {
         PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
     });
 }

@@ -137,16 +137,18 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> Assign(List<string> claims)
         {
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains("IN-PROGRESS"));
-            if (status == null)
+            var initiatedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            if (initiatedStatus == null)
             {
 
                 return RedirectToAction(nameof(Create));
             }
+            
             await claimsInvestigationService.Assign(HttpContext.User.Identity.Name,claims);       
+            
             await mailboxService.NotifyClaimAssignment(HttpContext.User.Identity.Name, claims);
 
-            return Problem();
+            return RedirectToAction(nameof(Index));
         }
         // GET: ClaimsInvestigation/Details/5
         public async Task<IActionResult> Details(string id)

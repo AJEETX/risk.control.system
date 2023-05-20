@@ -15,9 +15,8 @@ namespace risk.control.system.Services
         Task<InboxMessage> GetMessagedetail(long messageId, string userEmail);
         Task<OutboxMessage> GetMessagedetailReply(long messageId, string userEmail, string actiontype);
 
-        Task<bool> SendInboxDetailsReply(OutboxMessage contactMessage, string userEmail);
         Task<int> InboxDetailsDelete(long id, string userEmail);
-        Task<bool> SendMessage(OutboxMessage contactMessage, string userEmail);
+        Task<bool> SendMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument);
     }
     public class InboxMailService : IInboxMailService
     {
@@ -93,8 +92,24 @@ namespace risk.control.system.Services
                 {
                     message.MessageStatus = MessageStatus.TRASHED;
                     userMailbox.Inbox.Remove(message);
-                    var jsonMessage = JsonSerializer.Serialize(message, options);
-                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
+                    var trashMessage = new TrashMessage
+                    {
+                        Attachment = message.Attachment,
+                        AttachmentName = message.AttachmentName,
+                        Created = message.Created,
+                        Extension = message.Extension,
+                        FileType = message.FileType,
+                        Message = message.Message,
+                        MessageStatus = MessageStatus.TRASHED,
+                        Priority = message.Priority,
+                        Read = message.Read,
+                        ReceipientEmail = message.ReceipientEmail,
+                        SendDate = message.SendDate,
+                        Subject = message.Subject,
+                        SenderEmail = message.SenderEmail,
+                        Updated = message.Updated,
+                        UpdatedBy = message.UpdatedBy,
+                    };
                     userMailbox.Trash.Add(trashMessage);
                 }
             }
@@ -109,14 +124,30 @@ namespace risk.control.system.Services
                 .Include(m => m.Trash)
                 .FirstOrDefault(c => c.Name == userEmail);
 
-            var userInboxMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
+            var message = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
 
-            if (userInboxMessage is not null)
+            if (message is not null)
             {
-                userInboxMessage.MessageStatus = MessageStatus.TRASHED;
-                userMailbox.Inbox.Remove(userInboxMessage);
-                var jsonMessage = JsonSerializer.Serialize(userInboxMessage, options);
-                TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
+                message.MessageStatus = MessageStatus.TRASHED;
+                userMailbox.Inbox.Remove(message);
+                var trashMessage = new TrashMessage
+                {
+                    Attachment = message.Attachment,
+                    AttachmentName = message.AttachmentName,
+                    Created = message.Created,
+                    Extension = message.Extension,
+                    FileType = message.FileType,
+                    Message = message.Message,
+                    MessageStatus = MessageStatus.TRASHED,
+                    Priority = message.Priority,
+                    Read = message.Read,
+                    ReceipientEmail = message.ReceipientEmail,
+                    SendDate = message.SendDate,
+                    Subject = message.Subject,
+                    SenderEmail = message.SenderEmail,
+                    Updated = message.Updated,
+                    UpdatedBy = message.UpdatedBy,
+                };
                 userMailbox.Trash.Add(trashMessage);
             }
 
@@ -124,50 +155,7 @@ namespace risk.control.system.Services
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> SendInboxDetailsReply(OutboxMessage contactMessage, string userEmail)
-        {
-            var userMailbox = _context.Mailbox.AsNoTracking().Include(m => m.Inbox).Include(m => m.Sent).FirstOrDefault(c => c.Name == userEmail);
-
-            var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
-
-            contactMessage.Read = false;
-            contactMessage.SendDate = DateTime.Now;
-            contactMessage.Updated = DateTime.Now;
-            contactMessage.UpdatedBy = userEmail;
-            contactMessage.SenderEmail = userEmail;
-
-            if (recepientMailbox is not null)
-            {
-                //add to sender's sent box
-                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
-                SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
-                userMailbox.Sent.Add(sentMessage);
-                _context.Mailbox.Attach(userMailbox);
-                _context.Mailbox.Update(userMailbox);
-
-
-                //add to receiver's inbox
-                InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
-                recepientMailbox.Inbox.Add(inboxMessage);
-                _context.Mailbox.Attach(recepientMailbox);
-                _context.Mailbox.Update(recepientMailbox);
-
-                var rows = await _context.SaveChangesAsync();
-
-                return true;
-            }
-            else
-            {
-                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
-                OutboxMessage outboxMessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage, options);
-                userMailbox.Outbox.Add(outboxMessage);
-                _context.Mailbox.Update(userMailbox);
-                var rows = await _context.SaveChangesAsync();
-            }
-            return false;
-        }
-
-        public async Task<bool> SendMessage(OutboxMessage contactMessage, string userEmail)
+        public async Task<bool> SendMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Sent).Include(m => m.Outbox).FirstOrDefault(c => c.Name == userEmail);
 
@@ -184,14 +172,39 @@ namespace risk.control.system.Services
                 var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
                 SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
 
+                if (messageDocument is not null)
+                {
+                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
+                    var extension = Path.GetExtension(messageDocument.FileName);
+
+                    sentMessage.Document = messageDocument;
+                    using var dataStream = new MemoryStream();
+                    await sentMessage.Document.CopyToAsync(dataStream);
+                    sentMessage.Attachment = dataStream.ToArray();
+                    sentMessage.FileType = messageDocument.ContentType;
+                    sentMessage.Extension = extension;
+                    sentMessage.AttachmentName = messageDocumentFileName;
+                }
                 userMailbox.Sent.Add(sentMessage);
                 _context.Mailbox.Attach(userMailbox);
                 _context.Mailbox.Update(userMailbox);
 
-
                 //add to receiver's inbox
                 InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
 
+                if (messageDocument is not null)
+                {
+                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
+                    var extension = Path.GetExtension(messageDocument.FileName);
+
+                    inboxMessage.Document = messageDocument;
+                    using var dataStream = new MemoryStream();
+                    await inboxMessage.Document.CopyToAsync(dataStream);
+                    inboxMessage.Attachment = dataStream.ToArray();
+                    inboxMessage.FileType = messageDocument.ContentType;
+                    inboxMessage.Extension = extension;
+                    inboxMessage.AttachmentName = messageDocumentFileName;
+                }
                 recepientMailbox.Inbox.Add(inboxMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
@@ -204,6 +217,20 @@ namespace risk.control.system.Services
             {
                 var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
                 OutboxMessage outboxMessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage, options);
+                if (messageDocument is not null)
+                {
+                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
+                    var extension = Path.GetExtension(messageDocument.FileName);
+
+                    outboxMessage.Document = messageDocument;
+                    using var dataStream = new MemoryStream();
+                    await outboxMessage.Document.CopyToAsync(dataStream);
+                    outboxMessage.Attachment = dataStream.ToArray();
+                    outboxMessage.FileType = messageDocument.ContentType;
+                    outboxMessage.Extension = extension;
+                    outboxMessage.AttachmentName = messageDocumentFileName;
+                }
+
                 userMailbox.Outbox.Add(outboxMessage);
                 _context.Mailbox.Update(userMailbox);
                 var rows = await _context.SaveChangesAsync();

@@ -118,55 +118,7 @@ namespace risk.control.system.Controllers
             ViewData["CountryId"] = new SelectList(context.Country, "CountryId", "Name");
             return View();
         }
-        [HttpPost, ActionName("GetStatesByCountryId")]
-        public async Task<JsonResult> GetStatesByCountryId(string countryId)
-        {
-            string cId;
-            var states = new List<State>();
-            if (!string.IsNullOrEmpty(countryId))
-            {
-                cId = countryId;
-                states = await context.State.Where(s => s.CountryId.Equals(cId)).ToListAsync();
-            }
-            return Json(states);
-        }
 
-        [HttpPost, ActionName("GetDistrictByStateId")]
-        public async Task<JsonResult> GetDistrictByStateId(string stateId)
-        {
-            string sId;
-            var districts = new List<District>();
-            if (!string.IsNullOrEmpty(stateId))
-            {
-                sId = stateId;
-                districts = await context.District.Where(s => s.State.StateId.Equals(sId)).ToListAsync();
-            }
-            return Json(districts);
-        }
-
-        [HttpPost, ActionName("GetPinCodesByDistrictId")]
-        public async Task<JsonResult> GetPinCodesByDistrictId(string districtId)
-        {
-            string sId;
-            var pincodes = new List<PinCode>();
-            if (!string.IsNullOrEmpty(districtId))
-            {
-                sId = districtId;
-                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
-            }
-            return Json(pincodes);
-        }
-
-        [HttpPost, ActionName("GetUserBySearch")]
-        public async Task<JsonResult> GetUserBySearch(string search)
-        {
-            var applicationUsers = new List<ApplicationUser>();
-            if (!string.IsNullOrEmpty(search))
-            {
-                applicationUsers = await context.ApplicationUser.Where(s => s.Email.Contains(search)).ToListAsync();
-            }
-            return Json(applicationUsers?.Select(a=>a.Email).ToList());
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser user)

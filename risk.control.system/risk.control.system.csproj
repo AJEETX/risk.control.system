@@ -158,7 +158,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Api\" />
     <Folder Include="wwwroot\vendor-document\" />
     <Folder Include="wwwroot\upload\" />
   </ItemGroup>
