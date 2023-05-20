@@ -63,8 +63,10 @@ namespace risk.control.system.Controllers
                 .Include(c => c.State);
  
             ViewBag.HasClientCompany = true;
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("CREATED"));
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains("ASSIGNED_TO_ASSIGNER"));
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => 
+                i.Name ==CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name== CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
@@ -109,12 +111,14 @@ namespace risk.control.system.Controllers
                 .Include(c => c.LineOfBusiness)
                 .Include(c => c.PinCode)
                 .Include(c => c.State);
+            ViewBag.HasClientCompany = true;
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()) || userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
             {
-                var status = _context.InvestigationCaseStatus.FirstOrDefault(i => !i.Name.Contains("FINISHED"));
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseStatusId == status.InvestigationCaseStatusId);
+                var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
             }
             else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
             {
@@ -123,7 +127,6 @@ namespace risk.control.system.Controllers
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            ViewBag.HasClientCompany = true;
             if (clientCompany == null)
             {
                 ViewBag.HasClientCompany = false;

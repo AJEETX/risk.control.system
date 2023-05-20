@@ -42,12 +42,14 @@ namespace risk.control.system.Models
         [Display(Name = "Customer name")]
         public string? CustomerName { get; set; }
         [Display(Name = "Customer date of birth")]
+        [DataType(DataType.Date)]
         public DateTime? CustomerDateOfBirth { get; set; }
         [Display(Name = "Customer contact number")]
         public long ContactNumber { get; set; }
         [Display(Name = "Claim type")]
         public ClaimType ClaimType { get; set; }
         [Display(Name = "Date of incident")]
+        [DataType(DataType.Date)]
         public DateTime? DateOfIncident { get; set; }
 
         [Display(Name = "Cause of loss")]

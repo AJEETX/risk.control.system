@@ -41,10 +41,13 @@ namespace risk.control.system.Models
         public string IFSCCode { get; set; } = default!;
         public string City { get; set; } = "KANPUR CITY";
         [Display(Name = "Agreement date")]
+        [DataType(DataType.Date)]
         public DateTime? AgreementDate { get; set; } = DateTime.Now;
         [Display(Name = "Activated date")]
+        [DataType(DataType.Date)]
         public DateTime? ActivatedDate { get; set; } = DateTime.Now;
         [Display(Name = "Delist date")]
+        [DataType(DataType.Date)]
         public DateTime? DeListedDate { get; set; }
         public VendorStatus? Status { get; set; } = VendorStatus.ACTIVE;
         [Display(Name = "Delist reason")]

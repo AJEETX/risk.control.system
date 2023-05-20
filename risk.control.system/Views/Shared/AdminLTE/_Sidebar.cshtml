@@ -175,8 +175,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Claim","") @Url.MakeActiveClass("Underwriting","") @Url.MakeActiveClass("ClaimsInvestigation","")">
-                        <i class="nav-icon fas fa-search"></i>
+                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsInvestigation","")">
+                        <i class="nav-icon fa fa-user-secret"></i>
                         <p class="sidebar-menu-header-label">
                             @Applicationsettings.INVESTIGATION_MAIN
                             <i class="right fas fa-angle-right"></i>
@@ -195,7 +195,7 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_NEW <span class="badge badge-light">@roleCode</span>
+                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">new</span>
                         </p>
                     </a>
                 </li>
@@ -203,7 +203,7 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Open")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_OPEN <span class="badge badge-light">@roleCode</span>
+                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">open</span>
                         </p>
                     </a>
                 </li>

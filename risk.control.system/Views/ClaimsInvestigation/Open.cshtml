@@ -37,6 +37,9 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-success card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">Open Claims List</h3>
+                    </div>
                     <div class="card-body p-0 contained-width">
                         <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
                             <div class="row">
@@ -67,6 +70,9 @@
                                                     @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
                                                 </th>
                                                 <th>
+                                                    @Html.DisplayNameFor(model => model.InvestigationCaseSubStatus)
+                                                </th>
+                                                <th>
                                                     @Html.DisplayNameFor(model => model.ContractIssueDate)
                                                 </th>
                                                 <th>
@@ -94,48 +100,6 @@
                                                     @Html.DisplayNameFor(model => model.SumAssuredValue)
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.PinCode)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.State)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.Country)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.District)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerIncome)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerOccupation)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerEducation)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.BeneficiaryName)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.BeneficiaryRelation)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.BeneficiaryContactNumber)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.BeneficiaryIncome)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerType)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CostCentre)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CaseEnabler)
-                                                </th>
-                                                <th>
                                                     @Html.DisplayNameFor(model => model.Comments)
                                                 </th>
                                                 <th></th>
@@ -145,7 +109,7 @@
                                             @foreach (var item in Model)
                                             {
                                                 <tr>
-                                                    <td style="display:@ViewBag.HasClientCompany">
+                                                    <td style="display:@hasClientCompany">
                                                         @Html.DisplayFor(modelItem => item.ClientCompany.Name)
                                                     </td>
                                                     <td>
@@ -159,6 +123,9 @@
                                                     </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.InvestigationCaseSubStatus.Name)
                                                     </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.ContractIssueDate)
@@ -186,48 +153,6 @@
                                                     </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.SumAssuredValue)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.PinCode.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.State.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Country.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.District.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerIncome)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerOccupation)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerEducation)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.BeneficiaryName)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.BeneficiaryContactNumber)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.BeneficiaryIncome)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerType)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CostCentre.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CaseEnabler.Name)
                                                     </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.Comments)

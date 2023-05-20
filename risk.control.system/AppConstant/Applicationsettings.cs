@@ -24,6 +24,7 @@
 
         public const string BACK = "back";
         public const string CANCEL = "cancel";
+        public const string RESET = "reset";
         public const string APPROVE = "approve";
         public const string SEARCH = "search";
         public const string CREATE = "create";
@@ -88,7 +89,7 @@
         public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
         public const string INVESTIGATION_CASE_STATUS = "Case status";
         public const string INVESTIGATION_CLAIMS = "Claim";
-        public const string INVESTIGATION_CLAIMS_NEW = "Claim case new";
+        public const string INVESTIGATION_CLAIMS_CASE= "Claim case";
         public const string INVESTIGATION_CLAIMS_OPEN = "Claim case open";
         public const string INVESTIGATION_CLAIMS_CASE_DETAILS = "Claim case details";
         public const string CUSTOMER_DETAILS = "Customer details";
