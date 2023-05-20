@@ -214,6 +214,7 @@ namespace risk.control.system.Models
         CREATED,
         DRAFTED,
         SENT,
+        REPLY,
         RECEIVED,
         TRASHED,
         TRASHDELETED

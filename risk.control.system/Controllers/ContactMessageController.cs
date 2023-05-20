@@ -9,21 +9,24 @@ using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
     public class ContactMessageController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IInboxMailService inboxMailService;
         private readonly IToastNotification toastNotification;
         private readonly JsonSerializerOptions options = new()
         {
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
-        public ContactMessageController(ApplicationDbContext context, IToastNotification toastNotification)
+        public ContactMessageController(ApplicationDbContext context, IInboxMailService inboxMailService, IToastNotification toastNotification)
         {
             _context = context;
+            this.inboxMailService = inboxMailService;
             this.toastNotification = toastNotification;
         }
 
@@ -37,9 +40,9 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == applicationUser.Email);
+            var userMailboxMessages = await inboxMailService.GetAllUserInboxMessages(userEmail);
 
-            return View(userMailbox.Inbox.OrderByDescending(o => o.SendDate).ToList());
+            return View(userMailboxMessages);
 
         }
         public async Task<IActionResult> InboxDelete(List<long> messages)
@@ -51,26 +54,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                           .Include(m => m.Inbox)
-                           .Include(m => m.Trash)
-                           .FirstOrDefault(c => c.ApplicationUserId == applicationUser.Id);
-
-            var userInboxMails = userMailbox.Inbox.Where(d => messages.Contains(d.InboxMessageId)).ToList();
-
-            if (userInboxMails is not null && userInboxMails.Count > 0)
-            {
-                foreach (var message in userInboxMails)
-                {
-                    message.MessageStatus = MessageStatus.TRASHED;
-                    userMailbox.Inbox.Remove(message);
-                    var jsonMessage = JsonSerializer.Serialize(message, options);
-                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
-                    userMailbox.Trash.Add(trashMessage);
-                }
-            }
-            _context.Mailbox.Update(userMailbox);
-            var rows = await _context.SaveChangesAsync();
+            var rows = await inboxMailService.InboxDelete(messages, applicationUser.Id);
             toastNotification.AddSuccessToastMessage($" {rows} mail(s) trashed successfully!");
 
             return RedirectToAction(nameof(Index));
@@ -89,16 +73,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                .Include(m => m.Inbox)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
-
-            var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
-            userMessage.Read = true;
-
-            _context.Mailbox.Attach(userMailbox);
-            _context.Mailbox.Update(userMailbox);
-            var rows = await _context.SaveChangesAsync();
+            var userMessage = await inboxMailService.GetMessagedetail(id, userEmail);
             return View(userMessage);
         }
         public async Task<IActionResult> InboxDetailsReply(long id, string actiontype)
@@ -115,20 +90,12 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                .Include(m => m.Inbox)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
-
-            var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
-
-            userMessage.ReceipientEmail= userMessage.SenderEmail; 
-            userMessage.SenderEmail= applicationUser.Email;
-            userMessage.Subject = actiontype + " :" + userMessage.Subject;
+            var userMessage = await inboxMailService.GetMessagedetailReply(id, userEmail, actiontype);
             ViewBag.ActionType = actiontype;
             return View(userMessage);
         }
         [HttpPost]
-        public async Task<IActionResult> InboxDetailsReply(InboxMessage contactMessage)
+        public async Task<IActionResult> InboxDetailsReply(OutboxMessage contactMessage)
         {
             var userEmail = HttpContext.User.Identity.Name;
 
@@ -138,86 +105,30 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var userMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == applicationUser.Email);
-
-            var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
-
-            contactMessage.SenderEmail = userEmail;
-            contactMessage.SendDate = DateTime.Now;
-            contactMessage.Read = false;
-
-            if (recepientMailbox is not null)
+            IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
+            if (messageDocument is not null)
             {
+                var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
+                var extension = Path.GetExtension(messageDocument.FileName);
 
-                contactMessage.MessageStatus = MessageStatus.SENT;
-                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
-                SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
+                contactMessage.Document = messageDocument;
+                using var dataStream = new MemoryStream();
+                await contactMessage.Document.CopyToAsync(dataStream);
+                contactMessage.Attachment = dataStream.ToArray();
+                contactMessage.FileType = messageDocument.ContentType;
+                contactMessage.Extension = extension;
+                contactMessage.AttachmentName = messageDocumentFileName;
+            }
 
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
+            var mailSent = await inboxMailService.SendInboxDetailsReply(contactMessage, userEmail);
 
-                    sentMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await sentMessage.Document.CopyToAsync(dataStream);
-                    sentMessage.Attachment = dataStream.ToArray();
-                    sentMessage.FileType = messageDocument.ContentType;
-                    sentMessage.Extension = extension;
-                    sentMessage.AttachmentName = messageDocumentFileName;
-                }
-                sentMessage.SendDate = DateTime.Now;
-                userMailbox.Sent.Add(sentMessage);
-                _context.Mailbox.Attach(userMailbox);
-                _context.Mailbox.Update(userMailbox);
-                InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
-
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
-                    inboxMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await inboxMessage.Document.CopyToAsync(dataStream);
-                    inboxMessage.Attachment = dataStream.ToArray();
-                    inboxMessage.FileType = messageDocument.ContentType;
-                    inboxMessage.Extension = extension;
-                    inboxMessage.AttachmentName = messageDocumentFileName;
-                }
-                inboxMessage.SendDate = DateTime.Now;
-                inboxMessage.ReceiveDate = DateTime.Now;
-                recepientMailbox.Inbox.Add(inboxMessage);
-                _context.Mailbox.Attach(recepientMailbox);
-                _context.Mailbox.Update(recepientMailbox);
-                var rowse = await _context.SaveChangesAsync();
-
+            if (mailSent)
+            {
                 toastNotification.AddSuccessToastMessage("mail sent successfully!");
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
-
-                    contactMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await contactMessage.Document.CopyToAsync(dataStream);
-                    contactMessage.Attachment = dataStream.ToArray();
-                    contactMessage.FileType = messageDocument.ContentType;
-                    contactMessage.Extension = extension;
-                    contactMessage.AttachmentName = messageDocumentFileName;
-                }
-
-                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
-                OutboxMessage outboxMessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage, options);
-                userMailbox.Outbox.Add(outboxMessage);
-                _context.Mailbox.Update(userMailbox);
-                var rowse = await _context.SaveChangesAsync();
-
                 toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
                 return RedirectToAction(nameof(Create));
             }
@@ -231,24 +142,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                .Include(m => m.Inbox)
-                .Include(m => m.Trash)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
-
-            var userInboxMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == id);
-
-            if (userInboxMessage is not null)
-            {
-                userInboxMessage.MessageStatus = MessageStatus.TRASHED;
-                userMailbox.Inbox.Remove(userInboxMessage);
-                var jsonMessage = JsonSerializer.Serialize(userInboxMessage, options);
-                TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
-                userMailbox.Trash.Add(trashMessage);
-            }
-
-            _context.Mailbox.Update(userMailbox);
-            var rows = await _context.SaveChangesAsync();
+            var rows = await inboxMailService.InboxDetailsDelete(id, userEmail);
             toastNotification.AddSuccessToastMessage($" {rows} mail trashed successfully!");
 
             return RedirectToAction(nameof(Index));
@@ -678,7 +572,7 @@ namespace risk.control.system.Controllers
 
             return RedirectToAction(nameof(Outbox));
         }
- 
+
         // GET: ContactMessage/Create
         public IActionResult Create()
         {
@@ -700,83 +594,30 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var userMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == applicationUser.Email);
-
-            var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
-
-            contactMessage.SenderEmail = userEmail;
-            contactMessage.SendDate = DateTime.Now;
-            contactMessage.Read = false;
-
-            if (recepientMailbox is not null)
+            IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
+            if (messageDocument is not null)
             {
-                
-                contactMessage.MessageStatus = MessageStatus.SENT;
-                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
-                SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
+                var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
+                var extension = Path.GetExtension(messageDocument.FileName);
 
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
+                contactMessage.Document = messageDocument;
+                using var dataStream = new MemoryStream();
+                await contactMessage.Document.CopyToAsync(dataStream);
+                contactMessage.Attachment = dataStream.ToArray();
+                contactMessage.FileType = messageDocument.ContentType;
+                contactMessage.Extension = extension;
+                contactMessage.AttachmentName = messageDocumentFileName;
+            }
 
-                    sentMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await sentMessage.Document.CopyToAsync(dataStream);
-                    sentMessage.Attachment = dataStream.ToArray();
-                    sentMessage.FileType = messageDocument.ContentType;
-                    sentMessage.Extension = extension;
-                    sentMessage.AttachmentName = messageDocumentFileName;
-                }
-                sentMessage.SendDate = DateTime.Now;
-                userMailbox.Sent.Add(sentMessage);
-                _context.Mailbox.Attach(userMailbox);
-                _context.Mailbox.Update(userMailbox);
-                InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
+            var mailSent = await inboxMailService.SendMessage(contactMessage, userEmail);
 
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
-                    inboxMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await inboxMessage.Document.CopyToAsync(dataStream);
-                    inboxMessage.Attachment = dataStream.ToArray();
-                    inboxMessage.FileType = messageDocument.ContentType;
-                    inboxMessage.Extension = extension;
-                    inboxMessage.AttachmentName = messageDocumentFileName;
-                }
-                inboxMessage.SendDate = DateTime.Now;
-                inboxMessage.ReceiveDate = DateTime.Now;
-                recepientMailbox.Inbox.Add(inboxMessage);
-                _context.Mailbox.Attach(recepientMailbox);
-                _context.Mailbox.Update(recepientMailbox);
-                var rowse = await _context.SaveChangesAsync();
-
+            if (mailSent)
+            {
                 toastNotification.AddSuccessToastMessage("mail sent successfully!");
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
-
-                    contactMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await contactMessage.Document.CopyToAsync(dataStream);
-                    contactMessage.Attachment = dataStream.ToArray();
-                    contactMessage.FileType = messageDocument.ContentType;
-                    contactMessage.Extension = extension;
-                    contactMessage.AttachmentName = messageDocumentFileName;
-                }
-                userMailbox.Outbox.Add(contactMessage);
-                _context.Mailbox.Update(userMailbox);
-                var rowse = await _context.SaveChangesAsync();
-
                 toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
                 return RedirectToAction(nameof(Create));
             }

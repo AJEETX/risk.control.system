@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.InboxMessage
+﻿@model risk.control.system.Models.OutboxMessage
 
 @{
     ViewData["Title"] = "Reply";
@@ -13,8 +13,6 @@
                         <div class="card-header">
                             <h3 class="card-title">@ViewBag.ActionType Mail</h3>
                         </div>
-
-                        <input type="hidden" asp-for="InboxMessageId" />
                         <div class="card-body">
                             <div class="form-group">
                                 <input id="receipient-email" class="form-control" asp-for="ReceipientEmail" value="@Model.ReceipientEmail">
