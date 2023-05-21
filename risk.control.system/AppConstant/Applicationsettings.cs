@@ -32,6 +32,7 @@
         public const string DELETE = "delete";
         public const string VIEW = "view";
         public const string DETAILS = "details";
+        public const string VERIFY_LOCATIONS = "Locations to verify";
 
         // LABELS / ACTIONS
         public const string CLIENT_COMPANIES = "Company";
@@ -55,6 +56,7 @@
         public const string VENDORS = "Vendor";
         public const string MANAGE_VENDOR = "Manage vendor";
         public const string MANAGE_CLIENT_COMPANY = "Manage client company";
+        public const string MANAGE_VERIFICTION_LOCATIONS = "Manage locations to verify";
         public const string EMPANEL = "Empanel";
         public const string BROADCAST = "Broadcast";
 

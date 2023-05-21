@@ -290,7 +290,7 @@ namespace risk.control.system.Seeds
 
             await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, abcVendorId);
 
-            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, xyzVendorId);
+            //await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, xyzVendorId);
 
             await context.SaveChangesAsync(null, false);
 

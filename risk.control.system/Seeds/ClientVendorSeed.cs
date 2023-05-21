@@ -103,7 +103,6 @@ namespace risk.control.system.Seeds
                 }
             };
 
-
             //await context.SaveChangesAsync(null, false);
             return (abcVendorCompany.Entity.VendorId, xyzVendorCompany.Entity.VendorId, tataAigCompany.Entity.ClientCompanyId);
         }

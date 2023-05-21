@@ -20,9 +20,14 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VerificationLocations
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string id)
         {
-            var applicationDbContext = _context.VerificationLocation.Include(v => v.Country).Include(v => v.District).Include(v => v.PinCode).Include(v => v.State);
+            var applicationDbContext = _context.VerificationLocation
+                .Include(v => v.ClaimsInvestigation)
+                .Include(v => v.Country)
+                .Include(v => v.District)
+                .Include(v => v.PinCode)
+                .Include(v => v.State).Where(l=>l.ClaimsInvestigation.ClaimsInvestigationCaseId == id);
             return View(await applicationDbContext.ToListAsync());
         }
 
