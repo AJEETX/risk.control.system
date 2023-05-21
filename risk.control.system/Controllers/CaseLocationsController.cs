@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
 
 using risk.control.system.Data;
@@ -54,7 +56,14 @@ namespace risk.control.system.Controllers
         // GET: CaseLocations/Create
         public IActionResult Create(string id)
         {
-            var claim = _context.ClaimsInvestigation.FirstOrDefault(v => v.ClaimsInvestigationId == id);
+            var claim = _context.ClaimsInvestigation
+                .Include(i => i.CaseLocations)
+                .ThenInclude(c => c.District)
+                                .Include(i => i.CaseLocations)
+                .ThenInclude(c => c.State)
+                                .Include(i => i.CaseLocations)
+                .ThenInclude(c => c.PincodeServices)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == id);
 
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name");
 
@@ -86,7 +95,7 @@ namespace risk.control.system.Controllers
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("verification location created successfully!");
-                return RedirectToAction(nameof(ClaimsInvestigationController.CaseLocation), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId});
+                return RedirectToAction(nameof(ClaimsInvestigationController.CaseLocation), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "DistrictId", caseLocation.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
@@ -117,7 +126,7 @@ namespace risk.control.system.Controllers
 
             var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
             services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
-            
+
             ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == caseLocation.DistrictId)
                 .Select(x => new SelectListItem
                 {
@@ -144,7 +153,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    if(caseLocation.SelectedMultiPincodeId.Count>0)
+                    if (caseLocation.SelectedMultiPincodeId.Count > 0)
                     {
                         var existingVerifyPincodes = _context.CaseLocation.Where(s => s.CaseLocationId == caseLocation.CaseLocationId);
                         _context.CaseLocation.RemoveRange(existingVerifyPincodes);
@@ -164,7 +173,7 @@ namespace risk.control.system.Controllers
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage("verification location edited successfully!");
-                return RedirectToAction(nameof(ClaimsInvestigationController.CaseLocation), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId});
+                        return RedirectToAction(nameof(ClaimsInvestigationController.CaseLocation), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
                     }
 
                 }
@@ -221,14 +230,14 @@ namespace risk.control.system.Controllers
             {
                 _context.CaseLocation.Remove(caseLocation);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction("Details", "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
         }
 
         private bool CaseLocationExists(long id)
         {
-          return (_context.CaseLocation?.Any(e => e.CaseLocationId == id)).GetValueOrDefault();
+            return (_context.CaseLocation?.Any(e => e.CaseLocationId == id)).GetValueOrDefault();
         }
     }
 }
