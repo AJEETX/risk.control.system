@@ -83,7 +83,6 @@ namespace risk.control.system.Controllers
                     VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId,
                     VendorInvestigationServiceType = vendorInvestigationServiceType,
                 }).ToList();
-                vendorInvestigationServiceType.PincodeServices = null;
                 vendorInvestigationServiceType.PincodeServices = servicePinCodes;
 
                 _context.Add(vendorInvestigationServiceType);
@@ -124,7 +123,10 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var services = _context.VendorInvestigationServiceType.Include(v => v.Vendor).Include(v => v.PincodeServices).First(v => v.VendorInvestigationServiceTypeId == id);
+            var services = _context.VendorInvestigationServiceType
+                .Include(v => v.Vendor)
+                .Include(v => v.PincodeServices)
+                .First(v => v.VendorInvestigationServiceTypeId == id);
 
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
@@ -184,6 +186,8 @@ namespace risk.control.system.Controllers
 
                         _context.Update(vendorInvestigationServiceType);
                         await _context.SaveChangesAsync();
+                        toastNotification.AddSuccessToastMessage("service updated successfully!");
+                        return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = vendorInvestigationServiceType.VendorId });
                     }
 
                 }

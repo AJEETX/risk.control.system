@@ -96,6 +96,37 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        public async Task<IActionResult> CaseLocation(string id)
+        {
+            if (id == null)
+            {
+                toastNotification.AddErrorToastMessage("vendor not found!");
+                return NotFound();
+            }
+
+            var applicationDbContext = _context.ClaimsInvestigation
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c=>c.PincodeServices)
+               .Include(c=>c.CaseLocations)
+               .ThenInclude(c=>c.State)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.District)
+               .Include(c => c.BeneficiaryRelation)
+               .Include(c => c.ClientCompany)
+               .Include(c => c.CaseEnabler)
+               .Include(c => c.CostCentre)
+               .Include(c => c.Country)
+               .Include(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.InvestigationServiceType)
+               .Include(c => c.LineOfBusiness)
+               .Include(c => c.PinCode)
+               .Include(c => c.State)
+                .FirstOrDefault(a => a.ClaimsInvestigationId == id);
+
+            return View(applicationDbContext);
+        }
         public async Task<IActionResult> Open()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -173,7 +204,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.LineOfBusiness)
                 .Include(c => c.PinCode)
                 .Include(c => c.State)
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationCaseId == id);
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
             if (claimsInvestigation == null)
             {
                 return NotFound();
@@ -318,7 +349,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ClaimsInvestigation claimsInvestigation)
         {
-            if (id != claimsInvestigation.ClaimsInvestigationCaseId)
+            if (id != claimsInvestigation.ClaimsInvestigationId)
             {
                 return NotFound();
             }
@@ -343,7 +374,7 @@ namespace risk.control.system.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClaimsInvestigationExists(claimsInvestigation.ClaimsInvestigationCaseId))
+                    if (!ClaimsInvestigationExists(claimsInvestigation.ClaimsInvestigationId))
                     {
                         return NotFound();
                     }
@@ -388,7 +419,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.LineOfBusiness)
                 .Include(c => c.PinCode)
                 .Include(c => c.State)
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationCaseId == id);
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
             if (claimsInvestigation == null)
             {
                 return NotFound();
@@ -421,7 +452,7 @@ namespace risk.control.system.Controllers
 
         private bool ClaimsInvestigationExists(string id)
         {
-            return (_context.ClaimsInvestigation?.Any(e => e.ClaimsInvestigationCaseId == id)).GetValueOrDefault();
+            return (_context.ClaimsInvestigation?.Any(e => e.ClaimsInvestigationId == id)).GetValueOrDefault();
         }
     }
 }

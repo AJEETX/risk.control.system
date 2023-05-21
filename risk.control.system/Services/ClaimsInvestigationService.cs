@@ -23,7 +23,7 @@ namespace risk.control.system.Services
         {
             if (claims is not null && claims.Count > 0)
             {
-                var cases2Assign = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationCaseId));
+                var cases2Assign = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationId));
                 foreach (var claimsInvestigation in cases2Assign)
                 {
                     claimsInvestigation.Updated = DateTime.UtcNow;

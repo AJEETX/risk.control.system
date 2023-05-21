@@ -27,7 +27,7 @@ namespace risk.control.system.Controllers
                 .Include(v => v.Country)
                 .Include(v => v.District)
                 .Include(v => v.PinCode)
-                .Include(v => v.State).Where(l=>l.ClaimsInvestigation.ClaimsInvestigationCaseId == id);
+                .Include(v => v.State).Where(l=>l.ClaimsInvestigation.ClaimsInvestigationId == id);
             return View(await applicationDbContext.ToListAsync());
         }
 

@@ -41,6 +41,7 @@
         public const string DISTRICT = "District";
         public const string CASE_STATUS = "Case status";
         public const string SERVICE = "Service";
+        public const string VERIFY_SERVICE = "Verify Service";
         public const string INVESTIGATION_SERVICE = "Type of service";
         public const string BENEFICIARY = "Claims beneficiary";
         public const string CASE_ENABLER = "Case enabler";

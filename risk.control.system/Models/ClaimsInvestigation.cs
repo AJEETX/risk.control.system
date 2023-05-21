@@ -8,7 +8,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ClaimsInvestigationCaseId { get; set; } = Guid.NewGuid().ToString();
+        public string ClaimsInvestigationId { get; set; } = Guid.NewGuid().ToString();
 
         [Display(Name = "Company name")]
         public string? ClientCompanyId { get; set; }
@@ -115,9 +115,10 @@ namespace risk.control.system.Models
         public bool SelectedToAssign { get; set; }
         public string? CurrentUserId { get; set; }
         public List<VerificationLocation> VerificationLocations { get; set; }
+        public List<CaseLocation>? CaseLocations { get; set; }
         public override string ToString()
         {
-            return $"Case Id: {ClaimsInvestigationCaseId}, <br /> ClaimType: {ClaimType}";
+            return $"Case Id: {ClaimsInvestigationId}, <br /> ClaimType: {ClaimType}";
         }
     }
 

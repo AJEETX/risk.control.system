@@ -70,10 +70,10 @@ namespace risk.control.system.Services
                 UpdatedBy = applicationUser.Email
             };
 
-            var claimsInvestigations = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationCaseId));
+            var claimsInvestigations = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationId));
             foreach (var claimsInvestigation in claimsInvestigations)
             {
-                contactMessage.Message += BaseUrl+ claimsInvestigation.ClaimsInvestigationCaseId;
+                contactMessage.Message += BaseUrl+ claimsInvestigation.ClaimsInvestigationId;
             }
 
 
@@ -113,7 +113,7 @@ namespace risk.control.system.Services
                     }
                 }
             }
-            string claimsUrl = $"<a href={BaseUrl + claimsInvestigation.ClaimsInvestigationCaseId}>url</a>";
+            string claimsUrl = $"<a href={BaseUrl + claimsInvestigation.ClaimsInvestigationId}>url</a>";
             claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
 
 

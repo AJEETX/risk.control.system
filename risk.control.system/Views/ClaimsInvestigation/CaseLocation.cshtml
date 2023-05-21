@@ -1,0 +1,109 @@
+﻿@model ClaimsInvestigation
+
+@{
+    ViewData["Title"] = @Applicationsettings.DETAILS;
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-success card-outline">
+                    <form asp-action="index">
+                        <div class="card-header">
+                            <h3 class="card-title">@Applicationsettings.VERIFY_LOCATIONS</h3>
+                            <div class="card-tools">
+                                <div class="input-group input-group-sm">
+                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
+                                    <div class="input-group-append">
+                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <a asp-controller="ClaimsInvestigation" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
+                                    <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.ClaimsInvestigationId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-success card-outline">
+                    <div class="card-body p-0">
+                        @if (Model.CaseLocations.Count == 0)
+                        {
+                            <hr />
+                            <div class="col-md-12 text-center">
+                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                            </div>
+                            <hr />
+                        }
+                        else
+                        {
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            District
+                                        </th>
+                                        <th>
+                                            State
+                                        </th>
+                                        
+                                        <th>
+                                            Verification Locations
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.UpdatedBy)
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.CaseLocations)
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.District.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.State.Name)
+                                            </td>
+                                           
+                                            <td>
+                                                @foreach (var svc in item?.PincodeServices)
+                                                {
+                                                    var pinCodeDetail = svc.Pincode;
+                                                    <span class="badge badge-light">@Html.DisplayFor(modelItem => pinCodeDetail)</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.UpdatedBy)
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-xs btn-info" asp-controller="CaseLocations" asp-action="Details" asp-route-id="@item.CaseLocationId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;
+                                                <a class="btn btn-xs btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@item.CaseLocationId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
+                                                <a class="btn btn-xs btn-danger" asp-controller="CaseLocations" asp-action="Delete" asp-route-id="@item.CaseLocationId"> <i class="fas fa-trash"></i>   @Applicationsettings.DELETE</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

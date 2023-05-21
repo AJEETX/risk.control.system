@@ -15,10 +15,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
 builder.Services.AddScoped<IMailboxService, MailboxService>();
+
 builder.Services.AddScoped<IInboxMailService, InboxMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()
@@ -27,11 +30,13 @@ builder.Services.AddControllersWithViews()
         ProgressBar = true,
         Timeout = 3000
     });
+
+
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=vendor-seed-08-15-21-May.db"));
+                    options.UseSqlite("Data Source=claim-14-15-21-May.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {

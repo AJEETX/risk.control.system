@@ -184,8 +184,8 @@
                         <div class="row">
                             <div class="col-md-12 text-right">
                                 <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.BACK</a> &nbsp;
-                                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.ClaimsInvestigationCaseId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
-                                <a class="btn btn-warning" asp-controller="VerificationLocations" asp-action="Index" asp-route-id="@Model?.ClaimsInvestigationCaseId"><i class="fas fa-pen"></i> @Applicationsettings.VERIFY_LOCATIONS</a>
+                                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.ClaimsInvestigationId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
+                                <a class="btn btn-warning" asp-action="CaseLocation" asp-route-id="@Model?.ClaimsInvestigationId"><i class="fas fa-pen"></i> @Applicationsettings.VERIFY_LOCATIONS</a>
                             </div>
                         </div>
                     </div>

@@ -111,7 +111,7 @@
                                             {
                                                 <tr>
                                                     <td>
-                                                        <input id="@item.ClaimsInvestigationCaseId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationCaseId" checked="@item.SelectedToAssign" />
+                                                        <input id="@item.ClaimsInvestigationId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationId" checked="@item.SelectedToAssign" />
                                                     </td>
                                                     <td style="display:@hasClientCompany">
                                                         @Html.DisplayFor(modelItem => item.ClientCompany.Name)
@@ -162,13 +162,13 @@
                                                         @Html.DisplayFor(modelItem => item.Comments)
                                                     </td>
                                                     <td>
-                                                        <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationCaseId">
+                                                        <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
                                                             <i class="fa fa-search"></i> @Applicationsettings.DETAILS
                                                         </a> &nbsp;
-                                                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClaimsInvestigationCaseId">
+                                                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClaimsInvestigationId">
                                                             <i class="fas fa-pen"></i> @Applicationsettings.EDIT
                                                         </a> &nbsp;
-                                                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClaimsInvestigationCaseId">
+                                                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClaimsInvestigationId">
                                                             <i class="fas fa-trash"></i> @Applicationsettings.DELETE
                                                         </a>
                                                     </td>
