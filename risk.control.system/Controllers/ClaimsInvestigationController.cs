@@ -56,7 +56,6 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Index()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.CaseEnabler)
                 .Include(c => c.CostCentre)
@@ -113,14 +112,13 @@ namespace risk.control.system.Controllers
 
             var applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.CaseLocations)
-               .ThenInclude(c=>c.PincodeServices)
+               .ThenInclude(c=>c.PinCode)
                .Include(c=>c.CaseLocations)
                .ThenInclude(c=>c.State)
                .Include(c => c.CaseLocations)
                .ThenInclude(c => c.District)
                .Include(c => c.CaseLocations)
                .ThenInclude(c => c.Country)
-               .Include(c => c.BeneficiaryRelation)
                .Include(c => c.ClientCompany)
                .Include(c => c.CaseEnabler)
                .Include(c => c.CostCentre)
@@ -139,7 +137,6 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Open()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClientCompany)
                 .Include(c => c.CaseEnabler)
                 .Include(c => c.CostCentre)
@@ -203,7 +200,6 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
-                .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.CaseEnabler)
                 .Include(c => c.CostCentre)
                 .Include(c => c.Country)
@@ -312,7 +308,6 @@ namespace risk.control.system.Controllers
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", claimsInvestigation.BeneficiaryRelationId);
             ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.CaseEnablerId);
             ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
@@ -339,7 +334,6 @@ namespace risk.control.system.Controllers
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", claimsInvestigation.BeneficiaryRelationId);
             ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.CaseEnablerId);
             ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
@@ -396,7 +390,6 @@ namespace risk.control.system.Controllers
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", claimsInvestigation.BeneficiaryRelationId);
             ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.CaseEnablerId);
             ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
@@ -418,7 +411,6 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
-                .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.CaseEnabler)
                 .Include(c => c.CostCentre)
                 .Include(c => c.Country)

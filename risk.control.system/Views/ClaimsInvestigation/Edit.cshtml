@@ -202,55 +202,33 @@
                             </div>
 
                         </div>
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-plus"></i>  @Applicationsettings.BENEFICIARY_DETAILS</h3>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="Comments" class="control-label"></label>
+                                    <textarea asp-for="Comments" class="form-control"></textarea>
+                                    <span asp-validation-for="Comments" class="text-danger"></span>
+                                </div>
+                                <div style="display:@hasClientCompany;" class="form-group">
+                                    <label asp-for="InvestigationCaseStatusId" class="control-label"></label>
+                                    <select id="InvestigationCaseStatusId" asp-for="InvestigationCaseStatusId" class="form-control" asp-items="ViewBag.InvestigationCaseStatusId" onchange="loadSubStatus(this)">
+                                        <option>--- SELECT STATUS ---</option>
+                                    </select>
+                                </div>
+
+                                <div style="display:@hasClientCompany;" class="form-group">
+                                    <label asp-for="InvestigationCaseSubStatusId" class="control-label"></label>
+                                    <select id="InvestigationCaseSubStatusId" asp-for="InvestigationCaseSubStatusId" class="form-control" asp-items="ViewBag.InvestigationCaseSubStatusId">
+                                        <option>--- SELECT SUB STATUS ---</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
+                        
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label asp-for="BeneficiaryName" class="control-label"></label>
-                                        <input asp-for="BeneficiaryName" class="form-control" />
-                                        <span asp-validation-for="BeneficiaryName" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="BeneficiaryRelationId" class="control-label"></label>
-                                        <select asp-for="BeneficiaryRelationId" class="form-control" asp-items="ViewBag.BeneficiaryRelationId">
-                                            <option>--- SELECT BENEFICIARY RELATION ---</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="BeneficiaryContactNumber" class="control-label"></label>
-                                        <input asp-for="BeneficiaryContactNumber" class="form-control" />
-                                        <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label asp-for="BeneficiaryIncome" class="control-label"></label>
-                                        <input asp-for="BeneficiaryIncome" class="form-control" />
-                                        <span asp-validation-for="BeneficiaryIncome" class="text-danger"></span>
-                                    </div>
-
-
-                                    <div class="form-group">
-                                        <label asp-for="Comments" class="control-label"></label>
-                                        <textarea asp-for="Comments" class="form-control"></textarea>
-                                        <span asp-validation-for="Comments" class="text-danger"></span>
-                                    </div>
-                                    <div style="display:@hasClientCompany;" class="form-group">
-                                        <label asp-for="InvestigationCaseStatusId" class="control-label"></label>
-                                        <select id="InvestigationCaseStatusId" asp-for="InvestigationCaseStatusId" class="form-control" asp-items="ViewBag.InvestigationCaseStatusId" onchange="loadSubStatus(this)">
-                                            <option>--- SELECT STATUS ---</option>
-                                        </select>
-                                    </div>
-
-                                    <div style="display:@hasClientCompany;" class="form-group">
-                                        <label asp-for="InvestigationCaseSubStatusId" class="control-label"></label>
-                                        <select id="InvestigationCaseSubStatusId" asp-for="InvestigationCaseSubStatusId" class="form-control" asp-items="ViewBag.InvestigationCaseSubStatusId">
-                                            <option>--- SELECT SUB STATUS ---</option>
-                                        </select>
-                                    </div>
+                                <div class="col-md-12">
+                                     
                                     <div class="form-group text-right">
                                         <a asp-action="Index" class="btn btn-secondary">
                                             <i class="fa fa-window-close"></i>

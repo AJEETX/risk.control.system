@@ -65,21 +65,21 @@ namespace risk.control.system.Controllers.Api
                 sId = districtId;
                 pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
 
-                var existingCaseLocations = context.CaseLocation
-                    .Include(c => c.PincodeServices)
-                    .Where(c => c.ClaimsInvestigationId == caseId);
+                //var existingCaseLocations = context.CaseLocation
+                //    .Include(c => c.PincodeServices)
+                //    .Where(c => c.ClaimsInvestigationId == caseId);
 
-                var existingVerifyPincodes = context.VerifyPinCode
-                    .Where(v => existingCaseLocations.Any(e => e.CaseLocationId == v.CaseLocationId))?.ToList();
+                //var existingVerifyPincodes = context.VerifyPinCode
+                //    .Where(v => existingCaseLocations.Any(e => e.CaseLocationId == v.CaseLocationId))?.ToList();
 
-                if (existingVerifyPincodes is not null && existingVerifyPincodes.Any())
-                {
-                    var existingPicodes = existingVerifyPincodes.Select(e => e.Pincode).ToList();
-                    var pinCodeString = pincodes.Select(p=>p.Code).ToList();
-                    var remaingPincodesString = pinCodeString.Except(existingPicodes).ToList();
-                    remaingPincodes = pincodes.Where(p=> remaingPincodesString.Contains(p.Code)).ToList();
-                    return Ok(remaingPincodes);
-                }
+                //if (existingVerifyPincodes is not null && existingVerifyPincodes.Any())
+                //{
+                //    var existingPicodes = existingVerifyPincodes.Select(e => e.Pincode).ToList();
+                //    var pinCodeString = pincodes.Select(p=>p.Code).ToList();
+                //    var remaingPincodesString = pinCodeString.Except(existingPicodes).ToList();
+                //    remaingPincodes = pincodes.Where(p=> remaingPincodesString.Contains(p.Code)).ToList();
+                //    return Ok(remaingPincodes);
+                //}
             }
             return Ok(pincodes);
         }

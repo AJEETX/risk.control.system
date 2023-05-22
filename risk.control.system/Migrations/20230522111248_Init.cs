@@ -434,10 +434,6 @@ namespace risk.control.system.Migrations
                     CustomerIncome = table.Column<int>(type: "INTEGER", nullable: true),
                     CustomerOccupation = table.Column<string>(type: "TEXT", nullable: true),
                     CustomerEducation = table.Column<string>(type: "TEXT", nullable: true),
-                    BeneficiaryName = table.Column<string>(type: "TEXT", nullable: true),
-                    BeneficiaryRelationId = table.Column<long>(type: "INTEGER", nullable: true),
-                    BeneficiaryContactNumber = table.Column<long>(type: "INTEGER", nullable: true),
-                    BeneficiaryIncome = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
                     CustomerType = table.Column<int>(type: "INTEGER", nullable: true),
                     CostCentreId = table.Column<string>(type: "TEXT", nullable: true),
                     CaseEnablerId = table.Column<string>(type: "TEXT", nullable: true),
@@ -451,11 +447,6 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ClaimsInvestigation", x => x.ClaimsInvestigationId);
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_BeneficiaryRelation_BeneficiaryRelationId",
-                        column: x => x.BeneficiaryRelationId,
-                        principalTable: "BeneficiaryRelation",
-                        principalColumn: "BeneficiaryRelationId");
                     table.ForeignKey(
                         name: "FK_ClaimsInvestigation_CaseEnabler_CaseEnablerId",
                         column: x => x.CaseEnablerId,
@@ -520,9 +511,16 @@ namespace risk.control.system.Migrations
                 {
                     CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    BeneficiaryName = table.Column<string>(type: "TEXT", nullable: true),
+                    BeneficiaryRelationId = table.Column<long>(type: "INTEGER", nullable: true),
+                    BeneficiaryContactNumber = table.Column<long>(type: "INTEGER", nullable: true),
+                    BeneficiaryIncome = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: true),
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
+                    Addressline2 = table.Column<string>(type: "TEXT", nullable: true),
                     ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -531,6 +529,11 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CaseLocation", x => x.CaseLocationId);
+                    table.ForeignKey(
+                        name: "FK_CaseLocation_BeneficiaryRelation_BeneficiaryRelationId",
+                        column: x => x.BeneficiaryRelationId,
+                        principalTable: "BeneficiaryRelation",
+                        principalColumn: "BeneficiaryRelationId");
                     table.ForeignKey(
                         name: "FK_CaseLocation_ClaimsInvestigation_ClaimsInvestigationId",
                         column: x => x.ClaimsInvestigationId,
@@ -547,6 +550,11 @@ namespace risk.control.system.Migrations
                         column: x => x.DistrictId,
                         principalTable: "District",
                         principalColumn: "DistrictId");
+                    table.ForeignKey(
+                        name: "FK_CaseLocation_PinCode_PinCodeId",
+                        column: x => x.PinCodeId,
+                        principalTable: "PinCode",
+                        principalColumn: "PinCodeId");
                     table.ForeignKey(
                         name: "FK_CaseLocation_State_StateId",
                         column: x => x.StateId,
@@ -1315,6 +1323,11 @@ namespace risk.control.system.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseLocation_BeneficiaryRelationId",
+                table: "CaseLocation",
+                column: "BeneficiaryRelationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CaseLocation_ClaimsInvestigationId",
                 table: "CaseLocation",
                 column: "ClaimsInvestigationId");
@@ -1330,14 +1343,14 @@ namespace risk.control.system.Migrations
                 column: "DistrictId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseLocation_PinCodeId",
+                table: "CaseLocation",
+                column: "PinCodeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CaseLocation_StateId",
                 table: "CaseLocation",
                 column: "StateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClaimsInvestigation_BeneficiaryRelationId",
-                table: "ClaimsInvestigation",
-                column: "BeneficiaryRelationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClaimsInvestigation_CaseEnablerId",
@@ -1685,13 +1698,13 @@ namespace risk.control.system.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "BeneficiaryRelation");
+
+            migrationBuilder.DropTable(
                 name: "Vendor");
 
             migrationBuilder.DropTable(
                 name: "ClaimsInvestigation");
-
-            migrationBuilder.DropTable(
-                name: "BeneficiaryRelation");
 
             migrationBuilder.DropTable(
                 name: "CaseEnabler");

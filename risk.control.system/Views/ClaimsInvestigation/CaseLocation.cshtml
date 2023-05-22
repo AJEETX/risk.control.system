@@ -63,7 +63,7 @@
                                         </th>
                                         
                                         <th>
-                                            Verification Locations
+                                            Verification Pincodes
                                         </th>
                                         <th>
                                             @Html.DisplayNameFor(model => model.UpdatedBy)
@@ -84,14 +84,11 @@
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.State.Name)
                                             </td>
-                                           
+
                                             <td>
-                                                @foreach (var svc in item?.PincodeServices)
-                                                {
-                                                    var pinCodeDetail = svc.Pincode;
-                                                    <span class="badge badge-light">@Html.DisplayFor(modelItem => pinCodeDetail)</span>
-                                                }
+                                                @Html.DisplayFor(modelItem => item.PinCode.Code)
                                             </td>
+
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.UpdatedBy)
                                             </td>

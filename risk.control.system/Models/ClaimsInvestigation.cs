@@ -38,6 +38,7 @@ namespace risk.control.system.Models
         [Display(Name = "Case sub status")]
         public InvestigationCaseSubStatus? InvestigationCaseSubStatus { get; set; } = default!;
         [Display(Name = "Case issue date")]
+        [DataType(DataType.Date)]
         public DateTime? ContractIssueDate { get; set; }
         [Display(Name = "Customer name")]
         public string? CustomerName { get; set; }
@@ -83,19 +84,7 @@ namespace risk.control.system.Models
         public string? CustomerOccupation { get; set; }
         [Display(Name = "Customer education")]
         public string? CustomerEducation { get; set; }
-        [Display(Name = "Beneficiary name")]
-        public string? BeneficiaryName { get; set; }
 
-        [Display(Name = "Beneficiary relation")]
-        public long? BeneficiaryRelationId { get; set; }
-        [Display(Name = "Beneficiary relation")]
-        public BeneficiaryRelation? BeneficiaryRelation { get; set; }
-        [Display(Name = "Beneficiary contact number")]
-        public long? BeneficiaryContactNumber { get; set; }
-        [Display(Name = "Beneficiary income")]
-
-        [Column(TypeName = "decimal(15,2)")]
-        public decimal? BeneficiaryIncome { get; set; }
         [Display(Name = "Customer type")]
         public CustomerType? CustomerType { get; set; }
         [Display(Name = "Cost centre")]

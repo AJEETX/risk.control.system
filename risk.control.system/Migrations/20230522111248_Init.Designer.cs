@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230522003059_Init")]
+    [Migration("20230522111248_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -387,6 +387,24 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Addressline")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Addressline2")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("BeneficiaryContactNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal?>("BeneficiaryIncome")
+                        .HasColumnType("decimal(15,2)");
+
+                    b.Property<string>("BeneficiaryName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("BeneficiaryRelationId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ClaimsInvestigationId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -400,6 +418,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("DistrictId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PinCodeId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
 
@@ -411,11 +432,15 @@ namespace risk.control.system.Migrations
 
                     b.HasKey("CaseLocationId");
 
+                    b.HasIndex("BeneficiaryRelationId");
+
                     b.HasIndex("ClaimsInvestigationId");
 
                     b.HasIndex("CountryId");
 
                     b.HasIndex("DistrictId");
+
+                    b.HasIndex("PinCodeId");
 
                     b.HasIndex("StateId");
 
@@ -430,18 +455,6 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("Addressline")
                         .HasColumnType("TEXT");
-
-                    b.Property<long?>("BeneficiaryContactNumber")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<decimal?>("BeneficiaryIncome")
-                        .HasColumnType("decimal(15,2)");
-
-                    b.Property<string>("BeneficiaryName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("BeneficiaryRelationId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("CaseEnablerId")
                         .HasColumnType("TEXT");
@@ -543,8 +556,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("ClaimsInvestigationId");
-
-                    b.HasIndex("BeneficiaryRelationId");
 
                     b.HasIndex("CaseEnablerId");
 
@@ -2044,6 +2055,10 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.CaseLocation", b =>
                 {
+                    b.HasOne("risk.control.system.Models.BeneficiaryRelation", "BeneficiaryRelation")
+                        .WithMany()
+                        .HasForeignKey("BeneficiaryRelationId");
+
                     b.HasOne("risk.control.system.Models.ClaimsInvestigation", "ClaimsInvestigation")
                         .WithMany("CaseLocations")
                         .HasForeignKey("ClaimsInvestigationId")
@@ -2058,9 +2073,15 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("DistrictId");
 
+                    b.HasOne("risk.control.system.Models.PinCode", "PinCode")
+                        .WithMany()
+                        .HasForeignKey("PinCodeId");
+
                     b.HasOne("risk.control.system.Models.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId");
+
+                    b.Navigation("BeneficiaryRelation");
 
                     b.Navigation("ClaimsInvestigation");
 
@@ -2068,15 +2089,13 @@ namespace risk.control.system.Migrations
 
                     b.Navigation("District");
 
+                    b.Navigation("PinCode");
+
                     b.Navigation("State");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
                 {
-                    b.HasOne("risk.control.system.Models.BeneficiaryRelation", "BeneficiaryRelation")
-                        .WithMany()
-                        .HasForeignKey("BeneficiaryRelationId");
-
                     b.HasOne("risk.control.system.Models.CaseEnabler", "CaseEnabler")
                         .WithMany()
                         .HasForeignKey("CaseEnablerId");
@@ -2122,8 +2141,6 @@ namespace risk.control.system.Migrations
                     b.HasOne("risk.control.system.Models.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId");
-
-                    b.Navigation("BeneficiaryRelation");
 
                     b.Navigation("CaseEnabler");
 
@@ -2484,7 +2501,7 @@ namespace risk.control.system.Migrations
             modelBuilder.Entity("risk.control.system.Models.VerifyPinCode", b =>
                 {
                     b.HasOne("risk.control.system.Models.CaseLocation", "CaseLocation")
-                        .WithMany("PincodeServices")
+                        .WithMany()
                         .HasForeignKey("CaseLocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2515,11 +2532,6 @@ namespace risk.control.system.Migrations
                     b.Navigation("ApplicationRoles");
 
                     b.Navigation("Mailbox");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.CaseLocation", b =>
-                {
-                    b.Navigation("PincodeServices");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>

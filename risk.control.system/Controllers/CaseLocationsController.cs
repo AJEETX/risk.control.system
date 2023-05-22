@@ -41,7 +41,6 @@ namespace risk.control.system.Controllers
             }
 
             var caseLocation = await _context.CaseLocation
-                .Include(c => c.PincodeServices)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
@@ -65,12 +64,12 @@ namespace risk.control.system.Controllers
                 .Include(i => i.CaseLocations)
                 .ThenInclude(c => c.Country)
                                 .Include(i => i.CaseLocations)
-                .ThenInclude(c => c.PincodeServices)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == id);
 
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
-            var model = new CaseLocation { SelectedMultiPincodeId = new List<string>(), ClaimsInvestigation = claim, PincodeServices = new List<VerifyPinCode>() };
+            var model = new CaseLocation { ClaimsInvestigation = claim };
 
             return View(model);
         }
@@ -84,36 +83,13 @@ namespace risk.control.system.Controllers
         {
             if (caseLocation is not null)
             {
-                var selectedPinCodes = await _context.PinCode.Where(p => caseLocation.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
-                var selectedVerifyPinCodes = selectedPinCodes.Select(p =>
-                    new VerifyPinCode
-                    {
-                        Name = p.Name,
-                        Pincode = p.Code,
-                        CaseLocationId = caseLocation.CaseLocationId,
-                        CaseLocation = caseLocation,
-                    }).ToList();
-
-                var existingCaseLocations = _context.CaseLocation
-                    .Include(c=>c.PincodeServices)
-                    .Where(c => c.ClaimsInvestigationId == caseLocation.ClaimsInvestigationId);
-
-                var existingVerifyPincodes= _context.VerifyPinCode
-                    .Where(v=> existingCaseLocations.Any(e=>e.CaseLocationId == v.CaseLocationId))?.ToList();
-
-                if(existingVerifyPincodes is not null && existingVerifyPincodes.Any())
-                {
-                    var existingPicodes= existingVerifyPincodes.Select(e=>e.Pincode);
-                }
-                //var existingPinCodeServices = _c
-
-                caseLocation.PincodeServices = selectedVerifyPinCodes;
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("verification location created successfully!");
                 return RedirectToAction(nameof(ClaimsInvestigationController.CaseLocation), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
+            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "DistrictId", caseLocation.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
             return View(caseLocation);
@@ -135,23 +111,13 @@ namespace risk.control.system.Controllers
 
             var services = _context.CaseLocation
                 .Include(v => v.ClaimsInvestigation)
-                .Include(v => v.PincodeServices)
                 .First(v => v.CaseLocationId == id);
 
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", caseLocation.StateId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
-
-            var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
-            services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
-
-            ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == caseLocation.DistrictId)
-                .Select(x => new SelectListItem
-                {
-                    Text = x.Name + " - " + x.Code,
-                    Value = x.PinCodeId.ToString()
-                }).ToList();
-
+            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", caseLocation.PinCodeId);
             return View(services);
         }
 
@@ -171,23 +137,8 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    if (caseLocation.SelectedMultiPincodeId.Count > 0)
                     {
-                        var existingVerifyPincodes = _context.CaseLocation.Where(s => s.CaseLocationId == caseLocation.CaseLocationId);
-                        _context.CaseLocation.RemoveRange(existingVerifyPincodes);
-
-                        var pinCodeDetails = _context.PinCode.Where(p => caseLocation.SelectedMultiPincodeId.Contains(p.PinCodeId));
-
-                        var pinCodesWithId = pinCodeDetails.Select(p => new VerifyPinCode
-                        {
-                            Pincode = p.Code,
-                            Name = p.Name,
-                            CaseLocationId = caseLocation.CaseLocationId
-                        }).ToList();
-
-                        _context.VerifyPinCode.AddRange(pinCodesWithId);
-
-                        caseLocation.PincodeServices = pinCodesWithId;
+                        
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage("verification location edited successfully!");
@@ -209,6 +160,8 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "DistrictId", caseLocation.DistrictId);
+            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", caseLocation.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
             return View(caseLocation);
         }
@@ -222,7 +175,6 @@ namespace risk.control.system.Controllers
             }
 
             var caseLocation = await _context.CaseLocation
-                .Include(c => c.PincodeServices)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .FirstOrDefaultAsync(m => m.CaseLocationId == id);
