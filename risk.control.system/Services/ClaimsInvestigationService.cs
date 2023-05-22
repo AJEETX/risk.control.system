@@ -42,22 +42,31 @@ namespace risk.control.system.Services
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (claimsInvestigation is not null)
             {
-                claimsInvestigation.Updated = DateTime.UtcNow;
-                claimsInvestigation.UpdatedBy = applicationUser.Email;
-                claimsInvestigation.CurrentUserId = applicationUser.Email;
-                claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
-                claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
-                if (claimDocument is not null)
+                try
                 {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimDocument.FileName);
-                    var extension = Path.GetExtension(claimDocument.FileName);
-                    claimsInvestigation.Document = claimDocument;
-                    using var dataStream = new MemoryStream();
-                    await claimsInvestigation.Document.CopyToAsync(dataStream);
-                    claimsInvestigation.DocumentImage = dataStream.ToArray();
+                    claimsInvestigation.Updated = DateTime.UtcNow;
+                    claimsInvestigation.UpdatedBy = applicationUser.Email;
+                    claimsInvestigation.CurrentUserId = applicationUser.Email;
+                    claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                    claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
+                    if (claimDocument is not null)
+                    {
+                        var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimDocument.FileName);
+                        var extension = Path.GetExtension(claimDocument.FileName);
+                        claimsInvestigation.Document = claimDocument;
+                        using var dataStream = new MemoryStream();
+                        await claimsInvestigation.Document.CopyToAsync(dataStream);
+                        claimsInvestigation.DocumentImage = dataStream.ToArray();
+                    }
+                    _context.ClaimsInvestigation.Add(claimsInvestigation);
+                    await _context.SaveChangesAsync();
                 }
-                _context.ClaimsInvestigation.Add(claimsInvestigation);
-                await _context.SaveChangesAsync();
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+
             }
         }
 

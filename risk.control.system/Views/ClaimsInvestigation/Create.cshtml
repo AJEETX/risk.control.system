@@ -199,7 +199,7 @@
                                         <textarea asp-for="Comments" class="form-control"></textarea>
                                         <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
-                                    <div style="display:@hasClientCompany;" class="form-group">
+                                    @*<div style="display:@hasClientCompany;" class="form-group">
                                         <label asp-for="InvestigationCaseStatusId" class="control-label"></label>
                                         <select id="InvestigationCaseStatusId" asp-for="InvestigationCaseStatusId" class="form-control" asp-items="ViewBag.InvestigationCaseStatusId" onchange="loadSubStatus(this)">
                                             <option>--- SELECT STATUS ---</option>
@@ -211,7 +211,7 @@
                                         <select id="InvestigationCaseSubStatusId" asp-for="InvestigationCaseSubStatusId" class="form-control" asp-items="ViewBag.InvestigationCaseSubStatusId">
                                             <option>--- SELECT SUB STATUS ---</option>
                                         </select>
-                                    </div>
+                                    </div>*@
                                 </div>
                             </div>
                             <div class="card-body">
