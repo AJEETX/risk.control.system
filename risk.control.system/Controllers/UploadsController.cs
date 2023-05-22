@@ -23,7 +23,7 @@ namespace risk.control.system.Controllers
         {
             if (postedFile != null)
             {
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-pincodes");
+                string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                return View(new PinCodeDetails { DataTable = dt });
+                return View(dt);
             }
             return Problem();
         }

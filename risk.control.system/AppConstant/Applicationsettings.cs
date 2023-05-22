@@ -50,6 +50,7 @@
         public const string CASE_SUBSTATUS = "Case sub status";
         public const string LINE_OF_BUSINESS = "Line of business";
         public const string PINCODE = "Pincode";
+        public const string RECORD = "Record";
         public const string ROLE = "Role";
         public const string STATE = "State";
         public const string USER = "User";
@@ -75,10 +76,12 @@
         public const string MULTIPLE_UPLOAD = "Multi-Upload";
         public const string PINCODE_UPLOAD = "Pincode upload";
         public const string PINCODE_SAMPLE = "Upload sample file to upload in csv format";
-        public const string PINCODE_UPLOADED_SAMPLE = "Uploaded Pincodes";
+        public const string UPLOADED_SAMPLE = "Uploaded Records";
         public const string NO_RECORDS_FOUND = "No Records Found";
 
-        public const string UPLOAD = "Upload";
+        public const string UPLOAD = "Upload Sample";
+        public const string UPLOAD_CASE = "Upload Cases";
+        public const string UPLOADED_CASES = "Uploaded Cases";
         public const string SAMPLE_PINCODE_FILE_TYPE = "csv";
         public const string DOWNLOAD = "Download";
         public static string SAMPLE_PINCODE_FILE = $"Sample csv file for pincode upload";
