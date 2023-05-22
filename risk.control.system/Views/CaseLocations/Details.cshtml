@@ -37,7 +37,25 @@
                     ;
                 }
             </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.District)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.District.Name)
+            </dd>
 
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.State)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.State.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Country)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Country.Name)
+            </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.Created)
             </dt>

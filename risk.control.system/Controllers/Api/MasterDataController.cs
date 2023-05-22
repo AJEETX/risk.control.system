@@ -27,6 +27,18 @@ namespace risk.control.system.Controllers.Api
             }
             return Ok(states);
         }
+        [HttpPost, ActionName("GetStatesByCountryIdWithoutPreviousSelected")]
+        public async Task<IActionResult> GetStatesByCountryIdWithoutPreviousSelected(string countryId, string caseId)
+        {
+            string cId;
+            var states = new List<State>();
+            if (!string.IsNullOrEmpty(countryId))
+            {
+                cId = countryId;
+                states = await context.State.Where(s => s.CountryId.Equals(cId)).ToListAsync();
+            }
+            return Ok(states);
+        }
 
         [HttpPost, ActionName("GetDistrictByStateId")]
         public async Task<IActionResult> GetDistrictByStateId(string stateId)

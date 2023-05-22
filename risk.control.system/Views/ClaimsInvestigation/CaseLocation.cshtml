@@ -53,6 +53,9 @@
                                 <thead>
                                     <tr>
                                         <th>
+                                            Country
+                                        </th>
+                                        <th>
                                             District
                                         </th>
                                         <th>
@@ -72,7 +75,9 @@
                                     @foreach (var item in Model.CaseLocations)
                                     {
                                         <tr>
-
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Country.Name)
+                                            </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.District.Name)
                                             </td>

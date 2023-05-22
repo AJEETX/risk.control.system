@@ -111,6 +111,8 @@ namespace risk.control.system.Controllers
                .ThenInclude(c=>c.State)
                .Include(c => c.CaseLocations)
                .ThenInclude(c => c.District)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.Country)
                .Include(c => c.BeneficiaryRelation)
                .Include(c => c.ClientCompany)
                .Include(c => c.CaseEnabler)

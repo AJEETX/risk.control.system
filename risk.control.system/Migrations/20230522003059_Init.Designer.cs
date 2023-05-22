@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230521044650_Initialized")]
-    partial class Initialized
+    [Migration("20230522003059_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -391,6 +391,9 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CountryId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
@@ -409,6 +412,8 @@ namespace risk.control.system.Migrations
                     b.HasKey("CaseLocationId");
 
                     b.HasIndex("ClaimsInvestigationId");
+
+                    b.HasIndex("CountryId");
 
                     b.HasIndex("DistrictId");
 
@@ -1713,6 +1718,9 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CountryId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
@@ -1743,6 +1751,8 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("VendorInvestigationServiceTypeId");
+
+                    b.HasIndex("CountryId");
 
                     b.HasIndex("DistrictId");
 
@@ -1800,7 +1810,7 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.VerifyPinCode", b =>
                 {
-                    b.Property<string>("ServicedPinCodeId")
+                    b.Property<string>("VerifyPinCodeId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
@@ -1824,7 +1834,7 @@ namespace risk.control.system.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("ServicedPinCodeId");
+                    b.HasKey("VerifyPinCodeId");
 
                     b.HasIndex("CaseLocationId");
 
@@ -2040,6 +2050,10 @@ namespace risk.control.system.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("risk.control.system.Models.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId");
+
                     b.HasOne("risk.control.system.Models.District", "District")
                         .WithMany()
                         .HasForeignKey("DistrictId");
@@ -2049,6 +2063,8 @@ namespace risk.control.system.Migrations
                         .HasForeignKey("StateId");
 
                     b.Navigation("ClaimsInvestigation");
+
+                    b.Navigation("Country");
 
                     b.Navigation("District");
 
@@ -2387,6 +2403,10 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.VendorInvestigationServiceType", b =>
                 {
+                    b.HasOne("risk.control.system.Models.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId");
+
                     b.HasOne("risk.control.system.Models.District", "District")
                         .WithMany()
                         .HasForeignKey("DistrictId");
@@ -2410,6 +2430,8 @@ namespace risk.control.system.Migrations
                         .HasForeignKey("VendorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Country");
 
                     b.Navigation("District");
 

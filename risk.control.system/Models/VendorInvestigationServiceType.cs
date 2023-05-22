@@ -15,7 +15,9 @@ namespace risk.control.system.Models
         [Display(Name = "Line of busuness")]
         public string? LineOfBusinessId { get; set; } = default!;
         public LineOfBusiness? LineOfBusiness { get; set; } = default!;
-
+        [Display(Name = "Country name")]
+        public string? CountryId { get; set; } = default!;
+        public Country? Country { get; set; } = default!;
         [Display(Name = "State")]
         public string? StateId { get; set; } = default!;
         public State? State { get; set; } = default!;

@@ -7,7 +7,10 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long CaseLocationId { get; set; } 
+        public long CaseLocationId { get; set; }
+        [Display(Name = "Country name")]
+        public string? CountryId { get; set; } = default!;
+        public Country? Country { get; set; } = default!;
         [Display(Name = "State")]
         public string? StateId { get; set; } = default!;
         public State? State { get; set; } = default!;

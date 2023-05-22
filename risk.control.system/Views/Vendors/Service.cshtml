@@ -64,6 +64,10 @@
                                         <th>
                                             State
                                         </th>
+
+                                        <th>
+                                            Country
+                                        </th>
                                         <th>
                                             Rate
                                         </th>
@@ -92,6 +96,10 @@
                                             </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.State.Name)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Country.Name)
                                             </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Price)

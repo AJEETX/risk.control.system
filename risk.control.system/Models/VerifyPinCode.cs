@@ -7,7 +7,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ServicedPinCodeId { get; set; } = Guid.NewGuid().ToString();
+        public string VerifyPinCodeId { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; } = default!;
         public string Pincode { get; set; } = default!;
         [Display(Name = "verify services")]
