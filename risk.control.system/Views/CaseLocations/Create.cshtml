@@ -45,15 +45,15 @@
                                             <label asp-for="ClaimsInvestigationId" class="control-label"></label>
                                             <input asp-for="ClaimsInvestigationId" class="form-control" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                                         </div>
-                                        
-                                    </div>
-                                    <br />
-                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label asp-for="Addressline" class="control-label"></label>
                                             <input asp-for="Addressline" class="form-control" value="100 GOOD STREET" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
+                                        
+                                    </div>
+                                    <br />
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label asp-for="Addressline2" class="control-label"></label>
                                             <input asp-for="Addressline2" class="form-control" value="100 GOOD STREET" />
@@ -95,7 +95,7 @@
                                     <div class="col-md-12">
                                         
                                         <div class="form-group text-right">
-                                            <a asp-controller="ClaimsInvestigation" asp-action="CaseLocation" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+                                            <a asp-controller="ClaimsInvestigation" asp-action="CaseLocation" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-secondary">
                                                 <i class="fa fa-window-close"></i>
                                                 @Applicationsettings.CANCEL
                                             </a>
