@@ -27,18 +27,6 @@ namespace risk.control.system.Controllers.Api
             }
             return Ok(states);
         }
-        [HttpPost, ActionName("GetStatesByCountryIdWithoutPreviousSelected")]
-        public async Task<IActionResult> GetStatesByCountryIdWithoutPreviousSelected(string countryId, string caseId)
-        {
-            string cId;
-            var states = new List<State>();
-            if (!string.IsNullOrEmpty(countryId))
-            {
-                cId = countryId;
-                states = await context.State.Where(s => s.CountryId.Equals(cId)).ToListAsync();
-            }
-            return Ok(states);
-        }
 
         [HttpPost, ActionName("GetDistrictByStateId")]
         public async Task<IActionResult> GetDistrictByStateId(string stateId)
@@ -62,6 +50,67 @@ namespace risk.control.system.Controllers.Api
             {
                 sId = districtId;
                 pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
+            }
+            return Ok(pincodes);
+        }
+        [HttpPost, ActionName("GetPincodesByDistrictIdWithoutPreviousSelected")]
+        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelected(string districtId, string caseId)
+        {
+            string sId;
+            var pincodes = new List<PinCode>();
+            var remaingPincodes = new List<PinCode>();
+
+            if (!string.IsNullOrEmpty(districtId))
+            {
+                sId = districtId;
+                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
+
+                var existingCaseLocations = context.CaseLocation
+                    .Include(c => c.PincodeServices)
+                    .Where(c => c.ClaimsInvestigationId == caseId);
+
+                var existingVerifyPincodes = context.VerifyPinCode
+                    .Where(v => existingCaseLocations.Any(e => e.CaseLocationId == v.CaseLocationId))?.ToList();
+
+                if (existingVerifyPincodes is not null && existingVerifyPincodes.Any())
+                {
+                    var existingPicodes = existingVerifyPincodes.Select(e => e.Pincode).ToList();
+                    var pinCodeString = pincodes.Select(p=>p.Code).ToList();
+                    var remaingPincodesString = pinCodeString.Except(existingPicodes).ToList();
+                    remaingPincodes = pincodes.Where(p=> remaingPincodesString.Contains(p.Code)).ToList();
+                    return Ok(remaingPincodes);
+                }
+            }
+            return Ok(pincodes);
+        }
+
+        [HttpPost, ActionName("GetPincodesByDistrictIdWithoutPreviousSelectedService")]
+        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(string districtId, string vendorId)
+        {
+            string sId;
+            var pincodes = new List<PinCode>();
+            var remaingPincodes = new List<PinCode>();
+
+            if (!string.IsNullOrEmpty(districtId))
+            {
+                sId = districtId;
+                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
+
+                var existingCaseLocations = context.VendorInvestigationServiceType
+                    .Include(c => c.PincodeServices)
+                    .Where(c => c.VendorId == vendorId);
+
+                var existingVerifyPincodes = context.ServicedPinCode
+                    .Where(v => existingCaseLocations.Any(e => e.VendorInvestigationServiceTypeId == v.VendorInvestigationServiceTypeId))?.ToList();
+
+                if (existingVerifyPincodes is not null && existingVerifyPincodes.Any())
+                {
+                    var existingPicodes = existingVerifyPincodes.Select(e => e.Pincode).ToList();
+                    var pinCodeString = pincodes.Select(p => p.Code).ToList();
+                    var remaingPincodesString = pinCodeString.Except(existingPicodes).ToList();
+                    remaingPincodes = pincodes.Where(p => remaingPincodesString.Contains(p.Code)).ToList();
+                    return Ok(remaingPincodes);
+                }
             }
             return Ok(pincodes);
         }

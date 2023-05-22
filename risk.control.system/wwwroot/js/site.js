@@ -182,10 +182,18 @@ function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, p
 function PopulatePinCodeDropDown(dropDownId, list, option, showDefaultOption) {
     $(dropDownId).empty();
     if (showDefaultOption)
-    $(dropDownId).append(option)
-    $.each(list, function (index, row) {
-        $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>")
-    });
+        $(dropDownId).append(option)
+    if (list && list.length > 0) {
+        $.each(list, function (index, row) {
+            $(dropDownId).append("<option value='" + row.pinCodeId + "'>" + row.name + " -- " + row.code + "</option>");
+            $('#create-pincode').prop('disabled', false);
+        });
+    }
+    else {
+        $(dropDownId).append("<option value='-1'>NO - PINCODE - AVAILABLE</option>")
+            $('#create-pincode').prop('disabled', true);
+    }
+    
 }
 function PopulateStateDropDown(pinCodedropDownId, districtDropDownId, stateDropDownId, list, stateOption, districtOption, pincodeOption, showDefaultOption) {
     $(stateDropDownId).empty();
@@ -223,4 +231,18 @@ function readURL(input) {
     } else {
         $('#img').attr('src', '/img/no-image.png');
     }
+}
+
+
+function loadRemainingPinCode(obj, showDefaultOption = true, caseId) {
+    var value = obj.value;
+    $.post("/MasterData/GetPincodesByDistrictIdWithoutPreviousSelected", { districtId: value, caseId: caseId }, function (data) {
+        PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
+    });
+}
+function loadRemainingServicePinCode(obj, showDefaultOption = true, vendorId) {
+    var value = obj.value;
+    $.post("/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: value, vendorId: vendorId }, function (data) {
+        PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
+    });
 }

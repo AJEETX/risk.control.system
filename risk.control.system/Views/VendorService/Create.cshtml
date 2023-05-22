@@ -65,7 +65,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="DistrictId" class="control-label"></label>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this, false)">
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId')">
                                                 <option>--SELECT DISTRICT--</option>
 
                                             </select>
@@ -96,7 +96,7 @@
                                                 <i class="fa fa-window-close"></i>
                                                 @Applicationsettings.CANCEL
                                             </a>
-                                            <button type="submit" class="btn btn-success">
+                                            <button disabled id="create-pincode" type="submit" class="btn btn-success">
                                                 <i class="fas fa-plus"></i> @Applicationsettings.CREATE
                                             </button>
                                         </div>

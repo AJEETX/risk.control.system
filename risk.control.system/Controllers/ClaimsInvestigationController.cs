@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ using NToastNotify;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
@@ -23,6 +25,8 @@ namespace risk.control.system.Controllers
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
+        private static string NO_DATA = " NO - DATA ";
+        private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
@@ -478,8 +482,8 @@ namespace risk.control.system.Controllers
                 }
 
                 string csvData = await System.IO.File.ReadAllTextAsync(filePath);
-                DataTable dt = new DataTable();
                 bool firstRow = true;
+                var claims = new List<ClaimsInvestigation>();
                 foreach (string row in csvData.Split('\n'))
                 {
                     if (!string.IsNullOrEmpty(row))
@@ -488,27 +492,24 @@ namespace risk.control.system.Controllers
                         {
                             if (firstRow)
                             {
-                                foreach (string cell in row.Split(','))
-                                {
-                                    dt.Columns.Add(cell.Trim());
-                                }
                                 firstRow = false;
                             }
                             else
                             {
-                                dt.Rows.Add();
-                                int i = 0;
-                                foreach (string cell in row.Split(','))
+                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                                var rowData = output.Split(',').ToList();
+                                var claim = new ClaimsInvestigation
                                 {
-                                    dt.Rows[dt.Rows.Count - 1][i] = cell.Trim();
-                                    i++;
-                                }
+                                    
+                                };
+                                claims.Add(claim);
+
                             }
                         }
                     }
                 }
 
-                return View(dt);
+                    return View(claims);
             }
             return Problem();
         }
