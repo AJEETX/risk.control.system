@@ -30,6 +30,7 @@
         public const string CREATE = "create";
         public const string EDIT = "edit";
         public const string DELETE = "delete";
+        public const string ALLOCATE = "Allocate";
         public const string VIEW = "view";
         public const string DETAILS = "details";
         public const string VERIFY_LOCATIONS = "Locations to verify";
