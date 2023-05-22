@@ -85,7 +85,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpPost, ActionName("GetPincodesByDistrictIdWithoutPreviousSelectedService")]
-        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(string districtId, string vendorId)
+        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(string districtId, string vendorId, string lobId, string serviceId)
         {
             string sId;
             var pincodes = new List<PinCode>();
@@ -96,17 +96,37 @@ namespace risk.control.system.Controllers.Api
                 sId = districtId;
                 pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
 
-                var existingCaseLocations = context.VendorInvestigationServiceType
-                    .Include(c => c.PincodeServices)
-                    .Where(c => c.VendorId == vendorId);
+                var vendor = context.Vendor
+                    .Include(c => c.VendorInvestigationServiceTypes)
+                    .ThenInclude(v=>v.Country)
+                    .Include(c => c.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.State)
+                    .Include(c => c.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(c => c.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices)
+                    .FirstOrDefault(c => c.VendorId == vendorId);
 
-                var existingVerifyPincodes = context.ServicedPinCode
-                    .Where(v => existingCaseLocations.Any(e => e.VendorInvestigationServiceTypeId == v.VendorInvestigationServiceTypeId))?.ToList();
+                var existingVendorServices = vendor.VendorInvestigationServiceTypes;
 
-                if (existingVerifyPincodes is not null && existingVerifyPincodes.Any())
+                var existingServicedPincodes = new List<ServicedPinCode>();
+
+                if (existingVendorServices is not null && existingVendorServices.Any())
                 {
-                    var existingPicodes = existingVerifyPincodes.Select(e => e.Pincode).ToList();
                     var pinCodeString = pincodes.Select(p => p.Code).ToList();
+
+                    foreach (var existingVendorService in existingVendorServices)
+                    {
+                        if(existingVendorService.LineOfBusinessId == lobId && existingVendorService.InvestigationServiceTypeId == serviceId)
+                        {
+                            foreach (var pincodeService in existingVendorService.PincodeServices)
+                            {
+                                existingServicedPincodes.Add(pincodeService);
+                            }
+                        }
+                    }
+
+                    var existingPicodes = existingServicedPincodes.Select(e => e.Pincode).ToList();
                     var remaingPincodesString = pinCodeString.Except(existingPicodes).ToList();
                     remaingPincodes = pincodes.Where(p => remaingPincodesString.Contains(p.Code)).ToList();
                     return Ok(remaingPincodes);
