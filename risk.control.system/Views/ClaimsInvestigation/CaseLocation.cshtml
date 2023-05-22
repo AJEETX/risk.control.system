@@ -53,6 +53,12 @@
                                 <thead>
                                     <tr>
                                         <th>
+                                            Benficiary Name
+                                        </th>
+                                        <th>
+                                            Benficiary Relation
+                                        </th>
+                                        <th>
                                             Country
                                         </th>
                                         <th>
@@ -75,6 +81,12 @@
                                     @foreach (var item in Model.CaseLocations)
                                     {
                                         <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.BeneficiaryName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
+                                            </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Country.Name)
                                             </td>

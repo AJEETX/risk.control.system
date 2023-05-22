@@ -68,7 +68,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="StateId" class="control-label"></label>
-                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
+                                            <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
                                                 <option>--SELECT STATE--</option>
 
                                             </select>
@@ -76,7 +76,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="DistrictId" class="control-label"></label>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadPinCode(this)">
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                                 <option>--SELECT DISTRICT--</option>
 
                                             </select>
@@ -117,25 +117,4 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/css/bootstrap-multiselect.js"></script>
-
-
-    <script>
-        $(document).ready(function () {
-            //$('#PinCodeId').attr('data-live-search', true);
-
-            //// Enable multiple select.
-            //$('#PinCodeId').attr('multiple', true);
-            //$('#PinCodeId').attr('data-selected-text-format', 'count');
-
-            //$('.selectPincode').selectpicker(
-            //    {
-            //        width: '100%',
-            //        title: '- [Choose Multiple Pincodes] -',
-            //        style: 'btn-warning',
-            //        size: 6,
-            //        iconBase: 'fa',
-            //        tickIcon: 'fa-check'
-            //    });
-        });
-    </script>
 }

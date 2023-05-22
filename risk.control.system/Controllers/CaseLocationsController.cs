@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "DistrictId", caseLocation.DistrictId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
             return View(caseLocation);
         }
@@ -111,6 +111,7 @@ namespace risk.control.system.Controllers
 
             var services = _context.CaseLocation
                 .Include(v => v.ClaimsInvestigation)
+                .Include(v => v.District)
                 .First(v => v.CaseLocationId == id);
 
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
@@ -159,10 +160,10 @@ namespace risk.control.system.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "DistrictId", caseLocation.DistrictId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", caseLocation.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
+            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", caseLocation.StateId);
             return View(caseLocation);
         }
 
