@@ -364,3 +364,6 @@ FodyWeavers.xsd
 /risk.control.system/*.db
 /risk.control.system/*-shm
 /risk.control.system/*.db-wal
+/risk.control.system/wwwroot/upload-case
+/risk.control.system/wwwroot/upload-pincodes
+/risk.control.system/Files
