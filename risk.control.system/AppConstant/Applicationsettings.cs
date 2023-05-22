@@ -81,7 +81,7 @@
         public const string NO_RECORDS_FOUND = "No Records Found";
 
         public const string UPLOAD = "Upload Sample";
-        public const string UPLOAD_CASE = "Upload Cases";
+        public const string UPLOAD_CASE = "Upload";
         public const string UPLOADED_CASES = "Uploaded Cases";
         public const string SAMPLE_PINCODE_FILE_TYPE = "csv";
         public const string DOWNLOAD = "Download";
