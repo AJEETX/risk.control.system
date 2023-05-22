@@ -158,12 +158,14 @@ let investigationServiceObj;
 function loadInvestigationServices(obj) {
     var value = obj.value;
     lobObj = value;
+    localStorage.setItem('lobId', value);
     $.post("/VendorService/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
         PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--SELECT TYPE OF INVESTIGATION--</option>");
     });
 }
 
 function setInvestigationServices(obj) {
+    localStorage.setItem('serviceId', obj.value);
     investigationServiceObj = obj.value;
 }
 function PopulateInvestigationServices(dropDownId, list, option) {
@@ -249,8 +251,10 @@ function loadRemainingPinCode(obj, showDefaultOption = true, caseId) {
 }
 function loadRemainingServicePinCode(obj, showDefaultOption = true, vendorId, lineId) {
     var value = obj.value;
-    var lobId = lobObj;
-    var serviceId = investigationServiceObj;
+
+    var lobId = localStorage.getItem('lobId');
+
+    var serviceId = localStorage.getItem('serviceId');
 
     $.post("/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: value, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
         PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
