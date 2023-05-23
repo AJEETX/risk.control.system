@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Web;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -42,7 +43,7 @@ namespace risk.control.system.Controllers
             }
             var userMailboxMessages = await inboxMailService.GetAllUserInboxMessages(userEmail);
 
-            return View(userMailboxMessages);
+            return View(userMailboxMessages.OrderBy(o=>o.SendDate));
 
         }
         public async Task<IActionResult> InboxDelete(List<long> messages)
@@ -73,7 +74,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMessage = await inboxMailService.GetMessagedetail(id, userEmail);
+            var userMessage = await inboxMailService.GetInboxMessagedetail(id, userEmail);
             return View(userMessage);
         }
         public async Task<IActionResult> InboxDetailsReply(long id, string actiontype)
@@ -90,13 +91,15 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMessage = await inboxMailService.GetMessagedetailReply(id, userEmail, actiontype);
+            var userMessage = await inboxMailService.GetInboxMessagedetailReply(id, userEmail, actiontype);
             ViewBag.ActionType = actiontype;
             return View(userMessage);
         }
         [HttpPost]
         public async Task<IActionResult> InboxDetailsReply(OutboxMessage contactMessage)
         {
+            contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
+
             var userEmail = HttpContext.User.Identity.Name;
 
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
@@ -172,7 +175,7 @@ namespace risk.control.system.Controllers
                     userMailbox.Trash.Remove(message);
                     if(message.Attachment?.Length>0)
                     {
-
+                        //TO-DO
                     }
                     var jsonMessage = JsonSerializer.Serialize(message, options);
                     DeletedMessage deletedMessage = JsonSerializer.Deserialize<DeletedMessage>(jsonMessage, options);
@@ -264,7 +267,7 @@ namespace risk.control.system.Controllers
             }
             var userMailbox = _context.Mailbox
                            .Include(m => m.Sent)
-                           .Include(m => m.Deleted)
+                           .Include(m => m.Trash)
                            .FirstOrDefault(c => c.ApplicationUserId == applicationUser.Id);
 
             var userSentMails = userMailbox.Sent.Where(d => messages.Contains(d.SentMessageId)).ToList();
@@ -276,8 +279,8 @@ namespace risk.control.system.Controllers
                     message.MessageStatus = MessageStatus.TRASHED;
                     userMailbox.Sent.Remove(message);
                     var jsonMessage = JsonSerializer.Serialize(message, options);
-                    DeletedMessage deletedMessage = JsonSerializer.Deserialize<DeletedMessage>(jsonMessage, options);
-                    userMailbox.Deleted.Add(deletedMessage);
+                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
+                    userMailbox.Trash.Add(trashMessage);
                 }
             }
             _context.Mailbox.Update(userMailbox);
@@ -324,16 +327,8 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                .Include(m => m.Sent)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
+            var userMessage = await inboxMailService.GetSentMessagedetailReply(id, userEmail, actiontype);
 
-            var userMessage = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == id);
-
-            userMessage.ReceipientEmail = userMessage.SenderEmail;
-            userMessage.SenderEmail = applicationUser.Email;
-
-            userMessage.Subject = actiontype + " :" + userMessage.Subject;
             ViewBag.ActionType = actiontype;
             return View(userMessage);
         }
@@ -341,6 +336,8 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> SentDetailsReply(SentMessage contactMessage)
         {
+            contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
+
             var userEmail = HttpContext.User.Identity.Name;
 
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
@@ -577,6 +574,8 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(OutboxMessage contactMessage)
         {
+            contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
+
             var userEmail = HttpContext.User.Identity.Name;
 
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();

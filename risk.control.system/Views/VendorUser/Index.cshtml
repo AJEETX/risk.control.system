@@ -1,5 +1,5 @@
 ﻿@using risk.control.system.Models.ViewModel;
-@model List<UsersViewModel>
+@model VendorUsersViewModel
 
 @{
     ViewData["Title"] = @Applicationsettings.VENDOR;
@@ -11,7 +11,7 @@
                 <div class="card card-success card-outline">
                     <form asp-action="index">
                         <div class="card-header">
-                            <h3 class="card-title">@Model.FirstOrDefault().VendorName @Applicationsettings.USER</h3>
+                            <h3 class="card-title">@Model.Vendor.Name @Applicationsettings.USER</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
@@ -26,8 +26,8 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.FirstOrDefault().VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
-                                    <a class="btn btn-success" asp-controller="VendorApplicationUsers" asp-action="Create" asp-route-id="@Model.FirstOrDefault().VendorId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
+                                    <a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
+                                    <a class="btn btn-success" asp-controller="VendorApplicationUsers" asp-action="Create" asp-route-id="@Model.Vendor.VendorId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                                 </div>
                             </div>
                         </div>
@@ -39,7 +39,7 @@
             <div class="col-md-12">
                 <div class="card card-success card-outline">
                     <div class="card-body p-0 contained-width">
-                        @if (Model.Count() == 0)
+                        @if (Model.Users.Count == 0)
                         {
                             <hr />
                             <div class="col-md-12 text-center">
@@ -70,7 +70,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var user in Model)
+                                    @foreach (var user in Model.Users)
                                     {
                                         <tr>
                                             <td>

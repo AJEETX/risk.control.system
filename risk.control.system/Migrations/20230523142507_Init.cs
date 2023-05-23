@@ -1145,6 +1145,7 @@ namespace risk.control.system.Migrations
                     SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
                     ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
                     Subject = table.Column<string>(type: "TEXT", nullable: false),
+                    RawMessage = table.Column<string>(type: "TEXT", nullable: false),
                     Message = table.Column<string>(type: "TEXT", nullable: false),
                     Read = table.Column<bool>(type: "INTEGER", nullable: false),
                     Priority = table.Column<int>(type: "INTEGER", nullable: false),

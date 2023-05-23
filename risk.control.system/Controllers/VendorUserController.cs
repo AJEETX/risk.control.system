@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -10,7 +12,7 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers
 {
-    public class VendorUserController :Controller
+    public class VendorUserController : Controller
     {
         public List<UsersViewModel> UserList;
         private readonly UserManager<VendorApplicationUser> userManager;
@@ -50,14 +52,14 @@ namespace risk.control.system.Controllers
             }
             ViewBag.CurrentFilter = searchString;
 
-            var applicationDbContext = userManager.Users
-                .Include(u => u.Country)
-                .Include(u => u.State)
-                .Include(u => u.PinCode)
-                .Include(u => u.Vendor).AsQueryable();
+            var vendor = await context.Vendor.Include(v => v.VendorApplicationUser).FirstOrDefaultAsync(v => v.VendorId == id);
 
-            applicationDbContext = applicationDbContext.Where(u => u.VendorId == id);
-            if (applicationDbContext.Any())
+            var applicationDbContext = vendor.VendorApplicationUser.AsQueryable();
+            var model = new VendorUsersViewModel
+            {
+                Vendor = vendor,
+            };
+            //if (applicationDbContext.Any())
             {
                 if (!string.IsNullOrEmpty(searchString))
                 {
@@ -90,9 +92,9 @@ namespace risk.control.system.Controllers
                 ViewBag.ShowFirst = pageNumber != 1;
                 ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
 
-                var users = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+                applicationDbContext = applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
-                foreach (var user in users)
+                foreach (var user in applicationDbContext)
                 {
                     var thisViewModel = new UsersViewModel();
                     thisViewModel.UserId = user.Id.ToString();
@@ -107,16 +109,17 @@ namespace risk.control.system.Controllers
                     thisViewModel.State = user.State.Name;
                     thisViewModel.PinCode = user.PinCode.Name;
                     thisViewModel.PinCodeId = user.PinCode.PinCodeId;
-                    thisViewModel.VendorName = user.Vendor.Name;
-                    thisViewModel.VendorId = user.VendorId;
+                    thisViewModel.VendorName = vendor.Name;
+                    thisViewModel.VendorId = vendor.VendorId;
                     thisViewModel.ProfileImageInByte = user.ProfilePicture;
                     thisViewModel.Roles = await GetUserRoles(user);
                     UserList.Add(thisViewModel);
                 }
-                return View(UserList);
+
+                model.Users = UserList;
             }
-            toastNotification.AddErrorToastMessage("vendor not found!");
-            return NotFound();
+            
+            return View(model);
         }
         private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
         {

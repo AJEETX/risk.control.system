@@ -1,4 +1,5 @@
-﻿@model IEnumerable<OutboxMessage>
+﻿@using System.Web;
+@model IEnumerable<OutboxMessage>
 @{
     ViewData["Title"] = "Outbox";
 }
@@ -72,6 +73,8 @@
                                                 {
                                                     fileAttachment = "none";
                                                 }
+                                                var messageLength = @HttpUtility.HtmlDecode(@message.Message).Length > 30 ? 30 : @HttpUtility.HtmlDecode(@message.Message).Length;
+                                                var messageSummary = @HttpUtility.HtmlDecode(@message.Message).Substring(0, messageLength) + "....";
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
                                                         <input id="@message.OutboxMessageId" class="vendors" name="messages" type="checkbox" value="@message.OutboxMessageId" checked="@message.SelectedForAction" />
@@ -83,7 +86,7 @@
                                                     <td><a class="row-links" asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId">@message.ReceipientEmail</a></td>
                                                     <td class="message-title text-muted">
                                                         <a class="row-links" asp-action="SentDetails" asp-route-id="@message.OutboxMessageId">
-                                                        <span>@message.Subject</span> - @message.Message
+                                                            <span>@message.Subject</span> - @messageSummary
                                                         </a>
                                                     </td>
                                                     <td class="mailbox-attachment"><a asp-action="OutBoxDetails" asp-route-id="@message.OutboxMessageId">

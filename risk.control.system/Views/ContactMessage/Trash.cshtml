@@ -1,4 +1,5 @@
-﻿@model IEnumerable<TrashMessage>
+﻿@using System.Web;
+@model IEnumerable<TrashMessage>
 @{
     ViewData["Title"] = "Trash";
 }
@@ -72,6 +73,8 @@
                                                                     {
                                                     fileAttachment = "none";
                                                 }
+                                                var messageLength = @HttpUtility.HtmlDecode(@message.Message).Length > 30 ? 30 : @HttpUtility.HtmlDecode(@message.Message).Length;
+                                                var messageSummary = @HttpUtility.HtmlDecode(@message.Message).Substring(0, messageLength) + "....";
                                                 <tr class="@(message.Read == false ? "message-unread" : "message-read")">
                                                     <td>
                                                         <input id="@message.TrashMessageId" class="vendors" name="messages" type="checkbox" value="@message.TrashMessageId" checked="@message.SelectedForAction" />
@@ -83,8 +86,9 @@
                                                     <td><a class="row-links" asp-action="TrashDetails" asp-route-id="@message.TrashMessageId">@message.ReceipientEmail</a></td>
                                                     <td class="message-title text-muted">
                                                         <a class="row-links" asp-action="TrashDetails" asp-route-id="@message.TrashMessageId">
-                                                        <span>@message.Subject</span> - @message.Message
+                                                            <span>@message.Subject</span> - @messageSummary
                                                         </a>
+                                                        
                                                     </td>
                                                     <td class="mailbox-attachment"><a asp-action="TrashDetails" asp-route-id="@message.TrashMessageId">
                                                             <span style="display:@fileAttachment"> <i class='fas fa-paperclip'></i></span>

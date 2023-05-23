@@ -12,8 +12,9 @@ namespace risk.control.system.Services
     {
         Task<IEnumerable<InboxMessage>> GetAllUserInboxMessages(string userEmail);
         Task<int> InboxDelete(List<long> messages, long userId);
-        Task<InboxMessage> GetMessagedetail(long messageId, string userEmail);
-        Task<OutboxMessage> GetMessagedetailReply(long messageId, string userEmail, string actiontype);
+        Task<InboxMessage> GetInboxMessagedetail(long messageId, string userEmail);
+        Task<OutboxMessage> GetInboxMessagedetailReply(long messageId, string userEmail, string actiontype);
+        Task<SentMessage> GetSentMessagedetailReply(long messageId, string userEmail, string actiontype);
 
         Task<int> InboxDetailsDelete(long id, string userEmail);
         Task<bool> SendMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument);
@@ -37,7 +38,7 @@ namespace risk.control.system.Services
             return userMailbox.Inbox.OrderByDescending(o => o.SendDate).ToList();
         }
 
-        public async Task<InboxMessage> GetMessagedetail(long messageId, string userEmail)
+        public async Task<InboxMessage> GetInboxMessagedetail(long messageId, string userEmail)
         {
             var userMailbox = _context.Mailbox
                 .Include(m => m.Inbox)
@@ -52,13 +53,15 @@ namespace risk.control.system.Services
             return userMessage;
         }
 
-        public async Task<OutboxMessage> GetMessagedetailReply(long messageId, string userEmail, string actiontype)
+        public async Task<OutboxMessage> GetInboxMessagedetailReply(long messageId, string userEmail, string actiontype)
         {
             var userMailbox = _context.Mailbox
                 .Include(m => m.Inbox)
                 .FirstOrDefault(c => c.Name == userEmail);
 
             var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == messageId);
+
+            var replyRawMessage = "<br />" + "<hr />" + "From: "+userMessage.SenderEmail + "<br />" + "<hr />" + "Sent:" + userMessage.SendDate + "<br />" + "<hr />" + userMessage.RawMessage;
 
             var userReplyMessage = new OutboxMessage
             {
@@ -71,6 +74,35 @@ namespace risk.control.system.Services
                 Extension = userMessage.Extension,
                 FileType = userMessage.FileType,
                 Message = userMessage.Message,
+                RawMessage = replyRawMessage,
+                Read = false,
+
+            };
+            return userReplyMessage;
+        }
+
+        public async Task<SentMessage> GetSentMessagedetailReply(long messageId, string userEmail, string actiontype)
+        {
+            var userMailbox = _context.Mailbox
+             .Include(m => m.Sent)
+             .FirstOrDefault(c => c.Name == userEmail);
+
+            var userMessage = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == messageId);
+
+            var replyRawMessage = "<br />" + "<hr />" + "From: " + userMessage.SenderEmail + "<br />" + "<hr />" + "Sent:" + userMessage.SendDate + "<br />" + "<hr />" + userMessage.RawMessage;
+
+            var userReplyMessage = new SentMessage
+            {
+                ReceipientEmail = userMessage.SenderEmail,
+                SenderEmail = userEmail,
+                Subject = actiontype + " :" + userMessage.Subject,
+                Attachment = userMessage.Attachment,
+                AttachmentName = userMessage.AttachmentName,
+                Created = userMessage.Created,
+                Extension = userMessage.Extension,
+                FileType = userMessage.FileType,
+                Message = userMessage.Message,
+                RawMessage = replyRawMessage,
                 Read = false,
 
             };

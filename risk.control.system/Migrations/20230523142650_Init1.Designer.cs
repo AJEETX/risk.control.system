@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230522111248_Init")]
-    partial class Init
+    [Migration("20230523142650_Init1")]
+    partial class Init1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1305,6 +1305,9 @@ namespace risk.control.system.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("RawMessage")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
 
@@ -2512,7 +2515,7 @@ namespace risk.control.system.Migrations
             modelBuilder.Entity("risk.control.system.Models.ClientCompanyApplicationUser", b =>
                 {
                     b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
-                        .WithMany("VendorApplicationUser")
+                        .WithMany("CompanyApplicationUser")
                         .HasForeignKey("ClientCompanyId");
 
                     b.Navigation("ClientCompany");
@@ -2547,9 +2550,9 @@ namespace risk.control.system.Migrations
                 {
                     b.Navigation("ClaimsInvestigations");
 
-                    b.Navigation("EmpanelledVendors");
+                    b.Navigation("CompanyApplicationUser");
 
-                    b.Navigation("VendorApplicationUser");
+                    b.Navigation("EmpanelledVendors");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationCaseStatus", b =>

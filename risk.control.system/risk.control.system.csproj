@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.9" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.5" />
@@ -158,6 +159,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\upload-pincodes\" />
     <Folder Include="wwwroot\vendor-document\" />
     <Folder Include="wwwroot\upload\" />
   </ItemGroup>

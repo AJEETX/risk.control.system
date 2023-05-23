@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -50,14 +52,20 @@ namespace risk.control.system.Controllers
             }
             ViewBag.CurrentFilter = searchString;
 
-            var applicationDbContext = userManager.Users
-                .Include(u => u.Country)
-                .Include(u => u.State)
-                .Include(u => u.PinCode)
-                .Include(u => u.ClientCompany).AsQueryable();
+            var company = _context.ClientCompany
+                .Include(c => c.CompanyApplicationUser)
+                .FirstOrDefault(c => c.ClientCompanyId == id);
+
+            var applicationDbContext = company.CompanyApplicationUser.AsQueryable();
 
             applicationDbContext = applicationDbContext.Where(u => u.ClientCompanyId == id);
-            if (applicationDbContext.Any())
+
+            var model = new CompanyUsersViewModel
+            {
+                Company = company,
+            };
+
+            //if (applicationDbContext.Any())
             {
                 if (!string.IsNullOrEmpty(searchString))
                 {
@@ -90,7 +98,7 @@ namespace risk.control.system.Controllers
                 ViewBag.ShowFirst = pageNumber != 1;
                 ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
 
-                var users = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+                var users = applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
                 foreach (var user in users)
                 {
@@ -113,10 +121,9 @@ namespace risk.control.system.Controllers
                     thisViewModel.Roles = await GetUserRoles(user);
                     UserList.Add(thisViewModel);
                 }
-                return View(UserList);
+                model.Users = UserList;
             }
-            toastNotification.AddErrorToastMessage("error occurred!");
-            return NotFound();
+            return View(model);
         }
         public async Task<IActionResult> Details(long? id)
         {
@@ -296,7 +303,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = clientCompanyApplicationUser.ClientCompanyId });
+            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = clientCompanyApplicationUser.ClientCompanyId });
         }
 
         private bool VendorApplicationUserExists(long id)

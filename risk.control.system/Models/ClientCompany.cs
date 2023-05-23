@@ -48,7 +48,7 @@ namespace risk.control.system.Models
         public IFormFile? Document { get; set; }
         [Display(Name = "Document url")]
         public byte[]? DocumentImage { get; set; } = default!;
-        public List<ClientCompanyApplicationUser>? VendorApplicationUser { get; set; }
+        public List<ClientCompanyApplicationUser>? CompanyApplicationUser { get; set; }
 
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
         public List<ClaimsInvestigation> ClaimsInvestigations { get; set; } = new();

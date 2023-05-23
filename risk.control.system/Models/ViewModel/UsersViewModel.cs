@@ -29,4 +29,15 @@ namespace risk.control.system.Models.ViewModel
         [Display(Name = "Profile")]
         public byte[]? ProfileImageInByte { get; set; } = default!;
     }
+
+    public class VendorUsersViewModel
+    {
+        public Vendor Vendor { get; set; }
+        public List<UsersViewModel> Users { get; set; } = new();
+    }
+    public class CompanyUsersViewModel
+    {
+        public ClientCompany Company { get; set; }
+        public List<UsersViewModel> Users { get; set; } = new();
+    }
 }

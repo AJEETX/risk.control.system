@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using risk.control.system.Data;
 
@@ -10,9 +11,11 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230523142507_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -770,9 +773,6 @@ namespace risk.control.system.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("RawMessage")
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
 
@@ -991,9 +991,6 @@ namespace risk.control.system.Migrations
 
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("RawMessage")
-                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
@@ -1309,6 +1306,7 @@ namespace risk.control.system.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("RawMessage")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Read")
@@ -1431,9 +1429,6 @@ namespace risk.control.system.Migrations
 
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("RawMessage")
-                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
@@ -1579,9 +1574,6 @@ namespace risk.control.system.Migrations
 
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("RawMessage")
-                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
