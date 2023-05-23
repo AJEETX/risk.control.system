@@ -42,7 +42,8 @@
         public const string DISTRICT = "District";
         public const string CASE_STATUS = "Case status";
         public const string SERVICE = "Service";
-        public const string VERIFY_SERVICE = "Verify Service";
+        public const string VERIFY_LOCATION = "Verify location";
+        public const string CUSTOMER_VERIFY_LOCATION = "Customer Verification location detail";
         public const string INVESTIGATION_SERVICE = "Type of service";
         public const string BENEFICIARY = "Claims beneficiary";
         public const string CASE_ENABLER = "Case enabler";
@@ -59,7 +60,8 @@
         public const string VENDORS = "Vendor";
         public const string MANAGE_VENDOR = "Manage vendor";
         public const string MANAGE_CLIENT_COMPANY = "Manage client company";
-        public const string MANAGE_VERIFICTION_LOCATIONS = "Manage locations to verify";
+        public const string CASE_PROFILE = "Case Profile";
+        public const string VERIFICTION_LOCATIONS = "Locations to verify";
         public const string EMPANEL = "Empanel";
         public const string BROADCAST = "Broadcast";
         public const string ASSIGN = "Assign";

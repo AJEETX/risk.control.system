@@ -9,7 +9,7 @@
             <div class="col-12">
                 <div class="card card-success card-outline">
                     <div class="card-header">
-                        <h3 class="card-title"> Delete service</h3>
+                        <h3 class="card-title"> Delete @Applicationsettings.CUSTOMER_VERIFY_LOCATION</h3>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
     <div class="text-right">
         <form asp-action="Delete">
             <input type="hidden" asp-for="CaseLocationId" />
-            <a asp-controller="ClaimsInvestigation" asp-action="CaseLocation" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+            <a asp-controller="ClaimsInvestigation" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
                 <i class="fa fa-window-close"></i>
                 @Applicationsettings.CANCEL
             </a> &nbsp;

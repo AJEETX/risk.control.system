@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Web;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -116,6 +118,7 @@ namespace risk.control.system.Services
             string claimsUrl = $"<a href={BaseUrl + claimsInvestigation.ClaimsInvestigationId}>url</a>";
             claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
 
+            //claimsUrl = Html.Raw( HttpUtility.HtmlEncode(claimsUrl));
 
             var contactMessage = new InboxMessage
             {

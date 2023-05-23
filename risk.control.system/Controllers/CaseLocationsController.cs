@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("verification location created successfully!");
-                return RedirectToAction(nameof(ClaimsInvestigationController.CaseLocation), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage("verification location edited successfully!");
-                        return RedirectToAction(nameof(ClaimsInvestigationController.CaseLocation), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+                        return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
                     }
 
                 }
@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("Details", "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+            return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
         }
 
         private bool CaseLocationExists(long id)

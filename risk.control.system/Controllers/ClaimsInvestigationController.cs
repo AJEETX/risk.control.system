@@ -202,6 +202,16 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c=>c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
                 .Include(c => c.CaseEnabler)
                 .Include(c => c.CostCentre)
                 .Include(c => c.Country)
