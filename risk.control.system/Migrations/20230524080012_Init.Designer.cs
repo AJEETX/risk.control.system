@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230524022131_Init")]
+    [Migration("20230524080012_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -544,6 +544,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PinCodeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SelectedCaseToAllocate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StateId")

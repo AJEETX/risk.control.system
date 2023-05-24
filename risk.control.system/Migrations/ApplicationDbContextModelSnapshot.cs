@@ -543,6 +543,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("SelectedCaseToAllocate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
 

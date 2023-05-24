@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -67,27 +68,14 @@ namespace risk.control.system.Controllers
                 .Include(c => c.LineOfBusiness)
                 .Include(c => c.PinCode)
                 .Include(c => c.State);
- 
+
             ViewBag.HasClientCompany = true;
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => 
-                i.Name ==CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name== CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
-            {
-                return View(await applicationDbContext.ToListAsync());
-            }
-            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId);
-            }
-            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
-            }
-
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -99,9 +87,61 @@ namespace risk.control.system.Controllers
             {
                 applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
             }
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            {
+                return View(await applicationDbContext.ToListAsync());
+            }
+            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId);
+                return View(await applicationDbContext.ToListAsync());
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
+                return View("Assigner", await applicationDbContext.ToListAsync());
+            }
+
             return View(await applicationDbContext.ToListAsync());
         }
+        [HttpPost]
+        public async Task<IActionResult> AllocateToVendor(string selectedcase)
+        {
+            if (_context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
 
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            return View(claimsInvestigation);
+        }
         public async Task<IActionResult> CaseLocation(string id)
         {
             if (id == null)
@@ -112,9 +152,9 @@ namespace risk.control.system.Controllers
 
             var applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.CaseLocations)
-               .ThenInclude(c=>c.PinCode)
-               .Include(c=>c.CaseLocations)
-               .ThenInclude(c=>c.State)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.State)
                .Include(c => c.CaseLocations)
                .ThenInclude(c => c.District)
                .Include(c => c.CaseLocations)
@@ -185,9 +225,9 @@ namespace risk.control.system.Controllers
 
                 return RedirectToAction(nameof(Create));
             }
-            
-            await claimsInvestigationService.Assign(HttpContext.User.Identity.Name,claims);       
-            
+
+            await claimsInvestigationService.Assign(HttpContext.User.Identity.Name, claims);
+
             await mailboxService.NotifyClaimAssignment(HttpContext.User.Identity.Name, claims);
 
             return RedirectToAction(nameof(Index));
@@ -203,7 +243,7 @@ namespace risk.control.system.Controllers
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
                 .Include(c => c.CaseLocations)
-                .ThenInclude(c=>c.District)
+                .ThenInclude(c => c.District)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.State)
                 .Include(c => c.CaseLocations)
@@ -313,7 +353,7 @@ namespace risk.control.system.Controllers
                 await claimsInvestigationService.Create(userEmail, claimsInvestigation, Request.Form?.Files?.FirstOrDefault());
 
                 await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
-         
+
                 toastNotification.AddSuccessToastMessage("case(s) created successfully!");
 
                 return RedirectToAction(nameof(Index));
@@ -504,7 +544,7 @@ namespace risk.control.system.Controllers
                                 var rowData = output.Split(',').ToList();
                                 var claim = new ClaimsInvestigation
                                 {
-                                    
+
                                 };
                                 claims.Add(claim);
 
@@ -513,7 +553,7 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                    return View(claims);
+                return View(claims);
             }
             return Problem();
         }

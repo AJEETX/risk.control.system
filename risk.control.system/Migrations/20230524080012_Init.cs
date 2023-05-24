@@ -440,6 +440,7 @@ namespace risk.control.system.Migrations
                     DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
                     Comments = table.Column<string>(type: "TEXT", nullable: true),
                     CurrentUserId = table.Column<string>(type: "TEXT", nullable: true),
+                    SelectedCaseToAllocate = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)

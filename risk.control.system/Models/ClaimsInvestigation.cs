@@ -105,6 +105,8 @@ namespace risk.control.system.Models
         public string? CurrentUserId { get; set; }
         public List<VerificationLocation> VerificationLocations { get; set; }
         public List<CaseLocation>? CaseLocations { get; set; }
+        public string? SelectedCaseToAllocate { get; set; }
+
         public override string ToString()
         {
             return $"Case Id: {ClaimsInvestigationId}, <br /> ClaimType: {ClaimType}";

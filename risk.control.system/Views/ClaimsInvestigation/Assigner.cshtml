@@ -1,0 +1,202 @@
+﻿@model IEnumerable<risk.control.system.Models.ClaimsInvestigation>
+
+@{
+    ViewData["Title"] = "Index";
+    var hasClientCompany = @ViewBag.HasClientCompany ? "none" : "";
+}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <form asp-action="index">
+                    <div class="card card-success card-outline">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_CASE</h3>
+                            <div class="card-tools">
+                                <div class="input-group input-group-sm">
+                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
+                                    <div class="input-group-append">
+                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
+                                            <i class="fas fa-search"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Uploads"><i class="fas fa-plus"></i> @Applicationsettings.UPLOAD_CASE</button>
+                                    <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-success card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">Claims to Assign</h3>
+                    </div>
+                    <div class="card-body p-0 contained-width">
+                        <form id="radioButtons" asp-action="AllocateToVendor" method="post" enctype="multipart/form-data">
+                            <div class="col-md-12">
+                                @if (Model.Count() == 0)
+                                {
+                                    <div class="col-md-12 text-center">
+                                        <p>@Applicationsettings.NO_RECORDS_FOUND</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th style="display:@hasClientCompany">
+                                                    @Html.DisplayNameFor(model => model.ClientCompany)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.ContractNumber)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Description)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.InvestigationCaseSubStatus)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.ContractIssueDate)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CustomerName)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CustomerDateOfBirth)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.ContactNumber)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.ClaimType)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.DateOfIncident)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.CauseOfLoss)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Gender)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.SumAssuredValue)
+                                                </th>
+                                                <th>
+                                                    @Html.DisplayNameFor(model => model.Comments)
+                                                </th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
+                                                    </td>
+                                                    <td style="display:@hasClientCompany">
+                                                        @Html.DisplayFor(modelItem => item.ClientCompany.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ContractNumber)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Description)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.InvestigationCaseSubStatus.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ContractIssueDate)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CustomerName)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CustomerDateOfBirth)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ContactNumber)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.ClaimType)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.DateOfIncident)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.CauseOfLoss)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Gender)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.SumAssuredValue)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Comments)
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
+                                                            <i class="fa fa-search"></i> @Applicationsettings.DETAILS
+                                                        </a> &nbsp;
+                                                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClaimsInvestigationId">
+                                                            <i class="fas fa-pen"></i> @Applicationsettings.EDIT
+                                                        </a> &nbsp;
+                                                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClaimsInvestigationId">
+                                                            <i class="fas fa-trash"></i> @Applicationsettings.DELETE
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="10">
+                                                    <a asp-action="Index" class="btn btn-secondary">
+                                                        <i class="fa fa-window-close"></i>
+                                                        @Applicationsettings.CANCEL
+                                                    </a>
+                                                    <button disabled id="allocate-case" type="submit" class="btn btn-success">
+                                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i>
+                                                        @Applicationsettings.ALLOCATE
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                }
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

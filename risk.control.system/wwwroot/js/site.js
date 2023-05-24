@@ -1,5 +1,17 @@
 ﻿$(document).ready(function () {
 
+
+    if ($(".selected-case:checked").length) {
+        $("#allocate-case").prop('disabled', false);
+    }
+
+    // When user checks a radio button, Enable submit button
+    $(".selected-case").change(function (e) {
+        if ($(this).is(":checked")) {
+            $("#allocate-case").prop('disabled', false);
+        }
+    });
+
     $('#RawMessage').summernote({
         height: 300,                 // set editor height
         minHeight: null,             // set minimum height of editor
