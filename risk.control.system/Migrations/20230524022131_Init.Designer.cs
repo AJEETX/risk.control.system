@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230523142650_Init1")]
-    partial class Init1
+    [Migration("20230524022131_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -421,6 +421,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("SelectedToAllocate")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
 
@@ -773,6 +776,9 @@ namespace risk.control.system.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("RawMessage")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
 
@@ -991,6 +997,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RawMessage")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
@@ -1429,6 +1438,9 @@ namespace risk.control.system.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("RawMessage")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");
 
@@ -1573,6 +1585,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("RawMessage")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Read")
                         .HasColumnType("INTEGER");

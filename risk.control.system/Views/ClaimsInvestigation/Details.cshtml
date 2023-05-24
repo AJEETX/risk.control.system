@@ -189,6 +189,7 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th>
                                             Benficiary Name
                                         </th>
@@ -217,6 +218,9 @@
                                     {
                                         <tr>
                                             <td>
+                                                <input asp-for="@item.SelectedToAllocate" type="radio" value="@item.CaseLocationId" />
+                                            </td>
+                                            <td>
                                                 @Html.DisplayFor(modelItem => item.BeneficiaryName)
                                             </td>
                                             <td>
@@ -240,11 +244,24 @@
                                                 <a class="btn btn-xs btn-info" asp-controller="CaseLocations" asp-action="Details" asp-route-id="@item.CaseLocationId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;
                                                 <a class="btn btn-xs btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@item.CaseLocationId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
                                                 <a class="btn btn-xs btn-danger" asp-controller="CaseLocations" asp-action="Delete" asp-route-id="@item.CaseLocationId"> <i class="fas fa-trash"></i>   @Applicationsettings.DELETE</a>
-                                                <button disabled class="btn btn-danger" asp-controller="CaseLocations" asp-action="Delete" asp-route-id="@item.CaseLocationId"> <i class="fas fa-rss"></i>   @Applicationsettings.ALLOCATE</button>
+                                                @*<button disabled class="btn btn-danger" asp-controller="CaseLocations" asp-action="Delete" asp-route-id="@item.CaseLocationId"> <i class="fas fa-rss"></i>   @Applicationsettings.ALLOCATE</button>*@
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="10">
+                                            <a asp-action="Index" class="btn btn-secondary">
+                                                <i class="fa fa-window-close"></i>
+                                                @Applicationsettings.CANCEL
+                                            </a>
+                                            <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
+                                                <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.ASSIGN_VENDOR
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         }
 

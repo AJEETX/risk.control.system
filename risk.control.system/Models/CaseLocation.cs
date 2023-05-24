@@ -42,6 +42,7 @@ namespace risk.control.system.Models
         public string? Addressline2 { get; set; }
         public string ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation ClaimsInvestigation { get; set; } = default!;
+        public long SelectedToAllocate { get; set; }
 
     }
 }
