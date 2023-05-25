@@ -1,4 +1,4 @@
-﻿@model IEnumerable<risk.control.system.Models.Vendor>
+﻿@model ClaimsInvestigationVendorsModel
 
 @{
     ViewData["Title"] = @Applicationsettings.SERVICE;
@@ -25,9 +25,152 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
-                                    @*<a asp-controller="ClientCompany" asp-action="AvailableVendors" asp-route-id="@ViewBag.CompanyId" class="btn btn-success"><i class="fas fa-thumbs-up"></i>  @Applicationsettings.EMPANEL</a>*@
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.LineOfBusiness)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.LineOfBusiness.Name)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerName)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerName)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.ContactNumber)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.ContactNumber)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.ClaimType)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.ClaimType)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.PinCode)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.PinCode.Name)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.State)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.State.Name)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Country)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Country.Name)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.District)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-3">
+                                            Document
+                                        </dt>
+                                        <dd class="col-sm-8">
+                                            @if (Model?.ClaimsInvestigation.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.DocumentImage))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </dd>
+
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerIncome)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerIncome)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerOccupation)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerOccupation)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerEducation)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerEducation)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerType)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerType)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Comments)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Comments)
+                                        </dd>
+                                    </dl>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dt class="col-sm-2">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
+                                    </dd>
+                                    <dt class="col-sm-2">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                    </dd>
+                                    <dt class="col-sm-2">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @Html.DisplayFor(model => model.CaseLocation.Addressline)
+                                    </dd>
+                                    
+                                </div>
+                                <div class="col-md-6">
+                                    
+                                    <dt class="col-sm-2">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
+                                    </dd>
+                                    <dt class="col-sm-2">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @Html.DisplayFor(model => model.CaseLocation.District.Name)
+                                    </dd>
+                                    <dt class="col-sm-2">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
+                                    </dt>
+                                    <dd class="col-sm-10">
+                                        @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                    </dd>
                                 </div>
                             </div>
                         </div>
@@ -43,8 +186,9 @@
                     </div>
                     <div class="card-body p-0 contained-width">
                         <form id="radioButtons" method="post" asp-action="CaseAllocatedToVendor" enctype="multipart/form-data">
-
-                            @if (Model == null || Model.Count() == 0)
+                            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                            <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
+                            @if (Model == null || Model.Vendors.Count == 0)
                             {
                                 <hr />
                                 <div class="col-md-12 text-center">
@@ -58,67 +202,54 @@
                                     <thead>
                                         <tr>
                                             <th>
-
+                                                
+                                            </th>
+                                            <th>
+                                                <span class="badge badge-success">Line of Business / Service / <span class="badge badge-light">Pincodes</span></span>
                                             </th>
 
                                             <th>
-                                                @Html.DisplayNameFor(model => model.Document)
+                                                Vendor Name
+                                            </th>
+                                            
+                                            <th>
+                                                PhoneNumber
                                             </th>
                                             <th>
-                                                @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.CodeSortParm })
-                                            </th>
-                                            <th>
-                                                @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.PhoneNumber)
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.Email)
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.Addressline)
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.State)
+                                                Email
                                             </th>
                                             <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var item in Model)
+                                        @foreach (var item in Model.Vendors)
                                         {
                                             <tr>
                                                 <td>
                                                     <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.VendorId" />
                                                 </td>
                                                 <td>
-                                                    @if (item?.DocumentImage is not null)
+                                                    @foreach (var service in item.VendorInvestigationServiceTypes)
                                                     {
-                                                        <img id="documentImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
-                                                    }
-                                                    else
-                                                    {
-                                                        <img id="documentImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
+                                                       <span class="badge badge-success"> @service.LineOfBusiness.Name / @service.InvestigationServiceType.Name
+                                                        @foreach (var pincode in service.PincodeServices)
+                                                        {
+                                                            <span class="badge badge-light">@pincode.Pincode</span>
+                                                        }
+                                                        </span>
+
+                                                        <br />
                                                     }
                                                 </td>
+                                                
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Code)
                                                 </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.PhoneNumber)
                                                 </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.Email)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Addressline)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.State.Name)
                                                 </td>
                                                 <td>
                                                     <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">

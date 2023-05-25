@@ -110,8 +110,16 @@ namespace risk.control.system.Controllers
         [HttpGet]
         public async Task<IActionResult> EmpanelledVendors(long selectedcase, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
-            var claimCase = _context.CaseLocation.Include(c => c.ClaimsInvestigation)
+            var claimCase = _context.CaseLocation
+                .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.PinCode)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.State)
                 .FirstOrDefault(c => c.CaseLocationId == selectedcase);
+            var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c=>c.LineOfBusiness)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimCase.ClaimsInvestigationId);
 
             var applicationDbContext = _context.Vendor
                 .Where(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.ClientCompanyId)
@@ -186,7 +194,7 @@ namespace risk.control.system.Controllers
             var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
             ViewBag.CompanyId = claimCase.ClaimsInvestigation.ClientCompanyId;
 
-            return View(applicationDbContextResult);
+            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = applicationDbContextResult, ClaimsInvestigation = claimsInvestigation });
         }
 
         [HttpGet]
@@ -228,7 +236,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CaseAllocatedToVendor(string selectedcase)
+        public async Task<IActionResult> CaseAllocatedToVendor(string selectedcase, string claimId, long caseLocationId)
         {
             //TO-DO:: ALLOCATE TO VENDOR LOGIC
             await Task.Delay(100);
@@ -595,7 +603,38 @@ namespace risk.control.system.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
+        {
+            if (id == null || _context.Vendor == null)
+            {
+                toastNotification.AddErrorToastMessage("vendor not found!");
+                return NotFound();
+            }
 
+            var vendor = await _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .FirstOrDefaultAsync(m => m.VendorId == id);
+            if (vendor == null)
+            {
+                return NotFound();
+            }
+            ViewBag.CompanyId = companyId;
+            ViewBag.Backurl = backurl;
+
+            return View(vendor);
+        }
         public async Task<IActionResult> Uploads()
         {
             return View();
