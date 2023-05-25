@@ -90,6 +90,8 @@ namespace risk.control.system.Controllers
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
             {
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId ||
+                a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
                 return View(await applicationDbContext.ToListAsync());
             }
             if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
@@ -105,7 +107,89 @@ namespace risk.control.system.Controllers
 
             return View(await applicationDbContext.ToListAsync());
         }
-        [HttpPost]
+        [HttpGet]
+        public async Task<IActionResult> EmpanelledVendors(long selectedcase, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        {
+            var claimCase = _context.CaseLocation.Include(c => c.ClaimsInvestigation)
+                .FirstOrDefault(c => c.CaseLocationId == selectedcase);
+
+            var applicationDbContext = _context.Vendor
+                .Where(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.ClientCompanyId)
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .AsQueryable();
+
+            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
+            if (searchString != null)
+            {
+                currentPage = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                applicationDbContext = applicationDbContext.Where(a =>
+                    a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Addressline.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.BankAccountNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.BankName.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Branch.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.City.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Email.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.IFSCCode.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.District.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.LineOfBusiness.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.InvestigationServiceType.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.VendorInvestigationServiceTypes.Any(v => v.PincodeServices.Any(p => p.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
+                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
+                    a.Code.ToLower().Contains(searchString.Trim().ToLower())));
+            }
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+                case "code_desc":
+                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
+                    break;
+                default:
+                    applicationDbContext.OrderByDescending(s => s.Name);
+                    break;
+            }
+            int pageNumber = (currentPage ?? 1);
+
+            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.ShowPrevious = pageNumber > 1;
+            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+            ViewBag.ShowFirst = pageNumber != 1;
+            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
+
+            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            ViewBag.CompanyId = claimCase.ClaimsInvestigation.ClientCompanyId;
+
+            return View(applicationDbContextResult);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
             if (_context.ClaimsInvestigation == null)
@@ -141,6 +225,15 @@ namespace risk.control.system.Controllers
             }
 
             return View(claimsInvestigation);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CaseAllocatedToVendor(string selectedcase)
+        {
+            //TO-DO:: ALLOCATE TO VENDOR LOGIC
+            await Task.Delay(100);
+            toastNotification.AddSuccessToastMessage("The allocation to vendor work is in-progress");
+            return RedirectToAction(nameof(ClaimsInvestigationController.Index), "ClaimsInvestigation");
         }
         public async Task<IActionResult> CaseLocation(string id)
         {

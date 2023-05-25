@@ -8,10 +8,10 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form asp-action="EmpanelledVendors">
+                <form asp-action="">
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.MANAGE_COMPANY_VENDOR</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.ALLOCATE_TO_VENDOR</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
@@ -27,7 +27,7 @@
                             <div class="row">
                                 <div class="col-md-12 text-right">
                                     <a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
-                                    <a asp-controller="ClientCompany" asp-action="AvailableVendors" asp-route-id="@ViewBag.CompanyId" class="btn btn-success"><i class="fas fa-thumbs-up"></i>  @Applicationsettings.EMPANEL</a>
+                                    @*<a asp-controller="ClientCompany" asp-action="AvailableVendors" asp-route-id="@ViewBag.CompanyId" class="btn btn-success"><i class="fas fa-thumbs-up"></i>  @Applicationsettings.EMPANEL</a>*@
                                 </div>
                             </div>
                         </div>
@@ -38,8 +38,11 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-success card-outline">
+                    <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.AVAILABLE_VENDORS</h3>
+                    </div>
                     <div class="card-body p-0 contained-width">
-                        <fosrm id="checkboxes" method="post" enctype="multipart/form-data">
+                        <form id="radioButtons" method="post" asp-action="CaseAllocatedToVendor" enctype="multipart/form-data">
 
                             @if (Model == null || Model.Count() == 0)
                             {
@@ -54,16 +57,18 @@
                                 <table class="table table-striped fixed-with-height">
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" id="checkall" /></th>
+                                            <th>
+
+                                            </th>
 
                                             <th>
                                                 @Html.DisplayNameFor(model => model.Document)
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model=>model.Name)
+                                                @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.CodeSortParm })
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model=>model.Code)
+                                                @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
                                             </th>
                                             <th>
                                                 @Html.DisplayNameFor(model => model.PhoneNumber)
@@ -85,7 +90,7 @@
                                         {
                                             <tr>
                                                 <td>
-                                                    <input id="@item.VendorId" class="vendors" name="vendors" type="checkbox" value="@item.VendorId" checked="@item.SelectedByCompany" />
+                                                    <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.VendorId" />
                                                 </td>
                                                 <td>
                                                     @if (item?.DocumentImage is not null)
@@ -126,19 +131,21 @@
                                     <tfoot>
                                         <tr>
                                             <td colspan="10">
-                                                <a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary">
+                                                <a asp-controller="ClaimsInvestigation" asp-action="Index" class="btn btn-secondary">
                                                     <i class="fa fa-window-close"></i>
                                                     @Applicationsettings.CANCEL
                                                 </a>
-                                                <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-danger">
-                                                    <i class="fas fa-thumbs-down" aria-hidden="true"></i> @Applicationsettings.DEPANEL_VENDORS
+                                                <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
+                                                    <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.BROADCAST
                                                 </button>
                                             </td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             }
-                        </fosrm>
+                        </form>
+                        <br />
+                        <br />
                     </div>
                 </div>
             </div>

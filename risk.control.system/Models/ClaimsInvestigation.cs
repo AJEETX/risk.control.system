@@ -14,7 +14,10 @@ namespace risk.control.system.Models
         public string? ClientCompanyId { get; set; }
         [Display(Name = "Company name")]
         public ClientCompany? ClientCompany { get; set; }
-
+        [Display(Name = "Vendor name")]
+        public string? VendorId { get; set; }
+        [Display(Name = "Vendor name")]
+        public Vendor? Vendor { get; set; }
         [NotMapped]
         public bool HasClientCompany { get; set; } = true;
         public List<Vendor>? Vendors { get; set; }
@@ -102,10 +105,8 @@ namespace risk.control.system.Models
         public string? Comments { get; set; }
         [NotMapped]
         public bool SelectedToAssign { get; set; }
-        public string? CurrentUserId { get; set; }
-        public List<VerificationLocation> VerificationLocations { get; set; }
+        public string? CurrentUserEmail { get; set; }
         public List<CaseLocation>? CaseLocations { get; set; }
-        public string? SelectedCaseToAllocate { get; set; }
 
         public override string ToString()
         {

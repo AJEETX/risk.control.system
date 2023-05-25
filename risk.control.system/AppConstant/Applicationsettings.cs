@@ -65,10 +65,12 @@
         public const string EMPANEL = "Empanel";
         public const string BROADCAST = "Broadcast";
         public const string ASSIGN = "Assign";
-        public const string ASSIGN_VENDOR = "Assign To Vendor";
+        public const string ALLOCATE_TO_VENDOR = "Allocate To Vendor";
         public const string CREATE_SELECTED_CASES = "Create selected cases";
 
         public const string MANAGE_COMPANY_VENDOR = "Manage company vendor";
+        public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Select Verification location to allocate to vendor";
+        public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "Select Claim case to allocate to vendor";
         public const string AVAILABLE_VENDORS = "Available vendors";
         public const string DEPANEL_VENDORS = "Depanel vendors";
         public const string MANAGE_VENDOR_USER = "Manage vendor user";

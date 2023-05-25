@@ -28,7 +28,7 @@ namespace risk.control.system.Services
                 {
                     claimsInvestigation.Updated = DateTime.UtcNow;
                     claimsInvestigation.UpdatedBy = userEmail;
-                    claimsInvestigation.CurrentUserId = userEmail;
+                    claimsInvestigation.CurrentUserEmail = userEmail;
                     claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
                     claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
                 }
@@ -46,7 +46,7 @@ namespace risk.control.system.Services
                 {
                     claimsInvestigation.Updated = DateTime.UtcNow;
                     claimsInvestigation.UpdatedBy = applicationUser.Email;
-                    claimsInvestigation.CurrentUserId = applicationUser.Email;
+                    claimsInvestigation.CurrentUserEmail = applicationUser.Email;
                     claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
                     claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
                     if (claimDocument is not null)

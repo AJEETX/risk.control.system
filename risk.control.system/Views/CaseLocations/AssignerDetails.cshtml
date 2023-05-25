@@ -77,10 +77,10 @@
         </dl>
     </div>
     <div class="text-right">
-        <a asp-controller="ClaimsInvestigation" asp-action="Index" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+        <a asp-controller="ClaimsInvestigation" asp-action="AllocateToVendor" asp-route-selectedcase="@Model.ClaimsInvestigationId" class="btn btn-secondary">
             <i class="fa fa-window-close"></i>
-            @Applicationsettings.CANCEL
+            @Applicationsettings.BACK
         </a>
-        <a asp-action="Edit" class="btn btn-warning" asp-route-id="@Model.CaseLocationId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>
+        @*<a asp-action="Edit" class="btn btn-warning" asp-route-id="@Model.CaseLocationId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a>*@
     </div>
 </section>

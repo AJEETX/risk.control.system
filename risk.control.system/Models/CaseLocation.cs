@@ -36,13 +36,16 @@ namespace risk.control.system.Models
         [Display(Name = "PinCode name")]
         public PinCode? PinCode { get; set; } = default!;
 
-        [Display(Name = "Address line1")]
+        [Display(Name = "Address line")]
         public string? Addressline { get; set; }
         [Display(Name = "Address line1")]
         public string? Addressline2 { get; set; }
         public string ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation ClaimsInvestigation { get; set; } = default!;
-        public long SelectedToAllocate { get; set; }
+        [Display(Name = "Vendor name")]
+        public string? VendorId { get; set; }
+        [Display(Name = "Vendor name")]
+        public Vendor? Vendor { get; set; }
 
     }
 }

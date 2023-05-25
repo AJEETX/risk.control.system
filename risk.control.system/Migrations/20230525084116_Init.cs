@@ -406,316 +406,81 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ClaimsInvestigation",
+                name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
-                    ContractNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    ContractIssueDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CustomerName = table.Column<string>(type: "TEXT", nullable: true),
-                    CustomerDateOfBirth = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ContactNumber = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<int>(type: "INTEGER", nullable: false),
-                    DateOfIncident = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    CauseOfLoss = table.Column<string>(type: "TEXT", nullable: true),
-                    Gender = table.Column<int>(type: "INTEGER", nullable: false),
-                    SumAssuredValue = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    CustomerIncome = table.Column<int>(type: "INTEGER", nullable: true),
-                    CustomerOccupation = table.Column<string>(type: "TEXT", nullable: true),
-                    CustomerEducation = table.Column<string>(type: "TEXT", nullable: true),
-                    CustomerType = table.Column<int>(type: "INTEGER", nullable: true),
-                    CostCentreId = table.Column<string>(type: "TEXT", nullable: true),
-                    CaseEnablerId = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    Comments = table.Column<string>(type: "TEXT", nullable: true),
-                    CurrentUserId = table.Column<string>(type: "TEXT", nullable: true),
-                    SelectedCaseToAllocate = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClaimsInvestigation", x => x.ClaimsInvestigationId);
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_CaseEnabler_CaseEnablerId",
-                        column: x => x.CaseEnablerId,
-                        principalTable: "CaseEnabler",
-                        principalColumn: "CaseEnablerId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_ClientCompany_ClientCompanyId",
-                        column: x => x.ClientCompanyId,
-                        principalTable: "ClientCompany",
-                        principalColumn: "ClientCompanyId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_CostCentre_CostCentreId",
-                        column: x => x.CostCentreId,
-                        principalTable: "CostCentre",
-                        principalColumn: "CostCentreId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_Country_CountryId",
-                        column: x => x.CountryId,
-                        principalTable: "Country",
-                        principalColumn: "CountryId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_District_DistrictId",
-                        column: x => x.DistrictId,
-                        principalTable: "District",
-                        principalColumn: "DistrictId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_InvestigationCaseStatus_InvestigationCaseStatusId",
-                        column: x => x.InvestigationCaseStatusId,
-                        principalTable: "InvestigationCaseStatus",
-                        principalColumn: "InvestigationCaseStatusId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_InvestigationCaseSubStatus_InvestigationCaseSubStatusId",
-                        column: x => x.InvestigationCaseSubStatusId,
-                        principalTable: "InvestigationCaseSubStatus",
-                        principalColumn: "InvestigationCaseSubStatusId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_InvestigationServiceType_InvestigationServiceTypeId",
-                        column: x => x.InvestigationServiceTypeId,
-                        principalTable: "InvestigationServiceType",
-                        principalColumn: "InvestigationServiceTypeId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_LineOfBusiness_LineOfBusinessId",
-                        column: x => x.LineOfBusinessId,
-                        principalTable: "LineOfBusiness",
-                        principalColumn: "LineOfBusinessId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_PinCode_PinCodeId",
-                        column: x => x.PinCodeId,
-                        principalTable: "PinCode",
-                        principalColumn: "PinCodeId");
-                    table.ForeignKey(
-                        name: "FK_ClaimsInvestigation_State_StateId",
-                        column: x => x.StateId,
-                        principalTable: "State",
-                        principalColumn: "StateId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CaseLocation",
-                columns: table => new
-                {
-                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    BeneficiaryName = table.Column<string>(type: "TEXT", nullable: true),
-                    BeneficiaryRelationId = table.Column<long>(type: "INTEGER", nullable: true),
-                    BeneficiaryContactNumber = table.Column<long>(type: "INTEGER", nullable: true),
-                    BeneficiaryIncome = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
-                    Addressline2 = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
-                    SelectedToAllocate = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    RoleId = table.Column<long>(type: "INTEGER", nullable: false),
+                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CaseLocation", x => x.CaseLocationId);
-                    table.ForeignKey(
-                        name: "FK_CaseLocation_BeneficiaryRelation_BeneficiaryRelationId",
-                        column: x => x.BeneficiaryRelationId,
-                        principalTable: "BeneficiaryRelation",
-                        principalColumn: "BeneficiaryRelationId");
-                    table.ForeignKey(
-                        name: "FK_CaseLocation_ClaimsInvestigation_ClaimsInvestigationId",
-                        column: x => x.ClaimsInvestigationId,
-                        principalTable: "ClaimsInvestigation",
-                        principalColumn: "ClaimsInvestigationId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CaseLocation_Country_CountryId",
-                        column: x => x.CountryId,
-                        principalTable: "Country",
-                        principalColumn: "CountryId");
-                    table.ForeignKey(
-                        name: "FK_CaseLocation_District_DistrictId",
-                        column: x => x.DistrictId,
-                        principalTable: "District",
-                        principalColumn: "DistrictId");
-                    table.ForeignKey(
-                        name: "FK_CaseLocation_PinCode_PinCodeId",
-                        column: x => x.PinCodeId,
-                        principalTable: "PinCode",
-                        principalColumn: "PinCodeId");
-                    table.ForeignKey(
-                        name: "FK_CaseLocation_State_StateId",
-                        column: x => x.StateId,
-                        principalTable: "State",
-                        principalColumn: "StateId");
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "FileAttachment",
+                name: "AspNetRoles",
                 columns: table => new
                 {
-                    FileAttachmentId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    AttachedDocument = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    ContactMessageId = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FileAttachment", x => x.FileAttachmentId);
-                    table.ForeignKey(
-                        name: "FK_FileAttachment_ClaimsInvestigation_ClaimsInvestigationId",
-                        column: x => x.ClaimsInvestigationId,
-                        principalTable: "ClaimsInvestigation",
-                        principalColumn: "ClaimsInvestigationId");
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Vendor",
+                name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    VendorId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Branch = table.Column<string>(type: "TEXT", nullable: false),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    BankName = table.Column<string>(type: "TEXT", nullable: false),
-                    BankAccountNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    IFSCCode = table.Column<string>(type: "TEXT", nullable: false),
-                    City = table.Column<string>(type: "TEXT", nullable: false),
-                    AgreementDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ActivatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DeListedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Status = table.Column<int>(type: "INTEGER", nullable: true),
-                    DelistReason = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Vendor", x => x.VendorId);
-                    table.ForeignKey(
-                        name: "FK_Vendor_ClaimsInvestigation_ClaimsInvestigationId",
-                        column: x => x.ClaimsInvestigationId,
-                        principalTable: "ClaimsInvestigation",
-                        principalColumn: "ClaimsInvestigationId");
-                    table.ForeignKey(
-                        name: "FK_Vendor_ClientCompany_ClientCompanyId",
-                        column: x => x.ClientCompanyId,
-                        principalTable: "ClientCompany",
-                        principalColumn: "ClientCompanyId");
-                    table.ForeignKey(
-                        name: "FK_Vendor_Country_CountryId",
-                        column: x => x.CountryId,
-                        principalTable: "Country",
-                        principalColumn: "CountryId");
-                    table.ForeignKey(
-                        name: "FK_Vendor_District_DistrictId",
-                        column: x => x.DistrictId,
-                        principalTable: "District",
-                        principalColumn: "DistrictId");
-                    table.ForeignKey(
-                        name: "FK_Vendor_PinCode_PinCodeId",
-                        column: x => x.PinCodeId,
-                        principalTable: "PinCode",
-                        principalColumn: "PinCodeId");
-                    table.ForeignKey(
-                        name: "FK_Vendor_State_StateId",
-                        column: x => x.StateId,
-                        principalTable: "State",
-                        principalColumn: "StateId");
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "VerificationLocation",
+                name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    VerificationLocationId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true)
+                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
+                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VerificationLocation", x => x.VerificationLocationId);
-                    table.ForeignKey(
-                        name: "FK_VerificationLocation_ClaimsInvestigation_ClaimsInvestigationId",
-                        column: x => x.ClaimsInvestigationId,
-                        principalTable: "ClaimsInvestigation",
-                        principalColumn: "ClaimsInvestigationId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_VerificationLocation_Country_CountryId",
-                        column: x => x.CountryId,
-                        principalTable: "Country",
-                        principalColumn: "CountryId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_VerificationLocation_District_DistrictId",
-                        column: x => x.DistrictId,
-                        principalTable: "District",
-                        principalColumn: "DistrictId");
-                    table.ForeignKey(
-                        name: "FK_VerificationLocation_PinCode_PinCodeId",
-                        column: x => x.PinCodeId,
-                        principalTable: "PinCode",
-                        principalColumn: "PinCodeId");
-                    table.ForeignKey(
-                        name: "FK_VerificationLocation_State_StateId",
-                        column: x => x.StateId,
-                        principalTable: "State",
-                        principalColumn: "StateId");
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
                 });
 
             migrationBuilder.CreateTable(
-                name: "VerifyPinCode",
+                name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    VerifyPinCodeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
-                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
+                    RoleId = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_VerifyPinCode", x => x.VerifyPinCodeId);
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_VerifyPinCode_CaseLocation_CaseLocationId",
-                        column: x => x.CaseLocationId,
-                        principalTable: "CaseLocation",
-                        principalColumn: "CaseLocationId",
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -790,127 +555,6 @@ namespace risk.control.system.Migrations
                         column: x => x.StateId,
                         principalTable: "State",
                         principalColumn: "StateId");
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Vendor_VendorId",
-                        column: x => x.VendorId,
-                        principalTable: "Vendor",
-                        principalColumn: "VendorId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "VendorInvestigationServiceType",
-                columns: table => new
-                {
-                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_VendorInvestigationServiceType", x => x.VendorInvestigationServiceTypeId);
-                    table.ForeignKey(
-                        name: "FK_VendorInvestigationServiceType_Country_CountryId",
-                        column: x => x.CountryId,
-                        principalTable: "Country",
-                        principalColumn: "CountryId");
-                    table.ForeignKey(
-                        name: "FK_VendorInvestigationServiceType_District_DistrictId",
-                        column: x => x.DistrictId,
-                        principalTable: "District",
-                        principalColumn: "DistrictId");
-                    table.ForeignKey(
-                        name: "FK_VendorInvestigationServiceType_InvestigationServiceType_InvestigationServiceTypeId",
-                        column: x => x.InvestigationServiceTypeId,
-                        principalTable: "InvestigationServiceType",
-                        principalColumn: "InvestigationServiceTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_VendorInvestigationServiceType_LineOfBusiness_LineOfBusinessId",
-                        column: x => x.LineOfBusinessId,
-                        principalTable: "LineOfBusiness",
-                        principalColumn: "LineOfBusinessId");
-                    table.ForeignKey(
-                        name: "FK_VendorInvestigationServiceType_State_StateId",
-                        column: x => x.StateId,
-                        principalTable: "State",
-                        principalColumn: "StateId");
-                    table.ForeignKey(
-                        name: "FK_VendorInvestigationServiceType_Vendor_VendorId",
-                        column: x => x.VendorId,
-                        principalTable: "Vendor",
-                        principalColumn: "VendorId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetRoles",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Code = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetRoles_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUserClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUserLogins",
-                columns: table => new
-                {
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -951,74 +595,6 @@ namespace risk.control.system.Migrations
                     table.ForeignKey(
                         name: "FK_Mailbox_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ServicedPinCode",
-                columns: table => new
-                {
-                    ServicedPinCodeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ServicedPinCode", x => x.ServicedPinCodeId);
-                    table.ForeignKey(
-                        name: "FK_ServicedPinCode_VendorInvestigationServiceType_VendorInvestigationServiceTypeId",
-                        column: x => x.VendorInvestigationServiceTypeId,
-                        principalTable: "VendorInvestigationServiceType",
-                        principalColumn: "VendorInvestigationServiceTypeId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetRoleClaims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RoleId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUserRoles",
-                columns: table => new
-                {
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    RoleId = table.Column<long>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
-                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1257,6 +833,390 @@ namespace risk.control.system.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "CaseLocation",
+                columns: table => new
+                {
+                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    BeneficiaryName = table.Column<string>(type: "TEXT", nullable: true),
+                    BeneficiaryRelationId = table.Column<long>(type: "INTEGER", nullable: true),
+                    BeneficiaryContactNumber = table.Column<long>(type: "INTEGER", nullable: true),
+                    BeneficiaryIncome = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
+                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
+                    Addressline2 = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CaseLocation", x => x.CaseLocationId);
+                    table.ForeignKey(
+                        name: "FK_CaseLocation_BeneficiaryRelation_BeneficiaryRelationId",
+                        column: x => x.BeneficiaryRelationId,
+                        principalTable: "BeneficiaryRelation",
+                        principalColumn: "BeneficiaryRelationId");
+                    table.ForeignKey(
+                        name: "FK_CaseLocation_Country_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "Country",
+                        principalColumn: "CountryId");
+                    table.ForeignKey(
+                        name: "FK_CaseLocation_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
+                    table.ForeignKey(
+                        name: "FK_CaseLocation_PinCode_PinCodeId",
+                        column: x => x.PinCodeId,
+                        principalTable: "PinCode",
+                        principalColumn: "PinCodeId");
+                    table.ForeignKey(
+                        name: "FK_CaseLocation_State_StateId",
+                        column: x => x.StateId,
+                        principalTable: "State",
+                        principalColumn: "StateId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VerifyPinCode",
+                columns: table => new
+                {
+                    VerifyPinCodeId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
+                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VerifyPinCode", x => x.VerifyPinCodeId);
+                    table.ForeignKey(
+                        name: "FK_VerifyPinCode_CaseLocation_CaseLocationId",
+                        column: x => x.CaseLocationId,
+                        principalTable: "CaseLocation",
+                        principalColumn: "CaseLocationId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClaimsInvestigation",
+                columns: table => new
+                {
+                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
+                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    ContractNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: true),
+                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: true),
+                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
+                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
+                    ContractIssueDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    CustomerName = table.Column<string>(type: "TEXT", nullable: true),
+                    CustomerDateOfBirth = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ContactNumber = table.Column<long>(type: "INTEGER", nullable: false),
+                    ClaimType = table.Column<int>(type: "INTEGER", nullable: false),
+                    DateOfIncident = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    CauseOfLoss = table.Column<string>(type: "TEXT", nullable: true),
+                    Gender = table.Column<int>(type: "INTEGER", nullable: false),
+                    SumAssuredValue = table.Column<decimal>(type: "decimal(15,2)", nullable: true),
+                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
+                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    CustomerIncome = table.Column<int>(type: "INTEGER", nullable: true),
+                    CustomerOccupation = table.Column<string>(type: "TEXT", nullable: true),
+                    CustomerEducation = table.Column<string>(type: "TEXT", nullable: true),
+                    CustomerType = table.Column<int>(type: "INTEGER", nullable: true),
+                    CostCentreId = table.Column<string>(type: "TEXT", nullable: true),
+                    CaseEnablerId = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    Comments = table.Column<string>(type: "TEXT", nullable: true),
+                    CurrentUserEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClaimsInvestigation", x => x.ClaimsInvestigationId);
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_CaseEnabler_CaseEnablerId",
+                        column: x => x.CaseEnablerId,
+                        principalTable: "CaseEnabler",
+                        principalColumn: "CaseEnablerId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_ClientCompany_ClientCompanyId",
+                        column: x => x.ClientCompanyId,
+                        principalTable: "ClientCompany",
+                        principalColumn: "ClientCompanyId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_CostCentre_CostCentreId",
+                        column: x => x.CostCentreId,
+                        principalTable: "CostCentre",
+                        principalColumn: "CostCentreId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_Country_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "Country",
+                        principalColumn: "CountryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_InvestigationCaseStatus_InvestigationCaseStatusId",
+                        column: x => x.InvestigationCaseStatusId,
+                        principalTable: "InvestigationCaseStatus",
+                        principalColumn: "InvestigationCaseStatusId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_InvestigationCaseSubStatus_InvestigationCaseSubStatusId",
+                        column: x => x.InvestigationCaseSubStatusId,
+                        principalTable: "InvestigationCaseSubStatus",
+                        principalColumn: "InvestigationCaseSubStatusId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_InvestigationServiceType_InvestigationServiceTypeId",
+                        column: x => x.InvestigationServiceTypeId,
+                        principalTable: "InvestigationServiceType",
+                        principalColumn: "InvestigationServiceTypeId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_LineOfBusiness_LineOfBusinessId",
+                        column: x => x.LineOfBusinessId,
+                        principalTable: "LineOfBusiness",
+                        principalColumn: "LineOfBusinessId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_PinCode_PinCodeId",
+                        column: x => x.PinCodeId,
+                        principalTable: "PinCode",
+                        principalColumn: "PinCodeId");
+                    table.ForeignKey(
+                        name: "FK_ClaimsInvestigation_State_StateId",
+                        column: x => x.StateId,
+                        principalTable: "State",
+                        principalColumn: "StateId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FileAttachment",
+                columns: table => new
+                {
+                    FileAttachmentId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    AttachedDocument = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ContactMessageId = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FileAttachment", x => x.FileAttachmentId);
+                    table.ForeignKey(
+                        name: "FK_FileAttachment_ClaimsInvestigation_ClaimsInvestigationId",
+                        column: x => x.ClaimsInvestigationId,
+                        principalTable: "ClaimsInvestigation",
+                        principalColumn: "ClaimsInvestigationId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vendor",
+                columns: table => new
+                {
+                    VendorId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Branch = table.Column<string>(type: "TEXT", nullable: false),
+                    Addressline = table.Column<string>(type: "TEXT", nullable: false),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
+                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    BankName = table.Column<string>(type: "TEXT", nullable: false),
+                    BankAccountNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    IFSCCode = table.Column<string>(type: "TEXT", nullable: false),
+                    City = table.Column<string>(type: "TEXT", nullable: false),
+                    AgreementDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ActivatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DeListedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: true),
+                    DelistReason = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vendor", x => x.VendorId);
+                    table.ForeignKey(
+                        name: "FK_Vendor_ClaimsInvestigation_ClaimsInvestigationId",
+                        column: x => x.ClaimsInvestigationId,
+                        principalTable: "ClaimsInvestigation",
+                        principalColumn: "ClaimsInvestigationId");
+                    table.ForeignKey(
+                        name: "FK_Vendor_ClientCompany_ClientCompanyId",
+                        column: x => x.ClientCompanyId,
+                        principalTable: "ClientCompany",
+                        principalColumn: "ClientCompanyId");
+                    table.ForeignKey(
+                        name: "FK_Vendor_Country_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "Country",
+                        principalColumn: "CountryId");
+                    table.ForeignKey(
+                        name: "FK_Vendor_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
+                    table.ForeignKey(
+                        name: "FK_Vendor_PinCode_PinCodeId",
+                        column: x => x.PinCodeId,
+                        principalTable: "PinCode",
+                        principalColumn: "PinCodeId");
+                    table.ForeignKey(
+                        name: "FK_Vendor_State_StateId",
+                        column: x => x.StateId,
+                        principalTable: "State",
+                        principalColumn: "StateId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VerificationLocation",
+                columns: table => new
+                {
+                    VerificationLocationId = table.Column<string>(type: "TEXT", nullable: false),
+                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
+                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
+                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
+                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VerificationLocation", x => x.VerificationLocationId);
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_ClaimsInvestigation_ClaimsInvestigationId",
+                        column: x => x.ClaimsInvestigationId,
+                        principalTable: "ClaimsInvestigation",
+                        principalColumn: "ClaimsInvestigationId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_Country_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "Country",
+                        principalColumn: "CountryId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_PinCode_PinCodeId",
+                        column: x => x.PinCodeId,
+                        principalTable: "PinCode",
+                        principalColumn: "PinCodeId");
+                    table.ForeignKey(
+                        name: "FK_VerificationLocation_State_StateId",
+                        column: x => x.StateId,
+                        principalTable: "State",
+                        principalColumn: "StateId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VendorInvestigationServiceType",
+                columns: table => new
+                {
+                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
+                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: true),
+                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
+                    StateId = table.Column<string>(type: "TEXT", nullable: true),
+                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VendorInvestigationServiceType", x => x.VendorInvestigationServiceTypeId);
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_Country_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "Country",
+                        principalColumn: "CountryId");
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId");
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_InvestigationServiceType_InvestigationServiceTypeId",
+                        column: x => x.InvestigationServiceTypeId,
+                        principalTable: "InvestigationServiceType",
+                        principalColumn: "InvestigationServiceTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_LineOfBusiness_LineOfBusinessId",
+                        column: x => x.LineOfBusinessId,
+                        principalTable: "LineOfBusiness",
+                        principalColumn: "LineOfBusinessId");
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_State_StateId",
+                        column: x => x.StateId,
+                        principalTable: "State",
+                        principalColumn: "StateId");
+                    table.ForeignKey(
+                        name: "FK_VendorInvestigationServiceType_Vendor_VendorId",
+                        column: x => x.VendorId,
+                        principalTable: "Vendor",
+                        principalColumn: "VendorId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServicedPinCode",
+                columns: table => new
+                {
+                    ServicedPinCodeId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
+                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServicedPinCode", x => x.ServicedPinCodeId);
+                    table.ForeignKey(
+                        name: "FK_ServicedPinCode_VendorInvestigationServiceType_VendorInvestigationServiceTypeId",
+                        column: x => x.VendorInvestigationServiceTypeId,
+                        principalTable: "VendorInvestigationServiceType",
+                        principalColumn: "VendorInvestigationServiceTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -1360,6 +1320,11 @@ namespace risk.control.system.Migrations
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseLocation_VendorId",
+                table: "CaseLocation",
+                column: "VendorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ClaimsInvestigation_CaseEnablerId",
                 table: "ClaimsInvestigation",
                 column: "CaseEnablerId");
@@ -1413,6 +1378,11 @@ namespace risk.control.system.Migrations
                 name: "IX_ClaimsInvestigation_StateId",
                 table: "ClaimsInvestigation",
                 column: "StateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClaimsInvestigation_VendorId",
+                table: "ClaimsInvestigation",
+                column: "VendorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClientCompany_CountryId",
@@ -1624,11 +1594,139 @@ namespace risk.control.system.Migrations
                 name: "IX_VerifyPinCode_CaseLocationId",
                 table: "VerifyPinCode",
                 column: "CaseLocationId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId",
+                principalTable: "AspNetRoles",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetRoles_AspNetUsers_ApplicationUserId",
+                table: "AspNetRoles",
+                column: "ApplicationUserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                table: "AspNetUserRoles",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUsers_Vendor_VendorId",
+                table: "AspNetUsers",
+                column: "VendorId",
+                principalTable: "Vendor",
+                principalColumn: "VendorId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_CaseLocation_ClaimsInvestigation_ClaimsInvestigationId",
+                table: "CaseLocation",
+                column: "ClaimsInvestigationId",
+                principalTable: "ClaimsInvestigation",
+                principalColumn: "ClaimsInvestigationId",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_CaseLocation_Vendor_VendorId",
+                table: "CaseLocation",
+                column: "VendorId",
+                principalTable: "Vendor",
+                principalColumn: "VendorId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ClaimsInvestigation_Vendor_VendorId",
+                table: "ClaimsInvestigation",
+                column: "VendorId",
+                principalTable: "Vendor",
+                principalColumn: "VendorId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_ClaimsInvestigation_ClientCompany_ClientCompanyId",
+                table: "ClaimsInvestigation");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Vendor_ClientCompany_ClientCompanyId",
+                table: "Vendor");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_ClaimsInvestigation_Country_CountryId",
+                table: "ClaimsInvestigation");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_District_Country_CountryId",
+                table: "District");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_PinCode_Country_CountryId",
+                table: "PinCode");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_State_Country_CountryId",
+                table: "State");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Vendor_Country_CountryId",
+                table: "Vendor");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_ClaimsInvestigation_District_DistrictId",
+                table: "ClaimsInvestigation");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_PinCode_District_DistrictId",
+                table: "PinCode");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Vendor_District_DistrictId",
+                table: "Vendor");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_ClaimsInvestigation_PinCode_PinCodeId",
+                table: "ClaimsInvestigation");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Vendor_PinCode_PinCodeId",
+                table: "Vendor");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_ClaimsInvestigation_State_StateId",
+                table: "ClaimsInvestigation");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Vendor_State_StateId",
+                table: "Vendor");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_ClaimsInvestigation_Vendor_VendorId",
+                table: "ClaimsInvestigation");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -1708,6 +1806,21 @@ namespace risk.control.system.Migrations
                 name: "BeneficiaryRelation");
 
             migrationBuilder.DropTable(
+                name: "ClientCompany");
+
+            migrationBuilder.DropTable(
+                name: "Country");
+
+            migrationBuilder.DropTable(
+                name: "District");
+
+            migrationBuilder.DropTable(
+                name: "PinCode");
+
+            migrationBuilder.DropTable(
+                name: "State");
+
+            migrationBuilder.DropTable(
                 name: "Vendor");
 
             migrationBuilder.DropTable(
@@ -1715,9 +1828,6 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "CaseEnabler");
-
-            migrationBuilder.DropTable(
-                name: "ClientCompany");
 
             migrationBuilder.DropTable(
                 name: "CostCentre");
@@ -1729,22 +1839,10 @@ namespace risk.control.system.Migrations
                 name: "InvestigationServiceType");
 
             migrationBuilder.DropTable(
-                name: "PinCode");
-
-            migrationBuilder.DropTable(
                 name: "InvestigationCaseStatus");
 
             migrationBuilder.DropTable(
                 name: "LineOfBusiness");
-
-            migrationBuilder.DropTable(
-                name: "District");
-
-            migrationBuilder.DropTable(
-                name: "State");
-
-            migrationBuilder.DropTable(
-                name: "Country");
         }
     }
 }

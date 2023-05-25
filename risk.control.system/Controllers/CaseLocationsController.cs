@@ -33,6 +33,27 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations/Details/5
+       
+        public async Task<IActionResult> AssignerDetails(long? id)
+        {
+            if (id == null || _context.CaseLocation == null)
+            {
+                return NotFound();
+            }
+
+            var caseLocation = await _context.CaseLocation
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.Country)
+                .FirstOrDefaultAsync(m => m.CaseLocationId == id);
+            if (caseLocation == null)
+            {
+                return NotFound();
+            }
+
+            return View(caseLocation);
+        }
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null || _context.CaseLocation == null)

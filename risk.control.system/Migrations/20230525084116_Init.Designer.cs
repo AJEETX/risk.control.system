@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230524080012_Init")]
+    [Migration("20230525084116_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -421,9 +421,6 @@ namespace risk.control.system.Migrations
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
-                    b.Property<long>("SelectedToAllocate")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
 
@@ -431,6 +428,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VendorId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("CaseLocationId");
@@ -446,6 +446,8 @@ namespace risk.control.system.Migrations
                     b.HasIndex("PinCodeId");
 
                     b.HasIndex("StateId");
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("CaseLocation");
                 });
@@ -494,7 +496,7 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CurrentUserId")
+                    b.Property<string>("CurrentUserEmail")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("CustomerDateOfBirth")
@@ -546,9 +548,6 @@ namespace risk.control.system.Migrations
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("SelectedCaseToAllocate")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
 
@@ -559,6 +558,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VendorId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ClaimsInvestigationId");
@@ -584,6 +586,8 @@ namespace risk.control.system.Migrations
                     b.HasIndex("PinCodeId");
 
                     b.HasIndex("StateId");
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("ClaimsInvestigation");
                 });
@@ -2102,6 +2106,10 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("StateId");
 
+                    b.HasOne("risk.control.system.Models.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId");
+
                     b.Navigation("BeneficiaryRelation");
 
                     b.Navigation("ClaimsInvestigation");
@@ -2113,6 +2121,8 @@ namespace risk.control.system.Migrations
                     b.Navigation("PinCode");
 
                     b.Navigation("State");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
@@ -2163,6 +2173,10 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("StateId");
 
+                    b.HasOne("risk.control.system.Models.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId");
+
                     b.Navigation("CaseEnabler");
 
                     b.Navigation("ClientCompany");
@@ -2184,6 +2198,8 @@ namespace risk.control.system.Migrations
                     b.Navigation("PinCode");
 
                     b.Navigation("State");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
@@ -2485,7 +2501,7 @@ namespace risk.control.system.Migrations
             modelBuilder.Entity("risk.control.system.Models.VerificationLocation", b =>
                 {
                     b.HasOne("risk.control.system.Models.ClaimsInvestigation", "ClaimsInvestigation")
-                        .WithMany("VerificationLocations")
+                        .WithMany()
                         .HasForeignKey("ClaimsInvestigationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2560,8 +2576,6 @@ namespace risk.control.system.Migrations
                     b.Navigation("CaseLocations");
 
                     b.Navigation("Vendors");
-
-                    b.Navigation("VerificationLocations");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClientCompany", b =>
