@@ -70,6 +70,7 @@
         public const string CASE_PROFILE = "Case Profile";
         public const string VERIFICTION_LOCATIONS = "Locations to verify";
         public const string EMPANEL = "Go to Empanel Vendors";
+        public const string SELECT_TO_EMPANEL = "Select to Empanel Vendors";
         public const string BROADCAST = "Broadcast";
         public const string ASSIGN = "Assign";
         public const string ALLOCATE_TO_VENDOR = "Allocate To Vendor";
@@ -81,6 +82,7 @@
         public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Select Claim case to assign to agent";
         public const string AVAILABLE_VENDORS = "Available vendors";
         public const string DEPANEL_VENDORS = "Go to Depanel vendors";
+        public const string SELECT_TO_DEPANEL_VENDORS = "Select to Depanel vendors";
         public const string MANAGE_VENDOR_USER = "Manage vendor user";
         public const string EDIT_VENDOR = "Edit vendor";
         public const string MANAGE_USERS = "Manage user";
