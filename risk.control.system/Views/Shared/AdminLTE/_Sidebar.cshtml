@@ -240,7 +240,8 @@
                         if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                         {
                             <li class="nav-item">
-                                <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","")">
+                                <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","") 
+                                @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","")">
                                     <i class="nav-icon fas fa-building"></i>
                                     <p>
                                         @Applicationsettings.CLIENT_COMPANIES

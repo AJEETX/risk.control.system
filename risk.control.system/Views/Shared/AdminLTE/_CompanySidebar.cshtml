@@ -213,12 +213,12 @@
                                 </p>
                             </a>
                         </li>
-
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
-                                <i class="nav-icon fa fa-binoculars"></i>
+                            <a is-active-page asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Details")
+                                    @Url.MakeActiveClass("CompanyUserRoles","")">
+                                <i class="nav-icon fas fa-building"></i>
                                 <p>
-                                    @Applicationsettings.VENDORS
+                                    @Applicationsettings.CLIENT_COMPANIY_PROFILE
                                 </p>
                             </a>
                         </li>
@@ -230,7 +230,30 @@
                                 </p>
                             </a>
                         </li>
-                       
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                                <i class="nav-icon fa fa-binoculars"></i>
+                                <p>
+                                    @Applicationsettings.MANAGE_VENDORS
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","EmpanelledVendors")">
+                                <i class="nav-icon fa fa-binoculars"></i>
+                                <p>
+                                    @Applicationsettings.EMPANELLED_VENDORS
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClientCompany" asp-action="AvailableVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","AvailableVendors")">
+                                <i class="nav-icon fa fa-binoculars"></i>
+                                <p>
+                                    @Applicationsettings.DEPANELLED_VENDORS
+                                </p>
+                            </a>
+                        </li>
                     }
                 }
                 @{

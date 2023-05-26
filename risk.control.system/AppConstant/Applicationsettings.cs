@@ -37,6 +37,7 @@
         public const string VERIFY_LOCATIONS = "Locations to verify";
 
         // LABELS / ACTIONS
+        public const string CLIENT_COMPANIY_PROFILE = "Company Profile";
         public const string CLIENT_COMPANIES = "Company";
         public const string CLIENT_COMPANY = "Company";
         public const string COUNTRY = "Country";
@@ -61,11 +62,14 @@
         public const string VENDOR_USERS = "Vendor Users";
         public const string VENDOR = "Vendor";
         public const string VENDORS = "Vendor";
+        public const string MANAGE_VENDORS = "Manage Vendors";
+        public const string EMPANELLED_VENDORS = "Empanelled Vendors";
+        public const string DEPANELLED_VENDORS = "Depanelled Vendors";
         public const string MANAGE_VENDOR = "Manage vendor";
         public const string MANAGE_CLIENT_COMPANY = "Manage client company";
         public const string CASE_PROFILE = "Case Profile";
         public const string VERIFICTION_LOCATIONS = "Locations to verify";
-        public const string EMPANEL = "Empanel";
+        public const string EMPANEL = "Go to Empanel Vendors";
         public const string BROADCAST = "Broadcast";
         public const string ASSIGN = "Assign";
         public const string ALLOCATE_TO_VENDOR = "Allocate To Vendor";
@@ -76,7 +80,7 @@
         public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "Select Claim case to allocate to vendor";
         public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Select Claim case to assign to agent";
         public const string AVAILABLE_VENDORS = "Available vendors";
-        public const string DEPANEL_VENDORS = "Depanel vendors";
+        public const string DEPANEL_VENDORS = "Go to Depanel vendors";
         public const string MANAGE_VENDOR_USER = "Manage vendor user";
         public const string EDIT_VENDOR = "Edit vendor";
         public const string MANAGE_USERS = "Manage user";

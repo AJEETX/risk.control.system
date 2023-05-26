@@ -422,7 +422,6 @@ namespace risk.control.system.Controllers
                 if (company != null)
                 {
                     var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
-                    .Where(v => v.VendorId != id)
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
@@ -437,7 +436,7 @@ namespace risk.control.system.Controllers
                     company.EmpanelledVendors.AddRange(empanelledVendors);
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
-                    toastNotification.AddSuccessToastMessage("Vendor(s) empanel sucessful!");
+                    toastNotification.AddSuccessToastMessage("Vendor(s) empanel successful!");
                     try
                     {
                         return RedirectToAction("Details", new { id = company.ClientCompanyId });

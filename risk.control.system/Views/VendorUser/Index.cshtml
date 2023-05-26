@@ -74,14 +74,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                @if (user?.ProfileImageInByte is not null)
-                                                {
-                                                    <img id="profileImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(user?.ProfileImageInByte))">
-                                                }
-                                                else
-                                                {
-                                                    <img id="profileImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
-                                                }
+                                                <img src="@user?.ProfileImage" height="30" alt="No image" />
                                             </td>
                                             <td style="width: 10%;">@user.Email</td>
                                             <td>@user.FirstName @user.LastName</td>

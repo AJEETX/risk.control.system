@@ -106,7 +106,7 @@ namespace risk.control.system.Controllers
                 ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
 
                 var users = applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-
+                var tempusers = userManager.Users.Where(c=>c.ClientCompanyId == id);
                 foreach (var user in users)
                 {
                     var country = _context.Country.FirstOrDefault(c=>c.CountryId == user.CountryId);
