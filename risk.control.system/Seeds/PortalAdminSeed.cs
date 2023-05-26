@@ -47,24 +47,24 @@ namespace risk.control.system.Seeds
                     await userManager.CreateAsync(portalAdmin, Password);
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.PortalAdmin.ToString());
 
-                    var portalAdminRole = new ApplicationRole(AppRoles.PortalAdmin.ToString(), AppRoles.PortalAdmin.ToString());
-                    portalAdmin.ApplicationRoles.Add(portalAdminRole);
+                    //var portalAdminRole = new ApplicationRole(AppRoles.PortalAdmin.ToString(), AppRoles.PortalAdmin.ToString());
+                    //portalAdmin.ApplicationRoles.Add(portalAdminRole);
 
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientAdmin.ToString());
-                    var clientAdminRole = new ApplicationRole(AppRoles.ClientAdmin.ToString(), AppRoles.ClientAdmin.ToString());
-                    portalAdmin.ApplicationRoles.Add(clientAdminRole);
+                    //var clientAdminRole = new ApplicationRole(AppRoles.ClientAdmin.ToString(), AppRoles.ClientAdmin.ToString());
+                    //portalAdmin.ApplicationRoles.Add(clientAdminRole);
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientCreator.ToString());
-                    context.ApplicationRole.Add(new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString()));
+                    //context.ApplicationRole.Add(new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString()));
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientAssigner.ToString());
-                    context.ApplicationRole.Add(new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString()));
+                    //context.ApplicationRole.Add(new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString()));
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.ClientAssessor.ToString());
-                    context.ApplicationRole.Add(new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString()));
+                    //context.ApplicationRole.Add(new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString()));
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.VendorAdmin.ToString());
-                    context.ApplicationRole.Add(new ApplicationRole(AppRoles.VendorAdmin.ToString(), AppRoles.VendorAdmin.ToString()));
+                    //context.ApplicationRole.Add(new ApplicationRole(AppRoles.VendorAdmin.ToString(), AppRoles.VendorAdmin.ToString()));
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.VendorSupervisor.ToString());
-                    context.ApplicationRole.Add(new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString()));
+                    //context.ApplicationRole.Add(new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString()));
                     await userManager.AddToRoleAsync(portalAdmin, AppRoles.VendorAgent.ToString());
-                    context.ApplicationRole.Add(new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString()));
+                    //context.ApplicationRole.Add(new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString()));
                 }
 
                 ////////PERMISSIONS TO MODULES

@@ -17,6 +17,8 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static risk.control.system.Helpers.Permissions;
+
 namespace risk.control.system.Controllers
 {
     public class ClaimsInvestigationController : Controller
@@ -70,23 +72,38 @@ namespace risk.control.system.Controllers
                 .Include(c => c.State);
 
             ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            if (clientCompany == null)
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            
+            if (companyUser == null && vendorUser == null)
             {
                 ViewBag.HasClientCompany = false;
+                ViewBag.HasVendorCompany = false;
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
             }
-            else
+            else if(companyUser != null && vendorUser == null)
             {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+                ViewBag.HasVendorCompany = false;
             }
+            else if(companyUser != null && vendorUser != null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId && i.VendorId == vendorUser.VendorId);
+            }
+
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
             {
@@ -103,6 +120,16 @@ namespace risk.control.system.Controllers
             {
                 applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
                 return View("Assigner", await applicationDbContext.ToListAsync());
+            }
+            else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()) || userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
+                return View("Vendor", await applicationDbContext.ToListAsync());
+            }
+            else if (userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
+                return View("VendorAgent", await applicationDbContext.ToListAsync());
             }
 
             return View(await applicationDbContext.ToListAsync());
@@ -197,6 +224,12 @@ namespace risk.control.system.Controllers
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = applicationDbContextResult, ClaimsInvestigation = claimsInvestigation });
         }
 
+        public async Task<IActionResult> AllocateToAgent(string selectedcase)
+        {
+            //TO-DO
+            await Task.Delay(1000);
+            return Ok();
+        }
         [HttpGet]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
@@ -239,8 +272,14 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> CaseAllocatedToVendor(string selectedcase, string claimId, long caseLocationId)
         {
             //TO-DO:: ALLOCATE TO VENDOR LOGIC
-            await Task.Delay(100);
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId);
+
+        await mailboxService.NotifyClaimAllocation(userEmail, claimId, selectedcase,caseLocationId);
+
             toastNotification.AddSuccessToastMessage("The allocation to vendor work is in-progress");
+
             return RedirectToAction(nameof(ClaimsInvestigationController.Index), "ClaimsInvestigation");
         }
         public async Task<IActionResult> CaseLocation(string id)
@@ -294,11 +333,29 @@ namespace risk.control.system.Controllers
             ViewBag.HasClientCompany = true;
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()) || userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
+            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+
+
+            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
             {
-                var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => 
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId);
+            }
+            else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a =>
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
             }
             else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
             {
@@ -327,7 +384,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Create));
             }
 
-            await claimsInvestigationService.Assign(HttpContext.User.Identity.Name, claims);
+            await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, claims);
 
             await mailboxService.NotifyClaimAssignment(HttpContext.User.Identity.Name, claims);
 

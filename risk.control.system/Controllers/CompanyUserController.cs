@@ -56,9 +56,16 @@ namespace risk.control.system.Controllers
                 .Include(c => c.CompanyApplicationUser)
                 .FirstOrDefault(c => c.ClientCompanyId == id);
 
-            var applicationDbContext = company.CompanyApplicationUser.AsQueryable();
+            var applicationDbContext = company.CompanyApplicationUser
+                .AsQueryable();
 
-            applicationDbContext = applicationDbContext.Where(u => u.ClientCompanyId == id);
+            applicationDbContext = applicationDbContext
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .Include(c => c.District)
+                .Include(c => c.PinCode)
+                .Include(c=>c.ClientCompany)
+                .Where(u => u.ClientCompanyId == id);
 
             var model = new CompanyUsersViewModel
             {
@@ -102,6 +109,11 @@ namespace risk.control.system.Controllers
 
                 foreach (var user in users)
                 {
+                    var country = _context.Country.FirstOrDefault(c=>c.CountryId == user.CountryId);
+                    var state = _context.State.FirstOrDefault(c=>c.StateId == user.StateId);
+                    var district = _context.District.FirstOrDefault(c=>c.DistrictId == user.DistrictId);
+                    var pinCode = _context.PinCode.FirstOrDefault(c=>c.PinCodeId == user.PinCodeId);
+
                     var thisViewModel = new UsersViewModel();
                     thisViewModel.UserId = user.Id.ToString();
                     thisViewModel.Email = user?.Email;
@@ -109,13 +121,13 @@ namespace risk.control.system.Controllers
                     thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
                     thisViewModel.FirstName = user.FirstName;
                     thisViewModel.LastName = user.LastName;
-                    thisViewModel.Country = user.Country.Name;
+                    thisViewModel.Country = country.Name;
                     thisViewModel.CountryId = user.CountryId;
                     thisViewModel.StateId = user.StateId;
-                    thisViewModel.State = user.State.Name;
-                    thisViewModel.PinCode = user.PinCode.Name;
-                    thisViewModel.PinCodeId = user.PinCode.PinCodeId;
-                    thisViewModel.CompanyName = user.ClientCompany.Name;
+                    thisViewModel.State = state.Name;
+                    thisViewModel.PinCode = pinCode.Name;
+                    thisViewModel.PinCodeId = pinCode.PinCodeId;
+                    thisViewModel.CompanyName = company.Name;
                     thisViewModel.CompanyId = user.ClientCompanyId;
                     thisViewModel.ProfileImageInByte = user.ProfilePicture;
                     thisViewModel.Roles = await GetUserRoles(user);

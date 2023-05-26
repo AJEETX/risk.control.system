@@ -344,8 +344,17 @@ namespace risk.control.system.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
+            var vendorUsers = _context.VendorApplicationUser.Include(u=>u.Vendor).Where(u=>u.Vendor.ClientCompanyId == id).ToList();
+            List<string> userVendorids = new List<string>();
+            if(vendorUsers is not null && vendorUsers.Count> 0)
+            {
+                userVendorids = vendorUsers.Select(u=>u.VendorId).ToList();
+            }
+
             var applicationDbContext = _context.Vendor
-                .Where(v => v.ClientCompanyId != id)
+                .Where(v => v.ClientCompanyId != id 
+                //&& userVendorids.Contains(v.VendorId) 
+                && (v.VendorInvestigationServiceTypes != null)  && v.VendorInvestigationServiceTypes.Count>0)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
@@ -449,10 +458,11 @@ namespace risk.control.system.Controllers
             if (vendors is not null && vendors.Count() > 0)
             {
                 var company = await _context.ClientCompany.FindAsync(id);
+
                 if (company != null)
                 {
                     var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
-                    .Where(v => v.VendorId != id)
+                    .Where(v => v.ClientCompanyId == id)
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)

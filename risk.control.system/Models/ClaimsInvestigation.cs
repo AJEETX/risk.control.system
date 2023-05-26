@@ -20,7 +20,7 @@ namespace risk.control.system.Models
         public Vendor? Vendor { get; set; }
         [NotMapped]
         public bool HasClientCompany { get; set; } = true;
-        public List<Vendor>? Vendors { get; set; }
+        public List<Vendor>? Vendors { get; set; } = new();
         [Display(Name = "Contract number")]
         public string ContractNumber { get; set; } = default!;
         public string Description { get; set; } = default!;

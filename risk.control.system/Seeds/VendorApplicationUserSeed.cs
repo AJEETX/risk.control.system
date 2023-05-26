@@ -44,16 +44,16 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(vendorAdmin, Password);
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAdmin.ToString());
-                    var vendorAdminRole = new ApplicationRole(AppRoles.VendorAdmin.ToString(), AppRoles.VendorAdmin.ToString());
-                    vendorAdmin.ApplicationRoles.Add(vendorAdminRole);
+                    //var vendorAdminRole = new ApplicationRole(AppRoles.VendorAdmin.ToString(), AppRoles.VendorAdmin.ToString());
+                    //vendorAdmin.ApplicationRoles.Add(vendorAdminRole);
 
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorSupervisor.ToString());
-                    var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
-                    vendorAdmin.ApplicationRoles.Add(vendorSuperVisorRole);
+                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
+                    //vendorAdmin.ApplicationRoles.Add(vendorSuperVisorRole);
 
                     await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAgent.ToString());
-                    var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
-                    vendorAdmin.ApplicationRoles.Add(vendorAgentRole);
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    //vendorAdmin.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
 
@@ -89,12 +89,12 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(vendorSupervisor, Password);
                     await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorSupervisor.ToString());
-                    var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
-                    vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);
+                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
+                    //vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);
 
                     await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorAgent.ToString());
-                    var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
-                    vendorSupervisor.ApplicationRoles.Add(vendorAgentRole);
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    //vendorSupervisor.ApplicationRoles.Add(vendorAgentRole);
 
                 }
             }
@@ -131,8 +131,8 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(vendorAgent, Password);
                     await userManager.AddToRoleAsync(vendorAgent, AppRoles.VendorAgent.ToString());
-                    var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
-                    vendorAgent.ApplicationRoles.Add(vendorAgentRole);
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    //vendorAgent.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
         }

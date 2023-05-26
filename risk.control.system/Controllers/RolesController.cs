@@ -16,7 +16,7 @@ namespace risk.control.system.Controllers
             _roleManager = roleManager;
             this.toastNotification = toastNotification;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string id=null)
         {
             var roles = await _roleManager.Roles.ToListAsync();
 

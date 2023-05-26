@@ -43,26 +43,21 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientAdmin, Password);
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAdmin.ToString());
-                    var clientAdminRole = new ApplicationRole(AppRoles.ClientAdmin.ToString(), AppRoles.ClientAdmin.ToString());
-                    clientAdmin.ApplicationRoles.Add(clientAdminRole);
+                    //var clientAdminRole = new ApplicationRole(AppRoles.ClientAdmin.ToString(), AppRoles.ClientAdmin.ToString());
+                    //clientAdmin.ApplicationRoles.Add(clientAdminRole);
 
 
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientCreator.ToString());
-                    var clientCreatorRole = new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString());
-                    clientAdmin.ApplicationRoles.Add(clientCreatorRole);
+                    //var clientCreatorRole = new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString());
+                    //clientAdmin.ApplicationRoles.Add(clientCreatorRole);
 
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssigner.ToString());
-                    var clientAssignerRole = new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString());
-                    clientAdmin.ApplicationRoles.Add(clientAssignerRole);
+                    //var clientAssignerRole = new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString());
+                    //clientAdmin.ApplicationRoles.Add(clientAssignerRole);
 
                     await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssessor.ToString());
-                    var clientAssessorRole = new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString());
-                    clientAdmin.ApplicationRoles.Add(clientAssessorRole);
-
-                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAdmin.ToString());
-
-                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorSupervisor.ToString());
-                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.VendorAgent.ToString());
+                    //var clientAssessorRole = new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString());
+                    //clientAdmin.ApplicationRoles.Add(clientAssessorRole);
                 }
             }
 
@@ -99,8 +94,8 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientCreator, Password);
                     await userManager.AddToRoleAsync(clientCreator, AppRoles.ClientCreator.ToString());
-                    var clientCreatorRole = new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString());
-                    clientCreator.ApplicationRoles.Add(clientCreatorRole);
+                    //var clientCreatorRole = new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString());
+                    //clientCreator.ApplicationRoles.Add(clientCreatorRole);
                 }
             }
 
@@ -136,8 +131,8 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientAssigner, Password);
                     await userManager.AddToRoleAsync(clientAssigner, AppRoles.ClientAssigner.ToString());
-                    var clientAssignerRole = new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString());
-                    clientAssigner.ApplicationRoles.Add(clientAssignerRole);
+                    //var clientAssignerRole = new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString());
+                    //clientAssigner.ApplicationRoles.Add(clientAssignerRole);
                 }
             }
 
@@ -173,8 +168,8 @@ namespace risk.control.system.Seeds
                 {
                     await userManager.CreateAsync(clientAssessor, Password);
                     await userManager.AddToRoleAsync(clientAssessor, AppRoles.ClientAssessor.ToString());
-                    var clientAssessorRole = new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString());
-                    clientAssigner.ApplicationRoles.Add(clientAssessorRole);
+                    //var clientAssessorRole = new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString());
+                    //clientAssigner.ApplicationRoles.Add(clientAssessorRole);
                 }
             }
         }

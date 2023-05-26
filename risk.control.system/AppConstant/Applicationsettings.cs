@@ -9,6 +9,7 @@
         //WEBSITE SETTINGS
 
         public const string WEBSITE_SITE_MENU_BRAND = "aby";
+        public const string WEBSITE_COMPANY_MENU_BRAND = "tata aig";
         public const string WEBSITE_TITLE = "risk.control.unit";
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
         public const string WEBSITE_SITE_DESIGNER = "its aby";
@@ -56,6 +57,8 @@
         public const string ROLE = "Role";
         public const string STATE = "State";
         public const string USER = "User";
+        public const string COMPANY_USERS = "Company Users";
+        public const string VENDOR_USERS = "Vendor Users";
         public const string VENDOR = "Vendor";
         public const string VENDORS = "Vendor";
         public const string MANAGE_VENDOR = "Manage vendor";
@@ -71,6 +74,7 @@
         public const string MANAGE_COMPANY_VENDOR = "Manage company vendor";
         public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Select Verification location to allocate to vendor";
         public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "Select Claim case to allocate to vendor";
+        public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Select Claim case to assign to agent";
         public const string AVAILABLE_VENDORS = "Available vendors";
         public const string DEPANEL_VENDORS = "Depanel vendors";
         public const string MANAGE_VENDOR_USER = "Manage vendor user";
