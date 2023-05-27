@@ -6,7 +6,7 @@
 }
 <section class="content">
     <div class="container-fluid ">
-        <form asp-action="Create" enctype="multipart/form-data">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-warning card-outline">
@@ -88,8 +88,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="ProfilePicture" class="control-label"></label>
-                                        <img class="form-Image" id="profilePicture" src="@Applicationsettings.NO_IMAGE">
-                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
+                                        <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
+                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                     <div class="form-group text-right">
                                         <a asp-controller="User" asp-action="Index" class="btn btn-secondary">

@@ -60,6 +60,8 @@ namespace risk.control.system.Controllers
         {
             if (beneficiaryRelation is not null)
             {
+                beneficiaryRelation.Updated= DateTime.Now;
+                beneficiaryRelation.UpdatedBy= HttpContext.User?.Identity?.Name;
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("beneficiary relation created successfully!");
@@ -100,6 +102,8 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    beneficiaryRelation.Updated = DateTime.UtcNow;
+                    beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(beneficiaryRelation);
                     await _context.SaveChangesAsync();
                 }
@@ -150,6 +154,8 @@ namespace risk.control.system.Controllers
             var beneficiaryRelation = await _context.BeneficiaryRelation.FindAsync(id);
             if (beneficiaryRelation != null)
             {
+                beneficiaryRelation.Updated = DateTime.UtcNow;
+                beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.BeneficiaryRelation.Remove(beneficiaryRelation);
             }
 

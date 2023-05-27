@@ -104,6 +104,8 @@ namespace risk.control.system.Controllers
         {
             if (caseLocation is not null)
             {
+                caseLocation.Updated = DateTime.UtcNow;
+                caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("verification location created successfully!");
@@ -160,7 +162,8 @@ namespace risk.control.system.Controllers
                 try
                 {
                     {
-                        
+                        caseLocation.Updated = DateTime.UtcNow;
+                        caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage("verification location edited successfully!");
@@ -220,6 +223,8 @@ namespace risk.control.system.Controllers
             var caseLocation = await _context.CaseLocation.FindAsync(id);
             if (caseLocation != null)
             {
+                caseLocation.Updated = DateTime.UtcNow;
+                caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CaseLocation.Remove(caseLocation);
             }
 

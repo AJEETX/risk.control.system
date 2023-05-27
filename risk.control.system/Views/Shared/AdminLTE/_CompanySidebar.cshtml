@@ -195,7 +195,7 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Open")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">open</span>
+                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-light">open</span>
                         </p>
                     </a>
                 </li>
@@ -205,7 +205,7 @@
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","")
-                                @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                                    @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.ADMIN_SETTINGS
@@ -231,7 +231,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") 
+                            @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
                                 <i class="nav-icon fa fa-binoculars"></i>
                                 <p>
                                     @Applicationsettings.MANAGE_VENDORS
@@ -240,7 +241,7 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","EmpanelledVendors")">
-                                <i class="nav-icon fa fa-binoculars"></i>
+                                <i class="nav-icon fa fa-thumbs-up"></i>
                                 <p>
                                     @Applicationsettings.EMPANELLED_VENDORS
                                 </p>
@@ -248,7 +249,7 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClientCompany" asp-action="AvailableVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","AvailableVendors")">
-                                <i class="nav-icon fa fa-binoculars"></i>
+                                <i class="nav-icon fa fa-thumbs-down"></i>
                                 <p>
                                     @Applicationsettings.DEPANELLED_VENDORS
                                 </p>

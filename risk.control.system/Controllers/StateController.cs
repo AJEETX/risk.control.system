@@ -102,6 +102,8 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(State state)
         {
+            state.Updated = DateTime.UtcNow;
+            state.UpdatedBy = HttpContext.User?.Identity?.Name;
             _context.Add(state);
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("state created successfully!");
@@ -145,6 +147,8 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    state.Updated = DateTime.UtcNow;
+                    state.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(state);
                     await _context.SaveChangesAsync();
                 }
@@ -200,6 +204,8 @@ namespace risk.control.system.Controllers
             var state = await _context.State.FindAsync(id);
             if (state != null)
             {
+                state.Updated = DateTime.UtcNow;
+                state.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.State.Remove(state);
             }
 

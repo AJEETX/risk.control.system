@@ -67,6 +67,8 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
+            user.Updated = DateTime.UtcNow;
+            user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
             result = await userManager.AddToRolesAsync(user, model.UserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName));

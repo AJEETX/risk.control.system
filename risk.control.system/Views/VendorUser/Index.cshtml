@@ -26,7 +26,7 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>
+                                    @*<a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>*@
                                     <a class="btn btn-success" asp-controller="VendorApplicationUsers" asp-action="Create" asp-route-id="@Model.Vendor.VendorId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                                 </div>
                             </div>

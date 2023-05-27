@@ -116,6 +116,9 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PinCode pinCode)
         {
+            pinCode.Updated = DateTime.UtcNow;
+            pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
+
             _context.Add(pinCode);
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("pincode created successfully!");
@@ -157,6 +160,8 @@ namespace risk.control.system.Controllers
             }
             try
             {
+                pinCode.Updated = DateTime.UtcNow;
+                pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Update(pinCode);
                 await _context.SaveChangesAsync();
             }
@@ -208,6 +213,8 @@ namespace risk.control.system.Controllers
             var pinCode = await _context.PinCode.FindAsync(id);
             if (pinCode != null)
             {
+                pinCode.Updated = DateTime.UtcNow;
+                pinCode.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.PinCode.Remove(pinCode);
             }
 

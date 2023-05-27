@@ -18,16 +18,20 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IInboxMailService inboxMailService;
+        private readonly ITrashMailService trashMailService;
         private readonly IToastNotification toastNotification;
         private readonly JsonSerializerOptions options = new()
         {
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
-        public ContactMessageController(ApplicationDbContext context, IInboxMailService inboxMailService, IToastNotification toastNotification)
+        public ContactMessageController(ApplicationDbContext context, IInboxMailService inboxMailService, 
+            ITrashMailService trashMailService,
+            IToastNotification toastNotification)
         {
             _context = context;
             this.inboxMailService = inboxMailService;
+            this.trashMailService = trashMailService;
             this.toastNotification = toastNotification;
         }
 
@@ -41,7 +45,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailboxMessages = await inboxMailService.GetAllUserInboxMessages(userEmail);
+            var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
 
             return View(userMailboxMessages.OrderBy(o=>o.SendDate));
 
@@ -147,9 +151,9 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox.Include(m => m.Trash).FirstOrDefault(c => c.Name == applicationUser.Email);
+            var usertrashMessages = await trashMailService.GetTrashMessages(userEmail);
 
-            return View(userMailbox.Trash.OrderByDescending(o => o.SendDate).ToList());
+            return View(usertrashMessages.OrderByDescending(o => o.SendDate).ToList());
         }
         public async Task<IActionResult> TrashDelete(List<long> messages)
         {
@@ -160,30 +164,8 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                           .Include(m => m.Trash)
-                           .Include(m => m.Deleted)
-                           .FirstOrDefault(c => c.ApplicationUserId == applicationUser.Id);
+            var rows = await trashMailService.TrashDelete(messages, applicationUser.Id);
 
-            var userTrashMails = userMailbox.Trash.Where(d => messages.Contains(d.TrashMessageId)).ToList();
-
-            if (userTrashMails is not null && userTrashMails.Count > 0)
-            {
-                foreach (var message in userTrashMails)
-                {
-                    message.MessageStatus = MessageStatus.TRASHDELETED;
-                    userMailbox.Trash.Remove(message);
-                    if(message.Attachment?.Length>0)
-                    {
-                        //TO-DO
-                    }
-                    var jsonMessage = JsonSerializer.Serialize(message, options);
-                    DeletedMessage deletedMessage = JsonSerializer.Deserialize<DeletedMessage>(jsonMessage, options);
-                    userMailbox.Deleted.Add(deletedMessage);
-                }
-            }
-            _context.Mailbox.Update(userMailbox);
-            var rows = await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage($" {messages.Count} mail(s) deleted permanently successfully!");
 
             return RedirectToAction(nameof(Trash));
@@ -202,14 +184,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                .Include(m => m.Trash)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
-
-            var userMessage = userMailbox.Trash.FirstOrDefault(c => c.TrashMessageId == id);
-            userMessage.Read = true;
-            _context.Mailbox.Update(userMailbox);
-            var rows = await _context.SaveChangesAsync();
+            var userMessage = await trashMailService.GetTrashMessagedetail(id, userEmail);
             return View(userMessage);
         }
         public async Task<IActionResult> TrashDetailsDelete(long id)
@@ -221,23 +196,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                .Include(m => m.Trash)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
-
-            var userTrashMessage = userMailbox.Trash.FirstOrDefault(c => c.TrashMessageId == id);
-
-            if (userTrashMessage is not null)
-            {
-                userTrashMessage.MessageStatus = MessageStatus.TRASHDELETED;
-                userMailbox.Trash.Remove(userTrashMessage);
-                var jsonMessage = JsonSerializer.Serialize(userTrashMessage, options);
-                DeletedMessage trashMessage = JsonSerializer.Deserialize<DeletedMessage>(jsonMessage, options);
-                userMailbox.Deleted.Add(trashMessage);
-            }
-
-            _context.Mailbox.Update(userMailbox);
-            var rows = await _context.SaveChangesAsync();
+           var rows = await trashMailService.TrashDetailsDelete(id, userEmail);
             toastNotification.AddSuccessToastMessage($" {rows} mail deleted permanently successfully!");
 
             return RedirectToAction(nameof(Trash));

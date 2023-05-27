@@ -113,6 +113,8 @@ namespace risk.control.system.Controllers
         {
             if (district is not null)
             {
+                district.Updated = DateTime.UtcNow;
+                district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(district);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("district created successfully!");
@@ -159,6 +161,8 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    district.Updated = DateTime.UtcNow;
+                    district.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(district);
                     await _context.SaveChangesAsync();
                 }
@@ -215,6 +219,8 @@ namespace risk.control.system.Controllers
             var district = await _context.District.FindAsync(id);
             if (district != null)
             {
+                district.Updated = DateTime.UtcNow;
+                district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.District.Remove(district);
             }
             

@@ -60,6 +60,8 @@ namespace risk.control.system.Controllers
         {
             if (caseEnabler is not null)
             {
+                caseEnabler.Updated = DateTime.UtcNow;
+                caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(caseEnabler);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("case enabler created successfully!");
@@ -100,6 +102,8 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    caseEnabler.Updated = DateTime.UtcNow;
+                    caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(caseEnabler);
                     await _context.SaveChangesAsync();
                 }
@@ -150,6 +154,8 @@ namespace risk.control.system.Controllers
             var caseEnabler = await _context.CaseEnabler.FindAsync(id);
             if (caseEnabler != null)
             {
+                caseEnabler.Updated = DateTime.UtcNow;
+                caseEnabler.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.CaseEnabler.Remove(caseEnabler);
             }
 

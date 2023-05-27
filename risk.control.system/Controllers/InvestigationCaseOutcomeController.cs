@@ -60,6 +60,8 @@ namespace risk.control.system.Controllers
         {
             if (investigationCaseOutcome is not null)
             {
+                investigationCaseOutcome.Updated = DateTime.UtcNow;
+                investigationCaseOutcome.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(investigationCaseOutcome);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("case outcome created successfully!");
@@ -100,6 +102,8 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    investigationCaseOutcome.Updated = DateTime.UtcNow;
+                    investigationCaseOutcome.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Update(investigationCaseOutcome);
                     await _context.SaveChangesAsync();
                 }
@@ -150,6 +154,8 @@ namespace risk.control.system.Controllers
             var investigationCaseOutcome = await _context.InvestigationCaseOutcome.FindAsync(id);
             if (investigationCaseOutcome != null)
             {
+                investigationCaseOutcome.Updated = DateTime.UtcNow;
+                investigationCaseOutcome.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.InvestigationCaseOutcome.Remove(investigationCaseOutcome);
             }
 

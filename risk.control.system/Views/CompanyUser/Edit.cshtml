@@ -16,7 +16,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                    <input type="hidden" asp-for="ClientCompanyId" />
+                                    <input type="hidden" asp-for="Id" />
                                     <div class="form-group hide-id">
                                         <label asp-for="ClientCompany" class="control-label"></label>
                                         <input asp-for="ClientCompanyId" class="form-control" value="@Model.ClientCompany.ClientCompanyId" />
@@ -98,15 +98,8 @@
 
                                     <div class="form-group">
                                         <label asp-for="ProfilePicture" class="control-label"></label>
-                                        @if (Model?.ProfilePicture is not null)
-                                        {
-                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                        <input asp-for="ProfilePicture" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
+                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                     <div class="form-group text-right">
                                         <a asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">

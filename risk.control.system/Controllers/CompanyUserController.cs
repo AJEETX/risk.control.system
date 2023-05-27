@@ -187,7 +187,8 @@ namespace risk.control.system.Controllers
                     await clientCompanyApplicationUser.ProfileImage.CopyToAsync(dataStream);
                     clientCompanyApplicationUser.ProfilePicture = dataStream.ToArray();
                 }
-
+                clientCompanyApplicationUser.Updated = DateTime.UtcNow;
+                clientCompanyApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(clientCompanyApplicationUser);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("company user created successfully!");
@@ -232,34 +233,66 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, ClientCompanyApplicationUser clientCompanyApplicationUser)
+        public async Task<IActionResult> Edit(string id, ClientCompanyApplicationUser applicationUser)
         {
-            if (id != clientCompanyApplicationUser.Id)
+            if (id != applicationUser.Id.ToString())
             {
                 toastNotification.AddErrorToastMessage("company not found!");
                 return NotFound();
             }
 
-            if (clientCompanyApplicationUser is not null)
+            if (applicationUser is not null)
             {
                 try
                 {
-                    clientCompanyApplicationUser.Mailbox.Name = clientCompanyApplicationUser.Email;
-                    IFormFile? vendorUserProfile = Request.Form?.Files?.FirstOrDefault();
-                    if (vendorUserProfile is not null)
+                    var user = await userManager.FindByIdAsync(id);
+                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
-                        clientCompanyApplicationUser.ProfileImage = vendorUserProfile;
-                        using var dataStream = new MemoryStream();
-                        await clientCompanyApplicationUser.ProfileImage.CopyToAsync(dataStream);
-                        clientCompanyApplicationUser.ProfilePicture = dataStream.ToArray();
+                        string newFileName = Guid.NewGuid().ToString();
+                        string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                        applicationUser.ProfilePictureUrl = "upload/" + newFileName;
                     }
 
-                    _context.ClientCompanyApplicationUser.Update(clientCompanyApplicationUser);
-                    await _context.SaveChangesAsync();
+                    if (user != null)
+                    {
+                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
+                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                        user.FirstName = applicationUser?.FirstName;
+                        user.LastName = applicationUser?.LastName;
+                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
+                        {
+                            user.Password = applicationUser.Password;
+                        }
+                        user.Email = applicationUser.Email;
+                        user.UserName = applicationUser.UserName;
+                        user.Country = applicationUser.Country;
+                        user.CountryId = applicationUser.CountryId;
+                        user.State = applicationUser.State;
+                        user.StateId = applicationUser.StateId;
+                        user.PinCode = applicationUser.PinCode;
+                        user.PinCodeId = applicationUser.PinCodeId;
+                        user.Updated = DateTime.UtcNow;
+                        user.Comments = applicationUser.Comments;
+                        user.PhoneNumber = applicationUser.PhoneNumber;
+                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                        user.SecurityStamp = DateTime.UtcNow.ToString();
+                        var result = await userManager.UpdateAsync(user);
+                        if (result.Succeeded)
+                        {
+                            toastNotification.AddSuccessToastMessage("Company user edited successfully!");
+                            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
+                        }
+                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+                        Errors(result);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VendorApplicationUserExists(clientCompanyApplicationUser.Id))
+                    if (!VendorApplicationUserExists(applicationUser.Id))
                     {
                         return NotFound();
                     }
@@ -268,14 +301,17 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("vendor user edited successfully!");
-                return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = clientCompanyApplicationUser.ClientCompanyId });
+                
             }
 
-            toastNotification.AddErrorToastMessage("Error to create vendor user!");
-            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = clientCompanyApplicationUser.ClientCompany });
+            toastNotification.AddErrorToastMessage("Error to create Company user!");
+            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompany });
         }
-
+        private void Errors(IdentityResult result)
+        {
+            foreach (IdentityError error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+        }
         // GET: VendorApplicationUsers/Delete/5
         public async Task<IActionResult> Delete(long? id)
         {
@@ -311,6 +347,8 @@ namespace risk.control.system.Controllers
             var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(id);
             if (clientCompanyApplicationUser != null)
             {
+                clientCompanyApplicationUser.Updated = DateTime.UtcNow;
+                clientCompanyApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompanyApplicationUser.Remove(clientCompanyApplicationUser);
             }
 

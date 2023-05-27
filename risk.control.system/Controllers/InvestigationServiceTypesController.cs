@@ -61,6 +61,8 @@ namespace risk.control.system.Controllers
         {
             if (investigationServiceType is not null)
             {
+                investigationServiceType.Updated = DateTime.UtcNow;
+                investigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(investigationServiceType);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("service type created successfully!");
@@ -107,6 +109,9 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    investigationServiceType.Updated = DateTime.UtcNow;
+                    investigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+
                     _context.Update(investigationServiceType);
                     await _context.SaveChangesAsync();
                 }
@@ -163,6 +168,9 @@ namespace risk.control.system.Controllers
             var investigationServiceType = await _context.InvestigationServiceType.FindAsync(id);
             if (investigationServiceType != null)
             {
+                investigationServiceType.Updated = DateTime.UtcNow;
+                investigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+
                 _context.InvestigationServiceType.Remove(investigationServiceType);
             }
 

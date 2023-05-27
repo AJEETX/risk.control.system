@@ -133,6 +133,8 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureUrl = "upload/" + newFileName;
             }
             user.Mailbox = new Mailbox { Name = user.Email };
+            user.Updated = DateTime.UtcNow;
+            user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
@@ -163,6 +165,7 @@ namespace risk.control.system.Controllers
 
             var applicationUser = await userManager.FindByIdAsync(userId);
             GetCountryStateEdit(applicationUser);
+
             if (applicationUser != null)
                 return View(applicationUser);
             else
@@ -177,6 +180,8 @@ namespace risk.control.system.Controllers
             var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Id.ToString() == id);
             if (user is not null)
             {
+                user.Updated = DateTime.UtcNow;
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.ProfilePictureUrl = null;
                 await context.SaveChangesAsync();
                 return Ok(new { message = "succes", succeeded = true });
@@ -228,6 +233,9 @@ namespace risk.control.system.Controllers
                         user.StateId = applicationUser.StateId;
                         user.PinCode = applicationUser.PinCode;
                         user.PinCodeId = applicationUser.PinCodeId;
+                        user.Updated = DateTime.UtcNow;
+                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                        user.SecurityStamp = DateTime.UtcNow.ToString();
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {

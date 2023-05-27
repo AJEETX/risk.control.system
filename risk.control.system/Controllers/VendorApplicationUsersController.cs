@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +17,18 @@ namespace risk.control.system.Controllers
     public class VendorApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
 
-        public VendorApplicationUsersController(ApplicationDbContext context, IToastNotification toastNotification)
+        public VendorApplicationUsersController(ApplicationDbContext context, 
+            UserManager<VendorApplicationUser> userManager,
+            IWebHostEnvironment webHostEnvironment,
+            IToastNotification toastNotification)
         {
             _context = context;
+            this.userManager = userManager;
+            this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
         }
 
@@ -66,30 +76,41 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(VendorApplicationUser vendorApplicationUser)
+        public async Task<IActionResult> Create(VendorApplicationUser user)
         {
-
-            if (vendorApplicationUser is not null)
+            if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                vendorApplicationUser.Mailbox.Name = vendorApplicationUser.Email;
-                IFormFile? vendorUserProfile = Request.Form?.Files?.FirstOrDefault();
-                if (vendorUserProfile is not null)
-                {
-                    vendorApplicationUser.ProfileImage = vendorUserProfile;
-                    using var dataStream = new MemoryStream();
-                    await vendorApplicationUser.ProfileImage.CopyToAsync(dataStream);
-                    vendorApplicationUser.ProfilePicture = dataStream.ToArray();
-                }
-
-                _context.Add(vendorApplicationUser);
-                await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("vendor user created successfully!");
-                return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = vendorApplicationUser.VendorId });
+                string newFileName = Guid.NewGuid().ToString();
+                string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
+                newFileName += fileExtension;
+                var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                user.ProfilePictureUrl = "upload/" + newFileName;
             }
-            toastNotification.AddErrorToastMessage("Error to create vendor user!");
-            return Problem();
-        }
+            user.Mailbox = new Mailbox { Name = user.Email };
+            user.Updated = DateTime.UtcNow;
+            user.UpdatedBy = HttpContext.User?.Identity?.Name;
+            IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
+            if (result.Succeeded)
+                return RedirectToAction(nameof(Index));
+            else
+            {
+                toastNotification.AddErrorToastMessage("Error to create user!");
+                foreach (IdentityError error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+            }
+            GetCountryStateEdit(user);
+            toastNotification.AddSuccessToastMessage("user created successfully!");
+            return View(user);
+        }
+        private void GetCountryStateEdit(VendorApplicationUser? user)
+        {
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", user?.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
+            ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
+        }
         // GET: VendorApplicationUsers/Edit/5
         public async Task<IActionResult> Edit(long? userId)
         {
@@ -99,7 +120,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
+            var vendorApplicationUser = _context.VendorApplicationUser.Include(v=>v.Mailbox).Where(v=>v.Id == userId)?.FirstOrDefault();
             if (vendorApplicationUser == null)
             {
                 toastNotification.AddErrorToastMessage("user not found!");
@@ -125,34 +146,60 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, VendorApplicationUser vendorApplicationUser)
+        public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
         {
-            if (id != vendorApplicationUser.Id)
-            {
-                toastNotification.AddErrorToastMessage("user not found!");
-                return NotFound();
-            }
-
-            if (vendorApplicationUser is not null)
+            if (applicationUser is not null)
             {
                 try
                 {
-                    vendorApplicationUser.Mailbox.Name = vendorApplicationUser.Email;
-                    IFormFile? vendorUserProfile = Request.Form?.Files?.FirstOrDefault();
-                    if (vendorUserProfile is not null)
+                    var user = await userManager.FindByIdAsync(id);
+                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
-                        vendorApplicationUser.ProfileImage = vendorUserProfile;
-                        using var dataStream = new MemoryStream();
-                        await vendorApplicationUser.ProfileImage.CopyToAsync(dataStream);
-                        vendorApplicationUser.ProfilePicture = dataStream.ToArray();
+                        string newFileName = Guid.NewGuid().ToString();
+                        string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                        applicationUser.ProfilePictureUrl = "upload/" + newFileName;
                     }
 
-                    _context.Update(vendorApplicationUser);
-                    await _context.SaveChangesAsync();
+                    if (user != null)
+                    {
+                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
+                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                        user.FirstName = applicationUser?.FirstName;
+                        user.LastName = applicationUser?.LastName;
+                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
+                        {
+                            user.Password = applicationUser.Password;
+                        }
+                        user.Email = applicationUser.Email;
+                        user.UserName = applicationUser.UserName;
+                        user.Country = applicationUser.Country;
+                        user.CountryId = applicationUser.CountryId;
+                        user.State = applicationUser.State;
+                        user.StateId = applicationUser.StateId;
+                        user.PinCode = applicationUser.PinCode;
+                        user.PinCodeId = applicationUser.PinCodeId;
+                        user.Updated = DateTime.UtcNow;
+                        user.Comments = applicationUser.Comments;
+                        user.PhoneNumber = applicationUser.PhoneNumber;
+                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                        user.SecurityStamp = DateTime.UtcNow.ToString();
+                        var result = await userManager.UpdateAsync(user);
+                        if (result.Succeeded)
+                        {
+                            toastNotification.AddSuccessToastMessage("vendor user edited successfully!");
+                            return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
+                        }
+                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+                        Errors(result);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VendorApplicationUserExists(vendorApplicationUser.Id))
+                    if (!VendorApplicationUserExists(applicationUser.Id))
                     {
                         return NotFound();
                     }
@@ -161,12 +208,11 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("vendor user edited successfully!");
-                return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = vendorApplicationUser.VendorId });
+                
             }
 
             toastNotification.AddErrorToastMessage("Error to create vendor user!");
-            return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = vendorApplicationUser.VendorId });
+            return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
         }
 
         // GET: VendorApplicationUsers/Delete/5
@@ -204,13 +250,19 @@ namespace risk.control.system.Controllers
             var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(id);
             if (vendorApplicationUser != null)
             {
+                vendorApplicationUser.Updated = DateTime.UtcNow;
+                vendorApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.VendorApplicationUser.Remove(vendorApplicationUser);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        private void Errors(IdentityResult result)
+        {
+            foreach (IdentityError error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+        }
         private bool VendorApplicationUserExists(long id)
         {
             return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();

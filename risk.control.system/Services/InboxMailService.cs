@@ -10,7 +10,7 @@ namespace risk.control.system.Services
 {
     public interface IInboxMailService
     {
-        Task<IEnumerable<InboxMessage>> GetAllUserInboxMessages(string userEmail);
+        Task<IEnumerable<InboxMessage>> GetInboxMessages(string userEmail);
         Task<int> InboxDelete(List<long> messages, long userId);
         Task<InboxMessage> GetInboxMessagedetail(long messageId, string userEmail);
         Task<OutboxMessage> GetInboxMessagedetailReply(long messageId, string userEmail, string actiontype);
@@ -32,7 +32,7 @@ namespace risk.control.system.Services
         {
             this._context = context;
         }
-        public async Task<IEnumerable<InboxMessage>> GetAllUserInboxMessages(string userEmail)
+        public async Task<IEnumerable<InboxMessage>> GetInboxMessages(string userEmail)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmail);
             return userMailbox.Inbox.OrderByDescending(o => o.SendDate).ToList();
@@ -194,8 +194,8 @@ namespace risk.control.system.Services
             var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
 
             contactMessage.Read = false;
-            contactMessage.SendDate = DateTime.Now;
-            contactMessage.Updated = DateTime.Now;
+            contactMessage.SendDate = DateTime.UtcNow;
+            contactMessage.Updated = DateTime.UtcNow;
             contactMessage.UpdatedBy = userEmail;
             contactMessage.SenderEmail = userEmail;
             if (recepientMailbox is not null)

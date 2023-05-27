@@ -46,6 +46,8 @@ namespace risk.control.system.Controllers
                     await clientCompany.Document.CopyToAsync(dataStream);
                     clientCompany.DocumentImage = dataStream.ToArray();
                 }
+                clientCompany.Updated = DateTime.UtcNow;
+                clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(clientCompany);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("client company created successfully!");
@@ -91,6 +93,8 @@ namespace risk.control.system.Controllers
             var clientCompany = await _context.ClientCompany.FindAsync(id);
             if (clientCompany != null)
             {
+                clientCompany.Updated = DateTime.UtcNow;
+                clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Remove(clientCompany);
             }
 
@@ -179,6 +183,8 @@ namespace risk.control.system.Controllers
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                         }
                     }
+                    clientCompany.Updated = DateTime.UtcNow;
+                    clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(clientCompany);
                     await _context.SaveChangesAsync();
                 }
@@ -434,6 +440,8 @@ namespace risk.control.system.Controllers
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.PincodeServices);
                     company.EmpanelledVendors.AddRange(empanelledVendors);
+                    company.Updated = DateTime.UtcNow;
+                    company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
                     toastNotification.AddSuccessToastMessage("Vendor(s) empanel successful!");
@@ -478,6 +486,8 @@ namespace risk.control.system.Controllers
                         company.EmpanelledVendors.Remove(v);
                     }
                     _context.ClientCompany.Update(company);
+                    company.Updated = DateTime.UtcNow;
+                    company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     var savedRows = await _context.SaveChangesAsync();
                     toastNotification.AddSuccessToastMessage("Vendor(s) depanel sucessful!");
                     try

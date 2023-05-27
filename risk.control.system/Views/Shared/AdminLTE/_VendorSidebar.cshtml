@@ -205,7 +205,7 @@
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","")
-                                    @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                                            @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.ADMIN_SETTINGS
@@ -213,11 +213,28 @@
                                 </p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a is-active-page asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="actual-link nav-link @Url.MakeActiveClass("VendorUser","")">
+                            <a is-active-page asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.VendorId" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Details")   @Url.MakeActiveClass("Vendors","Edit")">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.VENDOR_USERS
+                                    @Applicationsettings.MANAGE_VENDOR_PROFILE
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Service") @Url.MakeActiveClass("VendorService","")">
+                                <i class="fas fa-user-friends nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.MANAGE_SERVICE
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="actual-link nav-link @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+                                <i class="fas fa-user-friends nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.MANAGE_USERS
                                 </p>
                             </a>
                         </li>

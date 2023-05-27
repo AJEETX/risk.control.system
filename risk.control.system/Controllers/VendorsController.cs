@@ -157,7 +157,8 @@ namespace risk.control.system.Controllers
                         await vendor.Document.CopyToAsync(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
                     }
-
+                    vendor.Updated = DateTime.UtcNow;
+                    vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Add(vendor);
                     await _context.SaveChangesAsync();
                     toastNotification.AddSuccessToastMessage("vendor created successfully!");
@@ -225,6 +226,8 @@ namespace risk.control.system.Controllers
                             vendor.DocumentImage = existingVendor.DocumentImage;
                         }
                     }
+                    vendor.Updated = DateTime.UtcNow;
+                    vendor.UpdatedBy= HttpContext.User?.Identity?.Name;
                     _context.Vendor.Update(vendor);
                     await _context.SaveChangesAsync();
                 }
@@ -240,7 +243,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 toastNotification.AddSuccessToastMessage("vendor edited successfully!");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(VendorsController.Details), "Vendors", new {id= id});
             }
             return Problem();
         }
@@ -279,6 +282,8 @@ namespace risk.control.system.Controllers
             var vendor = await _context.Vendor.FindAsync(id);
             if (vendor != null)
             {
+                vendor.Updated = DateTime.UtcNow;
+                vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Vendor.Remove(vendor);
             }
 

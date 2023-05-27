@@ -84,7 +84,9 @@ namespace risk.control.system.Controllers
                     VendorInvestigationServiceType = vendorInvestigationServiceType,
                 }).ToList();
                 vendorInvestigationServiceType.PincodeServices = servicePinCodes;
-
+                vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+                vendorInvestigationServiceType.Created = DateTime.UtcNow;
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("service created successfully!");
@@ -135,20 +137,15 @@ namespace risk.control.system.Controllers
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
             ViewData["DistrictId"] = new SelectList(_context.District.Where(d => d.State.StateId == vendorInvestigationServiceType.StateId), "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", vendorInvestigationServiceType.CountryId);
-
-            var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
-            services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
-
-            //ViewData["PinCodeId"] = _context.PinCode.Select(p => new SelectListItem { Text = p.Code, Value = p.PinCodeId }).ToList();
-
-            //ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(p => p.State.StateId == vendorInvestigationServiceType.StateId), "PinCodeId", "Code", selected);
-
             ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
                 .Select(x => new SelectListItem
                 {
                     Text = x.Name + " - " + x.Code,
                     Value = x.PinCodeId.ToString()
                 }).ToList();
+
+            var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
+            services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
 
             return View(services);
         }
@@ -185,7 +182,8 @@ namespace risk.control.system.Controllers
                         _context.ServicedPinCode.AddRange(pinCodesWithId);
 
                         vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
-
+                        vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                        vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                         _context.Update(vendorInvestigationServiceType);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage("service updated successfully!");
@@ -249,6 +247,8 @@ namespace risk.control.system.Controllers
             var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
             if (vendorInvestigationServiceType != null)
             {
+                vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
             }
 

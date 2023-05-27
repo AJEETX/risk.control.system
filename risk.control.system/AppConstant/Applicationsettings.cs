@@ -77,6 +77,7 @@
         public const string CREATE_SELECTED_CASES = "Create selected cases";
 
         public const string MANAGE_COMPANY_VENDOR = "Manage company vendor";
+        public const string MANAGE_VENDOR_PROFILE = "Manage Vendor Profile";
         public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Select Verification location to allocate to vendor";
         public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "Select Claim case to allocate to vendor";
         public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Select Claim case to assign to agent";
@@ -85,12 +86,12 @@
         public const string SELECT_TO_DEPANEL_VENDORS = "Select to Depanel vendors";
         public const string MANAGE_VENDOR_USER = "Manage vendor user";
         public const string EDIT_VENDOR = "Edit vendor";
-        public const string MANAGE_USERS = "Manage user";
+        public const string PROFILE = "Profile";
+        public const string MANAGE_USERS = "Manage users";
         public const string AUDIT_LOG = "Audit log";
 
         public const string MANAGE_SERVICE = "Manage service";
         public const string ADD_SERVICE = "Add service";
-        public const string PROFILE = "Profile";
         public const string MULTIPLE_UPLOAD = "Multi-Upload";
         public const string PINCODE_UPLOAD = "Pincode upload";
         public const string PINCODE_SAMPLE = "Upload sample file to upload in csv format";
