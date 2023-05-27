@@ -200,7 +200,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 toastNotification.AddSuccessToastMessage("client company edited successfully!");
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ClientCompanyController.Details),"ClientCompany", new { id = clientCompany.ClientCompanyId});
             }
             toastNotification.AddErrorToastMessage("Error to edit client company!");
             return Problem();

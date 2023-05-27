@@ -55,7 +55,6 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        // GET: ClaimsInvestigation
         public async Task<IActionResult> Index()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -73,14 +72,76 @@ namespace risk.control.system.Controllers
 
             ViewBag.HasClientCompany = true;
             ViewBag.HasVendorCompany = true;
+
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                ViewBag.HasClientCompany = false;
+                ViewBag.HasVendorCompany = false;
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+                ViewBag.HasVendorCompany = false;
+            }
+            else if (companyUser != null && vendorUser != null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId && i.VendorId == vendorUser.VendorId);
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId ||
+                a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
+                return View(await applicationDbContext.ToListAsync());
+            }
+            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && a.CaseLocations.Count > 0);
+                return View(await applicationDbContext.ToListAsync());
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
+                return View("Assigner", await applicationDbContext.ToListAsync());
+            }
+            return View(await applicationDbContext.ToListAsync());
+        }
+        // GET: ClaimsInvestigation
+        public async Task<IActionResult> Draft()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State);
+
+            ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
@@ -113,7 +174,7 @@ namespace risk.control.system.Controllers
             }
             if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId);
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && a.CaseLocations.Count == 0);
                 return View(await applicationDbContext.ToListAsync());
             }
             else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
@@ -121,17 +182,6 @@ namespace risk.control.system.Controllers
                 applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
                 return View("Assigner", await applicationDbContext.ToListAsync());
             }
-            else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()) || userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
-                return View("Vendor", await applicationDbContext.ToListAsync());
-            }
-            else if (userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
-                return View("VendorAgent", await applicationDbContext.ToListAsync());
-            }
-
             return View(await applicationDbContext.ToListAsync());
         }
         [HttpGet]
@@ -349,7 +399,8 @@ namespace risk.control.system.Controllers
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => 
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId);
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId 
+                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
             }
             else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
             {
@@ -514,7 +565,7 @@ namespace risk.control.system.Controllers
 
                 toastNotification.AddSuccessToastMessage("case(s) created successfully!");
 
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Draft));
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);

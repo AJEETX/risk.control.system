@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230525142115_Init2")]
-    partial class Init2
+    [Migration("20230527101343_Ddl")]
+    partial class Ddl
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -502,8 +502,8 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("CustomerDateOfBirth")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CustomerEducation")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("CustomerEducation")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("CustomerIncome")
                         .HasColumnType("INTEGER");
@@ -511,8 +511,8 @@ namespace risk.control.system.Migrations
                     b.Property<string>("CustomerName")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CustomerOccupation")
-                        .HasColumnType("TEXT");
+                    b.Property<int?>("CustomerOccupation")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("CustomerType")
                         .HasColumnType("INTEGER");

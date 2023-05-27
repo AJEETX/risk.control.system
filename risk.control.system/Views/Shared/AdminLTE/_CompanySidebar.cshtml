@@ -183,14 +183,39 @@
                         </p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
-                        <i class="fas fa-rupee-sign nav-icon"></i>
-                        <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">new</span>
-                        </p>
-                    </a>
-                </li>
+                @{
+                    if (User.IsInRole(AppRoles.ClientAdmin.ToString()) || User.IsInRole(AppRoles.ClientCreator.ToString()))
+                    {
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft") @Url.MakeActiveClass("ClaimsInvestigation","Details")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">incomplete...</span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">ready to assign</span>
+                                </p>
+                            </a>
+                        </li>
+                    }
+                    if (User.IsInRole(AppRoles.ClientAdmin.ToString()) || User.IsInRole(AppRoles.ClientAssigner.ToString()))
+                    {
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">ready to allocate</span>
+                                </p>
+                            </a>
+                        </li>
+                    }
+                }
+                
                 <li class="nav-item">
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Open")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
@@ -215,7 +240,7 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Details")
-                                    @Url.MakeActiveClass("CompanyUserRoles","")">
+                                        @Url.MakeActiveClass("ClientCompany","Edit") @Url.MakeActiveClass("CompanyUserRoles","")">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>
                                     @Applicationsettings.CLIENT_COMPANIY_PROFILE

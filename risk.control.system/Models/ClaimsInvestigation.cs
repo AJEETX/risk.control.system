@@ -81,13 +81,6 @@ namespace risk.control.system.Models
         public string? DistrictId { get; set; } = default!;
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
-        [Display(Name = "Customer income")]
-        public int? CustomerIncome { get; set; }
-        [Display(Name = "Customer occupation")]
-        public string? CustomerOccupation { get; set; }
-        [Display(Name = "Customer education")]
-        public string? CustomerEducation { get; set; }
-
         [Display(Name = "Customer type")]
         public CustomerType? CustomerType { get; set; }
         [Display(Name = "Cost centre")]
@@ -112,8 +105,65 @@ namespace risk.control.system.Models
         {
             return $"Case Id: {ClaimsInvestigationId}, <br /> ClaimType: {ClaimType}";
         }
+        [Display(Name = "Customer income")]
+        public Income? CustomerIncome { get; set; }
+        [Display(Name = "Customer occupation")]
+        public Occupation? CustomerOccupation { get; set; }
+        [Display(Name = "Customer education")]
+        public Education? CustomerEducation { get; set; }
+    }
+    public enum Income
+    {
+        [Display(Name = "UNKNOWN")]
+        UNKNOWN,
+        [Display(Name = "0.0")]
+        NO_INCOME,
+        [Display(Name = "0 -2.5 Lac")]
+        TAXFREE_SLOT,
+        [Display(Name = "2.5 - 5 Lac")]
+        BASIC_INCOME,
+        [Display(Name = "5 -8 Lac")]
+        MEDIUUM_INCOME,
+        [Display(Name = "8 - 15 Lac")]
+        UPPER_INCOME,
+        [Display(Name = "15 -30 Lac")]
+        HIGHER_INCOME,
+        [Display(Name = "30 -50 Lac")]
+        TOP_HIGHER_INCOME,
+        [Display(Name = "50 + Lac")]
+        PREMIUM_INCOME,
     }
 
+    public enum Occupation
+    {
+        UNKNOWN,
+        [Display(Name = "UNEMPLOYED")]
+        UNEMPLOYED,
+        [Display(Name = "DOCTOR")]
+        DOCTOR,
+        [Display(Name = "ENGINEER")]
+        ENGINEER,
+        [Display(Name = "ACCOUNTANT")]
+        ACCOUNTANT,
+        [Display(Name = "SELF EMPLOYED")]
+        SELF_EMPLOYED,
+        [Display(Name = "OTHER")]
+        OTHER
+    }
+    public enum Education
+    {
+        [Display(Name = "PRIMARY SCHOOL")]
+        PRIMARY_SCHOOL,
+        [Display(Name = "HIGH SCHOOL")]
+        HIGH_SCHOOL,
+        [Display(Name = "12th Class")]
+        CLASS_12,
+        [Display(Name = "GRADUATE")]
+        GRADUATE,
+        [Display(Name = "PROFESSIONAL")]
+        PROFESSIONAL,
+
+    }
     public class VerificationLocation
     {
         [Key]

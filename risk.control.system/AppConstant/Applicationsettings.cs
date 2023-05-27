@@ -81,6 +81,7 @@
         public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Select Verification location to allocate to vendor";
         public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "Select Claim case to allocate to vendor";
         public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Select Claim case to assign to agent";
+        public const string SELECT_CASE_TO_START = "Select Claim case to Verify";
         public const string AVAILABLE_VENDORS = "Available vendors";
         public const string DEPANEL_VENDORS = "Go to Depanel vendors";
         public const string SELECT_TO_DEPANEL_VENDORS = "Select to Depanel vendors";
@@ -113,9 +114,10 @@
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
         public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
         public const string INVESTIGATION_CASE_STATUS = "Case status";
-        public const string INVESTIGATION_CLAIMS = "Claim";
-        public const string INVESTIGATION_CLAIMS_CASE= "Claim case";
-        public const string INVESTIGATION_CLAIMS_OPEN = "Claim case open";
+        public const string INVESTIGATION_CLAIMS_CASE = "Claim";
+        public const string INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN= "Claim (ready to assign)";
+        public const string INVESTIGATION_CLAIMS_CASE_DRAFT= "Claim case (incomplete)";
+        public const string INVESTIGATION_CLAIMS_OPEN = "Claim case (open)";
         public const string INVESTIGATION_CLAIMS_CASE_DETAILS = "Claim case details";
         public const string CUSTOMER_DETAILS = "Customer details";
         public const string BENEFICIARY_DETAILS = "Beneficiary details";

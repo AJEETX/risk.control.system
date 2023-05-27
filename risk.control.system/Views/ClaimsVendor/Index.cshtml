@@ -11,7 +11,7 @@
                 <form asp-action="index">
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_CASE</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
@@ -23,14 +23,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Uploads"><i class="fas fa-plus"></i> @Applicationsettings.UPLOAD_CASE</button>
-                                    <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </form>
             </div>
@@ -39,10 +31,10 @@
             <div class="col-md-12">
                 <div class="card card-success card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">@Applicationsettings.INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN List</h3>
+                        <h3 class="card-title">Allocated Claims cases</h3>
                     </div>
                     <div class="card-body p-0 contained-width">
-                        <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
+                        <form id="radioButtons" asp-action="AllocateToAgent" method="get" enctype="multipart/form-data">
                             <div class="col-md-12">
                                 @if (Model.Count() == 0)
                                 {
@@ -55,7 +47,7 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th><input type="checkbox" id="checkall" /></th>
+                                                <th></th>
                                                 <th style="display:@hasClientCompany">
                                                     @Html.DisplayNameFor(model => model.ClientCompany)
                                                 </th>
@@ -112,7 +104,7 @@
                                             {
                                                 <tr>
                                                     <td>
-                                                        <input id="@item.ClaimsInvestigationId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationId" checked="@item.SelectedToAssign" />
+                                                        <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
                                                     </td>
                                                     <td style="display:@hasClientCompany">
                                                         @Html.DisplayFor(modelItem => item.ClientCompany.Name)
@@ -165,12 +157,6 @@
                                                     <td>
                                                         <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
                                                             <i class="fa fa-search"></i> @Applicationsettings.DETAILS
-                                                        </a> &nbsp;
-                                                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClaimsInvestigationId">
-                                                            <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                                        </a> &nbsp;
-                                                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClaimsInvestigationId">
-                                                            <i class="fas fa-trash"></i> @Applicationsettings.DELETE
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -183,8 +169,9 @@
                                                         <i class="fa fa-window-close"></i>
                                                         @Applicationsettings.CANCEL
                                                     </a>
-                                                    <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
-                                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.ASSIGN
+                                                    <button disabled type="submit" class="btn btn-success">
+                                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i>
+                                                        @Applicationsettings.SELECT_CASE_TO_ASSIGN_TO_AGENT
                                                     </button>
                                                 </td>
                                             </tr>

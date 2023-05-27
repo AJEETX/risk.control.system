@@ -11,7 +11,7 @@
                 <form asp-action="index">
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_CASE</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.ALLOCATE_TO_VENDOR</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
@@ -39,7 +39,7 @@
             <div class="col-md-12">
                 <div class="card card-success card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">Claims to Allocate</h3>
+                        <h3 class="card-title">@Applicationsettings.ALLOCATE_TO_VENDOR List</h3>
                     </div>
                     <div class="card-body p-0 contained-width">
                         <form id="radioButtons" asp-action="AllocateToVendor" method="get" enctype="multipart/form-data">

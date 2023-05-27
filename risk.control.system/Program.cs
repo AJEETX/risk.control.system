@@ -37,7 +37,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=sidebar-12-15-27-May.db"));
+                    options.UseSqlite("Data Source=sidebar-21-15-27-May.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {

@@ -73,14 +73,13 @@ namespace risk.control.system.Services
 
         public async Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument)
         {
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
             if (claimsInvestigation is not null)
             {
                 try
                 {
                     claimsInvestigation.Updated = DateTime.UtcNow;
-                    claimsInvestigation.UpdatedBy = applicationUser.Email;
-                    claimsInvestigation.CurrentUserEmail = applicationUser.Email;
+                    claimsInvestigation.UpdatedBy = userEmail;
+                    claimsInvestigation.CurrentUserEmail = userEmail;
                     claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
                     claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
                     if (claimDocument is not null)

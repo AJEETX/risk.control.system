@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class Ddl : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -935,15 +935,15 @@ namespace risk.control.system.Migrations
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
                     DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    CustomerIncome = table.Column<int>(type: "INTEGER", nullable: true),
-                    CustomerOccupation = table.Column<string>(type: "TEXT", nullable: true),
-                    CustomerEducation = table.Column<string>(type: "TEXT", nullable: true),
                     CustomerType = table.Column<int>(type: "INTEGER", nullable: true),
                     CostCentreId = table.Column<string>(type: "TEXT", nullable: true),
                     CaseEnablerId = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
                     Comments = table.Column<string>(type: "TEXT", nullable: true),
                     CurrentUserEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    CustomerIncome = table.Column<int>(type: "INTEGER", nullable: true),
+                    CustomerOccupation = table.Column<int>(type: "INTEGER", nullable: true),
+                    CustomerEducation = table.Column<int>(type: "INTEGER", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)

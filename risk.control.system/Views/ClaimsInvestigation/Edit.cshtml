@@ -184,18 +184,21 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="CustomerIncome" class="control-label"></label>
-                                        <input asp-for="CustomerIncome" class="form-control" />
-                                        <span asp-validation-for="CustomerIncome" class="text-danger"></span>
+                                        <select asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
+                                            <option>--- SELECT CUSTOMER INCOME ---</option>
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="CustomerOccupation" class="control-label"></label>
-                                        <input asp-for="CustomerOccupation" class="form-control" />
-                                        <span asp-validation-for="CustomerOccupation" class="text-danger"></span>
+                                        <select asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
+                                            <option>--- SELECT CUSTOMER OCCUPATION ---</option>
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="CustomerEducation" class="control-label"></label>
-                                        <input asp-for="CustomerEducation" class="form-control" />
-                                        <span asp-validation-for="CustomerEducation" class="text-danger"></span>
+                                        <select asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
+                                            <option>--- SELECT CUSTOMER EDUCATION ---</option>
+                                        </select>
                                     </div>
 
                                 </div>

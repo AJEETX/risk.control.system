@@ -11,7 +11,7 @@
                 <form asp-action="index">
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.INVESTIGATION_CLAIMS_CASE_DRAFT</h3>
                             <div class="card-tools">
                                 <div class="input-group input-group-sm">
                                     <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
@@ -39,7 +39,7 @@
             <div class="col-md-12">
                 <div class="card card-success card-outline">
                     <div class="card-header">
-                        <h3 class="card-title">@Applicationsettings.INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN List</h3>
+                        <h3 class="card-title">@Applicationsettings.INVESTIGATION_CLAIMS_CASE_DRAFT List</h3>
                     </div>
                     <div class="card-body p-0 contained-width">
                         <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
@@ -55,7 +55,6 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th><input type="checkbox" id="checkall" /></th>
                                                 <th style="display:@hasClientCompany">
                                                     @Html.DisplayNameFor(model => model.ClientCompany)
                                                 </th>
@@ -111,9 +110,7 @@
                                             @foreach (var item in Model)
                                             {
                                                 <tr>
-                                                    <td>
-                                                        <input id="@item.ClaimsInvestigationId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationId" checked="@item.SelectedToAssign" />
-                                                    </td>
+                                                   
                                                     <td style="display:@hasClientCompany">
                                                         @Html.DisplayFor(modelItem => item.ClientCompany.Name)
                                                     </td>
@@ -176,19 +173,7 @@
                                                 </tr>
                                             }
                                         </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="10">
-                                                    <a asp-action="Index" class="btn btn-secondary">
-                                                        <i class="fa fa-window-close"></i>
-                                                        @Applicationsettings.CANCEL
-                                                    </a>
-                                                    <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
-                                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.ASSIGN
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
+                                       
                                     </table>
                                 }
                             </div>
