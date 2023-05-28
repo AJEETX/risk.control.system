@@ -274,12 +274,6 @@ namespace risk.control.system.Controllers
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = applicationDbContextResult, ClaimsInvestigation = claimsInvestigation });
         }
 
-        public async Task<IActionResult> AllocateToAgent(string selectedcase)
-        {
-            //TO-DO
-            await Task.Delay(1000);
-            return Ok();
-        }
         [HttpGet]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
@@ -321,14 +315,13 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> CaseAllocatedToVendor(string selectedcase, string claimId, long caseLocationId)
         {
-            //TO-DO:: ALLOCATE TO VENDOR LOGIC
             var userEmail = HttpContext.User?.Identity?.Name;
 
             await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId);
 
-        await mailboxService.NotifyClaimAllocation(userEmail, claimId, selectedcase,caseLocationId);
+            await mailboxService.NotifyClaimAllocationToVendor(userEmail, claimId, selectedcase, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage("The allocation to vendor work is in-progress");
+            toastNotification.AddSuccessToastMessage("claim case allocated to vendor successfully!");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Index), "ClaimsInvestigation");
         }
@@ -428,16 +421,9 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> Assign(List<string> claims)
         {
-            var initiatedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            if (initiatedStatus == null)
-            {
-
-                return RedirectToAction(nameof(Create));
-            }
-
             await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, claims);
 
-            await mailboxService.NotifyClaimAssignment(HttpContext.User.Identity.Name, claims);
+            await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
 
             return RedirectToAction(nameof(Index));
         }

@@ -11,7 +11,8 @@ namespace risk.control.system.Services
         List<ClaimsInvestigation> GetAll();
         Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
-        Task AllocateToVendor(string userEmail, string claimsInvestigation, string vendorId, long caseLocationId);
+        Task AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
+        Task AssignToVendorAgent(string userEmail, string claimsInvestigationId);
     }
     public class ClaimsInvestigationService : IClaimsInvestigationService
     {
@@ -30,6 +31,7 @@ namespace risk.control.system.Services
             {
                 var claimsCaseLocation = _context.CaseLocation
                 .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.Vendor)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
@@ -37,7 +39,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.CaseLocationId == caseLocationId);
 
                 claimsCaseLocation.Vendor = vendor;
-
+                claimsCaseLocation.VendorId = vendorId;
                 var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation.FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
                 claimsCaseToAllocateToVendor.Updated = DateTime.UtcNow;
                 claimsCaseToAllocateToVendor.UpdatedBy = userEmail;
@@ -47,7 +49,7 @@ namespace risk.control.system.Services
 
                 claimsCaseToAllocateToVendor.Vendors.Add(vendor);
                 _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
-                await _context.SaveChangesAsync();  
+                await _context.SaveChangesAsync();
             }
         }
 
@@ -61,14 +63,29 @@ namespace risk.control.system.Services
                     claimsInvestigation.Updated = DateTime.UtcNow;
                     claimsInvestigation.UpdatedBy = userEmail;
                     claimsInvestigation.CurrentUserEmail = userEmail;
-                    claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
-                    claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
+                    claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
+                    claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
                 }
                 _context.UpdateRange(cases2Assign);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task AssignToVendorAgent(string userEmail, string claimsInvestigationId)
+        {
+            var claim = _context.ClaimsInvestigation
+                .Include(c => c.CaseLocations)
+                .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
+            if (claim != null)
+            {
+                claim.Updated = DateTime.UtcNow;
+                claim.UpdatedBy = userEmail;
+                claim.CurrentUserEmail = userEmail;
+                claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
+                claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
+            }
+            _context.ClaimsInvestigation.Update(claim);
+            await _context.SaveChangesAsync();
         }
 
         public async Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument)

@@ -14,10 +14,8 @@ namespace risk.control.system.Services
         Task<int> InboxDelete(List<long> messages, long userId);
         Task<InboxMessage> GetInboxMessagedetail(long messageId, string userEmail);
         Task<OutboxMessage> GetInboxMessagedetailReply(long messageId, string userEmail, string actiontype);
-        Task<SentMessage> GetSentMessagedetailReply(long messageId, string userEmail, string actiontype);
-
         Task<int> InboxDetailsDelete(long id, string userEmail);
-        Task<bool> SendMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument);
+        Task<bool> SendReplyMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument);
     }
     public class InboxMailService : IInboxMailService
     {
@@ -64,34 +62,6 @@ namespace risk.control.system.Services
             var replyRawMessage = "<br />" + "<hr />" + "From: "+userMessage.SenderEmail + "<br />" + "<hr />" + "Sent:" + userMessage.SendDate + "<br />" + "<hr />" + userMessage.RawMessage;
 
             var userReplyMessage = new OutboxMessage
-            {
-                ReceipientEmail = userMessage.SenderEmail,
-                SenderEmail = userEmail,
-                Subject = actiontype + " :" + userMessage.Subject,
-                Attachment = userMessage.Attachment,
-                AttachmentName = userMessage.AttachmentName,
-                Created = userMessage.Created,
-                Extension = userMessage.Extension,
-                FileType = userMessage.FileType,
-                Message = userMessage.Message,
-                RawMessage = replyRawMessage,
-                Read = false,
-
-            };
-            return userReplyMessage;
-        }
-
-        public async Task<SentMessage> GetSentMessagedetailReply(long messageId, string userEmail, string actiontype)
-        {
-            var userMailbox = _context.Mailbox
-             .Include(m => m.Sent)
-             .FirstOrDefault(c => c.Name == userEmail);
-
-            var userMessage = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == messageId);
-
-            var replyRawMessage = "<br />" + "<hr />" + "From: " + userMessage.SenderEmail + "<br />" + "<hr />" + "Sent:" + userMessage.SendDate + "<br />" + "<hr />" + userMessage.RawMessage;
-
-            var userReplyMessage = new SentMessage
             {
                 ReceipientEmail = userMessage.SenderEmail,
                 SenderEmail = userEmail,
@@ -187,7 +157,7 @@ namespace risk.control.system.Services
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> SendMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument)
+        public async Task<bool> SendReplyMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Sent).Include(m => m.Outbox).FirstOrDefault(c => c.Name == userEmail);
 

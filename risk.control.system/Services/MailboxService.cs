@@ -12,8 +12,9 @@ namespace risk.control.system.Services
     public interface IMailboxService
     {
         Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation);
-        Task NotifyClaimAllocation(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
-        Task NotifyClaimAssignment(string userEmail, List<string> claims);
+        Task NotifyClaimAllocationToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
+        Task NotifyClaimAssignmentToAssigner(string userEmail, List<string> claims);
+        Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, string claimId);
     }
     public class MailboxService : IMailboxService
     {
@@ -35,7 +36,7 @@ namespace risk.control.system.Services
             this.userVendorManager = userVendorManager;
         }
 
-        public async Task NotifyClaimAllocation(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId)
+        public async Task NotifyClaimAllocationToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId)
         {
             //1. get vendor admin and supervisor email 
 
@@ -54,9 +55,6 @@ namespace risk.control.system.Services
                     userEmailsToSend.Add(assignedUser.Email);
                 }
             }
-
-            //1. send email to vendor admin and supervisor
-            
 
             foreach (var userEmailToSend in userEmailsToSend)
             {
@@ -83,15 +81,15 @@ namespace risk.control.system.Services
             var rows = await _context.SaveChangesAsync();
         }
 
-        public async Task NotifyClaimAssignment(string userEmail, List<string> claims)
+        public async Task NotifyClaimAssignmentToAssigner(string senderUserEmail, List<string> claims)
         {
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == senderUserEmail).FirstOrDefault();
             List<string> userEmailsToSend = new();
 
             var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == applicationUser.Email);
             if (clientCompanyUser == null)
             {
-                userEmailsToSend.Add(userEmail);
+                userEmailsToSend.Add(senderUserEmail);
             }
             else
             {
@@ -109,10 +107,7 @@ namespace risk.control.system.Services
                 }
             }
 
-            
-
             var claimsInvestigations = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationId));
-
 
             foreach (var userEmailToSend in userEmailsToSend)
             {
@@ -141,6 +136,18 @@ namespace risk.control.system.Services
                 _context.Mailbox.Update(recepientMailbox);
             }
             var rows = await _context.SaveChangesAsync();
+        }
+
+        public Task NotifyClaimAssignmentToVendorAgent(string userEmail, string claimId)
+        {
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.VendorAgent.ToString()));
+
+            var claim = _context.ClaimsInvestigation.Include(c=>c.Vendors).Where(c=>c.ClaimsInvestigationId.Equals(claimId)).FirstOrDefault();
+            if (claim != null)
+            {
+            }
+
+            throw new NotImplementedException();
         }
 
         public async Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation)

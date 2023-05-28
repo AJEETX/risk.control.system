@@ -17,6 +17,7 @@ builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationServi
 builder.Services.AddScoped<IMailboxService, MailboxService>();
 
 builder.Services.AddScoped<IInboxMailService, InboxMailService>();
+builder.Services.AddScoped<ISentMailService, SentMailService>();
 builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
@@ -37,7 +38,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=sidebar-21-15-27-May.db"));
+                    options.UseSqlite("Data Source=allocate-21-15-27-May.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {

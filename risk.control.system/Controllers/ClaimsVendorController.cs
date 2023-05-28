@@ -3,25 +3,98 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
     public class ClaimsVendorController : Controller
     {
+        private readonly IClaimsInvestigationService claimsInvestigationService;
+        private readonly IMailboxService mailboxService;
+        private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext _context;
 
-        public ClaimsVendorController(ApplicationDbContext context)
+        public ClaimsVendorController(IClaimsInvestigationService claimsInvestigationService,IMailboxService mailboxService, IToastNotification toastNotification,
+            ApplicationDbContext context)
         {
+            this.claimsInvestigationService = claimsInvestigationService;
+            this.mailboxService = mailboxService;
+            this.toastNotification = toastNotification;
             this._context = context;
+        }
+        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase)
+        {
+
+            if (_context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.Vendor)
+                .Include(c => c.Vendors)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase && m.CaseLocations.Any(c=>c.VendorId == vendorUser.VendorId));
+            var onlyAllocatedCaseLocations = claimsInvestigation.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId)?.ToList();
+            claimsInvestigation.CaseLocations.RemoveAll((a)=> true);
+            claimsInvestigation.CaseLocations = onlyAllocatedCaseLocations;
+
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            return View(claimsInvestigation);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, long caseLocationId)
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            await claimsInvestigationService.AssignToVendorAgent(HttpContext?.User?.Identity?.Name, selectedcase);
+            //TO-DO :: send notification to  
+
+
+            await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId);
+
+            await mailboxService.NotifyClaimAllocationToVendor(userEmail, claimId, selectedcase, caseLocationId);
+
+            toastNotification.AddSuccessToastMessage("claim case allocated to vendor successfully!");
+
+            return RedirectToAction(nameof(ClaimsInvestigationController.Index), "ClaimsInvestigation");
         }
         public async Task<IActionResult> Index()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
                 .Include(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .Include(c => c.Vendor)
                 .Include(c => c.CostCentre)
                 .Include(c => c.Country)
                 .Include(c => c.District)
@@ -64,7 +137,10 @@ namespace risk.control.system.Controllers
             {
                 applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId && i.VendorId == vendorUser.VendorId);
             }
-
+            else if (companyUser == null && vendorUser != null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c=>c.VendorId == vendorUser.VendorId));
+            }
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
             {

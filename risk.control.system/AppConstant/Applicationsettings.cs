@@ -78,9 +78,9 @@
 
         public const string MANAGE_COMPANY_VENDOR = "Manage company vendor";
         public const string MANAGE_VENDOR_PROFILE = "Manage Vendor Profile";
-        public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Select Verification location to allocate to vendor";
-        public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "Select Claim case to allocate to vendor";
-        public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Select Claim case to assign to agent";
+        public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Allocate to vendor";
+        public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "ALLOCATE";
+        public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Assign to agent";
         public const string SELECT_CASE_TO_START = "Select Claim case to Verify";
         public const string AVAILABLE_VENDORS = "Available vendors";
         public const string DEPANEL_VENDORS = "Go to Depanel vendors";

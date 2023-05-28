@@ -17,6 +17,7 @@ namespace risk.control.system.Controllers
     public class ContactMessageController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ISentMailService sentMailService;
         private readonly IInboxMailService inboxMailService;
         private readonly ITrashMailService trashMailService;
         private readonly IToastNotification toastNotification;
@@ -25,11 +26,13 @@ namespace risk.control.system.Controllers
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
-        public ContactMessageController(ApplicationDbContext context, IInboxMailService inboxMailService, 
+        public ContactMessageController(ApplicationDbContext context, ISentMailService sentMailService,
+            IInboxMailService inboxMailService, 
             ITrashMailService trashMailService,
             IToastNotification toastNotification)
         {
             _context = context;
+            this.sentMailService = sentMailService;
             this.inboxMailService = inboxMailService;
             this.trashMailService = trashMailService;
             this.toastNotification = toastNotification;
@@ -47,7 +50,7 @@ namespace risk.control.system.Controllers
             }
             var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
 
-            return View(userMailboxMessages.OrderBy(o=>o.SendDate));
+            return View(userMailboxMessages.OrderByDescending(o=>o.SendDate));
 
         }
         public async Task<IActionResult> InboxDelete(List<long> messages)
@@ -114,7 +117,7 @@ namespace risk.control.system.Controllers
 
             IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 
-            var mailSent = await inboxMailService.SendMessage(contactMessage, userEmail, messageDocument);
+            var mailSent = await inboxMailService.SendReplyMessage(contactMessage, userEmail, messageDocument);
 
             if (mailSent)
             {
@@ -211,9 +214,9 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox.Include(m => m.Sent).FirstOrDefault(c => c.Name == applicationUser.Email);
+            var userMailboxMessages = await sentMailService.GetSentMessages(userEmail);
 
-            return View(userMailbox.Sent.OrderByDescending(o => o.SendDate).ToList());
+            return View(userMailboxMessages.OrderByDescending(o => o.SendDate));
         }
         public async Task<IActionResult> SentDelete(List<long> messages)
         {
@@ -224,26 +227,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                           .Include(m => m.Sent)
-                           .Include(m => m.Trash)
-                           .FirstOrDefault(c => c.ApplicationUserId == applicationUser.Id);
-
-            var userSentMails = userMailbox.Sent.Where(d => messages.Contains(d.SentMessageId)).ToList();
-
-            if (userSentMails is not null && userSentMails.Count > 0)
-            {
-                foreach (var message in userSentMails)
-                {
-                    message.MessageStatus = MessageStatus.TRASHED;
-                    userMailbox.Sent.Remove(message);
-                    var jsonMessage = JsonSerializer.Serialize(message, options);
-                    TrashMessage trashMessage = JsonSerializer.Deserialize<TrashMessage>(jsonMessage, options);
-                    userMailbox.Trash.Add(trashMessage);
-                }
-            }
-            _context.Mailbox.Update(userMailbox);
-            var rows = await _context.SaveChangesAsync();
+            var rows = await sentMailService.SentDelete(messages, applicationUser.Id);
             toastNotification.AddSuccessToastMessage($" {rows} mail(s) trashed successfully!");
 
             return RedirectToAction(nameof(Sent));
@@ -262,14 +246,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMailbox = _context.Mailbox
-                .Include(m => m.Sent)
-                .FirstOrDefault(c => c.Name == applicationUser.Email);
-
-            var userMessage = userMailbox.Sent.FirstOrDefault(c => c.SentMessageId == id);
-            userMessage.Read = true;
-            _context.Mailbox.Update(userMailbox);
-            var rows = await _context.SaveChangesAsync();
+            var userMessage = await sentMailService.GetSentMessagedetail(id, userEmail);
             return View(userMessage);
         }
         public async Task<IActionResult> SentDetailsReply(long id, string actiontype)
@@ -286,7 +263,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var userMessage = await inboxMailService.GetSentMessagedetailReply(id, userEmail, actiontype);
+            var userMessage = await sentMailService.GetSentMessagedetailReply(id, userEmail, actiontype);
 
             ViewBag.ActionType = actiontype;
             return View(userMessage);
@@ -304,84 +281,17 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+            IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 
-            var userMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == applicationUser.Email);
+            var mailSent = await sentMailService.SendReplyMessage(contactMessage, userEmail, messageDocument);
 
-            var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
-            contactMessage.SenderEmail = userEmail;
-            contactMessage.SendDate = DateTime.Now;
-            contactMessage.Read = false;
-            if (recepientMailbox is not null)
+            if (mailSent)
             {
-
-                contactMessage.MessageStatus = MessageStatus.SENT;
-                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
-                SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
-
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
-
-                    sentMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await sentMessage.Document.CopyToAsync(dataStream);
-                    sentMessage.Attachment = dataStream.ToArray();
-                    sentMessage.FileType = messageDocument.ContentType;
-                    sentMessage.Extension = extension;
-                    sentMessage.AttachmentName = messageDocumentFileName;
-                }
-                sentMessage.SendDate = DateTime.Now;
-                userMailbox.Sent.Add(sentMessage);
-                _context.Mailbox.Attach(userMailbox);
-                _context.Mailbox.Update(userMailbox);
-                InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
-
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
-                    inboxMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await inboxMessage.Document.CopyToAsync(dataStream);
-                    inboxMessage.Attachment = dataStream.ToArray();
-                    inboxMessage.FileType = messageDocument.ContentType;
-                    inboxMessage.Extension = extension;
-                    inboxMessage.AttachmentName = messageDocumentFileName;
-                }
-                inboxMessage.SendDate = DateTime.Now;
-                recepientMailbox.Inbox.Add(inboxMessage);
-                _context.Mailbox.Attach(recepientMailbox);
-                _context.Mailbox.Update(recepientMailbox);
-                var rowse = await _context.SaveChangesAsync();
-
                 toastNotification.AddSuccessToastMessage("mail sent successfully!");
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-                if (messageDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
-
-                    contactMessage.Document = (FormFile?)messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await contactMessage.Document.CopyToAsync(dataStream);
-                    contactMessage.Attachment = dataStream.ToArray();
-                    contactMessage.FileType = messageDocument.ContentType;
-                    contactMessage.Extension = extension;
-                    contactMessage.AttachmentName = messageDocumentFileName;
-                }
-
-                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
-                OutboxMessage outboxMessage = JsonSerializer.Deserialize<OutboxMessage>(jsonMessage, options);
-                userMailbox.Outbox.Add(outboxMessage);
-                _context.Mailbox.Update(userMailbox);
-                var rowse = await _context.SaveChangesAsync();
-
                 toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
                 return RedirectToAction(nameof(Create));
             }
@@ -545,7 +455,7 @@ namespace risk.control.system.Controllers
 
             IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
             
-            var mailSent = await inboxMailService.SendMessage(contactMessage, userEmail, messageDocument);
+            var mailSent = await inboxMailService.SendReplyMessage(contactMessage, userEmail, messageDocument);
 
             if (mailSent)
             {
@@ -558,7 +468,5 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Create));
             }
         }
-
-
     }
 }
