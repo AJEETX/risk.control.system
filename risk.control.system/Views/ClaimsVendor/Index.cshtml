@@ -60,58 +60,25 @@
                                                     @Html.DisplayNameFor(model => model.ClientCompany)
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.ContractNumber)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.Description)
-                                                </th>
-                                                <th>
                                                     @Html.DisplayNameFor(model => model.LineOfBusiness)
                                                 </th>
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.InvestigationCaseSubStatus)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.ContractIssueDate)
-                                                </th>
-                                                <th>
                                                     @Html.DisplayNameFor(model => model.CustomerName)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerDateOfBirth)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.ContactNumber)
                                                 </th>
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.ClaimType)
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.DateOfIncident)
+                                                    Location - SubStatus
                                                 </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CauseOfLoss)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.Gender)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.SumAssuredValue)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.Comments)
-                                                </th>
-                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach (var item in Model)
                                             {
-                                                <input type="hidden" id="vendorId" name="vendorId" value="@item.VendorId" />
-
                                                 <tr>
                                                     <td>
                                                         <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
@@ -120,60 +87,24 @@
                                                         @Html.DisplayFor(modelItem => item.ClientCompany.Name)
                                                     </td>
                                                     <td>
-                                                        @Html.DisplayFor(modelItem => item.ContractNumber)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Description)
-                                                    </td>
-                                                    <td>
                                                         @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
                                                     </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                                     </td>
                                                     <td>
-                                                        @Html.DisplayFor(modelItem => item.InvestigationCaseSubStatus.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.ContractIssueDate)
-                                                    </td>
-                                                    <td>
                                                         @Html.DisplayFor(modelItem => item.CustomerName)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerDateOfBirth)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.ContactNumber)
                                                     </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.ClaimType)
                                                     </td>
                                                     <td>
-                                                        @Html.DisplayFor(modelItem => item.DateOfIncident)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CauseOfLoss)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Gender)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.SumAssuredValue)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Comments)
-                                                    </td>
-                                                    <td>
-                                                        <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
-                                                            <i class="fa fa-search"></i> @Applicationsettings.DETAILS
-                                                        </a> &nbsp;
-                                                        <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClaimsInvestigationId">
-                                                            <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                                        </a> &nbsp;
-                                                        <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClaimsInvestigationId">
-                                                            <i class="fas fa-trash"></i> @Applicationsettings.DELETE
-                                                        </a>
+                                                        @{
+                                                            foreach (var caseLocation in item.CaseLocations)
+                                                            {
+                                                                <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
+                                                            }
+                                                        }
                                                     </td>
                                                 </tr>
                                             }

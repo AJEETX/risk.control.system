@@ -191,6 +191,19 @@
                         </p>
                     </a>
                 </li>
+                @{
+                    if (User.IsInRole(AppRoles.VendorAdmin.ToString()) || User.IsInRole(AppRoles.VendorSupervisor.ToString()))
+                    {
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">report</span>
+                                </p>
+                            </a>
+                        </li>
+                    }
+                  }
                 <li class="nav-item">
                     <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open") @Url.MakeActiveClass("ClaimsVendor","VendorAgent")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
@@ -200,7 +213,6 @@
                     </a>
                 </li>
                 @{
-
                     if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
                     {
                         <li class="nav-item">

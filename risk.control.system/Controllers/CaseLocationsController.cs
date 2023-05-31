@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -102,10 +103,14 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CaseLocation caseLocation)
         {
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+               i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+
             if (caseLocation is not null)
             {
                 caseLocation.Updated = DateTime.UtcNow;
                 caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
+                caseLocation.InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId;
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("verification location created successfully!");
@@ -182,7 +187,6 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);

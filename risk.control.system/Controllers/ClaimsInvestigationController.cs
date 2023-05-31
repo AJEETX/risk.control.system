@@ -28,6 +28,7 @@ namespace risk.control.system.Controllers
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
+
         private static string NO_DATA = " NO - DATA ";
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
@@ -60,7 +61,110 @@ namespace risk.control.system.Controllers
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
                 .Include(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+            .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations).
+                ThenInclude(c => c.InvestigationCaseSubStatus)
+            .Include(c => c.CostCentre)
+            .Include(c => c.Country)
+            .Include(c => c.District)
+            .Include(c => c.InvestigationCaseStatus)
+            .Include(c => c.InvestigationCaseSubStatus)
+            .Include(c => c.InvestigationServiceType)
+            .Include(c => c.LineOfBusiness)
+            .Include(c => c.PinCode)
+            .Include(c => c.State);
+
+            ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                ViewBag.HasClientCompany = false;
+                ViewBag.HasVendorCompany = false;
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+                ViewBag.HasVendorCompany = false;
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString())
+                || userRole.Value.Contains(AppRoles.ClientAdmin.ToString())
+                || userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(
+                    a => a.CaseLocations.Count > 0
+                    && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
+                }
+                return View(await applicationDbContext.ToListAsync());
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
+
+                var claimsAssigned = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                        && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+                return View("Assigner", claimsAssigned);
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+                return View("Assessor", claimsSubmitted);
+            }
+            return View(await applicationDbContext.ToListAsync());
+        }
+
+        // GET: ClaimsInvestigation
+        public async Task<IActionResult> Draft()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseEnabler)
                 .Include(c => c.CostCentre)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.Country)
                 .Include(c => c.District)
                 .Include(c => c.InvestigationCaseStatus)
@@ -109,71 +213,6 @@ namespace risk.control.system.Controllers
             }
             if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && a.CaseLocations.Count > 0);
-                return View(await applicationDbContext.ToListAsync());
-            }
-            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
-                return View("Assigner", await applicationDbContext.ToListAsync());
-            }
-            return View(await applicationDbContext.ToListAsync());
-        }
-        // GET: ClaimsInvestigation
-        public async Task<IActionResult> Draft()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-
-            ViewBag.HasClientCompany = true;
-            ViewBag.HasVendorCompany = true;
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            
-            if (companyUser == null && vendorUser == null)
-            {
-                ViewBag.HasClientCompany = false;
-                ViewBag.HasVendorCompany = false;
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
-            }
-            else if(companyUser != null && vendorUser == null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
-                ViewBag.HasVendorCompany = false;
-            }
-            else if(companyUser != null && vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId && i.VendorId == vendorUser.VendorId);
-            }
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId ||
-                a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
-                return View(await applicationDbContext.ToListAsync());
-            }
-            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
-            {
                 applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && a.CaseLocations.Count == 0);
                 return View(await applicationDbContext.ToListAsync());
             }
@@ -184,18 +223,24 @@ namespace risk.control.system.Controllers
             }
             return View(await applicationDbContext.ToListAsync());
         }
+
         [HttpGet]
         public async Task<IActionResult> EmpanelledVendors(long selectedcase, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var claimCase = _context.CaseLocation
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.State)
-                .FirstOrDefault(c => c.CaseLocationId == selectedcase);
+                .FirstOrDefault(c => c.CaseLocationId == selectedcase
+                //&& c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId
+                );
+
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c=>c.LineOfBusiness)
+                .Include(c => c.LineOfBusiness)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimCase.ClaimsInvestigationId);
 
             var applicationDbContext = _context.Vendor
@@ -251,9 +296,11 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
+
                 case "code_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.Name);
                     break;
@@ -308,7 +355,12 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var caseLocations = claimsInvestigation.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+            && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId).ToList();
 
+            claimsInvestigation.CaseLocations = caseLocations;
             return View(claimsInvestigation);
         }
 
@@ -325,6 +377,7 @@ namespace risk.control.system.Controllers
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Index), "ClaimsInvestigation");
         }
+
         public async Task<IActionResult> CaseLocation(string id)
         {
             if (id == null)
@@ -359,12 +412,215 @@ namespace risk.control.system.Controllers
 
             return View(applicationDbContext);
         }
+
+        public async Task<IActionResult> Approved()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                 .Include(c => c.ClientCompany)
+                 .Include(c => c.CaseEnabler)
+                 .Include(c => c.CaseLocations)
+             .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations).
+                 ThenInclude(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.CostCentre)
+             .Include(c => c.Country)
+             .Include(c => c.District)
+             .Include(c => c.InvestigationCaseStatus)
+             .Include(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.InvestigationServiceType)
+             .Include(c => c.LineOfBusiness)
+             .Include(c => c.PinCode)
+             .Include(c => c.State);
+
+            ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                ViewBag.HasClientCompany = false;
+                ViewBag.HasVendorCompany = false;
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+                ViewBag.HasVendorCompany = false;
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+                return View(claimsSubmitted);
+            }
+            return Problem();
+        }
+
+        public async Task<IActionResult> Reject()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                 .Include(c => c.ClientCompany)
+                 .Include(c => c.CaseEnabler)
+                 .Include(c => c.CaseLocations)
+             .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations).
+                 ThenInclude(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.CostCentre)
+             .Include(c => c.Country)
+             .Include(c => c.District)
+             .Include(c => c.InvestigationCaseStatus)
+             .Include(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.InvestigationServiceType)
+             .Include(c => c.LineOfBusiness)
+             .Include(c => c.PinCode)
+             .Include(c => c.State);
+
+            ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                ViewBag.HasClientCompany = false;
+                ViewBag.HasVendorCompany = false;
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+                ViewBag.HasVendorCompany = false;
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+                return View(claimsSubmitted);
+            }
+            return Problem();
+        }
+
+        public async Task<IActionResult> Review()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                 .Include(c => c.ClientCompany)
+                 .Include(c => c.CaseEnabler)
+                 .Include(c => c.CaseLocations)
+             .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations).
+                 ThenInclude(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.CostCentre)
+             .Include(c => c.Country)
+             .Include(c => c.District)
+             .Include(c => c.InvestigationCaseStatus)
+             .Include(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.InvestigationServiceType)
+             .Include(c => c.LineOfBusiness)
+             .Include(c => c.PinCode)
+             .Include(c => c.State);
+
+            ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                ViewBag.HasClientCompany = false;
+                ViewBag.HasVendorCompany = false;
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+                ViewBag.HasVendorCompany = false;
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+                return View(claimsSubmitted);
+            }
+            return Problem();
+        }
+
         public async Task<IActionResult> Open()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
                 .Include(c => c.CaseEnabler)
                 .Include(c => c.CostCentre)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
                 .Include(c => c.Country)
                 .Include(c => c.District)
                 .Include(c => c.InvestigationCaseStatus)
@@ -382,7 +638,6 @@ namespace risk.control.system.Controllers
             var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
 
-
             if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
@@ -391,8 +646,8 @@ namespace risk.control.system.Controllers
             else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => 
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId 
+                applicationDbContext = applicationDbContext.Where(a =>
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
                 || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
             }
             else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
@@ -418,6 +673,42 @@ namespace risk.control.system.Controllers
             }
             return View(await applicationDbContext.ToListAsync());
         }
+
+        public async Task<IActionResult> GetInvestigateReport(string selectedcase)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.LineOfBusiness)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var claimCase = _context.CaseLocation
+                .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.PinCode)
+                .Include(c => c.ClaimReport)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
+                && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
+                    );
+            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
+        {
+            string userEmail = HttpContext?.User?.Identity.Name;
+
+            //TO-DO:: IMPLEMENTATION
+            await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, assessorRemarkType);
+
+            //TO-DO :: IMPLEMENTATION
+            await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
+
+            return RedirectToAction(nameof(ClaimsInvestigationController.Index));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Assign(List<string> claims)
         {
@@ -427,6 +718,7 @@ namespace risk.control.system.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
         // GET: ClaimsInvestigation/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -496,10 +788,8 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-
                 model.ClientCompanyId = clientCompanyUser.ClientCompanyId;
             }
-
 
             //mailboxService.InsertMessage(new ContactMessage
             //{
@@ -515,8 +805,6 @@ namespace risk.control.system.Controllers
             //    Read = false,
             //    UpdatedBy = userEmail.Value
             //});
-
-
 
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
@@ -697,6 +985,7 @@ namespace risk.control.system.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
         public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
         {
             if (id == null || _context.Vendor == null)
@@ -729,10 +1018,12 @@ namespace risk.control.system.Controllers
 
             return View(vendor);
         }
+
         public async Task<IActionResult> Uploads()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Uploads(IFormFile postedFile)
         {
@@ -770,10 +1061,8 @@ namespace risk.control.system.Controllers
                                 var rowData = output.Split(',').ToList();
                                 var claim = new ClaimsInvestigation
                                 {
-
                                 };
                                 claims.Add(claim);
-
                             }
                         }
                     }
@@ -783,6 +1072,7 @@ namespace risk.control.system.Controllers
             }
             return Problem();
         }
+
         private bool ClaimsInvestigationExists(string id)
         {
             return (_context.ClaimsInvestigation?.Any(e => e.ClaimsInvestigationId == id)).GetValueOrDefault();

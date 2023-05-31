@@ -214,6 +214,41 @@
                             </a>
                         </li>
                     }
+                    if (User.IsInRole(AppRoles.ClientAdmin.ToString()) || User.IsInRole(AppRoles.ClientAssessor.ToString()))
+                    {
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">ready to assess</span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-success">approved</span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">review</span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Reject" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Reject")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">reject</span>
+                                </p>
+                            </a>
+                        </li>
+                    }
                 }
                 
                 <li class="nav-item">

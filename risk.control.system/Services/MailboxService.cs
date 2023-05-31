@@ -12,10 +12,20 @@ namespace risk.control.system.Services
     public interface IMailboxService
     {
         Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation);
+
         Task NotifyClaimAllocationToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
+
         Task NotifyClaimAssignmentToAssigner(string userEmail, List<string> claims);
-        Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, string claimId);
+
+        Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, string claimId, string agentEmail, string vendorId, long caseLocationId);
+
+        Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimId, long caseLocationId);
+
+        Task NotifyClaimReportSubmitToCompany(string senderUserEmail, string claimId, long caseLocationId);
+
+        Task NotifyClaimReportProcess(string senderUserEmail, string claimId, long caseLocationId);
     }
+
     public class MailboxService : IMailboxService
     {
         private static string BaseUrl = string.Empty;
@@ -38,7 +48,7 @@ namespace risk.control.system.Services
 
         public async Task NotifyClaimAllocationToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId)
         {
-            //1. get vendor admin and supervisor email 
+            //1. get vendor admin and supervisor email
 
             var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.VendorSupervisor.ToString()));
 
@@ -77,7 +87,7 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
             }
-            
+
             var rows = await _context.SaveChangesAsync();
         }
 
@@ -111,7 +121,7 @@ namespace risk.control.system.Services
 
             foreach (var userEmailToSend in userEmailsToSend)
             {
-                var recepientMailbox = _context.Mailbox.Include(m=>m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend);
+                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend);
                 var contactMessage = new InboxMessage
                 {
                     //ReceipientEmail = userEmailToSend,
@@ -138,16 +148,33 @@ namespace risk.control.system.Services
             var rows = await _context.SaveChangesAsync();
         }
 
-        public Task NotifyClaimAssignmentToVendorAgent(string userEmail, string claimId)
+        public async Task NotifyClaimAssignmentToVendorAgent(string userEmail, string claimId, string agentEmail, string vendorId, long caseLocationId)
         {
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.VendorAgent.ToString()));
 
-            var claim = _context.ClaimsInvestigation.Include(c=>c.Vendors).Where(c=>c.ClaimsInvestigationId.Equals(claimId)).FirstOrDefault();
-            if (claim != null)
-            {
-            }
+            var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == agentEmail);
 
-            throw new NotImplementedException();
+            string claimsUrl = $"<a href={BaseUrl + claimId}>url</a>";
+            claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+            var contactMessage = new InboxMessage
+            {
+                //ReceipientEmail = userEmailToSend,
+                Created = DateTime.UtcNow,
+                Message = "New case allocated:" + claimId,
+                Subject = "New case allocated:" + claimId,
+                RawMessage = "New case allocated:" + claimsUrl,
+                SenderEmail = userEmail,
+                Priority = ContactMessagePriority.URGENT,
+                SendDate = DateTime.Now,
+                Updated = DateTime.Now,
+                Read = false,
+                UpdatedBy = userEmail,
+                ReceipientEmail = recepientMailbox.Name
+            };
+            recepientMailbox?.Inbox.Add(contactMessage);
+            _context.Mailbox.Attach(recepientMailbox);
+            _context.Mailbox.Update(recepientMailbox);
+            var rows = await _context.SaveChangesAsync();
         }
 
         public async Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation)
@@ -178,13 +205,12 @@ namespace risk.control.system.Services
             string claimsUrl = $"<a href={BaseUrl + claimsInvestigation.ClaimsInvestigationId}>url</a>";
             claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
 
-            //claimsUrl = Html.Raw( HttpUtility.HtmlEncode(claimsUrl));
-
             var contactMessage = new InboxMessage
             {
                 //ReceipientEmail = userEmailToSend,
                 Created = DateTime.UtcNow,
                 Message = claimsUrl,
+                RawMessage = claimsUrl,
                 Subject = "New case created: case Id = " + claimsUrl,
                 SenderEmail = clientCompanyUser?.Email ?? applicationUser.Email,
                 Priority = ContactMessagePriority.NORMAL,
@@ -210,6 +236,145 @@ namespace risk.control.system.Services
             {
                 var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == userEmailToSend);
                 contactMessage.ReceipientEmail = recepientMailbox.Name;
+                recepientMailbox?.Inbox.Add(contactMessage);
+                _context.Mailbox.Attach(recepientMailbox);
+                _context.Mailbox.Update(recepientMailbox);
+            }
+            var rows = await _context.SaveChangesAsync();
+        }
+
+        public async Task NotifyClaimReportProcess(string senderUserEmail, string claimId, long caseLocationId)
+        {
+            var claim = _context.ClaimsInvestigation.Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
+            if (claim != null)
+            {
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
+
+                var clientAdminrRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAdmin.ToString()));
+
+                List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
+                foreach (var user in companyUsers)
+                {
+                    var isAdmin = await userManager.IsInRoleAsync(user, clientAdminrRole?.Name);
+                    if (isAdmin)
+                    {
+                        users.Add(user);
+                    }
+                }
+
+                string claimsUrl = $"<a href={BaseUrl + claimId}>url</a>";
+                claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+                foreach (var user in users)
+                {
+                    var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == user.Email);
+                    var contactMessage = new InboxMessage
+                    {
+                        //ReceipientEmail = userEmailToSend,
+                        Created = DateTime.UtcNow,
+                        Message = "New case(s) report:",
+                        RawMessage = "New case(s) report:" + claimsUrl,
+                        Subject = "New case(s) report:",
+                        SenderEmail = senderUserEmail,
+                        Priority = ContactMessagePriority.NORMAL,
+                        SendDate = DateTime.Now,
+                        Updated = DateTime.Now,
+                        Read = false,
+                        UpdatedBy = senderUserEmail,
+                        ReceipientEmail = recepientMailbox.Name
+                    };
+                    recepientMailbox?.Inbox.Add(contactMessage);
+                    _context.Mailbox.Attach(recepientMailbox);
+                    _context.Mailbox.Update(recepientMailbox);
+                }
+                var rows = await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task NotifyClaimReportSubmitToCompany(string senderUserEmail, string claimId, long caseLocationId)
+        {
+            var claim = _context.ClaimsInvestigation.Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
+            if (claim != null)
+            {
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
+
+                var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAssessor.ToString()));
+
+                List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
+                foreach (var user in companyUsers)
+                {
+                    var isAssessor = await userManager.IsInRoleAsync(user, assessorRole?.Name);
+                    if (isAssessor)
+                    {
+                        users.Add(user);
+                    }
+                }
+
+                string claimsUrl = $"<a href={BaseUrl + claimId}>url</a>";
+                claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+                foreach (var user in users)
+                {
+                    var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == user.Email);
+                    var contactMessage = new InboxMessage
+                    {
+                        //ReceipientEmail = userEmailToSend,
+                        Created = DateTime.UtcNow,
+                        Message = "New case(s) report:",
+                        RawMessage = "New case(s) report:" + claimsUrl,
+                        Subject = "New case(s) report:",
+                        SenderEmail = senderUserEmail,
+                        Priority = ContactMessagePriority.NORMAL,
+                        SendDate = DateTime.Now,
+                        Updated = DateTime.Now,
+                        Read = false,
+                        UpdatedBy = senderUserEmail,
+                        ReceipientEmail = recepientMailbox.Name
+                    };
+                    recepientMailbox?.Inbox.Add(contactMessage);
+                    _context.Mailbox.Attach(recepientMailbox);
+                    _context.Mailbox.Update(recepientMailbox);
+                }
+                var rows = await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimId, long caseLocationId)
+        {
+            var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.VendorSupervisor.ToString()));
+
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == senderUserEmail);
+
+            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == vendorUser.VendorId);
+
+            List<VendorApplicationUser> users = new List<VendorApplicationUser>();
+
+            foreach (var user in vendorUsers)
+            {
+                var isSupervisor = await userVendorManager.IsInRoleAsync(user, supervisorRole?.Name);
+                if (isSupervisor)
+                {
+                    users.Add(user);
+                }
+            }
+            string claimsUrl = $"<a href={BaseUrl + claimId}>url</a>";
+            claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+            foreach (var user in users)
+            {
+                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == user.Email);
+                var contactMessage = new InboxMessage
+                {
+                    //ReceipientEmail = userEmailToSend,
+                    Created = DateTime.UtcNow,
+                    Message = "New case(s) report:",
+                    Subject = "New case(s) report:",
+                    RawMessage = "New case(s) report:" + claimsUrl,
+                    SenderEmail = senderUserEmail,
+                    Priority = ContactMessagePriority.NORMAL,
+                    SendDate = DateTime.Now,
+                    Updated = DateTime.Now,
+                    Read = false,
+                    UpdatedBy = senderUserEmail,
+                    ReceipientEmail = recepientMailbox.Name
+                };
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);

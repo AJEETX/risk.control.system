@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class Ddl : Migration
+    public partial class completeApprove : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -851,6 +851,8 @@ namespace risk.control.system.Migrations
                     Addressline2 = table.Column<string>(type: "TEXT", nullable: true),
                     ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
                     VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
+                    AssignedAgentUserEmail = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -874,6 +876,11 @@ namespace risk.control.system.Migrations
                         principalTable: "District",
                         principalColumn: "DistrictId");
                     table.ForeignKey(
+                        name: "FK_CaseLocation_InvestigationCaseSubStatus_InvestigationCaseSubStatusId",
+                        column: x => x.InvestigationCaseSubStatusId,
+                        principalTable: "InvestigationCaseSubStatus",
+                        principalColumn: "InvestigationCaseSubStatusId");
+                    table.ForeignKey(
                         name: "FK_CaseLocation_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
                         principalTable: "PinCode",
@@ -883,6 +890,29 @@ namespace risk.control.system.Migrations
                         column: x => x.StateId,
                         principalTable: "State",
                         principalColumn: "StateId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClaimReport",
+                columns: table => new
+                {
+                    ClaimReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    AgentRemarks = table.Column<string>(type: "TEXT", nullable: true),
+                    SupervisorRemarks = table.Column<string>(type: "TEXT", nullable: true),
+                    SupervisorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
+                    AssessorRemarks = table.Column<string>(type: "TEXT", nullable: true),
+                    AssessorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
+                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClaimReport", x => x.ClaimReportId);
+                    table.ForeignKey(
+                        name: "FK_ClaimReport_CaseLocation_CaseLocationId",
+                        column: x => x.CaseLocationId,
+                        principalTable: "CaseLocation",
+                        principalColumn: "CaseLocationId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1310,6 +1340,11 @@ namespace risk.control.system.Migrations
                 column: "DistrictId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CaseLocation_InvestigationCaseSubStatusId",
+                table: "CaseLocation",
+                column: "InvestigationCaseSubStatusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CaseLocation_PinCodeId",
                 table: "CaseLocation",
                 column: "PinCodeId");
@@ -1323,6 +1358,12 @@ namespace risk.control.system.Migrations
                 name: "IX_CaseLocation_VendorId",
                 table: "CaseLocation",
                 column: "VendorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClaimReport_CaseLocationId",
+                table: "ClaimReport",
+                column: "CaseLocationId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClaimsInvestigation_CaseEnablerId",
@@ -1744,6 +1785,9 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "AuditLogs");
+
+            migrationBuilder.DropTable(
+                name: "ClaimReport");
 
             migrationBuilder.DropTable(
                 name: "DeletedMessage");

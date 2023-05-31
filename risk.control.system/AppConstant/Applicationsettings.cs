@@ -17,9 +17,8 @@
 
         //LOGIN
         public const string WEBSITE_LOGIN = "Log in: risk.control.unit";
+
         public const string WEBSITE_SIGNIN = "Sign in";
-
-
 
         // BUTTONS / ACTIONS
 
@@ -38,6 +37,7 @@
 
         // LABELS / ACTIONS
         public const string CLIENT_COMPANIY_PROFILE = "Company Profile";
+
         public const string CLIENT_COMPANIES = "Company";
         public const string CLIENT_COMPANY = "Company";
         public const string COUNTRY = "Country";
@@ -74,13 +74,19 @@
         public const string BROADCAST = "Broadcast";
         public const string ASSIGN = "Assign";
         public const string ALLOCATE_TO_VENDOR = "Allocate To Vendor";
+        public const string SUBMIT_REPORT = "Submit Report";
         public const string CREATE_SELECTED_CASES = "Create selected cases";
 
         public const string MANAGE_COMPANY_VENDOR = "Manage company vendor";
         public const string MANAGE_VENDOR_PROFILE = "Manage Vendor Profile";
         public const string SELECT_VERIFICATION_LOCATION_TO_ALLOCATE_TO_VENDOR = "Allocate to vendor";
         public const string SELECT_CASE_TO_ALLOCATE_TO_VENDOR = "ALLOCATE";
+        public const string SELECT_CASE_INVESTIGATE = "INVESTIGATE";
+        public const string SELECT_CASE_REPORT = "Verify report";
+        public const string SUBMIT_CASE_INVESTIGATE = "Submit";
+        public const string SUBMIT_CASE_TO_COMPANY = "Submit to company";
         public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Assign to agent";
+        public const string AGENTS = "Agents list";
         public const string SELECT_CASE_TO_START = "Select Claim case to Verify";
         public const string AVAILABLE_VENDORS = "Available vendors";
         public const string DEPANEL_VENDORS = "Go to Depanel vendors";
@@ -106,7 +112,6 @@
         public const string DOWNLOAD = "Download";
         public static string SAMPLE_PINCODE_FILE = $"Sample csv file for pincode upload";
 
-
         // MENUS / SUBMENUS
 
         public const string DASHBOARD = "Dashboard";
@@ -115,9 +120,10 @@
         public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
         public const string INVESTIGATION_CASE_STATUS = "Case status";
         public const string INVESTIGATION_CLAIMS_CASE = "Claim";
-        public const string INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN= "Claim (ready to assign)";
-        public const string INVESTIGATION_CLAIMS_CASE_DRAFT= "Claim case (incomplete)";
+        public const string INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN = "Claim (ready to assign)";
+        public const string INVESTIGATION_CLAIMS_CASE_DRAFT = "Claim case (incomplete)";
         public const string INVESTIGATION_CLAIMS_OPEN = "Claim case (open)";
+        public const string INVESTIGATION_CLAIMS_SUBMITTED_BY_AGENT = "Claim case (report)";
         public const string INVESTIGATION_CLAIMS_CASE_DETAILS = "Claim case details";
         public const string CUSTOMER_DETAILS = "Customer details";
         public const string BENEFICIARY_DETAILS = "Beneficiary details";
@@ -136,14 +142,12 @@
         public const string UPLOAD_DATABASE = "UPLOAD DB";
         public const string AUDIT_LOGS = "AUDIT LOGS";
 
-
         public const string CURRENT_PINCODE = "515631";
         public const string CURRENT_DISTRICT = "ANANTAPUR";
         public const string CURRENT_STATE = "AD";
 
-
-
         public const string NO_IMAGE = "/img/no-image.png";
+
         public static class PORTAL_ADMIN
         {
             public const string DISPLAY_NAME = "PORTAL ADMIN";
@@ -154,6 +158,7 @@
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/superadmin.jpg";
         }
+
         public static class CLIENT_ADMIN
         {
             public const string DISPLAY_NAME = "CLIENT ADMIN";
@@ -164,6 +169,7 @@
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/admin.png";
         }
+
         public static class CLIENT_CREATOR
         {
             public const string DISPLAY_NAME = "CLIENT CREATOR";
@@ -174,6 +180,7 @@
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/creator.jpg";
         }
+
         public static class CLIENT_ASSIGNER
         {
             public const string DISPLAY_NAME = "CLIENT ASSIGNER";
@@ -184,6 +191,7 @@
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/assigner.png";
         }
+
         public static class CLIENT_ASSESSOR
         {
             public const string DISPLAY_NAME = "CLIENT ASSESSOR";
@@ -194,6 +202,7 @@
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/assessor.png";
         }
+
         public static class VENDOR_ADMIN
         {
             public const string DISPLAY_NAME = "VENDOR ADMIN";
@@ -204,6 +213,7 @@
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/vendor-admin.png";
         }
+
         public static class VENDOR_SUPERVISOR
         {
             public const string DISPLAY_NAME = "VENDOR SUPERVISOR";
@@ -214,6 +224,7 @@
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/supervisor.png";
         }
+
         public static class VENDOR_AGENT
         {
             public const string DISPLAY_NAME = "VENDOR AGENT";

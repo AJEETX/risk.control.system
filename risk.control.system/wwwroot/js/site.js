@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
 
+    $("#datepicker").datepicker();
 
     if ($(".selected-case:checked").length) {
         $("#allocate-case").prop('disabled', false);

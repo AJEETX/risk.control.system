@@ -10,6 +10,7 @@ namespace risk.control.system.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor context) : base(options, context)
         {
         }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -19,8 +20,10 @@ namespace risk.control.system.Data
         public virtual DbSet<ClientCompanyApplicationUser> ClientCompanyApplicationUser { get; set; }
         public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
         public virtual DbSet<InvestigationCase> InvestigationCase { get; set; }
+
         //public virtual DbSet<ClaimsInvestigation> ClaimsInvestigation { get; set; }
         public virtual DbSet<LineOfBusiness> LineOfBusiness { get; set; }
+
         public virtual DbSet<InvestigationCaseStatus> InvestigationCaseStatus { get; set; }
         public virtual DbSet<InvestigationCaseSubStatus> InvestigationCaseSubStatus { get; set; }
         public virtual DbSet<InvestigationCaseOutcome> InvestigationCaseOutcome { get; set; }
@@ -45,8 +48,7 @@ namespace risk.control.system.Data
         public virtual DbSet<VendorInvestigationServiceType> VendorInvestigationServiceType { get; set; } = default!;
         public virtual DbSet<VendorApplicationUser> VendorApplicationUser { get; set; } = default!;
         public virtual DbSet<Mailbox> Mailbox { get; set; } = default!;
-
-
+        public virtual DbSet<ClaimReport> ClaimReport { get; set; } = default!;
 
         public virtual DbSet<FileOnDatabaseModel> FilesOnDatabase { get; set; }
         public virtual DbSet<FileOnFileSystemModel> FilesOnFileSystem { get; set; }

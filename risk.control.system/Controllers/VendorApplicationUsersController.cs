@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
-                return RedirectToAction(nameof(Index));
+               return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
             else
             {
                 toastNotification.AddErrorToastMessage("Error to create user!");
@@ -120,7 +120,9 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var vendorApplicationUser = _context.VendorApplicationUser.Include(v=>v.Mailbox).Where(v=>v.Id == userId)?.FirstOrDefault();
+            var vendorApplicationUser = _context.VendorApplicationUser
+                .Include(v=>v.Mailbox).Where(v=>v.Id == userId)
+                ?.FirstOrDefault();
             if (vendorApplicationUser == null)
             {
                 toastNotification.AddErrorToastMessage("user not found!");

@@ -23,7 +23,6 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
-
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()
@@ -33,12 +32,11 @@ builder.Services.AddControllersWithViews()
         Timeout = 3000
     });
 
-
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=allocate-21-15-27-May.db"));
+                    options.UseSqlite("Data Source=submit-2-supervisor-17-15-31-May.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -68,7 +66,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
     options.AccessDeniedPath = "/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
-
 });
 builder.Services.AddAuthorization(options =>
 {
@@ -102,5 +99,3 @@ app.MapControllerRoute(
     pattern: "{controller=ContactMessage}/{action=Index}/{id?}");
 
 app.Run();
-
-

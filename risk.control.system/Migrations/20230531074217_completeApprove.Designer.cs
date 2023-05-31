@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230527101343_Ddl")]
-    partial class Ddl
+    [Migration("20230531074217_completeApprove")]
+    partial class completeApprove
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -393,6 +393,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Addressline2")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("AssignedAgentUserEmail")
+                        .HasColumnType("TEXT");
+
                     b.Property<long?>("BeneficiaryContactNumber")
                         .HasColumnType("INTEGER");
 
@@ -416,6 +419,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DistrictId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InvestigationCaseSubStatusId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PinCodeId")
@@ -443,6 +449,8 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("DistrictId");
 
+                    b.HasIndex("InvestigationCaseSubStatusId");
+
                     b.HasIndex("PinCodeId");
 
                     b.HasIndex("StateId");
@@ -450,6 +458,38 @@ namespace risk.control.system.Migrations
                     b.HasIndex("VendorId");
 
                     b.ToTable("CaseLocation");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ClaimReport", b =>
+                {
+                    b.Property<string>("ClaimReportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("AssessorRemarkType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AssessorRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CaseLocationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SupervisorRemarkType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SupervisorRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ClaimReportId");
+
+                    b.HasIndex("CaseLocationId")
+                        .IsUnique();
+
+                    b.ToTable("ClaimReport");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
@@ -2098,6 +2138,10 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("DistrictId");
 
+                    b.HasOne("risk.control.system.Models.InvestigationCaseSubStatus", "InvestigationCaseSubStatus")
+                        .WithMany()
+                        .HasForeignKey("InvestigationCaseSubStatusId");
+
                     b.HasOne("risk.control.system.Models.PinCode", "PinCode")
                         .WithMany()
                         .HasForeignKey("PinCodeId");
@@ -2118,11 +2162,24 @@ namespace risk.control.system.Migrations
 
                     b.Navigation("District");
 
+                    b.Navigation("InvestigationCaseSubStatus");
+
                     b.Navigation("PinCode");
 
                     b.Navigation("State");
 
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ClaimReport", b =>
+                {
+                    b.HasOne("risk.control.system.Models.CaseLocation", "CaseLocation")
+                        .WithOne("ClaimReport")
+                        .HasForeignKey("risk.control.system.Models.ClaimReport", "CaseLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CaseLocation");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
@@ -2569,6 +2626,11 @@ namespace risk.control.system.Migrations
                     b.Navigation("ApplicationRoles");
 
                     b.Navigation("Mailbox");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.CaseLocation", b =>
+                {
+                    b.Navigation("ClaimReport");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>

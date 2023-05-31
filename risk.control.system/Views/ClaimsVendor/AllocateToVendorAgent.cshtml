@@ -169,7 +169,7 @@
                         <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.VERIFICTION_LOCATIONS</h3>
                     </div>
                     <div class="card-body p-0 contained-width">
-                        <form id="radioButtons" asp-action="AllocateToVendorAgent" method="post" enctype="multipart/form-data">
+                        <form id="radioButtons" asp-action="SelectVendorAgent" method="post" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigationId" />
                             <div class="col-md-12">
                                 @if (Model.CaseLocations.Count == 0)
