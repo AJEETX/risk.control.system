@@ -176,11 +176,20 @@ namespace risk.control.system.Controllers
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
+                var claimsAssigned = new List<ClaimsInvestigation>();
+
+                applicationDbContext = applicationDbContext.Where(a =>
+                a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId)?.ToList();
+                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
+                    && !c.IsReviewCaseLocation)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
                 }
+                return View(claimsAssigned);
             }
             else if (userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
             {
@@ -189,7 +198,8 @@ namespace risk.control.system.Controllers
                 foreach (var item in applicationDbContext)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && c.AssignedAgentUserEmail == currentUserEmail)?.ToList();
+                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
+                        && c.AssignedAgentUserEmail == currentUserEmail)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claimsAssigned.Add(item);
@@ -223,6 +233,40 @@ namespace risk.control.system.Controllers
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
 
+        public async Task<IActionResult> GetInvestigateReportReview(string selectedcase)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.LineOfBusiness)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+            var submittedToSupervisortStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            var claimCase = _context.CaseLocation
+                .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.PinCode)
+                .Include(c => c.ClaimReport)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
+                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId || c.IsReviewCaseLocation
+                    );
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.VendorAgent.ToString()));
+
+            List<VendorApplicationUser> agents = new List<VendorApplicationUser>();
+            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimCase.VendorId);
+
+            foreach (var vendorUser in vendorUsers)
+            {
+                var isTrue = await userManager.IsInRoleAsync(vendorUser, agentRole?.Name);
+                if (isTrue)
+                {
+                    agents.Add(vendorUser);
+                }
+            }
+            return View(new ClaimsInvestigationVendorAgentModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation, VendorApplicationUser = agents });
+        }
+
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -239,7 +283,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId
+                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId || c.IsReviewCaseLocation
                     );
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
@@ -253,20 +297,28 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
 
+            toastNotification.AddSuccessToastMessage("report submitted to supervisor successfully");
+
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitReportToCompany(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
+        public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
         {
             string userEmail = HttpContext?.User?.Identity.Name;
+            var reportUpdateStatus = Enum.Parse<SupervisorRemarkType>(supervisorRemarkType);
 
-            //TO-DO:: IMPLEMENTATION
-            await claimsInvestigationService.SubmitToCompany(userEmail, supervisorRemarks, caseLocationId, claimId, supervisorRemarkType);
+            var success = await claimsInvestigationService.Process(userEmail, supervisorRemarks, caseLocationId, claimId, supervisorRemarkType);
 
-            //TO-DO :: IMPLEMENTATION
-            await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-
+            if (success)
+            {
+                await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
+                toastNotification.AddSuccessToastMessage("report submitted to Company successfully");
+            }
+            else
+            {
+                toastNotification.AddSuccessToastMessage("Report sent to review successfully");
+            }
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
@@ -391,7 +443,9 @@ namespace risk.control.system.Controllers
                 foreach (var item in applicationDbContext)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
+                        && c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId
+                        //&& !c.IsReviewCaseLocation
+                        )?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claimsSubmitted.Add(item);
@@ -404,6 +458,69 @@ namespace risk.control.system.Controllers
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
                         && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && c.AssignedAgentUserEmail == currentUserEmail)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+            }
+
+            return View(claimsSubmitted);
+        }
+
+        public async Task<IActionResult> ClaimReportReview()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport)
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Vendor)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport)
+                .Include(c => c.Vendor)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State);
+
+            ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
+
+            var allocatedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (vendorUser != null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+            }
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+            if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            {
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId && c.IsReviewCaseLocation == true
+                        && (c.InvestigationCaseSubStatusId == allocatedToVendorSupervisorStatus.InvestigationCaseSubStatusId
+                        || c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId))?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claimsSubmitted.Add(item);

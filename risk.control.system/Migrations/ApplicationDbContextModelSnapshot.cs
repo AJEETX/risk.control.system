@@ -421,6 +421,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("InvestigationCaseSubStatusId")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsReviewCaseLocation")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
@@ -578,6 +581,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("InvestigationServiceTypeId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsReviewCase")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("LineOfBusinessId")
                         .HasColumnType("TEXT");

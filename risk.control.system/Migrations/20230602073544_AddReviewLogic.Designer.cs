@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230531074217_completeApprove")]
-    partial class completeApprove
+    [Migration("20230602073544_AddReviewLogic")]
+    partial class AddReviewLogic
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -424,6 +424,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("InvestigationCaseSubStatusId")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsReviewCaseLocation")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
@@ -581,6 +584,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("InvestigationServiceTypeId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsReviewCase")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("LineOfBusinessId")
                         .HasColumnType("TEXT");

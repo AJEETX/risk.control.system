@@ -156,6 +156,8 @@ namespace risk.control.system.Models
 
         [Display(Name = "Customer education")]
         public Education? CustomerEducation { get; set; }
+
+        public bool IsReviewCase { get; set; } = false;
     }
 
     public enum Income
@@ -166,22 +168,22 @@ namespace risk.control.system.Models
         [Display(Name = "0.0 Lac")]
         NO_INCOME,
 
-        [Display(Name = "0 -2.5 Lac")]
+        [Display(Name = "0 - 2.5 Lac")]
         TAXFREE_SLOT,
 
         [Display(Name = "2.5 - 5 Lac")]
         BASIC_INCOME,
 
-        [Display(Name = "5 -8 Lac")]
+        [Display(Name = "5 - 8 Lac")]
         MEDIUUM_INCOME,
 
         [Display(Name = "8 - 15 Lac")]
         UPPER_INCOME,
 
-        [Display(Name = "15 -30 Lac")]
+        [Display(Name = "15 - 30 Lac")]
         HIGHER_INCOME,
 
-        [Display(Name = "30 -50 Lac")]
+        [Display(Name = "30 - 50 Lac")]
         TOP_HIGHER_INCOME,
 
         [Display(Name = "50 + Lac")]

@@ -378,7 +378,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsInvestigationController.Index), "ClaimsInvestigation");
         }
 
-        public async Task<IActionResult> CaseLocation(string id)
+        public IActionResult CaseLocation(string id)
         {
             if (id == null)
             {
@@ -700,10 +700,8 @@ namespace risk.control.system.Controllers
         {
             string userEmail = HttpContext?.User?.Identity.Name;
 
-            //TO-DO:: IMPLEMENTATION
             await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, assessorRemarkType);
 
-            //TO-DO :: IMPLEMENTATION
             await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Index));

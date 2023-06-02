@@ -1,4 +1,4 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@model ClaimsInvestigationVendorAgentModel
 
 @{
     ViewData["Title"] = @Applicationsettings.SERVICE;
@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form asp-action="ProcessCaseReport" method="post">
+                <form asp-action="ProcessReport" method="post">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                     <div class="card card-success card-outline">
@@ -103,7 +103,7 @@
                             </div>
                         </div>
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> Verified Location</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.VERIFY_LOCATION</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -126,10 +126,10 @@
                                     <dd class="col-sm-10">
                                         @Html.DisplayFor(model => model.CaseLocation.Addressline)
                                     </dd>
-
+                                    
                                 </div>
                                 <div class="col-md-6">
-
+                                    
                                     <dt class="col-sm-2">
                                         @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
                                     </dt>
@@ -151,8 +151,11 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> AGENCY Report</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> AGENT Report</h3>
                         </div>
                         <div class="card-body">
                             <div class="=row">
@@ -160,41 +163,102 @@
                                     <textarea disabled name="@Model.CaseLocation.ClaimReport.AgentRemarks" id="remarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.AgentRemarks</textarea>
                                 </div>
                             </div>
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value ='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
-                                    <select disabled name="supervisorRemarkType" id="supervisorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<SupervisorRemarkType>()"></select>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div class="card card-success card-outline">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> PROCESS REPORT</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> Review Report</h3>
                         </div>
                         <div class="card-body">
                             <div class="=row">
                                 <div class="col-md-12">
-                                    <textarea name="assessorRemarks" id="assessorRemarks" type="text" class="form-control"></textarea>
-                                    <select name="assessorRemarkType" id="assessorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<AssessorRemarkType>()"></select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="=row">
-                                <div class="col-md-12 float-right">
-                                    <a asp-controller="ClaimsVendor" asp-action="Index" class="btn btn-secondary">
-                                        <i class="fa fa-window-close"></i>
-                                        @Applicationsettings.CANCEL
-                                    </a>
-                                    <button id="allocate-case" type="submit" class="btn btn-success">
-                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i> PROCESS
-                                    </button>
+                                    <textarea disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.SupervisorRemarks</textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-success card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.AGENTS</h3>
+                    </div>
+                    <div class="card-body p-0 contained-width">
+                        <form id="radioButtons" method="post" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
+                            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                            <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
+                            @if (Model == null || Model.VendorApplicationUser.Count == 0)
+                            {
+                                <hr />
+                                <div class="col-md-12 text-center">
+                                    <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
+                                </div>
+                                <hr />
+                            }
+                            else
+                            {
+                                <table class="table table-striped fixed-with-height">
+                                    <thead>
+                                        <tr>
+                                            <th>
+
+                                            </th>
+                                            <th>
+                                                Agent Name
+                                            </th>
+
+                                            <th>
+                                                PhoneNumber
+                                            </th>
+                                            <th>
+                                                Email
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.VendorApplicationUser)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.Id" />
+                                                </td>
+
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.FirstName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Email)
+                                                </td>
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="10">
+                                                <a asp-controller="ClaimsInvestigation" asp-action="Index" class="btn btn-secondary">
+                                                    <i class="fa fa-window-close"></i>
+                                                    @Applicationsettings.CANCEL
+                                                </a>
+                                                <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
+                                                    <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.BROADCAST
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            }
+                        </form>
+                        <br />
+                        <br />
+                    </div>
+                </div>
             </div>
         </div>
     </div>

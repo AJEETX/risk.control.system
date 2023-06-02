@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class completeApprove : Migration
+    public partial class AddReviewLogic : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -853,6 +853,7 @@ namespace risk.control.system.Migrations
                     VendorId = table.Column<string>(type: "TEXT", nullable: true),
                     InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
                     AssignedAgentUserEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    IsReviewCaseLocation = table.Column<bool>(type: "INTEGER", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -974,6 +975,7 @@ namespace risk.control.system.Migrations
                     CustomerIncome = table.Column<int>(type: "INTEGER", nullable: true),
                     CustomerOccupation = table.Column<int>(type: "INTEGER", nullable: true),
                     CustomerEducation = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsReviewCase = table.Column<bool>(type: "INTEGER", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
