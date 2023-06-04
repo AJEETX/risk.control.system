@@ -29,6 +29,5 @@ namespace risk.control.system.Models
     {
         OK,
         REVIEW,
-        REJECT
     }
 }

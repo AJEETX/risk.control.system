@@ -364,6 +364,51 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ReAllocateToVendor(string selectedcase)
+        {
+            if (_context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var caseLocations = claimsInvestigation.CaseLocations.Where(c => !string.IsNullOrWhiteSpace(c.VendorId)
+            && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId).ToList();
+
+            claimsInvestigation.CaseLocations = caseLocations;
+            return View(claimsInvestigation);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CaseAllocatedToVendor(string selectedcase, string claimId, long caseLocationId)
         {
@@ -551,7 +596,9 @@ namespace risk.control.system.Controllers
                  .Include(c => c.ClientCompany)
                  .Include(c => c.CaseEnabler)
                  .Include(c => c.CaseLocations)
-             .ThenInclude(c => c.PinCode)
+                 .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations)
+                 .ThenInclude(c => c.ClaimReport)
                  .Include(c => c.CaseLocations).
                  ThenInclude(c => c.InvestigationCaseSubStatus)
              .Include(c => c.CostCentre)
@@ -571,7 +618,7 @@ namespace risk.control.system.Controllers
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+            var reassignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
@@ -592,7 +639,7 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()) || userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
@@ -600,7 +647,7 @@ namespace risk.control.system.Controllers
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claimsSubmitted.Add(item);

@@ -172,6 +172,7 @@
                         <div class="card-body">
                             <div class="=row">
                                 <div class="col-md-12">
+                                    <select disabled name="supervisorRemarkType" id="supervisorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<SupervisorRemarkType>()"></select>
                                     <textarea disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.SupervisorRemarks</textarea>
                                 </div>
                             </div>

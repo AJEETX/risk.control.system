@@ -213,6 +213,14 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">review to allocate</span>
+                                </p>
+                            </a>
+                        </li>
                     }
                     if (User.IsInRole(AppRoles.ClientAdmin.ToString()) || User.IsInRole(AppRoles.ClientAssessor.ToString()))
                     {

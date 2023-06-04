@@ -2,13 +2,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using NToastNotify;
+
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
+        private const string mobileAppUrl = "http://localhost:19006/";
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IToastNotification toastNotification;
@@ -42,38 +45,31 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+            if (result.Succeeded && returnUrl != mobileAppUrl)
             {
-                //var loggedinUser = await _userManager.FindByEmailAsync(model.Email);
-                //if (loggedinUser != null)
-                //{
-                //    // Now user have entered correct username and password.
-                //    // Time to change the security stamp
-                //    await _userManager.UpdateSecurityStampAsync(loggedinUser);
-                //}
+                _logger.LogInformation("User logged in.");
+                toastNotification.AddSuccessToastMessage("login successful!");
+                return RedirectToLocal(returnUrl);
+            }
 
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
-                    toastNotification.AddSuccessToastMessage("login successful!");
-                    return RedirectToLocal(returnUrl);
-                }
- 
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToAction(nameof(Lockout));
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    model.Error = "Invalid login attempt.";
-                    return View(model);
-                }
+            if (result.IsLockedOut && returnUrl != mobileAppUrl)
+            {
+                _logger.LogWarning("User account locked out.");
+                return RedirectToAction(nameof(Lockout));
+            }
+            else if (result.Succeeded && returnUrl == mobileAppUrl)
+            {
+                return Ok(new { success = "SUCCESS" });
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                model.Error = "Invalid login attempt.";
+                return View(model);
             }
         }
 
@@ -85,6 +81,7 @@ namespace risk.control.system.Controllers
             _logger.LogInformation("User logged out.");
             return RedirectToAction(nameof(ContactMessageController.Index), "ContactMessage");
         }
+
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Lockout()

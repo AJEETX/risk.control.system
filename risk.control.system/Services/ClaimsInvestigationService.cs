@@ -24,7 +24,7 @@ namespace risk.control.system.Services
 
         Task<bool> Process(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, string remarks);
 
-        Task ProcessCaseReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, string remarks);
+        Task<bool> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, string assessorRemarkType);
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -169,7 +169,64 @@ namespace risk.control.system.Services
             throw new NotImplementedException();
         }
 
-        public async Task ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, string assessorRemarkType)
+        public async Task<bool> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, string assessorRemarkType)
+        {
+            var claim = _context.ClaimsInvestigation
+                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+
+            var reportUpdateStatus = Enum.Parse<AssessorRemarkType>(assessorRemarkType);
+
+            if (reportUpdateStatus == AssessorRemarkType.OK)
+            {
+                return await ApproveCaseReport(userEmail, assessorRemarks, caseLocationId, claimsInvestigationId, assessorRemarkType);
+            }
+            else
+            {
+                //PUT th case back in review list :: Assign back to Agent
+                await ReAssignToAssigner(userEmail, claimsInvestigationId, caseLocationId, assessorRemarks, assessorRemarkType);
+
+                return false;
+            }
+        }
+
+        private async Task ReAssignToAssigner(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, string assessorRemarkType)
+        {
+            var claimsCaseLocation = _context.CaseLocation
+                .Include(c => c.ClaimReport)
+                .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.Vendor)
+                .Include(c => c.PinCode)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.State)
+                .FirstOrDefault(c => c.CaseLocationId == caseLocationId);
+
+            var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
+            report.AssessorRemarkType = Enum.Parse<AssessorRemarkType>(assessorRemarkType);
+            report.AssessorRemarks = assessorRemarks;
+
+            _context.ClaimReport.Update(report);
+            claimsCaseLocation.ClaimReport = report;
+            claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
+            claimsCaseLocation.IsReviewCaseLocation = true;
+            _context.CaseLocation.Update(claimsCaseLocation);
+
+            var claimsCaseToReassign = _context.ClaimsInvestigation.FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+            claimsCaseToReassign.Updated = DateTime.UtcNow;
+            claimsCaseToReassign.UpdatedBy = userEmail;
+            claimsCaseToReassign.CurrentUserEmail = userEmail;
+            claimsCaseToReassign.IsReviewCase = true;
+            claimsCaseToReassign.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
+
+            _context.ClaimsInvestigation.Update(claimsCaseToReassign);
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<bool> ApproveCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, string assessorRemarkType)
         {
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
@@ -199,13 +256,14 @@ namespace risk.control.system.Services
                     claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId;
                     _context.ClaimsInvestigation.Update(claim);
-                    await _context.SaveChangesAsync();
+                    return await _context.SaveChangesAsync() > 0 ? true : false;
                 }
             }
             catch (Exception ex)
             {
                 throw;
             }
+            return false;
         }
 
         public async Task<bool> Process(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, string supervisorRemarkType)
@@ -308,6 +366,7 @@ namespace risk.control.system.Services
                 AgentRemarks = remarks,
                 CaseLocationId = caseLocationId,
             };
+
             _context.ClaimReport.Add(report);
             caseLocation.ClaimReport = report;
             caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
@@ -315,6 +374,7 @@ namespace risk.control.system.Services
             caseLocation.Updated = DateTime.UtcNow;
             caseLocation.UpdatedBy = userEmail;
             caseLocation.AssignedAgentUserEmail = userEmail;
+            caseLocation.IsReviewCaseLocation = false;
             _context.CaseLocation.Update(caseLocation);
             try
             {

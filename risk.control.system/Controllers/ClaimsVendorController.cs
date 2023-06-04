@@ -441,7 +441,7 @@ namespace risk.control.system.Controllers
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
                         && c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId
-                        //&& !c.IsReviewCaseLocation
+                        && !c.IsReviewCaseLocation
                         )?.ToList();
                     if (item.CaseLocations.Any())
                     {
@@ -449,18 +449,18 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
-            else if (userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
-            {
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && c.AssignedAgentUserEmail == currentUserEmail)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsSubmitted.Add(item);
-                    }
-                }
-            }
+            //else if (userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
+            //{
+            //    foreach (var item in applicationDbContext)
+            //    {
+            //        item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
+            //            && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && c.AssignedAgentUserEmail == currentUserEmail)?.ToList();
+            //        if (item.CaseLocations.Any())
+            //        {
+            //            claimsSubmitted.Add(item);
+            //        }
+            //    }
+            //}
 
             return View(claimsSubmitted);
         }
