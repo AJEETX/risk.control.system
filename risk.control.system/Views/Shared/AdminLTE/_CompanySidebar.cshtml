@@ -184,7 +184,7 @@
                     </a>
                 </li>
                 @{
-                    if (User.IsInRole(AppRoles.ClientAdmin.ToString()) || User.IsInRole(AppRoles.ClientCreator.ToString()))
+                    if (User.IsInRole(AppRoles.ClientCreator.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft") @Url.MakeActiveClass("ClaimsInvestigation","Details")">
@@ -203,7 +203,7 @@
                             </a>
                         </li>
                     }
-                    if (User.IsInRole(AppRoles.ClientAdmin.ToString()) || User.IsInRole(AppRoles.ClientAssigner.ToString()))
+                    if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
@@ -222,7 +222,7 @@
                             </a>
                         </li>
                     }
-                    if (User.IsInRole(AppRoles.ClientAdmin.ToString()) || User.IsInRole(AppRoles.ClientAssessor.ToString()))
+                    if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">

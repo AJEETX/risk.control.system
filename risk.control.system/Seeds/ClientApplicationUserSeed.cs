@@ -47,15 +47,15 @@ namespace risk.control.system.Seeds
                     //clientAdmin.ApplicationRoles.Add(clientAdminRole);
 
 
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientCreator.ToString());
+                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientCreator.ToString());
                     //var clientCreatorRole = new ApplicationRole(AppRoles.ClientCreator.ToString(), AppRoles.ClientCreator.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientCreatorRole);
 
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssigner.ToString());
+                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssigner.ToString());
                     //var clientAssignerRole = new ApplicationRole(AppRoles.ClientAssigner.ToString(), AppRoles.ClientAssigner.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientAssignerRole);
 
-                    await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssessor.ToString());
+                    //await userManager.AddToRoleAsync(clientAdmin, AppRoles.ClientAssessor.ToString());
                     //var clientAssessorRole = new ApplicationRole(AppRoles.ClientAssessor.ToString(), AppRoles.ClientAssessor.ToString());
                     //clientAdmin.ApplicationRoles.Add(clientAssessorRole);
                 }

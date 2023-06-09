@@ -62,18 +62,18 @@ namespace risk.control.system.Controllers
                 .Include(c => c.ClientCompany)
                 .Include(c => c.CaseEnabler)
                 .Include(c => c.CaseLocations)
-            .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations).
-                ThenInclude(c => c.InvestigationCaseSubStatus)
-            .Include(c => c.CostCentre)
-            .Include(c => c.Country)
-            .Include(c => c.District)
-            .Include(c => c.InvestigationCaseStatus)
-            .Include(c => c.InvestigationCaseSubStatus)
-            .Include(c => c.InvestigationServiceType)
-            .Include(c => c.LineOfBusiness)
-            .Include(c => c.PinCode)
-            .Include(c => c.State);
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State);
 
             ViewBag.HasClientCompany = true;
             ViewBag.HasVendorCompany = true;
@@ -103,20 +103,21 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString())
-                || userRole.Value.Contains(AppRoles.ClientAdmin.ToString())
-                || userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(
-                    a => a.CaseLocations.Count > 0
-                    && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
 
+                var claimsAssigned = new List<ClaimsInvestigation>();
                 foreach (var item in applicationDbContext)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
                     && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
                 }
-                return View(await applicationDbContext.ToListAsync());
+                return View(claimsAssigned);
             }
             else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
             {
