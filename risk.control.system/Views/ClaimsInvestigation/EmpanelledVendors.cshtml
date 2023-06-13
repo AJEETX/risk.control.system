@@ -234,10 +234,10 @@
                                                 <td>
                                                     @foreach (var service in item.VendorInvestigationServiceTypes)
                                                     {
-                                                       <span class="badge badge-success"> @service.LineOfBusiness.Name / @service.InvestigationServiceType.Name
+                                                       <span class="badge badge-light"> @service.LineOfBusiness.Name / @service.InvestigationServiceType.Name
                                                         @foreach (var pincode in service.PincodeServices)
                                                         {
-                                                            <span class="badge badge-light">@pincode.Pincode</span>
+                                                            <span class="badge badge-info">@pincode.Pincode</span>
                                                         }
                                                         </span>
 

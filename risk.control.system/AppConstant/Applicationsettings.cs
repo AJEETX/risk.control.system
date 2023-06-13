@@ -115,14 +115,14 @@
         // MENUS / SUBMENUS
 
         public const string DASHBOARD = "Dashboard";
-        public const string INVESTIGATION_MAIN = "INVESTIGATIONS";
+        public const string INVESTIGATION_CLAIM = "CLAIMS";
         public const string INVESTIGATION_CASE_SETTINGS = "CASE SETTINGS";
         public const string COMPANY_SETTINGS = "COMPANY SETTINGS";
         public const string INVESTIGATION_CASE_STATUS = "Case status";
         public const string INVESTIGATION_CLAIMS_CASE = "Claim";
         public const string INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN = "Claim (ready to assign)";
-        public const string INVESTIGATION_CLAIMS_CASE_DRAFT = "Claim case (incomplete)";
-        public const string INVESTIGATION_CLAIMS_OPEN = "Claim case (open)";
+        public const string INVESTIGATION_CLAIMS_CASE_DRAFT = "Claim (draft)";
+        public const string INVESTIGATION_CLAIMS_OPEN = "Claim (open)";
         public const string INVESTIGATION_CLAIMS_SUBMITTED_BY_AGENT = "Claim case (report)";
         public const string INVESTIGATION_CLAIMS_CASE_DETAILS = "Claim case details";
         public const string CUSTOMER_DETAILS = "Customer details";

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -47,11 +48,11 @@ namespace risk.control.system.Seeds
                     //var vendorAdminRole = new ApplicationRole(AppRoles.VendorAdmin.ToString(), AppRoles.VendorAdmin.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorAdminRole);
 
-                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorSupervisor.ToString());
+                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorSupervisor.ToString());
                     //var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorSuperVisorRole);
 
-                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAgent.ToString());
+                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAgent.ToString());
                     //var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorAgentRole);
                 }
@@ -92,10 +93,9 @@ namespace risk.control.system.Seeds
                     //var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
                     //vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);
 
-                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorAgent.ToString());
+                    //await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorAgent.ToString());
                     //var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
                     //vendorSupervisor.ApplicationRoles.Add(vendorAgentRole);
-
                 }
             }
 

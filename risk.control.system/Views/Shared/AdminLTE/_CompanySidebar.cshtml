@@ -178,7 +178,7 @@
                     <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsInvestigation","")">
                         <i class="nav-icon fa fa-user-secret"></i>
                         <p class="sidebar-menu-header-label">
-                            @Applicationsettings.INVESTIGATION_MAIN
+                            @Applicationsettings.INVESTIGATION_CLAIM
                             <i class="right fas fa-angle-right"></i>
                         </p>
                     </a>
@@ -190,7 +190,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft") @Url.MakeActiveClass("ClaimsInvestigation","Details")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">incomplete...</span>
+                                    <span class="badge badge-warning">draft</span>
                                 </p>
                             </a>
                         </li>
@@ -198,7 +198,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">ready to assign</span>
+                                    <span class="badge badge-danger">ready to assign</span>
                                 </p>
                             </a>
                         </li>
@@ -209,7 +209,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">ready to allocate</span>
+                                    <span class="badge badge-danger">ready to allocate</span>
                                 </p>
                             </a>
                         </li>
@@ -217,7 +217,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">review to allocate</span>
+                                    <span class="badge badge-warning">review to allocate</span>
                                 </p>
                             </a>
                         </li>
@@ -228,7 +228,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">ready to assess</span>
+                                    <span class="badge badge-danger">ready to assess</span>
                                 </p>
                             </a>
                         </li>
@@ -236,7 +236,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-success">approved</span>
+                                    <span class="badge badge-success">approved</span>
                                 </p>
                             </a>
                         </li>
@@ -244,7 +244,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">review</span>
+                                     <span class="badge badge-warning">review</span>
                                 </p>
                             </a>
                         </li>
@@ -255,7 +255,7 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Open")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-light">open</span>
+                             <span class="badge badge-light">open</span>
                         </p>
                     </a>
                 </li>

@@ -65,17 +65,21 @@
                                     <dd class="col-sm-8">
                                         @foreach (var service in Model.VendorInvestigationServiceTypes)
                                         {
-                                            <span class="badge badge-light">@service.LineOfBusiness.Name</span>
+                                            <span class="badge badge-light">@service.LineOfBusiness.Name</span> <span class="badge badge-light">@service.Price</span>
+                                            foreach(var pincode in service.PincodeServices)
+                                            {
+                                                <span class="badge badge-light">@pincode.Pincode : @pincode.Name</span>
+                                            }
                                         }
                                     </dd>
 
                                     <dt class="col-sm-3">
-                                        Services
+                                        Prices
                                     </dt>
                                     <dd class="col-sm-8">
                                         @foreach (var service in Model.VendorInvestigationServiceTypes)
                                         {
-                                            <span class="badge badge-light">@service.LineOfBusiness.Name</span>
+                                            <span class="badge badge-light">@service.Price</span>
                                         }
                                     </dd>
 
