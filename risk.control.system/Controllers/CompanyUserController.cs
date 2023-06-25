@@ -37,6 +37,7 @@ namespace risk.control.system.Controllers
             this._context = context;
             UserList = new List<UsersViewModel>();
         }
+
         public async Task<IActionResult> Index(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.EmailSortParm = string.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
@@ -64,7 +65,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.State)
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
-                .Include(c=>c.ClientCompany)
+                .Include(c => c.ClientCompany)
                 .Where(u => u.ClientCompanyId == id);
 
             var model = new CompanyUsersViewModel
@@ -86,12 +87,15 @@ namespace risk.control.system.Controllers
                     case "name_desc":
                         applicationDbContext = applicationDbContext.OrderByDescending(s => new { s.FirstName, s.LastName });
                         break;
+
                     case "email_desc":
                         applicationDbContext = applicationDbContext.OrderByDescending(s => s.Email);
                         break;
+
                     case "pincode_desc":
                         applicationDbContext = applicationDbContext.OrderByDescending(s => s.PinCode.Code);
                         break;
+
                     default:
                         applicationDbContext.OrderByDescending(s => s.Email);
                         break;
@@ -106,13 +110,13 @@ namespace risk.control.system.Controllers
                 ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
 
                 var users = applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-                var tempusers = userManager.Users.Where(c=>c.ClientCompanyId == id);
+                var tempusers = userManager.Users.Where(c => c.ClientCompanyId == id);
                 foreach (var user in users)
                 {
-                    var country = _context.Country.FirstOrDefault(c=>c.CountryId == user.CountryId);
-                    var state = _context.State.FirstOrDefault(c=>c.StateId == user.StateId);
-                    var district = _context.District.FirstOrDefault(c=>c.DistrictId == user.DistrictId);
-                    var pinCode = _context.PinCode.FirstOrDefault(c=>c.PinCodeId == user.PinCodeId);
+                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                    var state = _context.State.FirstOrDefault(c => c.StateId == user.StateId);
+                    var district = _context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
+                    var pinCode = _context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
 
                     var thisViewModel = new UsersViewModel();
                     thisViewModel.UserId = user.Id.ToString();
@@ -137,6 +141,7 @@ namespace risk.control.system.Controllers
             }
             return View(model);
         }
+
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null || _context.ClientCompanyApplicationUser == null)
@@ -173,29 +178,41 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientCompanyApplicationUser clientCompanyApplicationUser)
+        public async Task<IActionResult> Create(ClientCompanyApplicationUser user)
         {
-
-            if (clientCompanyApplicationUser is not null)
+            if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                clientCompanyApplicationUser.Mailbox.Name = clientCompanyApplicationUser.Email;
-                IFormFile? vendorUserProfile = Request.Form?.Files?.FirstOrDefault();
-                if (vendorUserProfile is not null)
-                {
-                    clientCompanyApplicationUser.ProfileImage = vendorUserProfile;
-                    using var dataStream = new MemoryStream();
-                    await clientCompanyApplicationUser.ProfileImage.CopyToAsync(dataStream);
-                    clientCompanyApplicationUser.ProfilePicture = dataStream.ToArray();
-                }
-                clientCompanyApplicationUser.Updated = DateTime.UtcNow;
-                clientCompanyApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.Add(clientCompanyApplicationUser);
-                await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("company user created successfully!");
-                return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = clientCompanyApplicationUser.ClientCompanyId });
+                string newFileName = Guid.NewGuid().ToString();
+                string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
+                newFileName += fileExtension;
+                var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                user.ProfilePictureUrl = "upload/" + newFileName;
             }
-            toastNotification.AddErrorToastMessage("Error to create company user!");
-            return Problem();
+            user.Mailbox = new Mailbox { Name = user.Email };
+            user.Updated = DateTime.UtcNow;
+            user.UpdatedBy = HttpContext.User?.Identity?.Name;
+            IdentityResult result = await userManager.CreateAsync(user, user.Password);
+
+            if (result.Succeeded)
+                return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
+            else
+            {
+                toastNotification.AddErrorToastMessage("Error to create user!");
+                foreach (IdentityError error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+            }
+            GetCountryStateEdit(user);
+            toastNotification.AddSuccessToastMessage("user created successfully!");
+            return View(user);
+        }
+
+        private void GetCountryStateEdit(ClientCompanyApplicationUser? user)
+        {
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", user?.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
+            ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
         }
 
         // GET: ClientCompanyApplicationUser/Edit/5
@@ -301,17 +318,18 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                
             }
 
             toastNotification.AddErrorToastMessage("Error to create Company user!");
             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompany });
         }
+
         private void Errors(IdentityResult result)
         {
             foreach (IdentityError error in result.Errors)
                 ModelState.AddModelError("", error.Description);
         }
+
         // GET: VendorApplicationUsers/Delete/5
         public async Task<IActionResult> Delete(long? id)
         {
@@ -360,6 +378,7 @@ namespace risk.control.system.Controllers
         {
             return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
         private async Task<List<string>> GetUserRoles(ClientCompanyApplicationUser user)
         {
             return new List<string>(await userManager.GetRolesAsync(user));
