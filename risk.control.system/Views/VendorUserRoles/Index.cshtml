@@ -1,16 +1,16 @@
 ﻿@using risk.control.system.Models.ViewModel;
 @model VendorUserRolesViewModel
-<section class="content">
+<h3><i class="fas fa-folder-open"></i> Vendors</h3>
+
+<section class="content pt-2">
     <div class="container-fluid ">
 
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success card-outline">
                     <form method="post" action="VendorUserRoles/update">
-                        <div class="row">
                             <div class="card card-success card-outline">
                                 <div class="card-header">
-                                    <h3>Roles for User: <i> @Model.UserName </i></h3>
+                            <h3>Roles for User: </h3><i> @Model.UserName </i>
                                 </div>
                                 <div class="card-body contained-width">
                                     <input hidden asp-for="@Model.UserId" />
@@ -40,9 +40,7 @@
                                 </div>
                             </div>
 
-                        </div>
                     </form>
-                </div>
             </div>
         </div>
     </div>

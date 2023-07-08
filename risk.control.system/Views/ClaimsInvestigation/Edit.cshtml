@@ -4,19 +4,17 @@
     ViewData["Title"] = "Edit";
     var hasClientCompany = @Model.HasClientCompany ? "none" : "";
 }
+<h3>EDIT CLAIM CASE </h3>
+
 <section class="content">
     <div class="container-fluid ">
         <form asp-action="Edit" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <input type="hidden" asp-for="ClaimsInvestigationId" />
-                    <div class="card card-warning card-outline">
+                    <div class="card card-warning">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen"></i>  @Applicationsettings.INVESTIGATION_CLAIMS_CASE</h3>
-                        </div>
-                        <hr />
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen"></i>  @Applicationsettings.INVESTIGATION_CLAIMS_CASE_DETAILS</h3>
+                            <h3 class="card-title"><i class="fas fa-pen"></i> Edit @Applicationsettings.INVESTIGATION_CLAIMS_CASE_DETAILS</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -104,7 +102,7 @@
                             </div>
                         </div>
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-plus"></i>  @Applicationsettings.CUSTOMER_DETAILS</h3>
+                            <h3 class="card-title"><i class="fas fa-plus"></i> Edit @Applicationsettings.CUSTOMER_DETAILS</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
