@@ -386,7 +386,7 @@ function createMonthChart(container, titleText, data, keys, total) {
             marginRight: 0
         },
         title: {
-            text: 'Total ' + titleText + ' Count' + total,
+            text: 'Total ' + titleText + ' Count ' + total,
             style: {
                 fontSize: '1rem',
                 fontFamily: 'Arial Narrow, sans-serif'

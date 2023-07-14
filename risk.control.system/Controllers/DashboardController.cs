@@ -46,7 +46,7 @@ namespace risk.control.system.Controllers
         public JsonResult GetClaimWeeklyTat()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            Dictionary<string, double> monthlyExpense = dashboardService.CalculateTimespan(userEmail);
+            Dictionary<string, int> monthlyExpense = dashboardService.CalculateTimespan(userEmail);
             return new JsonResult(monthlyExpense);
         }
 

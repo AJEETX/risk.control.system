@@ -13,7 +13,7 @@ namespace risk.control.system.Services
 
         Dictionary<string, int> CalculateCaseChart(string userEmail);
 
-        Dictionary<string, double> CalculateTimespan(string userEmail);
+        Dictionary<string, int> CalculateTimespan(string userEmail);
     }
 
     public class DashboardService : IDashboardService
@@ -105,9 +105,9 @@ namespace risk.control.system.Services
             return dictWeeklyCases;
         }
 
-        public Dictionary<string, double> CalculateTimespan(string userEmail)
+        public Dictionary<string, int> CalculateTimespan(string userEmail)
         {
-            Dictionary<string, double> dictWeeklyCases = new Dictionary<string, double>();
+            Dictionary<string, int> dictWeeklyCases = new Dictionary<string, int>();
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             if (companyUser != null)
             {

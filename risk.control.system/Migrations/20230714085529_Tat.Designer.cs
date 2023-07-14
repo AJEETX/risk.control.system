@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230711090649_LogCase")]
-    partial class LogCase
+    [Migration("20230714085529_Tat")]
+    partial class Tat
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1283,6 +1283,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("InvestigationCaseSubStatusId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("Time2Update")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");
