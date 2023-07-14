@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Security.Claims;
+
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +14,7 @@ namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
-        private const string mobileAppUrl = "http://localhost:19006/";
+        private const string mobileAppUrl = "mobileapp";
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IToastNotification toastNotification;
@@ -63,7 +66,14 @@ namespace risk.control.system.Controllers
             }
             else if (result.Succeeded && returnUrl == mobileAppUrl)
             {
-                return Ok(new { success = "SUCCESS" });
+                var claims = new List<Claim> {
+                        new Claim(ClaimTypes.Name, model.Email) ,
+                        new Claim(ClaimTypes.Email, model.Email)
+                    };
+                var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                return Ok(new { success = model.Email });
             }
             else
             {
@@ -79,7 +89,7 @@ namespace risk.control.system.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(ContactMessageController.Index), "ContactMessage");
+            return RedirectToAction(nameof(DashboardController.Index), "Dashboard");
         }
 
         [HttpGet]
@@ -105,7 +115,7 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(ContactMessageController.Index), "ContactMessage");
+                return RedirectToAction(nameof(DashboardController.Index), "Dashboard");
             }
         }
 

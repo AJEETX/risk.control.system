@@ -17,6 +17,7 @@ namespace risk.control.system.Data
         }
 
         public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
+        public virtual DbSet<InvestigationTransaction> InvestigationTransaction { get; set; }
         public virtual DbSet<ClientCompanyApplicationUser> ClientCompanyApplicationUser { get; set; }
         public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
         public virtual DbSet<InvestigationCase> InvestigationCase { get; set; }

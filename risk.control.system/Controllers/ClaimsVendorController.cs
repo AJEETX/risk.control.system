@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -164,10 +165,10 @@ namespace risk.control.system.Controllers
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            //var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
 
             if (vendorUser != null)
             {

@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    #total-expense {
+        background-color: green;
+        color: white;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+</style>
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-light">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Bar Chart</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="container-claim" style="height:auto;margin: 0 auto;min-height:30rem;">
+                                </div>
+                            </div>
+                            <div class="card-body dataTable-search-form">
+                                <div class="row">
+                                    <div class="col-md-12 text-right">
+                                        <button id="btnWeeklyReport" class="btn btn-warning"><i class="far fa-chart-bar"></i> Weekly</button>
+                                        <button id="btnMonthlyReport" class="btn btn-info"><i class="fas fa-chart-bar"></i> Monthly</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-light">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="container-claim-pie" style="height:auto;margin: 0 auto;min-height:30rem;">
+                                </div>
+                            </div>
+                            <div class="card-body dataTable-search-form">
+                                <div class="row">
+                                    <div class="col-md-12 text-right">
+                                        <button id="btnWeeklyPie" class="btn btn-warning"><i class="far fa-chart-bar"></i> Weekly</button>
+                                        <button id="btnMonthlyPie" class="btn btn-info"><i class="fas fa-chart-bar"></i> Monthly</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-light">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Turn Around Time </h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="container-claim-tat" style="height:auto;margin: 0 auto;min-height:30rem;">
+                                </div>
+                            </div>
+                            <div class="card-body dataTable-search-form">
+                                <div class="row">
+                                    <div class="col-md-12 text-right">
+                                        <button id="btnWeeklyTat" class="btn btn-warning"><i class="far fa-chart-bar"></i> Weekly</button>
+                                        <button id="btnMonthlyTat" class="btn btn-info"><i class="fas fa-chart-bar"></i> Monthly</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-light">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Monthly Claims</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="container-monthly-claim" style="height:auto;margin: 0 auto;min-height:30rem;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

@@ -69,6 +69,19 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId;
                 claimsCaseToAllocateToVendor.Vendors.Add(vendor);
                 _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                i.ClaimsInvestigationId == claimsCaseToAllocateToVendor.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                var log = new InvestigationTransaction
+                {
+                    ClaimsInvestigationId = claimsCaseToAllocateToVendor.ClaimsInvestigationId,
+                    Created = DateTime.UtcNow,
+                    Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId,
+                    UpdatedBy = userEmail
+                };
+                _context.InvestigationTransaction.Add(log);
 
                 await _context.SaveChangesAsync();
             }
@@ -92,6 +105,20 @@ namespace risk.control.system.Services
                         caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
                     }
+
+                    var lastLog = _context.InvestigationTransaction.Where(i =>
+                    i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                    var log = new InvestigationTransaction
+                    {
+                        ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                        Created = DateTime.UtcNow,
+                        Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                        InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                        InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId,
+                        UpdatedBy = userEmail
+                    };
+                    _context.InvestigationTransaction.Add(log);
                 }
                 _context.UpdateRange(cases2Assign);
                 await _context.SaveChangesAsync();
@@ -125,9 +152,20 @@ namespace risk.control.system.Services
                 claim.CurrentUserEmail = userEmail;
                 claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
                 claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
-                //claim.CaseLocations = claim.CaseLocations.Where(
-                //    c => c.VendorId == vendorId
-                //    && c.InvestigationCaseSubStatusId == _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId)?.ToList();
+
+                var lastLog = _context.InvestigationTransaction.Where(i =>
+                i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+                var log = new InvestigationTransaction
+                {
+                    ClaimsInvestigationId = claim.ClaimsInvestigationId,
+                    Created = DateTime.UtcNow,
+                    Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId,
+                    UpdatedBy = userEmail
+                };
+                _context.InvestigationTransaction.Add(log);
             }
             _context.ClaimsInvestigation.Update(claim);
             await _context.SaveChangesAsync();
@@ -155,6 +193,17 @@ namespace risk.control.system.Services
                     }
 
                     _context.ClaimsInvestigation.Add(claimsInvestigation);
+                    var log = new InvestigationTransaction
+                    {
+                        ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                        Created = DateTime.UtcNow,
+                        Time2Update = 0,
+                        InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                        InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                        UpdatedBy = userEmail
+                    };
+
+                    _context.InvestigationTransaction.Add(log);
                     await _context.SaveChangesAsync();
                 }
                 catch (Exception ex)
@@ -222,6 +271,19 @@ namespace risk.control.system.Services
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
 
             _context.ClaimsInvestigation.Update(claimsCaseToReassign);
+            var lastLog = _context.InvestigationTransaction.Where(i =>
+                            i.ClaimsInvestigationId == claimsCaseToReassign.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+            var log = new InvestigationTransaction
+            {
+                ClaimsInvestigationId = claimsCaseToReassign.ClaimsInvestigationId,
+                Created = DateTime.UtcNow,
+                Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId,
+                UpdatedBy = userEmail
+            };
+            _context.InvestigationTransaction.Add(log);
 
             await _context.SaveChangesAsync();
         }
@@ -244,6 +306,21 @@ namespace risk.control.system.Services
             caseLocation.UpdatedBy = userEmail;
             caseLocation.AssignedAgentUserEmail = userEmail;
             _context.CaseLocation.Update(caseLocation);
+
+            var lastLog = _context.InvestigationTransaction.Where(i =>
+                 i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+            var log = new InvestigationTransaction
+            {
+                ClaimsInvestigationId = claimsInvestigationId,
+                Created = DateTime.UtcNow,
+                Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId,
+                UpdatedBy = userEmail
+            };
+            _context.InvestigationTransaction.Add(log);
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -256,6 +333,19 @@ namespace risk.control.system.Services
                     claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId;
                     _context.ClaimsInvestigation.Update(claim);
+
+                    var finalLog = new InvestigationTransaction
+                    {
+                        ClaimsInvestigationId = claimsInvestigationId,
+                        Created = DateTime.UtcNow,
+                        Time2Update = DateTime.UtcNow.Subtract(claim.Created).Days,
+                        InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId,
+                        InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId,
+                        UpdatedBy = userEmail
+                    };
+
+                    _context.InvestigationTransaction.Add(finalLog);
+
                     return await _context.SaveChangesAsync() > 0 ? true : false;
                 }
             }
@@ -268,14 +358,11 @@ namespace risk.control.system.Services
 
         public async Task<bool> Process(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, string supervisorRemarkType)
         {
-            var claim = _context.ClaimsInvestigation
-                .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
-
             var reportUpdateStatus = Enum.Parse<SupervisorRemarkType>(supervisorRemarkType);
 
             if (reportUpdateStatus == SupervisorRemarkType.OK)
             {
-                return await ApproveAgentReport(userEmail, caseLocationId, supervisorRemarks, supervisorRemarkType);
+                return await ApproveAgentReport(userEmail, claimsInvestigationId, caseLocationId, supervisorRemarks, supervisorRemarkType);
             }
             else
             {
@@ -322,10 +409,24 @@ namespace risk.control.system.Services
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId;
             _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
 
+            var lastLog = _context.InvestigationTransaction.Where(i =>
+                 i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+            var log = new InvestigationTransaction
+            {
+                ClaimsInvestigationId = claimsInvestigationId,
+                Created = DateTime.UtcNow,
+                Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId,
+                UpdatedBy = userEmail
+            };
+            _context.InvestigationTransaction.Add(log);
+
             await _context.SaveChangesAsync();
         }
 
-        private async Task<bool> ApproveAgentReport(string userEmail, long caseLocationId, string supervisorRemarks, string supervisorRemarkType)
+        private async Task<bool> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, string supervisorRemarkType)
         {
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
@@ -342,6 +443,21 @@ namespace risk.control.system.Services
             caseLocation.UpdatedBy = userEmail;
             caseLocation.AssignedAgentUserEmail = userEmail;
             _context.CaseLocation.Update(caseLocation);
+
+            var lastLog = _context.InvestigationTransaction.Where(i =>
+                i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+            var log = new InvestigationTransaction
+            {
+                ClaimsInvestigationId = claimsInvestigationId,
+                Created = DateTime.UtcNow,
+                Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR).InvestigationCaseSubStatusId,
+                UpdatedBy = userEmail
+            };
+            _context.InvestigationTransaction.Add(log);
+
             try
             {
                 return await _context.SaveChangesAsync() > 0 ? true : false;
@@ -376,6 +492,21 @@ namespace risk.control.system.Services
             caseLocation.AssignedAgentUserEmail = userEmail;
             caseLocation.IsReviewCaseLocation = false;
             _context.CaseLocation.Update(caseLocation);
+
+            var lastLog = _context.InvestigationTransaction.Where(i =>
+               i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
+
+            var log = new InvestigationTransaction
+            {
+                ClaimsInvestigationId = claimsInvestigationId,
+                Created = DateTime.UtcNow,
+                Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
+                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId,
+                UpdatedBy = userEmail
+            };
+            _context.InvestigationTransaction.Add(log);
+
             try
             {
                 await _context.SaveChangesAsync();

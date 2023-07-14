@@ -1,5 +1,4 @@
 ﻿$(document).ready(function () {
-
     $("#datepicker").datepicker();
 
     if ($(".selected-case:checked").length) {
@@ -30,7 +29,6 @@
                     response($.map(data, function (item) {
                         return { label: item, value: item };
                     }))
-
                 }
             })
         },
@@ -40,9 +38,8 @@
                 return r;
             }
         },
-        minLength:3
-    });  
-
+        minLength: 3
+    });
 
     $('.row-links').on('click', function () {
         let form = $('#message-detail');
@@ -89,7 +86,6 @@
     });
 
     $("input.vendors").click(function () {
-
         var checkboxes = $("input[type='checkbox'].vendors");
         var anyChecked = checkIfAnyChecked(checkboxes);
         var allChecked = checkIfAllChecked(checkboxes);
@@ -109,7 +105,7 @@
                     $("#ProfilePictureUrl").val("");
                 }
                 else {
-                   // toastr.error(data.message);
+                    // toastr.error(data.message);
                 }
             },
             beforeSend: function () {
@@ -121,6 +117,31 @@
             },
         });
     });
+    GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
+    GetWeeklyPie('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+    GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
+
+    GetChart('Claim', 'GetClaimChart', 'container-monthly-claim')
+
+    $("#btnWeeklyReport").click(function () {
+        GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
+    })
+
+    $("#btnMonthlyReport").click(function () {
+        GetMonthly('Claim', 'GetMonthlyClaim', 'container-claim');
+    })
+    $("#btnWeeklyPie").click(function () {
+        GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
+    })
+    $("#btnMonthlyPie").click(function () {
+        GetMonthlyPie('Claim', 'GetMonthlyClaim', 'container-claim-pie');
+    })
+    $("#btnWeeklyTat").click(function () {
+        GetWeeklyPie('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+    })
+    $("#btnMonthlyTat").click(function () {
+        GetMonthlyPie('Claim', 'GetMonthlyClaim', 'container-claim-tat');
+    })
 });
 
 function checkIfAllChecked(elements) {
@@ -134,7 +155,7 @@ function checkIfAnyChecked(elements) {
 
     $.each(elements, function (index, element) {
         if (element.checked === true) {
-            hasAnyCheckboxChecked= true;
+            hasAnyCheckboxChecked = true;
         }
     });
     return hasAnyCheckboxChecked;
@@ -151,7 +172,7 @@ function loadDistrict(obj, showDefaultOption = true) {
         PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option>--SELECT PINCODE--</option>", "<option>--SELECT DISTRICT--</option>", showDefaultOption);
     });
 }
-function loadPinCode(obj, showDefaultOption= true) {
+function loadPinCode(obj, showDefaultOption = true) {
     var value = obj.value;
     $.post("/MasterData/GetPinCodesByDistrictId", { districtId: value }, function (data) {
         PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
@@ -197,7 +218,7 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 }
 function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, pincodeOption, districtOption, showDefaultOption) {
     $(pinCodedropDownId).empty();
-    if (showDefaultOption){
+    if (showDefaultOption) {
         $(pinCodedropDownId).append(pincodeOption)
     }
 
@@ -220,9 +241,8 @@ function PopulatePinCodeDropDown(dropDownId, list, option, showDefaultOption) {
     }
     else {
         $(dropDownId).append("<option value='-1'>NO - PINCODE - AVAILABLE</option>")
-            $('#create-pincode').prop('disabled', true);
+        $('#create-pincode').prop('disabled', true);
     }
-    
 }
 function PopulateStateDropDown(pinCodedropDownId, districtDropDownId, stateDropDownId, list, stateOption, districtOption, pincodeOption, showDefaultOption) {
     $(stateDropDownId).empty();
@@ -241,9 +261,9 @@ function PopulateStateDropDown(pinCodedropDownId, districtDropDownId, stateDropD
 }
 function toggleChecked(status) {
     $("#checkboxes input").each(function () {
-        // Set the checked status of each to match the 
+        // Set the checked status of each to match the
         // checked status of the check all checkbox:
-        $(this).prop("checked", status);        
+        $(this).prop("checked", status);
     });
 }
 function readURL(input) {
@@ -262,7 +282,6 @@ function readURL(input) {
     }
 }
 
-
 function loadRemainingPinCode(obj, showDefaultOption = true, caseId) {
     var value = obj.value;
     $.post("/MasterData/GetPincodesByDistrictIdWithoutPreviousSelected", { districtId: value, caseId: caseId }, function (data) {
@@ -279,4 +298,230 @@ function loadRemainingServicePinCode(obj, showDefaultOption = true, vendorId, li
     $.post("/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: value, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
         PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
     });
+}
+
+function createCharts(container, txn, sum, titleText, totalspent) {
+    Highcharts.chart(container, {
+        chart: {
+            type: 'pie'
+        },
+        title: {
+            text: titleText + ' ' + totalspent,
+            style: {
+                fontSize: '.9rem',
+                fontFamily: 'Arial Narrow, sans-serif'
+            }
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Arial Narrow, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: txn + ' Count'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            pointFormat: 'Total ' + txn + ': Count <b>{point.y:.2f} </b>'
+        },
+        series: [{
+            type: 'pie',
+            data: sum,
+        }]
+    });
+}
+function createChartColumn(container, txn, sum, titleText, totalspent) {
+    Highcharts.chart(container, {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: titleText + ' ' + totalspent,
+            style: {
+                fontSize: '.9rem',
+                fontFamily: 'Arial Narrow, sans-serif'
+            }
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '12px',
+                    fontFamily: 'Arial Narrow, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: txn + ' Count'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            pointFormat: 'Total ' + txn + ': Count <b>{point.y:.2f} </b>'
+        },
+        series: [{
+            type: 'column',
+            data: sum,
+        }]
+    });
+}
+function createMonthChart(container, titleText, data, keys, total) {
+    Highcharts.chart(container, {
+        chart: {
+            marginRight: 0
+        },
+        title: {
+            text: 'Total ' + titleText + ' Count' + total,
+            style: {
+                fontSize: '1rem',
+                fontFamily: 'Arial Narrow, sans-serif'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        xAxis: {
+            categories: keys
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: ' Count'
+            }
+        },
+        series: [{
+            data: data,
+            color: 'green'
+        }]
+    });
+}
+
+function GetChart(title, url, container) {
+    var titleMessage = "Last 12 month " + title + ":Count";
+    $.ajax({
+        type: "GET",
+        url: "/Dashboard/" + url,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            var keys = Object.keys(result);
+            var weeklydata = new Array();
+            var totalspent = 0.0;
+            for (var i = 0; i < keys.length; i++) {
+                var arrL = new Array();
+                arrL.push(keys[i]);
+                arrL.push(result[keys[i]]);
+                totalspent += result[keys[i]];
+                weeklydata.push(arrL);
+            }
+            createMonthChart(container, title, weeklydata, keys, totalspent);
+        }
+    })
+}
+
+function GetWeekly(title, url, container) {
+    var titleMessage = "Last 4 week " + title + ":Count";
+    $.ajax({
+        type: "GET",
+        url: "/Dashboard/" + url,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            var keys = Object.keys(result);
+            var weeklydata = new Array();
+            var totalspent = 0.0;
+            for (var i = 0; i < keys.length; i++) {
+                var arrL = new Array();
+                arrL.push(keys[i]);
+                arrL.push(result[keys[i]]);
+                totalspent += result[keys[i]];
+                weeklydata.push(arrL);
+            }
+            createChartColumn(container, title, weeklydata, titleMessage, totalspent);
+        }
+    })
+}
+function GetWeeklyPie(title, url, container) {
+    var titleMessage = "Last 4 week " + title + ":Count";
+    $.ajax({
+        type: "GET",
+        url: "/Dashboard/" + url,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            var keys = Object.keys(result);
+            var weeklydata = new Array();
+            var totalspent = 0.0;
+            for (var i = 0; i < keys.length; i++) {
+                var arrL = new Array();
+                arrL.push(keys[i]);
+                arrL.push(result[keys[i]]);
+                totalspent += result[keys[i]];
+                weeklydata.push(arrL);
+            }
+            createCharts(container, title, weeklydata, titleMessage, totalspent);
+        }
+    })
+}
+
+function GetMonthly(title, url, container) {
+    var titleMessage = "Last 6 month " + title + "Count";
+
+    $.ajax({
+        type: "GET",
+        url: "/Dashboard/" + url,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            var keys = Object.keys(result);
+            var monthlydata = new Array();
+            var totalspent = 0.0;
+            for (var i = 0; i < keys.length; i++) {
+                var arrL = new Array();
+                arrL.push(keys[i]);
+                arrL.push(result[keys[i]]);
+                totalspent += result[keys[i]];
+                monthlydata.push(arrL);
+            }
+            createChartColumn(container, title, monthlydata, titleMessage, totalspent);
+        }
+    })
+}
+function GetMonthlyPie(title, url, container) {
+    var titleMessage = "Last 6 month " + title + "Count";
+
+    $.ajax({
+        type: "GET",
+        url: "/Dashboard/" + url,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            var keys = Object.keys(result);
+            var monthlydata = new Array();
+            var totalspent = 0.0;
+            for (var i = 0; i < keys.length; i++) {
+                var arrL = new Array();
+                arrL.push(keys[i]);
+                arrL.push(result[keys[i]]);
+                totalspent += result[keys[i]];
+                monthlydata.push(arrL);
+            }
+            createCharts(container, title, monthlydata, titleMessage, totalspent);
+        }
+    })
 }
