@@ -140,7 +140,7 @@ namespace risk.control.system.Services
 
                         if (caseWithCurrentWorkDay?.Count() > 0)
                         {
-                            dictWeeklyCases.Add(i.ToString(), caseCurrentStatusOrderedByTime.Count());
+                            dictWeeklyCases.Add(i.ToString() + " Days", caseCurrentStatusOrderedByTime.Count());
                         }
                     }
                 }

@@ -118,7 +118,7 @@
         });
     });
     GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
-    GetWeeklyPie('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+    GetWeekly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
     GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
 
     GetChart('Claim', 'GetClaimChart', 'container-monthly-claim')
@@ -137,10 +137,10 @@
         GetMonthlyPie('Claim', 'GetMonthlyClaim', 'container-claim-pie');
     })
     $("#btnWeeklyTat").click(function () {
-        GetWeeklyPie('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+        GetWeekly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
     })
     $("#btnMonthlyTat").click(function () {
-        GetMonthlyPie('Claim', 'GetMonthlyClaim', 'container-claim-tat');
+        //GetMonthly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
     })
 });
 
