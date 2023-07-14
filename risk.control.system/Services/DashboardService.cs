@@ -129,6 +129,7 @@ namespace risk.control.system.Services
 
                 for (int i = 0; i < workDays.Count; i++)
                 {
+                    var totalCount = 0;
                     foreach (var caseWithStatuses in cases)
                     {
                         var caseCurrentStatusOrderedByTime = caseWithStatuses.OrderBy(o => o.Created);
@@ -140,9 +141,10 @@ namespace risk.control.system.Services
 
                         if (caseWithCurrentWorkDay?.Count() > 0)
                         {
-                            dictWeeklyCases.Add(i.ToString() + " Days", caseCurrentStatusOrderedByTime.Count());
+                            totalCount += caseWithCurrentWorkDay.Count();
                         }
                     }
+                    dictWeeklyCases.Add(i.ToString() + " Days", totalCount);
                 }
             }
             return dictWeeklyCases;
