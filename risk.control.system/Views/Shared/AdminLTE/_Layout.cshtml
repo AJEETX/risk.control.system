@@ -18,6 +18,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <partial name="AdminLTE/_Styles" />
+    <partial name="AdminLTE/_Scripts" />
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -85,7 +86,6 @@
             </div>
         </div>
     </div>
-    <partial name="AdminLTE/_Scripts" />
     @RenderSection("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")
  @*       <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">

@@ -97,6 +97,12 @@
                                                     </td>
                                                     <td>
                                                         @{
+                                                            if (item.CaseLocations.Count == 0)
+                                                            {
+                                                                <span class="badge badge-danger">Add verification location</span>
+                                                            }
+                                                        }
+                                                        @{
                                                             foreach (var caseLocation in item.CaseLocations)
                                                             {
                                                                 <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
