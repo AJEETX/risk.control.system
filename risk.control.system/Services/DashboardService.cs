@@ -13,7 +13,7 @@ namespace risk.control.system.Services
 
         Dictionary<string, int> CalculateCaseChart(string userEmail);
 
-        Dictionary<string, int> CalculateTimespan(string userEmail);
+        TatResult CalculateTimespan(string userEmail);
     }
 
     public class DashboardService : IDashboardService
@@ -105,9 +105,11 @@ namespace risk.control.system.Services
             return dictWeeklyCases;
         }
 
-        public Dictionary<string, int> CalculateTimespan(string userEmail)
+        public TatResult CalculateTimespan(string userEmail)
         {
-            Dictionary<string, int> dictWeeklyCases = new Dictionary<string, int>();
+            var dictWeeklyCases = new Dictionary<string, List<int>>();
+            var result = new List<TatDetail>();
+            int totalStatusChanged = 0;
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             if (companyUser != null)
             {
@@ -120,34 +122,40 @@ namespace risk.control.system.Services
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var subStatuses = _context.InvestigationCaseSubStatus;
-                var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
+                var userCaseStatuses = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
 
-                var cases = tdetail.GroupBy(g => g.ClaimsInvestigationId)?.ToList();
+                var caseLogs = tdetail.GroupBy(g => g.InvestigationCaseSubStatusId)?.ToList();
 
                 var workDays = new List<int> { 1, 2, 3, 4, 5 };
                 var casesWithSameStatus = new List<InvestigationTransaction> { };
-
-                for (int i = 0; i < workDays.Count; i++)
+                foreach (var userCaseStatus in userCaseStatuses)
                 {
-                    var totalCount = 0;
-                    foreach (var caseWithStatuses in cases)
+                    List<int> caseListByStatus = new List<int>();
+
+                    var caseLogsByStatus = caseLogs.Where(
+                        c => c.Key == userCaseStatus.InvestigationCaseSubStatusId);
+
+                    foreach (var caseWithSameStatus in caseLogsByStatus)
                     {
-                        var caseCurrentStatusOrderedByTime = caseWithStatuses.OrderBy(o => o.Created);
-
-                        var caseWithCurrentWorkDay = caseCurrentStatusOrderedByTime
-                            .Where(c => c.Time2Update >= i &&
-                            c.Time2Update < i + 1
-                            );
-
-                        if (caseWithCurrentWorkDay?.Count() > 0)
+                        var casesWithCurrentStatus = caseWithSameStatus
+                                                      .Where(c => c.InvestigationCaseSubStatusId == userCaseStatus.InvestigationCaseSubStatusId);
+                        for (int i = 0; i < workDays.Count; i++)
                         {
-                            totalCount += caseWithCurrentWorkDay.Count();
+                            var caseWithCurrentWorkDay = casesWithCurrentStatus.Where(c => c.Time2Update >= i && c.Time2Update < i + 1);
+
+                            caseListByStatus.Add(caseWithCurrentWorkDay.Count());
+                            if (caseWithCurrentWorkDay.Count() > 0)
+                            {
+                                totalStatusChanged++;
+                            }
                         }
                     }
-                    dictWeeklyCases.Add(i.ToString() + " Days", totalCount);
+
+                    dictWeeklyCases.Add(userCaseStatus.Name, caseListByStatus);
+                    result.Add(new TatDetail { Name = userCaseStatus.Name, Data = caseListByStatus });
                 }
             }
-            return dictWeeklyCases;
+            return new TatResult { Count = totalStatusChanged, TatDetails = result };
         }
 
         public Dictionary<string, int> CalculateWeeklyCaseStatus(string userEmail)
@@ -191,5 +199,17 @@ namespace risk.control.system.Services
             }
             return dictWeeklyCases;
         }
+    }
+
+    public class TatDetail
+    {
+        public string Name { get; set; }
+        public List<int> Data { get; set; }
+    }
+
+    public class TatResult
+    {
+        public List<TatDetail> TatDetails { get; set; }
+        public int Count { get; set; }
     }
 }

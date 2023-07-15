@@ -118,7 +118,7 @@
         });
     });
     GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
-    GetWeekly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+    GetWeeklyTat('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
     GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
 
     GetChart('Claim', 'GetClaimChart', 'container-monthly-claim')
@@ -137,7 +137,7 @@
         GetMonthlyPie('Claim', 'GetMonthlyClaim', 'container-claim-pie');
     })
     $("#btnWeeklyTat").click(function () {
-        GetWeekly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
+        GetWeeklyTat('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
     })
     $("#btnMonthlyTat").click(function () {
         //GetMonthly('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
@@ -332,7 +332,7 @@ function createCharts(container, txn, sum, titleText, totalspent) {
             enabled: false
         },
         tooltip: {
-            pointFormat: 'Total ' + txn + ': Count <b>{point.y:.2f} </b>'
+            pointFormat: 'Total ' + txn + ': Count <b>{point.y} </b>'
         },
         series: [{
             type: 'pie',
@@ -372,7 +372,7 @@ function createChartColumn(container, txn, sum, titleText, totalspent) {
             enabled: false
         },
         tooltip: {
-            pointFormat: 'Total ' + txn + ': Count <b>{point.y:.2f} </b>'
+            pointFormat: 'Total ' + txn + ': Count <b>{point.y} </b>'
         },
         series: [{
             type: 'column',
@@ -522,6 +522,77 @@ function GetMonthlyPie(title, url, container) {
                 monthlydata.push(arrL);
             }
             createCharts(container, title, monthlydata, titleMessage, totalspent);
+        }
+    })
+}
+
+function createChartTat(container, txn, sum, titleText, totalspent) {
+    var data = [
+        {
+            name: 'CREATED -> ASSIGNED',
+            data: [3, 5, 1, 1, 5, 3]
+        },
+        {
+            name: 'ASSIGNED -> ALLOCATED',
+            data: [1, 2, 4, 2, 2, 4]
+        },
+        {
+            name: 'ALLOCATED -> AGENT',
+            data: [0, 2, 1, 3, 2, 1]
+        },
+        {
+            name: 'AGENT -> SUBMIT',
+            data: [2, 1, 0, 1, 3, 2]
+        }
+    ];
+    Highcharts.chart(container, {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: titleText + ' ' + totalspent,
+            style: {
+                fontSize: '.9rem',
+                fontFamily: 'Arial Narrow, sans-serif'
+            }
+        },
+        xAxis: {
+            categories: ['0 Day', '1 Day', '2 Day', '3 Day', '4 Day', '5 plus Day']
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: txn + ' Status changes '
+            }
+        },
+        legend: {
+            enabled: true
+        },
+        tooltip: {
+            pointFormat: 'Total ' + txn + ': Status changes <b>{point.y} </b>'
+        },
+        series: sum
+    });
+}
+function GetWeeklyTat(title, url, container) {
+    var titleMessage = "Last 4 week " + title + ":Status changes";
+    $.ajax({
+        type: "GET",
+        url: "/Dashboard/" + url,
+        contentType: "application/json",
+        dataType: "json",
+        success: function (result) {
+            var keys = Object.keys(result);
+            var weeklydata = new Array();
+            var totalspent = 0.0;
+            for (var i = 0; i < keys.length; i++) {
+                var arrL = new Array();
+                arrL.push(keys[i]);
+                arrL.push(result[keys[i]]);
+                totalspent += result[keys[i]];
+                weeklydata.push(arrL);
+            }
+            createChartTat(container, title, result.tatDetails, titleMessage, result.count);
         }
     })
 }
