@@ -435,7 +435,7 @@ function GetChart(title, url, container) {
 }
 
 function GetWeekly(title, url, container) {
-    var titleMessage = "Last 4 week " + title + ":Count";
+    var titleMessage = "All Current " + title + ":Grouped by status";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,
@@ -457,7 +457,7 @@ function GetWeekly(title, url, container) {
     })
 }
 function GetWeeklyPie(title, url, container) {
-    var titleMessage = "Last 4 week " + title + ":Count";
+    var titleMessage = "All Current " + title + ":Count";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,
@@ -480,7 +480,7 @@ function GetWeeklyPie(title, url, container) {
 }
 
 function GetMonthly(title, url, container) {
-    var titleMessage = "Last 6 month " + title + "Count";
+    var titleMessage = "All Current " + title + "Count by status";
 
     $.ajax({
         type: "GET",
@@ -503,7 +503,7 @@ function GetMonthly(title, url, container) {
     })
 }
 function GetMonthlyPie(title, url, container) {
-    var titleMessage = "Last 6 month " + title + "Count";
+    var titleMessage = "All Current " + title + "Count by status";
 
     $.ajax({
         type: "GET",
@@ -527,24 +527,6 @@ function GetMonthlyPie(title, url, container) {
 }
 
 function createChartTat(container, txn, sum, titleText, totalspent) {
-    var data = [
-        {
-            name: 'CREATED -> ASSIGNED',
-            data: [3, 5, 1, 1, 5, 3]
-        },
-        {
-            name: 'ASSIGNED -> ALLOCATED',
-            data: [1, 2, 4, 2, 2, 4]
-        },
-        {
-            name: 'ALLOCATED -> AGENT',
-            data: [0, 2, 1, 3, 2, 1]
-        },
-        {
-            name: 'AGENT -> SUBMIT',
-            data: [2, 1, 0, 1, 3, 2]
-        }
-    ];
     Highcharts.chart(container, {
         chart: {
             type: 'column'
@@ -575,7 +557,7 @@ function createChartTat(container, txn, sum, titleText, totalspent) {
     });
 }
 function GetWeeklyTat(title, url, container) {
-    var titleMessage = "Last 4 week " + title + ":Status changes";
+    var titleMessage = "All Current " + title + ":Status changes";
     $.ajax({
         type: "GET",
         url: "/Dashboard/" + url,
