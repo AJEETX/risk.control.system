@@ -302,6 +302,9 @@ function loadRemainingServicePinCode(obj, showDefaultOption = true, vendorId, li
 
 function createCharts(container, txn, sum, titleText, totalspent) {
     Highcharts.chart(container, {
+        credits: {
+            enabled: false
+        },
         chart: {
             type: 'pie'
         },
@@ -342,6 +345,9 @@ function createCharts(container, txn, sum, titleText, totalspent) {
 }
 function createChartColumn(container, txn, sum, titleText, totalspent) {
     Highcharts.chart(container, {
+        credits: {
+            enabled: false
+        },
         chart: {
             type: 'column'
         },
@@ -382,6 +388,9 @@ function createChartColumn(container, txn, sum, titleText, totalspent) {
 }
 function createMonthChart(container, titleText, data, keys, total) {
     Highcharts.chart(container, {
+        credits: {
+            enabled: false
+        },
         chart: {
             marginRight: 0
         },
@@ -528,6 +537,9 @@ function GetMonthlyPie(title, url, container) {
 
 function createChartTat(container, txn, sum, titleText, totalspent) {
     Highcharts.chart(container, {
+        credits: {
+            enabled: false
+        },
         chart: {
             type: 'column'
         },
