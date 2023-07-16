@@ -12,6 +12,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <input type="hidden" asp-for="ClaimsInvestigationId" />
+                    <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
                     <div class="card card-warning">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-pen"></i> Edit @Applicationsettings.INVESTIGATION_CLAIMS_CASE_DETAILS</h3>
@@ -20,6 +21,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
                                     <div style="display:@hasClientCompany;" class="form-group">
                                         <label asp-for="ClientCompanyId" class="control-label"></label>
                                         <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
@@ -39,7 +41,19 @@
                                         </select>
                                         <span asp-validation-for="ClaimType" class="text-danger"></span>
                                     </div>
+                                    <div class="form-group">
+                                        <label asp-for="CostCentreId" class="control-label"></label>
+                                        <select asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
+                                            <option>--- SELECT COST CENTRE ---</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="CaseEnablerId" class="control-label"></label>
+                                        <select asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
+                                            <option>--- SELECT CASE ENABLER ---</option>
 
+                                        </select>
+                                    </div>
                                     <div class="form-group">
                                         <label asp-for="ContractIssueDate" class="control-label"></label>
                                         <input asp-for="ContractIssueDate" class="form-control" />
@@ -56,50 +70,30 @@
                                 </div>
                                 <div class="col-sm-6">
 
+                                   <div class="form-group">
+                                        <label asp-for="ContractNumber" class="control-label"></label>
+                                        <input asp-for="ContractNumber" class="form-control" />
+                                        <span asp-validation-for="ContractNumber" class="text-danger"></span>
+                                    </div>
                                     <div class="form-group">
                                         <label asp-for="SumAssuredValue" class="control-label"></label>
                                         <input asp-for="SumAssuredValue" class="form-control" />
                                         <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="CostCentreId" class="control-label"></label>
-                                        <select asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
-                                            <option>--- SELECT COST CENTRE ---</option>
-                                        </select>
+                                        <label asp-for="CauseOfLoss" class="control-label"></label>
+                                        <textarea asp-for="CauseOfLoss" class="form-control"></textarea>
+                                        <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
                                     </div>
-                                    <div class="form-group">
-                                        <label asp-for="CaseEnablerId" class="control-label"></label>
-                                        <select asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
-                                            <option>--- SELECT CASE ENABLER ---</option>
-
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="ContractNumber" class="control-label"></label>
-                                        <input asp-for="ContractNumber" class="form-control" />
-                                        <span asp-validation-for="ContractNumber" class="text-danger"></span>
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
                                     <div class="form-group">
                                         <label asp-for="DocumentImage" class="control-label"></label>
                                         <img class="form-Image" id="documentImage" src="/img/no-image.png">
                                         <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
+
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label asp-for="CauseOfLoss" class="control-label"></label>
-                                        <textarea asp-for="CauseOfLoss" class="form-control"></textarea>
-                                        <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
+                            
                         </div>
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-plus"></i> Edit @Applicationsettings.CUSTOMER_DETAILS</h3>
