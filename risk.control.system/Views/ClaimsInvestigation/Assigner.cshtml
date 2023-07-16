@@ -4,41 +4,36 @@
     ViewData["Title"] = "Index";
     var hasClientCompany = @ViewBag.HasClientCompany ? "none" : "";
 }
-<h3>ASSIGN CLAIMS</h3>
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <form asp-action="index">
-                    <div class="card card-success card-outline">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.ALLOCATE_TO_VENDOR</h3>
-                            <div class="card-tools">
-                                <div class="input-group input-group-sm">
-                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
-                                    <div class="input-group-append">
-                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
-                                            <i class="fas fa-search"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Uploads"><i class="fas fa-plus"></i> @Applicationsettings.UPLOAD_CASE</button>
-                                    <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</button>
+        <form asp-action="index">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.ALLOCATE_TO_VENDOR</h3>
+                    <div class="card-tools">
+                        <div class="input-group input-group-sm">
+                            <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
+                            <div class="input-group-append">
+                                <div onclick="this.parentNode.submit()" class="btn btn-success">
+                                    <i class="fas fa-search"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Uploads"><i class="fas fa-plus"></i> @Applicationsettings.UPLOAD_CASE</button>
+                            <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success card-outline">
+                <div class="card card-success">
                     <div class="card-header">
                         <h3 class="card-title">@Applicationsettings.ALLOCATE_TO_VENDOR List</h3>
                     </div>

@@ -129,7 +129,7 @@ namespace risk.control.system.Controllers
 
             toastNotification.AddSuccessToastMessage("claim case allocated to vendor agent successfully!");
 
-            return RedirectToAction(nameof(ClaimsInvestigationController.Index), "ClaimsVendor");
+            return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
         public async Task<IActionResult> Index()

@@ -11,7 +11,7 @@
                 <form asp-action="SubmitReport" method="post">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
-                    <div class="card card-success card-outline">
+                    <div class="card card-success">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.SUBMIT_REPORT</h3>
                         </div>
@@ -145,7 +145,7 @@
                     @{
                         @if(Model.CaseLocation.ClaimReport != null && Model.CaseLocation.ClaimReport.AgentRemarks != null)
                         {
-                            <div class="card card-success card-outline">
+                            <div class="card card-success">
                                 <div class="card-header">
                                     <h3 class="card-title"><i class="fas fa-folder-open"></i> AGENT Report</h3>
                                 </div>
@@ -157,7 +157,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card card-success card-outline">
+                            <div class="card card-success">
                                 <div class="card-header">
                                     <h3 class="card-title"><i class="fas fa-folder-open"></i> Review Report</h3>
                                 </div>
@@ -173,7 +173,7 @@
                         }
                     }
 
-                    <div class="card card-success card-outline">
+                    <div class="card card-success">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.SUBMIT_REPORT</h3>
                         </div>

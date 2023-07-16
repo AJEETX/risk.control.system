@@ -7,6 +7,8 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
     public class VendorsController : Controller
@@ -23,6 +25,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors
+        [Breadcrumb(" Vendors")]
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -51,9 +54,11 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
+
                 case "code_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.Name);
                     break;
@@ -73,6 +78,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Details/5
+        [Breadcrumb(" Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -104,6 +110,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
+        [Breadcrumb(" Service")]
         public async Task<IActionResult> Service(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -131,7 +138,9 @@ namespace risk.control.system.Controllers
 
             return View(applicationDbContext);
         }
+
         // GET: Vendors/Create
+        [Breadcrumb(" Create")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -174,6 +183,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Edit/5
+        [Breadcrumb(" Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -227,7 +237,7 @@ namespace risk.control.system.Controllers
                         }
                     }
                     vendor.Updated = DateTime.UtcNow;
-                    vendor.UpdatedBy= HttpContext.User?.Identity?.Name;
+                    vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Vendor.Update(vendor);
                     await _context.SaveChangesAsync();
                 }
@@ -243,7 +253,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 toastNotification.AddSuccessToastMessage("vendor edited successfully!");
-                return RedirectToAction(nameof(VendorsController.Details), "Vendors", new {id= id});
+                return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = id });
             }
             return Problem();
         }

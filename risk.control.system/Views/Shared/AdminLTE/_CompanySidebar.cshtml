@@ -187,18 +187,26 @@
                     if (User.IsInRole(AppRoles.ClientCreator.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft") @Url.MakeActiveClass("ClaimsInvestigation","Details")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Create")">
                                 <i class="fas fa-search-dollar nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-warning">draft / new</span>
+                                    <span class="badge badge-success">Create New </span>
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Incomplete" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Incomplete") @Url.MakeActiveClass("ClaimsInvestigation","Details")">
+                                <i class="fas fa-search-dollar nav-icon"></i>
+                                <p>
+                                    <span class="badge badge-warning">Incomplete</span>
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assign" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assign")">
                                 <i class="fas fa-funnel-dollar nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-danger">ready to assign</span>
+                                    <span class="badge badge-danger">Ready to assign</span>
                                 </p>
                             </a>
                         </li>
@@ -206,7 +214,7 @@
                     if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Allocate" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Allocate")">
                                 <i class="fas fa-funnel-dollar nav-icon"></i>
                                 <p>
                                     <span class="badge badge-danger">ready to allocate</span>
@@ -217,7 +225,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-warning">review to allocate</span>
+                                    <span class="badge badge-warning">Review to allocate</span>
                                 </p>
                             </a>
                         </li>
@@ -225,10 +233,10 @@
                     if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assess" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
                                 <i class="fas fa-glasses nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-danger">ready to assess</span>
+                                    <span class="badge badge-danger">Ready to assess</span>
                                 </p>
                             </a>
                         </li>
@@ -236,7 +244,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")">
                                 <i class="fas fa-glasses nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-success">approved</span>
+                                    <span class="badge badge-success">Approved</span>
                                 </p>
                             </a>
                         </li>
@@ -244,7 +252,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
                                 <i class="fas fa-glasses nav-icon"></i>
                                 <p>
-                                     <span class="badge badge-warning">review</span>
+                                     <span class="badge badge-warning">Reviewed</span>
                                 </p>
                             </a>
                         </li>
@@ -252,10 +260,10 @@
                 }
                 
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Open")">
+                    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                             <span class="badge badge-light">open</span>
+                             <span class="badge badge-light">Active case</span>
                         </p>
                     </a>
                 </li>

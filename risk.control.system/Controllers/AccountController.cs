@@ -1,10 +1,13 @@
 ﻿using System.Security.Claims;
+using System.Text;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
+using Newtonsoft.Json.Linq;
 
 using NToastNotify;
 
@@ -73,6 +76,7 @@ namespace risk.control.system.Controllers
                 var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                HttpContext.Response.Cookies.Append("UserLoginCookie", "UserLoginCookie", new CookieOptions() { HttpOnly = true });
                 return Ok(new { success = model.Email });
             }
             else

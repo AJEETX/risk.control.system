@@ -4,13 +4,12 @@
     ViewData["Title"] = @Applicationsettings.CREATE;
     var hasClientCompany = @Model.HasClientCompany ? "none" : "";
 }
-<h3>CREATE CLAIM CASE </h3>
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid ">
         <form asp-action="Create" enctype="multipart/form-data">
             <div class="card card-success">
                 <div class="card-header card-info">
-                    <h3 class="card-title"><i class="fas fa-plus"></i> Create @Applicationsettings.INVESTIGATION_CLAIMS_CASE_DETAILS</h3>
+                    <h3 class="card-title"><i class="fas fa-plus"></i> Claim detail</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -91,7 +90,7 @@
                     </div>
                 </div>
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-plus"></i> Create @Applicationsettings.CUSTOMER_DETAILS</h3>
+                    <h3 class="card-title"><i class="fas fa-plus"></i> Customer detail</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">

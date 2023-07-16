@@ -17,10 +17,13 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using SmartBreadcrumbs.Attributes;
+
 using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb(" Claims")]
     public class ClaimsInvestigationController : Controller
     {
         private readonly JsonSerializerOptions options = new()
@@ -56,7 +59,13 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
+        {
+            return Ok();
+        }
+
+        [Breadcrumb(" Ready to Assign")]
+        public async Task<IActionResult> Assign()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
@@ -134,7 +143,7 @@ namespace risk.control.system.Controllers
                         claimsAssigned.Add(item);
                     }
                 }
-                return View("Assigner", claimsAssigned);
+                return View(claimsAssigned);
             }
             else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
             {
@@ -155,8 +164,174 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [Breadcrumb(" Assess")]
+        public async Task<IActionResult> Assess()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State);
+
+            ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                ViewBag.HasClientCompany = false;
+                ViewBag.HasVendorCompany = false;
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+                ViewBag.HasVendorCompany = false;
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
+
+                var claimsAssigned = new List<ClaimsInvestigation>();
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+                return View(claimsAssigned);
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
+
+                var claimsAssigned = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                        && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+                return View(claimsAssigned);
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+                return View(claimsSubmitted);
+            }
+            return View(await applicationDbContext.ToListAsync());
+        }
+
+        [Breadcrumb(" Allocate")]
+        public async Task<IActionResult> Allocate()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State);
+
+            ViewBag.HasClientCompany = true;
+            ViewBag.HasVendorCompany = true;
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                ViewBag.HasClientCompany = false;
+                ViewBag.HasVendorCompany = false;
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+                ViewBag.HasVendorCompany = false;
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
+
+            var claimsAssigned = new List<ClaimsInvestigation>();
+
+            foreach (var item in applicationDbContext)
+            {
+                item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                if (item.CaseLocations.Any())
+                {
+                    claimsAssigned.Add(item);
+                }
+            }
+            return View(claimsAssigned);
+        }
+
         // GET: ClaimsInvestigation
-        public async Task<IActionResult> Draft()
+
+        [Breadcrumb(" Incomplete")]
+        public async Task<IActionResult> Incomplete()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
@@ -226,6 +401,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        [Breadcrumb(" Empanelled vendors")]
         public async Task<IActionResult> EmpanelledVendors(long selectedcase, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -323,6 +499,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        [Breadcrumb(" Allocate to vendor")]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
             if (_context.ClaimsInvestigation == null)
@@ -366,6 +543,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        [Breadcrumb(" Re-allocate to vendor")]
         public async Task<IActionResult> ReAllocateToVendor(string selectedcase)
         {
             if (_context.ClaimsInvestigation == null)
@@ -421,9 +599,10 @@ namespace risk.control.system.Controllers
 
             toastNotification.AddSuccessToastMessage("claim case allocated to vendor successfully!");
 
-            return RedirectToAction(nameof(ClaimsInvestigationController.Index), "ClaimsInvestigation");
+            return RedirectToAction(nameof(ClaimsInvestigationController.Allocate), "ClaimsInvestigation");
         }
 
+        [Breadcrumb(" Case-locations")]
         public IActionResult CaseLocation(string id)
         {
             if (id == null)
@@ -459,6 +638,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContext);
         }
 
+        [Breadcrumb(" Approved")]
         public async Task<IActionResult> Approved()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -525,6 +705,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
+        [Breadcrumb(" Rejected")]
         public async Task<IActionResult> Reject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -591,6 +772,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
+        [Breadcrumb(" Review")]
         public async Task<IActionResult> Review()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -659,7 +841,8 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        public async Task<IActionResult> Open()
+        [Breadcrumb(title: " Active case")]
+        public async Task<IActionResult> Active()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
@@ -722,6 +905,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [Breadcrumb(title: " Report")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -752,7 +936,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
 
-            return RedirectToAction(nameof(ClaimsInvestigationController.Index));
+            return RedirectToAction(nameof(ClaimsInvestigationController.Assess));
         }
 
         [HttpPost]
@@ -766,6 +950,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Details/5
+        [Breadcrumb(title: " Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -804,6 +989,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Create
+        [Breadcrumb(title: " Create")]
         public async Task<IActionResult> Create()
         {
             var userEmailToSend = string.Empty;
@@ -885,7 +1071,7 @@ namespace risk.control.system.Controllers
 
                 toastNotification.AddSuccessToastMessage("case(s) created successfully!");
 
-                return RedirectToAction(nameof(Draft));
+                return RedirectToAction(nameof(Incomplete));
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
@@ -901,6 +1087,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Edit/5
+        [Breadcrumb(title: " Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -983,6 +1170,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Delete/5
+        [Breadcrumb(title: " Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1032,6 +1220,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Breadcrumb(title: " Vendor detail")]
         public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
         {
             if (id == null || _context.Vendor == null)

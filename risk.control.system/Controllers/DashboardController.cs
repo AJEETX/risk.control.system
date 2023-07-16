@@ -5,8 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Services;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [DefaultBreadcrumb("Home")]
     public class DashboardController : Controller
     {
         private readonly IDashboardService dashboardService;

@@ -1,7 +1,10 @@
+using System.Reflection;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 using NToastNotify;
 
@@ -11,7 +14,21 @@ using risk.control.system.Permission;
 using risk.control.system.Seeds;
 using risk.control.system.Services;
 
+using SmartBreadcrumbs.Extensions;
+
+using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
+{
+    options.TagName = "nav";
+    options.TagClasses = "";
+    options.OlClasses = "breadcrumb";
+    options.LiClasses = "breadcrumb-item";
+    options.ActiveLiClasses = "breadcrumb-item active";
+    options.SeparatorElement = "<li class=\"separator\"> / </li>";
+});
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
@@ -29,9 +46,21 @@ builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(builder =>
     {
-        builder.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        builder.WithMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+            .WithHeaders(HeaderNames.Accept,
+                HeaderNames.ContentType,
+                HeaderNames.Authorization)
+            .AllowCredentials()
+            .SetIsOriginAllowed(origin =>
+            {
+                if (string.IsNullOrWhiteSpace(origin)) return false;
+                // Only add this to allow testing with localhost, remove this line in production!
+                if (origin.ToLower().StartsWith("http://localhost")) return true;
+                // Insert your production domain here.
+                if (origin.ToLower().StartsWith("https://dev.mydomain.com")) return true;
+                return false;
+            });
+        ;
     });
 });
 
@@ -75,18 +104,22 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
                 {
-                    options.LoginPath = new PathString("/auth/login");
+                    options.Events.OnRedirectToLogin = (context) =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        return Task.CompletedTask;
+                    };
+                    options.Cookie.Name = "UserLoginCookie";
+                    options.LoginPath = "/Account/Login";
+                    options.LogoutPath = "/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
+                    options.AccessDeniedPath = "/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
                     options.Cookie.HttpOnly = true;
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(120);
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
                     options.SlidingExpiration = true;
                 });
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Cookie.HttpOnly = true;
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
-    options.AccessDeniedPath = "/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
-});
+
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
@@ -110,7 +143,11 @@ app.UseHttpLogging();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseCookiePolicy(
+    new CookiePolicyOptions
+    {
+        Secure = CookieSecurePolicy.Always
+    });
 app.UseAuthentication();
 app.UseCors();
 app.UseAuthorization();

@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success card-outline">
+                <div class="card card-success">
                     <form asp-action="index" asp-antiforgery="true">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.ROLE</h3>
@@ -31,7 +31,7 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success card-outline">
+                <div class="card card-success">
                     <div class="card-body p-0 contained-width">
                         @if (Model.Count() == 0)
                         {

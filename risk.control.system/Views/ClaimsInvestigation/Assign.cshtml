@@ -10,7 +10,7 @@
         <form asp-action="index">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-folder-open"></i> Ready to Assign</h3>
+                    <h3 class="card-title"><i class="fas fa-search"></i> Search Ready to Assign</h3>
                     <div class="card-tools">
                         <div class="input-group input-group-sm">
                             <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
@@ -25,7 +25,6 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-12 text-right">
-                            <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Uploads"><i class="fas fa-plus"></i> @Applicationsettings.UPLOAD_CASE</button>
                             <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                         </div>
                     </div>
@@ -33,7 +32,7 @@
             </div>
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">@Applicationsettings.INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN List</h3>
+                    <h3 class="card-title">Ready to Assign List</h3>
                 </div>
                 <div class="card-body p-0 contained-width">
                     <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
