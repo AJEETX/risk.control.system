@@ -1106,6 +1106,7 @@ namespace risk.control.system.Controllers
             ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.DistrictId);
+            ViewData["InvestigationCaseSubStatusId"] = new SelectList(_context.InvestigationCaseSubStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseSubStatusId);
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
@@ -1129,9 +1130,10 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    var user = User?.Claims.FirstOrDefault(u => u.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+                    var user = User?.Claims.FirstOrDefault(u => u.Type == ClaimTypes.Email)?.Value;
                     claimsInvestigation.Updated = DateTime.UtcNow;
                     claimsInvestigation.UpdatedBy = user;
+                    claimsInvestigation.CurrentUserEmail = user;
                     IFormFile? claimDocument = Request.Form?.Files?.FirstOrDefault();
                     if (claimDocument is not null)
                     {
@@ -1143,7 +1145,7 @@ namespace risk.control.system.Controllers
                     _context.Update(claimsInvestigation);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
                     if (!ClaimsInvestigationExists(claimsInvestigation.ClaimsInvestigationId))
                     {
@@ -1162,6 +1164,7 @@ namespace risk.control.system.Controllers
             ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.DistrictId);
+            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
