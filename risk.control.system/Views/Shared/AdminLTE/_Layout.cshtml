@@ -18,7 +18,9 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <partial name="AdminLTE/_Styles" />
+    <partial name="AdminLTE/_DataTableStylePartial" />
     <partial name="AdminLTE/_Scripts" />
+    <partial name="AdminLTE/_DataTableScriptPartial" />
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -89,7 +91,5 @@
     </div>
     @RenderSection("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")
- @*       <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">*@
 </body>
 </html>

@@ -8,9 +8,11 @@ using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Company")]
+    [Breadcrumb("Company ")]
     public class ClientCompanyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -104,7 +106,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Details/5
-        [Breadcrumb("Details")]
+        [Breadcrumb(" Profile")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.ClientCompany == null)
@@ -166,7 +168,6 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-
                     IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                     if (companyDocument is not null)
                     {
@@ -177,8 +178,8 @@ namespace risk.control.system.Controllers
                     }
                     else
                     {
-                        var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c=>c.ClientCompanyId == id);
-                        if(existingClientCompany.DocumentImage!= null)
+                        var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == id);
+                        if (existingClientCompany.DocumentImage != null)
                         {
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                         }
@@ -200,7 +201,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 toastNotification.AddSuccessToastMessage("client company edited successfully!");
-                return RedirectToAction(nameof(ClientCompanyController.Details),"ClientCompany", new { id = clientCompany.ClientCompanyId});
+                return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
             toastNotification.AddErrorToastMessage("Error to edit client company!");
             return Problem();
@@ -235,9 +236,11 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
+
                 case "code_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.Name);
                     break;
@@ -312,9 +315,11 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
+
                 case "code_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.Name);
                     break;
@@ -350,17 +355,17 @@ namespace risk.control.system.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var vendorUsers = _context.VendorApplicationUser.Include(u=>u.Vendor).Where(u=>u.Vendor.ClientCompanyId == id).ToList();
+            var vendorUsers = _context.VendorApplicationUser.Include(u => u.Vendor).Where(u => u.Vendor.ClientCompanyId == id).ToList();
             List<string> userVendorids = new List<string>();
-            if(vendorUsers is not null && vendorUsers.Count> 0)
+            if (vendorUsers is not null && vendorUsers.Count > 0)
             {
-                userVendorids = vendorUsers.Select(u=>u.VendorId).ToList();
+                userVendorids = vendorUsers.Select(u => u.VendorId).ToList();
             }
 
             var applicationDbContext = _context.Vendor
-                .Where(v => v.ClientCompanyId != id 
-                //&& userVendorids.Contains(v.VendorId) 
-                && (v.VendorInvestigationServiceTypes != null)  && v.VendorInvestigationServiceTypes.Count>0)
+                .Where(v => v.ClientCompanyId != id
+                //&& userVendorids.Contains(v.VendorId)
+                && (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
@@ -399,9 +404,11 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
+
                 case "code_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.Name);
                     break;
@@ -419,6 +426,7 @@ namespace risk.control.system.Controllers
             ViewBag.CompanyId = id;
             return View(applicationDbContextResult);
         }
+
         [HttpPost]
         public async Task<IActionResult> AvailableVendors(string id, List<string> vendors)
         {
@@ -503,7 +511,6 @@ namespace risk.control.system.Controllers
                     }
                     catch (Exception ex)
                     {
-
                         throw;
                     }
                 }
@@ -511,6 +518,7 @@ namespace risk.control.system.Controllers
             ViewBag.CompanyId = id;
             return Problem();
         }
+
         public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
         {
             if (id == null || _context.Vendor == null)
@@ -543,6 +551,7 @@ namespace risk.control.system.Controllers
 
             return View(vendor);
         }
+
         private bool ClientCompanyExists(string id)
         {
             return (_context.ClientCompany?.Any(e => e.ClientCompanyId == id)).GetValueOrDefault();

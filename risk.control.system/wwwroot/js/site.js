@@ -1,4 +1,6 @@
 ﻿$(document).ready(function () {
+    var datatable = $('#datatable').dataTable({});
+
     $("#datepicker").datepicker();
 
     if ($(".selected-case:checked").length) {

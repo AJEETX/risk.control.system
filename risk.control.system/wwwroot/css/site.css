@@ -78,9 +78,6 @@ body {
 }
 
 /* custom */
-.form-control {
-  background-color: lightyellow;
-}
 
 .login-box {
   background-color: #e5e5e5;
@@ -143,10 +140,10 @@ table td {
     font-weight:bold;
 }
 .navlink-border {
-    border: 1px solid #28a745;
+    border: 1px solid #6c757d;
 }
 .sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active {
-    background-color: #28a745 !important;
+    background-color: #6c757d !important;
 }
 .sidebar-light-primary .nav-sidebar > .nav-item > .nav-link.active > p {
     color: white;
@@ -231,4 +228,9 @@ textarea {
 .row-links:hover {
     cursor: pointer;
     text-decoration: none;
+}
+.toolbar {
+    float: left;
+    border-radius: 4px;
+    background-color: #6c757d;
 }
