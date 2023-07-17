@@ -1,8 +1,9 @@
-﻿@using risk.control.system.Models.ViewModel;
-@model VendorUsersViewModel
+﻿@using risk.control.system.AppConstant;
+@using risk.control.system.Models.ViewModel;
+@model CompanyUsersViewModel
 
 @{
-    ViewData["Title"] = @Applicationsettings.VENDOR;
+    ViewData["Title"] = @Applicationsettings.USER;
 }
 
 <section class="content pt-2">
@@ -11,27 +12,11 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-user-friends"></i> Manage Agency User</h3>
+                        <h3 class="card-title"><i class="fas fa-user-friends"></i> Company Users List</h3>
                     </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    @*<a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>*@
-                                    <a class="btn btn-success" asp-controller="VendorApplicationUsers" asp-action="Create" asp-route-id="@Model.Vendor.VendorId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
-                                </div>
-                            </div>
-                        </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-list"></i> Agency User list</h3>
-                    </div>
-
                     <div class="card-body">
+                        
+
                         @if (Model.Users.Count == 0)
                         {
                             <hr />
@@ -43,7 +28,6 @@
                         else
                         {
                             <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -54,7 +38,7 @@
                                             Name
                                         </th>
                                         <th>
-                                            Pincode
+                                           Pincode
                                         </th>
                                         <th>State</th>
                                         <th>Country</th>
@@ -111,18 +95,18 @@
                                                 }
                                             </td>
                                             <td>
-                                                <a class="btn btn-xs btn-warning" asp-controller="VendorApplicationUsers" asp-action="Edit" asp-route-userId="@user.UserId">
+                                                <a class="btn btn-xs btn-warning" asp-controller="Company" asp-action ="User" asp-action="EditUser" asp-route-userId="@user.UserId">
                                                     <i class="fas fa-pen"></i> @Applicationsettings.EDIT
                                                 </a>&nbsp;
-                                                <a class="btn btn-xs btn-danger" asp-controller="VendorUserRoles" asp-action="Index"
+                                                <a class="btn btn-xs btn-danger" asp-controller="CompanyUserRoles" asp-action="Index"
                                            asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> @Applicationsettings.ROLE</a>
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
+                            <br />
                         }
-                        
                     </div>
                 </div>
             </div>

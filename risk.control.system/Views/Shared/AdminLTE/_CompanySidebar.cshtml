@@ -273,7 +273,7 @@
                     if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","")
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","")
                                     @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
@@ -283,8 +283,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Details")
-                                        @Url.MakeActiveClass("ClientCompany","Edit") @Url.MakeActiveClass("CompanyUserRoles","")">
+                            <a is-active-page asp-controller="Company" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Company","Index")
+                                        @Url.MakeActiveClass("Company","Edit") @Url.MakeActiveClass("CompanyUserRoles","")">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>
                                     @Applicationsettings.CLIENT_COMPANIY_PROFILE
@@ -292,10 +292,19 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("CompanyUser","")">
+                            <a is-active-page asp-controller="Company" asp-action="User" class="actual-link nav-link @Url.MakeActiveClass("Company","User")">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     @Applicationsettings.COMPANY_USERS
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Company" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("Company","CreateUser")
+                                    @Url.MakeActiveClass("Company","UserEdit")">
+                                <i class="fas fa-user-plus nav-icon"></i>
+                                <p>
+                                    Create User
                                 </p>
                             </a>
                         </li>
@@ -304,15 +313,16 @@
                             @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
                                 <i class="nav-icon fa fa-binoculars"></i>
                                 <p>
-                                    @Applicationsettings.MANAGE_VENDORS
+                                    Manage Agencies
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","EmpanelledVendors")">
+                            <a is-active-page asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link 
+                                @Url.MakeActiveClass("ClientCompany","EmpanelledVendors") @Url.MakeActiveClass("ClientCompany","VendorDetail")">
                                 <i class="nav-icon fa fa-thumbs-up"></i>
                                 <p>
-                                    @Applicationsettings.EMPANELLED_VENDORS
+                                    Empanelled Agencies
                                 </p>
                             </a>
                         </li>
@@ -320,7 +330,7 @@
                             <a is-active-page asp-controller="ClientCompany" asp-action="AvailableVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","AvailableVendors")">
                                 <i class="nav-icon fa fa-thumbs-down"></i>
                                 <p>
-                                    @Applicationsettings.DEPANELLED_VENDORS
+                                    Available Agencies
                                 </p>
                             </a>
                         </li>

@@ -2,24 +2,13 @@
 @{
     ViewData["Title"] = @Applicationsettings.COST_CENTRE;
 }
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success">
-                    <form asp-action="index">
+                <div class="card card-secondary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.COST_CENTRE</h3>
-                            <div class="card-tools">
-                                <div class="input-group input-group-sm">
-                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
-                                    <div class="input-group-append">
-                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
-                                            <i class="fas fa-search"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div class="card-body">
                             
@@ -29,41 +18,41 @@
                                 </div>
                             </div>
                         </div>
-                    </form>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success">
-                    <div class="card-body p-0 contained-width">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-list"></i> @Applicationsettings.COST_CENTRE List</h3>
+                    </div>
+                    <div class="card-body">
                         @if (Model.Count() == 0)
                         {
-                            <hr />
                             <div class="col-md-12 text-center">
                                 <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
                             </div>
-                            <hr />
                         }
                         else
                         {
-                            <table class="table table-striped">
+                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                 <thead>
                                     <tr>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.Name)
+                                            Name
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.Code)
+                                            Code
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.Created)
+                                            Created
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.Updated)
+                                            Updated
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.UpdatedBy)
+                                            UpdatedBy
                                         </th>
                                         <th></th>
                                     </tr>
@@ -73,26 +62,24 @@
                                     {
                                         <tr>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Name)
+                                                Name
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Code)
+                                                Code
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Created)
+                                                Created
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Updated)
+                                                Updated
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.UpdatedBy)
+                                                UpdatedBy
                                             </td>
-                                            <td>
                                             <td>
                                                 <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.CostCentreId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a> &nbsp;
                                                 <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.CostCentreId"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
                                                 <input type="hidden" value="@item.CostCentreId" />
-                                            </td>
                                             </td>
                                         </tr>
                                     }

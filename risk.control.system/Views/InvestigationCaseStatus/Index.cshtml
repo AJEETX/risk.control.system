@@ -3,40 +3,31 @@
 @{
     ViewData["Title"] = @Applicationsettings.CASE_STATUS;
 }
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success">
-                    <form asp-action="index" asp-antiforgery="true">
-                        <div class="card-header">
+                <div class="card card-secondary">
+                    <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.CASE_STATUS</h3>
-                            <div class="card-tools">
-                                <div class="input-group input-group-sm">
-                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
-                                    <div class="input-group-append">
-                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
-                                            <i class="fas fa-search"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                     </div>
-                        <div class="card-body dataTable-search-form">
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <a class="btn btn-success" asp-controller="InvestigationCaseStatus" asp-action="Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
-                                </div>
+                    <div class="card-body dataTable-search-form">
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <a class="btn btn-success" asp-controller="InvestigationCaseStatus" asp-action="Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success">
-                    <div class="card-body p-0 contained-width">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-list"></i> @Applicationsettings.CASE_STATUS List</h3>
+                    </div>
+                    <div class="card-body">
                         @if (Model.Count() == 0)
                         {
                             <hr />
@@ -47,7 +38,7 @@
                         }
                         else
                         {
-                            <table class="table table-striped">
+                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                 <thead>
                                     <tr>
                                         <th>
@@ -66,7 +57,7 @@
                                     @foreach (var item in Model)
 
                                     {
-                                        var masterData = item.MasterData? "none":"";
+                                        var masterData = item.MasterData ? "none" : "";
                                         <tr>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Name)
@@ -79,20 +70,20 @@
                                             </td>
                                             <td>
                                                 <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationCaseStatusId">
-                                                <i class="fa fa-search"></i>  @Applicationsettings.VIEW
+                                                    <i class="fa fa-search"></i>  @Applicationsettings.VIEW
                                                 </a> &nbsp;
                                                 <a class="btn btn-xs btn-warning" style="pointer-events:@masterData" asp-action="Edit" asp-route-id="@item.InvestigationCaseStatusId">
-                                                <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                                    <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
                                                 </a> &nbsp;
                                                 <a class="btn btn-xs btn-danger" style="pointer-events:@masterData" asp-action="Delete" asp-route-id="@item.InvestigationCaseStatusId">
-                                                <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
+                                                    <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
                                                 </a>
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                            }
+                        }
                     </div>
                 </div>
             </div>

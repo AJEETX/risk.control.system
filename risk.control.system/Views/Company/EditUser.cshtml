@@ -1,9 +1,9 @@
-﻿@using risk.control.system.Models.ViewModel;
-@model ApplicationUser
+﻿@model risk.control.system.Models.ClientCompanyApplicationUser
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
+
 <section class="content pt-2">
     <div class="container-fluid ">
         <form asp-action="Edit" enctype="multipart/form-data">
@@ -11,13 +11,19 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen"></i>  @Applicationsettings.USER</h3>
+                            <h3 class="card-title"><i class="fas fa-pen"></i> Edit  User.
+                                </h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <input type="hidden" asp-for="Id" />
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <input type="hidden" asp-for="Id" />
+                                    <div class="form-group hide-id">
+                                        <label asp-for="ClientCompany" class="control-label"></label>
+                                        <input asp-for="ClientCompanyId" class="form-control" value="@Model.ClientCompany.ClientCompanyId" />
+                                        <span asp-validation-for="ClientCompanyId" class="text-danger"></span>
+                                    </div>
                                     <div class="form-group">
                                         <label asp-for="UserName" class="control-label"></label>
                                         <input asp-for="UserName" class="form-control" />
@@ -43,10 +49,10 @@
                                         <input asp-for="Email" class="form-control" />
                                         <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
-                                    <div class="form-group form-check">
-                                        <label class="form-check-label">
-                                            <input class="form-check-input" asp-for="EmailConfirmed" /> @Html.DisplayNameFor(model => model.EmailConfirmed)
-                                        </label>
+                                    <div class="form-group">
+                                        <label asp-for="Comments" class="control-label"></label>
+                                        <input asp-for="Comments" class="form-control" />
+                                        <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
@@ -86,13 +92,14 @@
                                             <option>--- SELECT PINCODE ---</option>
                                         </select>
                                     </div>
+
                                     <div class="form-group">
                                         <label asp-for="ProfilePicture" class="control-label"></label>
                                         <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
                                         <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                     <div class="form-group text-right">
-                                        <a asp-controller="User" asp-action="Index" class="btn btn-secondary">
+                                        <a asp-controller="Company" asp-action="User" class="btn btn-secondary">
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
                                         </a>

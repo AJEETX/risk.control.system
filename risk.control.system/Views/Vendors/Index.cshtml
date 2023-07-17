@@ -4,22 +4,12 @@
     ViewData["Title"] = @Applicationsettings.VENDOR;
 }
 
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid">
-        <div class="card card-success">
-            <form asp-action="index">
-                <div class="card-header">
-                    <div class="card-tools">
-                        <div class="input-group input-group-sm">
-                            <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
-                            <div class="input-group-append">
-                                <div onclick="this.parentNode.submit()" class="btn btn-success">
-                                    <i class="fas fa-search"></i>
-                                </div>
-                            </div>
-                        </div>
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user-friends"></i> Manage Agencies</h3>
                     </div>
-                </div>
                 <div class="card-body">
 
                     <div class="row">
@@ -27,15 +17,14 @@
                             <a class="btn btn-success" asp-controller="Vendors" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                         </div>
                     </div>
+                    </div>
                 </div>
-            </form>
-        </div>
-        <div class="card card-success">
+        <div class="card card-secondary">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.VENDORS list</h3>
+                <h3 class="card-title"><i class="fas fa-list"></i> Agencies list</h3>
             </div>
 
-            <div class="card-body p-0 contained-width">
+            <div class="card-body">
                 @if (Model.Count() == 0)
                 {
                     <hr />
@@ -47,7 +36,7 @@
                 else
                 {
 
-                    <table class="table table-striped fixed-with-height">
+                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                         <thead>
                             <tr>
 
@@ -55,22 +44,22 @@
                                     @Html.DisplayNameFor(model => model.Document)
                                 </th>
                                 <th>
-                                    @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.CodeSortParm })
+                                    Name
                                 </th>
                                 <th>
-                                    @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
+                                    Code
                                 </th>
                                 <th>
-                                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                                    Phone Number
                                 </th>
                                 <th>
-                                    @Html.DisplayNameFor(model => model.Email)
+                                    Email
                                 </th>
                                 <th>
-                                    @Html.DisplayNameFor(model => model.Addressline)
+                                    Address line
                                 </th>
                                 <th>
-                                    @Html.DisplayNameFor(model => model.State)
+                                    State
                                 </th>
                                 <th></th>
                             </tr>
@@ -124,46 +113,6 @@
                         </tbody>
                     </table>
                 }
-                <br />
-                <br />
-                @{
-                    var PageNumber = (int)@ViewBag.PageNumber;
-
-                    var PageSize = (int)@ViewBag.PageSize;
-
-                    var TotalPages = (int)@ViewBag.TotalPages;
-
-                    var ShowPrevious = (bool)@ViewBag.ShowPrevious;
-
-                    var ShowNext = (bool)@ViewBag.ShowNext;
-
-                    var ShowFirst = (bool)@ViewBag.ShowFirst;
-
-                    var ShowLast = (bool)@ViewBag.ShowLast;
-                }
-                <ul class="pagination">
-                    <li class="page-item @(!ShowFirst? "disabled":"")">
-                        <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
-                            <i class="fas fa-fast-backward"></i>
-                        </a>
-                    </li>
-                    <li class="page-item @(!ShowPrevious? "disabled":"")">
-                        <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
-                            <i class="fas fa-step-backward"></i>
-                        </a>
-                    </li>
-                    <li class="page-item  @(!ShowNext? "disabled":"")">
-                        <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
-                            <i class="fas fa-step-forward"></i>
-                        </a>
-                    </li>
-
-                    <li class="page-item  @(!ShowLast? "disabled":"")">
-                        <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
-                            <i class="fas fa-fast-forward"></i>
-                        </a>
-                    </li>
-                </ul>
             </div>
         </div>
     </div>

@@ -3,16 +3,14 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
-<h3><i class="fas fa-folder-open"></i> Vendors</h3>
-
 <section class="content pt-2">
     <div class="container-fluid ">
         <form asp-action="Edit" enctype="multipart/form-data">
             <div class="row mb-2">
                 <div class="col-sm-12">
-                    <div class="card card-warning">
+                    <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen"></i>  Edit @Model.Vendor.Name @Applicationsettings.USER</h3>
+                            <h3 class="card-title"><i class="fas fa-pen"></i>  Edit Agency User</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -49,16 +47,7 @@
                                         <input asp-for="Email" class="form-control" />
                                         <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
-                                    <div class="form-group">
-                                        <label asp-for="Comments" class="control-label"></label>
-                                        <input asp-for="Comments" class="form-control" />
-                                        <span asp-validation-for="Comments" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group form-check">
-                                        <label class="form-check-label">
-                                            <input class="form-check-input" asp-for="EmailConfirmed" /> @Html.DisplayNameFor(model => model.EmailConfirmed)
-                                        </label>
-                                    </div>
+                                    
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
                                         <input asp-for="PhoneNumber" class="form-control" />
@@ -102,6 +91,11 @@
                                         <label asp-for="ProfilePicture" class="control-label"></label>
                                         <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
                                         <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Comments" class="control-label"></label>
+                                        <input asp-for="Comments" class="form-control" />
+                                        <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group text-right">
                                         <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="btn btn-secondary">
