@@ -190,7 +190,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Create")">
                                 <i class="fas fa-search-dollar nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-success">Create New </span>
+                                    <span class="badge badge-success">Create </span>
                                 </p>
                             </a>
                         </li>
@@ -214,10 +214,11 @@
                     if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Allocate" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Allocate")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assigner")
+                                    @Url.MakeActiveClass("ClaimsInvestigation","AllocateToVendor") @Url.MakeActiveClass("ClaimsInvestigation","EmpanelledVendors")">
                                 <i class="fas fa-funnel-dollar nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-danger">ready to allocate</span>
+                                    <span class="badge badge-danger">Ready To Allocate</span>
                                 </p>
                             </a>
                         </li>
@@ -225,7 +226,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-warning">Review to allocate</span>
+                                    <span class="badge badge-warning">Review To Allocate</span>
                                 </p>
                             </a>
                         </li>
@@ -233,10 +234,10 @@
                     if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assess" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assessor" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assessor")">
                                 <i class="fas fa-glasses nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-danger">Ready to assess</span>
+                                    <span class="badge badge-danger">Ready To Assess</span>
                                 </p>
                             </a>
                         </li>
@@ -263,7 +264,7 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                             <span class="badge badge-light">Active case</span>
+                             <span class="badge badge-light">Active</span>
                         </p>
                     </a>
                 </li>

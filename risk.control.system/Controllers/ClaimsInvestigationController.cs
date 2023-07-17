@@ -165,7 +165,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Assess")]
-        public async Task<IActionResult> Assess()
+        public async Task<IActionResult> Assessor()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
@@ -265,7 +265,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Allocate")]
-        public async Task<IActionResult> Allocate()
+        public async Task<IActionResult> Assigner()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
@@ -599,7 +599,7 @@ namespace risk.control.system.Controllers
 
             toastNotification.AddSuccessToastMessage("claim case allocated to vendor successfully!");
 
-            return RedirectToAction(nameof(ClaimsInvestigationController.Allocate), "ClaimsInvestigation");
+            return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
         }
 
         [Breadcrumb(" Case-locations")]
@@ -841,7 +841,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(title: " Active case")]
+        [Breadcrumb(title: " Active Claim")]
         public async Task<IActionResult> Active()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -936,7 +936,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
 
-            return RedirectToAction(nameof(ClaimsInvestigationController.Assess));
+            return RedirectToAction(nameof(ClaimsInvestigationController.Assessor));
         }
 
         [HttpPost]

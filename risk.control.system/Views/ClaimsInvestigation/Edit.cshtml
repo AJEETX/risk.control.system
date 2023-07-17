@@ -4,242 +4,223 @@
     ViewData["Title"] = "Edit";
     var hasClientCompany = @Model.HasClientCompany ? "none" : "";
 }
-<h3>EDIT CLAIM CASE </h3>
 
 <section class="content">
     <div class="container-fluid ">
         <form asp-action="Edit" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-md-12">
-                    <input type="hidden" asp-for="ClaimsInvestigationId" />
-                    <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
-                    <div class="card card-warning">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen"></i> Edit @Applicationsettings.INVESTIGATION_CLAIMS_CASE_DETAILS</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                    <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
-                                    <div style="display:@hasClientCompany;" class="form-group">
-                                        <label asp-for="ClientCompanyId" class="control-label"></label>
-                                        <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
-                                            <option>--- SELECT COMPANY ---</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
-                                        <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
-                                            <option>--- SELECT SERVICE TYPE ---</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="ClaimType" class="control-label"></label>
-                                        <select asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
-                                            <option>--- SELECT CLAIM TYPE ---</option>
-                                        </select>
-                                        <span asp-validation-for="ClaimType" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="CostCentreId" class="control-label"></label>
-                                        <select asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
-                                            <option>--- SELECT COST CENTRE ---</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="CaseEnablerId" class="control-label"></label>
-                                        <select asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
-                                            <option>--- SELECT CASE ENABLER ---</option>
 
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="ContractIssueDate" class="control-label"></label>
-                                        <input asp-for="ContractIssueDate" class="form-control" />
-                                        <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
-                                    </div>
+            <input type="hidden" asp-for="ClaimsInvestigationId" />
+            <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
+            <div class="card card-secondary">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-pen"></i> Claim detail</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
 
-
-                                    <div class="form-group">
-                                        <label asp-for="DateOfIncident" class="control-label"></label>
-                                        <input asp-for="DateOfIncident" class="form-control" />
-                                        <span asp-validation-for="DateOfIncident" class="text-danger"></span>
-                                    </div>
-
-                                </div>
-                                <div class="col-sm-6">
-
-                                   <div class="form-group">
-                                        <label asp-for="ContractNumber" class="control-label"></label>
-                                        <input asp-for="ContractNumber" class="form-control" />
-                                        <span asp-validation-for="ContractNumber" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="SumAssuredValue" class="control-label"></label>
-                                        <input asp-for="SumAssuredValue" class="form-control" />
-                                        <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="CauseOfLoss" class="control-label"></label>
-                                        <textarea asp-for="CauseOfLoss" class="form-control"></textarea>
-                                        <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="DocumentImage" class="control-label"></label>
-                                        <img class="form-Image" id="documentImage" src="/img/no-image.png">
-                                        <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
-                                    </div>
-
-                                </div>
+                            <div style="display:@hasClientCompany;" class="form-group">
+                                <label asp-for="ClientCompanyId" class="control-label"></label>
+                                <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
+                                    <option>--- SELECT COMPANY ---</option>
+                                </select>
                             </div>
-                            
-                        </div>
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-plus"></i> Edit @Applicationsettings.CUSTOMER_DETAILS</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
+                                <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                    <option>--- SELECT SERVICE TYPE ---</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ClaimType" class="control-label"></label>
+                                <select asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
+                                    <option>--- SELECT CLAIM TYPE ---</option>
+                                </select>
+                                <span asp-validation-for="ClaimType" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CostCentreId" class="control-label"></label>
+                                <select asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
+                                    <option>--- SELECT COST CENTRE ---</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CaseEnablerId" class="control-label"></label>
+                                <select asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
+                                    <option>--- SELECT CASE ENABLER ---</option>
 
-                                    <div class="form-group">
-                                        <label asp-for="CustomerType" class="control-label"></label>
-                                        <select asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
-                                            <option>--- SELECT CUSTOMER TYPE  ---</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ContractIssueDate" class="control-label"></label>
+                                <input asp-for="ContractIssueDate" class="form-control" />
+                                <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
+                            </div>
 
-                                        </select>
-                                        <span asp-validation-for="CustomerType" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="CustomerName" class="control-label"></label>
-                                        <input asp-for="CustomerName" class="form-control" />
-                                        <span asp-validation-for="CustomerName" class="text-danger"></span>
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label asp-for="Description" class="control-label"></label>
-                                        <input asp-for="Description" class="form-control" />
-                                        <span asp-validation-for="Description" class="text-danger"></span>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label asp-for="CustomerDateOfBirth" class="control-label"></label>
-                                        <input asp-for="CustomerDateOfBirth" class="form-control" />
-                                        <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="Gender" class="control-label"></label>
-                                        <select asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
-                                            <option>--- SELECT GENDER ---</option>
-                                        </select>
-                                        <span asp-validation-for="Gender" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="ContactNumber" class="control-label"></label>
-                                        <input asp-for="ContactNumber" class="form-control" />
-                                        <span asp-validation-for="ContactNumber" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="Addressline" class="control-label"></label>
-                                        <input asp-for="Addressline" class="form-control" value="100 GOOD STREET" />
-                                        <span asp-validation-for="Addressline" class="text-danger"></span>
-                                    </div>
-
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label asp-for="CountryId" class="control-label"></label>
-                                        <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                            <option>--- SELECT COUNTRY ---</option>
-                                        </select>
-                                        <span asp-validation-for="CountryId" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="StateId" class="control-label"></label>
-                                        <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                            <option>--- SELECT STATE ---</option>
-                                        </select>
-                                        <span asp-validation-for="StateId" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="DistrictId" class="control-label"></label>
-                                        <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                            <option>--- SELECT DISTRICT ---</option>
-                                        </select>
-                                        <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="PinCodeId" class="control-label"></label>
-                                        <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                            <option>--- SELECT PINCODE ---</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="CustomerIncome" class="control-label"></label>
-                                        <select asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
-                                            <option>--- SELECT CUSTOMER INCOME ---</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="CustomerOccupation" class="control-label"></label>
-                                        <select asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
-                                            <option>--- SELECT CUSTOMER OCCUPATION ---</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="CustomerEducation" class="control-label"></label>
-                                        <select asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
-                                            <option>--- SELECT CUSTOMER EDUCATION ---</option>
-                                        </select>
-                                    </div>
-
-                                </div>
+                            <div class="form-group">
+                                <label asp-for="DateOfIncident" class="control-label"></label>
+                                <input asp-for="DateOfIncident" class="form-control" />
+                                <span asp-validation-for="DateOfIncident" class="text-danger"></span>
                             </div>
 
                         </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label asp-for="Comments" class="control-label"></label>
-                                    <textarea asp-for="Comments" class="form-control"></textarea>
-                                    <span asp-validation-for="Comments" class="text-danger"></span>
-                                </div>
-                                <div style="display:@hasClientCompany;" class="form-group">
-                                    <label asp-for="InvestigationCaseStatusId" class="control-label"></label>
-                                    <select id="InvestigationCaseStatusId" asp-for="InvestigationCaseStatusId" class="form-control" asp-items="ViewBag.InvestigationCaseStatusId" onchange="loadSubStatus(this)">
-                                        <option>--- SELECT STATUS ---</option>
-                                    </select>
-                                </div>
+                        <div class="col-sm-6">
 
-                                <div style="display:@hasClientCompany;" class="form-group">
-                                    <label asp-for="InvestigationCaseSubStatusId" class="control-label"></label>
-                                    <select id="InvestigationCaseSubStatusId" asp-for="InvestigationCaseSubStatusId" class="form-control" asp-items="ViewBag.InvestigationCaseSubStatusId">
-                                        <option>--- SELECT SUB STATUS ---</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label asp-for="ContractNumber" class="control-label"></label>
+                                <input asp-for="ContractNumber" class="form-control" />
+                                <span asp-validation-for="ContractNumber" class="text-danger"></span>
                             </div>
-                        </div>
-                        
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                     
-                                    <div class="form-group text-right">
-                                        <a asp-action="Index" class="btn btn-secondary">
-                                            <i class="fa fa-window-close"></i>
-                                            @Applicationsettings.CANCEL
-                                        </a>
-                                        <button type="submit" class="btn btn-warning">
-                                            <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="form-group">
+                                <label asp-for="SumAssuredValue" class="control-label"></label>
+                                <input asp-for="SumAssuredValue" class="form-control" />
+                                <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CauseOfLoss" class="control-label"></label>
+                                <textarea asp-for="CauseOfLoss" class="form-control"></textarea>
+                                <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DocumentImage" class="control-label"></label>
+                                <img class="form-Image" id="documentImage" src="/img/no-image.png">
+                                <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                             </div>
 
                         </div>
                     </div>
                 </div>
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-plus"></i> Customer detail</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+
+                            <div class="form-group">
+                                <label asp-for="CustomerType" class="control-label"></label>
+                                <select asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
+                                    <option>--- SELECT CUSTOMER TYPE  ---</option>
+
+                                </select>
+                                <span asp-validation-for="CustomerType" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CustomerName" class="control-label"></label>
+                                <input asp-for="CustomerName" class="form-control" />
+                                <span asp-validation-for="CustomerName" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description" class="control-label"></label>
+                                <input asp-for="Description" class="form-control" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="CustomerDateOfBirth" class="control-label"></label>
+                                <input asp-for="CustomerDateOfBirth" class="form-control" />
+                                <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Gender" class="control-label"></label>
+                                <select asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
+                                    <option>--- SELECT GENDER ---</option>
+                                </select>
+                                <span asp-validation-for="Gender" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ContactNumber" class="control-label"></label>
+                                <input asp-for="ContactNumber" class="form-control" />
+                                <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Addressline" class="control-label"></label>
+                                <input asp-for="Addressline" class="form-control" value="100 GOOD STREET" />
+                                <span asp-validation-for="Addressline" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label asp-for="CountryId" class="control-label"></label>
+                                <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                    <option>--- SELECT COUNTRY ---</option>
+                                </select>
+                                <span asp-validation-for="CountryId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="StateId" class="control-label"></label>
+                                <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                    <option>--- SELECT STATE ---</option>
+                                </select>
+                                <span asp-validation-for="StateId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DistrictId" class="control-label"></label>
+                                <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                    <option>--- SELECT DISTRICT ---</option>
+                                </select>
+                                <span asp-validation-for="DistrictId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="PinCodeId" class="control-label"></label>
+                                <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                    <option>--- SELECT PINCODE ---</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CustomerIncome" class="control-label"></label>
+                                <select asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
+                                    <option>--- SELECT CUSTOMER INCOME ---</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CustomerOccupation" class="control-label"></label>
+                                <select asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
+                                    <option>--- SELECT CUSTOMER OCCUPATION ---</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CustomerEducation" class="control-label"></label>
+                                <select asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
+                                    <option>--- SELECT CUSTOMER EDUCATION ---</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label asp-for="Comments" class="control-label"></label>
+                                <textarea asp-for="Comments" class="form-control"></textarea>
+                                <span asp-validation-for="Comments" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+
+                            <div class="col-md-12">
+
+
+                                <div class="form-group text-right">
+
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-plus"></i> @Applicationsettings.EDIT
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
+
         </form>
     </div>
 </section>

@@ -184,10 +184,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ClaimsVendor" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Index")">
-                        <i class="fas fa-rupee-sign nav-icon"></i>
+                    <a is-active-page asp-controller="ClaimsVendor" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Index")
+                    @Url.MakeActiveClass("ClaimsVendor","AllocateToVendorAgent") @Url.MakeActiveClass("ClaimsVendor","SelectVendorAgent") @Url.MakeActiveClass("ClaimsVendor","GetInvestigate")">
+                        <i class="fas fa-search-dollar nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">new</span>
+                           <span class="badge badge-danger">Claims</span>
                         </p>
                     </a>
                 </li>
@@ -195,10 +196,11 @@
                     if (User.IsInRole(AppRoles.VendorAdmin.ToString()) || User.IsInRole(AppRoles.VendorSupervisor.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")">
-                                <i class="fas fa-rupee-sign nav-icon"></i>
+                            <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")
+                                    @Url.MakeActiveClass("ClaimsVendor","GetInvestigateReport")">
+                                <i class="fas fa-funnel-dollar nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">report</span>
+                                   <span class="badge badge-danger">Reports</span>
                                 </p>
                             </a>
                         </li>
@@ -206,7 +208,7 @@
                             <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReportReview" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReportReview")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-danger">review</span>
+                                    <span class="badge badge-danger">Review Reports</span>
                                 </p>
                             </a>
                         </li>
@@ -216,7 +218,7 @@
                     <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open") @Url.MakeActiveClass("ClaimsVendor","VendorAgent")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
-                            @Applicationsettings.INVESTIGATION_CLAIMS_CASE <span class="badge badge-warning">open</span>
+                            <span class="badge badge-warning">Active</span>
                         </p>
                     </a>
                 </li>

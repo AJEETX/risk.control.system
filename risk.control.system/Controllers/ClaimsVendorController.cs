@@ -13,8 +13,11 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb(" Claims")]
     public class ClaimsVendorController : Controller
     {
         private readonly IClaimsInvestigationService claimsInvestigationService;
@@ -33,6 +36,7 @@ namespace risk.control.system.Controllers
             this._context = context;
         }
 
+        [Breadcrumb(" Allocate To Agent")]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase)
         {
             if (_context.ClaimsInvestigation == null)
@@ -212,6 +216,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [Breadcrumb(" Report")]
         public async Task<IActionResult> GetInvestigate(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -234,6 +239,7 @@ namespace risk.control.system.Controllers
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
 
+        [Breadcrumb(" Review Report")]
         public async Task<IActionResult> GetInvestigateReportReview(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -268,6 +274,7 @@ namespace risk.control.system.Controllers
             return View(new ClaimsInvestigationVendorAgentModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation, VendorApplicationUser = agents });
         }
 
+        [Breadcrumb("  Report")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -323,6 +330,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
+        [Breadcrumb(" Active")]
         public async Task<IActionResult> Open()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -388,6 +396,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [Breadcrumb(" Report")]
         public async Task<IActionResult> ClaimReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -466,6 +475,7 @@ namespace risk.control.system.Controllers
             return View(claimsSubmitted);
         }
 
+        [Breadcrumb(" Review")]
         public async Task<IActionResult> ClaimReportReview()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
