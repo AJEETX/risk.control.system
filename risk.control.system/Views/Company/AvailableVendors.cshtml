@@ -6,16 +6,15 @@
 
 <section class="content pt-2">
     <div class="container-fluid">
-        
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-list"></i> Empanelled Agencies</h3>
+                        <h3 class="card-title"><i class="fas fa-list"></i> Available Agencies</h3>
                     </div>
                     <div class="card-body">
-                        <form id="checkboxes" method="post" asp-action="EmpanelledVendors">
-
+                        <form id="checkboxes" asp-action="AvailableVendors" method="post" asp-route-id="@ViewBag.CompanyId" enctype="multipart/form-data">
+                            <input type="hidden" id="@ViewBag.CompanyId" />
                             @if (Model == null || Model.Count() == 0)
                             {
                                 <hr />
@@ -23,6 +22,7 @@
                                     <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
                                 </div>
                                 <hr />
+
                             }
                             else
                             {
@@ -35,10 +35,10 @@
                                                 @Html.DisplayNameFor(model => model.Document)
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model=>model.Name)
+                                                @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.CodeSortParm })
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model=>model.Code)
+                                                @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
                                             </th>
                                             <th>
                                                 @Html.DisplayNameFor(model => model.PhoneNumber)
@@ -91,7 +91,7 @@
                                                     @Html.DisplayFor(modelItem => item.State.Name)
                                                 </td>
                                                 <td>
-                                                    <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
+                                                    <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="AvailableVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
                                                         <i class="fa fa-search"></i> @Applicationsettings.DETAILS
                                                     </a>
                                                 </td>
@@ -103,8 +103,12 @@
                                 <div class="row">
                                     <div class="col-md-12">
 
-                                        <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-danger">
-                                            <i class="fas fa-thumbs-down" aria-hidden="true"></i> @Applicationsettings.SELECT_TO_DEPANEL_VENDORS
+                                        <a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@ViewBag.CompanyId" class="btn btn-secondary">
+                                            <i class="fa fa-window-close"></i>
+                                            @Applicationsettings.CANCEL
+                                        </a>
+                                        <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
+                                            <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.SELECT_TO_EMPANEL
                                         </button>
                                     </div>
                                 </div>

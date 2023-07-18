@@ -89,6 +89,7 @@ namespace risk.control.system.Controllers
             }
             user.Mailbox = new Mailbox { Name = user.Email };
             user.Updated = DateTime.UtcNow;
+            user.EmailConfirmed = true;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 

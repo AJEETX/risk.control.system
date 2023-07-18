@@ -1,5 +1,7 @@
 ﻿$(document).ready(function () {
-    var datatable = $('#datatable').dataTable({});
+    var datatable = $('#datatable').dataTable({
+        processing:true
+    });
 
     $("#datepicker").datepicker();
 

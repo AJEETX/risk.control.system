@@ -46,16 +46,7 @@
                                             <input asp-for="Email" class="form-control" />
                                             <span asp-validation-for="Email" class="text-danger"></span>
                                         </div>
-                                        <div class="form-group">
-                                            <label asp-for="Comments" class="control-label"></label>
-                                            <input asp-for="Comments" class="form-control" />
-                                            <span asp-validation-for="Comments" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group form-check">
-                                            <label class="form-check-label">
-                                                <input class="form-check-input" asp-for="EmailConfirmed" /> @Html.DisplayNameFor(model => model.EmailConfirmed)
-                                            </label>
-                                        </div>
+                                        
                                         <div class="form-group">
                                             <label asp-for="PhoneNumber" class="control-label"></label>
                                             <input asp-for="PhoneNumber" class="form-control" />
@@ -98,6 +89,11 @@
                                         <label asp-for="ProfilePicture" class="control-label"></label>
                                         <img class="form-Image" id="profilePicture" src="@Applicationsettings.NO_IMAGE">
                                         <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Comments" class="control-label"></label>
+                                        <input asp-for="Comments" class="form-control" />
+                                        <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group text-right">
                                         <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">

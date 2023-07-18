@@ -318,8 +318,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link 
-                                @Url.MakeActiveClass("ClientCompany","EmpanelledVendors") @Url.MakeActiveClass("ClientCompany","VendorDetail")">
+                            <a is-active-page asp-controller="Company" asp-action="EmpanelledVendors" class="actual-link nav-link 
+                                @Url.MakeActiveClass("Company","EmpanelledVendors")">
                                 <i class="nav-icon fa fa-thumbs-up"></i>
                                 <p>
                                     Empanelled Agencies
@@ -327,7 +327,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClientCompany" asp-action="AvailableVendors" asp-route-id="@Model.ClientCompanyId" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","AvailableVendors")">
+                            <a is-active-page asp-controller="Company" asp-action="AvailableVendors" class="actual-link nav-link @Url.MakeActiveClass("Company","AvailableVendors")">
                                 <i class="nav-icon fa fa-thumbs-down"></i>
                                 <p>
                                     Available Agencies

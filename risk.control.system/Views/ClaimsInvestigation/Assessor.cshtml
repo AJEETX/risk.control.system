@@ -25,9 +25,7 @@
                             <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                 <thead>
                                     <tr>
-                                        <th style="display:@hasClientCompany">
-                                            @Html.DisplayNameFor(model => model.ClientCompany)
-                                        </th>
+                                        
                                         <th></th>
                                         <th>
                                             @Html.DisplayNameFor(model => model.LineOfBusiness)
@@ -53,9 +51,7 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td style="display:@hasClientCompany">
-                                                @Html.DisplayFor(modelItem => item.ClientCompany.Name)
-                                            </td>
+                                            
                                             <td>
                                                 <input id="@item.ClaimsInvestigationId" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
                                             </td>

@@ -4,16 +4,16 @@
     ViewData["Title"] = @Applicationsettings.SERVICE;
 }
 
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <form asp-action="ProcessCaseReport" method="post">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
-                    <div class="card card-success">
+                    <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> Case Report</h3>
+                            <h3 class="card-title"><i class="fas fa-prescription"></i> Claim Report</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -101,10 +101,7 @@
 
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> Verified Location</h3>
-                        </div>
+                            <hr />
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
@@ -152,7 +149,7 @@
                             </div>
                         </div>
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> AGENCY Report</h3>
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> Agency Report</h3>
                         </div>
                         <div class="card-body">
                             <div class="=row">
@@ -160,6 +157,7 @@
                                     <textarea disabled name="@Model.CaseLocation.ClaimReport.AgentRemarks" id="remarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.AgentRemarks</textarea>
                                 </div>
                             </div>
+                            <hr />
                             <div class="=row">
                                 <div class="col-md-12">
                                     <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value ='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
@@ -168,9 +166,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card card-success">
+                    </div>
+                    <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> PROCESS REPORT</h3>
+                            <h3 class="card-title"><i class="fas fa-list-alt"></i> PROCESS REPORT</h3>
                         </div>
                         <div class="card-body">
                             <div class="=row">

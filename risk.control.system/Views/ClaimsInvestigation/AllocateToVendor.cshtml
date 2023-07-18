@@ -203,7 +203,6 @@
                                                     Verification Pincodes
                                                 </th>
 
-                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -233,9 +232,6 @@
                                                         @Html.DisplayFor(modelItem => item.PinCode.Code)
                                                     </td>
 
-                                                    <td>
-                                                        <a class="btn btn-xs btn-info" asp-controller="CaseLocations" asp-action="AssignerDetails" asp-route-id="@item.CaseLocationId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;
-                                                        </td>
                                                 </tr>
                                             }
                                         </tbody>
