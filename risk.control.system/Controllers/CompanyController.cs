@@ -268,7 +268,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ClientCompanyApplicationUser applicationUser)
+        public async Task<IActionResult> EditUser(string id, ClientCompanyApplicationUser applicationUser)
         {
             if (id != applicationUser.Id.ToString())
             {
@@ -320,7 +320,7 @@ namespace risk.control.system.Controllers
                         if (result.Succeeded)
                         {
                             toastNotification.AddSuccessToastMessage("Company user edited successfully!");
-                            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
+                            return RedirectToAction(nameof(CompanyUserController.User), "Company");
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
                         Errors(result);
@@ -340,7 +340,7 @@ namespace risk.control.system.Controllers
             }
 
             toastNotification.AddErrorToastMessage("Error to create Company user!");
-            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompany });
+            return RedirectToAction(nameof(CompanyUserController.User), "Company", new { id = applicationUser.ClientCompany });
         }
 
         [HttpGet]
@@ -597,7 +597,7 @@ namespace risk.control.system.Controllers
             await signInManager.RefreshSignInAsync(currentUser);
 
             toastNotification.AddSuccessToastMessage("roles updated successfully!");
-            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { Id = model.CompanyId });
+            return RedirectToAction(nameof(CompanyController.User), "Company");
         }
 
         private bool VendorApplicationUserExists(long id)
