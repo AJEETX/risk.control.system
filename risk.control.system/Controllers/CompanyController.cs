@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +18,7 @@ namespace risk.control.system.Controllers
     public class CompanyController : Controller
     {
         public List<UsersViewModel> UserList;
+        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -27,11 +27,13 @@ namespace risk.control.system.Controllers
 
         public CompanyController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification)
         {
             this._context = context;
+            this.signInManager = signInManager;
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
@@ -533,6 +535,69 @@ namespace risk.control.system.Controllers
             ViewBag.Backurl = backurl;
 
             return View(vendor);
+        }
+
+        public async Task<IActionResult> UserRoles(string userId)
+        {
+            var userRoles = new List<CompanyUserRoleViewModel>();
+            //ViewBag.userId = userId;
+            ClientCompanyApplicationUser user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                toastNotification.AddErrorToastMessage("user not found!");
+                return NotFound();
+            }
+            //ViewBag.UserName = user.UserName;
+            foreach (var role in roleManager.Roles.Where(r =>
+                r.Name.Contains(AppRoles.ClientAdmin.ToString()) ||
+                r.Name.Contains(AppRoles.ClientCreator.ToString()) ||
+                r.Name.Contains(AppRoles.ClientAssigner.ToString()) ||
+                r.Name.Contains(AppRoles.ClientAssessor.ToString())))
+            {
+                var userRoleViewModel = new CompanyUserRoleViewModel
+                {
+                    RoleId = role.Id.ToString(),
+                    RoleName = role?.Name
+                };
+                if (await userManager.IsInRoleAsync(user, role?.Name))
+                {
+                    userRoleViewModel.Selected = true;
+                }
+                else
+                {
+                    userRoleViewModel.Selected = false;
+                }
+                userRoles.Add(userRoleViewModel);
+            }
+            var model = new CompanyUserRolesViewModel
+            {
+                UserId = userId,
+                CompanyId = user.ClientCompanyId,
+                UserName = user.UserName,
+                CompanyUserRoleViewModel = userRoles
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(string userId, CompanyUserRolesViewModel model)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SecurityStamp = Guid.NewGuid().ToString();
+            user.Updated = DateTime.UtcNow;
+            user.UpdatedBy = HttpContext.User?.Identity?.Name;
+            var roles = await userManager.GetRolesAsync(user);
+            var result = await userManager.RemoveFromRolesAsync(user, roles);
+            result = await userManager.AddToRolesAsync(user, model.CompanyUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName));
+            var currentUser = await userManager.GetUserAsync(HttpContext.User);
+            await signInManager.RefreshSignInAsync(currentUser);
+
+            toastNotification.AddSuccessToastMessage("roles updated successfully!");
+            return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { Id = model.CompanyId });
         }
 
         private bool VendorApplicationUserExists(long id)
