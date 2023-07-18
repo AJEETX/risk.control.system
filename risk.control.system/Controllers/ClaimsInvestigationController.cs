@@ -946,7 +946,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Assign));
         }
 
         // GET: ClaimsInvestigation/Details/5
