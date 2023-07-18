@@ -71,7 +71,10 @@ builder.Services.AddControllersWithViews()
     {
         ProgressBar = true,
         Timeout = 3000
-    });
+    })
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -392,11 +392,7 @@ namespace risk.control.system.Controllers
                 applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && a.CaseLocations.Count == 0);
                 return View(await applicationDbContext.ToListAsync());
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
-                return View("Assigner", await applicationDbContext.ToListAsync());
-            }
+
             return View(await applicationDbContext.ToListAsync());
         }
 

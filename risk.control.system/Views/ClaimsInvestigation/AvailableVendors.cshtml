@@ -41,17 +41,7 @@
                     <div class="card-body">
                         <form id="checkboxes" asp-action="AvailableVendors" method="post" asp-route-id="@ViewBag.CompanyId" enctype="multipart/form-data">
                             <input type="hidden" id="@ViewBag.CompanyId" />
-                            @if (Model == null || Model.Count() == 0)
-                            {
-                                <hr />
-                                <div class="col-md-12 text-center">
-                                    <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                                </div>
-                                <hr />
-
-                            }
-                            else
-                            {
+                            
                                 <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
@@ -133,8 +123,6 @@
                                         </button>
                                     </div>
                                 </div>
-                            }
-
                         </form>
                         <br />
                         <br />

@@ -11,7 +11,7 @@
                 <div class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-newspaper"></i> Claim Description</h3>
-                        
+
                     </div>
                     <div class="card-body">
                         <div class="row">
@@ -121,51 +121,51 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <dl class="row">
-                                <dt class="col-sm-5">
-                                    @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
-                                </dt>
-                                <dd class="col-sm-5">
-                                    @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
-                                </dd>
-                                <dt class="col-sm-5">
-                                    @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                </dt>
-                                <dd class="col-sm-5">
-                                    @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                </dd>
-                                <dt class="col-sm-5">
-                                    @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
-                                </dt>
-                                <dd class="col-sm-5">
-                                    @Html.DisplayFor(model => model.CaseLocation.Addressline)
-                                </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.Addressline)
+                                    </dd>
                                 </dl>
                             </div>
                             <div class="col-md-6">
                                 <dl class="row">
-                                <dt class="col-sm-5">
-                                    @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                </dt>
-                                <dd class="col-sm-5">
-                                    <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                </dd>
-                                <dt class="col-sm-5">
-                                    @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
-                                </dt>
-                                <dd class="col-sm-5">
-                                    @Html.DisplayFor(model => model.CaseLocation.District.Name)
-                                </dd>
-                                <dt class="col-sm-5">
-                                    @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
-                                </dt>
-                                <dd class="col-sm-5">
-                                    @Html.DisplayFor(model => model.CaseLocation.State.Name)
-                                </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.District.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                    </dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -179,87 +179,76 @@
                         <form id="radioButtons" method="post" asp-action="CaseAllocatedToVendor" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
-                            @if (Model == null || Model.Vendors.Count == 0)
-                            {
-                                <hr />
-                                <div class="col-md-12 text-center">
-                                    <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                                </div>
-                                <hr />
-                            }
-                            else
-                            {
-                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                    <thead>
+                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                <thead>
+                                    <tr>
+                                        <th>
+
+                                        </th>
+                                        <th>
+                                            <span class="badge badge-success">Line of Business / Service-type / <span class="badge badge-light">Pincodes</span></span>
+                                        </th>
+
+                                        <th>
+                                            Vendor Name
+                                        </th>
+
+                                        <th>
+                                            PhoneNumber
+                                        </th>
+                                        <th>
+                                            Email
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Vendors)
+                                    {
                                         <tr>
-                                            <th>
+                                            <td>
+                                                <input id="@item.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.VendorId" />
+                                            </td>
+                                            <td>
+                                                @foreach (var service in item.VendorInvestigationServiceTypes)
+                                                {
+                                                    <span class="badge badge-light">
+                                                        @service.LineOfBusiness.Name / @service.InvestigationServiceType.Name
+                                                        @foreach (var pincode in service.PincodeServices)
+                                                        {
+                                                            <span class="badge badge-info">@pincode.Pincode</span>
+                                                        }
+                                                    </span>
 
-                                            </th>
-                                            <th>
-                                                <span class="badge badge-success">Line of Business / Service-type / <span class="badge badge-light">Pincodes</span></span>
-                                            </th>
+                                                    <br />
+                                                }
+                                            </td>
 
-                                            <th>
-                                                Vendor Name
-                                            </th>
-
-                                            <th>
-                                                PhoneNumber
-                                            </th>
-                                            <th>
-                                                Email
-                                            </th>
-                                            <th></th>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Email)
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
+                                                    <i class="fa fa-search"></i> @Applicationsettings.DETAILS
+                                                </a>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model.Vendors)
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <input id="@item.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.VendorId" />
-                                                </td>
-                                                <td>
-                                                    @foreach (var service in item.VendorInvestigationServiceTypes)
-                                                    {
-                                                        <span class="badge badge-light">
-                                                            @service.LineOfBusiness.Name / @service.InvestigationServiceType.Name
-                                                            @foreach (var pincode in service.PincodeServices)
-                                                            {
-                                                                <span class="badge badge-info">@pincode.Pincode</span>
-                                                            }
-                                                        </span>
-
-                                                        <br />
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.PhoneNumber)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Email)
-                                                </td>
-                                                <td>
-                                                    <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
-                                                        <i class="fa fa-search"></i> @Applicationsettings.DETAILS
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
-                                            <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.BROADCAST
-                                        </button>
-                                    </div>
+                                    }
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
+                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.BROADCAST
+                                    </button>
                                 </div>
-                            }
+                            </div>
                         </form>
 
                     </div>

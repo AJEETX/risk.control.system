@@ -1,6 +1,9 @@
 ﻿$(document).ready(function () {
     var datatable = $('#datatable').dataTable({
-        processing:true
+        processing: true,
+        ordering: true,
+        paging: true,
+        searching: true
     });
 
     $("#datepicker").datepicker();

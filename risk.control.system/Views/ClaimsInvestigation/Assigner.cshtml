@@ -16,14 +16,7 @@
                     <div class="card-body">
                         <form id="radioButtons" asp-action="AllocateToVendor" method="get" enctype="multipart/form-data">
                             <div class="col-md-12">
-                                @if (Model.Count() == 0)
-                                {
-                                    <div class="col-md-12 text-center">
-                                        <p>@Applicationsettings.NO_RECORDS_FOUND</p>
-                                    </div>
-                                }
-                                else
-                                {
+                                
                                     <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                         <thead>
                                             <tr>
@@ -88,7 +81,6 @@
                                                     </button>
                                             </div>
                                         </div>
-                                }
                             </div>
                         </form>
                     </div>

@@ -15,98 +15,84 @@
                         <h3 class="card-title"><i class="fas fa-user-friends"></i> Company Users List</h3>
                     </div>
                     <div class="card-body">
-                        
-
-                        @if (Model.Users.Count == 0)
-                        {
-                            <hr />
-                            <div class="col-md-12 text-center">
-                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                            </div>
-                            <hr />
-                        }
-                        else
-                        {
-                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                <thead>
+                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>
+                                        Email
+                                    </th>
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        Pincode
+                                    </th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                    <th>Roles</th>
+                                    <th>Code</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model.Users)
+                                {
                                     <tr>
-                                        <th></th>
-                                        <th>
-                                            Email
-                                        </th>
-                                        <th>
-                                            Name
-                                        </th>
-                                        <th>
-                                           Pincode
-                                        </th>
-                                        <th>State</th>
-                                        <th>Country</th>
-                                        <th>Roles</th>
-                                        <th>Code</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var user in Model.Users)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <img src="@user?.ProfileImage" height="30" alt="No image" />
-                                            </td>
-                                            <td style="width: 10%;">@user.Email</td>
-                                            <td>@user.FirstName @user.LastName</td>
-                                            <td>@user.PinCode</td>
-                                            <td>@user.State</td>
-                                            <td>@user.Country</td>
-                                            <td style="width:20%">
-                                                @foreach (var role in user.Roles)
+                                        <td>
+                                            <img src="@user?.ProfileImage" height="30" alt="No image" />
+                                        </td>
+                                        <td style="width: 10%;">@user.Email</td>
+                                        <td>@user.FirstName @user.LastName</td>
+                                        <td>@user.PinCode</td>
+                                        <td>@user.State</td>
+                                        <td>@user.Country</td>
+                                        <td style="width:20%">
+                                            @foreach (var role in user.Roles)
+
+                                            {
+                                                <span class="badge badge-light">@role</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                if (user.Roles.Contains(AppRoles.PortalAdmin.ToString()))
 
                                                 {
-                                                    <span class="badge badge-light">@role</span>
+                                                    <span class="badge badge-danger">PA</span>
                                                 }
-                                            </td>
-                                            <td>
-                                                @{
-                                                    if (user.Roles.Contains(AppRoles.PortalAdmin.ToString()))
 
-                                                    {
-                                                        <span class="badge badge-danger">PA</span>
-                                                    }
+                                                else if (user.Roles.Contains(AppRoles.ClientAdmin.ToString()))
 
-                                                    else if (user.Roles.Contains(AppRoles.ClientAdmin.ToString()))
-
-                                                    {
-                                                        <span class="badge badge-danger">CA</span>
-                                                    }
-
-                                                    else if (user.Roles.Contains(AppRoles.VendorAdmin.ToString()))
-
-                                                    {
-                                                        <span class="badge badge-warning">VA</span>
-                                                    }
-
-                                                    else
-
-                                                    {
-                                                        <span class="badge badge-success">ST</span>
-                                                    }
-
+                                                {
+                                                    <span class="badge badge-danger">CA</span>
                                                 }
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-xs btn-warning" asp-controller="Company" asp-action="EditUser" asp-route-userId="@user.UserId">
-                                                    <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                                </a>&nbsp;
-                                                <a class="btn btn-xs btn-danger" asp-controller="CompanyUserRoles" asp-action="Index"
+
+                                                else if (user.Roles.Contains(AppRoles.VendorAdmin.ToString()))
+
+                                                {
+                                                    <span class="badge badge-warning">VA</span>
+                                                }
+
+                                                else
+
+                                                {
+                                                    <span class="badge badge-success">ST</span>
+                                                }
+
+                                            }
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-warning" asp-controller="Company" asp-action="EditUser" asp-route-userId="@user.UserId">
+                                                <i class="fas fa-pen"></i> @Applicationsettings.EDIT
+                                            </a>&nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-controller="CompanyUserRoles" asp-action="Index"
                                            asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> @Applicationsettings.ROLE</a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                            <br />
-                        }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

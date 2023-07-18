@@ -33,32 +33,24 @@
                     <div class="card-body">
                         <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
                             <div class="col-md-12">
-                                @if (Model.Count() == 0)
-                                {
-                                    <div class="col-md-12 text-center">
-                                        <p>@Applicationsettings.NO_RECORDS_FOUND</p>
-                                    </div>
-                                }
-                                else
-                                {
                                     <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                         <thead>
                                             <tr>
 
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                                    Line Of Business
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                                    Claim Status
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerName)
+                                                    Customer Name
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.ClaimType)
+                                                    Claim Type
                                                 </th>
                                                 <th>
-                                                    Location - SubStatus
+                                                    Location - Status
                                                 </th>
                                                 <th></th>
                                             </tr>
@@ -109,7 +101,7 @@
                                         </tbody>
 
                                     </table>
-                                }
+                                
                             </div>
                         </form>
                     </div>
@@ -118,3 +110,14 @@
         </div>
     </div>
 </section>
+    <script>
+    $(document).ready(function () {
+        //$('#datatable').DataTable({
+        //    processing: true,
+        //    ordering: true,
+        //    paging: true,
+        //    searching: true
+        //});
+    });
+
+    </script>

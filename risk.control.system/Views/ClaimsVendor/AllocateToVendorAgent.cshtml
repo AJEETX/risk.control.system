@@ -119,83 +119,72 @@
                         <form id="radioButtons" asp-action="SelectVendorAgent" method="post" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigationId" />
                             <div class="col-md-12">
-                                @if (Model.CaseLocations.Count == 0)
-                                {
-                                    <hr />
-                                    <div class="col-md-12 text-center">
-                                        <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                                    </div>
-                                    <hr />
-                                }
-                                else
-                                {
-                                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>
-                                                    Benficiary Name
-                                                </th>
-                                                <th>
-                                                    Benficiary Relation
-                                                </th>
-                                                <th>
-                                                    Address
-                                                </th>
-                                                <th>
-                                                    District
-                                                </th>
-                                                <th>
-                                                    State
-                                                </th>
+                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>
+                                                Benficiary Name
+                                            </th>
+                                            <th>
+                                                Benficiary Relation
+                                            </th>
+                                            <th>
+                                                Address
+                                            </th>
+                                            <th>
+                                                District
+                                            </th>
+                                            <th>
+                                                State
+                                            </th>
 
-                                                <th>
-                                                    Verification Pincodes
-                                                </th>
+                                            <th>
+                                                Verification Pincodes
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.CaseLocations)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.CaseLocationId" />
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.BeneficiaryName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Addressline)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.District.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.State.Name)
+                                                </td>
+
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.PinCode.Code)
+                                                </td>
+
 
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var item in Model.CaseLocations)
-                                            {
-                                                <tr>
-                                                    <td>
-                                                        <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.CaseLocationId" />
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.BeneficiaryName)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Addressline)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.District.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.State.Name)
-                                                    </td>
+                                        }
+                                    </tbody>
 
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.PinCode.Code)
-                                                    </td>
-
-                                                    
-                                                </tr>
-                                            }
-                                        </tbody>
-
-                                    </table>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
-                                                <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.SELECT_CASE_TO_ASSIGN_TO_AGENT
-                                            </button>
-                                        </div>
+                                </table>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
+                                            <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.SELECT_CASE_TO_ASSIGN_TO_AGENT
+                                        </button>
                                     </div>
-                                }
+                                </div>
                             </div>
                         </form>
                     </div>

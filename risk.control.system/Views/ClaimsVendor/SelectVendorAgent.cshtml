@@ -167,65 +167,54 @@
                         <form id="radioButtons" method="post" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
-                            @if (Model == null || Model.VendorApplicationUser.Count == 0)
-                            {
-                                <hr />
-                                <div class="col-md-12 text-center">
-                                    <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                                </div>
-                                <hr />
-                            }
-                            else
-                            {
-                                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                    <thead>
+                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                <thead>
+                                    <tr>
+                                        <th>
+
+                                        </th>
+                                        <th>
+                                            Agent Name
+                                        </th>
+
+                                        <th>
+                                            PhoneNumber
+                                        </th>
+                                        <th>
+                                            Email
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.VendorApplicationUser)
+                                    {
                                         <tr>
-                                            <th>
+                                            <td>
+                                                <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.Id" />
+                                            </td>
 
-                                            </th>
-                                            <th>
-                                                Agent Name
-                                            </th>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.FirstName)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Email)
+                                            </td>
 
-                                            <th>
-                                                PhoneNumber
-                                            </th>
-                                            <th>
-                                                Email
-                                            </th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model.VendorApplicationUser)
-                                        {
-                                            <tr>
-                                                <td>
-                                                    <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.Id" />
-                                                </td>
+                                    }
+                                </tbody>
 
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.FirstName)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.PhoneNumber)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Email)
-                                                </td>
-
-                                            </tr>
-                                        }
-                                    </tbody>
-                                    
-                                    </table>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                                <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
-                                                    <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.BROADCAST
-                                                </button>
-                                    </div>
+                            </table>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
+                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.BROADCAST
+                                    </button>
                                 </div>
-                            }
+                            </div>
                         </form>
                         <br />
                         <br />

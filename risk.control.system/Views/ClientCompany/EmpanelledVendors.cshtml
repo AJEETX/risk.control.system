@@ -15,17 +15,6 @@
                     </div>
                     <div class="card-body">
                         <form id="checkboxes" method="post" asp-action="EmpanelledVendors">
-
-                            @if (Model == null || Model.Count() == 0)
-                            {
-                                <hr />
-                                <div class="col-md-12 text-center">
-                                    <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                                </div>
-                                <hr />
-                            }
-                            else
-                            {
                                 <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
@@ -108,7 +97,6 @@
                                         </button>
                                     </div>
                                 </div>
-                            }
                         </form>
                     </div>
                 </div>

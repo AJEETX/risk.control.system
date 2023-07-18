@@ -5,27 +5,15 @@
 @{
     ViewData["Title"] = @Applicationsettings.USER;
 }
-<h3><i class="fas fa-folder-open"></i> Client Companies</h3>
-
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <form asp-action="index">
-                    <div class="card card-success">
+                    <div class="card card-secondary">
                     <div class="card-header">
                             <div class="card-header">
                                 <h3 class="card-title">@Model.Company.Name @Applicationsettings.USER</h3>
-                            </div>
-                            <div class="card-tools">
-                                <div class="input-group input-group-sm">
-                                    <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
-                                    <div class="input-group-append">
-                                        <div onclick="this.parentNode.submit()" class="btn btn-success">
-                                            <i class="fas fa-search"></i>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                     </div>
                         <div class="card-body">
@@ -42,34 +30,23 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success">
-                    <div class="card-body p-0 contained-width">
+                <div class="card card-secondary">
+                    <div class="card-body">
                         <div class="card-header">
                             <h3 class="card-title">@Model.Company.Name @Applicationsettings.USER list</h3>
                         </div>
-
-                        @if (Model.Users.Count == 0)
-                        {
-                            <hr />
-                            <div class="col-md-12 text-center">
-                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                            </div>
-                            <hr />
-                        }
-                        else
-                        {
-                        <table class="table table-striped">
+                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
                                     <th></th>
                                     <th>
-                                        @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.EmailSortParm })
+                                        Email
                                     </th>
                                     <th>
-                                        @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.NameSortParm })
+                                        Name
                                     </th>
                                     <th>
-                                        @Html.ActionLink("Pincode", "Index", new { sortOrder = ViewBag.PincodeSortParm })
+                                        Pincode
                                     </th>
                                     <th>State</th>
                                     <th>Country</th>

@@ -9,17 +9,17 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i>  Type of Service</h3>
-                        </div>
-                        <div class="card-body">
-                            
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <a class="btn btn-success" asp-controller="InvestigationServiceTypes" asp-action="Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
-                                </div>
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-folder-open"></i>  Type of Service</h3>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <a class="btn btn-success" asp-controller="InvestigationServiceTypes" asp-action="Create"><i class="fas fa-plus"></i>  @Applicationsettings.CREATE</a>
                             </div>
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -30,60 +30,49 @@
                         <h3 class="card-title"><i class="fas fa-list"></i>  Type of Service list</h3>
                     </div>
                     <div class="card-body">
-                        @if (Model.Count() == 0)
-                        {
-                            <hr />
-                            <div class="col-md-12 text-center">
-                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                            </div>
-                            <hr />
-                        }
-                        else
-                        {
-                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                <thead>
+                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Name)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Code)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
                                     <tr>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.Name)
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.Code)
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.LineOfBusiness)
-                                        </th>
-                                        <th></th>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationServiceTypeId">
+                                                <i class="fa fa-search"></i>  @Applicationsettings.VIEW
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationServiceTypeId">
+                                                <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationServiceTypeId">
+                                                <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
+                                            </a>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Code)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.InvestigationServiceTypeId">
-                                                    <i class="fa fa-search"></i>  @Applicationsettings.VIEW
-                                                </a> &nbsp;
-                                                <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationServiceTypeId">
-                                                    <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
-                                                </a> &nbsp;
-                                                <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationServiceTypeId">
-                                                    <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
