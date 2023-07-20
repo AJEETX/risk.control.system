@@ -942,6 +942,8 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
 
+            toastNotification.AddSuccessToastMessage("case(s) assigned successfully!");
+
             return RedirectToAction(nameof(Assign));
         }
 

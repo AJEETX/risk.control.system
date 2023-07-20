@@ -20,7 +20,7 @@
     var newSentMessgeDisplay = string.Empty;
     var newTrashMessgeDisplay = string.Empty;
 
-    
+
     var newInboxMessages = userMailbox?.Inbox.Where(i => i.Read == false);
     if (newInboxMessages is not null && newInboxMessages.Count() > 0)
     {
@@ -116,14 +116,13 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
-
-               @* <li class="nav-item ">
-                    <a asp-controller="Home" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("home","")">
-                        <i class="nav-icon fas fa-home"></i>
-                        <p class="sidebar-menu-header-label">
-                            @Applicationsettings.DASHBOARD
-                        </p>
-                    </a>
+                @* <li class="nav-item ">
+                <a asp-controller="Home" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("home","")">
+                <i class="nav-icon fas fa-home"></i>
+                <p class="sidebar-menu-header-label">
+                @Applicationsettings.DASHBOARD
+                </p>
+                </a>
                 </li>*@
                 <li class="nav-item ">
                     <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ContactMessage","")">
@@ -134,7 +133,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link 
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link
                         @Url.MakeActiveClass("ContactMessage","Index") @Url.MakeActiveClass("ContactMessage","InboxDetails") @Url.MakeActiveClass("ContactMessage","InboxDetailsReply")">
                         <i class="fas fa-envelope-open nav-icon"></i>
                         <p>
@@ -188,7 +187,7 @@
                     @Url.MakeActiveClass("ClaimsVendor","AllocateToVendorAgent") @Url.MakeActiveClass("ClaimsVendor","SelectVendorAgent") @Url.MakeActiveClass("ClaimsVendor","GetInvestigate")">
                         <i class="fas fa-search-dollar nav-icon"></i>
                         <p>
-                           <span class="badge badge-danger">Claims</span>
+                            <span class="badge badge-danger">Claims</span>
                         </p>
                     </a>
                 </li>
@@ -197,10 +196,10 @@
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")
-                                    @Url.MakeActiveClass("ClaimsVendor","GetInvestigateReport")">
+                                        @Url.MakeActiveClass("ClaimsVendor","GetInvestigateReport")">
                                 <i class="fas fa-funnel-dollar nav-icon"></i>
                                 <p>
-                                   <span class="badge badge-danger">Reports</span>
+                                    <span class="badge badge-danger">Reports</span>
                                 </p>
                             </a>
                         </li>
@@ -212,22 +211,22 @@
                                 </p>
                             </a>
                         </li>
+                    <li class="nav-item">
+                        <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open") @Url.MakeActiveClass("ClaimsVendor","VendorAgent")">
+                            <i class="fas fa-rupee-sign nav-icon"></i>
+                            <p>
+                                <span class="badge badge-warning">Active</span>
+                            </p>
+                        </a>
+                    </li>
                     }
-                  }
-                <li class="nav-item">
-                    <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open") @Url.MakeActiveClass("ClaimsVendor","VendorAgent")">
-                        <i class="fas fa-rupee-sign nav-icon"></i>
-                        <p>
-                            <span class="badge badge-warning">Active</span>
-                        </p>
-                    </a>
-                </li>
+                }
                 @{
                     if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","")
-                                            @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+                                                @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.ADMIN_SETTINGS
