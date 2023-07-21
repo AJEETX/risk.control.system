@@ -8,11 +8,11 @@ namespace risk.control.system.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string VendorId { get; set; } = Guid.NewGuid().ToString();
-        [Display(Name = "Vendor name")]
+        [Display(Name = "Agency name")]
         public string Name { get; set; } = string.Empty;
-        [Display(Name = "Vendor code")]
+        [Display(Name = "Agency code")]
         public string Code { get; set; } = string.Empty;
-        [Display(Name = "Vendor detail")]
+        [Display(Name = "Agency detail")]
         public string Description { get; set; } = string.Empty;
         [Display(Name = "Phone number")]
         public string PhoneNumber { get; set; } = string.Empty;

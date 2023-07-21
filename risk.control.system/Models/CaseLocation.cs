@@ -55,10 +55,10 @@ namespace risk.control.system.Models
         public string ClaimsInvestigationId { get; set; }
         public ClaimsInvestigation ClaimsInvestigation { get; set; } = default!;
 
-        [Display(Name = "Vendor name")]
+        [Display(Name = "Agency name")]
         public string? VendorId { get; set; }
 
-        [Display(Name = "Vendor name")]
+        [Display(Name = "Agency name")]
         public Vendor? Vendor { get; set; }
 
         [Display(Name = "Case sub status")]

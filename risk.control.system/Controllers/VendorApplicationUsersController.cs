@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -21,7 +23,7 @@ namespace risk.control.system.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
 
-        public VendorApplicationUsersController(ApplicationDbContext context, 
+        public VendorApplicationUsersController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification)
@@ -87,6 +89,7 @@ namespace risk.control.system.Controllers
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 user.ProfilePictureUrl = "upload/" + newFileName;
             }
+            user.UserName = user.Email;
             user.Mailbox = new Mailbox { Name = user.Email };
             user.Updated = DateTime.UtcNow;
             user.EmailConfirmed = true;
@@ -94,7 +97,7 @@ namespace risk.control.system.Controllers
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
-               return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
+                return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
             else
             {
                 toastNotification.AddErrorToastMessage("Error to create user!");
@@ -105,6 +108,7 @@ namespace risk.control.system.Controllers
             toastNotification.AddSuccessToastMessage("user created successfully!");
             return View(user);
         }
+
         private void GetCountryStateEdit(VendorApplicationUser? user)
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", user?.CountryId);
@@ -112,6 +116,7 @@ namespace risk.control.system.Controllers
             ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
         }
+
         // GET: VendorApplicationUsers/Edit/5
         public async Task<IActionResult> Edit(long? userId)
         {
@@ -122,7 +127,7 @@ namespace risk.control.system.Controllers
             }
 
             var vendorApplicationUser = _context.VendorApplicationUser
-                .Include(v=>v.Mailbox).Where(v=>v.Id == userId)
+                .Include(v => v.Mailbox).Where(v => v.Id == userId)
                 ?.FirstOrDefault();
             if (vendorApplicationUser == null)
             {
@@ -178,7 +183,7 @@ namespace risk.control.system.Controllers
                             user.Password = applicationUser.Password;
                         }
                         user.Email = applicationUser.Email;
-                        user.UserName = applicationUser.UserName;
+                        user.UserName = applicationUser.Email;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;
@@ -193,7 +198,7 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
-                            toastNotification.AddSuccessToastMessage("vendor user edited successfully!");
+                            toastNotification.AddSuccessToastMessage("agency user edited successfully!");
                             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
@@ -211,10 +216,9 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                
             }
 
-            toastNotification.AddErrorToastMessage("Error to create vendor user!");
+            toastNotification.AddErrorToastMessage("Error to create agency user!");
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
         }
 
@@ -261,11 +265,13 @@ namespace risk.control.system.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
         private void Errors(IdentityResult result)
         {
             foreach (IdentityError error in result.Errors)
                 ModelState.AddModelError("", error.Description);
         }
+
         private bool VendorApplicationUserExists(long id)
         {
             return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();

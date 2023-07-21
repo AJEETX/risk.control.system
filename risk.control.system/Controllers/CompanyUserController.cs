@@ -190,6 +190,7 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureUrl = "upload/" + newFileName;
             }
             user.EmailConfirmed = true;
+            user.UserName = user.Email;
             user.Mailbox = new Mailbox { Name = user.Email };
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -285,8 +286,9 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
+                        user.UserName = applicationUser.Email;
                         user.Email = applicationUser.Email;
-                        user.EmailConfirmed =true;
+                        user.EmailConfirmed = true;
                         user.UserName = applicationUser.UserName;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;

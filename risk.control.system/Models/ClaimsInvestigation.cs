@@ -16,10 +16,10 @@ namespace risk.control.system.Models
         [Display(Name = "Company name")]
         public ClientCompany? ClientCompany { get; set; }
 
-        [Display(Name = "Vendor name")]
+        [Display(Name = "Agency name")]
         public string? VendorId { get; set; }
 
-        [Display(Name = "Vendor name")]
+        [Display(Name = "Agency name")]
         public Vendor? Vendor { get; set; }
 
         [NotMapped]

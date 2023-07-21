@@ -3,7 +3,12 @@
         processing: true,
         ordering: true,
         paging: true,
-        searching: true
+        searching: true,
+        //'fnDrawCallback': function (oSettings) {
+        //    $('.dataTables_filter').each(function () {
+        //        $(this).prepend('<button class="btn btn-success mr-xs pull-right" type="button"><i class="fas fa-plus"></i>  Add</button>');
+        //    });
+        //}
     });
 
     $("#datepicker").datepicker();

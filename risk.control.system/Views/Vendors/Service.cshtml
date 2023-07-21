@@ -14,7 +14,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-12 text-left">
+                            <div class="col-md-12 text-right">
                                 @*<a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>*@
                                 <a class="btn btn-success" asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
                             </div>
@@ -57,7 +57,7 @@
                                         Pincode Services
                                     </th>
                                     <th>
-                                        @Html.DisplayNameFor(model => model.UpdatedBy)
+                                        UpdatedBy
                                     </th>
                                     <th></th>
                                 </tr>
