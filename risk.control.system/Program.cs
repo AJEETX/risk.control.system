@@ -41,16 +41,27 @@ builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-var allowSpecificOrigins = "_allowSpecificOrigins";
 
-builder.Services.AddCors(options =>
+builder.Services.AddCors(opt =>
 {
-    options.AddPolicy(name: allowSpecificOrigins,
-                          policy =>
-                          {
-                              policy.WithOrigins("http://locahost",
-                                                  "https://rcu.azurewebsites.net/");
-                          });
+    opt.AddDefaultPolicy(builder =>
+    {
+        builder.WithMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+            .WithHeaders(HeaderNames.Accept,
+                HeaderNames.ContentType,
+                HeaderNames.Authorization)
+            .AllowCredentials()
+            .SetIsOriginAllowed(origin =>
+            {
+                if (string.IsNullOrWhiteSpace(origin)) return false;
+                // Only add this to allow testing with localhost, remove this line in production!
+                if (origin.ToLower().StartsWith("http://localhost")) return true;
+                // Insert your production domain here.
+                if (origin.ToLower().StartsWith("https://dev.mydomain.com")) return true;
+                return false;
+            });
+        ;
+    });
 });
 
 // Add services to the container.
@@ -141,7 +152,7 @@ app.UseCookiePolicy(
         Secure = CookieSecurePolicy.Always
     });
 app.UseAuthentication();
-app.UseCors(allowSpecificOrigins);
+app.UseCors();
 app.UseAuthorization();
 
 app.MapControllerRoute(

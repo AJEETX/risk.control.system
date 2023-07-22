@@ -31,7 +31,6 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpGet("claims")]
         public async Task<IActionResult> Index(string email)
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
