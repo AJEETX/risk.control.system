@@ -382,7 +382,7 @@ namespace risk.control.system.Controllers
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 if (userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
                 {
-                    applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseStatusId));
+                    applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId));
                 }
 
                 var claimsAllocated = new List<ClaimsInvestigation>();

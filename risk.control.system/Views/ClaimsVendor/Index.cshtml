@@ -37,11 +37,19 @@
                                                 <th>
                                                     Location - SubStatus
                                                 </th>
+                                            <th>
+                                                Allocated Date
+                                            </th>
+                                            <th>
+                                                Waiting days
+                                            </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach (var item in Model)
                                             {
+                                                var timePending = DateTime.Now.Subtract(item.Updated.Value).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Updated.Value).Days.ToString();
+
                                                 <tr>
                                                     <td>
                                                         <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
@@ -69,6 +77,12 @@
                                                             }
                                                         }
                                                     </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Updated)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => timePending )
+                                                </td>
                                                 </tr>
                                             }
                                         </tbody>

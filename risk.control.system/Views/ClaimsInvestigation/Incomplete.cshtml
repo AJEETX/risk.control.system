@@ -6,24 +6,7 @@
 }
 <section class="content pt-2">
     <div class="container-fluid">
-        <div class="row ">
-            <div class="col-md-12">
-                <form asp-action="incomplete">
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-search"></i> Incomplete claim</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fas fa-plus"></i> Create New Claim</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+        
         <div class="row ">
             <div class="col-md-12">
                 <div class="card card-secondary">
@@ -52,12 +35,19 @@
                                                 <th>
                                                     Location - Status
                                                 </th>
+                                                <th>
+                                                    Created Date
+                                                </th>
+                                                <th>
+                                                    Day since Drafted
+                                                </th>
                                                 <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach (var item in Model)
                                             {
+                                                var timePending = DateTime.Now.Subtract(item.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Created).Days.ToString();
                                                 <tr>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
@@ -85,6 +75,12 @@
                                                             }
                                                         }
                                                     </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Created)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => timePending )
+                                                </td>
                                                     <td>
                                                         <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
                                                             <i class="fa fa-search"></i> @Applicationsettings.DETAILS
