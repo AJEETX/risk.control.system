@@ -593,7 +593,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimAllocationToVendor(userEmail, claimId, selectedcase, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage("claim case allocated to vendor successfully!");
+            toastNotification.AddSuccessToastMessage("claim case allocated to agent successfully!");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
         }
