@@ -42,23 +42,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
-builder.Services.AddCors(opt =>
-{
-    opt.AddDefaultPolicy(builder =>
-    {
-        builder.WithMethods("GET", "POST")
-            .SetIsOriginAllowed(origin =>
-            {
-                if (string.IsNullOrWhiteSpace(origin)) return false;
-                // Only add this to allow testing with localhost, remove this line in production!
-                if (origin.ToLower().StartsWith("http://localhost")) return true;
-                // Insert your production domain here.
-                if (origin.ToLower().StartsWith("https://rcu.azurewebsites.net/")) return true;
-                return false;
-            });
-        ;
-    });
-});
+builder.Services.AddCors();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews()
@@ -148,7 +132,13 @@ app.UseCookiePolicy(
         Secure = CookieSecurePolicy.Always
     });
 app.UseAuthentication();
-app.UseCors();
+app.UseCors(builder =>
+{
+    builder
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader();
+});
 app.UseAuthorization();
 
 app.MapControllerRoute(
