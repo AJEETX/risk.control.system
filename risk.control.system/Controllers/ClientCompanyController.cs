@@ -523,7 +523,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.Vendor == null)
             {
-                toastNotification.AddErrorToastMessage("vendor not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
 

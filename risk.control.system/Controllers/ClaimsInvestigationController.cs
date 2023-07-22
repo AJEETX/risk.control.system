@@ -495,7 +495,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb(" Allocate to vendor")]
+        [Breadcrumb(" Allocate to agency")]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
             if (_context.ClaimsInvestigation == null)
@@ -539,7 +539,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb(" Re-allocate to vendor")]
+        [Breadcrumb(" Re-allocate to agency")]
         public async Task<IActionResult> ReAllocateToVendor(string selectedcase)
         {
             if (_context.ClaimsInvestigation == null)
@@ -603,7 +603,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null)
             {
-                toastNotification.AddErrorToastMessage("vendor not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
 
@@ -1226,7 +1226,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.Vendor == null)
             {
-                toastNotification.AddErrorToastMessage("vendor not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
 

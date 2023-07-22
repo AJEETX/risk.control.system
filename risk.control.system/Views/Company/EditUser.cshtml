@@ -25,9 +25,9 @@
                                         <span asp-validation-for="ClientCompanyId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="UserName" class="control-label"></label>
-                                        <input asp-for="UserName" class="form-control" />
-                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                        <label asp-for="Email" class="control-label"></label>
+                                        <input readonly asp-for="Email" class="form-control" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="FirstName" class="control-label"></label>
@@ -41,13 +41,8 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Password" class="control-label"></label>
-                                        <input asp-for="Password" class="form-control" />
+                                        <input asp-for="Password" type="password" class="form-control" />
                                         <span asp-validation-for="Password" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="Email" class="control-label"></label>
-                                        <input asp-for="Email" class="form-control" />
-                                        <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                     
                                     <div class="form-group">
@@ -55,7 +50,11 @@
                                         <input asp-for="PhoneNumber" class="form-control" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
-                                    </>
+                                    <div class="form-group">
+                                        <label asp-for="ProfilePicture" class="control-label"></label>
+                                        <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
+                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -89,11 +88,7 @@
                                         </select>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label asp-for="ProfilePicture" class="control-label"></label>
-                                        <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
-                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
-                                    </div>
+                                
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
                                         <input asp-for="Comments" class="form-control" />

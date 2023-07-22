@@ -225,8 +225,7 @@
                     if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","")
-                                                @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Agency","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
                                     @Applicationsettings.ADMIN_SETTINGS
@@ -236,7 +235,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.VendorId" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Details")   @Url.MakeActiveClass("Vendors","Edit")">
+                            <a is-active-page asp-controller="Agency" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Agency","Index")">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     Agency Profile
@@ -244,22 +243,38 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Service") @Url.MakeActiveClass("VendorService","")">
+                            <a is-active-page asp-controller="Agency" asp-action="Service" class="actual-link nav-link @Url.MakeActiveClass("Agency","Service")">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     @Applicationsettings.MANAGE_SERVICE
                                 </p>
                             </a>
                         </li>
+
                         <li class="nav-item">
-                            <a is-active-page asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="actual-link nav-link @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+                            <a is-active-page asp-controller="Agency" asp-action="CreateService" class="actual-link nav-link @Url.MakeActiveClass("Agency","CreateService") @Url.MakeActiveClass("Agency","EditService")">
+                                <i class="fas fa-plus nav-icon"></i>
+                                <p>
+                                    Create Service
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Agency" asp-action="User" class="actual-link nav-link @Url.MakeActiveClass("Agency","User") ">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     @Applicationsettings.MANAGE_USERS
                                 </p>
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Agency" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("Agency","CreateUser") @Url.MakeActiveClass("Agency","EditUser")">
+                                <i class="fas fa-user-friends nav-icon"></i>
+                                <p>
+                                    Create User
+                                </p>
+                            </a>
+                        </li>
                     }
                 }
             </ul>

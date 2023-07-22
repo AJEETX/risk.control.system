@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -67,6 +68,13 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
+                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
+                s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
+                s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
+                s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
+                );
+
                 var tdetail = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation)
                     .ThenInclude(i => i.CaseLocations)
@@ -75,7 +83,6 @@ namespace risk.control.system.Services
                      d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
-                var subStatuses = _context.InvestigationCaseSubStatus;
                 var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
 
                 var cases = tdetail.GroupBy(g => g.ClaimsInvestigationId);
@@ -137,6 +144,12 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
+                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
+                    s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
+                    s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                    s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
+                    s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
+                    );
                 var tdetail = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation)
                     .ThenInclude(i => i.CaseLocations)
@@ -145,7 +158,6 @@ namespace risk.control.system.Services
                      d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId) &&
                        d.Created > DateTime.Now.AddMonths(-7));
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
-                var subStatuses = _context.InvestigationCaseSubStatus;
                 var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
 
                 var cases = tdetail.GroupBy(g => g.ClaimsInvestigationId);
@@ -222,6 +234,12 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
+                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
+                   );
                 var tdetail = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation)
                     .ThenInclude(i => i.CaseLocations)
@@ -231,7 +249,6 @@ namespace risk.control.system.Services
                     d.Created > DateTime.Now.AddDays(-28));
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
-                var subStatuses = _context.InvestigationCaseSubStatus;
                 var userCaseStatuses = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
 
                 var caseLogs = tdetail.GroupBy(g => g.InvestigationCaseSubStatusId)?.ToList();
@@ -312,13 +329,18 @@ namespace risk.control.system.Services
             }
             else if (vendorUser != null)
             {
+                var subStatuses = _context.InvestigationCaseSubStatus.Where(s =>
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT ||
+                   s.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR
+                   );
                 var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
                     (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
                     d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
-                var subStatuses = _context.InvestigationCaseSubStatus;
                 var filteredCases = subStatuses.Where(c => userSubStatuses.Contains(c.InvestigationCaseSubStatusId));
 
                 var cases = tdetail.GroupBy(g => g.ClaimsInvestigationId);

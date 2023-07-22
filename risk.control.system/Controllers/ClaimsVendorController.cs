@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorUser.Email, vendorUser.VendorId, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage("claim case allocated to vendor agent successfully!");
+            toastNotification.AddSuccessToastMessage("claim case allocated to agency agent successfully!");
 
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }

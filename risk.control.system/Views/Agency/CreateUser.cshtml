@@ -1,4 +1,4 @@
-﻿@model risk.control.system.Models.ClientCompanyApplicationUser
+﻿@model risk.control.system.Models.VendorApplicationUser
 
 @{
     ViewData["Title"] = Applicationsettings.CREATE;
@@ -6,7 +6,7 @@
 
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="Create" enctype="multipart/form-data">
+        <form asp-action="CreateUser" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -18,9 +18,9 @@
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <div class="form-group hide-id">
-                                        <label asp-for="ClientCompanyId" class="control-label"></label>
-                                        <input asp-for="ClientCompanyId" class="form-control" value="@Model.ClientCompany.ClientCompanyId" />
-                                        <span asp-validation-for="ClientCompanyId" class="text-danger"></span>
+                                        <label asp-for="VendorId" class="control-label"></label>
+                                        <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
+                                        <span asp-validation-for="VendorId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Email" class="control-label"></label>
@@ -43,7 +43,7 @@
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
                                     
-                                    
+
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
                                         <input asp-for="PhoneNumber" class="form-control" />
@@ -86,7 +86,7 @@
                                             <option>--- SELECT PINCODE ---</option>
                                         </select>
                                     </div>
-                                   
+                                    
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
                                         <input asp-for="Comments" class="form-control" />

@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers
             return View(clientCompany);
         }
 
-        [Breadcrumb("Manage ")]
+        [Breadcrumb("Manage Company Profile")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -146,7 +146,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb("User ")]
+        [Breadcrumb("Users ")]
         public async Task<IActionResult> User()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -215,6 +215,7 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureUrl = "upload/" + newFileName;
             }
             user.EmailConfirmed = true;
+            user.UserName = user.Email;
             user.Mailbox = new Mailbox { Name = user.Email };
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -303,6 +304,7 @@ namespace risk.control.system.Controllers
                             user.Password = applicationUser.Password;
                         }
                         user.Email = applicationUser.Email;
+                        user.UserName = applicationUser.Email;
                         user.EmailConfirmed = true;
                         user.UserName = applicationUser.UserName;
                         user.Country = applicationUser.Country;
@@ -322,7 +324,7 @@ namespace risk.control.system.Controllers
                             toastNotification.AddSuccessToastMessage("Company user edited successfully!");
                             return RedirectToAction(nameof(CompanyUserController.User), "Company");
                         }
-                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+                        toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
                         Errors(result);
                     }
                 }
@@ -340,10 +342,11 @@ namespace risk.control.system.Controllers
             }
 
             toastNotification.AddErrorToastMessage("Error to create Company user!");
-            return RedirectToAction(nameof(CompanyUserController.User), "Company", new { id = applicationUser.ClientCompany });
+            return RedirectToAction(nameof(CompanyController.User), "Company");
         }
 
         [HttpGet]
+        [Breadcrumb("Available Agency(s) ")]
         public async Task<IActionResult> AvailableVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -422,6 +425,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        [Breadcrumb("Empanelled Agency(s) ")]
         public async Task<IActionResult> EmpanelledVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -505,11 +509,12 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
+        [Breadcrumb("Agency Detail ")]
         public async Task<IActionResult> VendorDetail(string id, string backurl)
         {
             if (id == null || _context.Vendor == null)
             {
-                toastNotification.AddErrorToastMessage("vendor not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
 
@@ -537,6 +542,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
+        [Breadcrumb("User Role(s) ")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<CompanyUserRoleViewModel>();

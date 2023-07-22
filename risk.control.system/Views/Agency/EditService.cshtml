@@ -1,0 +1,151 @@
+﻿@model risk.control.system.Models.VendorInvestigationServiceType
+
+@{
+    ViewData["Title"] = @Applicationsettings.EDIT;
+}
+
+<section class="content pt-2">
+    <div class="container-fluid ">
+        <form asp-action="EditService" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title">Edit @Model.Vendor.Name @Applicationsettings.SERVICE</h3>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Edit">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                        <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
+                                        <div class="form-group">
+                                            <div style="display:none" class="form-group">
+                                                <label asp-for="VendorId" class="control-label"></label>
+                                                <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
+                                                <span asp-validation-for="VendorId" class="text-danger"></span>
+                                            </div>
+                                            <label asp-for="LineOfBusinessId" class="control-label"></label>
+                                            <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
+                                                <option>--SELECT LINE OF BUSINESS--</option>
+                                            </select>
+                                            <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
+                                            <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" onchange="setInvestigationServices(this)" asp-items="ViewBag.InvestigationServiceTypeId">
+                                                <option>--SELECT TYPE OF INVESTIGATION--</option>
+                                            </select>
+                                            <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="Price" class="control-label"></label>
+                                            <input asp-for="Price" class="form-control" />
+                                            <span asp-validation-for="Price" class="text-danger"></span>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="CountryId" class="control-label"></label>
+                                            <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)">
+                                                <option>--SELECT COUNTRY--</option>
+                                            </select>
+                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="StateId" class="control-label"></label>
+                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
+                                                <option>--SELECT STATE--</option>
+
+                                            </select>
+                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label asp-for="DistrictId" class="control-label"></label>
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId')">
+                                                <option>--SELECT DISTRICT--</option>
+
+                                            </select>
+                                            <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        @* <div class="form-group">
+                                        <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
+                                        <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control" asp-items="ViewBag.PinCodeId" multiple>
+                                        </select>
+                                        <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
+                                        </div>*@
+                                        <div class="form-group">
+                                            @Html.LabelFor(model => model.SelectedMultiPincodeId, new { @class = "col-sm-2 col-form-label" })
+                                            @{
+                                                var pincodes = ViewBag.PinCodeId as List<SelectListItem>;
+                                            }
+                                            @Html.ListBoxFor(model => model.SelectedMultiPincodeId, new MultiSelectList(pincodes, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "PinCodeId" })
+                                        </div>
+                                        @*                                        <div class="form-group">
+                                        <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
+                                        <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control selectPincode show-tick form-control input-md" asp-items="ViewBag.PinCodeId">
+                                        </select>
+                                        <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
+                                        </div>*@
+
+                                        @*                                       <div class="form-group">
+                                        <div class="input-group">
+                                        <span class="input-group-addon icon-custom"><i class="fa fa-flag"></i> pincodes</span>
+
+                                        @{
+                                        var selectedPinCodes = Model.PincodeServices.Select(p => new SelectListItem { Text = p.Name +" - " + p.Pincode, Value = p.ServicedPinCodeId , Selected= true });
+                                        }
+                                        @Html.ListBoxFor(m =>  selectedPinCodes, this.ViewBag.PinCodeId as SelectList, new { id = "PinCodeId", @class = "selectPincode show-tick form-control input-md" })
+                                        </div>
+                                        </div>*@
+                                        <div class="form-group text-right">
+                                            <a asp-controller="Agency" asp-action="Service" class="btn btn-secondary">
+                                                <i class="fa fa-window-close"></i>
+                                                @Applicationsettings.CANCEL
+                                            </a>
+                                            <button type="submit" class="btn btn-warning">
+                                                <i class="fas fa-pen"></i> @Applicationsettings.EDIT
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+        <script>
+            $(document).ready(function () {
+                $('.selectPincode').attr('data-live-search', true);
+
+                // Enable multiple select.
+                $('.selectPincode').attr('multiple', true);
+                $('.selectPincode').attr('data-selected-text-format', 'count');
+
+                $('.selectPincode').selectpicker(
+                    {
+                        width: '100%',
+                        title: '- [Choose Multiple Pincodes] -',
+                        style: 'btn-info',
+                        size: 6,
+                        iconBase: 'fa',
+                        tickIcon: 'fa-check'
+                    });
+                $('#PinCodeId').attr('multiple', true);
+            });
+        </script>
+    }
+}

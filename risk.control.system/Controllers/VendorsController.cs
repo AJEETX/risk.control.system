@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.Vendor == null)
             {
-                toastNotification.AddErrorToastMessage("vendor not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
 
@@ -115,7 +115,7 @@ namespace risk.control.system.Controllers
         {
             if (id == null || _context.Vendor == null)
             {
-                toastNotification.AddErrorToastMessage("vendor not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
 
@@ -170,10 +170,10 @@ namespace risk.control.system.Controllers
                     vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Add(vendor);
                     await _context.SaveChangesAsync();
-                    toastNotification.AddSuccessToastMessage("vendor created successfully!");
+                    toastNotification.AddSuccessToastMessage("agency created successfully!");
                     return RedirectToAction(nameof(Index));
                 }
-                toastNotification.AddErrorToastMessage("Error to create vendor!");
+                toastNotification.AddErrorToastMessage("Error to create agency!");
                 return Problem();
             }
             catch (Exception)
@@ -212,7 +212,7 @@ namespace risk.control.system.Controllers
         {
             if (id != vendor.VendorId)
             {
-                toastNotification.AddErrorToastMessage("vendor not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
 
@@ -252,7 +252,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("vendor edited successfully!");
+                toastNotification.AddSuccessToastMessage("agency edited successfully!");
                 return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = id });
             }
             return Problem();
@@ -286,7 +286,7 @@ namespace risk.control.system.Controllers
         {
             if (_context.Vendor == null)
             {
-                toastNotification.AddErrorToastMessage("vendor not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return Problem("Entity set 'ApplicationDbContext.Vendor'  is null.");
             }
             var vendor = await _context.Vendor.FindAsync(id);
@@ -298,7 +298,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("vendor deleted successfully!");
+            toastNotification.AddSuccessToastMessage("agency deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
