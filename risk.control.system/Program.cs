@@ -46,11 +46,7 @@ builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(builder =>
     {
-        builder.WithMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
-            .WithHeaders(HeaderNames.Accept,
-                HeaderNames.ContentType,
-                HeaderNames.Authorization)
-            .AllowCredentials()
+        builder.WithMethods("GET", "POST")
             .SetIsOriginAllowed(origin =>
             {
                 if (string.IsNullOrWhiteSpace(origin)) return false;
