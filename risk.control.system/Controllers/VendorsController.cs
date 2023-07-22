@@ -41,7 +41,11 @@ namespace risk.control.system.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var applicationDbContext = _context.Vendor.Include(v => v.Country).Include(v => v.PinCode).Include(v => v.State).Include(v => v.VendorInvestigationServiceTypes).AsQueryable();
+            var applicationDbContext = _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes).AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
             {
                 applicationDbContext = applicationDbContext.Where(a =>
@@ -161,10 +165,16 @@ namespace risk.control.system.Controllers
                     IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                     if (vendorDocument is not null)
                     {
+                        string newFileName = Guid.NewGuid().ToString();
+                        string fileExtension = Path.GetExtension(vendorDocument.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
                         vendor.Document = vendorDocument;
+
                         using var dataStream = new MemoryStream();
                         await vendor.Document.CopyToAsync(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
+                         vendor.DocumentUrl = newFileName;
                     }
                     vendor.Updated = DateTime.UtcNow;
                     vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -223,10 +233,16 @@ namespace risk.control.system.Controllers
                     IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                     if (vendorDocument is not null)
                     {
+                        string newFileName = Guid.NewGuid().ToString();
+                        string fileExtension = Path.GetExtension(vendorDocument.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
                         vendor.Document = vendorDocument;
+
                         using var dataStream = new MemoryStream();
                         await vendor.Document.CopyToAsync(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
+                        vendor.DocumentUrl = newFileName;
                     }
                     else
                     {

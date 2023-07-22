@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -110,10 +111,16 @@ namespace risk.control.system.Controllers
                     IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                     if (companyDocument is not null)
                     {
+                        string newFileName = Guid.NewGuid().ToString();
+                        string fileExtension = Path.GetExtension(companyDocument.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+
                         clientCompany.Document = companyDocument;
                         using var dataStream = new MemoryStream();
                         await clientCompany.Document.CopyToAsync(dataStream);
                         clientCompany.DocumentImage = dataStream.ToArray();
+                        clientCompany.DocumentUrl = newFileName;
                     }
                     else
                     {
@@ -123,6 +130,7 @@ namespace risk.control.system.Controllers
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                         }
                     }
+
                     clientCompany.Updated = DateTime.UtcNow;
                     clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(clientCompany);

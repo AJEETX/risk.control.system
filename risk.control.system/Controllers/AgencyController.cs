@@ -109,10 +109,16 @@ namespace risk.control.system.Controllers
                     IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                     if (vendorDocument is not null)
                     {
+                        string newFileName = Guid.NewGuid().ToString();
+                        string fileExtension = Path.GetExtension(vendorDocument.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
                         vendor.Document = vendorDocument;
+
                         using var dataStream = new MemoryStream();
                         await vendor.Document.CopyToAsync(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
+                        vendor.DocumentUrl = newFileName;
                     }
                     else
                     {

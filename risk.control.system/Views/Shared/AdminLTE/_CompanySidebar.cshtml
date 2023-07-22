@@ -273,11 +273,10 @@
                     if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","") @Url.MakeActiveClass("Vendors","")
-                                    @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","Index") @Url.MakeActiveClass("CompanyUserRoles","") ">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
-                                    @Applicationsettings.ADMIN_SETTINGS
+                                    MANAGE COMPANY
                                     <i class="right fas fa-angle-right"></i>
                                 </p>
                             </a>
@@ -309,11 +308,22 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") 
+                            <a is-active-page class="navlink-border nav-link  @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("Company","AvailableVendors") @Url.MakeActiveClass("Company","EmpanelledVendors")
+                                           @Url.MakeActiveClass("Company","VendorDetail") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+                                <i class="nav-icon fas fa-shield-alt"></i>
+                                <p class="sidebar-menu-header-label">
+                                    MANAGE AGENCY
+                                    <i class="right fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Index") @Url.MakeActiveClass("Vendors","Details")
                             @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
                                 <i class="nav-icon fa fa-binoculars"></i>
                                 <p>
-                                    Manage Agencies
+                                    All Agencies
                                 </p>
                             </a>
                         </li>
@@ -331,6 +341,15 @@
                                 <i class="nav-icon fa fa-thumbs-down"></i>
                                 <p>
                                     Available Agencies
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Vendors" asp-action="Create" class="actual-link nav-link
+                                            @Url.MakeActiveClass("Vendors","Create")">
+                                <i class="nav-icon fa fa-thumbs-up"></i>
+                                <p>
+                                    Add Agency
                                 </p>
                             </a>
                         </li>

@@ -114,5 +114,51 @@ namespace risk.control.system.Controllers.Api
 
             return Ok();
         }
+
+        [AllowAnonymous]
+        [HttpGet("Vendors")]
+        public async Task<IActionResult> Vendors()
+        {
+            var applicationDbContext = await _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes).ToListAsync();
+
+            var data = applicationDbContext.Select(a => new VendorData
+            {
+                Image = a.DocumentImage,
+                Name = a.Name,
+                Code = a.Code,
+                PhoneNumber = a.PhoneNumber,
+                Email = a.Email,
+                Addressline = a.Addressline,
+                State = a.State.Name,
+                Created = a.Created.ToString("dd/MM/yyyy")
+            });
+
+            var response = new VendorDataDataTable
+            {
+                data = data.ToList()
+            };
+            return Ok(response);
+        }
+    }
+
+    public class VendorData
+    {
+        public byte[]? Image { get; set; }
+        public string Name { get; set; }
+        public string Code { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public string Addressline { get; set; }
+        public string State { get; set; }
+        public string Created { get; set; }
+    }
+
+    public class VendorDataDataTable
+    {
+        public List<VendorData> data { get; set; }
     }
 }
