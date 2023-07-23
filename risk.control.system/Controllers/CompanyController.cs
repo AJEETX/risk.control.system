@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers
             return View(clientCompany);
         }
 
-        [Breadcrumb("Manage Company Profile")]
+        [Breadcrumb("Company Profile")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -218,9 +218,9 @@ namespace risk.control.system.Controllers
                 string newFileName = Guid.NewGuid().ToString();
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                user.ProfilePictureUrl = "upload/" + newFileName;
+                user.ProfilePictureUrl = "/img/" + newFileName;
             }
             user.EmailConfirmed = true;
             user.UserName = user.Email;
@@ -295,9 +295,9 @@ namespace risk.control.system.Controllers
                         string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "upload/" + newFileName;
+                        applicationUser.ProfilePictureUrl = "/img/" + newFileName;
                     }
 
                     if (user != null)
@@ -329,7 +329,7 @@ namespace risk.control.system.Controllers
                         if (result.Succeeded)
                         {
                             toastNotification.AddSuccessToastMessage("Company user edited successfully!");
-                            return RedirectToAction(nameof(CompanyUserController.User), "Company");
+                            return RedirectToAction(nameof(CompanyController.User), "Company");
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
                         Errors(result);

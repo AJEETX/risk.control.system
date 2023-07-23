@@ -94,9 +94,9 @@ namespace risk.control.system.Controllers
                         string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "upload/" + newFileName;
+                        applicationUser.ProfilePictureUrl = "/img/" + newFileName;
                     }
 
                     if (user != null)
@@ -113,7 +113,6 @@ namespace risk.control.system.Controllers
                         user.Email = applicationUser.Email;
                         user.UserName = applicationUser.Email;
                         user.EmailConfirmed = true;
-                        user.UserName = applicationUser.UserName;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;

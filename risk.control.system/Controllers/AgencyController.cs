@@ -226,7 +226,7 @@ namespace risk.control.system.Controllers
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
-                return RedirectToAction(nameof(CompanyController.User), "Company");
+                return RedirectToAction(nameof(AgencyController.User), "Agency");
             else
             {
                 toastNotification.AddErrorToastMessage("Error to create user!");
@@ -277,7 +277,7 @@ namespace risk.control.system.Controllers
         {
             if (id != applicationUser.Id.ToString())
             {
-                toastNotification.AddErrorToastMessage("company not found!");
+                toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
 
@@ -559,7 +559,7 @@ namespace risk.control.system.Controllers
                         _context.Update(vendorInvestigationServiceType);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage("service updated successfully!");
-                        return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = vendorInvestigationServiceType.VendorId });
+                        return RedirectToAction(nameof(AgencyController.Service), "Agency");
                     }
                 }
                 catch (DbUpdateConcurrencyException ex)
@@ -573,8 +573,8 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("service edited successfully!");
-                return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
+                toastNotification.AddErrorToastMessage("Error: service edit!");
+                return BadRequest();
             }
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
@@ -626,7 +626,7 @@ namespace risk.control.system.Controllers
 
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("service deleted successfully!");
-            return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
+            return RedirectToAction("Service", "Agency");
         }
 
         [Breadcrumb(" ServiceDetail")]
