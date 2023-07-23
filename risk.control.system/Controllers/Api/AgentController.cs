@@ -77,7 +77,23 @@ namespace risk.control.system.Controllers.Api
                         claimsAssigned.Add(item);
                     }
                 }
-                return Ok(claimsAssigned);
+                var claim2Agent = claimsAssigned
+                    .Select(c =>
+                new
+                {
+                    claimId = c.ClaimsInvestigationId,
+                    CustomerName = c.CustomerName,
+                    CustomerEmail = email,
+                    c.Gender,
+                    c.Addressline,
+                    c.PinCode.Code,
+                    Country = c.Country.Name,
+                    State = c.State.Name,
+                    District = c.District.Name,
+                    c.Description,
+                    Locations = c.CaseLocations.Select(l => new { l.CaseLocationId, l.BeneficiaryName, l.Addressline, l.Addressline2, l.PinCode.Code, District = l.District.Name, State = l.State.Name, })
+                });
+                return Ok(claim2Agent);
             }
             return Unauthorized();
         }

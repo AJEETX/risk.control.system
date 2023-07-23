@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
-
 <section class="content pt-2">
     <div class="container-fluid ">
         <form asp-action="EditUser" enctype="multipart/form-data">
@@ -11,20 +10,13 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-pen"></i> Edit  User
-                            </h3>
+                            <h3 class="card-title"> <i class="fas fa-pen"></i> Edit  User </h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <input type="hidden" asp-for="Id" />
-                                    <div class="form-group hide-id">
-                                        <label asp-for="Vendor" class="control-label"></label>
-                                        <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
-                                        <span asp-validation-for="VendorId" class="text-danger"></span>
-                                    </div>
                                     <div class="form-group">
                                         <label asp-for="Email" class="control-label"></label>
                                         <input readonly asp-for="Email" class="form-control" />
@@ -40,27 +32,28 @@
                                         <input asp-for="LastName" class="form-control" />
                                         <span asp-validation-for="LastName" class="text-danger"></span>
                                     </div>
-                                    <div class="form-group">
-                                        <label asp-for="Password" class="control-label"></label>
-                                        <input asp-for="Password" type="password" class="form-control" />
-                                        <span asp-validation-for="Password" class="text-danger"></span>
-                                    </div>
-
+                                    
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
                                         <input asp-for="PhoneNumber" class="form-control" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="ProfilePicture" class="control-label"></label>
-                                        <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
-                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        <label asp-for="ProfileImage" class="control-label"></label>
+                                        @if (Model?.ProfilePictureUrl is not null)
+                                        {
+                                            <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                        }
+                                        else
+                                        {
+                                            <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+
+                                        <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-
                                     <div class="form-group">
                                         <label asp-for="CountryId" class="control-label"></label>
                                         <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
@@ -88,8 +81,6 @@
                                             <option>--- SELECT PINCODE ---</option>
                                         </select>
                                     </div>
-
-
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
                                         <input asp-for="Comments" class="form-control" />

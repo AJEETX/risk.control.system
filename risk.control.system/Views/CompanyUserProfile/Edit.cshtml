@@ -1,30 +1,29 @@
-﻿@model risk.control.system.Models.VendorApplicationUser
+﻿@model risk.control.system.Models.ClientCompanyApplicationUser
 
 @{
-    ViewData["Title"] = Applicationsettings.CREATE;
+    ViewData["Title"] = @Applicationsettings.EDIT;
 }
 
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="CreateUser" enctype="multipart/form-data">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-plus"></i>  Create User</h3>
+                            <h3 class="card-title"><i class="fas fa-pen"></i> Edit  Profile
+                                </h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                    <div class="form-group hide-id">
-                                        <label asp-for="VendorId" class="control-label"></label>
-                                        <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
-                                        <span asp-validation-for="VendorId" class="text-danger"></span>
-                                    </div>
+                                    <input type="hidden" asp-for="Id" />
+                                    <input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId"/>
+                                    
                                     <div class="form-group">
                                         <label asp-for="Email" class="control-label"></label>
-                                        <input asp-for="Email" class="form-control" />
+                                        <input readonly asp-for="Email" class="form-control" />
                                         <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
@@ -50,12 +49,13 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="ProfilePicture" class="control-label"></label>
-                                        <img class="form-Image" id="profilePicture" src="@Applicationsettings.NO_IMAGE">
-                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
+                                        <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
+                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
 
                                     <div class="form-group">
                                         <label asp-for="CountryId" class="control-label"></label>
@@ -84,15 +84,17 @@
                                             <option>--- SELECT PINCODE ---</option>
                                         </select>
                                     </div>
-                                    
+
+                                
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
                                         <input asp-for="Comments" class="form-control" />
                                         <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group text-right">
+                                       
                                         <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-plus"></i> @Applicationsettings.CREATE
+                                            <i class="fas fa-plus"></i> @Applicationsettings.EDIT
                                         </button>
                                     </div>
                                 </div>

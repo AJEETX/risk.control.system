@@ -1,0 +1,166 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using NToastNotify;
+using risk.control.system.Data;
+using risk.control.system.Models.ViewModel;
+
+using risk.control.system.Models;
+using SmartBreadcrumbs.Attributes;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace risk.control.system.Controllers
+{
+    [Breadcrumb("Profile ")]
+    public class AgencyUserProfileController : Controller
+    {
+        public List<UsersViewModel> UserList;
+        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly IToastNotification toastNotification;
+        private readonly IWebHostEnvironment webHostEnvironment;
+
+        public AgencyUserProfileController(ApplicationDbContext context,
+            UserManager<VendorApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<ApplicationRole> roleManager,
+            IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
+        {
+            _context = context;
+            this.signInManager = signInManager;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
+            this.toastNotification = toastNotification;
+            this.webHostEnvironment = webHostEnvironment;
+            UserList = new List<UsersViewModel>();
+        }
+
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        [Breadcrumb("Edit ")]
+        public async Task<IActionResult> Edit(long? userId)
+        {
+            if (userId == null || _context.VendorApplicationUser == null)
+            {
+                toastNotification.AddErrorToastMessage("agency not found");
+                return NotFound();
+            }
+
+            var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
+            if (vendorApplicationUser == null)
+            {
+                toastNotification.AddErrorToastMessage("agency not found");
+                return NotFound();
+            }
+            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
+
+            if (vendor == null)
+            {
+                toastNotification.AddErrorToastMessage("agency not found");
+                return NotFound();
+            }
+            vendorApplicationUser.Vendor = vendor;
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", vendor.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name");
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", vendor.PinCodeId);
+            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendor.StateId);
+            return View(vendorApplicationUser);
+        }
+
+        // POST: ClientCompanyApplicationUser/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
+        {
+            if (id != applicationUser.Id.ToString())
+            {
+                toastNotification.AddErrorToastMessage("agency not found!");
+                return NotFound();
+            }
+
+            if (applicationUser is not null)
+            {
+                try
+                {
+                    var user = await userManager.FindByIdAsync(id);
+                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
+                    {
+                        string newFileName = Guid.NewGuid().ToString();
+                        string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                        applicationUser.ProfilePictureUrl = "upload/" + newFileName;
+                    }
+
+                    if (user != null)
+                    {
+                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
+                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                        user.FirstName = applicationUser?.FirstName;
+                        user.LastName = applicationUser?.LastName;
+                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
+                        {
+                            user.Password = applicationUser.Password;
+                        }
+                        user.Email = applicationUser.Email;
+                        user.UserName = applicationUser.Email;
+                        user.EmailConfirmed = true;
+                        user.UserName = applicationUser.UserName;
+                        user.Country = applicationUser.Country;
+                        user.CountryId = applicationUser.CountryId;
+                        user.State = applicationUser.State;
+                        user.StateId = applicationUser.StateId;
+                        user.PinCode = applicationUser.PinCode;
+                        user.PinCodeId = applicationUser.PinCodeId;
+                        user.Updated = DateTime.UtcNow;
+                        user.Comments = applicationUser.Comments;
+                        user.PhoneNumber = applicationUser.PhoneNumber;
+                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                        user.SecurityStamp = DateTime.UtcNow.ToString();
+                        var result = await userManager.UpdateAsync(user);
+                        if (result.Succeeded)
+                        {
+                            toastNotification.AddSuccessToastMessage("User profile edited successfully!");
+                            return RedirectToAction(nameof(Index), "Dashboard");
+                        }
+                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+                        Errors(result);
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!VendorApplicationUserExists(applicationUser.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            toastNotification.AddErrorToastMessage("Error to create Agency user!");
+            return RedirectToAction(nameof(Index), "Dashboard");
+        }
+
+        private bool VendorApplicationUserExists(long id)
+        {
+            return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        private void Errors(IdentityResult result)
+        {
+            foreach (IdentityError error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+        }
+    }
+}

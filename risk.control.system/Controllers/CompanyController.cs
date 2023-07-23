@@ -314,7 +314,6 @@ namespace risk.control.system.Controllers
                         user.Email = applicationUser.Email;
                         user.UserName = applicationUser.Email;
                         user.EmailConfirmed = true;
-                        user.UserName = applicationUser.UserName;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;
