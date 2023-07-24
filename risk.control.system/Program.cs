@@ -58,7 +58,7 @@ builder.Services.AddControllersWithViews()
     .AddNToastNotifyNoty(new NotyOptions
     {
         ProgressBar = true,
-        Timeout = 3000
+        Timeout = 1000
     })
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -142,7 +142,7 @@ app.UseCookiePolicy(
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseNToastNotify();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
