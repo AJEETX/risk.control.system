@@ -43,7 +43,12 @@ namespace risk.control.system.Controllers
         public IActionResult Index()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = _context.ClientCompanyApplicationUser
+                .Include(u => u.PinCode)
+                .Include(u => u.Country)
+                .Include(u => u.State)
+                .Include(u => u.District)
+                .FirstOrDefault(c => c.Email == userEmail);
 
             return View(companyUser);
         }

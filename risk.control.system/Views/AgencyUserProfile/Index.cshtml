@@ -16,78 +16,76 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <dl class="row">
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
+                                        Profile photo
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ProfilePictureUrl is not null)
+                                        {
+                                            <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                        }
+                                        else
+                                        {
+                                            <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.FirstName)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.FirstName)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.LastName)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.LastName)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Email)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Email)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.PhoneNumber)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.PhoneNumber)
                                     </dd>
-                                    
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.Addressline)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(model => model.Addressline)
-                                    </dd>
-
                                 </dl>
                             </div>
                             <div class="col-md-6">
                                 <dl class="row">
-                                    <dt class="col-sm-3">
-                                        Document
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.Addressline)
                                     </dt>
-                                    <dd class="col-sm-8">
-                                        @if (Model?.ProfileImage is not null)
-                                        {
-                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.Addressline)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.District)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.District.Name)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.State)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.State.Name)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.PinCode)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.PinCode.Name)
                                     </dd>
 
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Country)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Country.Name)
                                     </dd>
                                 </dl>
