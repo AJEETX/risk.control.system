@@ -230,6 +230,15 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    var userEmail = HttpContext.User?.Identity?.Name;
+                    var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                    var company = _context.ClientCompany
+                   .Include(c => c.EmpanelledVendors)
+                   .AsNoTracking()
+                   .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+                    var empanelledVendors = company.EmpanelledVendors?.ToList();
+
                     IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                     if (vendorDocument is not null)
                     {
@@ -257,20 +266,9 @@ namespace risk.control.system.Controllers
 
                     _context.Vendor.Update(vendor);
 
-                    await _context.SaveChangesAsync();
-
-                    var userEmail = HttpContext.User?.Identity?.Name;
-                    var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                    var company = _context.ClientCompany
-                   .Include(c => c.CompanyApplicationUser)
-                   .Include(c => c.EmpanelledVendors)
-                   .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
                     if (company != null)
                     {
-                        var existingVendor = company.EmpanelledVendors.FirstOrDefault(e =>
-                        e.ClientCompanyId == companyUser.ClientCompanyId &&
-                        e.VendorId == vendor.VendorId);
+                        var existingVendor = empanelledVendors.FirstOrDefault(e => e.VendorId == vendor.VendorId);
                         if (existingVendor != null)
                         {
                             company.EmpanelledVendors.Remove(existingVendor);
@@ -278,6 +276,7 @@ namespace risk.control.system.Controllers
                             _context.ClientCompany.Update(company);
                         }
                     }
+                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
