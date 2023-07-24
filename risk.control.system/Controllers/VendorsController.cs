@@ -25,7 +25,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors
-        [Breadcrumb(" Vendors")]
+        [Breadcrumb(" Agencies")]
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -174,7 +174,7 @@ namespace risk.control.system.Controllers
                         using var dataStream = new MemoryStream();
                         await vendor.Document.CopyToAsync(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
-                         vendor.DocumentUrl = newFileName;
+                        vendor.DocumentUrl = newFileName;
                     }
                     vendor.Updated = DateTime.UtcNow;
                     vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
@@ -254,8 +254,30 @@ namespace risk.control.system.Controllers
                     }
                     vendor.Updated = DateTime.UtcNow;
                     vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
+
                     _context.Vendor.Update(vendor);
+
                     await _context.SaveChangesAsync();
+
+                    var userEmail = HttpContext.User?.Identity?.Name;
+                    var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                    var company = _context.ClientCompany
+                   .Include(c => c.CompanyApplicationUser)
+                   .Include(c => c.EmpanelledVendors)
+                   .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+                    if (company != null)
+                    {
+                        var existingVendor = company.EmpanelledVendors.FirstOrDefault(e =>
+                        e.ClientCompanyId == companyUser.ClientCompanyId &&
+                        e.VendorId == vendor.VendorId);
+                        if (existingVendor != null)
+                        {
+                            company.EmpanelledVendors.Remove(existingVendor);
+                            company.EmpanelledVendors.Add(vendor);
+                            _context.ClientCompany.Update(company);
+                        }
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
