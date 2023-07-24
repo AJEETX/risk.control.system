@@ -102,70 +102,77 @@
                                 </div>
                             </div>
                             <hr />
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
-                                    </dd>
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                    </dd>
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(model => model.CaseLocation.Addressline)
-                                    </dd>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.CaseLocation.Addressline)
+                                        </dd>
 
-                                </div>
-                                <div class="col-md-6">
+                                    </div>
+                                    <div class="col-md-6">
 
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                    </dd>
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(model => model.CaseLocation.District.Name)
-                                    </dd>
-                                    <dt class="col-sm-2">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
-                                    </dt>
-                                    <dd class="col-sm-10">
-                                        @Html.DisplayFor(model => model.CaseLocation.State.Name)
-                                    </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.CaseLocation.District.Name)
+                                        </dd>
+                                        <dt class="col-sm-2">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
+                                        </dt>
+                                        <dd class="col-sm-10">
+                                            @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                        </dd>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-folder-open"></i> Agency Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-prescription"></i> Agent Report</h3>
+                                </div>
+                                <div class="=row">
+                                    <div class="col-md-12">
+                                        <textarea disabled name="@Model.CaseLocation.ClaimReport.AgentRemarks" id="remarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.AgentRemarks</textarea>
+                                    </div>
+                                </div>
+                                <hr />
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-prescription"></i> Agency complete report</h3>
+                                </div>
+                               
+                                <div class="=row">
+                                    <div class="col-md-12">
+                                        <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
+                                        <select disabled name="supervisorRemarkType" id="supervisorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<SupervisorRemarkType>()"></select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> Agency Report</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <textarea disabled name="@Model.CaseLocation.ClaimReport.AgentRemarks" id="remarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.AgentRemarks</textarea>
-                                </div>
-                            </div>
-                            <hr />
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value ='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
-                                    <select disabled name="supervisorRemarkType" id="supervisorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<SupervisorRemarkType>()"></select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     </div>
                     <div class="card card-secondary">
                         <div class="card-header">
