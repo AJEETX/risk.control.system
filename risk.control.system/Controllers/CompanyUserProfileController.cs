@@ -42,7 +42,10 @@ namespace risk.control.system.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            return View(companyUser);
         }
 
         [Breadcrumb("Edit ")]
