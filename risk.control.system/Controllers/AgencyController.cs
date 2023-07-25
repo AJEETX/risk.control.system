@@ -590,7 +590,7 @@ namespace risk.control.system.Controllers
 
         // GET: VendorService/Delete/5
         [Breadcrumb(" DeleteService")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> DeleteService(string id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
             {

@@ -251,7 +251,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Agency" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Agency","Index")">
+                            <a is-active-page asp-controller="Agency" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Agency","Index") @Url.MakeActiveClass("Agency","Edit")">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     Agency Profile
@@ -259,7 +259,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Agency" asp-action="Service" class="actual-link nav-link @Url.MakeActiveClass("Agency","Service")">
+                            <a is-active-page asp-controller="Agency" asp-action="Service" class="actual-link nav-link @Url.MakeActiveClass("Agency","Service")
+                                @Url.MakeActiveClass("Agency","EditService") ">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     @Applicationsettings.MANAGE_SERVICE
@@ -268,7 +269,8 @@
                         </li>
 
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Agency" asp-action="CreateService" class="actual-link nav-link @Url.MakeActiveClass("Agency","CreateService") @Url.MakeActiveClass("Agency","EditService")">
+                            <a is-active-page asp-controller="Agency" asp-action="CreateService" class="actual-link nav-link @Url.MakeActiveClass("Agency","CreateService") 
+                                    @Url.MakeActiveClass("Agency","ServiceDetail")">
                                 <i class="fas fa-plus nav-icon"></i>
                                 <p>
                                     Create Service
@@ -276,7 +278,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Agency" asp-action="User" class="actual-link nav-link @Url.MakeActiveClass("Agency","User") ">
+                            <a is-active-page asp-controller="Agency" asp-action="User" class="actual-link nav-link @Url.MakeActiveClass("Agency","User") @Url.MakeActiveClass("Agency","EditUser") 
+                                @Url.MakeActiveClass("Agency","UserRoles")">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     @Applicationsettings.MANAGE_USERS
@@ -284,7 +287,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Agency" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("Agency","CreateUser") @Url.MakeActiveClass("Agency","EditUser")">
+                            <a is-active-page asp-controller="Agency" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("Agency","CreateUser") 
+                            ">
                                 <i class="fas fa-user-friends nav-icon"></i>
                                 <p>
                                     Create User
