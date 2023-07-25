@@ -857,7 +857,17 @@ namespace risk.control.system.Controllers
                 .Include(c => c.PinCode)
                 .Include(c => c.State);
             ViewBag.HasClientCompany = true;
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
+            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            if (clientCompany == null)
+            {
+                ViewBag.HasClientCompany = false;
+            }
+            else
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
+            }
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -883,11 +893,27 @@ namespace risk.control.system.Controllers
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
                 openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId 
-                || a.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
                 || a.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId
                 || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
                 || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+                return View(claimsSubmitted);
             }
             else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
             {
@@ -897,19 +923,11 @@ namespace risk.control.system.Controllers
             }
             else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
             {
-                return View(new List<ClaimsInvestigation> { });
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+                return View(await applicationDbContext.ToListAsync());
             }
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            if (clientCompany == null)
-            {
-                ViewBag.HasClientCompany = false;
-            }
-            else
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
-            }
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -1026,6 +1044,44 @@ namespace risk.control.system.Controllers
         // GET: ClaimsInvestigation/Details/5
         [Breadcrumb(title: " Details")]
         public async Task<IActionResult> Details(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            return View(claimsInvestigation);
+        }
+
+        [Breadcrumb(title: " Detail")]
+        public async Task<IActionResult> Detail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
             {
