@@ -1,4 +1,5 @@
 ﻿$(document).ready(function () {
+    $('#datatable thead th').css('background-color', '#e9ecef')
     var datatable = $('#datatable').dataTable({
         processing: true,
         ordering: true,
