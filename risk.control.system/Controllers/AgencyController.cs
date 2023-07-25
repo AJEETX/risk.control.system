@@ -389,7 +389,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(string userId, CompanyUserRolesViewModel model)
+        public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
         {
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
@@ -401,7 +401,8 @@ namespace risk.control.system.Controllers
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
-            result = await userManager.AddToRolesAsync(user, model.CompanyUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName));
+            result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
+                Where(x => x.Selected).Select(y => y.RoleName));
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
 
