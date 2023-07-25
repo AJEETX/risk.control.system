@@ -128,6 +128,10 @@
                                         <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                     <div class="form-group text-right">
+                                        <a asp-action="Index" class="btn btn-default">
+                                            <i class="fa fa-window-close"></i>
+                                            @Applicationsettings.CANCEL
+                                        </a>
                                         <button type="submit" class="btn btn-secondary">
                                             <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
                                         </button>

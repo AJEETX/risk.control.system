@@ -8,156 +8,87 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form asp-action="index">
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-search"></i> Companies</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-                                    <a class="btn btn-success" asp-controller="ClientCompany" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.CLIENT_COMPANY list</h3>
+                        <h3 class="card-title"><i class="fas fa-list"></i> Companies</h3>
                      </div>
                     <div class="card-body">
-                        @if (Model.Count() == 0)
-                        {
-                            <hr />
-                            <div class="col-md-12 text-center">
-                                <caption>@Applicationsettings.NO_RECORDS_FOUND</caption>
-                            </div>
-                            <hr />
-                        }
-                        else
-                        {
-                            <table class="table table-striped fixed-with-height">
-                                <thead>
+                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+
+                                    <th>
+                                        Document
+                                    </th>
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        Code
+                                    </th>
+                                    <th>
+                                        Phone Number
+                                    </th>
+                                    <th>
+                                        Email
+                                    </th>
+                                    <th>
+                                        Addressline
+                                    </th>
+                                    <th>
+                                        State
+                                    </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
                                     <tr>
 
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.Document)
-                                        </th>
-                                        <th>
-                                            @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.CodeSortParm })
-                                        </th>
-                                        <th>
-                                            @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.PhoneNumber)
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.Email)
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.Addressline)
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.State)
-                                        </th>
-                                        <th></th>
+                                        <td>
+                                            @if (item?.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Email)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Addressline)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.State.Name)
+                                        </td>
+                                        <td>
+                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClientCompanyId">
+                                                <i class="fa fa-search"></i> @Applicationsettings.DETAILS
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClientCompanyId">
+                                                <i class="fas fa-pen"></i> @Applicationsettings.EDIT
+                                            </a> &nbsp;
+                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClientCompanyId">
+                                                <i class="fas fa-trash"></i> @Applicationsettings.DELETE
+                                            </a>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr>
-
-                                            <td>
-                                                @if (item?.DocumentImage is not null)
-                                                {
-                                                    <img id="documentImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
-                                                }
-                                                else
-                                                {
-                                                    <img id="documentImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
-                                                }
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Code)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.PhoneNumber)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Email)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Addressline)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.State.Name)
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClientCompanyId">
-                                                    <i class="fa fa-search"></i> @Applicationsettings.DETAILS
-                                                </a> &nbsp;
-                                                <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClientCompanyId">
-                                                    <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                                </a> &nbsp;
-                                                <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClientCompanyId">
-                                                    <i class="fas fa-trash"></i> @Applicationsettings.DELETE
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                        <br />
-                        <br />
-                        @{
-                            var PageNumber = (int)@ViewBag.PageNumber;
-
-                            var PageSize = (int)@ViewBag.PageSize;
-
-                            var TotalPages = (int)@ViewBag.TotalPages;
-
-                            var ShowPrevious = (bool)@ViewBag.ShowPrevious;
-
-                            var ShowNext = (bool)@ViewBag.ShowNext;
-
-                            var ShowFirst = (bool)@ViewBag.ShowFirst;
-
-                            var ShowLast = (bool)@ViewBag.ShowLast;
-                        }
-                        <ul class="pagination">
-                            <li class="page-item @(!ShowFirst? "disabled":"")">
-                                <a asp-page="/pagination" asp-route-CurrentPage="1" class="page-link">
-                                    <i class="fas fa-fast-backward"></i>
-                                </a>
-                            </li>
-                            <li class="page-item @(!ShowPrevious? "disabled":"")">
-                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber -1)" class="page-link">
-                                    <i class="fas fa-step-backward"></i>
-                                </a>
-                            </li>
-                            <li class="page-item  @(!ShowNext? "disabled":"")">
-                                <a asp-page="/pagination" asp-route-CurrentPage="@(PageNumber + 1)" class="page-link">
-                                    <i class="fas fa-step-forward"></i>
-                                </a>
-                            </li>
-
-                            <li class="page-item  @(!ShowLast? "disabled":"")">
-                                <a asp-page="/pagination" asp-route-CurrentPage="@TotalPages" class="page-link">
-                                    <i class="fas fa-fast-forward"></i>
-                                </a>
-                            </li>
-                        </ul>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

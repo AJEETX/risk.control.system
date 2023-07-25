@@ -234,17 +234,29 @@
                         if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                         {
                             <li class="nav-item">
-                                <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","") 
+                                <a is-active-page asp-controller="ClientCompany" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Index")
+                                        @Url.MakeActiveClass("ClientCompany","Details")
+                                        @Url.MakeActiveClass("ClientCompany","Edit")
                                 @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","")">
                                     <i class="nav-icon fas fa-building"></i>
                                     <p>
-                                        @Applicationsettings.CLIENT_COMPANIES
+                                        Companies
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a is-active-page asp-controller="ClientCompany" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClientCompany","Create")
+                                    ">
+                                    <i class="nav-icon fas fa-plus"></i>
+                                    <p>
+                                       Create Company
                                     </p>
                                 </a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","") 
+                            @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
                                 <i class="nav-icon fa fa-binoculars"></i>
                                 <p>
                                     @Applicationsettings.VENDORS
