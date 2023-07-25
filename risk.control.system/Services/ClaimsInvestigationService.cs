@@ -50,7 +50,7 @@ namespace risk.control.system.Services
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.State)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId);
+                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
                 claimsCaseLocation.Vendor = vendor;
                 claimsCaseLocation.VendorId = vendorId;
@@ -91,7 +91,9 @@ namespace risk.control.system.Services
         {
             if (claims is not null && claims.Count > 0)
             {
-                var cases2Assign = _context.ClaimsInvestigation.Include(c => c.CaseLocations).Where(v => claims.Contains(v.ClaimsInvestigationId));
+                var cases2Assign = _context.ClaimsInvestigation
+                    .Include(c => c.CaseLocations)
+                    .Where(v => claims.Contains(v.ClaimsInvestigationId));
                 foreach (var claimsInvestigation in cases2Assign)
                 {
                     claimsInvestigation.Updated = DateTime.UtcNow;
@@ -249,7 +251,7 @@ namespace risk.control.system.Services
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.State)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId);
+                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
             report.AssessorRemarkType = Enum.Parse<AssessorRemarkType>(assessorRemarkType);
@@ -292,7 +294,7 @@ namespace risk.control.system.Services
         {
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId);
+                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
             report.AssessorRemarkType = Enum.Parse<AssessorRemarkType>(assessorRemarkType);
@@ -384,7 +386,7 @@ namespace risk.control.system.Services
             .Include(c => c.District)
             .Include(c => c.State)
             .Include(c => c.State)
-            .FirstOrDefault(c => c.CaseLocationId == caseLocationId);
+            .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
             report.SupervisorRemarkType = Enum.Parse<SupervisorRemarkType>(supervisorRemarkType);
@@ -430,7 +432,7 @@ namespace risk.control.system.Services
         {
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId);
+                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
             report.SupervisorRemarkType = Enum.Parse<SupervisorRemarkType>(supervisorRemarkType);
             report.SupervisorRemarks = supervisorRemarks;
@@ -475,7 +477,7 @@ namespace risk.control.system.Services
 
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
-                .FirstOrDefault(c => c.CaseLocationId == caseLocationId);
+                .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var report = new ClaimReport
             {
