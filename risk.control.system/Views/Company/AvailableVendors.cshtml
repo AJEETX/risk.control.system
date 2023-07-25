@@ -24,23 +24,26 @@
                                                 @Html.DisplayNameFor(model => model.Document)
                                             </th>
                                             <th>
-                                                @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.CodeSortParm })
+                                                Name
                                             </th>
                                             <th>
-                                                @Html.ActionLink("Code", "Index", new { sortOrder = ViewBag.CodeSortParm })
+                                                Code
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.PhoneNumber)
+                                                Phone Number
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.Email)
+                                                Email
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.Addressline)
+                                                Address line
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.State)
+                                                District
                                             </th>
+                                        <th>
+                                            State
+                                        </th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -77,8 +80,11 @@
                                                     @Html.DisplayFor(modelItem => item.Addressline)
                                                 </td>
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.State.Name)
+                                                    @Html.DisplayFor(modelItem => item.District.Name)
                                                 </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.State.Name)
+                                            </td>
                                                 <td>
                                                     <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="AvailableVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
                                                         <i class="fa fa-search"></i> @Applicationsettings.DETAILS

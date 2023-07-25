@@ -158,13 +158,6 @@
 
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                <a asp-action="Incomplete" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.BACK</a> &nbsp;
-                                <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.ClaimsInvestigationId"><i class="fas fa-map-marker-alt"></i> Add Location(s) To verify</a>
-                                @*<a class="btn btn-success" asp-action="CaseLocation" asp-route-id="@Model?.ClaimsInvestigationId"><i class="fas fa-pen"></i> @Applicationsettings.VERIFY_LOCATIONS</a>*@
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -199,7 +192,6 @@
                                         Verification Pincodes
                                     </th>
 
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -227,31 +219,18 @@
                                             @Html.DisplayFor(modelItem => item.PinCode.Code)
                                         </td>
 
-                                        <td>
-                                            <a class="btn btn-xs btn-info" asp-controller="CaseLocations" asp-action="Details" asp-route-id="@item.CaseLocationId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;
-                                            <a class="btn btn-xs btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@item.CaseLocationId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-controller="CaseLocations" asp-action="Delete" asp-route-id="@item.CaseLocationId"> <i class="fas fa-trash"></i>   @Applicationsettings.DELETE</a>
-                                            @*<button disabled class="btn btn-danger" asp-controller="CaseLocations" asp-action="Delete" asp-route-id="@item.CaseLocationId"> <i class="fas fa-rss"></i>   @Applicationsettings.ALLOCATE</button>*@
-                                        </td>
                                     </tr>
                                 }
                             </tbody>
-                            @*<tfoot>
-                            <tr>
-                            <td colspan="10">
-                            <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fa fa-window-close"></i>
-                            @Applicationsettings.CANCEL
-                            </a>
-                            <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
-                            <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.ASSIGN_VENDOR
-                            </button>
-                            </td>
-                            </tr>
-                            </tfoot>*@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <a asp-action="Assign" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.BACK</a> &nbsp;
             </div>
         </div>
     </div>

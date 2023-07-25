@@ -1120,6 +1120,44 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
+        [Breadcrumb(title: " Detail")]
+        public async Task<IActionResult> AssignDetail(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            return View(claimsInvestigation);
+        }
+
         // GET: ClaimsInvestigation/Create
         [Breadcrumb(title: " Create")]
         public async Task<IActionResult> Create()
