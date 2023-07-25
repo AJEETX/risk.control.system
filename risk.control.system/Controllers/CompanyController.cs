@@ -230,15 +230,14 @@ namespace risk.control.system.Controllers
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
-                return RedirectToAction(nameof(CompanyController.User), "Company");
-            else
             {
-                toastNotification.AddErrorToastMessage("Error to create user!");
-                foreach (IdentityError error in result.Errors)
-                    ModelState.AddModelError("", error.Description);
+                toastNotification.AddSuccessToastMessage("User created successfully!");
+                return RedirectToAction(nameof(CompanyController.User), "Company");
             }
+            toastNotification.AddErrorToastMessage("Error to create user!");
+            foreach (IdentityError error in result.Errors)
+                ModelState.AddModelError("", error.Description);
             GetCountryStateEdit(user);
-            toastNotification.AddSuccessToastMessage("User created successfully!");
             return View(user);
         }
 
@@ -311,9 +310,6 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
-                        user.Email = applicationUser.Email;
-                        user.UserName = applicationUser.Email;
-                        user.EmailConfirmed = true;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;
@@ -440,7 +436,7 @@ namespace risk.control.system.Controllers
             var company = _context.ClientCompany
                 .Include(c => c.CompanyApplicationUser)
                 .Include(c => c.EmpanelledVendors)
-                .ThenInclude(c=>c.State)
+                .ThenInclude(c => c.State)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var applicationDbContext = _context.Vendor

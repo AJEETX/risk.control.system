@@ -37,6 +37,7 @@ namespace risk.control.system.Controllers
             this.context = context;
             UserList = new List<UsersViewModel>();
         }
+
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.EmailSortParm = string.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
@@ -71,12 +72,15 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => new { s.FirstName, s.LastName });
                     break;
+
                 case "email_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Email);
                     break;
+
                 case "pincode_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.PinCode.Code);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.Email);
                     break;
@@ -128,17 +132,22 @@ namespace risk.control.system.Controllers
                 string newFileName = Guid.NewGuid().ToString();
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                user.ProfilePictureUrl = "upload/" + newFileName;
+                user.ProfilePictureUrl = "/img/" + newFileName;
             }
+            user.EmailConfirmed = true;
+            user.UserName = user.Email;
             user.Mailbox = new Mailbox { Name = user.Email };
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
+            {
+                toastNotification.AddSuccessToastMessage("User created successfully!");
                 return RedirectToAction(nameof(Index));
+            }
             else
             {
                 toastNotification.AddErrorToastMessage("Error to create user!");
@@ -146,9 +155,9 @@ namespace risk.control.system.Controllers
                     ModelState.AddModelError("", error.Description);
             }
             GetCountryStateEdit(user);
-            toastNotification.AddSuccessToastMessage("user created successfully!");
             return View(user);
         }
+
         private void GetCountryStateEdit(ApplicationUser? user)
         {
             ViewData["CountryId"] = new SelectList(context.Country, "CountryId", "Name", user?.CountryId);
@@ -156,6 +165,7 @@ namespace risk.control.system.Controllers
             ViewData["StateId"] = new SelectList(context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
             ViewData["PinCodeId"] = new SelectList(context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
         }
+
         public async Task<IActionResult> Edit(string userId)
         {
             if (userId == null)
@@ -174,6 +184,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction("Index");
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> DeleteImage(string id)
         {
@@ -200,6 +211,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
+            if (applicationUser is not null)
             {
                 try
                 {
@@ -209,9 +221,9 @@ namespace risk.control.system.Controllers
                         string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "upload/" + newFileName;
+                        applicationUser.ProfilePictureUrl = "/img/" + newFileName;
                     }
 
                     if (user != null)
@@ -225,8 +237,6 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
-                        user.Email = applicationUser.Email;
-                        user.UserName = applicationUser.UserName;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;
@@ -234,25 +244,26 @@ namespace risk.control.system.Controllers
                         user.PinCode = applicationUser.PinCode;
                         user.PinCodeId = applicationUser.PinCodeId;
                         user.Updated = DateTime.UtcNow;
+                        user.PhoneNumber = applicationUser.PhoneNumber;
                         user.UpdatedBy = HttpContext.User?.Identity?.Name;
                         user.SecurityStamp = DateTime.UtcNow.ToString();
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
-                            toastNotification.AddSuccessToastMessage("user edited successfully!");
-                            return RedirectToAction("Index");
+                            toastNotification.AddSuccessToastMessage("User edited successfully!");
+                            return RedirectToAction(nameof(Index));
                         }
-                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+                        toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
                         Errors(result);
                     }
                 }
-                catch (Exception ex)
+                catch (DbUpdateConcurrencyException)
                 {
-                    throw;
                 }
             }
+
             toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
-            return Problem();
+            return RedirectToAction(nameof(User));
         }
 
         private void Errors(IdentityResult result)
@@ -260,6 +271,7 @@ namespace risk.control.system.Controllers
             foreach (IdentityError error in result.Errors)
                 ModelState.AddModelError("", error.Description);
         }
+
         private async Task<List<string>> GetUserRoles(Models.ApplicationUser user)
         {
             return new List<string>(await userManager.GetRolesAsync(user));

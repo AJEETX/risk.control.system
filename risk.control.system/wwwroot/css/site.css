@@ -30,7 +30,7 @@ a {
 -------------------------------------------------- */
 html {
     font-size: 14px;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+    font-family: "Arial Narrow" !important;
 }
 
 @media (min-width: 768px) {
@@ -119,7 +119,6 @@ table td {
     height: 110px;
 }
 .attachment-list {
-    width: 250px;
     height: 50px;
     object-fit: cover
 }
@@ -133,7 +132,6 @@ table td {
     display:none;
 }
 .table-row-image {
-    width: 150px;
     height: 50px;
     object-fit: cover
 }
