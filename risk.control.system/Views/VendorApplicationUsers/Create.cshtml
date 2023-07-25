@@ -49,9 +49,9 @@
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="ProfilePicture" class="control-label"></label>
-                                        <img class="form-Image" id="profilePicture" src="@Applicationsettings.NO_IMAGE">
-                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('profilePicture').src = window.URL.createObjectURL(this.files[0])" />
+                                        <label asp-for="ProfileImage" class="control-label"></label>
+                                        <img id="ProfileImage" class="form-Image">
+                                        <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">

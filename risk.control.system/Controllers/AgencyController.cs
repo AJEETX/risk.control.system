@@ -307,8 +307,6 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
-                        user.Email = applicationUser.Email;
-                        user.UserName = applicationUser.Email;
                         user.EmailConfirmed = true;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;

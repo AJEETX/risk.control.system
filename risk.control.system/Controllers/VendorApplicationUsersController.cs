@@ -85,9 +85,9 @@ namespace risk.control.system.Controllers
                 string newFileName = Guid.NewGuid().ToString();
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                user.ProfilePictureUrl = "upload/" + newFileName;
+                user.ProfilePictureUrl = "/img/" + newFileName;
             }
             user.UserName = user.Email;
             user.Mailbox = new Mailbox { Name = user.Email };
@@ -166,9 +166,9 @@ namespace risk.control.system.Controllers
                         string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "upload/" + newFileName;
+                        applicationUser.ProfilePictureUrl = "/img/" + newFileName;
                     }
 
                     if (user != null)
@@ -182,8 +182,6 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
-                        user.Email = applicationUser.Email;
-                        user.UserName = applicationUser.Email;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;

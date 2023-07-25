@@ -42,7 +42,19 @@
                                         <input asp-for="PhoneNumber" class="form-control" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
-                                    </>
+                                    <div class="form-group">
+                                        <label asp-for="ProfileImage" class="control-label"></label>
+                                        @if (Model?.ProfilePictureUrl is not null)
+                                        {
+                                            <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                        }
+                                        else
+                                        {
+                                            <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+
+                                        <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -76,11 +88,6 @@
                                         </select>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label asp-for="ProfilePicture" class="control-label"></label>
-                                        <img id="ProfileImage" src="@Model.ProfilePictureUrl" class="form-Image" alt="No image" />
-                                        <input asp-for="ProfilePicture" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
-                                    </div>
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
                                         <input asp-for="Comments" class="form-control" />
