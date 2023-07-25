@@ -454,6 +454,11 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateService(VendorInvestigationServiceType vendorInvestigationServiceType)
         {
+
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+
             if (vendorInvestigationServiceType is not null)
             {
                 var pincodesServiced = await _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
@@ -469,6 +474,7 @@ namespace risk.control.system.Controllers
                 vendorInvestigationServiceType.Updated = DateTime.UtcNow;
                 vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                 vendorInvestigationServiceType.Created = DateTime.UtcNow;
+                vendorInvestigationServiceType.VendorId = vendor.VendorId;
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("service created successfully!");

@@ -49,7 +49,7 @@
             }
             else
             {
-                <img src="@Applicationsettings.NO_IMAGE" alt="logo" class="brand-image elevation-0" style="opacity: .8">
+                <img src="@Applicationsettings.NO_IMAGE" alt="logo" class="brand-image elevation-4" style="opacity: .8">
             }
         </div>
         <div>
@@ -73,7 +73,7 @@
                 @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
                 {
                     <div class="image">
-                        <img class="elevation-0 sidebar-profile" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
+                        <img class="elevation-2 sidebar-profile" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
                     </div>
                 }
                 else
