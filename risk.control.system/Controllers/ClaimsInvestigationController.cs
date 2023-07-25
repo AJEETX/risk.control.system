@@ -1312,6 +1312,9 @@ namespace risk.control.system.Controllers
                         await claimsInvestigation.Document.CopyToAsync(dataStream);
                         claimsInvestigation.DocumentImage = dataStream.ToArray();
                     }
+                    claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper()
+                    == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+
                     _context.Update(claimsInvestigation);
                     toastNotification.AddSuccessToastMessage("claim case edited successfully!");
                     await _context.SaveChangesAsync();
@@ -1327,7 +1330,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Incomplete));
             }
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
