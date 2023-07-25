@@ -82,7 +82,7 @@
                         <img class="elevation-0 sidebar-profile" src="@Applicationsettings.NO_IMAGE">
                     </div>
                 }
-                <a href="#" class="d-block">
+                <a href="/companyuserprofile" class="d-block">
                     @UserManager.GetUserAsync(User).Result?.FirstName @UserManager.GetUserAsync(User).Result?.LastName
                     @if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                     {
@@ -335,7 +335,7 @@
                                     @Url.MakeActiveClass("Company","UserEdit")">
                                 <i class="fas fa-user-plus nav-icon"></i>
                                 <p>
-                                    Create User
+                                    Add User
                                 </p>
                             </a>
                         </li>
@@ -370,7 +370,7 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="Company" asp-action="AvailableVendors" class="actual-link nav-link @Url.MakeActiveClass("Company","AvailableVendors")">
-                                <i class="nav-icon fa fa-thumbs-down"></i>
+                                <i class="nav-icon fas fa-hand-pointer"></i>
                                 <p>
                                     Available Agencies
                                 </p>
@@ -379,7 +379,7 @@
                         <li class="nav-item">
                             <a is-active-page asp-controller="Vendors" asp-action="Create" class="actual-link nav-link
                                             @Url.MakeActiveClass("Vendors","Create")">
-                                <i class="nav-icon fa fa-thumbs-up"></i>
+                                <i class="nav-icon fa fa-plus"></i>
                                 <p>
                                     Add Agency
                                 </p>

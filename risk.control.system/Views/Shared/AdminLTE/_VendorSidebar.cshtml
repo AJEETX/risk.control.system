@@ -81,7 +81,7 @@
                         <img class="elevation-0 sidebar-profile" src="@Applicationsettings.NO_IMAGE">
                     </div>
                 }
-                <a href="#" class="d-block">
+                <a href="/agencyuserprofile" class="d-block">
                     @UserManager.GetUserAsync(User).Result?.FirstName @UserManager.GetUserAsync(User).Result?.LastName
                     @if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                     {

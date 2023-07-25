@@ -114,6 +114,10 @@ table td {
 .form-Image {
     height: 40px;
 }
+
+.profile-image {
+    height: 110px;
+}
 .attachment-list {
     width: 250px;
     height: 50px;

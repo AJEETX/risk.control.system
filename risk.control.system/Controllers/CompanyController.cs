@@ -440,6 +440,7 @@ namespace risk.control.system.Controllers
             var company = _context.ClientCompany
                 .Include(c => c.CompanyApplicationUser)
                 .Include(c => c.EmpanelledVendors)
+                .ThenInclude(c=>c.State)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var applicationDbContext = _context.Vendor
