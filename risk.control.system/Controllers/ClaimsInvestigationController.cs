@@ -837,7 +837,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(title: " Active Claim")]
+        [Breadcrumb(title: " Active")]
         public async Task<IActionResult> Active()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -931,8 +931,8 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [Breadcrumb(title: " Withdraw Claim")]
-        public async Task<IActionResult> Withdraw()
+        [Breadcrumb(title: "Yet To Investigate")]
+        public async Task<IActionResult> ToInvestigate()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
@@ -1025,6 +1025,8 @@ namespace risk.control.system.Controllers
             await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, assessorRemarkType);
 
             await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
+
+            toastNotification.AddSuccessToastMessage("claim case processed successfully!");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor));
         }
@@ -1273,6 +1275,7 @@ namespace risk.control.system.Controllers
                         claimsInvestigation.DocumentImage = dataStream.ToArray();
                     }
                     _context.Update(claimsInvestigation);
+                    toastNotification.AddSuccessToastMessage("claim case edited successfully!");
                     await _context.SaveChangesAsync();
                 }
                 catch (Exception ex)
@@ -1300,6 +1303,86 @@ namespace risk.control.system.Controllers
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.StateId);
             return View(claimsInvestigation);
+        }
+
+        // GET: ClaimsInvestigation/Edit/5
+        [Breadcrumb(title: " Withdraw")]
+        public async Task<IActionResult> Withdraw(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            return View(claimsInvestigation);
+        }
+
+        // POST: ClaimsInvestigation/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public async Task<IActionResult> SetWithdraw(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
+        {
+            if (claimsInvestigationId == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
+
+            var withDrawnByCompanySubStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
+
+            var existingClaimsInvestigation = await _context.ClaimsInvestigation
+               .Include(c => c.ClientCompany)
+               .Include(c => c.CaseEnabler)
+               .Include(c => c.CostCentre)
+               .Include(c => c.Country)
+               .Include(c => c.District)
+               .Include(c => c.InvestigationServiceType)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.LineOfBusiness)
+               .Include(c => c.PinCode)
+               .Include(c => c.State).AsNoTracking()
+               .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
+
+            existingClaimsInvestigation.InvestigationCaseSubStatus = withDrawnByCompanySubStatus;
+            existingClaimsInvestigation.InvestigationCaseStatus = finishedStatus;
+            existingClaimsInvestigation.Comments = claimsInvestigation.Comments;
+            _context.ClaimsInvestigation.Update(existingClaimsInvestigation);
+
+            await _context.SaveChangesAsync();
+
+            toastNotification.AddSuccessToastMessage("claim case withdrawn successfully!");
+
+            return RedirectToAction(nameof(ToInvestigate));
         }
 
         // GET: ClaimsInvestigation/Delete/5
@@ -1353,7 +1436,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Breadcrumb(title: " Vendor detail")]
+        [Breadcrumb(title: " Agency detail")]
         public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
         {
             if (id == null || _context.Vendor == null)

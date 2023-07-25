@@ -161,7 +161,7 @@
                         <div class="row">
                             <div class="col-md-12 text-right">
                                 <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.BACK</a> &nbsp;
-                                <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.ClaimsInvestigationId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
+                                <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.ClaimsInvestigationId"><i class="fas fa-map-marker-alt"></i> Add Location(s) To verify</a>
                                 @*<a class="btn btn-success" asp-action="CaseLocation" asp-route-id="@Model?.ClaimsInvestigationId"><i class="fas fa-pen"></i> @Applicationsettings.VERIFY_LOCATIONS</a>*@
                             </div>
                         </div>
@@ -173,7 +173,7 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.VERIFICTION_LOCATIONS</h3>
+                        <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> @Applicationsettings.VERIFICTION_LOCATIONS</h3>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">

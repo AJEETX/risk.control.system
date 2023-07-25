@@ -1,105 +1,251 @@
-﻿@model IEnumerable<risk.control.system.Models.ClaimsInvestigation>
+﻿@model risk.control.system.Models.ClaimsInvestigation
 
 @{
-    ViewData["Title"] = "Claim: Active ";
-    var hasClientCompany = @ViewBag.HasClientCompany ? "none" : "";
+    ViewData["Title"] = "Details";
 }
 <section class="content pt-2">
-    <div class="container-fluid">
-        <div class="row ">
-            <div class="col-md-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-list"></i>  Yet to Investigate Claim List</h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
-                            <div class="col-md-12">
+    <form asp-action="SetWithdraw" enctype="multipart/form-data">
+        <input type="hidden" asp-for="ClaimsInvestigationId" />
+        <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
+        <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
 
-                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                    <thead>
-                                        <tr>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.CASE_PROFILE</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ContractNumber)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ContractNumber)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.Description)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.Description)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.LineOfBusiness.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.InvestigationCaseStatus.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ContractIssueDate)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ContractIssueDate)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CustomerName)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CustomerName)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CustomerDateOfBirth)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CustomerDateOfBirth)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ContactNumber)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ContactNumber)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimType)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimType)
+                                        </dd>
+                                        <dt class="col-sm-4">
+                                            Document
+                                        </dt>
+                                        <dd class="col-sm-6">
+                                            @if (Model?.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
 
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.LineOfBusiness)
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.CustomerName)
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.ClaimType)
-                                            </th>
-                                            <th>
-                                                Location-Status
-                                            </th>
-                                            <th>
-                                                Created Date
-                                            </th>
-                                            <th>
-                                                Active days
-                                            </th>
-                                            <th>
-                                                Withdraw
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model)
-                                        {
-                                            var timePending = DateTime.Now.Subtract(item.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Created).Days.ToString();
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CustomerIncome)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CustomerIncome)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CustomerOccupation)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CustomerOccupation)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CustomerEducation)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CustomerEducation)
+                                        </dd>
 
-                                            <tr>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CustomerType)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CustomerType)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CostCentre)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CostCentre.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseEnabler)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseEnabler.Name)
+                                        </dd>
 
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.CustomerName)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.ClaimType)
-                                                </td>
-                                                <td>
-                                                    @{
-                                                        if (item.CaseLocations.Count == 0)
-                                                        {
-                                                            <span class="badge badge-danger">Add verification location</span>
-                                                        }
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.PinCode)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.PinCode.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.State)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.State.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.Country)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.Country.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.District)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.District.Name)
+                                        </dd>
+                                       
+                                    </dl>
+
+                                </div>
+                           
+                                <div class="col-md-12">
+                                    <div class="card card-default">
+                                        <div class="card-header">
+                                            <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> Location(s) to Verify</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            Benficiary Name
+                                                        </th>
+                                                        <th>
+                                                            Benficiary Relation
+                                                        </th>
+                                                        <th>
+                                                            Address
+                                                        </th>
+                                                        <th>
+                                                            District
+                                                        </th>
+                                                        <th>
+                                                            State
+                                                        </th>
+
+                                                        <th>
+                                                            Verification Pincodes
+                                                        </th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var item in Model.CaseLocations)
+                                                    {
+                                                        <tr>
+
+                                                            <td>
+                                                                @Html.DisplayFor(modelItem => item.BeneficiaryName)
+                                                            </td>
+                                                            <td>
+                                                                @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
+                                                            </td>
+                                                            <td>
+                                                                @Html.DisplayFor(modelItem => item.Addressline)
+                                                            </td>
+                                                            <td>
+                                                                @Html.DisplayFor(modelItem => item.District.Name)
+                                                            </td>
+                                                            <td>
+                                                                @Html.DisplayFor(modelItem => item.State.Name)
+                                                            </td>
+
+                                                            <td>
+                                                                @Html.DisplayFor(modelItem => item.PinCode.Code)
+                                                            </td>
+
+                                                        </tr>
                                                     }
-                                                    @{
-                                                        foreach (var caseLocation in item.CaseLocations)
-                                                        {
-                                                            <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
-                                                        }
-                                                    }
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Created)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => timePending )
-                                                </td>
-                                                <td>
-
-                                                    <a style="pointer-events: none" class="btn btn-xs btn-danger" asp-action="withdraw" asp-route-id="@item.ClaimsInvestigationId">
-                                                        <i class="fas fa-trash"></i> X
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        Withdrawl Remarks
+                        <input asp-for="Comments" class="form-control" />
+                        <span asp-validation-for="Comments" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-right">
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa fa-window-close"></i> Withdraw &nbsp;
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
+        <
+    </form>
 </section>
