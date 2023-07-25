@@ -1,0 +1,105 @@
+﻿@model IEnumerable<risk.control.system.Models.ClaimsInvestigation>
+
+@{
+    ViewData["Title"] = "Claim: Active ";
+    var hasClientCompany = @ViewBag.HasClientCompany ? "none" : "";
+}
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row ">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-list"></i>  Yet to Investigate Claim List</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
+                            <div class="col-md-12">
+
+                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                    <thead>
+                                        <tr>
+
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                            </th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                            </th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.CustomerName)
+                                            </th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.ClaimType)
+                                            </th>
+                                            <th>
+                                                Location-Status
+                                            </th>
+                                            <th>
+                                                Created Date
+                                            </th>
+                                            <th>
+                                                Active days
+                                            </th>
+                                            <th>
+                                                Withdraw
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            var timePending = DateTime.Now.Subtract(item.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Created).Days.ToString();
+
+                                            <tr>
+
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.ClaimType)
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        if (item.CaseLocations.Count == 0)
+                                                        {
+                                                            <span class="badge badge-danger">Add verification location</span>
+                                                        }
+                                                    }
+                                                    @{
+                                                        foreach (var caseLocation in item.CaseLocations)
+                                                        {
+                                                            <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
+                                                        }
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Created)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => timePending )
+                                                </td>
+                                                <td>
+
+                                                    <a style="pointer-events: none" class="btn btn-xs btn-danger" asp-action="" asp-route-id="@item.ClaimsInvestigationId">
+                                                        <i class="fas fa-trash"></i> X
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

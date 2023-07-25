@@ -234,18 +234,34 @@
                                     @Url.MakeActiveClass("ClaimsInvestigation","AllocateToVendor") @Url.MakeActiveClass("ClaimsInvestigation","EmpanelledVendors")">
                                 <i class="fas fa-funnel-dollar nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-danger">Ready To Allocate</span>
+                                    <span class="badge badge-danger">Allocate</span>
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
-                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <i class="fas fa-glasses nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-warning">Review To Allocate</span>
+                                    <span class="badge badge-warning">Re Allocate</span>
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Withdraw" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Withdraw")">
+                                <i class="fa fa-binoculars nav-icon"></i>
+                                <p>
+                                    <span class="badge badge-warning">Yet to Investigate</span>
+                                </p>
+                            </a>
+                        </li>
+                        //<li class="nav-item">
+                        //    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")">
+                        //        <i class="fas fa-rupee-sign nav-icon"></i>
+                        //        <p>
+                        //            <span class="badge badge-warning">Allocated Claims</span>
+                        //        </p>
+                        //    </a>
+                        //</li>
                     }
                     if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
                     {
