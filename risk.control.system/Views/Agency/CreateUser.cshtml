@@ -91,6 +91,10 @@
                                         <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group text-right">
+                                        <a asp-controller="Agency" asp-action="User" class="btn btn-secondary">
+                                            <i class="fa fa-window-close"></i>
+                                            @Applicationsettings.CANCEL
+                                        </a>
                                         <button type="submit" class="btn btn-success">
                                             <i class="fas fa-plus"></i> @Applicationsettings.CREATE
                                         </button>

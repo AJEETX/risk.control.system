@@ -66,7 +66,7 @@
                                         @foreach (var service in Model.VendorInvestigationServiceTypes)
                                         {
                                             <span class="badge badge-light">@service.LineOfBusiness.Name</span> <span class="badge badge-light">@service.Price</span>
-                                            foreach(var pincode in service.PincodeServices)
+                                            foreach (var pincode in service.PincodeServices)
                                             {
                                                 <span class="badge badge-light">@pincode.Pincode : @pincode.Name</span>
                                             }
@@ -127,7 +127,7 @@
                                     <dd class="col-sm-8">
                                         @Html.DisplayFor(model => model.PinCode.Name)
                                     </dd>
-                                    
+
                                     <dt class="col-sm-3">
                                         @Html.DisplayNameFor(model => model.Country)
                                     </dt>
@@ -142,10 +142,18 @@
                                 <a asp-controller="Vendors" asp-action="Edit" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-pen'></i> @Applicationsettings.PROFILE</a>
                                 <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-plus"></i>  @Applicationsettings.USER</a>
                                 <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i>  @Applicationsettings.SERVICE</a>
-                                <a asp-controller="Vendors" asp-action="Index" class="btn btn-secondary"><i class='fas fa-undo'></i> Go @Applicationsettings.BACK</a>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group text-right">
+                    <a asp-controller="Vendors" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
                 </div>
             </div>
         </div>
