@@ -6,8 +6,11 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Case")]
     public class InvestigationCaseController : Controller
     {
         private readonly ApplicationDbContext _context;

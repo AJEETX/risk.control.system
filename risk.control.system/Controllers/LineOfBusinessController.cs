@@ -1,11 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Line Of Business")]
     public class LineOfBusinessController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,6 +31,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.LineOfBusiness == null)
@@ -46,6 +52,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes/Create
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             return View();
@@ -63,11 +70,12 @@ namespace risk.control.system.Controllers
 
             _context.Add(lineOfBusiness);
             await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("line of business created successfully!");
+            toastNotification.AddSuccessToastMessage("line of business created successfully!");
             return RedirectToAction(nameof(Index));
         }
 
         // GET: RiskCaseTypes/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.LineOfBusiness == null)
@@ -122,11 +130,12 @@ namespace risk.control.system.Controllers
                 toastNotification.AddSuccessToastMessage("line of business edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-                toastNotification.AddErrorToastMessage("Error to edit line of business!");
+            toastNotification.AddErrorToastMessage("Error to edit line of business!");
             return View(lineOfBusiness);
         }
 
         // GET: RiskCaseTypes/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.LineOfBusiness == null)
@@ -166,7 +175,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("line of business deleted successfully!");
+            toastNotification.AddSuccessToastMessage("line of business deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 

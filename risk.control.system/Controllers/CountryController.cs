@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Country")]
     public class CountryController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -38,7 +44,7 @@ namespace risk.control.system.Controllers
             }
 
             ViewBag.CurrentFilter = searchString;
-            
+
             var applicationDbContext = _context.Country.AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -52,9 +58,11 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
+
                 case "code_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.Name);
                     break;
@@ -69,7 +77,7 @@ namespace risk.control.system.Controllers
             ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
 
             var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-            if(applicationDbContextResult != null)
+            if (applicationDbContextResult != null)
             {
                 return View(applicationDbContextResult);
             }
@@ -81,6 +89,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.Country == null)
@@ -99,23 +108,27 @@ namespace risk.control.system.Controllers
 
             return View(country);
         }
+
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Country country)
         {
             country.Updated = DateTime.UtcNow;
             country.UpdatedBy = HttpContext.User?.Identity?.Name;
-            _context.Add(country );
+            _context.Add(country);
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("country added successfully!");
             return RedirectToAction(nameof(Index));
         }
 
         // GET: RiskCaseStatus/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Country == null)
@@ -169,11 +182,12 @@ namespace risk.control.system.Controllers
                 toastNotification.AddSuccessToastMessage("country edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-                toastNotification.AddErrorToastMessage("Error to edit country!");
+            toastNotification.AddErrorToastMessage("Error to edit country!");
             return View(country);
         }
 
         // GET: RiskCaseStatus/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Country == null)
@@ -210,7 +224,7 @@ namespace risk.control.system.Controllers
                 country.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Country.Remove(country);
             }
-            
+
             await _context.SaveChangesAsync();
             toastNotification.AddSuccessToastMessage("country deleted successfully!");
             return RedirectToAction(nameof(Index));
@@ -218,7 +232,7 @@ namespace risk.control.system.Controllers
 
         private bool CountryExists(string id)
         {
-          return (_context.Country?.Any(e => e.CountryId == id)).GetValueOrDefault();
+            return (_context.Country?.Any(e => e.CountryId == id)).GetValueOrDefault();
         }
     }
 }

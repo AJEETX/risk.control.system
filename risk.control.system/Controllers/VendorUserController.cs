@@ -14,7 +14,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-        [Breadcrumb(" Agency")]
+    [Breadcrumb(" Agency")]
     public class VendorUserController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -40,6 +40,7 @@ namespace risk.control.system.Controllers
             this.context = context;
             UserList = new List<UsersViewModel>();
         }
+
         public async Task<IActionResult> Index(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.EmailSortParm = string.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
@@ -76,12 +77,15 @@ namespace risk.control.system.Controllers
                     case "name_desc":
                         applicationDbContext = applicationDbContext.OrderByDescending(s => new { s.FirstName, s.LastName });
                         break;
+
                     case "email_desc":
                         applicationDbContext = applicationDbContext.OrderByDescending(s => s.Email);
                         break;
+
                     case "pincode_desc":
                         applicationDbContext = applicationDbContext.OrderByDescending(s => s.PinCode.Code);
                         break;
+
                     default:
                         applicationDbContext.OrderByDescending(s => s.Email);
                         break;
@@ -126,9 +130,10 @@ namespace risk.control.system.Controllers
 
                 model.Users = UserList;
             }
-            
+
             return View(model);
         }
+
         private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
         {
             return new List<string>(await userManager.GetRolesAsync(user));

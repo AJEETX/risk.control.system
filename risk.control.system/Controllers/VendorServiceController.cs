@@ -2,13 +2,19 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
+
+using SmartBreadcrumbs.Attributes;
+
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb(" Service")]
     public class VendorServiceController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -33,6 +39,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Details/5
+        [Breadcrumb(" Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
@@ -56,6 +63,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Create
+        [Breadcrumb(" Create")]
         public IActionResult Create(string id)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
@@ -101,6 +109,7 @@ namespace risk.control.system.Controllers
 
             return View(vendorInvestigationServiceType);
         }
+
         [HttpPost, ActionName("GetInvestigationServicesByLineOfBusinessId")]
         public async Task<JsonResult> GetInvestigationServicesByLineOfBusinessId(string LineOfBusinessId)
         {
@@ -113,7 +122,9 @@ namespace risk.control.system.Controllers
             }
             return Json(services);
         }
+
         // GET: VendorService/Edit/5
+        [Breadcrumb(" Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
@@ -189,7 +200,6 @@ namespace risk.control.system.Controllers
                         toastNotification.AddSuccessToastMessage("service updated successfully!");
                         return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = vendorInvestigationServiceType.VendorId });
                     }
-
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
@@ -213,6 +223,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Delete/5
+        [Breadcrumb(" Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)

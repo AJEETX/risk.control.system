@@ -1,12 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("District")]
     public class DistrictController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +24,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District
-        public async Task<IActionResult> Index(string sortOrder,string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewBag.StateSortParm = string.IsNullOrEmpty(sortOrder) ? "state_desc" : "";
@@ -51,12 +56,15 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
+
                 case "state_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.State.Name);
                     break;
+
                 case "country_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Country.Name);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.State.Name);
                     break;
@@ -76,6 +84,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.District == null)
@@ -98,6 +107,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District/Create
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -120,11 +130,12 @@ namespace risk.control.system.Controllers
                 toastNotification.AddSuccessToastMessage("district created successfully!");
                 return RedirectToAction(nameof(Index));
             }
-                toastNotification.AddErrorToastMessage("district not found!");
+            toastNotification.AddErrorToastMessage("district not found!");
             return Problem();
         }
 
         // GET: District/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.District == null)
@@ -180,11 +191,12 @@ namespace risk.control.system.Controllers
                 toastNotification.AddSuccessToastMessage("district edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
-                toastNotification.AddErrorToastMessage("Error to edit district!");
+            toastNotification.AddErrorToastMessage("Error to edit district!");
             return Problem();
         }
 
         // GET: District/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.District == null)
@@ -223,15 +235,15 @@ namespace risk.control.system.Controllers
                 district.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.District.Remove(district);
             }
-            
+
             await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("district deleted successfully!");
+            toastNotification.AddSuccessToastMessage("district deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
         private bool DistrictExists(string id)
         {
-          return (_context.District?.Any(e => e.DistrictId == id)).GetValueOrDefault();
+            return (_context.District?.Any(e => e.DistrictId == id)).GetValueOrDefault();
         }
     }
 }

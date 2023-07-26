@@ -6,8 +6,11 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Case Outcome")]
     public class InvestigationCaseOutcomeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -28,6 +31,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseOutcome/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.InvestigationCaseOutcome == null)
@@ -46,6 +50,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseOutcome/Create
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             return View();
@@ -71,6 +76,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseOutcome/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.InvestigationCaseOutcome == null)
@@ -125,6 +131,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseOutcome/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.InvestigationCaseOutcome == null)

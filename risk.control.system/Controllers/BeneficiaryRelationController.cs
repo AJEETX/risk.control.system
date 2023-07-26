@@ -6,8 +6,11 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Beneficairy Relation ")]
     public class BeneficiaryRelationController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -28,6 +31,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Details/5
+        [Breadcrumb("Details ")]
         public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)
@@ -46,6 +50,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Create
+        [Breadcrumb("Create ")]
         public IActionResult Create()
         {
             return View();
@@ -60,8 +65,8 @@ namespace risk.control.system.Controllers
         {
             if (beneficiaryRelation is not null)
             {
-                beneficiaryRelation.Updated= DateTime.Now;
-                beneficiaryRelation.UpdatedBy= HttpContext.User?.Identity?.Name;
+                beneficiaryRelation.Updated = DateTime.Now;
+                beneficiaryRelation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(beneficiaryRelation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("beneficiary relation created successfully!");
@@ -71,6 +76,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Edit/5
+        [Breadcrumb("Edit ")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)
@@ -125,6 +131,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Delete/5
+        [Breadcrumb("Delete ")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)

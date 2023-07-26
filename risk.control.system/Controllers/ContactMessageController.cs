@@ -12,8 +12,11 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Services;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Mailbox")]
     public class ContactMessageController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,13 +24,15 @@ namespace risk.control.system.Controllers
         private readonly IInboxMailService inboxMailService;
         private readonly ITrashMailService trashMailService;
         private readonly IToastNotification toastNotification;
+
         private readonly JsonSerializerOptions options = new()
         {
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
+
         public ContactMessageController(ApplicationDbContext context, ISentMailService sentMailService,
-            IInboxMailService inboxMailService, 
+            IInboxMailService inboxMailService,
             ITrashMailService trashMailService,
             IToastNotification toastNotification)
         {
@@ -50,9 +55,10 @@ namespace risk.control.system.Controllers
             }
             var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
 
-            return View(userMailboxMessages.OrderByDescending(o=>o.SendDate));
-
+            return View(userMailboxMessages.OrderByDescending(o => o.SendDate));
         }
+
+        [Breadcrumb("Delete", FromAction = "Index")]
         public async Task<IActionResult> InboxDelete(List<long> messages)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -67,6 +73,8 @@ namespace risk.control.system.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [Breadcrumb("Details", FromAction = "Index")]
         public async Task<IActionResult> InboxDetails(long id)
         {
             if (id == 0)
@@ -84,6 +92,8 @@ namespace risk.control.system.Controllers
             var userMessage = await inboxMailService.GetInboxMessagedetail(id, userEmail);
             return View(userMessage);
         }
+
+        [Breadcrumb("Reply", FromAction = "Index")]
         public async Task<IActionResult> InboxDetailsReply(long id, string actiontype)
         {
             if (id == 0)
@@ -102,6 +112,7 @@ namespace risk.control.system.Controllers
             ViewBag.ActionType = actiontype;
             return View(userMessage);
         }
+
         [HttpPost]
         public async Task<IActionResult> InboxDetailsReply(OutboxMessage contactMessage)
         {
@@ -130,6 +141,8 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Create));
             }
         }
+
+        [Breadcrumb("Delete", FromAction = "InboxDetails")]
         public async Task<IActionResult> InboxDetailsDelete(long id)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -145,6 +158,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Breadcrumb("Trash", FromAction = "Index")]
         public async Task<IActionResult> Trash()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -158,6 +172,8 @@ namespace risk.control.system.Controllers
 
             return View(usertrashMessages.OrderByDescending(o => o.SendDate).ToList());
         }
+
+        [Breadcrumb("Delete", FromAction = "Trash")]
         public async Task<IActionResult> TrashDelete(List<long> messages)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -173,6 +189,8 @@ namespace risk.control.system.Controllers
 
             return RedirectToAction(nameof(Trash));
         }
+
+        [Breadcrumb("Details", FromAction = "Trash")]
         public async Task<IActionResult> TrashDetails(long id)
         {
             if (id == 0)
@@ -190,6 +208,8 @@ namespace risk.control.system.Controllers
             var userMessage = await trashMailService.GetTrashMessagedetail(id, userEmail);
             return View(userMessage);
         }
+
+        [Breadcrumb("Delete", FromAction = "TrashDetails")]
         public async Task<IActionResult> TrashDetailsDelete(long id)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -199,12 +219,13 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-           var rows = await trashMailService.TrashDetailsDelete(id, userEmail);
+            var rows = await trashMailService.TrashDetailsDelete(id, userEmail);
             toastNotification.AddSuccessToastMessage($" {rows} mail deleted permanently successfully!");
 
             return RedirectToAction(nameof(Trash));
         }
 
+        [Breadcrumb("Sent", FromAction = "Index")]
         public async Task<IActionResult> Sent()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -218,6 +239,8 @@ namespace risk.control.system.Controllers
 
             return View(userMailboxMessages.OrderByDescending(o => o.SendDate));
         }
+
+        [Breadcrumb("Delete", FromAction = "Sent")]
         public async Task<IActionResult> SentDelete(List<long> messages)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -232,6 +255,8 @@ namespace risk.control.system.Controllers
 
             return RedirectToAction(nameof(Sent));
         }
+
+        [Breadcrumb("Details", FromAction = "Sent")]
         public async Task<IActionResult> SentDetails(long id)
         {
             if (id == 0)
@@ -249,6 +274,8 @@ namespace risk.control.system.Controllers
             var userMessage = await sentMailService.GetSentMessagedetail(id, userEmail);
             return View(userMessage);
         }
+
+        [Breadcrumb("Reply", FromAction = "SentDetails")]
         public async Task<IActionResult> SentDetailsReply(long id, string actiontype)
         {
             if (id == 0)
@@ -296,6 +323,8 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Create));
             }
         }
+
+        [Breadcrumb("Delete", FromAction = "SentDetails")]
         public async Task<IActionResult> SentDetailsDelete(long id)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -328,6 +357,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Sent));
         }
 
+        [Breadcrumb("Outbox", FromAction = "Index")]
         public async Task<IActionResult> Outbox()
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -341,6 +371,8 @@ namespace risk.control.system.Controllers
 
             return View(userMailbox.Outbox.OrderByDescending(o => o.SendDate).ToList());
         }
+
+        [Breadcrumb("Delete", FromAction = "Outbox")]
         public async Task<IActionResult> OutboxDelete(List<long> messages)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -374,7 +406,9 @@ namespace risk.control.system.Controllers
 
             return RedirectToAction(nameof(Outbox));
         }
+
         // GET: ContactMessage/Details/5
+        [Breadcrumb("Details", FromAction = "Outbox")]
         public async Task<IActionResult> OutBoxDetails(long id)
         {
             if (id == 0)
@@ -399,6 +433,8 @@ namespace risk.control.system.Controllers
             var rows = await _context.SaveChangesAsync();
             return View(userMessage);
         }
+
+        [Breadcrumb("Delete", FromAction = "OutBoxDetails")]
         public async Task<IActionResult> OutboxDetailsDelete(long id)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -431,11 +467,13 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ContactMessage/Create
+        [Breadcrumb("Compose", FromAction = "Index")]
         public IActionResult Create()
         {
             ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUser, "Id", "CountryId");
             return View();
         }
+
         // POST: ContactMessage/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -454,7 +492,7 @@ namespace risk.control.system.Controllers
             }
 
             IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-            
+
             var mailSent = await inboxMailService.SendReplyMessage(contactMessage, userEmail, messageDocument);
 
             if (mailSent)

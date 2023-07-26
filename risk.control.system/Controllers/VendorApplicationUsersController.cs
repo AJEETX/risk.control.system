@@ -14,8 +14,11 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("User")]
     public class VendorApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -42,6 +45,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorApplicationUsers/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null || _context.VendorApplicationUser == null)
@@ -65,6 +69,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorApplicationUsers/Create
+        [Breadcrumb("Create")]
         public IActionResult Create(string id)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
@@ -118,6 +123,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorApplicationUsers/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(long? userId)
         {
             if (userId == null || _context.VendorApplicationUser == null)
@@ -221,6 +227,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorApplicationUsers/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null || _context.VendorApplicationUser == null)

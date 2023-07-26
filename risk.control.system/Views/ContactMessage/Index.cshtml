@@ -4,31 +4,19 @@
     ViewData["Title"] = "Inbox";
 }
 
-<h3>MAILBOX</h3>
-
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-success">
+                <div class="card card-secondary">
                     <form id="checkboxes" asp-controller="ContactMessage" asp-action="InboxDelete" method="post" id="listForm">
 
                         <div class="card-header">
-                            <h3 class="card-title">Inbox</h3>
-                            <div class="card-tools">
-                                <div class="input-group input-group-sm">
-                                    <input type="text" class="form-control" placeholder="Search Mail">
-                                    <div class="input-group-append">
-                                        <div class="btn btn-success">
-                                            <i class="fas fa-search"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <h3 class="card-title"><i class="fas fa-inbox"></i> Inbox</h3>
 
                         </div>
 
-                        <div class="card-body p-0">
+                        <div class="card-body">
                             <div class="table-responsive mailbox-messages">
                                 <table id="dataTbl" class="table message-table table-bordered">
                                     <thead>

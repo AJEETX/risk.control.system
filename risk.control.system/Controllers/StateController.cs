@@ -7,8 +7,11 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("State")]
     public class StateController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -50,9 +53,11 @@ namespace risk.control.system.Controllers
                 case "country_desc":
                     states = states.OrderByDescending(s => s.Country.Name);
                     break;
+
                 case "state_desc":
                     states = states.OrderBy(s => s.Name);
                     break;
+
                 default:
                     states = states.OrderBy(s => s.Name);
                     break;
@@ -75,6 +80,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.State == null)
@@ -93,11 +99,14 @@ namespace risk.control.system.Controllers
 
             return View(state);
         }
+
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             return View();
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(State state)
@@ -111,6 +120,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.State == null)
@@ -173,6 +183,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.State == null)

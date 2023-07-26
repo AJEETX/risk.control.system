@@ -1,12 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using NToastNotify;
+
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Permission")]
     public class PermissionController : Controller
     {
         private readonly RoleManager<ApplicationRole> _roleManager;
@@ -41,6 +46,7 @@ namespace risk.control.system.Controllers
             model.RoleId = Id;
             return View(model);
         }
+
         private async Task<List<RoleClaimsViewModel>> GetModulePermission(Type type, ApplicationRole role)
         {
             var claims = await _roleManager.GetClaimsAsync(role);
@@ -58,6 +64,7 @@ namespace risk.control.system.Controllers
             }
             return modulePermissions;
         }
+
         public async Task<IActionResult> Update(PermissionsViewModel model)
         {
             var role = await _roleManager.FindByIdAsync(model.RoleId);

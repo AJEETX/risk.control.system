@@ -7,8 +7,11 @@ using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Company User Roles")]
     public class CompanyUserRolesController : Controller
     {
         private readonly SignInManager<ApplicationUser> signInManager;

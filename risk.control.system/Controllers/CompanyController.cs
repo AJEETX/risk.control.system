@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers
             return View(clientCompany);
         }
 
-        [Breadcrumb("Company Profile")]
+        [Breadcrumb("Edit", FromAction = "Index")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -198,7 +198,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("CreateUser ")]
+        [Breadcrumb("Create", FromAction = "User")]
         public IActionResult CreateUser()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -241,7 +241,7 @@ namespace risk.control.system.Controllers
             return View(user);
         }
 
-        [Breadcrumb("EditUser ")]
+        [Breadcrumb("Edit", FromAction = "User")]
         public async Task<IActionResult> EditUser(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
@@ -427,7 +427,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb("Empanelled Agency(s) ")]
+        [Breadcrumb("Empanelled Agency(s)")]
         public async Task<IActionResult> EmpanelledVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -514,7 +514,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb("Agency Detail ")]
+        [Breadcrumb("Agency Detail", FromAction = "AvailableVendors")]
         public async Task<IActionResult> VendorDetail(string id, string backurl)
         {
             if (id == null || _context.Vendor == null)
@@ -547,7 +547,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        [Breadcrumb("User Role(s) ")]
+        [Breadcrumb("Role", FromAction = "User")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<CompanyUserRoleViewModel>();

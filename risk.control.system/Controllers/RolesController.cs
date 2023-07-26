@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using risk.control.system.Models;
 using NToastNotify;
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Roles")]
     public class RolesController : Controller
     {
         private readonly RoleManager<ApplicationRole> _roleManager;
@@ -16,12 +18,15 @@ namespace risk.control.system.Controllers
             _roleManager = roleManager;
             this.toastNotification = toastNotification;
         }
-        public async Task<IActionResult> Index(string id=null)
+
+        public async Task<IActionResult> Index(string id = null)
         {
             var roles = await _roleManager.Roles.ToListAsync();
 
             return View(roles);
         }
+
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             return View();
@@ -38,6 +43,8 @@ namespace risk.control.system.Controllers
             toastNotification.AddSuccessToastMessage("role created successfully!");
             return RedirectToAction(nameof(Index));
         }
+
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(string Id)
         {
             ApplicationRole role = null;
@@ -62,10 +69,11 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-                toastNotification.AddErrorToastMessage("Error to edit role!");
+            toastNotification.AddErrorToastMessage("Error to edit role!");
             return View(role);
         }
 
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(string Id)
         {
             var role = await _roleManager.FindByIdAsync(Id);
@@ -77,8 +85,8 @@ namespace risk.control.system.Controllers
             }
 
             return View(role);
-
         }
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string Id)
@@ -88,7 +96,7 @@ namespace risk.control.system.Controllers
             {
                 await _roleManager.DeleteAsync(role);
             }
-                toastNotification.AddSuccessToastMessage("role deleted successfully!");
+            toastNotification.AddSuccessToastMessage("role deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
     }

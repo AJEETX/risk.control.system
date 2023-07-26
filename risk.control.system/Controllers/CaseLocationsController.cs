@@ -13,8 +13,11 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Locations ")]
     public class CaseLocationsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -34,7 +37,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations/Details/5
-       
+
         public async Task<IActionResult> AssignerDetails(long? id)
         {
             if (id == null || _context.CaseLocation == null)
@@ -55,6 +58,7 @@ namespace risk.control.system.Controllers
 
             return View(caseLocation);
         }
+
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null || _context.CaseLocation == null)
@@ -76,6 +80,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations/Create
+        [Breadcrumb("Create ")]
         public IActionResult Create(string id)
         {
             var claim = _context.ClaimsInvestigation
@@ -124,6 +129,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations/Edit/5
+        [Breadcrumb("Edit ")]
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null || _context.CaseLocation == null)
@@ -174,7 +180,6 @@ namespace risk.control.system.Controllers
                         toastNotification.AddSuccessToastMessage("verification location edited successfully!");
                         return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
                     }
-
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -196,6 +201,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations/Delete/5
+        [Breadcrumb("Delete ")]
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null || _context.CaseLocation == null)

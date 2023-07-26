@@ -10,8 +10,11 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb(" Users")]
     public class UserController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -117,6 +120,7 @@ namespace risk.control.system.Controllers
             return View(UserList);
         }
 
+        [Breadcrumb(" Create")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(context.Country, "CountryId", "Name");
@@ -166,6 +170,7 @@ namespace risk.control.system.Controllers
             ViewData["PinCodeId"] = new SelectList(context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
         }
 
+        [Breadcrumb(" Edit")]
         public async Task<IActionResult> Edit(string userId)
         {
             if (userId == null)

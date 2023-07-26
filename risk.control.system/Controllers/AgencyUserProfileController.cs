@@ -160,6 +160,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        [Breadcrumb("Changed Password ")]
         public IActionResult ChangePassword()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -207,6 +208,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        [Breadcrumb("Password Change Succees")]
         public IActionResult ChangePasswordConfirmation()
         {
             var userEmail = HttpContext.User?.Identity?.Name;

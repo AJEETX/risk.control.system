@@ -7,8 +7,11 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Case SubStatus")]
     public class InvestigationCaseSubStatusController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -40,9 +43,11 @@ namespace risk.control.system.Controllers
                     .Include(i => i.InvestigationCaseStatus).Where(s =>
                     s.InvestigationCaseStatus.InvestigationCaseStatusId.Equals(lId)).ToListAsync();
             }
-            return Ok(subStatuses?.Select(s=> new {s.Code, s.InvestigationCaseSubStatusId }));
+            return Ok(subStatuses?.Select(s => new { s.Code, s.InvestigationCaseSubStatusId }));
         }
+
         // GET: InvestigationCaseSubStatus/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.InvestigationCaseSubStatus == null)
@@ -62,6 +67,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseSubStatus/Create
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
@@ -90,6 +96,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseSubStatus/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.InvestigationCaseSubStatus == null)
@@ -146,6 +153,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseSubStatus/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.InvestigationCaseSubStatus == null)

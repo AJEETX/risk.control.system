@@ -10,8 +10,11 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Company User")]
     public class CompanyUserController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -142,6 +145,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null || _context.ClientCompanyApplicationUser == null)
@@ -165,6 +169,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanyApplicationUser/Create
+        [Breadcrumb("Create")]
         public IActionResult Create(string id)
         {
             var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == id);
@@ -218,6 +223,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanyApplicationUser/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
@@ -335,6 +341,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorApplicationUsers/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null || _context.VendorApplicationUser == null)

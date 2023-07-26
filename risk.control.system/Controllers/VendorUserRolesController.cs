@@ -1,15 +1,20 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb(" Role")]
     public class VendorUserRolesController : Controller
     {
-    private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
@@ -22,6 +27,7 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
             this.signInManager = signInManager;
         }
+
         public async Task<IActionResult> Index(string userId)
         {
             var userRoles = new List<VendorUserRoleViewModel>();
@@ -33,8 +39,8 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             //ViewBag.UserName = user.UserName;
-            foreach (var role in roleManager.Roles.Where(r => 
-                r.Name.Contains(AppRoles.VendorAdmin.ToString()) || 
+            foreach (var role in roleManager.Roles.Where(r =>
+                r.Name.Contains(AppRoles.VendorAdmin.ToString()) ||
                 r.Name.Contains(AppRoles.VendorSupervisor.ToString()) ||
                 r.Name.Contains(AppRoles.VendorAgent.ToString())))
             {
@@ -67,7 +73,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Update(string userId, VendorUserRolesViewModel model)
         {
             var user = await userManager.FindByIdAsync(userId);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }

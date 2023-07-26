@@ -162,6 +162,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
+        [Breadcrumb("Change Password")]
         [HttpGet]
         public IActionResult ChangePassword()
         {
@@ -210,6 +211,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        [Breadcrumb("Password Change Success")]
         public IActionResult ChangePasswordConfirmation()
         {
             toastNotification.AddSuccessToastMessage("password edited successfully!");

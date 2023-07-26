@@ -1,14 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
 using NToastNotify;
+
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Role")]
     public class UserRolesController : Controller
     {
-    private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
@@ -21,6 +26,7 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
             this.signInManager = signInManager;
         }
+
         public async Task<IActionResult> Index(string userId)
         {
             var userRoles = new List<UserRoleViewModel>();

@@ -60,6 +60,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Delete/5
+        [Breadcrumb("Delete ")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ClientCompany == null)
@@ -130,6 +131,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Edit/5
+        [Breadcrumb(title: "Edit ")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.ClientCompany == null)
@@ -259,6 +261,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContextResult);
         }
 
+        [Breadcrumb("Empanelled Agency(s)")]
         [HttpGet]
         public async Task<IActionResult> EmpanelledVendors(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
@@ -339,6 +342,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContextResult);
         }
 
+        [Breadcrumb("Available Agency(s)")]
         [HttpGet]
         public async Task<IActionResult> AvailableVendors(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
@@ -519,6 +523,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
+        [Breadcrumb("Agency Detail")]
         public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
         {
             if (id == null || _context.Vendor == null)

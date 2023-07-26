@@ -1,12 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
+using SmartBreadcrumbs.Attributes;
+
 namespace risk.control.system.Controllers
 {
+    [Breadcrumb("Pincode")]
     public class PinCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -51,15 +56,19 @@ namespace risk.control.system.Controllers
                 case "code_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
                     break;
+
                 case "name_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
                     break;
+
                 case "district_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.District.Name);
                     break;
+
                 case "state_desc":
                     applicationDbContext = applicationDbContext.OrderByDescending(s => s.State.Name);
                     break;
+
                 default:
                     applicationDbContext.OrderByDescending(s => s.State.Name);
                     break;
@@ -80,6 +89,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Details/5
+        [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.PinCode == null)
@@ -103,6 +113,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Create
+        [Breadcrumb("Create")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -126,6 +137,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Edit/5
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.PinCode == null)
@@ -181,6 +193,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Delete/5
+        [Breadcrumb("Delete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.PinCode == null)
