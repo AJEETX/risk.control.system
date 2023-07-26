@@ -14,10 +14,10 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Locations ")]
     public class CaseLocationsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -30,6 +30,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations
+        [Breadcrumb("Location", FromController = typeof(ClaimsInvestigationController), FromAction = "Incomplete")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.CaseLocation.Include(c => c.District).Include(c => c.State);
@@ -80,7 +81,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations/Create
-        [Breadcrumb("Create ")]
+        //[Breadcrumb("Create", FromController = typeof(ClaimsInvestigationController), FromAction = "Details")]
         public IActionResult Create(string id)
         {
             var claim = _context.ClaimsInvestigation
@@ -98,6 +99,14 @@ namespace risk.control.system.Controllers
 
             var model = new CaseLocation { ClaimsInvestigation = claim };
 
+            var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
+            var incompleteClaims = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Incomplete") { Parent = activeClaims };
+
+            var incompleteClaim = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", "Details") { Parent = incompleteClaims, RouteValues = new { id = id } };
+
+            var locationPage = new MvcBreadcrumbNode("Create", "CaseLocations", "Location") { Parent = incompleteClaim, RouteValues = new { id = id } };
+
+            ViewData["BreadcrumbNode"] = locationPage;
             return View(model);
         }
 
@@ -119,7 +128,7 @@ namespace risk.control.system.Controllers
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("verification location created successfully!");
-                return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
+                return RedirectToAction(nameof(ClaimsInvestigationController.Assign), "ClaimsInvestigation");
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);

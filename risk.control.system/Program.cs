@@ -27,7 +27,6 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.OlClasses = "breadcrumb";
     options.LiClasses = "breadcrumb-item";
     options.ActiveLiClasses = "breadcrumb-item active";
-    options.SeparatorElement = "<li class=\"separator\"> / </li>";
 });
 
 builder.Services.AddHttpContextAccessor();

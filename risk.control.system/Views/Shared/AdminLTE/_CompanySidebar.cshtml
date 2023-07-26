@@ -212,7 +212,8 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Incomplete" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Incomplete") 
-                                        @Url.MakeActiveClass("ClaimsInvestigation","Details") @Url.MakeActiveClass("CaseLocations","Create") @Url.MakeActiveClass("CaseLocations","Edit")
+                                        @Url.MakeActiveClass("ClaimsInvestigation","Details") @Url.MakeActiveClass("ClaimsInvestigation","Edit") 
+                                        @Url.MakeActiveClass("CaseLocations","Create") @Url.MakeActiveClass("CaseLocations","Edit")
                                             @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete")">
                                 <i class="fas fa-search-dollar nav-icon"></i>
                                 <p>
@@ -296,7 +297,8 @@
                 }
                 
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active") @Url.MakeActiveClass("ClaimsInvestigation","Detail")">
+                    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Index")
+                    @Url.MakeActiveClass("ClaimsInvestigation","Detail")">
                         <i class="fas fa-rupee-sign nav-icon"></i>
                         <p>
                              <span class="badge badge-light">Active</span>

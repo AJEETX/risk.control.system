@@ -1,51 +1,25 @@
 ﻿@model IEnumerable<risk.control.system.Models.ClaimsInvestigation>
 
 @{
-    ViewData["Title"] = "Claim";
+    ViewData["Title"] = "Claim: Active ";
     var hasClientCompany = @ViewBag.HasClientCompany ? "none" : "";
 }
-
 <section class="content pt-2">
     <div class="container-fluid">
-        <form asp-action="index">
-            <div class="card card-secondary">
-                <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-folder-open"></i> Ready to Assign</h3>
-                    <div class="card-tools">
-                        <div class="input-group input-group-sm">
-                            <input autocomplete="off" name="SearchString" type="text" class="form-control" placeholder="search">
-                            <div class="input-group-append">
-                                <div onclick="this.parentNode.submit()" class="btn btn-success">
-                                    <i class="fas fa-search"></i>
-                                </div>
-                            </div>
-                        </div>
+        <div class="row ">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-list"></i>  Claims</h3>
                     </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <button disabled class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Uploads"><i class="fas fa-plus"></i> @Applicationsettings.UPLOAD_CASE</button>
-                            <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card card-secondary">
-                <div class="card-header">
-                    <h3 class="card-title">@Applicationsettings.INVESTIGATION_CLAIMS_CASE_READY_TO_ASSIGN List</h3>
-                </div>
-                <div class="card-body">
-                    <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
-                        <div class="col-md-12">
-                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                    <div class="card-body">
+                        <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
+                            <div class="col-md-12">
 
+                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" id="checkall" /></th>
-                                            <th style="display:@hasClientCompany">
-                                                @Html.DisplayNameFor(model => model.ClientCompany)
-                                            </th>
+
                                             <th>
                                                 @Html.DisplayNameFor(model => model.LineOfBusiness)
                                             </th>
@@ -59,21 +33,26 @@
                                                 @Html.DisplayNameFor(model => model.ClaimType)
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.CaseLocations)
+                                                Location-Status
                                             </th>
-                                            <th></th>
+                                            <th>
+                                                Created Date
+                                            </th>
+                                            <th>
+                                                Active days
+                                            </th>
+                                            <th>
+
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach (var item in Model)
                                         {
+                                            var timePending = DateTime.Now.Subtract(item.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Created).Days.ToString();
+
                                             <tr>
-                                                <td>
-                                                    <input id="@item.ClaimsInvestigationId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationId" checked="@item.SelectedToAssign" />
-                                                </td>
-                                                <td style="display:@hasClientCompany">
-                                                    @Html.DisplayFor(modelItem => item.ClientCompany.Name)
-                                                </td>
+
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
                                                 </td>
@@ -88,46 +67,38 @@
                                                 </td>
                                                 <td>
                                                     @{
+                                                        if (item.CaseLocations.Count == 0)
+                                                        {
+                                                            <span class="badge badge-danger">Add verification location</span>
+                                                        }
+                                                    }
+                                                    @{
                                                         foreach (var caseLocation in item.CaseLocations)
                                                         {
-                                                            <div>
-                                                                <span class="badge badge-info">@caseLocation.PinCode.Code = @caseLocation.InvestigationCaseSubStatus.Name</span>
-                                                            </div>
+                                                            <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
                                                         }
                                                     }
                                                 </td>
                                                 <td>
-                                                    <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
+                                                    @Html.DisplayFor(modelItem => item.Created)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => timePending )
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-xs btn-info" asp-action="Detail" asp-route-id="@item.ClaimsInvestigationId">
                                                         <i class="fa fa-search"></i> @Applicationsettings.DETAILS
-                                                    </a> &nbsp;
-                                                    <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClaimsInvestigationId">
-                                                        <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                                    </a> &nbsp;
-                                                    <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClaimsInvestigationId">
-                                                        <i class="fas fa-trash"></i> @Applicationsettings.DELETE
                                                     </a>
                                                 </td>
                                             </tr>
                                         }
                                     </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="10">
-                                                <a asp-action="Index" class="btn btn-secondary">
-                                                    <i class="fa fa-window-close"></i>
-                                                    @Applicationsettings.CANCEL
-                                                </a>
-                                                <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
-                                                    <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.ASSIGN
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
                                 </table>
-                        </div>
-                    </form>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </section>

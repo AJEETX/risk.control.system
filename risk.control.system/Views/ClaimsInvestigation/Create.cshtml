@@ -43,7 +43,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label asp-for="CaseEnablerId" class="control-label"></label>
+                                <label asp-for="CaseEnablerId" class="control-label">Case Enabler</label>
                                 <select asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
                                     <option>--- SELECT CASE ENABLER ---</option>
 
@@ -56,15 +56,15 @@
                             </div>
 
 
+                           
+
+                        </div>
+                        <div class="col-sm-6">
                             <div class="form-group">
                                 <label asp-for="DateOfIncident" class="control-label"></label>
                                 <input asp-for="DateOfIncident" class="form-control" />
                                 <span asp-validation-for="DateOfIncident" class="text-danger"></span>
                             </div>
-
-                        </div>
-                        <div class="col-sm-6">
-
                             <div class="form-group">
                                 <label asp-for="ContractNumber" class="control-label"></label>
                                 <input asp-for="ContractNumber" class="form-control" />
@@ -77,7 +77,7 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="CauseOfLoss" class="control-label"></label>
-                                <textarea asp-for="CauseOfLoss" class="form-control"></textarea>
+                                <input asp-for="CauseOfLoss" class="form-control" />
                                 <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
                             </div>
                             <div class="form-group">
@@ -193,19 +193,19 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label asp-for="Comments" class="control-label"></label>
-                                <textarea asp-for="Comments" class="form-control"></textarea>
+                                <input asp-for="Comments" class="form-control" />
                                 <span asp-validation-for="Comments" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="row">
-
                             <div class="col-md-12">
-
-
                                 <div class="form-group text-right">
-                                    
+                                    <a asp-action="Index" class="btn btn-secondary">
+                                        <i class="fa fa-window-close"></i>
+                                        @Applicationsettings.CANCEL
+                                    </a>
                                     <button type="submit" class="btn btn-success">
                                         <i class="fas fa-plus"></i> @Applicationsettings.CREATE
                                     </button>

@@ -23,7 +23,6 @@ using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb(" Claims")]
     public class ClaimsInvestigationController : Controller
     {
         private readonly JsonSerializerOptions options = new()
@@ -59,12 +58,101 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        public IActionResult Index()
+        [Breadcrumb(" Claims")]
+        public async Task<IActionResult> Index()
         {
-            return Ok();
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State);
+            ViewBag.HasClientCompany = true;
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            if (clientCompany == null)
+            {
+                ViewBag.HasClientCompany = false;
+            }
+            else
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
+            }
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
+            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+
+            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a =>
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
+            }
+            else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                var claimsSubmitted = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+                return View(claimsSubmitted);
+            }
+            else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a =>
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
+            }
+            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+                return View(await applicationDbContext.ToListAsync());
+            }
+
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        [Breadcrumb(" Ready to Assign")]
+        [Breadcrumb(" Ready to Assign", FromAction = "Index")]
         public async Task<IActionResult> Assign()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -164,7 +252,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [Breadcrumb(" Assess")]
+        [Breadcrumb(" Assess", FromAction = "Index")]
         public async Task<IActionResult> Assessor()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -264,7 +352,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [Breadcrumb(" Allocate")]
+        [Breadcrumb(" Allocate", FromAction = "Index")]
         public async Task<IActionResult> Assigner()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -330,7 +418,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClaimsInvestigation
 
-        [Breadcrumb(" Incomplete")]
+        [Breadcrumb(" Incomplete", FromAction = "Index")]
         public async Task<IActionResult> Incomplete()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -701,7 +789,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(" Rejected")]
+        [Breadcrumb(" Rejected", FromAction = "Index")]
         public async Task<IActionResult> Reject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -768,7 +856,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(" Review")]
+        [Breadcrumb(" Review", FromAction = "Index")]
         public async Task<IActionResult> Review()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -931,7 +1019,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [Breadcrumb(title: "Yet To Investigate")]
+        [Breadcrumb(title: "Yet To Investigate", FromAction = "Index")]
         public async Task<IActionResult> ToInvestigate()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -1044,7 +1132,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Details/5
-        [Breadcrumb(title: " Details")]
+        [Breadcrumb("Detail", FromAction = "Incomplete")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1082,7 +1170,7 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
-        [Breadcrumb(title: " Detail")]
+        [Breadcrumb(title: " Detail", FromAction = "Index")]
         public async Task<IActionResult> Detail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1120,7 +1208,7 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
-        [Breadcrumb(title: " Detail")]
+        [Breadcrumb(title: " Detail", FromAction = "Assign")]
         public async Task<IActionResult> AssignDetail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1257,7 +1345,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Edit/5
-        [Breadcrumb(title: " Edit")]
+        [Breadcrumb(title: " Edit", FromAction = "Incomplete")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1281,6 +1369,7 @@ namespace risk.control.system.Controllers
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.StateId);
+
             return View(claimsInvestigation);
         }
 
@@ -1427,7 +1516,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Delete/5
-        [Breadcrumb(title: " Delete")]
+        [Breadcrumb(title: " Delete", FromAction = "Incomplete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1477,7 +1566,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Breadcrumb(title: " Agency detail")]
+        [Breadcrumb(title: " Agency detail", FromAction = "Incomplete")]
         public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
         {
             if (id == null || _context.Vendor == null)
