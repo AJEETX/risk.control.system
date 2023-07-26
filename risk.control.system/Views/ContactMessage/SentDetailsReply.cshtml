@@ -3,14 +3,12 @@
 @{
     ViewData["Title"] = "Reply";
 }
-<h3>MAILBOX</h3>
-
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <form asp-controller="ContactMessage" id="email-form" method="post" enctype="multipart/form-data">
-                    <div class="card card-success">
+                    <div class="card card-secondary">
                         <div class="card-header">
                             <h3 class="card-title">@ViewBag.ActionType Mail</h3>
                         </div>
