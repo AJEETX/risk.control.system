@@ -547,6 +547,39 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
+        [Breadcrumb("Agency Detail", FromAction = "EmpanelledVendors")]
+        public async Task<IActionResult> VendorDetails(string id, string backurl)
+        {
+            if (id == null || _context.Vendor == null)
+            {
+                toastNotification.AddErrorToastMessage("agency not found!");
+                return NotFound();
+            }
+
+            var vendor = await _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .FirstOrDefaultAsync(m => m.VendorId == id);
+            if (vendor == null)
+            {
+                return NotFound();
+            }
+            ViewBag.Backurl = backurl;
+
+            return View(vendor);
+        }
+
         [Breadcrumb("Role", FromAction = "User")]
         public async Task<IActionResult> UserRoles(string userId)
         {
