@@ -16,34 +16,10 @@
                             <div class="col-md-6">
                                 <dl class="row">
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ContractNumber)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ContractNumber)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Description)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Description)
-                                    </dd>
-                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.LineOfBusiness)
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.LineOfBusiness.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.InvestigationCaseStatus.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ContractIssueDate)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ContractIssueDate)
                                     </dd>
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CustomerName)
@@ -64,16 +40,28 @@
                                         @Html.DisplayFor(model => model.ContactNumber)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimType)
+                                        @Html.DisplayNameFor(model => model.ContractNumber)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ClaimType)
+                                        @Html.DisplayFor(model => model.ContractNumber)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.PinCode)
+                                        @Html.DisplayNameFor(model => model.ContractIssueDate)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.PinCode.Name)
+                                        @Html.DisplayFor(model => model.ContractIssueDate)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.Addressline)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.Addressline)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.District)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.District.Name)
                                     </dd>
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.State)
@@ -88,19 +76,31 @@
                                         @Html.DisplayFor(model => model.Country.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.District)
+                                        @Html.DisplayNameFor(model => model.PinCode)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.District.Name)
+                                        @Html.DisplayFor(model => model.PinCode.Code)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.InvestigationCaseStatus.Name)
                                     </dd>
                                 </dl>
                             </div>
                             <div class="col-md-6">
                                 <dl class="row">
-                                    <dt class="col-sm-4">
-                                        Document
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimType)
                                     </dt>
-                                    <dd class="col-sm-6">
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimType)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Claim Document
+                                    </dt>
+                                    <dd class="col-sm-5">
                                         @if (Model?.DocumentImage is not null)
                                         {
                                             <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
@@ -149,10 +149,23 @@
                                         @Html.DisplayFor(model => model.CaseEnabler.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Comments)
+                                        @Html.DisplayNameFor(model => model.Description)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Comments)
+                                        @Html.DisplayFor(model => model.Description)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Customer Photo
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ProfilePicture is not null)
+                                        {
+                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                        }
+                                        else
+                                        {
+                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
                                     </dd>
                                 </dl>
 

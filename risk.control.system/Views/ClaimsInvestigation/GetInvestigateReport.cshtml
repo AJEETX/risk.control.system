@@ -19,40 +19,40 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <dl class="row">
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.LineOfBusiness)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.LineOfBusiness.Name)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerName)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerName)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.ClaimType)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.ClaimType)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.PinCode)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.PinCode.Name)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.State)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.State.Name)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.District)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
                                         </dd>
                                     </dl>
@@ -60,7 +60,7 @@
                                 <div class="col-md-6">
                                     <dl class="row">
                                         <dt class="col-sm-3">
-                                            Document
+                                            Claim Document
                                         </dt>
                                         <dd class="col-sm-8">
                                             @if (Model?.ClaimsInvestigation.DocumentImage is not null)
@@ -73,28 +73,28 @@
                                             }
                                         </dd>
 
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerIncome)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerIncome)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerOccupation)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerOccupation)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerEducation)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerEducation)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.Comments)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.Comments)
                                         </dd>
                                     </dl>
@@ -105,44 +105,44 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.Addressline)
                                         </dd>
 
                                     </div>
                                     <div class="col-md-6">
 
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.District.Name)
                                         </dd>
-                                        <dt class="col-sm-2">
+                                        <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
                                         </dt>
-                                        <dd class="col-sm-10">
+                                        <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.State.Name)
                                         </dd>
                                     </div>
