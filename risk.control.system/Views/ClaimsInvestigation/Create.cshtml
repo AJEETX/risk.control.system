@@ -79,9 +79,9 @@
                                 <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="DocumentImage" class="control-label"></label>
+                                <label asp-for="Document" class="control-label"></label>
                                 <img class="form-Image" id="documentImage" src="/img/no-image.png">
-                                <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                <input asp-for="Document" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                             </div>
 
                         </div>

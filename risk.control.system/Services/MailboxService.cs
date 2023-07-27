@@ -191,14 +191,14 @@ namespace risk.control.system.Services
             {
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientCreator.ToString()));
 
-                var creatorUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
-                foreach (var creatorUser in creatorUsers)
+                foreach (var companyUser in companyUsers)
                 {
-                    var isTrue = await userManager.IsInRoleAsync(creatorUser, creatorRole?.Name);
-                    if (isTrue)
+                    var userInCreatorRole = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
+                    if (userInCreatorRole)
                     {
-                        userEmailsToSend.Add(creatorUser.Email);
+                        userEmailsToSend.Add(companyUser.Email);
                     }
                 }
             }
