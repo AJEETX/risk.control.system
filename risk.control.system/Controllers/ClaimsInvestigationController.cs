@@ -502,6 +502,8 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.LineOfBusiness)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimCase.ClaimsInvestigationId);
 
             var applicationDbContext = _context.Vendor

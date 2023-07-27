@@ -19,7 +19,9 @@
                                     <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                         <thead>
                                             <tr>
-                                                <th></th>
+                                            <th></th>
+                                            <th>Case Document</th>
+                                            <th>Customer Photo</th>
                                                
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.LineOfBusiness)
@@ -52,10 +54,30 @@
                                                     <td>
                                                         <input id="@item.ClaimsInvestigationId" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
                                                     </td>
+                                                <td>
+                                                    @if (item?.DocumentImage is not null)
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (item?.ProfilePicture is not null)
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                </td>
                                                     
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                                    </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                                     </td>

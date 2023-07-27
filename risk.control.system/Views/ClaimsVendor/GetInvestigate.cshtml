@@ -210,7 +210,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="CaseLocation.ClaimReport.LongLat" class="control-label"></label>
-                                        <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.LongLat" type="text" class="form-control" />
+                                        <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.LongLat" value="10101 Norrace Road Vermont VIC" type="text" class="form-control" />
                                     </div>
 
                                 </div>
@@ -221,7 +221,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="CaseLocation.ClaimReport.AgentOcrData" class="control-label"></label>
-                                        <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" type="text" class="form-control" />
+                                        <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" type="text" value="OCR Sample Data" class="form-control" />
                                     </div>
 
 
@@ -242,7 +242,7 @@
                         <div class="card-body">
                             <div class="=row">
                                 <div class="col-md-12">
-                                    <button id="allocate-case" type="submit" class="btn btn-success">
+                                    <button id="submit-case" type="submit" class="btn btn-success">
                                         <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.SUBMIT_CASE_INVESTIGATE
                                     </button>
                                 </div>
