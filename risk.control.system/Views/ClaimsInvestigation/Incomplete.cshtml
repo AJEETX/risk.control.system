@@ -20,6 +20,11 @@
                                         <thead>
                                             <tr>
 
+                                            <th>
+                                                Claim Document
+                                            </th>
+                                            <th>Customer Photo</th>
+
                                                 <th>
                                                     Line Of Business
                                                 </th>
@@ -49,7 +54,27 @@
                                             {
                                                 var timePending = DateTime.Now.Subtract(item.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Created).Days.ToString();
                                                 <tr>
-                                                    <td>
+                                                <td>
+                                                    @if (item?.DocumentImage is not null)
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (item?.ProfilePicture is not null)
+                                                    {
+                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                    }
+                                                </td>
+                                                <td>
                                                         @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
                                                     </td>
                                                     <td>

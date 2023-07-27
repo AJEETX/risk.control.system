@@ -13,7 +13,7 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> Add Location To Verify</h3>
+                            <h3 class="card-title"><i class="fas fa-map-marker-alt"></i> Location To Verify</h3>
                         </div>
                         <div class="card-body">
                             <form asp-action="Create">
@@ -53,13 +53,18 @@
                                             <input asp-for="ClaimsInvestigationId" class="form-control" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                                         </div>
                                         <div class="form-group">
+                                            <label asp-for="BeneficiaryDateOfBirth" class="control-label"></label>
+                                            <input required asp-for="BeneficiaryDateOfBirth" class="form-control" />
+                                            <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
                                             <label asp-for="Addressline" class="control-label"></label>
                                             <input asp-for="Addressline" class="form-control" value="100 GOOD STREET" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
-                                        
-                                    </div>
-                                    <div class="col-md-6">
+
                                         <div class="form-group">
                                             <label asp-for="Addressline2" class="control-label"></label>
                                             <input asp-for="Addressline2" class="form-control" value="100 GOOD STREET" />

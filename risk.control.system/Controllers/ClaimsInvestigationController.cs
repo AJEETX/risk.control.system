@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        [Breadcrumb(" Claims")]
+        [Breadcrumb(" Active")]
         public async Task<IActionResult> Index()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation

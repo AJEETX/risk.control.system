@@ -39,7 +39,7 @@ namespace risk.control.system.Models
 
         [Display(Name = "Beneficiary Date of birth")]
         [DataType(DataType.Date)]
-        public DateTime BeneficiaryDateOfBirth { get; set; }
+        public DateTime BeneficiaryDateOfBirth { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Country name")]
         public string CountryId { get; set; } = default!;
