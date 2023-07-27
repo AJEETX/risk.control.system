@@ -495,7 +495,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
-                .Include(c => c.State)
+                .Include(c => c.Country)
                 .FirstOrDefault(c => c.CaseLocationId == selectedcase
                 //&& c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId
                 );
@@ -1110,11 +1110,29 @@ namespace risk.control.system.Controllers
         {
             string userEmail = HttpContext?.User?.Identity.Name;
 
-            await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, assessorRemarkType);
+            var reportUpdateStatus = AssessorRemarkType.OK;
+
+            await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
             await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
 
             toastNotification.AddSuccessToastMessage("claim case processed successfully!");
+
+            return RedirectToAction(nameof(ClaimsInvestigationController.Assessor));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
+        {
+            string userEmail = HttpContext?.User?.Identity.Name;
+
+            var reportUpdateStatus = AssessorRemarkType.REVIEW;
+
+            await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
+
+            await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
+
+            toastNotification.AddSuccessToastMessage("claim case re-assigned successfully!");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor));
         }
@@ -1280,7 +1298,7 @@ namespace risk.control.system.Controllers
 
                 model.ClientCompanyId = clientCompanyUser.ClientCompanyId;
             }
-
+            ViewBag.ClientCompanyId = clientCompanyUser.ClientCompanyId;
             //mailboxService.InsertMessage(new ContactMessage
             //{
             //    ApplicationUserId = clientCompanyUser != null ? clientCompanyUser.Id : _context.ApplicationUser.First(u => u.isSuperAdmin).Id,
@@ -1314,34 +1332,42 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClaimsInvestigation claimsInvestigation)
         {
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains("INITIATED"));
-            if (status == null)
-            {
-                return View(claimsInvestigation);
-            }
+            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
+
             var userEmail = HttpContext.User.Identity.Name;
 
-            if (claimsInvestigation is not null)
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
+            claimsInvestigation.InvestigationCaseStatus = status;
+            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
+            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
+            claimsInvestigation.ClientCompanyId = companyUser?.ClientCompanyId;
+
+            if (status == null || !ModelState.IsValid)
             {
-                await claimsInvestigationService.Create(userEmail, claimsInvestigation, Request.Form?.Files?.FirstOrDefault());
-
-                await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
-
-                toastNotification.AddSuccessToastMessage("case(s) created successfully!");
-
-                return RedirectToAction(nameof(Incomplete));
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.CaseEnablerId);
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
+                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.DistrictId);
+                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
+                ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
+                ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.StateId);
+                toastNotification.AddErrorToastMessage("Error: Claim case edited!");
+                return View(claimsInvestigation);
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
-            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.CaseEnablerId);
-            ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.DistrictId);
-            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.StateId);
-            return View(claimsInvestigation);
+
+            await claimsInvestigationService.Create(userEmail, claimsInvestigation, Request.Form?.Files?.FirstOrDefault(), Request.Form?.Files?.Skip(1).Take(1)?.FirstOrDefault());
+
+            await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+
+            toastNotification.AddSuccessToastMessage("case(s) created successfully!");
+
+            return RedirectToAction(nameof(Incomplete));
         }
 
         // GET: ClaimsInvestigation/Edit/5
@@ -1380,59 +1406,62 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ClaimsInvestigation claimsInvestigation)
         {
-            if (id != claimsInvestigation.ClaimsInvestigationId)
+            if (id != claimsInvestigation.ClaimsInvestigationId || !ModelState.IsValid)
             {
-                return NotFound();
+                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
+                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.CaseEnablerId);
+                ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
+                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.DistrictId);
+                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
+                ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
+                ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.StateId);
+                return View(claimsInvestigation);
             }
-
-            if (claimsInvestigation is not null)
+            try
             {
-                try
+                var userEmail = HttpContext.User.Identity.Name;
+                claimsInvestigation.Updated = DateTime.UtcNow;
+                claimsInvestigation.UpdatedBy = userEmail;
+                claimsInvestigation.CurrentUserEmail = userEmail;
+                IFormFile? claimDocument = Request.Form?.Files?.FirstOrDefault();
+                if (claimDocument is not null)
                 {
-                    var user = User?.Claims.FirstOrDefault(u => u.Type == ClaimTypes.Email)?.Value;
-                    claimsInvestigation.Updated = DateTime.UtcNow;
-                    claimsInvestigation.UpdatedBy = user;
-                    claimsInvestigation.CurrentUserEmail = user;
-                    IFormFile? claimDocument = Request.Form?.Files?.FirstOrDefault();
-                    if (claimDocument is not null)
-                    {
-                        claimsInvestigation.Document = claimDocument;
-                        using var dataStream = new MemoryStream();
-                        await claimsInvestigation.Document.CopyToAsync(dataStream);
-                        claimsInvestigation.DocumentImage = dataStream.ToArray();
-                    }
-                    claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper()
-                    == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                    claimsInvestigation.Document = claimDocument;
+                    using var dataStream = new MemoryStream();
+                    await claimsInvestigation.Document.CopyToAsync(dataStream);
+                    claimsInvestigation.DocumentImage = dataStream.ToArray();
+                }
 
-                    _context.Update(claimsInvestigation);
-                    toastNotification.AddSuccessToastMessage("claim case edited successfully!");
-                    await _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
+                var customerDocument = Request.Form?.Files?.Skip(1).Take(1)?.FirstOrDefault();
+                if (customerDocument is not null)
                 {
-                    if (!ClaimsInvestigationExists(claimsInvestigation.ClaimsInvestigationId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
+                    var extension = Path.GetExtension(customerDocument.FileName);
+                    claimsInvestigation.ProfileImage = customerDocument;
+                    using var dataStream = new MemoryStream();
+                    await claimsInvestigation.ProfileImage.CopyToAsync(dataStream);
+                    claimsInvestigation.ProfilePicture = dataStream.ToArray();
                 }
-                return RedirectToAction(nameof(Incomplete));
+                _context.Update(claimsInvestigation);
+                toastNotification.AddSuccessToastMessage("claim case edited successfully!");
+                await _context.SaveChangesAsync();
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
-            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.CaseEnablerId);
-            ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.CostCentreId);
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.DistrictId);
-            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
-            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.StateId);
-            return View(claimsInvestigation);
+            catch (Exception ex)
+            {
+                if (!ClaimsInvestigationExists(claimsInvestigation.ClaimsInvestigationId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Incomplete));
         }
 
         // GET: ClaimsInvestigation/Edit/5

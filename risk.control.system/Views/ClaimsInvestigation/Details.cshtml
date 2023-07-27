@@ -180,6 +180,9 @@
                             <thead>
                                 <tr>
                                     <th>
+                                        Photo
+                                    </th>
+                                    <th>
                                         Benficiary Name
                                     </th>
                                     <th>
@@ -206,6 +209,16 @@
                                 @foreach (var item in Model.CaseLocations)
                                 {
                                     <tr>
+                                        <td>
+                                            @if (item?.ProfileImage is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </td>
 
                                         <td>
                                             @Html.DisplayFor(modelItem => item.BeneficiaryName)

@@ -60,7 +60,6 @@ button.accept-policy {
 -------------------------------------------------- */
 html {
   position: relative;
-  min-height: 100%;
 }
 
 body {
@@ -118,6 +117,23 @@ table td {
 .profile-image {
     height: 110px;
 }
+.report-image {
+    width: 16rem;
+    height: 5rem;
+    object-fit: cover;
+}
+
+.report-disclaimer{
+    overflow-y:scroll;
+    height:5rem;
+    border:.1rem double #ddd;
+    background-color:whitesmoke;
+}
+.disclaimer-body{
+    margin:1rem;
+    border:1px solid #ccc;
+    border-radius:.3rem;
+}
 .attachment-list {
     height: 50px;
     object-fit: cover
@@ -133,7 +149,7 @@ table td {
 }
 .table-row-image {
     height: 50px;
-    object-fit: cover
+    object-fit: cover;
 }
 
 .sidebar-menu-header-label{

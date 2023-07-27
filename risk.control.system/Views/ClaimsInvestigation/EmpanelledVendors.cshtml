@@ -65,17 +65,30 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
                                     </dd>
+                                    <dt class="col-sm-5">
+                                        Document
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ClaimsInvestigation.DocumentImage is not null)
+                                        {
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.DocumentImage))">
+                                        }
+                                        else
+                                        {
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
                                 </dl>
                             </div>
                             <div class="col-md-6">
                                 <dl class="row">
-                                    <dt class="col-sm-3">
-                                        Document
+                                    <dt class="col-sm-5">
+                                        Customer Photo
                                     </dt>
-                                    <dd class="col-sm-8">
-                                        @if (Model?.ClaimsInvestigation.DocumentImage is not null)
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ClaimsInvestigation.ProfilePicture is not null)
                                         {
-                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.DocumentImage))">
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.ProfilePicture))">
                                         }
                                         else
                                         {
@@ -108,19 +121,34 @@
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerType)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.Comments)
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.Description)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ClaimsInvestigation.Comments)
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.Description)
                                     </dd>
                                 </dl>
 
                             </div>
                         </div>
                         <hr />
-                        <div class="row">
+                        <div class="card-body">
+
+                            <div class="row">
                             <div class="col-md-6">
                                 <dl class="row">
+                                    <dt class="col-sm-5">
+                                        Beneficiary Photo
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.CaseLocation?.ProfileImage is not null)
+                                        {
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CaseLocation?.ProfilePicture))">
+                                        }
+                                        else
+                                        {
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
                                     </dt>
@@ -133,16 +161,17 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
                                     </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.Addressline)
                                     </dd>
-                                </dl>
-                            </div>
-                            <div class="col-md-6">
-                                <dl class="row">
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
                                     </dt>
@@ -163,6 +192,7 @@
                                     </dd>
                                 </dl>
                             </div>
+                        </div>
                         </div>
                     </div>
 

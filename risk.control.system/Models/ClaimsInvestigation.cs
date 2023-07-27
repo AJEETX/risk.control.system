@@ -10,8 +10,9 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ClaimsInvestigationId { get; set; } = Guid.NewGuid().ToString();
 
+        [Required]
         [Display(Name = "Company name")]
-        public string? ClientCompanyId { get; set; }
+        public string ClientCompanyId { get; set; }
 
         [Display(Name = "Company name")]
         public ClientCompany? ClientCompany { get; set; }
@@ -30,16 +31,19 @@ namespace risk.control.system.Models
         [Display(Name = "Contract number")]
         public string ContractNumber { get; set; } = default!;
 
+        [Display(Name = "Claim Comments")]
         public string Description { get; set; } = default!;
 
+        [Required]
         [Display(Name = "Line of Business")]
-        public string? LineOfBusinessId { get; set; } = default!;
+        public string LineOfBusinessId { get; set; } = default!;
 
         [Display(Name = "Line of Business")]
         public LineOfBusiness? LineOfBusiness { get; set; } = default!;
 
+        [Required]
         [Display(Name = "Investigation type")]
-        public string? InvestigationServiceTypeId { get; set; } = default!;
+        public string InvestigationServiceTypeId { get; set; } = default!;
 
         [Display(Name = "Investigation type")]
         public InvestigationServiceType? InvestigationServiceType { get; set; } = default!;
@@ -56,47 +60,59 @@ namespace risk.control.system.Models
         [Display(Name = "Case sub status")]
         public InvestigationCaseSubStatus? InvestigationCaseSubStatus { get; set; } = default!;
 
+        [Required]
         [Display(Name = "Case issue date")]
         [DataType(DataType.Date)]
-        public DateTime? ContractIssueDate { get; set; }
+        public DateTime ContractIssueDate { get; set; } = DateTime.UtcNow;
 
+        [Required]
         [Display(Name = "Customer name")]
-        public string? CustomerName { get; set; }
+        public string CustomerName { get; set; }
 
+        [Required]
         [Display(Name = "Customer date of birth")]
         [DataType(DataType.Date)]
-        public DateTime? CustomerDateOfBirth { get; set; }
+        public DateTime CustomerDateOfBirth { get; set; } = DateTime.UtcNow;
 
+        [Required]
         [Display(Name = "Customer contact number")]
+        [DataType(DataType.PhoneNumber)]
         public long ContactNumber { get; set; }
 
+        [Required]
         [Display(Name = "Claim type")]
         public ClaimType ClaimType { get; set; }
 
+        [Required]
         [Display(Name = "Date of incident")]
         [DataType(DataType.Date)]
-        public DateTime? DateOfIncident { get; set; }
+        public DateTime DateOfIncident { get; set; } = DateTime.UtcNow;
 
+        [Required]
         [Display(Name = "Cause of loss")]
-        public string? CauseOfLoss { get; set; }
+        public string CauseOfLoss { get; set; }
 
         public Gender Gender { get; set; }
 
+        [Required]
         [Display(Name = "Sum assured value")]
         [Column(TypeName = "decimal(15,2)")]
-        public decimal? SumAssuredValue { get; set; }
+        public decimal SumAssuredValue { get; set; }
 
+        [Required]
         [Display(Name = "Address line")]
-        public string? Addressline { get; set; }
+        public string Addressline { get; set; }
 
+        [Required]
         [Display(Name = "PinCode name")]
-        public string? PinCodeId { get; set; } = default!;
+        public string PinCodeId { get; set; } = default!;
 
         [Display(Name = "PinCode name")]
         public PinCode? PinCode { get; set; } = default!;
 
         [Display(Name = "State name")]
-        public string? StateId { get; set; } = default!;
+        [Required]
+        public string StateId { get; set; } = default!;
 
         [Display(Name = "State name")]
         public State? State { get; set; } = default!;
@@ -106,35 +122,40 @@ namespace risk.control.system.Models
         public string CountryId { get; set; } = default!;
 
         [Display(Name = "Country name")]
-        public Country Country { get; set; } = default!;
+        public Country? Country { get; set; } = default!;
 
+        [Required]
         [Display(Name = "District")]
-        public string? DistrictId { get; set; } = default!;
+        public string DistrictId { get; set; } = default!;
 
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
 
+        [Required]
         [Display(Name = "Customer type")]
-        public CustomerType? CustomerType { get; set; }
+        public CustomerType CustomerType { get; set; }
 
-        [Display(Name = "Cost centre")]
-        public string? CostCentreId { get; set; }
+        [Required]
+        [Display(Name = "Budget centre")]
+        public string CostCentreId { get; set; }
 
-        [Display(Name = "Cost centre")]
+        [Display(Name = "Budget centre")]
         public CostCentre? CostCentre { get; set; }
 
-        public string? CaseEnablerId { get; set; }
+        [Required]
+        public string CaseEnablerId { get; set; }
 
-        [Display(Name = "Case enabler")]
+        [Display(Name = "Reason To Verify")]
         public CaseEnabler? CaseEnabler { get; set; }
 
-        [Display(Name = "Document")]
+        [Display(Name = "Claim Document")]
         [NotMapped]
         public IFormFile? Document { get; set; }
 
-        [Display(Name = "Document url")]
+        [Display(Name = "Claim Document")]
         public byte[]? DocumentImage { get; set; } = default!;
 
+        [Display(Name = "Claim remarks")]
         public string? Comments { get; set; }
 
         [NotMapped]
@@ -148,14 +169,26 @@ namespace risk.control.system.Models
             return $"Case Id: {ClaimsInvestigationId}, <br /> ClaimType: {ClaimType}";
         }
 
+        [Required]
         [Display(Name = "Customer income")]
         public Income? CustomerIncome { get; set; }
 
+        [Required]
         [Display(Name = "Customer occupation")]
         public Occupation? CustomerOccupation { get; set; }
 
+        [Required]
         [Display(Name = "Customer education")]
         public Education? CustomerEducation { get; set; }
+
+        [FileExtensions(Extensions = "jpg,jpeg,png")]
+        public string? ProfilePictureUrl { get; set; }
+
+        public byte[]? ProfilePicture { get; set; }
+
+        [Display(Name = "Image")]
+        [NotMapped]
+        public IFormFile? ProfileImage { get; set; }
 
         public bool IsReviewCase { get; set; } = false;
     }

@@ -19,26 +19,27 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <dl class="row">
-                                        
+
                                         <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerName)
                                         </dt>
                                         <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerName)
                                         </dd>
-                                        
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.ContactNumber)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.ContactNumber)
+                                        </dd>
+
                                         <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.PinCode)
                                         </dt>
                                         <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.PinCode.Name)
                                         </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.State)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.State.Name)
-                                        </dd>
+
                                         <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.District)
                                         </dt>
@@ -46,7 +47,7 @@
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
                                         </dd>
                                         <dt class="col-sm-5">
-                                            Document
+                                            Case Document
                                         </dt>
                                         <dd class="col-sm-5">
                                             @if (Model?.ClaimsInvestigation.DocumentImage is not null)
@@ -62,8 +63,19 @@
                                 </div>
                                 <div class="col-md-6">
                                     <dl class="row">
-                                        
-
+                                        <dt class="col-sm-5">
+                                            Customer Photo
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @if (Model?.ClaimsInvestigation?.ProfilePicture is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.ProfilePicture))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </dd>
                                         <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerIncome)
                                         </dt>
@@ -82,67 +94,79 @@
                                         <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerEducation)
                                         </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Comments)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Comments)
-                                        </dd>
+
                                     </dl>
 
                                 </div>
                             </div>
                         </div>
-                       <hr />
+                        <hr />
                         <div class="card-body">
+
                             <div class="row">
                                 <div class="col-md-6">
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CaseLocation.Addressline)
-                                    </dd>
-                                    
+                                    <dl class="row">
+                                        <dt class="col-sm-5">
+                                            Beneficiary Photo
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @if (Model?.CaseLocation?.ProfileImage is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CaseLocation?.ProfilePicture))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                        </dd>
+                                    </dl>
                                 </div>
                                 <div class="col-md-6">
-                                    
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CaseLocation.District.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CaseLocation.State.Name)
-                                    </dd>
+                                    <dl class="row">
+
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.Addressline)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.District.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                        </dd>
+                                    </dl>
                                 </div>
                             </div>
                         </div>
                     </div>
                     @{
-                        @if(Model.CaseLocation.ClaimReport != null && Model.CaseLocation.ClaimReport.AgentRemarks != null)
+                        @if (Model.CaseLocation.ClaimReport != null && Model.CaseLocation.ClaimReport.AgentRemarks != null)
                         {
                             <div class="card card-secondary">
                                 <div class="card-header">
@@ -177,16 +201,47 @@
                             <h3 class="card-title"><i class="fas fa-file"></i> @Applicationsettings.SUBMIT_REPORT</h3>
                         </div>
                         <div class="card-body">
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <textarea name="remarks" id="remarks" type="text" class="form-control"></textarea>
+                            <div class="row">
+                                <div class="col-sm-6">
+
+                                    <div class="form-group">
+                                        <label asp-for="CaseLocation.ClaimReport.AgentOcrPicture" class="control-label"></label>
+                                        <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="CaseLocation.ClaimReport.LongLat" class="control-label"></label>
+                                        <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.LongLat" type="text" class="form-control" />
+                                    </div>
+
                                 </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label asp-for="CaseLocation.ClaimReport.AgentQrPicture" class="control-label"></label>
+                                        <img id="agentQrPicture" class="report-Image" id="documentImage" src="/img/no-image.png">
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="CaseLocation.ClaimReport.AgentOcrData" class="control-label"></label>
+                                        <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" type="text" class="form-control" />
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label asp-for="CaseLocation.ClaimReport.AgentRemarks" class="control-label">Agent Remarks</label>
+                                        <input name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" />
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="=row">
                                 <div class="col-md-12">
-                                    
                                     <button id="allocate-case" type="submit" class="btn btn-success">
                                         <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.SUBMIT_CASE_INVESTIGATE
                                     </button>

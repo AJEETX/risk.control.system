@@ -23,12 +23,6 @@
                                         @Html.DisplayFor(model => model.CustomerName)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CustomerDateOfBirth)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CustomerDateOfBirth)
-                                    </dd>
-                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.ContactNumber)
                                     </dt>
                                     <dd class="col-sm-5">
@@ -42,29 +36,13 @@
                                         @Html.DisplayFor(model => model.PinCode.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.State)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.State.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Country)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Country.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.District)
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.District.Name)
                                     </dd>
-                                </dl>
-                            </div>
-                            <div class="col-md-6">
-                                <dl class="row">
                                     <dt class="col-sm-5">
-                                        Document
+                                        Case Document
                                     </dt>
                                     <dd class="col-sm-5">
                                         @if (Model?.DocumentImage is not null)
@@ -76,7 +54,24 @@
                                             <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                         }
                                     </dd>
-
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    
+                                    <dt class="col-sm-5">
+                                        Customer Photo
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ProfilePicture is not null)
+                                        {
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                        }
+                                        else
+                                        {
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CustomerIncome)
                                     </dt>
@@ -95,12 +90,7 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CustomerEducation)
                                     </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Comments)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Comments)
-                                    </dd>
+ 
                                 </dl>
 
                             </div>
@@ -123,6 +113,9 @@
                                     <thead>
                                         <tr>
                                             <th></th>
+                                            <th>
+                                                Benficiary Photo
+                                            </th>
                                             <th>
                                                 Benficiary Name
                                             </th>
@@ -151,6 +144,16 @@
                                             <tr>
                                                 <td>
                                                     <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.CaseLocationId" />
+                                                </td>
+                                                <td>
+                                                    @if (item?.ProfileImage is not null)
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                    }
                                                 </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.BeneficiaryName)

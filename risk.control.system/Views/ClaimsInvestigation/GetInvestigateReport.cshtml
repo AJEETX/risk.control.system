@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form asp-action="ProcessCaseReport" method="post">
+                <form method="post">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                     <div class="card card-secondary">
@@ -148,31 +148,84 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-folder-open"></i> Agency Report</h3>
+                        </div>
+                    </div>
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-prescription"></i> Agency complete report</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <fieldset>
+                                        <legend>
+                                            Ocr Image
+                                        </legend>
+                                        <div class="form-group">
+                                            <img id="agentLocationPicture" class="report-image" src="/img/no-photo.png">
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>
+                                            Image Location
+                                        </legend>
+                                        <div class="form-group">
+                                            <input readonly name="agentLonglat" id="agentLonglat" asp-for="CaseLocation.ClaimReport.LongLat" value="Lucknow road, Kanpur UP 101010" type="text" class="form-control" />
+                                        </div>
+                                    </fieldset>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <fieldset>
+                                        <legend>
+                                            QR Image
+                                        </legend>
+                                        <div class="form-group">
+                                            <img id="agentQrPicture" class="report-image" src="/img/user.png">
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>
+                                            OCR Data
+                                        </legend>
+                                        <div class="form-group">
+                                            <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" value="PAN Card: ABCXNX10101" type="text" class="form-control" />
+                                        </div>
+                                    </fieldset>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <div class="card-header">
-                                    <h3 class="card-title"><i class="fas fa-prescription"></i> Agent Report</h3>
+                           
+                            <div class="=row">
+                                <div class="col-md-12">
+                                    <fieldset>
+                                        <legend>
+                                            Agent Remarks
+                                        </legend>
+                                        <input readonly asp-for="CaseLocation.ClaimReport.AgentRemarks" name="agentRemarks" id="remarks" type="text" class="form-control" value="@Model.CaseLocation.ClaimReport.AgentRemarks" />
+                                    </fieldset>
                                 </div>
-                                <div class="=row">
-                                    <div class="col-md-12">
-                                        <textarea disabled name="@Model.CaseLocation.ClaimReport.AgentRemarks" id="remarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.AgentRemarks</textarea>
-                                    </div>
-                                </div>
-                                <hr />
-                                <div class="card-header">
-                                    <h3 class="card-title"><i class="fas fa-prescription"></i> Agency complete report</h3>
-                                </div>
-                               
-                                <div class="=row">
-                                    <div class="col-md-12">
-                                        <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
-                                        <select disabled name="supervisorRemarkType" id="supervisorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<SupervisorRemarkType>()"></select>
-                                    </div>
+
+                            </div>
+                            <div class="=row">
+                                <div class="col-md-12">
+                                    <fieldset>
+                                        <legend>
+                                            Additional Document / File
+                                        </legend>
+                                        <div class="form-group">
+                                            <img id="supervisorPicture" asp-for="" class="report-image" src="/img/no-image.png">
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>
+                                            Supervisor Remarks
+                                        </legend>
+                                    <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
+                                    </fieldset>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                     <div class="card card-secondary">
                         <div class="card-header">
@@ -182,18 +235,17 @@
                             <div class="=row">
                                 <div class="col-md-12">
                                     <textarea name="assessorRemarks" id="assessorRemarks" type="text" class="form-control"></textarea>
-                                    <select name="assessorRemarkType" id="assessorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<AssessorRemarkType>()"></select>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="=row">
                                 <div class="col-md-12 float-right">
-                                    <a asp-controller="ClaimsVendor" asp-action="Index" class="btn btn-secondary">
+                                    <a asp-action="ReProcessCaseReport" class="btn btn-secondary">
                                         <i class="fa fa-window-close"></i>
-                                        @Applicationsettings.CANCEL
+                                        Re Assign
                                     </a>
-                                    <button id="allocate-case" type="submit" class="btn btn-success">
+                                    <button asp-action="ProcessCaseReport" id="approve-case" type="submit" class="btn btn-success">
                                         <i class="fas fa-thumbs-up" aria-hidden="true"></i> PROCESS
                                     </button>
                                 </div>

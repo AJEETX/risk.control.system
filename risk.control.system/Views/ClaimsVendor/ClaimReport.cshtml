@@ -20,6 +20,9 @@
                                             <tr>
 
                                                 <th></th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.ClientCompany.Name)
+                                            </th>
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.LineOfBusiness)
                                                 </th>
@@ -56,8 +59,11 @@
                                                         <input id="@item.ClaimsInvestigationId" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
                                                     </td>
                                                     <td>
-                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                        @Html.DisplayFor(modelItem => item.ClientCompany.Name)
                                                     </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                                     </td>

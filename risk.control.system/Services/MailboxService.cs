@@ -211,7 +211,7 @@ namespace risk.control.system.Services
                 Created = DateTime.UtcNow,
                 Message = claimsUrl,
                 RawMessage = claimsUrl,
-                Subject = "New case created: case Id = " + claimsUrl,
+                Subject = $"New case created: case Id = {claimsInvestigation.ClaimsInvestigationId}",
                 SenderEmail = clientCompanyUser?.Email ?? applicationUser.Email,
                 Priority = ContactMessagePriority.NORMAL,
                 SendDate = DateTime.Now,

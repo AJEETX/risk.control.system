@@ -125,6 +125,18 @@ namespace risk.control.system.Controllers
                 caseLocation.Updated = DateTime.UtcNow;
                 caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                 caseLocation.InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId;
+
+                IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
+                if (customerDocument is not null)
+                {
+                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
+                    var extension = Path.GetExtension(customerDocument.FileName);
+                    caseLocation.ProfileImage = customerDocument;
+                    using var dataStream = new MemoryStream();
+                    await caseLocation.ProfileImage.CopyToAsync(dataStream);
+                    caseLocation.ProfilePicture = dataStream.ToArray();
+                }
+
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage("verification location created successfully!");
@@ -184,6 +196,16 @@ namespace risk.control.system.Controllers
                     {
                         caseLocation.Updated = DateTime.UtcNow;
                         caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
+                        IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
+                        if (customerDocument is not null)
+                        {
+                            var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
+                            var extension = Path.GetExtension(customerDocument.FileName);
+                            caseLocation.ProfileImage = customerDocument;
+                            using var dataStream = new MemoryStream();
+                            await caseLocation.ProfileImage.CopyToAsync(dataStream);
+                            caseLocation.ProfilePicture = dataStream.ToArray();
+                        }
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage("verification location edited successfully!");

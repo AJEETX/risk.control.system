@@ -10,44 +10,60 @@ namespace risk.control.system.Models
         public long CaseLocationId { get; set; }
 
         [Display(Name = "Beneficiary name")]
-        public string? BeneficiaryName { get; set; }
+        public string BeneficiaryName { get; set; }
 
         [Display(Name = "Beneficiary relation")]
-        public long? BeneficiaryRelationId { get; set; }
+        public long BeneficiaryRelationId { get; set; }
 
         [Display(Name = "Beneficiary relation")]
-        public BeneficiaryRelation? BeneficiaryRelation { get; set; }
+        public BeneficiaryRelation BeneficiaryRelation { get; set; }
 
+        [DataType(DataType.PhoneNumber)]
         [Display(Name = "Beneficiary contact number")]
-        public long? BeneficiaryContactNumber { get; set; }
+        public long BeneficiaryContactNumber { get; set; }
 
         [Display(Name = "Beneficiary income")]
         [Column(TypeName = "decimal(15,2)")]
         public decimal? BeneficiaryIncome { get; set; }
 
-        [Display(Name = "Country name")]
-        public string? CountryId { get; set; } = default!;
+        [FileExtensions(Extensions = "jpg,jpeg,png")]
+        [Display(Name = "Beneficiary Photo")]
+        public string? ProfilePictureUrl { get; set; }
 
-        public Country? Country { get; set; } = default!;
+        [Display(Name = "Beneficiary Photo")]
+        public byte[]? ProfilePicture { get; set; }
+
+        [Display(Name = "Beneficiary Photo")]
+        [NotMapped]
+        public IFormFile? ProfileImage { get; set; }
+
+        [Display(Name = "Beneficiary Date of birth")]
+        [DataType(DataType.Date)]
+        public DateTime BeneficiaryDateOfBirth { get; set; }
+
+        [Display(Name = "Country name")]
+        public string CountryId { get; set; } = default!;
+
+        public Country Country { get; set; } = default!;
 
         [Display(Name = "State")]
-        public string? StateId { get; set; } = default!;
+        public string StateId { get; set; } = default!;
 
-        public State? State { get; set; } = default!;
+        public State State { get; set; } = default!;
 
         [Display(Name = "District")]
-        public string? DistrictId { get; set; } = default!;
+        public string DistrictId { get; set; } = default!;
 
-        public District? District { get; set; } = default!;
-
-        [Display(Name = "PinCode name")]
-        public string? PinCodeId { get; set; } = default!;
+        public District District { get; set; } = default!;
 
         [Display(Name = "PinCode name")]
-        public PinCode? PinCode { get; set; } = default!;
+        public string PinCodeId { get; set; } = default!;
+
+        [Display(Name = "PinCode name")]
+        public PinCode PinCode { get; set; } = default!;
 
         [Display(Name = "Address line")]
-        public string? Addressline { get; set; }
+        public string Addressline { get; set; }
 
         [Display(Name = "Address line1")]
         public string? Addressline2 { get; set; }

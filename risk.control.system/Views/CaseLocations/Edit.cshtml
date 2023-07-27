@@ -21,6 +21,11 @@
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <input type="hidden" asp-for="CaseLocationId" />
                                         <div class="form-group">
+                                            <label asp-for="ProfileImage" class="control-label"></label>
+                                            <img class="form-Image" id="profileImage" src="/img/no-image.png">
+                                            <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        </div>
+                                        <div class="form-group">
                                             <label asp-for="BeneficiaryName" class="control-label"></label>
                                             <input asp-for="BeneficiaryName" class="form-control" />
                                             <span asp-validation-for="BeneficiaryName" class="text-danger"></span>

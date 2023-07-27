@@ -314,9 +314,29 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
         {
             string userEmail = HttpContext?.User?.Identity.Name;
-            var reportUpdateStatus = Enum.Parse<SupervisorRemarkType>(supervisorRemarkType);
+            var reportUpdateStatus = SupervisorRemarkType.OK;
 
-            var success = await claimsInvestigationService.Process(userEmail, supervisorRemarks, caseLocationId, claimId, supervisorRemarkType);
+            var success = await claimsInvestigationService.Process(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
+
+            if (success)
+            {
+                await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
+                toastNotification.AddSuccessToastMessage("report submitted to Company successfully");
+            }
+            else
+            {
+                toastNotification.AddSuccessToastMessage("Report sent to review successfully");
+            }
+            return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReAllocateReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
+        {
+            string userEmail = HttpContext?.User?.Identity.Name;
+            var reportUpdateStatus = SupervisorRemarkType.REVIEW;
+
+            var success = await claimsInvestigationService.Process(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
             if (success)
             {

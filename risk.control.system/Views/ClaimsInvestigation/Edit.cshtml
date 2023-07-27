@@ -32,6 +32,7 @@
                                 <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
                                     <option>--- SELECT SERVICE TYPE ---</option>
                                 </select>
+                                <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="ClaimType" class="control-label"></label>
@@ -43,15 +44,16 @@
                             <div class="form-group">
                                 <label asp-for="CostCentreId" class="control-label"></label>
                                 <select asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
-                                    <option>--- SELECT COST CENTRE ---</option>
+                                    <option>--- SELECT BUDGET CENTRE ---</option>
                                 </select>
+                                <span asp-validation-for="CostCentreId" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="CaseEnablerId" class="control-label">Case Enabler</label>
                                 <select asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
-                                    <option>--- SELECT CASE ENABLER ---</option>
-
+                                    <option>--- SELECT REASON TO VERIFY ---</option>
                                 </select>
+                                <span asp-validation-for="CaseEnablerId" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="ContractIssueDate" class="control-label"></label>
@@ -96,12 +98,15 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-6">
-
+                            <div class="form-group">
+                                <label asp-for="ProfileImage" class="control-label"></label>
+                                <img class="form-Image" id="profileImage" src="/img/no-image.png">
+                                <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                            </div>
                             <div class="form-group">
                                 <label asp-for="CustomerType" class="control-label"></label>
                                 <select asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
                                     <option>--- SELECT CUSTOMER TYPE  ---</option>
-
                                 </select>
                                 <span asp-validation-for="CustomerType" class="text-danger"></span>
                             </div>
@@ -109,12 +114,6 @@
                                 <label asp-for="CustomerName" class="control-label"></label>
                                 <input asp-for="CustomerName" class="form-control" />
                                 <span asp-validation-for="CustomerName" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group">
-                                <label asp-for="Description" class="control-label"></label>
-                                <input asp-for="Description" class="form-control" />
-                                <span asp-validation-for="Description" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
@@ -193,9 +192,9 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                <label asp-for="Comments" class="control-label"></label>
-                                <input asp-for="Comments" class="form-control" />
-                                <span asp-validation-for="Comments" class="text-danger"></span>
+                                <label asp-for="Description" class="control-label"></label>
+                                <input asp-for="Description" class="form-control" />
+                                <span asp-validation-for="Description" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
