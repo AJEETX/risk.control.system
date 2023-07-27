@@ -92,10 +92,10 @@
                                             @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerEducation)
                                         </dd>
                                         <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Comments)
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Description)
                                         </dt>
                                         <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Comments)
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Description)
                                         </dd>
                                     </dl>
 
@@ -105,6 +105,19 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
+                                        <dt class="col-sm-5">
+                                            Beneficiary Photo
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @if (Model?.CaseLocation.ProfilePicture is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CaseLocation.ProfilePicture))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </dd>
                                         <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
                                         </dt>

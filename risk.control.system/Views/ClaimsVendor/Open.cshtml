@@ -22,6 +22,12 @@
                                                 @Html.DisplayNameFor(model => model.ClientCompany)
                                             </th>
                                             <th>
+                                                Claim Document
+                                            </th>
+                                            <th>
+                                                Customer Photo Document
+                                            </th>
+                                            <th>
                                                 @Html.DisplayNameFor(model => model.LineOfBusiness)
                                             </th>
                                             <th>
@@ -52,6 +58,26 @@
                                             <tr>
                                                 <td style="display:@hasClientCompany">
                                                     @Html.DisplayFor(modelItem => item.ClientCompany.Name)
+                                                </td>
+                                                <td>
+                                                    @if (item?.DocumentImage is not null)
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (item?.ProfilePicture is not null)
+                                                    {
+                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                    }
                                                 </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
