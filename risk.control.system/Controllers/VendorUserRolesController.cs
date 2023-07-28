@@ -8,10 +8,11 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb(" Role")]
+    [Breadcrumb(" Agency")]
     public class VendorUserRolesController : Controller
     {
         private readonly SignInManager<ApplicationUser> signInManager;
@@ -66,6 +67,13 @@ namespace risk.control.system.Controllers
                 UserName = user.UserName,
                 VendorUserRoleViewModel = userRoles
             };
+
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = user.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Users") { Parent = agencyPage, RouteValues = new { id = user.VendorId } };
+            var userRolePage = new MvcBreadcrumbNode("Index", "VendorUserRoles", $"Edit Role") { Parent = editPage, RouteValues = new { userid = userId } };
+            ViewData["BreadcrumbNode"] = userRolePage;
+
             return View(model);
         }
 

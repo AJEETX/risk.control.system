@@ -12,6 +12,7 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
@@ -67,7 +68,7 @@ namespace risk.control.system.Controllers
             return View(clientCompany);
         }
 
-        [Breadcrumb("Edit", FromAction = "Index")]
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -198,7 +199,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Create", FromAction = "User")]
+        [Breadcrumb("Create", FromAction ="User")]
         public IActionResult CreateUser()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -241,7 +242,7 @@ namespace risk.control.system.Controllers
             return View(user);
         }
 
-        [Breadcrumb("Edit", FromAction = "User")]
+        [Breadcrumb("Edit")]
         public async Task<IActionResult> EditUser(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
@@ -268,6 +269,12 @@ namespace risk.control.system.Controllers
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name");
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", clientComapany.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", clientComapany.StateId);
+
+            var companyPage = new MvcBreadcrumbNode("Index", "Company", "Company");
+            var usersPage = new MvcBreadcrumbNode("User", "Company", "Users") { Parent = companyPage };
+            var userEditPage = new MvcBreadcrumbNode("UserEdit", "Company", $"Edit") { Parent = usersPage, RouteValues = new { userid = userId } };
+            ViewData["BreadcrumbNode"] = userEditPage;
+
             return View(clientCompanyApplicationUser);
         }
 
@@ -580,7 +587,6 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        [Breadcrumb("Role", FromAction = "User")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<CompanyUserRoleViewModel>();
@@ -620,6 +626,12 @@ namespace risk.control.system.Controllers
                 UserName = user.UserName,
                 CompanyUserRoleViewModel = userRoles
             };
+
+            var companyPage = new MvcBreadcrumbNode("Index", "Company", "Company");
+            var usersPage = new MvcBreadcrumbNode("User", "Company", "Users") { Parent = companyPage };
+            var userPage = new MvcBreadcrumbNode("EditUser", "Company", $"User") { Parent = usersPage, RouteValues = new { userid = userId } };
+            var userRolePage = new MvcBreadcrumbNode("UserRoles", "Company", $"Edit User Role") { Parent = usersPage, RouteValues = new { userid = userId } };
+            ViewData["BreadcrumbNode"] = userRolePage;
             return View(model);
         }
 
@@ -640,8 +652,8 @@ namespace risk.control.system.Controllers
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
 
-            toastNotification.AddSuccessToastMessage("roles updated successfully!");
-            return RedirectToAction(nameof(CompanyController.User), "Company");
+            toastNotification.AddSuccessToastMessage("User role(s) updated successfully!");
+            return RedirectToAction(nameof(CompanyController.EditUser), "Company", new { userid = userId });
         }
 
         private bool VendorApplicationUserExists(long id)

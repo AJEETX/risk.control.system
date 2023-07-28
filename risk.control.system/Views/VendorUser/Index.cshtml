@@ -17,7 +17,7 @@
                         <div class="row">
                             <div class="col-md-12 text-right">
                                 @*<a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>*@
-                                <a class="btn btn-success" asp-controller="VendorApplicationUsers" asp-action="Create" asp-route-id="@Model.Vendor.VendorId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
+                                <a class="btn btn-success" asp-controller="VendorApplicationUsers" asp-action="Create" asp-route-id="@Model.Vendor.VendorId"><i class="fas fa-user-plus"></i> Add User</a>
                             </div>
                         </div>
                     </div>
@@ -104,7 +104,7 @@
                                             <a class="btn btn-xs btn-warning" asp-controller="VendorApplicationUsers" asp-action="Edit" asp-route-userId="@user.UserId">
                                                 <i class="fas fa-pen"></i> @Applicationsettings.EDIT
                                             </a>&nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-controller="VendorUserRoles" asp-action="Index"
+                                            <a class="btn btn-xs btn-info" asp-controller="VendorUserRoles" asp-action="Index"
                                            asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> @Applicationsettings.ROLE</a>
                                         </td>
                                     </tr>

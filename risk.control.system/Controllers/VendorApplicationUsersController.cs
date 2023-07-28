@@ -15,10 +15,11 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("User")]
+    [Breadcrumb("Agencies")]
     public class VendorApplicationUsersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -45,7 +46,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorApplicationUsers/Details/5
-        [Breadcrumb("Details")]
+
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null || _context.VendorApplicationUser == null)
@@ -64,17 +65,29 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorApplicationUsers", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Details", "VendorApplicationUsers", $"Details") { Parent = usersPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendorApplicationUser);
         }
 
         // GET: VendorApplicationUsers/Create
-        [Breadcrumb("Create")]
+
         public IActionResult Create(string id)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
             var model = new VendorApplicationUser { Vendor = vendor };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Create", "VendorApplicationUsers", $"Add User") { Parent = usersPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = editPage;
+
             return View(model);
         }
 
@@ -123,7 +136,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorApplicationUsers/Edit/5
-        [Breadcrumb("Edit")]
+
         public async Task<IActionResult> Edit(long? userId)
         {
             if (userId == null || _context.VendorApplicationUser == null)
@@ -152,6 +165,13 @@ namespace risk.control.system.Controllers
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name");
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", vendor.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendor.StateId);
+
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = vendor.VendorId } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Edit", "VendorApplicationUsers", $"Edit") { Parent = usersPage, RouteValues = new { id = userId } };
+            ViewData["BreadcrumbNode"] = editPage;
+
             return View(vendorApplicationUser);
         }
 
@@ -227,7 +247,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorApplicationUsers/Delete/5
-        [Breadcrumb("Delete")]
+
         public async Task<IActionResult> Delete(long? id)
         {
             if (id == null || _context.VendorApplicationUser == null)
@@ -246,6 +266,12 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorApplicationUsers", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Delete", "VendorApplicationUsers", $"Delete") { Parent = usersPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendorApplicationUser);
         }

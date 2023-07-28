@@ -8,6 +8,7 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
@@ -82,7 +83,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Details/5
-        [Breadcrumb(" Details")]
+        [Breadcrumb(" Agency")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -110,6 +111,10 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            //var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit") { Parent = agencyPage, RouteValues = new { id = id } };
+            //ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendor);
         }
@@ -139,6 +144,11 @@ namespace risk.control.system.Controllers
                 .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(i => i.PincodeServices)
                 .FirstOrDefault(a => a.VendorId == id);
+
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Service") { Parent = agencyPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = editPage;
 
             return View(applicationDbContext);
         }
@@ -193,7 +203,6 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Edit/5
-        [Breadcrumb(" Edit")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -210,6 +219,12 @@ namespace risk.control.system.Controllers
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name");
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", vendor.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendor.StateId);
+
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit") { Parent = agencyPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = editPage;
+
             return View(vendor);
         }
 
@@ -312,7 +327,10 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete") { Parent = agencyPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = editPage;
             return View(vendor);
         }
 

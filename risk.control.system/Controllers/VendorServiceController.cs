@@ -9,6 +9,7 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -51,6 +52,8 @@ namespace risk.control.system.Controllers
                 .Include(v => v.InvestigationServiceType)
                 .Include(v => v.LineOfBusiness)
                 .Include(v => v.PincodeServices)
+                .Include(v => v.District)
+                .Include(v => v.Country)
                 .Include(v => v.State)
                 .Include(v => v.Vendor)
                 .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
@@ -58,6 +61,11 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
+
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Service") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendorInvestigationServiceType);
         }
@@ -70,6 +78,12 @@ namespace risk.control.system.Controllers
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<string>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Service") { Parent = agencyPage, RouteValues = new { id = id } };
+            var createPage = new MvcBreadcrumbNode("Create", "VendorService", $"Create") { Parent = editPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = createPage;
             return View(model);
         }
 
@@ -158,6 +172,12 @@ namespace risk.control.system.Controllers
             var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
             services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
 
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = services.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Service") { Parent = agencyPage, RouteValues = new { id = services.VendorId } };
+            var createPage = new MvcBreadcrumbNode("Edit", "VendorService", $"Edit") { Parent = editPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = createPage;
+
             return View(services);
         }
 
@@ -236,12 +256,19 @@ namespace risk.control.system.Controllers
                 .Include(v => v.LineOfBusiness)
                 .Include(v => v.PincodeServices)
                 .Include(v => v.State)
+                .Include(v => v.District)
+                .Include(v => v.Country)
                 .Include(v => v.Vendor)
                 .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
             if (vendorInvestigationServiceType == null)
             {
                 return NotFound();
             }
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Service") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            var createPage = new MvcBreadcrumbNode("Delete", "VendorService", $"Delete") { Parent = editPage, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = createPage;
 
             return View(vendorInvestigationServiceType);
         }

@@ -12,7 +12,7 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-user-friends"></i> Agency Users List</h3>
+                        <h3 class="card-title"><i class="fas fa-user-friends"></i> Agency Users</h3>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
@@ -86,7 +86,7 @@
                                             <a class="btn btn-xs btn-warning" asp-controller="Agency" asp-action="EditUser" asp-route-userId="@user.UserId">
                                                 <i class="fas fa-pen"></i> @Applicationsettings.EDIT
                                             </a>&nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-controller="Agency" asp-action="UserRoles"
+                                            <a class="btn btn-xs btn-info" asp-controller="Agency" asp-action="UserRoles"
                                            asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> @Applicationsettings.ROLE</a>
                                         </td>
                                     </tr>
