@@ -1408,6 +1408,20 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ClaimsInvestigation claimsInvestigation)
         {
+
+            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
+
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
+            claimsInvestigation.InvestigationCaseStatus = status;
+            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
+            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
+            claimsInvestigation.ClientCompanyId = companyUser?.ClientCompanyId;
+
             if (id != claimsInvestigation.ClaimsInvestigationId || !ModelState.IsValid)
             {
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
@@ -1425,7 +1439,6 @@ namespace risk.control.system.Controllers
             }
             try
             {
-                var userEmail = HttpContext.User.Identity.Name;
                 claimsInvestigation.Updated = DateTime.UtcNow;
                 claimsInvestigation.UpdatedBy = userEmail;
                 claimsInvestigation.CurrentUserEmail = userEmail;

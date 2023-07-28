@@ -24,27 +24,28 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Email" class="control-label"></label>
-                                        <input disabled asp-for="Email" class="form-control" />
+                                        <input asp-for="Email" class="form-control" required type="email" placeholder="Enter Email" />
                                         <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="FirstName" class="control-label"></label>
-                                        <input asp-for="FirstName" class="form-control" />
+                                        <input asp-for="FirstName" class="form-control" required type="text" placeholder="Enter First Name" />
                                         <span asp-validation-for="FirstName" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="LastName" class="control-label"></label>
-                                        <input asp-for="LastName" class="form-control" />
+                                        <input asp-for="LastName" class="form-control" required type="text" placeholder="Enter Last Name" />
                                         <span asp-validation-for="LastName" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
-                                        <input asp-for="PhoneNumber" class="form-control" />
+                                        <input asp-for="PhoneNumber" class="form-control" required type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="ProfileImage" class="control-label"></label>
-                                        @if (Model?.ProfilePictureUrl is not null)
+                                        <div class="input-group mb-3">
+                                            @if (Model?.ProfilePictureUrl is not null)
                                         {
                                             <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
                                         }
@@ -54,12 +55,11 @@
                                         }
 
                                         <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-
                                     <div class="form-group">
                                         <label asp-for="CountryId" class="control-label"></label>
                                         <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
@@ -90,7 +90,7 @@
 
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
-                                        <input asp-for="Comments" class="form-control" />
+                                        <input required asp-for="Comments" class="form-control" type="text" placeholder="Enter Comment" />
                                         <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group text-right">
@@ -99,7 +99,7 @@
                                             @Applicationsettings.CANCEL
                                         </a>
                                         <button type="submit" class="btn btn-warning">
-                                            <i class="fas fa-user-plus"></i> @Applicationsettings.EDIT User
+                                            <i class="fas fa-user-plus"></i> Edit User
                                         </button>
                                     </div>
                                 </div>

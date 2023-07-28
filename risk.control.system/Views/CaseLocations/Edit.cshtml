@@ -12,7 +12,7 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-map-marker-alt"></i>  Edit Location to verify</h3>
+                            <h3 class="card-title"><i class="fas fa-map-marker-alt"></i>  Edit Location</h3>
                         </div>
                         <div class="card-body">
                             <form asp-action="Edit">
@@ -20,11 +20,23 @@
                                     <div class="col-md-6">
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <input type="hidden" asp-for="CaseLocationId" />
+                                        
+                                        
                                         <div class="form-group">
                                             <label asp-for="ProfileImage" class="control-label"></label>
-                                            <img class="form-Image" id="profileImage" src="/img/no-image.png">
-                                            <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                            <div class="input-group mb-3">
+                                                @if (Model?.ProfilePicture is not null)
+                                                {
+                                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                                }
+                                                else
+                                                {
+                                                    <img class="form-Image" id="profileImage" src="/img/no-photo.png">
+                                                }
+                                                <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                            </div>
                                         </div>
+                                     
                                         <div class="form-group">
                                             <label asp-for="BeneficiaryName" class="control-label"></label>
                                             <input asp-for="BeneficiaryName" class="form-control" />
@@ -107,7 +119,7 @@
                                                 @Applicationsettings.CANCEL
                                             </a>
                                             <button type="submit" class="btn btn-warning">
-                                                <i class="fas fa-pen"></i> @Applicationsettings.EDIT
+                                                <i class="fas fa-pen"></i> Edit Location
                                             </button>
                                         </div>
                                     </div>

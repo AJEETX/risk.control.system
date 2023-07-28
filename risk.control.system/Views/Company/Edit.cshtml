@@ -11,7 +11,7 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen"></i>  @Applicationsettings.CLIENT_COMPANY Profile</h3>
+                            <h3 class="card-title"><i class="fas fa-building"></i>  @Applicationsettings.CLIENT_COMPANY Profile</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -43,7 +43,7 @@
                                         <input asp-for="PhoneNumber" class="form-control" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
-                                    
+
                                     <div class="form-group">
                                         <label asp-for="Branch" class="control-label"></label>
                                         <input asp-for="Branch" class="form-control" />
@@ -117,16 +117,18 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="DocumentImage" class="control-label"></label>
-                                        @if (Model?.DocumentImage is not null)
-                                        {
-                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                        <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        <label asp-for="DocumentImage" class="control-label">Document Image</label>
+                                        <div class="input-group mb-3">
+                                            @if (Model?.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                            <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        </div>
                                     </div>
                                     <div class="form-group text-right">
                                         <a asp-action="Index" class="btn btn-secondary">
@@ -134,7 +136,7 @@
                                             @Applicationsettings.CANCEL
                                         </a>
                                         <button type="submit" class="btn btn-warning">
-                                            <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                            <i class="fas fa-building"></i>  Edit Company Profile
                                         </button>
                                     </div>
                                 </div>

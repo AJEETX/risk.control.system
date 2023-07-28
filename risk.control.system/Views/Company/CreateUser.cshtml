@@ -11,7 +11,7 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-plus"></i>  Add User</h3>
+                            <h3 class="card-title"><i class="fas fa-user-plus"></i>  Add User</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -43,22 +43,21 @@
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
                                     
-                                    
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
-                                        <input asp-for="PhoneNumber" class="form-control" required type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
+                                        <input asp-for="PhoneNumber" class="form-control" required type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="ProfileImage" class="control-label"></label>
-                                         <img id="ProfileImage" class="form-Image">
-                                        <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        <div class="input-group mb-3">
+                                            <img id="ProfileImage" class="form-Image" src="/img/no-image.png">
+                                            <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-
                                     <div class="form-group">
                                         <label asp-for="CountryId" class="control-label"></label>
                                         <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
@@ -89,13 +88,13 @@
                                    
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
-                                        <input asp-for="Comments" class="form-control" type="text" placeholder="Enter Comment" />
+                                        <input required asp-for="Comments" class="form-control" type="text" placeholder="Enter Comment" />
                                         <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group text-right">
                                         <a asp-controller="Company" asp-action="User" class="btn btn-secondary"><i class="fas fa-window-close"></i> Cancel</a>
                                         <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-plus"></i> Add User
+                                            <i class="fas fa-user-plus"></i> Add User
                                         </button>
                                     </div>
                                 </div>

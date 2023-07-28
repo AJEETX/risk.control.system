@@ -10,7 +10,7 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"> <i class="fas fa-pen"></i> Edit  User </h3>
+                            <h3 class="card-title"> <i class="fas fa-user-plus"></i> Edit  User </h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -39,8 +39,9 @@
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="ProfileImage" class="control-label"></label>
-                                        @if (Model?.ProfilePictureUrl is not null)
+                                        <label asp-for="ProfileImage" class="control-label">User Photo</label>
+                                        <div class="input-group mb-3">
+                                            @if (Model?.ProfilePictureUrl is not null)
                                         {
                                             <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
                                         }
@@ -50,6 +51,7 @@
                                         }
 
                                         <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -92,7 +94,7 @@
                                             @Applicationsettings.CANCEL
                                         </a>
                                         <button type="submit" class="btn btn-warning">
-                                            <i class="fas fa-plus"></i> @Applicationsettings.EDIT
+                                            <i class="fas fa-user-plus"></i>  Edit User
                                         </button>
                                     </div>
                                 </div>

@@ -99,42 +99,44 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="AgreementDate" class="control-label"></label>
-                                        <input asp-for="AgreementDate" class="form-control" type="date" />
+                                        <input disabled asp-for="AgreementDate" class="form-control" type="date" />
                                         <span asp-validation-for="AgreementDate" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="ActivatedDate" class="control-label"></label>
-                                        <input asp-for="ActivatedDate" class="form-control" type="date" />
+                                        <input readonly asp-for="ActivatedDate" class="form-control" type="date" />
                                         <span asp-validation-for="ActivatedDate" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="DeListedDate" class="control-label"></label>
-                                        <input asp-for="DeListedDate" class="form-control" type="date" />
+                                        <input readonly asp-for="DeListedDate" class="form-control" type="date" />
                                         <span asp-validation-for="DeListedDate" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Status" class="control-label"></label>
-                                        <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<VendorStatus>()">
+                                        <select disabled asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<VendorStatus>()">
                                             <option>--- SELECT STATUS ---</option>
                                         </select>
                                         <span asp-validation-for="Status" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="DelistReason" class="control-label"></label>
-                                        <textarea asp-for="DelistReason" class="form-control"></textarea>
+                                        <textarea disabled asp-for="DelistReason" class="form-control"></textarea>
                                         <span asp-validation-for="DelistReason" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="DocumentImage" class="control-label"></label>
-                                        @if (Model?.DocumentImage is not null)
-                                        {
-                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                        <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        <label asp-for="Document" class="control-label"></label>
+                                        <div class="input-group mb-3">
+                                            @if (Model?.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                            <input asp-for="Document" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        </div>
                                     </div>
                                     <div class="form-group text-right">
                                         <a asp-action="Index"class="btn btn-secondary">
@@ -142,7 +144,7 @@
                                             @Applicationsettings.CANCEL
                                         </a>
                                         <button type="submit" class="btn btn-warning">
-                                            <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                            <i class="fas fa-pen"></i>  Edit Agency
                                         </button>
                                     </div>
                                 </div>

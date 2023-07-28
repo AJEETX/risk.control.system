@@ -199,7 +199,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Create", FromAction ="User")]
+        [Breadcrumb("Add", FromAction ="User")]
         public IActionResult CreateUser()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -587,6 +587,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
+        [Breadcrumb("Role", FromAction ="User")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<CompanyUserRoleViewModel>();

@@ -212,9 +212,7 @@ function PopulateInvestigationServices(dropDownId, list, option) {
 }
 function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, pincodeOption, districtOption, showDefaultOption) {
     $(pinCodedropDownId).empty();
-    if (showDefaultOption) {
-        $(pinCodedropDownId).append(pincodeOption)
-    }
+    $(pinCodedropDownId).append(pincodeOption)
 
     $(districtDropdownId).empty();
     $(districtDropdownId).append(districtOption)
@@ -245,9 +243,8 @@ function PopulateStateDropDown(pinCodedropDownId, districtDropDownId, stateDropD
 
     $(stateDropDownId).append(stateOption);
     $(districtDropDownId).append(districtOption);
-    if (showDefaultOption) {
-        $(pinCodedropDownId).append(pincodeOption);
-    }
+    $(pinCodedropDownId).append(pincodeOption);
+
 
     $.each(list, function (index, row) {
         $(stateDropDownId).append("<option value='" + row.stateId + "'>" + row.name + "</option>")
