@@ -503,6 +503,10 @@ namespace risk.control.system.Controllers
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.LineOfBusiness)
                 .Include(c => c.CaseEnabler)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.PinCode)
+                .Include(c => c.InvestigationCaseStatus)
                 .Include(c => c.CostCentre)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimCase.ClaimsInvestigationId);
 

@@ -215,6 +215,7 @@
                                         Verification Pincodes
                                     </th>
 
+                                    <th>Status</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -252,7 +253,9 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.PinCode.Code)
                                         </td>
-
+                                        <td>
+                                            <span class="badge badge-info">   @Html.DisplayFor(modelItem => item.InvestigationCaseSubStatus.Name)</span>
+                                        </td>
                                         <td>
                                             @*<a class="btn btn-xs btn-info" asp-controller="CaseLocations" asp-action="Details" asp-route-id="@item.CaseLocationId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;*@
                                             <a class="btn btn-xs btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@item.CaseLocationId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;

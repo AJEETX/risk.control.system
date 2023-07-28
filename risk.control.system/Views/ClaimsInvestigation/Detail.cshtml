@@ -207,6 +207,7 @@
                                     <th>
                                         Verification Pincodes
                                     </th>
+                                    <th>Status</th>
 
                                 </tr>
                             </thead>
@@ -244,7 +245,9 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.PinCode.Code)
                                         </td>
-
+                                        <td>
+                                            <span class="badge badge-info">   @Html.DisplayFor(modelItem => item.InvestigationCaseSubStatus.Name)</span>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
@@ -256,7 +259,7 @@
 
         <div class="row">
             <div class="col-md-12 text-right">
-                <a asp-action="Active" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+                <a asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
             </div>
         </div>
     </div>

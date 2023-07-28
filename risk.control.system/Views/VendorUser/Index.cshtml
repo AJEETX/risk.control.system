@@ -67,9 +67,19 @@
                                         <td>@user.Country</td>
                                         <td style="width:20%">
                                             @foreach (var role in user.Roles)
-
                                             {
-                                                <span class="badge badge-light">@role</span>
+                                                if(role != null)
+                                                {
+                                                    <span class="badge badge-light">@role</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-danger">N.A.</span>
+                                                }
+                                            }
+                                            @if (user.Roles == null || user.Roles.Count() == 0 )
+                                            {
+                                                <span class="badge badge-danger">No Role Assigned</span>
                                             }
                                         </td>
                                         <td>
@@ -91,11 +101,20 @@
                                                 {
                                                     <span class="badge badge-warning">VA</span>
                                                 }
+                                                else if (user.Roles.Contains(AppRoles.VendorSupervisor.ToString()))
 
+                                                {
+                                                    <span class="badge badge-warning">VS</span>
+                                                }
+                                                else if (user.Roles.Contains(AppRoles.VendorAgent.ToString()))
+
+                                                {
+                                                    <span class="badge badge-warning">VA</span>
+                                                }
                                                 else
 
                                                 {
-                                                    <span class="badge badge-success">ST</span>
+                                                    <span class="badge badge-danger">No Role Assigned</span>
                                                 }
 
                                             }

@@ -22,17 +22,17 @@
 
         // BUTTONS / ACTIONS
 
-        public const string BACK = "back";
-        public const string CANCEL = "cancel";
-        public const string RESET = "reset";
-        public const string APPROVE = "approve";
-        public const string SEARCH = "search";
-        public const string CREATE = "create";
-        public const string EDIT = "edit";
-        public const string DELETE = "delete";
+        public const string BACK = "Back";
+        public const string CANCEL = "Cancel";
+        public const string RESET = "Reset";
+        public const string APPROVE = "Approve";
+        public const string SEARCH = "Search";
+        public const string CREATE = "Create";
+        public const string EDIT = "Edit";
+        public const string DELETE = "Delete";
         public const string ALLOCATE = "Allocate";
-        public const string VIEW = "view";
-        public const string DETAILS = "details";
+        public const string VIEW = "View";
+        public const string DETAILS = "Details";
         public const string VERIFY_LOCATIONS = "Locations to verify";
 
         // LABELS / ACTIONS
