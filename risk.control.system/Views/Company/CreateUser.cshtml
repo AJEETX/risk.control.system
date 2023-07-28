@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = Applicationsettings.CREATE;
+    var email = Model.ClientCompany.Email.Substring(Model.ClientCompany.Email.IndexOf('@'));
 }
 
 <section class="content pt-2">
@@ -22,31 +23,54 @@
                                         <input asp-for="ClientCompanyId" class="form-control" value="@Model.ClientCompany.ClientCompanyId" />
                                         <span asp-validation-for="ClientCompanyId" class="text-danger"></span>
                                     </div>
+
                                     <div class="form-group">
-                                        <label asp-for="Email" class="control-label"></label>
-                                        <input asp-for="Email" class="form-control" required type="email" placeholder="Enter Email" />
-                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+                                            <input type="text" asp-for="Email" class="form-control" required placeholder="Enter Agency user email">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" id="basic-addon2">@email</span>
+                                            </div>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
-                                        <label asp-for="FirstName" class="control-label"></label>
-                                        <input asp-for="FirstName" class="form-control" required type="text" placeholder="Enter First Name" />
-                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">First Name</span>
+                                            </div>
+                                            <input type="text" asp-for="FirstName" class="form-control" required placeholder="Enter First Name">
+                                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
-                                        <label asp-for="LastName" class="control-label"></label>
-                                        <input asp-for="LastName" class="form-control" required type="text" placeholder="Enter Last Name" />
-                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">Last Name</span>
+                                            </div>
+                                            <input type="text" asp-for="LastName" class="form-control" required placeholder="Enter Last Name">
+                                            <span asp-validation-for="LastName" class="text-danger"></span>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
-                                        <label asp-for="Password" class="control-label"></label>
-                                        <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password" />
-                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">Password</span>
+                                            </div>
+                                            <input type="password" asp-for="Password" class="form-control" required placeholder="Enter Password">
+                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                        </div>
                                     </div>
-                                    
+
                                     <div class="form-group">
-                                        <label asp-for="PhoneNumber" class="control-label"></label>
-                                        <input asp-for="PhoneNumber" class="form-control" required type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
-                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">Phone Number</span>
+                                            </div>
+                                            <input type="password" asp-for="PhoneNumber" class="form-control" required type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="ProfileImage" class="control-label"></label>
@@ -59,38 +83,67 @@
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <div class="form-group">
-                                        <label asp-for="CountryId" class="control-label"></label>
-                                        <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                            <option>--- SELECT COUNTRY ---</option>
-                                        </select>
-                                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+                                            <select asp-for="CountryId" class="custom-select" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                                <option selected>--- SELECT COUNTRY ---</option>
+                                            </select>
+                                            <div class="input-group-append">
+                                                <label class="input-group-text" for="inputGroupSelect01">SELECT COUNTRY</label>
+                                            </div>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
-                                        <label asp-for="StateId" class="control-label"></label>
-                                        <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                            <option>--- SELECT STATE ---</option>
-                                        </select>
-                                        <span asp-validation-for="StateId" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+                                            <select id="StateId" asp-for="StateId" class="custom-select" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                                <option>--- SELECT STATE ---</option>
+                                            </select>
+                                            <div class="input-group-append">
+                                                <label class="input-group-text" for="inputGroupSelect01">SELECT STATE</label>
+                                            </div>
+                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
-                                        <label asp-for="DistrictId" class="control-label"></label>
-                                        <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                            <option>--- SELECT DISTRICT ---</option>
-                                        </select>
-                                        <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+
+                                            <select id="DistrictId" asp-for="DistrictId" class="custom-select" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                                <option>--- SELECT DISTRICT ---</option>
+                                            </select>
+                                            <div class="input-group-append">
+                                                <label class="input-group-text" for="inputGroupSelect01">SELECT DISTRICT</label>
+                                            </div>
+                                            <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                        </div>
                                     </div>
+
                                     <div class="form-group">
-                                        <label asp-for="PinCodeId" class="control-label"></label>
-                                        <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                            <option>--- SELECT PINCODE ---</option>
-                                        </select>
+                                        <div class="input-group mb-3">
+
+                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                                <option>--- SELECT PINCODE ---</option>
+                                            </select>
+                                            <div class="input-group-append">
+                                                <label class="input-group-text" for="inputGroupSelect01">SELECT PINCODE</label>
+                                            </div>
+                                        </div>
                                     </div>
-                                   
+
                                     <div class="form-group">
-                                        <label asp-for="Comments" class="control-label"></label>
-                                        <input required asp-for="Comments" class="form-control" type="text" placeholder="Enter Comment" />
-                                        <span asp-validation-for="Comments" class="text-danger"></span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="basic-addon1">Comment</span>
+                                            </div>
+                                            <input type="password" asp-for="Comments" class="form-control" required type="text" placeholder="Enter Comment" />
+                                            <span asp-validation-for="Comments" class="text-danger"></span>
+                                        </div>
                                     </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
                                     <div class="form-group text-right">
                                         <a asp-controller="Company" asp-action="User" class="btn btn-secondary"><i class="fas fa-window-close"></i> Cancel</a>
                                         <button type="submit" class="btn btn-success">

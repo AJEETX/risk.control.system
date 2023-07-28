@@ -186,6 +186,8 @@ namespace risk.control.system.Controllers
                         vendor.DocumentImage = dataStream.ToArray();
                         vendor.DocumentUrl = newFileName;
                     }
+                    vendor.Status = VendorStatus.ACTIVE;
+                    vendor.ActivatedDate = DateTime.UtcNow;
                     vendor.Updated = DateTime.UtcNow;
                     vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Add(vendor);
