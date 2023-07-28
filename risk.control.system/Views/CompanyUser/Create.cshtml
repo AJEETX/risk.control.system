@@ -25,33 +25,33 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Email" class="control-label"></label>
-                                        <input asp-for="Email" class="form-control" />
+                                        <input asp-for="Email" class="form-control" required placeholder="Enter Email" type="email" />
                                         <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="FirstName" class="control-label"></label>
-                                        <input asp-for="FirstName" class="form-control" />
+                                        <input asp-for="FirstName" class="form-control" required placeholder="Enter First Name" type="text" />
                                         <span asp-validation-for="FirstName" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="LastName" class="control-label"></label>
-                                        <input asp-for="LastName" class="form-control" />
+                                        <input asp-for="LastName" class="form-control" required placeholder="Enter Last Name" type="text" />
                                         <span asp-validation-for="LastName" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Password" class="control-label"></label>
-                                        <input asp-for="Password" type="password" class="form-control" />
+                                        <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password"  />
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
 
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
-                                        <input asp-for="Comments" class="form-control" />
+                                        <input asp-for="Comments" class="form-control" required placeholder="Enter Comment" />
                                         <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
-                                        <input asp-for="PhoneNumber" class="form-control" />
+                                        <input asp-for="PhoneNumber" class="form-control" required type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">

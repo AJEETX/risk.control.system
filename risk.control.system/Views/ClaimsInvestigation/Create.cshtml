@@ -53,29 +53,29 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="ContractIssueDate" class="control-label"></label>
-                                <input required asp-for="ContractIssueDate" class="form-control" />
+                                <input required asp-for="ContractIssueDate" class="form-control" type="date" />
                                 <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label asp-for="DateOfIncident" class="control-label"></label>
-                                <input required asp-for="DateOfIncident" class="form-control" />
+                                <input required asp-for="DateOfIncident" class="form-control" type="date" />
                                 <span asp-validation-for="DateOfIncident" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="ContractNumber" class="control-label"></label>
-                                <input required asp-for="ContractNumber" class="form-control" />
+                                <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract Number" />
                                 <span asp-validation-for="ContractNumber" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="SumAssuredValue" class="control-label"></label>
-                                <input required asp-for="SumAssuredValue" class="form-control" />
+                                <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum" />
                                 <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="CauseOfLoss" class="control-label"></label>
-                                <input required asp-for="CauseOfLoss" class="form-control" />
+                                <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" />
                                 <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
                             </div>
                             <div class="form-group">
@@ -108,13 +108,13 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="CustomerName" class="control-label"></label>
-                                <input required asp-for="CustomerName" class="form-control" />
+                                <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" />
                                 <span asp-validation-for="CustomerName" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
                                 <label asp-for="CustomerDateOfBirth" class="control-label"></label>
-                                <input required asp-for="CustomerDateOfBirth" class="form-control" />
+                                <input required asp-for="CustomerDateOfBirth" class="form-control" type="date" />
                                 <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
                             </div>
                             <div class="form-group">
@@ -126,12 +126,12 @@
                             </div>
                             <div class="form-group">
                                 <label asp-for="ContactNumber" class="control-label"></label>
-                                <input required asp-for="ContactNumber" class="form-control" />
+                                <input required asp-for="ContactNumber" class="form-control" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Contract Number" />
                                 <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="Addressline" class="control-label"></label>
-                                <input required asp-for="Addressline" class="form-control" />
+                                <input required asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" />
                                 <span asp-validation-for="Addressline" class="text-danger field-validation-valid"></span>
                             </div>
                         </div>
@@ -188,7 +188,7 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label asp-for="Description" class="control-label"></label>
-                                <input required asp-for="Description" class="form-control" />
+                                <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" />
                                 <span asp-validation-for="Description" class="text-danger"></span>
                             </div>
                         </div>

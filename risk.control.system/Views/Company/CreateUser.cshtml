@@ -24,29 +24,29 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Email" class="control-label"></label>
-                                        <input asp-for="Email" class="form-control" />
+                                        <input asp-for="Email" class="form-control" required type="email" placeholder="Enter Email" />
                                         <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="FirstName" class="control-label"></label>
-                                        <input asp-for="FirstName" class="form-control" />
+                                        <input asp-for="FirstName" class="form-control" required type="text" placeholder="Enter First Name" />
                                         <span asp-validation-for="FirstName" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="LastName" class="control-label"></label>
-                                        <input asp-for="LastName" class="form-control" />
+                                        <input asp-for="LastName" class="form-control" required type="text" placeholder="Enter Last Name" />
                                         <span asp-validation-for="LastName" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Password" class="control-label"></label>
-                                        <input asp-for="Password" type="password" class="form-control" />
+                                        <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password" />
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
                                     
                                     
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
-                                        <input asp-for="PhoneNumber" class="form-control" />
+                                        <input asp-for="PhoneNumber" class="form-control" required type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
@@ -89,13 +89,13 @@
                                    
                                     <div class="form-group">
                                         <label asp-for="Comments" class="control-label"></label>
-                                        <input asp-for="Comments" class="form-control" />
+                                        <input asp-for="Comments" class="form-control" type="text" placeholder="Enter Comment" />
                                         <span asp-validation-for="Comments" class="text-danger"></span>
                                     </div>
                                     <div class="form-group text-right">
                                         <a asp-controller="Company" asp-action="User" class="btn btn-secondary"><i class="fas fa-window-close"></i> Cancel</a>
                                         <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-plus"></i> @Applicationsettings.CREATE
+                                            <i class="fas fa-plus"></i> Add User
                                         </button>
                                     </div>
                                 </div>

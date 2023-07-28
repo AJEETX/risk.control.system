@@ -27,30 +27,31 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="BeneficiaryName" class="control-label"></label>
-                                            <input asp-for="BeneficiaryName" class="form-control" />
+                                            <input required asp-for="BeneficiaryName" class="form-control" type="text" placeholder="Enter Beneficiary Name" />
                                             <span asp-validation-for="BeneficiaryName" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="BeneficiaryRelationId" class="control-label"></label>
-                                            <select asp-for="BeneficiaryRelationId" class="form-control" asp-items="ViewBag.BeneficiaryRelationId">
+                                            <select required asp-for="BeneficiaryRelationId" class="form-control" asp-items="ViewBag.BeneficiaryRelationId">
                                                 <option>--- SELECT BENEFICIARY RELATION ---</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="BeneficiaryContactNumber" class="control-label"></label>
-                                            <input asp-for="BeneficiaryContactNumber" class="form-control" />
+                                            <input required asp-for="BeneficiaryContactNumber" class="form-control" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                                                   placeholder="Enter Contact Name" />
                                             <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="BeneficiaryIncome" class="control-label"></label>
-                                            <select asp-for="BeneficiaryIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
+                                            <select required asp-for="BeneficiaryIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
                                                 <option>--- SELECT BENEFICIARY INCOME ---</option>
                                             </select>
                                             <span asp-validation-for="BeneficiaryIncome" class="text-danger"></span>
                                         </div>
                                         <div style="display:none" class="form-group">
                                             <label asp-for="ClaimsInvestigationId" class="control-label"></label>
-                                            <input asp-for="ClaimsInvestigationId" class="form-control" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                                            <input required asp-for="ClaimsInvestigationId" class="form-control" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="BeneficiaryDateOfBirth" class="control-label"></label>
@@ -61,25 +62,25 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label asp-for="Addressline" class="control-label"></label>
-                                            <input asp-for="Addressline" class="form-control" value="100 GOOD STREET" />
+                                            <input required asp-for="Addressline" class="form-control" placeholder="Enter Address line" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
 
                                         <div class="form-group">
                                             <label asp-for="Addressline2" class="control-label"></label>
-                                            <input asp-for="Addressline2" class="form-control" value="100 GOOD STREET" />
+                                            <input asp-for="Addressline2" class="form-control" placeholder="Enter Address line 2 (optional)" />
                                             <span asp-validation-for="Addressline2" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="CountryId" class="control-label"></label>
-                                            <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)">
+                                            <select required asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)">
                                                 <option>--SELECT COUNTRY--</option>
                                             </select>
                                             <span asp-validation-for="StateId" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="StateId" class="control-label"></label>
-                                            <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
+                                            <select required id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
                                                 <option>--SELECT STATE--</option>
 
                                             </select>
@@ -87,7 +88,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="DistrictId" class="control-label"></label>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                            <select required id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                                 <option>--SELECT DISTRICT--</option>
 
                                             </select>
@@ -95,7 +96,7 @@
                                         </div>
                                         <div class="form-group">
                                             <label asp-for="PinCodeId" class="control-label"></label>
-                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                            <select required id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                                 <option>--- SELECT PINCODE ---</option>
                                             </select>
                                         </div>
