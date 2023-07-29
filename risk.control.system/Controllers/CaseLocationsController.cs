@@ -188,13 +188,15 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+               i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             if (caseLocation is not null)
             {
                 try
                 {
                     {
                         caseLocation.Updated = DateTime.UtcNow;
+                        caseLocation.InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId;
                         caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                         IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
                         if (customerDocument is not null)

@@ -23,92 +23,142 @@
                                         
                                         
                                         <div class="form-group">
-                                            <label asp-for="ProfileImage" class="control-label"></label>
                                             <div class="input-group mb-3">
-                                                @if (Model?.ProfilePicture is not null)
-                                                {
-                                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
-                                                }
-                                                else
-                                                {
-                                                    <img class="form-Image" id="profileImage" src="/img/no-photo.png">
-                                                }
-                                                <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                <div class="input-group-prepend">
+                                                <span class="input-group-text" id="documentImage">Beneficiary Photo</span>
+                                            </div>
+                                            @if (Model?.ProfilePicture is not null)
+                                            {
+                                                <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                            }
+                                            else
+                                            {
+                                                <img class="form-Image" id="profileImage" src="/img/no-photo.png">
+                                            }
+                                            <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
                                             </div>
                                         </div>
-                                     
+
                                         <div class="form-group">
-                                            <label asp-for="BeneficiaryName" class="control-label"></label>
-                                            <input asp-for="BeneficiaryName" class="form-control" />
-                                            <span asp-validation-for="BeneficiaryName" class="text-danger"></span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" asp-for="BeneficiaryName">Beneficiary Name</span>
+                                                </div>
+                                                <input required asp-for="BeneficiaryName" class="form-control" type="text" placeholder="Enter Beneficiary Name" />
+                                                <span asp-validation-for="BeneficiaryName" class="text-danger"></span>
+                                            </div>
                                         </div>
+
                                         <div class="form-group">
-                                            <label asp-for="BeneficiaryRelationId" class="control-label"></label>
-                                            <select asp-for="BeneficiaryRelationId" class="form-control" asp-items="ViewBag.BeneficiaryRelationId">
-                                                <option>--- SELECT BENEFICIARY RELATION ---</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="BeneficiaryContactNumber" class="control-label"></label>
-                                            <input asp-for="BeneficiaryContactNumber" class="form-control" />
-                                            <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="BeneficiaryIncome" class="control-label"></label>
-                                            <input asp-for="BeneficiaryIncome" class="form-control" />
-                                            <span asp-validation-for="BeneficiaryIncome" class="text-danger"></span>
-                                        </div>
-                                        <div style="display:none" class="form-group">
-                                            <label asp-for="ClaimsInvestigationId" class="control-label"></label>
-                                            <input asp-for="ClaimsInvestigationId" class="form-control" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" asp-for="BeneficiaryName">Relation</span>
+                                                </div>
+                                                <select required asp-for="BeneficiaryRelationId" class="form-control" asp-items="ViewBag.BeneficiaryRelationId">
+                                                    <option>--- SELECT BENEFICIARY RELATION ---</option>
+                                                </select>
+                                                <span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
+                                            </div>
                                         </div>
                                         <div class="form-group">
-                                            <label asp-for="BeneficiaryDateOfBirth" class="control-label"></label>
-                                            <input required asp-for="BeneficiaryDateOfBirth" class="form-control" />
-                                            <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" asp-for="BeneficiaryContactNumber">Contact Number</span>
+                                                </div>
+                                                <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
+                                                <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
+                                            </div>
                                         </div>
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" asp-for="BeneficiaryIncome">Annual Income</span>
+                                                </div>
+                                                <select required asp-for="BeneficiaryIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
+                                                    <option>--- SELECT BENEFICIARY INCOME ---</option>
+                                                </select>
+                                                <span asp-validation-for="BeneficiaryIncome" class="text-danger"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" asp-for="BeneficiaryDateOfBirth">Date Of Birth</span>
+                                                </div>
+                                                <input required asp-for="BeneficiaryDateOfBirth" class="form-control" type="date" />
+                                                <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
+                                            </div>
+                                        </div>
+
                                     </div>
                                     <div class="col-md-6">
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="CountryId">Country</span>
+                                                </div>
+                                                <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                                    <option selected>--- SELECT COUNTRY ---</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
 
                                         <div class="form-group">
-                                            <label asp-for="Addressline" class="control-label"></label>
-                                            <input asp-for="Addressline" class="form-control" value="100 GOOD STREET" />
-                                            <span asp-validation-for="Addressline" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="Addressline2" class="control-label"></label>
-                                            <input asp-for="Addressline2" class="form-control" value="100 GOOD STREET" />
-                                            <span asp-validation-for="Addressline2" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="CountryId" class="control-label"></label>
-                                            <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)">
-                                                <option>--SELECT COUNTRY--</option>
-                                            </select>
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="StateId" class="control-label"></label>
-                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
-                                                <option>--SELECT STATE--</option>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="StateId">State</span>
+                                                </div>
+                                                <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                                    <option>--- SELECT STATE ---</option>
+                                                </select>
 
-                                            </select>
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                                <span asp-validation-for="StateId" class="text-danger"></span>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label asp-for="DistrictId" class="control-label"></label>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                                <option>--SELECT DISTRICT--</option>
 
-                                            </select>
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="DistrictId">District</span>
+                                                </div>
+                                                <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                                    <option>--- SELECT DISTRICT ---</option>
+                                                </select>
+
+                                                <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="PinCodeId">Pincode</span>
+                                                </div>
+                                                <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                                    <option>--- SELECT PINCODE ---</option>
+                                                </select>
+
+                                            </div>
                                         </div>
                                         <div class="form-group">
-                                            <label asp-for="PinCodeId" class="control-label"></label>
-                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                                <option>--- SELECT PINCODE ---</option>
-                                            </select>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="Addressline">Address line</span>
+                                                </div>
+                                                <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" />
+                                            </div>
                                         </div>
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="Addressline">Address line2</span>
+                                                </div>
+                                                <input type="text" asp-for="Addressline2" class="form-control" type="text" placeholder="Enter Address line2 (optional)" />
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                                 <div class="row">

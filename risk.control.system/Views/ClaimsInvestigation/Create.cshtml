@@ -29,7 +29,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type</label>
+                                        <span class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type</span>
                                     </div>
                                     <select required id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
                                         <option>--- SELECT SERVICE TYPE ---</option>
@@ -41,7 +41,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="ClaimType">Claim Type</label>
+                                        <span class="input-group-text" asp-for="ClaimType">Claim Type</span>
                                     </div>
                                     <select required asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
                                         <option>--- SELECT CLAIM TYPE ---</option>
@@ -53,7 +53,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CostCentreId">Budget Centre</label>
+                                        <span class="input-group-text" asp-for="CostCentreId">Budget Centre</span>
                                     </div>
                                     <select required asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
                                         <option>--- SELECT BUDGET CENTRE ---</option>
@@ -65,7 +65,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CaseEnablerId">Reason To Verify</label>
+                                        <span class="input-group-text" asp-for="CaseEnablerId">Reason To Verify</span>
                                     </div>
                                     <select required asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
                                         <option>--- SELECT REASON TO VERIFY ---</option>
@@ -77,7 +77,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="ContractIssueDate">Contract Issue Date</label>
+                                        <span class="input-group-text" asp-for="ContractIssueDate">Contract Issue Date</span>
                                     </div>
                                     <input required asp-for="ContractIssueDate" class="form-control" type="date" />
                                     <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
@@ -89,7 +89,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="DateOfIncident">Date Of Incident</label>
+                                        <span class="input-group-text" asp-for="DateOfIncident">Date Of Incident</span>
                                     </div>
                                     <input required asp-for="DateOfIncident" class="form-control" type="date" />
                                     <span asp-validation-for="DateOfIncident" class="text-danger"></span>
@@ -98,7 +98,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="ContractNumber">Contract Number</label>
+                                        <span class="input-group-text" asp-for="ContractNumber">Contract Number</span>
                                     </div>
                                     <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract Number" />
                                     <span asp-validation-for="ContractNumber" class="text-danger"></span>
@@ -107,7 +107,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="SumAssuredValue">Insured Amount</label>
+                                        <span class="input-group-text" asp-for="SumAssuredValue">Insured Amount</span>
                                     </div>
                                     <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum" />
                                     <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
@@ -118,7 +118,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss</label>
+                                        <span class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss</span>
                                     </div>
                                     <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" />
                                     <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
@@ -127,7 +127,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="Document">Claim Document</label>
+                                        <span class="input-group-text" asp-for="Document">Claim Document</span>
                                     </div>
                                     <img class="form-Image" id="documentImage" src="/img/no-photo.png">
                                     <input asp-for="Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
@@ -148,7 +148,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CustomerType">Customer Type</label>
+                                        <span class="input-group-text" asp-for="CustomerType">Customer Type</span>
                                     </div>
                                     <select required asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
                                         <option>--- SELECT CUSTOMER TYPE  ---</option>
@@ -160,7 +160,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CustomerName">Customer Name</label>
+                                        <span class="input-group-text" asp-for="CustomerName">Customer Name</span>
                                     </div>
                                     <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" />
                                     <span asp-validation-for="CustomerName" class="text-danger"></span>
@@ -169,7 +169,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth</label>
+                                        <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth</span>
                                     </div>
                                     <input required asp-for="CustomerDateOfBirth" class="form-control" type="date" />
                                     <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
@@ -178,7 +178,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="Gender">Gender</label>
+                                        <span class="input-group-text" asp-for="Gender">Gender</span>
                                     </div>
                                     <select required asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
                                         <option>--- SELECT GENDER ---</option>
@@ -190,7 +190,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="ContactNumber">Contact Number</label>
+                                        <span class="input-group-text" asp-for="ContactNumber">Contact Number</span>
                                     </div>
                                     <input required asp-for="ContactNumber" class="form-control" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Contract Number" />
                                     <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
@@ -200,7 +200,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CustomerIncome">Customer Income</label>
+                                        <span class="input-group-text" asp-for="CustomerIncome">Customer Income</span>
                                     </div>
                                     <select required asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
                                         <option>--- SELECT CUSTOMER INCOME ---</option>
@@ -212,7 +212,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CustomerOccupation">Customer Occupation</label>
+                                        <span class="input-group-text" asp-for="CustomerOccupation">Customer Occupation</span>
                                     </div>
                                     <select required asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
                                         <option>--- SELECT CUSTOMER OCCUPATION ---</option>
@@ -223,7 +223,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="CustomerEducation">Customer Education</label>
+                                        <span class="input-group-text" asp-for="CustomerEducation">Customer Education</span>
                                     </div>
                                     <select required asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
                                         <option>--- SELECT CUSTOMER EDUCATION ---</option>
@@ -237,7 +237,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" for="CountryId">Country</label>
+                                        <span class="input-group-text" for="CountryId">Country</span>
                                     </div>
                                     <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
                                         <option selected>--- SELECT COUNTRY ---</option>
@@ -249,7 +249,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" for="StateId">State</label>
+                                        <span class="input-group-text" for="StateId">State</span>
                                     </div>
                                     <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
                                         <option>--- SELECT STATE ---</option>
@@ -262,7 +262,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" for="DistrictId">District</label>
+                                        <span class="input-group-text" for="DistrictId">District</span>
                                     </div>
                                     <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                         <option>--- SELECT DISTRICT ---</option>
@@ -275,7 +275,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" for="PinCodeId">Pincode</label>
+                                        <span class="input-group-text" for="PinCodeId">Pincode</span>
                                     </div>
                                     <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                         <option>--- SELECT PINCODE ---</option>
@@ -307,7 +307,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" asp-for="ProfileImage">Claim Document</label>
+                                        <span class="input-group-text" asp-for="ProfileImage">Claim Document</span>
                                     </div>
                                     <img class="form-Image" id="profileImage" src="/img/no-photo.png">
                                     <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />

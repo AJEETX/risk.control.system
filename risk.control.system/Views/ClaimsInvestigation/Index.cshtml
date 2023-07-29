@@ -99,7 +99,7 @@
                                                     @{
                                                         foreach (var caseLocation in item.CaseLocations)
                                                         {
-                                                            <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
+                                                            <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus?.Name</span>
                                                         }
                                                     }
                                                 </td>

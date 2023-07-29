@@ -121,7 +121,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="CountryId">Country</label>
+                                                <span class="input-group-text" for="CountryId">Country</span>
                                             </div>
                                             <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
                                                 <option selected>--- SELECT COUNTRY ---</option>
@@ -133,7 +133,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="StateId">State</label>
+                                                <span class="input-group-text" for="StateId">State</span>
                                             </div>
                                             <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
                                                 <option>--- SELECT STATE ---</option>
@@ -146,7 +146,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="DistrictId">District</label>
+                                                <span class="input-group-text" for="DistrictId">District</span>
                                             </div>
                                             <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                                 <option>--- SELECT DISTRICT ---</option>
@@ -159,7 +159,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="PinCodeId">Pincode</label>
+                                                <span class="input-group-text" for="PinCodeId">Pincode</span>
                                             </div>
                                             <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                                 <option>--- SELECT PINCODE ---</option>
@@ -187,7 +187,7 @@
                                             }
                                             else
                                             {
-                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                <img id="documentImage" class="form-Image" src="/img/no-photo.png">
                                             }
                                             <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                         </div>

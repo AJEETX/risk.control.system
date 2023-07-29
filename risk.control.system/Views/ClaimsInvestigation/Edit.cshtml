@@ -130,7 +130,14 @@
                                     <div class="input-group-prepend">
                                         <label class="input-group-text" asp-for="Document">Claim Document</label>
                                     </div>
-                                    <img class="form-Image" id="documentImage" src="/img/no-photo.png">
+                                    @if (Model?.DocumentImage is not null)
+                                    {
+                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                    }
+                                    else
+                                    {
+                                        <img id="documentImage" class="form-Image" src="/img/no-photo.png">
+                                    }
                                     <input asp-for="Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                 </div>
                             </div>
@@ -238,9 +245,9 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" for="CountryId">Country</label>
+                                        <span class="input-group-text" for="CountryId">Country</span>
                                     </div>
-                                    <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                    <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
                                         <option selected>--- SELECT COUNTRY ---</option>
                                     </select>
 
@@ -250,7 +257,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" for="StateId">State</label>
+                                        <span class="input-group-text" for="StateId">State</span>
                                     </div>
                                     <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
                                         <option>--- SELECT STATE ---</option>
@@ -263,7 +270,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" for="DistrictId">District</label>
+                                        <span class="input-group-text" for="DistrictId">District</span>
                                     </div>
                                     <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                         <option>--- SELECT DISTRICT ---</option>
@@ -276,7 +283,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <label class="input-group-text" for="PinCodeId">Pincode</label>
+                                        <span class="input-group-text" for="PinCodeId">Pincode</span>
                                     </div>
                                     <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                         <option>--- SELECT PINCODE ---</option>
@@ -289,11 +296,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="Addressline">Address line</span>
                                     </div>
-                                    <input type="text" asp-for="Addressline" class="form-control" type="text" required placeholder="Enter Address line" />
-                                    <span asp-validation-for="Addressline" class="text-danger"></span>
+                                    <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" />
                                 </div>
                             </div>
-
 
                             <div class="form-group">
                                 <div class="input-group mb-3">
@@ -310,7 +315,14 @@
                                     <div class="input-group-prepend">
                                         <label class="input-group-text" asp-for="ProfileImage">Claim Document</label>
                                     </div>
-                                    <img class="form-Image" id="profileImage" src="/img/no-photo.png">
+                                    @if (Model?.ProfilePicture is not null)
+                                    {
+                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                    }
+                                    else
+                                    {
+                                        <img id="profileImage" class="form-Image" src="/img/no-photo.png">
+                                    }
                                     <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
                                 </div>
                             </div>
