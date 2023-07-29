@@ -19,78 +19,105 @@
                                     <div class="col-md-6">
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
+                                        <div style="display:none" class="form-group">
+                                            <label asp-for="VendorId" class="control-label"></label>
+                                            <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
+                                            <span asp-validation-for="VendorId" class="text-danger"></span>
+                                        </div>
                                         <div class="form-group">
-                                            <div style="display:none" class="form-group">
-                                                <label asp-for="VendorId" class="control-label"></label>
-                                                <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
-                                                <span asp-validation-for="VendorId" class="text-danger"></span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="LineOfBusinessId">Line Of Business</span>
+                                                </div>
+                                                <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
+                                                    <option>--SELECT LINE OF BUSINESS--</option>
+                                                </select>
+                                                <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
                                             </div>
-                                            <label asp-for="LineOfBusinessId" class="control-label"></label>
-                                            <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
-                                                <option>--SELECT LINE OF BUSINESS--</option>
-                                            </select>
-                                            <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
-                                            <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" onchange="setInvestigationServices(this)" asp-items="ViewBag.InvestigationServiceTypeId">
-                                                <option>--SELECT TYPE OF INVESTIGATION--</option>
-                                            </select>
-                                            <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="Price" class="control-label"></label>
-                                            <input asp-for="Price" class="form-control" />
-                                            <span asp-validation-for="Price" class="text-danger"></span>
                                         </div>
 
+
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="InvestigationServiceTypeId">Service Type</span>
+                                                </div>
+                                                <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" onchange="setInvestigationServices(this)" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                                    <option>--SELECT TYPE OF INVESTIGATION--</option>
+                                                </select>
+                                                <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="Price">Service Price (Rs.)</span>
+                                                </div>
+                                                <input asp-for="Price" class="form-control" type="number" placeholder="Enter Service Price" />
+                                                <span asp-validation-for="Price" class="text-danger"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
+
                                         <div class="form-group">
-                                            <label asp-for="CountryId" class="control-label"></label>
-                                            <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)">
-                                                <option>--SELECT COUNTRY--</option>
-                                            </select>
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="CountryId">Country</span>
+                                                </div>
+                                                <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)">
+                                                    <option>--SELECT COUNTRY--</option>
+                                                </select>
+                                                <span asp-validation-for="CountryId" class="text-danger"></span>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="CountryId">State</span>
+                                                </div>
+                                                <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
+                                                    <option>--SELECT STATE--</option>
+                                                </select>
+                                                <span asp-validation-for="StateId" class="text-danger"></span>
+                                            </div>
                                         </div>
                                         <div class="form-group">
-                                            <label asp-for="StateId" class="control-label"></label>
-                                            <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
-                                                <option>--SELECT STATE--</option>
-
-                                            </select>
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="DistrictId" class="control-label"></label>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId')">
-                                                <option>--SELECT DISTRICT--</option>
-
-                                            </select>
-                                            <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" for="DistrictId">District</span>
+                                                </div>
+                                                <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId')">
+                                                    <option>--SELECT DISTRICT--</option>
+                                                </select>
+                                                <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                       @* <div class="form-group">
-                                            <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
-                                            <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control" asp-items="ViewBag.PinCodeId" multiple>
-                                            </select>
-                                            <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
+                                        @* <div class="form-group">
+                                        <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
+                                        <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control" asp-items="ViewBag.PinCodeId" multiple>
+                                        </select>
+                                        <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
                                         </div>*@
                                         <div class="form-group">
                                             @Html.LabelFor(model => model.SelectedMultiPincodeId, new { @class = "col-sm-2 col-form-label" })
-                                                @{
-                                                    var pincodes = ViewBag.PinCodeId as List<SelectListItem>;
-                                                }
-                                                @Html.ListBoxFor(model => model.SelectedMultiPincodeId, new MultiSelectList(pincodes, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "PinCodeId" })
+                                            @{
+                                                var pincodes = ViewBag.PinCodeId as List<SelectListItem>;
+                                            }
+                                            @Html.ListBoxFor(model => model.SelectedMultiPincodeId, new MultiSelectList(pincodes, "Value", "Text"), new { @class = "form-control", multiple = "multiple", id = "PinCodeId" })
                                         </div>
-@*                                        <div class="form-group">
-                                            <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
-                                            <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control selectPincode show-tick form-control input-md" asp-items="ViewBag.PinCodeId">
-                                            </select>
-                                            <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
+                                        @*                                        <div class="form-group">
+                                        <label asp-for="SelectedMultiPincodeId" class="control-label"></label>
+                                        <select id="PinCodeId" asp-for="SelectedMultiPincodeId" class="form-control selectPincode show-tick form-control input-md" asp-items="ViewBag.PinCodeId">
+                                        </select>
+                                        <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
                                         </div>*@
 
                                         @*                                       <div class="form-group">
@@ -126,7 +153,7 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        
+
         <script>
             $(document).ready(function () {
                 $('.selectPincode').attr('data-live-search', true);

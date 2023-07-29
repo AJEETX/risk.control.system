@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Create
-        [Breadcrumb(" Create")]
+        [Breadcrumb(" Add")]
         public IActionResult Create(string id)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
