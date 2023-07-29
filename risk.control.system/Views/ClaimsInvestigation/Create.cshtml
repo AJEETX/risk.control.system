@@ -11,7 +11,9 @@
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-plus"></i> Claim detail</h3>
                 </div>
+                
                 <div class="card-body">
+
                     <div class="row">
                         <div class="col-sm-6">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -23,177 +25,295 @@
                                     <option>--- SELECT COMPANY ---</option>
                                 </select>
                             </div>
+
                             <div class="form-group">
-                                <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
-                                <select required id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
-                                    <option>--- SELECT SERVICE TYPE ---</option>
-                                </select>
-                                <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type</label>
+                                    </div>
+                                    <select required id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                        <option>--- SELECT SERVICE TYPE ---</option>
+                                    </select>
+                                    <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label asp-for="ClaimType" class="control-label"></label>
-                                <select required asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
-                                    <option>--- SELECT CLAIM TYPE ---</option>
-                                </select>
-                                <span asp-validation-for="ClaimType" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="ClaimType">Claim Type</label>
+                                    </div>
+                                    <select required asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
+                                        <option>--- SELECT CLAIM TYPE ---</option>
+                                    </select>
+                                    <span asp-validation-for="ClaimType" class="text-danger"></span>
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label asp-for="CostCentreId" class="control-label"></label>
-                                <select required asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
-                                    <option>--- SELECT BUDGET CENTRE ---</option>
-                                </select>
-                                <span asp-validation-for="CostCentreId" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CostCentreId">Budget Centre</label>
+                                    </div>
+                                    <select required asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
+                                        <option>--- SELECT BUDGET CENTRE ---</option>
+                                    </select>
+                                    <span asp-validation-for="CostCentreId" class="text-danger"></span>
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label asp-for="CaseEnablerId" class="control-label">Reason To Verify</label>
-                                <select required asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
-                                    <option>--- SELECT REASON TO VERIFY ---</option>
-                                </select>
-                                <span asp-validation-for="CaseEnablerId" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CaseEnablerId">Reason To Verify</label>
+                                    </div>
+                                    <select required asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
+                                        <option>--- SELECT REASON TO VERIFY ---</option>
+                                    </select>
+                                    <span asp-validation-for="CaseEnablerId" class="text-danger"></span>
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label asp-for="ContractIssueDate" class="control-label"></label>
-                                <input required asp-for="ContractIssueDate" class="form-control" type="date" />
-                                <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="ContractIssueDate">Contract Issue Date</label>
+                                    </div>
+                                    <input required asp-for="ContractIssueDate" class="form-control" type="date" />
+                                    <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
+                                </div>
                             </div>
+
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label asp-for="DateOfIncident" class="control-label"></label>
-                                <input required asp-for="DateOfIncident" class="form-control" type="date" />
-                                <span asp-validation-for="DateOfIncident" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="ContractNumber" class="control-label"></label>
-                                <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract Number" />
-                                <span asp-validation-for="ContractNumber" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="SumAssuredValue" class="control-label"></label>
-                                <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum" />
-                                <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="CauseOfLoss" class="control-label"></label>
-                                <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" />
-                                <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="Document" class="control-label"></label>
                                 <div class="input-group mb-3">
-                                    <img class="form-Image" id="documentImage" src="/img/no-image.png">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="DateOfIncident">Date Of Incident</label>
+                                    </div>
+                                    <input required asp-for="DateOfIncident" class="form-control" type="date" />
+                                    <span asp-validation-for="DateOfIncident" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="ContractNumber">Contract Number</label>
+                                    </div>
+                                    <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract Number" />
+                                    <span asp-validation-for="ContractNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="SumAssuredValue">Insured Amount</label>
+                                    </div>
+                                    <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum" />
+                                    <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                          
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss</label>
+                                    </div>
+                                    <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" />
+                                    <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="Document">Claim Document</label>
+                                    </div>
+                                    <img class="form-Image" id="documentImage" src="/img/no-photo.png">
                                     <input asp-for="Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                 </div>
                 <div class="card-header">
-                    <h3 class="card-title"><i class="fas fa-plus"></i> Customer detail</h3>
+                    <h3 class="card-title"><i class="fas fa-user-plus"></i> Customer detail</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-6">
+                            
+
                             <div class="form-group">
-                                <label asp-for="ProfileImage" class="control-label">Customer Image</label>
                                 <div class="input-group mb-3">
-                                    <img class="form-Image" id="profileImage" src="/img/no-image.png">
-                                <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CustomerType">Customer Type</label>
+                                    </div>
+                                    <select required asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
+                                        <option>--- SELECT CUSTOMER TYPE  ---</option>
+                                    </select>
+                                    <span asp-validation-for="CustomerType" class="text-danger"></span>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label asp-for="CustomerType" class="control-label"></label>
-                                <select required asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
-                                    <option>--- SELECT CUSTOMER TYPE  ---</option>
-                                </select>
-                                <span asp-validation-for="CustomerType" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CustomerName">Customer Name</label>
+                                    </div>
+                                    <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" />
+                                    <span asp-validation-for="CustomerName" class="text-danger"></span>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label asp-for="CustomerName" class="control-label"></label>
-                                <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" />
-                                <span asp-validation-for="CustomerName" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth</label>
+                                    </div>
+                                    <input required asp-for="CustomerDateOfBirth" class="form-control" type="date" />
+                                    <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="Gender">Gender</label>
+                                    </div>
+                                    <select required asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
+                                        <option>--- SELECT GENDER ---</option>
+                                    </select>
+                                    <span asp-validation-for="Gender" class="text-danger"></span>
+                                </div>
                             </div>
 
                             <div class="form-group">
-                                <label asp-for="CustomerDateOfBirth" class="control-label"></label>
-                                <input required asp-for="CustomerDateOfBirth" class="form-control" type="date" />
-                                <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="ContactNumber">Contact Number</label>
+                                    </div>
+                                    <input required asp-for="ContactNumber" class="form-control" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Contract Number" />
+                                    <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
+
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label asp-for="Gender" class="control-label"></label>
-                                <select required asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
-                                    <option>--- SELECT GENDER ---</option>
-                                </select>
-                                <span asp-validation-for="Gender" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CustomerIncome">Customer Income</label>
+                                    </div>
+                                    <select required asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
+                                        <option>--- SELECT CUSTOMER INCOME ---</option>
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CustomerOccupation">Customer Occupation</label>
+                                    </div>
+                                    <select required asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
+                                        <option>--- SELECT CUSTOMER OCCUPATION ---</option>
+                                    </select>
+
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label asp-for="ContactNumber" class="control-label"></label>
-                                <input required asp-for="ContactNumber" class="form-control" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Contract Number" />
-                                <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="CustomerEducation">Customer Education</label>
+                                    </div>
+                                    <select required asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
+                                        <option>--- SELECT CUSTOMER EDUCATION ---</option>
+                                    </select>
+
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label asp-for="Addressline" class="control-label"></label>
-                                <input required asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" />
-                                <span asp-validation-for="Addressline" class="text-danger field-validation-valid"></span>
-                            </div>
+                          
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label asp-for="CountryId" class="control-label"></label>
-                                <select required asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                    <option>--- SELECT COUNTRY ---</option>
-                                </select>
-                                <span asp-validation-for="CountryId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="StateId" class="control-label"></label>
-                                <select required id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                    <option>--- SELECT STATE ---</option>
-                                </select>
-                                <span asp-validation-for="StateId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="DistrictId" class="control-label"></label>
-                                <select required id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                    <option>--- SELECT DISTRICT ---</option>
-                                </select>
-                                <span asp-validation-for="DistrictId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="PinCodeId" class="control-label"></label>
-                                <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                    <option>--- SELECT PINCODE ---</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="CustomerIncome" class="control-label"></label>
-                                <select required asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
-                                    <option>--- SELECT CUSTOMER INCOME ---</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="CustomerOccupation" class="control-label"></label>
-                                <select required asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
-                                    <option>--- SELECT CUSTOMER OCCUPATION ---</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="CustomerEducation" class="control-label"></label>
-                                <select required asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
-                                    <option>--- SELECT CUSTOMER EDUCATION ---</option>
-                                </select>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="CountryId">Country</label>
+                                    </div>
+                                    <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                        <option selected>--- SELECT COUNTRY ---</option>
+                                    </select>
+
+                                </div>
                             </div>
 
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
                             <div class="form-group">
-                                <label asp-for="Description" class="control-label"></label>
-                                <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" />
-                                <span asp-validation-for="Description" class="text-danger"></span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="StateId">State</label>
+                                    </div>
+                                    <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                        <option>--- SELECT STATE ---</option>
+                                    </select>
+
+                                    <span asp-validation-for="StateId" class="text-danger"></span>
+                                </div>
                             </div>
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="DistrictId">District</label>
+                                    </div>
+                                    <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                        <option>--- SELECT DISTRICT ---</option>
+                                    </select>
+
+                                    <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="PinCodeId">Pincode</label>
+                                    </div>
+                                    <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                        <option>--- SELECT PINCODE ---</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="Addressline">Address line</span>
+                                    </div>
+                                    <input type="text" asp-for="Addressline" class="form-control" type="text" required placeholder="Enter Address line" />
+                                    <span asp-validation-for="Addressline" class="text-danger"></span>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="Addressline">Remarks</span>
+                                    </div>
+                                    <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" />
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" asp-for="ProfileImage">Claim Document</label>
+                                    </div>
+                                    <img class="form-Image" id="profileImage" src="/img/no-photo.png">
+                                    <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                     <div class="card-body">
@@ -225,6 +345,6 @@
     }
     <script>
         $("#InvestigationServiceTypeId").focus();
-        
+
     </script>
 }

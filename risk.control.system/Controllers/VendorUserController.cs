@@ -61,6 +61,8 @@ namespace risk.control.system.Controllers
                 var thisViewModel = new UsersViewModel();
                 thisViewModel.UserId = user.Id.ToString();
                 thisViewModel.Email = user?.Email;
+                thisViewModel.Addressline = user?.Addressline;
+                thisViewModel.PhoneNumber = user?.PhoneNumber;
                 thisViewModel.UserName = user?.UserName;
                 thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
                 thisViewModel.FirstName = user.FirstName;

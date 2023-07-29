@@ -179,6 +179,8 @@ namespace risk.control.system.Controllers
                 var thisViewModel = new UsersViewModel();
                 thisViewModel.UserId = user.Id.ToString();
                 thisViewModel.Email = user?.Email;
+                thisViewModel.Addressline = user?.Addressline;
+                thisViewModel.PhoneNumber = user?.PhoneNumber;
                 thisViewModel.UserName = user?.UserName;
                 thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
                 thisViewModel.FirstName = user.FirstName;
@@ -199,7 +201,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Add", FromAction ="User")]
+        [Breadcrumb("Add", FromAction = "User")]
         public IActionResult CreateUser()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -212,7 +214,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientCompanyApplicationUser user)
+        public async Task<IActionResult> Create(ClientCompanyApplicationUser user, string emailSuffix)
         {
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
@@ -223,9 +225,12 @@ namespace risk.control.system.Controllers
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
+
+            var userFullEmail = user.Email + emailSuffix;
+            user.Email = userFullEmail;
             user.EmailConfirmed = true;
-            user.UserName = user.Email;
-            user.Mailbox = new Mailbox { Name = user.Email };
+            user.UserName = userFullEmail;
+            user.Mailbox = new Mailbox { Name = userFullEmail };
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
@@ -317,6 +322,7 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
+                        user.Addressline = applicationUser.Addressline;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;
@@ -587,7 +593,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        [Breadcrumb("Role", FromAction ="User")]
+        [Breadcrumb("Role", FromAction = "User")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<CompanyUserRoleViewModel>();
@@ -631,7 +637,7 @@ namespace risk.control.system.Controllers
             var companyPage = new MvcBreadcrumbNode("Index", "Company", "Company");
             var usersPage = new MvcBreadcrumbNode("User", "Company", "Users") { Parent = companyPage };
             var userPage = new MvcBreadcrumbNode("EditUser", "Company", $"User") { Parent = usersPage, RouteValues = new { userid = userId } };
-            var userRolePage = new MvcBreadcrumbNode("UserRoles", "Company", $"Edit User Role") { Parent = usersPage, RouteValues = new { userid = userId } };
+            var userRolePage = new MvcBreadcrumbNode("UserRoles", "Company", $"Edit Role") { Parent = usersPage, RouteValues = new { userid = userId } };
             ViewData["BreadcrumbNode"] = userRolePage;
             return View(model);
         }

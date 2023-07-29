@@ -11,7 +11,7 @@ namespace risk.control.system.Models.ViewModel
         public string LastName { get; set; }
         public string UserName { get; set; }
         public string? PinCodeId { get; set; }
-        public string? PinCode { get; set; }        
+        public string? PinCode { get; set; }
         public string? StateId { get; set; }
         public string? State { get; set; }
         public string? Country { get; set; }
@@ -21,11 +21,14 @@ namespace risk.control.system.Models.ViewModel
         public string VendorName { get; set; }
         public string CompanyId { get; set; }
         public string CompanyName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Addressline { get; set; }
         public IEnumerable<string> Roles { get; set; }
 
         [Display(Name = "Profile")]
         [NotMapped]
         public IFormFile? Profile { get; set; }
+
         [Display(Name = "Profile")]
         public byte[]? ProfileImageInByte { get; set; } = default!;
     }
@@ -35,6 +38,7 @@ namespace risk.control.system.Models.ViewModel
         public Vendor Vendor { get; set; }
         public List<UsersViewModel> Users { get; set; } = new();
     }
+
     public class CompanyUsersViewModel
     {
         public ClientCompany Company { get; set; }

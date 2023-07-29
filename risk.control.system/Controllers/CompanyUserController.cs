@@ -128,6 +128,8 @@ namespace risk.control.system.Controllers
                     thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
                     thisViewModel.FirstName = user.FirstName;
                     thisViewModel.LastName = user.LastName;
+                    thisViewModel.Addressline = user.Addressline;
+                    thisViewModel.PhoneNumber = user.PhoneNumber;
                     thisViewModel.Country = country.Name;
                     thisViewModel.CountryId = user.CountryId;
                     thisViewModel.StateId = user.StateId;
@@ -292,10 +294,7 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
-                        user.UserName = applicationUser.Email;
-                        user.Email = applicationUser.Email;
-                        user.EmailConfirmed = true;
-                        user.UserName = applicationUser.UserName;
+                        user.Addressline = applicationUser.Addressline;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;

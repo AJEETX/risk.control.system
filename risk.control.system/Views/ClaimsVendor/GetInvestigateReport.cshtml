@@ -313,9 +313,12 @@
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label><input type="checkbox" class="selected-case" id="selected-case" name="selected-case" title="I Agree to the term and conditions. ">  I Agree to the term and conditions</label>
+                                            <div class="custom-control custom-checkbox mr-sm-2">
+                                                <input type="checkbox" class="custom-control-input selected-case" id="selected-case" name="selected-case">
+                                                <label class="custom-control-label" for="selected-case"> I hereby consent to agree to the term and conditions.</label>
+                                            </div>
 
-                                        @*<select name="supervisorRemarkType" id="supervisorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<SupervisorRemarkType>()"></select>*@
+                                        
                                     </div>
                                 </div>
                             </div>

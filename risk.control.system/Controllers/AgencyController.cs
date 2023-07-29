@@ -178,6 +178,8 @@ namespace risk.control.system.Controllers
                 thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
                 thisViewModel.FirstName = user.FirstName;
                 thisViewModel.LastName = user.LastName;
+                thisViewModel.PhoneNumber = user.PhoneNumber;
+                thisViewModel.Addressline = user.Addressline;
                 thisViewModel.Country = country.Name;
                 thisViewModel.CountryId = user.CountryId;
                 thisViewModel.StateId = user.StateId;
@@ -207,7 +209,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateUser(VendorApplicationUser user)
+        public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix)
         {
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
@@ -218,9 +220,11 @@ namespace risk.control.system.Controllers
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
+            var userFullEmail = user.Email + emailSuffix;
+            user.Email = userFullEmail;
             user.EmailConfirmed = true;
-            user.UserName = user.Email;
-            user.Mailbox = new Mailbox { Name = user.Email };
+            user.UserName = userFullEmail;
+            user.Mailbox = new Mailbox { Name = userFullEmail };
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
@@ -307,7 +311,7 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
-                        user.EmailConfirmed = true;
+                        user.Addressline = applicationUser.Addressline;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;

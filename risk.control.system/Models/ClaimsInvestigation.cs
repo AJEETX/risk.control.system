@@ -306,6 +306,9 @@ namespace risk.control.system.Models
 
     public enum ClaimType
     {
+        [Display(Name = "---SELECT CLAIM TYPE---")]
+        NONE,
+
         [Display(Name = "Death")]
         DEATH,
 
@@ -315,6 +318,9 @@ namespace risk.control.system.Models
 
     public enum Gender
     {
+        [Display(Name = "---SELECT GENDER---")]
+        NONE,
+
         [Display(Name = "Male")]
         MALE,
 
@@ -327,6 +333,9 @@ namespace risk.control.system.Models
 
     public enum CustomerType
     {
+        [Display(Name = "---SELECT CUSTOMER TYPE---")]
+        NONE,
+
         [Display(Name = "HNI")]
         HNI,
 

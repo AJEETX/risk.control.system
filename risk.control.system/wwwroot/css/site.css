@@ -252,3 +252,11 @@ textarea {
     border-radius: 4px;
     background-color: #6c757d;
 }
+.form-control[readonly]{
+    background-color:whitesmoke;
+    font-weight:bold;
+}
+.input-group-prepend{
+    display:block;
+    width:10rem;
+}

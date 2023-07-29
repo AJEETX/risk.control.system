@@ -25,6 +25,13 @@
                                     <th>
                                         Name
                                     </th>
+
+                                    <th>
+                                        Phone
+                                    </th>
+                                    <th>
+                                        Addresline
+                                    </th>
                                     <th>
                                         Pincode
                                     </th>
@@ -44,40 +51,61 @@
                                         </td>
                                         <td style="width: 10%;">@user.Email</td>
                                         <td>@user.FirstName @user.LastName</td>
+                                        <td>@user.PhoneNumber</td>
+                                        <td>@user.Addressline</td>
                                         <td>@user.PinCode</td>
                                         <td>@user.State</td>
                                         <td>@user.Country</td>
-                                        <td style="width:20%">
-                                            @foreach (var role in user.Roles)
-
+                                        <td>
+                                            @if(user.Roles.Count() == 0)
                                             {
-                                                <span class="badge badge-light">@role</span>
+                                                <span class="badge badge-danger">No role Added</span>
+                                            }
+                                            else
+                                            {
+                                                @foreach (var role in user.Roles)
+                                                {
+                                                    <span class="badge badge-light">@role</span>
+                                                }
                                             }
                                         </td>
                                         <td>
                                             @{
                                                 if (user.Roles.Contains(AppRoles.PortalAdmin.ToString()))
-
                                                 {
-                                                    <span class="badge badge-danger">PA</span>
+                                                    <span class="badge badge-light">PA</span>
                                                 }
-
                                                 else if (user.Roles.Contains(AppRoles.ClientAdmin.ToString()))
-
                                                 {
-                                                    <span class="badge badge-danger">CA</span>
+                                                    <span class="badge badge-light">CA</span>
                                                 }
-
+                                                else if (user.Roles.Contains(AppRoles.ClientCreator.ToString()))
+                                                {
+                                                    <span class="badge badge-warning">CC</span>
+                                                }
+                                                else if (user.Roles.Contains(AppRoles.ClientAssigner.ToString()))
+                                                {
+                                                    <span class="badge badge-info">CS</span>
+                                                }
+                                                else if (user.Roles.Contains(AppRoles.ClientAssessor.ToString()))
+                                                {
+                                                    <span class="badge badge-success">CAS</span>
+                                                }
                                                 else if (user.Roles.Contains(AppRoles.VendorAdmin.ToString()))
-
                                                 {
-                                                    <span class="badge badge-warning">VA</span>
+                                                    <span class="badge badge-danger">VA</span>
                                                 }
-
-                                                else
-
+                                                else if (user.Roles.Contains(AppRoles.VendorSupervisor.ToString()))
                                                 {
-                                                    <span class="badge badge-success">ST</span>
+                                                    <span class="badge badge-warning">VS</span>
+                                                }
+                                                else if (user.Roles.Contains(AppRoles.VendorAgent.ToString()))
+                                                {
+                                                    <span class="badge badge-success">VA</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-light">...</span>
                                                 }
 
                                             }
