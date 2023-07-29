@@ -11,20 +11,17 @@
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-plus"></i> Claim detail</h3>
                 </div>
-                
                 <div class="card-body">
-
                     <div class="row">
-                        <div class="col-sm-6">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
-
                             <div style="display:@hasClientCompany;" class="form-group">
-                                <label asp-for="ClientCompanyId" class="control-label"></label>
+                                <span asp-for="ClientCompanyId" class="control-label"></span>
                                 <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
                                     <option>--- SELECT COMPANY ---</option>
                                 </select>
                             </div>
+                        <div class="col-sm-6">
 
                             <div class="form-group">
                                 <div class="input-group mb-3">
@@ -143,8 +140,6 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-6">
-                            
-
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
@@ -171,7 +166,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth</span>
                                     </div>
-                                    <input required asp-for="CustomerDateOfBirth" class="form-control" type="date" />
+                                    <input id="datepicker" required asp-for="CustomerDateOfBirth" class="form-control" type="date" />
                                     <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
                                 </div>
                             </div>
@@ -192,7 +187,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="ContactNumber">Contact Number</span>
                                     </div>
-                                    <input required asp-for="ContactNumber" class="form-control" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Contract Number" />
+                                    <input required asp-for="ContactNumber" class="form-control" type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Contract Number" />
                                     <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
 
                                 </div>

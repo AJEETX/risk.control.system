@@ -12,7 +12,7 @@
         //}
     });
 
-    $("#datepicker").datepicker();
+    $("#datepicker").datepicker({ maxDate: '0' });
 
     if ($(".selected-case:checked").length) {
         $("#allocate-case").prop('disabled', false);
