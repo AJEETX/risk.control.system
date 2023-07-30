@@ -33,6 +33,7 @@ namespace risk.control.system.Controllers.Api
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
+            string email = "vendor-agent@admin.com";
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.ClaimReport)
@@ -60,7 +61,7 @@ namespace risk.control.system.Controllers.Api
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == "vendor-agent@admin.com");
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email);
 
             if (vendorUser != null)
             {
