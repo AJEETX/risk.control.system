@@ -17,8 +17,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <partial name="AdminLTE/_Styles" />
     <style>
-        html, body {
-            height: 100%;
+         html {
+            font-size: 14px;
+            font-family: "Arial Narrow" !important;
+        }
+
+        body {
+            margin: 0;
+            background-color: hsl(0, 0%, 98%);
+            color: #333;
+            font: 100% / normal Arial Narrow;
+        }
+
+        main {
+            margin: 0 auto;
+            border-radius: .5rem;
+        }
+
+        form {
+            box-sizing: border-box;
+            padding: 2rem;
+            border-radius: 1rem;
+            background-color: hsl(0, 0%, 100%);
+            gap: 2rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
         }
     </style>
 </head>

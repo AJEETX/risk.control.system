@@ -29,6 +29,35 @@
         .noty_theme__mint.noty_type__success{
             background-color:green !important;
         }
+
+        <style >
+        body {
+            margin: 0;
+            background-color: hsl(0, 0%, 98%);
+            color: #333;
+            font: 100% / normal Arial Narrow;
+        }
+
+        main {
+            margin: 0 auto;
+            border-radius: .5rem;
+            background-color: #e5e5e5;
+            border: .5rem solid #e5e5e5;
+        }
+
+        form {
+            box-sizing: border-box;
+            padding: 2rem;
+            border-radius: 1rem;
+            background-color: hsl(0, 0%, 100%);
+            border: 4px solid hsl(0, 0%, 90%);
+            display: grid;
+            gap: 2rem;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
     </style>
 </head>
 
@@ -93,7 +122,7 @@
                     <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" type="button" data-dismiss="modal"><i class="fa fa-window-close"></i> Cancel</button>
-                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" style="padding:0;border:0">
                             <div class="pull-right">
                                 <button type="submit" class="btn btn-default btn-flat btn-outline-danger"><i class="fa fa-sign-out"></i> Logout</button>
                             </div>

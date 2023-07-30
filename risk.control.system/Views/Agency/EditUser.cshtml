@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.Vendor.Email.Substring(Model.Vendor.Email.IndexOf('@'));
+    Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
 <section class="content pt-2">
     <div class="container-fluid ">
