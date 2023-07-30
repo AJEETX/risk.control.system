@@ -31,11 +31,14 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpGet("test")]
         public IActionResult Test()
         {
             return Ok();
         }
+
         [AllowAnonymous]
+        [HttpGet("agent")]
         public async Task<IActionResult> Index()
         {
             string email = "vendor-agent@admin.com";

@@ -486,7 +486,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb(" Empanelled vendors")]
-        public async Task<IActionResult> EmpanelledVendors(long selectedcase, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> EmpanelledVendors(long selectedcase)
         {
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
@@ -510,7 +510,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.CostCentre)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimCase.ClaimsInvestigationId);
 
-            var applicationDbContext = _context.Vendor
+            var existingVendors = await _context.Vendor
                 .Where(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.ClientCompanyId)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
@@ -523,69 +523,71 @@ namespace risk.control.system.Controllers
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
-                .AsQueryable();
+                .ToListAsync();
 
-            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
-            if (searchString != null)
+            var claimsCases = _context.ClaimsInvestigation
+                .Include(c => c.Vendors)
+                .Include(c => c.CaseLocations);
+
+            var vendorCaseCount = new Dictionary<string, int>();
+
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+            var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            int countOfCases = 0;
+            foreach (var claimsCase in claimsCases)
             {
-                currentPage = 1;
+                if (claimsCase.CaseLocations.Count > 0)
+                {
+                    foreach (var CaseLocation in claimsCase.CaseLocations)
+                    {
+                        if (!string.IsNullOrEmpty(CaseLocation.VendorId))
+                        {
+                            if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                    CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                    CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
+                                    )
+                            {
+                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId, out countOfCases))
+                                {
+                                    vendorCaseCount.Add(CaseLocation.VendorId, 1);
+                                }
+                                else
+                                {
+                                    int currentCount = vendorCaseCount[CaseLocation.VendorId];
+                                    ++currentCount;
+                                    vendorCaseCount[CaseLocation.VendorId] = currentCount;
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            else
+
+            List<VendorCaseModel> vendorWithCaseCounts = new();
+
+            foreach (var existingVendor in existingVendors)
             {
-                searchString = currentFilter;
+                foreach (var vendorCase in vendorCaseCount)
+                {
+                    if (vendorCase.Key == existingVendor.VendorId)
+                    {
+                        vendorWithCaseCounts.Add(new VendorCaseModel
+                        {
+                            CaseCount = vendorCase.Value,
+                            Vendor = existingVendor,
+                        });
+                    }
+                }
             }
 
-            ViewBag.CurrentFilter = searchString;
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                applicationDbContext = applicationDbContext.Where(a =>
-                    a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Addressline.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.BankAccountNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.BankName.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Branch.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.City.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Email.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.IFSCCode.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.District.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.LineOfBusiness.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.InvestigationServiceType.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.PincodeServices.Any(p => p.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Code.ToLower().Contains(searchString.Trim().ToLower())));
-            }
-
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-
-                case "code_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
-                    break;
-
-                default:
-                    applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-            }
-            int pageNumber = (currentPage ?? 1);
-
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-
-            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
             ViewBag.CompanyId = claimCase.ClaimsInvestigation.ClientCompanyId;
 
-            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = applicationDbContextResult, ClaimsInvestigation = claimsInvestigation });
+            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation });
         }
 
         [HttpGet]

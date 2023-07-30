@@ -275,6 +275,9 @@
                                             Email
                                         </th>
                                         <th>
+                                            Case Count
+                                        </th>
+                                        <th>
                                             <span class="badge badge-success">Service-type = <span class="badge badge-light">Pincodes</span></span>
                                         </th>
                                         <th></th>
@@ -285,12 +288,12 @@
                                     {
                                         <tr>
                                             <td>
-                                                <input id="@item.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.VendorId" />
+                                                <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" />
                                             </td>
                                             <td>
-                                                @if (item?.DocumentImage is not null)
+                                                @if (item?.Vendor.DocumentImage is not null)
                                             {
-                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.Vendor.DocumentImage))">
                                             }
                                             else
                                             {
@@ -298,16 +301,19 @@
                                             }
                                             </td>
                                             <td>
-                                            @Html.DisplayFor(modelItem => item.Name)
+                                            @Html.DisplayFor(modelItem => item.Vendor.Name)
                                             </td>
                                             <td>
-                                            @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                            @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)
                                             </td>
                                             <td>
-                                            @Html.DisplayFor(modelItem => item.Email)
+                                            @Html.DisplayFor(modelItem => item.Vendor.Email)
                                             </td>
                                             <td>
-                                            @foreach (var service in item.VendorInvestigationServiceTypes)
+                                                @Html.DisplayFor(modelItem => item.CaseCount)
+                                            </td>
+                                            <td>
+                                            @foreach (var service in item.Vendor.VendorInvestigationServiceTypes)
                                             {
                                                     <span class="badge badge-light">
                                                     @service.LineOfBusiness.Name - @service.InvestigationServiceType.Name
@@ -322,7 +328,7 @@
                                             </td>
 
                                             <td>
-                                                <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
+                                                <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-backurl="EmpanelledVendors" asp-route-id="@item.Vendor.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
                                                     <i class="fa fa-search"></i> @Applicationsettings.DETAILS
                                                 </a>
                                             </td>
