@@ -208,6 +208,17 @@ namespace risk.control.system.Controllers
                             await caseLocation.ProfileImage.CopyToAsync(dataStream);
                             caseLocation.ProfilePicture = dataStream.ToArray();
                         }
+
+                        var existingLocation = _context.CaseLocation.AsNoTracking().Where(c=>
+                        c.CaseLocationId == caseLocation.CaseLocationId && c.CaseLocationId == id ).FirstOrDefault();
+                        if (existingLocation != null)
+                        {
+                            if(existingLocation.ProfilePicture != null)
+                            {
+                                caseLocation.ProfilePicture = existingLocation.ProfilePicture;
+                            }
+                        }
+
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage("verification location edited successfully!");

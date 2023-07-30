@@ -20,6 +20,7 @@
                                     <div class="col-md-6">
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <input type="hidden" asp-for="CaseLocationId" />
+                                        <input type="hidden" asp-for="ClaimsInvestigationId" />
                                         
                                         
                                         <div class="form-group">
@@ -55,7 +56,7 @@
                                                     <span class="input-group-text" asp-for="BeneficiaryName">Relation</span>
                                                 </div>
                                                 <select required asp-for="BeneficiaryRelationId" class="form-control" asp-items="ViewBag.BeneficiaryRelationId">
-                                                    <option>--- SELECT BENEFICIARY RELATION ---</option>
+                                                    <option value="">--- SELECT BENEFICIARY RELATION ---</option>
                                                 </select>
                                                 <span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
                                             </div>
@@ -75,7 +76,7 @@
                                                     <span class="input-group-text" asp-for="BeneficiaryIncome">Annual Income</span>
                                                 </div>
                                                 <select required asp-for="BeneficiaryIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
-                                                    <option>--- SELECT BENEFICIARY INCOME ---</option>
+                                                    <option value="">--- SELECT BENEFICIARY INCOME ---</option>
                                                 </select>
                                                 <span asp-validation-for="BeneficiaryIncome" class="text-danger"></span>
                                             </div>
@@ -99,7 +100,7 @@
                                                     <span class="input-group-text" for="CountryId">Country</span>
                                                 </div>
                                                 <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                                    <option selected>--- SELECT COUNTRY ---</option>
+                                                    <option value="">--- SELECT COUNTRY ---</option>
                                                 </select>
 
                                             </div>
@@ -111,7 +112,7 @@
                                                     <span class="input-group-text" for="StateId">State</span>
                                                 </div>
                                                 <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                                    <option>--- SELECT STATE ---</option>
+                                                    <option value="">--- SELECT STATE ---</option>
                                                 </select>
 
                                                 <span asp-validation-for="StateId" class="text-danger"></span>
@@ -124,7 +125,7 @@
                                                     <span class="input-group-text" for="DistrictId">District</span>
                                                 </div>
                                                 <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                                    <option>--- SELECT DISTRICT ---</option>
+                                                    <option value="">--- SELECT DISTRICT ---</option>
                                                 </select>
 
                                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
@@ -137,7 +138,7 @@
                                                     <span class="input-group-text" for="PinCodeId">Pincode</span>
                                                 </div>
                                                 <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                                    <option>--- SELECT PINCODE ---</option>
+                                                    <option value="">--- SELECT PINCODE ---</option>
                                                 </select>
 
                                             </div>
@@ -147,7 +148,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" id="Addressline">Address line</span>
                                                 </div>
-                                                <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" />
+                                                <input required type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" />
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -169,7 +170,7 @@
                                                 @Applicationsettings.CANCEL
                                             </a>
                                             <button type="submit" class="btn btn-warning">
-                                                <i class="fas fa-pen"></i> Edit Location
+                                                <i class="fas fa-map-marker-alt"></i> Edit Location
                                             </button>
                                         </div>
                                     </div>
