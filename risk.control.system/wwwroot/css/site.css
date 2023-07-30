@@ -305,3 +305,11 @@ textarea {
 .nav-item {
     border-bottom: 1px dotted #ccc;
 }
+
+:not(.layout-fixed) .main-sidebar {
+    height: inherit;
+    min-height: 100%;
+    border-right: .4rem solid #ccc;
+    position: absolute;
+    top: 0;
+}

@@ -11456,10 +11456,11 @@ body.sidebar-collapse:not(.sidebar-mini-md):not(.sidebar-mini) .main-header::bef
 }
 
 :not(.layout-fixed) .main-sidebar {
-  height: inherit;
-  min-height: 100%;
-  position: absolute;
-  top: 0;
+    height: inherit;
+    min-height: 100%;
+    border-right: .4rem solid #ccc;
+    position: absolute;
+    top: 0;
 }
 
 .layout-fixed .brand-link {
