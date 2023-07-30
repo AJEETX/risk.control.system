@@ -7,33 +7,37 @@
 <section class="content pt-2">
     <div class="container-fluid ">
         <form asp-action="Create" enctype="multipart/form-data">
-            <div class="card card-secondary">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title"><i class="fas fa-plus"></i> Claim detail</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
+                            
+                        <div class="col-sm-6">
                             <div style="display:@hasClientCompany;" class="form-group">
                                 <span asp-for="ClientCompanyId" class="control-label"></span>
-                                <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
+                                <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control"  asp-items="ViewBag.ClientCompanyId">
                                     <option>--- SELECT COMPANY ---</option>
                                 </select>
                             </div>
-                        <div class="col-sm-6">
-
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type</span>
                                     </div>
-                                    <select required id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
-                                        <option>--- SELECT SERVICE TYPE ---</option>
+                                    <select required asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                        <option value="">--- SELECT SERVICE TYPE ---</option>
                                     </select>
                                     <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
                                 </div>
                             </div>
+
+                            
 
                             <div class="form-group">
                                 <div class="input-group mb-3">
@@ -41,11 +45,15 @@
                                         <span class="input-group-text" asp-for="ClaimType">Claim Type</span>
                                     </div>
                                     <select required asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
-                                        <option>--- SELECT CLAIM TYPE ---</option>
+                                        <option value="">--- SELECT CLAIM TYPE ---</option>
                                     </select>
                                     <span asp-validation-for="ClaimType" class="text-danger"></span>
                                 </div>
                             </div>
+
+
+
+
 
                             <div class="form-group">
                                 <div class="input-group mb-3">
@@ -53,7 +61,7 @@
                                         <span class="input-group-text" asp-for="CostCentreId">Budget Centre</span>
                                     </div>
                                     <select required asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
-                                        <option>--- SELECT BUDGET CENTRE ---</option>
+                                        <option value="">--- SELECT BUDGET CENTRE ---</option>
                                     </select>
                                     <span asp-validation-for="CostCentreId" class="text-danger"></span>
                                 </div>
@@ -65,7 +73,7 @@
                                         <span class="input-group-text" asp-for="CaseEnablerId">Reason To Verify</span>
                                     </div>
                                     <select required asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
-                                        <option>--- SELECT REASON TO VERIFY ---</option>
+                                        <option value="">--- SELECT REASON TO VERIFY ---</option>
                                     </select>
                                     <span asp-validation-for="CaseEnablerId" class="text-danger"></span>
                                 </div>
@@ -76,7 +84,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="ContractIssueDate">Issue Date</span>
                                     </div>
-                                    <input required asp-for="ContractIssueDate" class="form-control" type="date" />
+                                    <input required asp-for="ContractIssueDate" class="form-control" type="date"value="" />
                                     <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
                                 </div>
                             </div>
@@ -88,7 +96,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="DateOfIncident">Date Of Incident</span>
                                     </div>
-                                    <input required asp-for="DateOfIncident" class="form-control" type="date" />
+                                    <input required asp-for="DateOfIncident" class="form-control" type="date" value="" />
                                     <span asp-validation-for="DateOfIncident" class="text-danger"></span>
                                 </div>
                             </div>
@@ -106,7 +114,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="SumAssuredValue">Insured Amount</span>
                                     </div>
-                                    <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum" />
+                                    <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum" value=""  min="1"/>
                                     <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
                                 </div>
                             </div>
@@ -146,7 +154,7 @@
                                         <span class="input-group-text" asp-for="CustomerType">Customer Type</span>
                                     </div>
                                     <select required asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
-                                        <option>--- SELECT CUSTOMER TYPE  ---</option>
+                                        <option value="">--- SELECT CUSTOMER TYPE  ---</option>
                                     </select>
                                     <span asp-validation-for="CustomerType" class="text-danger"></span>
                                 </div>
@@ -166,7 +174,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth</span>
                                     </div>
-                                    <input required asp-for="CustomerDateOfBirth" class="form-control" type="date"/>
+                                    <input required asp-for="CustomerDateOfBirth" class="form-control" type="date" value=""/>
                                     <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
                                 </div>
                             </div>
@@ -176,7 +184,7 @@
                                         <span class="input-group-text" asp-for="Gender">Gender</span>
                                     </div>
                                     <select required asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
-                                        <option>--- SELECT GENDER ---</option>
+                                        <option value="">--- SELECT GENDER ---</option>
                                     </select>
                                     <span asp-validation-for="Gender" class="text-danger"></span>
                                 </div>
@@ -187,7 +195,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="ContactNumber">Contact Number</span>
                                     </div>
-                                    <input required asp-for="ContactNumber" class="form-control" type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Contract Number" />
+                                    <input required asp-for="ContactNumber" class="form-control" type="number" value="" placeholder="Enter Contact Number" />
                                     <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
 
                                 </div>
@@ -195,10 +203,10 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerIncome">Customer Income</span>
+                                        <span class="input-group-text" asp-for="CustomerIncome">Income</span>
                                     </div>
                                     <select required asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
-                                        <option>--- SELECT CUSTOMER INCOME ---</option>
+                                        <option value="">--- SELECT INCOME ---</option>
                                     </select>
 
                                 </div>
@@ -207,10 +215,10 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerOccupation">Customer Occupation</span>
+                                        <span class="input-group-text" asp-for="CustomerOccupation">Occupation</span>
                                     </div>
                                     <select required asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
-                                        <option>--- SELECT CUSTOMER OCCUPATION ---</option>
+                                        <option value="">--- SELECT OCCUPATION ---</option>
                                     </select>
 
                                 </div>
@@ -218,10 +226,10 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerEducation">Customer Education</span>
+                                        <span class="input-group-text" asp-for="CustomerEducation">Education</span>
                                     </div>
                                     <select required asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
-                                        <option>--- SELECT CUSTOMER EDUCATION ---</option>
+                                        <option value="">--- SELECT EDUCATION ---</option>
                                     </select>
 
                                 </div>
@@ -235,7 +243,7 @@
                                         <span class="input-group-text" for="CountryId">Country</span>
                                     </div>
                                     <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                        <option selected>--- SELECT COUNTRY ---</option>
+                                        <option value="">--- SELECT COUNTRY ---</option>
                                     </select>
 
                                 </div>
@@ -247,7 +255,7 @@
                                         <span class="input-group-text" for="StateId">State</span>
                                     </div>
                                     <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                        <option>--- SELECT STATE ---</option>
+                                        <option value="">--- SELECT STATE ---</option>
                                     </select>
 
                                     <span asp-validation-for="StateId" class="text-danger"></span>
@@ -260,7 +268,7 @@
                                         <span class="input-group-text" for="DistrictId">District</span>
                                     </div>
                                     <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                        <option>--- SELECT DISTRICT ---</option>
+                                        <option value="">--- SELECT DISTRICT ---</option>
                                     </select>
 
                                     <span asp-validation-for="DistrictId" class="text-danger"></span>
@@ -273,7 +281,7 @@
                                         <span class="input-group-text" for="PinCodeId">Pincode</span>
                                     </div>
                                     <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                        <option>--- SELECT PINCODE ---</option>
+                                        <option value="">--- SELECT PINCODE ---</option>
                                     </select>
 
                                 </div>
@@ -311,7 +319,9 @@
 
                         </div>
                     </div>
-                    <div class="card-body">
+                
+                </div>
+                <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group text-right">
@@ -327,8 +337,12 @@
                         </div>
 
                     </div>
-                </div>
             </div>
+                </div>
+
+            </div>
+
+            
         </form>
     </div>
 </section>

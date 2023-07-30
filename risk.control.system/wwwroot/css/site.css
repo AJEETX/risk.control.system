@@ -260,3 +260,9 @@ textarea {
     display:block;
     width:8rem;
 }
+.input-validation-error{
+    border-color:red;
+}
+.field-validation-error{
+    display:none;
+}

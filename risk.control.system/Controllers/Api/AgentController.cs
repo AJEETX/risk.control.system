@@ -31,6 +31,11 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        public IActionResult Test()
+        {
+            return Ok();
+        }
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             string email = "vendor-agent@admin.com";

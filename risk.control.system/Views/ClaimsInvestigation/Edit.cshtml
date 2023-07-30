@@ -8,7 +8,7 @@
 <section class="content">
     <div class="container-fluid ">
         <form asp-action="Edit" enctype="multipart/form-data">
-
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ClaimsInvestigationId" />
             <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
             <div class="card card-secondary">
@@ -17,10 +17,8 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-sm-6">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
-
+                        <div class="col-sm-6">
                             <div style="display:@hasClientCompany;" class="form-group">
                                 <label asp-for="ClientCompanyId" class="control-label"></label>
                                 <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
@@ -329,7 +327,9 @@
 
                         </div>
                     </div>
-                    <div class="card-body">
+                    
+                </div>
+                <div class="card-body">
                         <div class="row">
 
                             <div class="col-md-12">
@@ -348,7 +348,6 @@
                         </div>
 
                     </div>
-                </div>
             </div>
 
         </form>
