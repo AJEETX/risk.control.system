@@ -62,7 +62,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber">Phone Number</span>
                                             </div>
-                                            <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required type="number" maxlength="14" min="1000000000" value="" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
+                                            <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required maxlength="14" min="3000000000" max="9999999999" value="" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
                                             <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -85,7 +85,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="BeneficiaryDateOfBirth">Date Of Birth</span>
                                             </div>
-                                            <input required asp-for="BeneficiaryDateOfBirth" class="form-control" type="date"  value=""/>
+                                            <input required asp-for="BeneficiaryDateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control" type="date" value="" />
                                             <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -189,5 +189,7 @@
     <script src="~/css/bootstrap-multiselect.js"></script>
     <script>
         $("#profileImage").focus();
+        BeneficiaryDateOfBirthId.max = new Date().toISOString().split("T")[0];
+
     </script>
 }

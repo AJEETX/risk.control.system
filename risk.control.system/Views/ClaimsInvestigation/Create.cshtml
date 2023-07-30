@@ -88,7 +88,10 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="ContractIssueDate">Issue Date</span>
                                                 </div>
-                                                <input required asp-for="ContractIssueDate" class="form-control" type="date" value="" />
+                                                @{
+                                                    var maxDate = @DateTime.Now.ToString("dd-MM-yyyy");
+                                                }
+                                                <input required asp-for="ContractIssueDate" id="dateContractId" class="form-control date-width" min="2000-01-01" max="@maxDate" type="date" value="" />
                                                 <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -100,7 +103,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="DateOfIncident">Date Of Incident</span>
                                                 </div>
-                                                <input required asp-for="DateOfIncident" class="form-control" type="date" value="" />
+                                                <input required asp-for="DateOfIncident" id="dateIncidentId" class="form-control" type="date" value="" />
                                                 <span asp-validation-for="DateOfIncident" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -182,7 +185,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth</span>
                                                 </div>
-                                                <input required asp-for="CustomerDateOfBirth" class="form-control" type="date" value="" />
+                                                <input required asp-for="CustomerDateOfBirth" id="dateCustomerId" class="form-control" type="date" value="" />
                                                 <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -203,7 +206,8 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="ContactNumber">Contact Number</span>
                                                 </div>
-                                                <input required asp-for="ContactNumber" class="form-control" type="number" value="" placeholder="Enter Contact Number" />
+                                                <input required asp-for="ContactNumber" class="form-control" type="number" min="3000000000" max="9999999999" value=""
+                                                       placeholder="10 digit e.g 3456789012" />
                                                 <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
 
                                             </div>
@@ -358,5 +362,8 @@
     <script>
         $("#InvestigationServiceTypeId").focus();
 
+        dateContractId.max = new Date().toISOString().split("T")[0];
+        dateIncidentId.max = new Date().toISOString().split("T")[0];
+        dateCustomerId.max = new Date().toISOString().split("T")[0];
     </script>
 }

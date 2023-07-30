@@ -88,7 +88,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="BeneficiaryDateOfBirth">Date Of Birth</span>
                                                 </div>
-                                                <input required asp-for="BeneficiaryDateOfBirth" class="form-control" type="date" />
+                                                <input required asp-for="BeneficiaryDateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control" type="date" />
                                                 <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -189,4 +189,9 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $("#profileImage").focus();
+        BeneficiaryDateOfBirthId.max = new Date().toISOString().split("T")[0];
+
+    </script>
 }

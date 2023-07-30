@@ -85,7 +85,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="ContractIssueDate">Issue Date</span>
                                                 </div>
-                                                <input required asp-for="ContractIssueDate" class="form-control" type="date" />
+                                                <input required asp-for="ContractIssueDate" id="dateContractId" class="form-control" type="date" />
                                                 <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -97,7 +97,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="DateOfIncident">Date Of Incident</span>
                                                 </div>
-                                                <input required asp-for="DateOfIncident" class="form-control" type="date" />
+                                                <input required asp-for="DateOfIncident" id="dateIncidentId" class="form-control" type="date" />
                                                 <span asp-validation-for="DateOfIncident" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -189,7 +189,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth</span>
                                     </div>
-                                    <input required asp-for="CustomerDateOfBirth" class="form-control" type="date" />
+                                                <input required asp-for="CustomerDateOfBirth" id="dateCustomerId" class="form-control" type="date" />
                                     <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
                                 </div>
                             </div>
@@ -257,7 +257,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" for="CountryId">Country</span>
                                     </div>
-                                    <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                    <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
                                         <option value="">--- SELECT COUNTRY ---</option>
                                     </select>
 
@@ -370,4 +370,11 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $("#InvestigationServiceTypeId").focus();
+
+        dateContractId.max = new Date().toISOString().split("T")[0];
+        dateIncidentId.max = new Date().toISOString().split("T")[0];
+        dateCustomerId.max = new Date().toISOString().split("T")[0];
+    </script>
 }
