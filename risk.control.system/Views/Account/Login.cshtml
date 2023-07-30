@@ -40,6 +40,7 @@
             border-radius: 1rem;
             background-color: hsl(0, 0%, 100%);
             gap: 2rem;
+            border:1px solid #ccc;
         }
 
         .full-width {
@@ -81,40 +82,55 @@
                             @*<h3 class="h4 font-weight-bold text-theme"><i class="fas fa-bug"></i> checkify </h3>*@
                         </div>
 
-                        <h6 class="h5 mb-0">Welcome back!</h6>
-                        <p class="text-muted mt-2 mb-5">Enter your email address and password.</p>
-                        <div style="text-align: -webkit-center;">
-                            <div class="alert">
-                                <div class="login-logo">
-                                    <i class="fas fa-bug"></i> checkify
-                                </div>
-                            </div>
-                            <br />
-                        </div>
+                        
+
                         <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
-                            <div class="mb-3">
-                                <div class="mb-3 input-group">
-                                    <input name="Email" placeholder="Email" type="email" id="email" class="form-control"
-                                           value="client-creator@admin.com">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    
+                                    <div style="text-align: -webkit-center;">
+                                        <h6 class="h5 mb-0">Welcome back!</h6>
+                                        <p class="text-muted mt-2 mb-5">Enter your email address and password.</p>
+                                        <div class="alert">
+                                            <div class="login-logo">
+                                                <i class="fas fa-bug"></i> checkify
+                                            </div>
+                                        </div>
+                                        <br />
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <div class="mb-3 input-group">
-                                    <input name="password" placeholder="Password" type="password"
-                                           id="password" class="form-control" value="@Applicationsettings.TestPassword">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-lock"></i>
-                                        </span>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3 input-group">
+                                        <input name="Email" placeholder="Email" type="email" id="email" class="form-control"
+                                               value="client-creator@admin.com">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-outline-secondary btn-block"><i class="fas fa-key"></i>&nbsp; @Applicationsettings.WEBSITE_SIGNIN</button>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="mb-3 input-group">
+                                        <input name="password" placeholder="Password" type="password"
+                                               id="password" class="form-control" value="@Applicationsettings.TestPassword">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-secondary btn-block"><i class="fas fa-key"></i>&nbsp; @Applicationsettings.WEBSITE_SIGNIN</button>
+                                </div>
+                            </div>
+                            
                         </form>
                     </div>
                     <div style="text-align: -webkit-center;">
