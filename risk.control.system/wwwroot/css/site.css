@@ -125,13 +125,13 @@ table td {
 
 .report-disclaimer{
     overflow-y:scroll;
-    height:5rem;
-    border:.1rem double #ddd;
+    height:20rem;
+    border:.1rem inset #ddd;
     background-color:whitesmoke;
 }
 .disclaimer-body{
     margin:1rem;
-    border:1px solid #ccc;
+    border:.5rem outset #ccc;
     border-radius:.3rem;
 }
 .attachment-list {
