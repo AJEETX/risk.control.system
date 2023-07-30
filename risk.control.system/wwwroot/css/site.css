@@ -266,3 +266,6 @@ textarea {
 .field-validation-error{
     display:none;
 }
+.nav-item {
+    border-bottom: 1px solid #ccc;
+}
