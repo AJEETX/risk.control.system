@@ -2,7 +2,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 
 @{
-    ViewData["Title"] ="login: checkify";
+    ViewData["Title"] = "login: checkify";
 
     Layout = null;
 }
@@ -16,63 +16,110 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <partial name="AdminLTE/_Styles" />
+    <style>
+        html, body {
+            height: 100%;
+        }
+    </style>
 </head>
 
-<body class="hold-transition login-page" style="background: white!important;">
-    <div class="login-box">
-        <div style="text-align: -webkit-center;">
-            <div class="alert">
-                <div class="login-logo">
-                    <i class="fas fa-bug"></i> <i><b>i</b></i>checkify
-                </div>
-            </div>
-            <br />
-        </div>
+<body class="transition">
+    <div class="container-fluid px-1 px-md-5 px-lg-1 px-xl-5 py-5 mx-auto">
+        <div class="card card0 border-0">
+            <div class="row d-flex">
+                <div class="col-lg-6" style="background-color:whitesmoke;">
+                    <div class="card1 pb-5">
+                        <div class="row">
 
-        <!-- /.login-logo -->
-        <div class="card">
-            <div class="card-body login-card-body">
-                <p class="login-box-msg">@Applicationsettings.WEBSITE_SIGNIN </p>
-                <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
-                    <div class="mb-3">
-                        <div class="mb-3 input-group">
-                            <input name="Email" placeholder="Email" type="email" id="email" class="form-control"
-                                value="client-admin@admin.com">
-                            <div class="input-group-append">
-                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                            </div>
+                            <div class="col-md-3">
+                                <img src="/img/logo.png" width="160" class="logo">
                             </div>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="mb-3 input-group"><input name="password" placeholder="Password" type="password"
-                                   id="password" class="form-control" value="@Applicationsettings.TestPassword">
-                            <div class="input-group-append"><span class="input-group-text"><i
-                                        class="fas fa-lock"></i></span></div>
+                        <div class="row">
+                            <div class="col-md-3">
+                            </div>
+                            <div class="col-md-3">
+                            </div>
+                        </div>
+                        <div class="row px-3 justify-content-center mt-4 mb-5 border-line">
+                            <img height="400" width="300" src="/img/why-us.png" class="image">
                         </div>
                     </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-secondary btn-block"><i class="fas fa-key"></i>&nbsp; @Applicationsettings.WEBSITE_SIGNIN</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <!-- /.login-card-body -->
-        <div style="text-align: -webkit-center;">
-            
-            @if (Model?.Error != null)
-            {
-                <div class="alert alert-warning">
-                    @Model?.Error
                 </div>
-            }
-            <br />
-            <div class="alert">
-                <span class="badge badge-default"><i class="fas fa-bug"></i> <a style="color:black;text-decoration:none;" href="https://icheckify.co.in"><i><b>i</b></i>checkify</a></span>
+                <div class="col-lg-6">
+                    <div class="p-5">
+                        <div class="mb-5">
+                            @*<h3 class="h4 font-weight-bold text-theme"><i class="fas fa-bug"></i> checkify </h3>*@
+                        </div>
+
+                        <h6 class="h5 mb-0">Welcome back!</h6>
+                        <p class="text-muted mt-2 mb-5">Enter your email address and password.</p>
+                        <div style="text-align: -webkit-center;">
+                            <div class="alert">
+                                <div class="login-logo">
+                                    <i class="fas fa-bug"></i> <i><b>i</b></i>checkify
+                                </div>
+                            </div>
+                            <br />
+                        </div>
+                        <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                            <div class="mb-3">
+                                <div class="mb-3 input-group">
+                                    <input name="Email" placeholder="Email" type="email" id="email" class="form-control"
+                                           value="client-admin@admin.com">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="mb-3 input-group">
+                                    <input name="password" placeholder="Password" type="password"
+                                           id="password" class="form-control" value="@Applicationsettings.TestPassword">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-lock"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-outline-secondary btn-block"><i class="fas fa-key"></i>&nbsp; @Applicationsettings.WEBSITE_SIGNIN</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div style="text-align: -webkit-center;">
+
+                        @if (Model?.Error != null)
+                        {
+                            <div class="alert alert-warning">
+                                @Model?.Error
+                            </div>
+                        }
+                        <br />
+                        <div class="alert">
+                            <span class="badge badge-default"><i class="fas fa-bug"></i> <a style="color:black;text-decoration:none;" href="https://icheckify.co.in"><i><b>i</b></i>checkify</a></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gradient-gray py-4">
+                <div class="row px-3">
+                    <small class="ml-4 ml-sm-5 mb-2">Copyright &copy; @DateTime.Now.Year. All rights reserved.</small>
+                    <div class="social-contact ml-4 ml-sm-auto">
+                        <span class="fa fa-facebook mr-4 text-sm"></span>
+                        <span class="fa fa-google-plus mr-4 text-sm"></span>
+                        <span class="fa fa-linkedin mr-4 text-sm"></span>
+                        <span class="fa fa-twitter mr-4 mr-sm-5 text-sm"></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <partial name="AdminLTE/_Scripts" />
-
 </body>
 
 </html>
