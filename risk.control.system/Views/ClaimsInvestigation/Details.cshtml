@@ -173,7 +173,6 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12 text-right">
-                                <a asp-action="Incomplete" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.BACK</a> &nbsp;
                                 <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.ClaimsInvestigationId"><i class="fas fa-map-marker-alt"></i> Add Location</a>
                                 @*<a class="btn btn-success" asp-action="CaseLocation" asp-route-id="@Model?.ClaimsInvestigationId"><i class="fas fa-pen"></i> @Applicationsettings.VERIFY_LOCATIONS</a>*@
                             </div>
@@ -281,6 +280,12 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
             </div>
         </div>
     </div>

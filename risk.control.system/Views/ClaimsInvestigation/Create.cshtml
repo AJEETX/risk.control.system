@@ -74,7 +74,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="ContractIssueDate">Contract Issue Date</span>
+                                        <span class="input-group-text" asp-for="ContractIssueDate">Issue Date</span>
                                     </div>
                                     <input required asp-for="ContractIssueDate" class="form-control" type="date" />
                                     <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
@@ -302,7 +302,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="ProfileImage">Claim Document</span>
+                                        <span class="input-group-text" asp-for="ProfileImage">Photo</span>
                                     </div>
                                     <img class="form-Image" id="profileImage" src="/img/no-photo.png">
                                     <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
@@ -320,7 +320,7 @@
                                         @Applicationsettings.CANCEL
                                     </a>
                                     <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-plus"></i> @Applicationsettings.CREATE
+                                        <i class="fas fa-plus"></i> @Applicationsettings.CREATE Claim
                                     </button>
                                 </div>
                             </div>

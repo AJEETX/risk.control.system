@@ -58,7 +58,7 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        [Breadcrumb(" Active")]
+        [Breadcrumb(" Claims")]
         public async Task<IActionResult> Index()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -1271,7 +1271,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Create
-        [Breadcrumb(title: " Create")]
+        [Breadcrumb(title: " Create Claim")]
         public async Task<IActionResult> Create()
         {
             var userEmailToSend = string.Empty;
@@ -1412,7 +1412,6 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ClaimsInvestigation claimsInvestigation)
         {
-
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
 
@@ -1604,9 +1603,9 @@ namespace risk.control.system.Controllers
             var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(id);
             if (claimsInvestigation != null)
             {
-                var user = User?.Claims.FirstOrDefault(u => u.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+                string userEmail = HttpContext?.User?.Identity.Name;
                 claimsInvestigation.Updated = DateTime.UtcNow;
-                claimsInvestigation.UpdatedBy = user;
+                claimsInvestigation.UpdatedBy = userEmail;
                 _context.ClaimsInvestigation.Remove(claimsInvestigation);
             }
 
