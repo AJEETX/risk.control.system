@@ -56,6 +56,7 @@ namespace risk.control.system.Controllers
 
             var clientCompany = await _context.ClientCompany
                 .Include(c => c.Country)
+                .Include(c => c.District)
                 .Include(c => c.PinCode)
                 .Include(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClientCompanyId == companyUser.ClientCompanyId);
@@ -201,7 +202,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Add", FromAction = "User")]
+        [Breadcrumb("Add User", FromAction = "User")]
         public IActionResult CreateUser()
         {
             var userEmail = HttpContext.User?.Identity?.Name;

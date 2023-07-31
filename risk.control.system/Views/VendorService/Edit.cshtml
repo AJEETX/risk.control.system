@@ -68,7 +68,7 @@
                                                     <span class="input-group-text" for="CountryId">Country</span>
                                                 </div>
                                                 <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)">
-                                                    <option>--SELECT COUNTRY--</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="CountryId" class="text-danger"></span>
 
@@ -81,7 +81,7 @@
                                                     <span class="input-group-text" for="CountryId">State</span>
                                                 </div>
                                                 <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
-                                                    <option>--SELECT STATE--</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="StateId" class="text-danger"></span>
                                             </div>
@@ -92,7 +92,7 @@
                                                     <span class="input-group-text" for="DistrictId">District</span>
                                                 </div>
                                                 <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId')">
-                                                    <option>--SELECT DISTRICT--</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
                                             </div>

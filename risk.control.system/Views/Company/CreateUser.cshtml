@@ -35,7 +35,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Email">Email Address</span>
                                             </div>
-                                            <input type="text" asp-for="Email" class="form-control" required placeholder="Enter User Email prefix">
+                                            <input type="text" asp-for="Email" class="form-control" value="" required placeholder="Enter User Email prefix">
                                             <div class="input-group-append">
                                                 <span class="input-group-text" id="Email">@email</span>
                                             </div>
@@ -48,7 +48,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="FirstName">First Name</span>
                                             </div>
-                                            <input type="text" asp-for="FirstName" class="form-control" required placeholder="Enter First Name">
+                                            <input type="text" asp-for="FirstName" class="form-control" value="" required placeholder="Enter First Name">
                                             <span asp-validation-for="FirstName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -58,7 +58,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="LastName">Last Name</span>
                                             </div>
-                                            <input type="text" asp-for="LastName" class="form-control" required placeholder="Enter Last Name">
+                                            <input type="text" asp-for="LastName" class="form-control" value="" required placeholder="Enter Last Name">
                                             <span asp-validation-for="LastName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -68,7 +68,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Password">Password</span>
                                             </div>
-                                            <input type="password" asp-for="Password" class="form-control" required placeholder="Enter Password">
+                                            <input type="password" asp-for="Password" class="form-control" value="" required placeholder="Enter Password">
                                             <span asp-validation-for="Password" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -78,7 +78,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber">Phone Number</span>
                                             </div>
-                                            <input type="number" asp-for="PhoneNumber" class="form-control" required type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
+                                            <input type="number" asp-for="PhoneNumber" class="form-control" required maxlength="10" value="" placeholder="Enter Phone Number (10 digit)" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -99,10 +99,10 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="CountryId">Country</label>
+                                                <span class="input-group-text" for="CountryId">Country</span>
                                             </div>
                                             <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                                <option selected>--- SELECT COUNTRY ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                         </div>
@@ -111,10 +111,10 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="StateId">State</label>
+                                                <span class="input-group-text" for="StateId">State</span>
                                             </div>
                                             <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                                <option>--- SELECT STATE ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                             <span asp-validation-for="StateId" class="text-danger"></span>
@@ -124,10 +124,10 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="DistrictId">District</label>
+                                                <span class="input-group-text" for="DistrictId">District</span>
                                             </div>
                                             <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                                <option>--- SELECT DISTRICT ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                             <span asp-validation-for="DistrictId" class="text-danger"></span>
@@ -137,10 +137,10 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="PinCodeId">Pincode</label>
+                                                <span class="input-group-text" for="PinCodeId">Pincode</span>
                                             </div>
                                             <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                                <option>--- SELECT PINCODE ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                         </div>
@@ -150,7 +150,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline">Address line</span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" />
+                                            <input type="text" asp-for="Addressline" class="form-control" value="" required placeholder="Enter Address line" />
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -158,7 +158,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Comments">Remarks</span>
                                             </div>
-                                            <input type="text" asp-for="Comments" class="form-control" type="text" placeholder="Enter Remarks" />
+                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" />
                                         </div>
                                     </div>
                                 </div>

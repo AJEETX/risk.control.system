@@ -33,7 +33,7 @@
                                                     <span class="input-group-text" for="LineOfBusinessId">Line Of Business</span>
                                                 </div>
                                                 <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
-                                                    <option>--SELECT LINE OF BUSINESS--</option>
+                                                    <option value="">--SELECT--</option>
                                                 </select>
                                                 <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
                                             </div>
@@ -45,7 +45,7 @@
                                                     <span class="input-group-text" for="InvestigationServiceTypeId">Service Type</span>
                                                 </div>
                                                 <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" onchange="setInvestigationServices(this)" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
-                                                    <option>--SELECT TYPE OF INVESTIGATION--</option>
+                                                    <option value="">--SELECT--</option>
                                                 </select>
                                                 <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
                                             </div>
@@ -69,7 +69,7 @@
                                                     <span class="input-group-text" for="CountryId">Country</span>
                                                 </div>
                                                 <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)">
-                                                    <option>--SELECT COUNTRY--</option>
+                                                    <option value="">--SELECT--</option>
                                                 </select>
                                                 <span asp-validation-for="CountryId" class="text-danger"></span>
 
@@ -82,7 +82,7 @@
                                                     <span class="input-group-text" for="CountryId">State</span>
                                                 </div>
                                                 <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
-                                                    <option>--SELECT STATE--</option>
+                                                    <option value="">--SELECT--</option>
                                                 </select>
                                                 <span asp-validation-for="StateId" class="text-danger"></span>
                                             </div>
@@ -91,12 +91,12 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="CountryId">State</span>
+                                                    <span class="input-group-text" for="DistrictId">District</span>
                                                 </div>
-                                                <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')">
-                                                    <option>--SELECT DISTRICT--</option>
+                                                <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')">
+                                                    <option value="">--SELECT --</option>
                                                 </select>
-                                                <span asp-validation-for="StateId" class="text-danger"></span>
+                                                <span asp-validation-for="DistrictId" class="text-danger"></span>
                                             </div>
                                         </div>
 
@@ -125,7 +125,7 @@
                                                 @Applicationsettings.CANCEL
                                             </a>
                                             <button disabled id="create-pincode" type="submit" class="btn btn-success">
-                                                <i class="fas fa-plus"></i> Add Service
+                                                <i class="fas fa-tasks"></i> Add Service
                                             </button>
                                         </div>
                                     </div>
