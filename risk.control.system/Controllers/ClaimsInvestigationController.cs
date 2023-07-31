@@ -207,11 +207,14 @@ namespace risk.control.system.Controllers
                 var claimsAssigned = new List<ClaimsInvestigation>();
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
-                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
+                    if (item.IsReady2Assign)
                     {
-                        claimsAssigned.Add(item);
+                        item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                        && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
+                        if (item.CaseLocations.Any())
+                        {
+                            claimsAssigned.Add(item);
+                        }
                     }
                 }
                 return View(claimsAssigned);
@@ -443,8 +446,6 @@ namespace risk.control.system.Controllers
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
@@ -469,15 +470,9 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId ||
-                a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId);
-                return View(await applicationDbContext.ToListAsync());
-            }
-            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && a.CaseLocations.Count == 0);
+                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !a.IsReady2Assign);
                 return View(await applicationDbContext.ToListAsync());
             }
 
@@ -572,16 +567,24 @@ namespace risk.control.system.Controllers
 
             foreach (var existingVendor in existingVendors)
             {
-                foreach (var vendorCase in vendorCaseCount)
+                bool caseHasVendor = false;
+                var vendorCase = vendorCaseCount.FirstOrDefault(v => v.Key == existingVendor.VendorId);
+                if (vendorCase.Key == existingVendor.VendorId)
                 {
-                    if (vendorCase.Key == existingVendor.VendorId)
+                    caseHasVendor = true;
+                    vendorWithCaseCounts.Add(new VendorCaseModel
                     {
-                        vendorWithCaseCounts.Add(new VendorCaseModel
-                        {
-                            CaseCount = vendorCase.Value,
-                            Vendor = existingVendor,
-                        });
-                    }
+                        CaseCount = vendorCase.Value,
+                        Vendor = existingVendor,
+                    });
+                }
+                else
+                {
+                    vendorWithCaseCounts.Add(new VendorCaseModel
+                    {
+                        CaseCount = 0,
+                        Vendor = existingVendor,
+                    });
                 }
             }
 
@@ -1196,6 +1199,24 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CaseReadyToAssign(string claimsInvestigationId)
+        {
+            if (claimsInvestigationId == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimsInvestigationId);
+            claimsInvestigation.IsReady2Assign = true;
+            _context.ClaimsInvestigation.Update(claimsInvestigation);
+            await _context.SaveChangesAsync();
+
+            toastNotification.AddSuccessToastMessage("claim set ready successfully!");
+
+            return RedirectToAction(nameof(Incomplete));
+        }
+
         [Breadcrumb(title: " Detail", FromAction = "Index")]
         public async Task<IActionResult> Detail(string id)
         {
@@ -1467,8 +1488,8 @@ namespace risk.control.system.Controllers
                     claimsInvestigation.ProfilePicture = dataStream.ToArray();
                 }
                 _context.Update(claimsInvestigation);
-                toastNotification.AddSuccessToastMessage("claim case edited successfully!");
                 await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage("claim case edited successfully!");
             }
             catch (Exception ex)
             {

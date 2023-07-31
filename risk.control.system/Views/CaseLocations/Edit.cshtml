@@ -67,7 +67,8 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="BeneficiaryContactNumber">Contact Number</span>
                                                 </div>
-                                                <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required type="number" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
+                                                <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required min="3000000000" max="9999999999" maxlength="10"
+                                                       placeholder="10 digit e.g 3456789012" />
                                                 <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
                                             </div>
                                         </div>

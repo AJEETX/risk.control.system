@@ -62,7 +62,8 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber">Phone Number</span>
                                             </div>
-                                            <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required maxlength="14" min="3000000000" max="9999999999" value="" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Enter Phone Number [Format: 123-456-7890]" />
+                                            <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required value="" min="3000000000" max="9999999999" maxlength="10"
+                                                   placeholder="10 digit e.g 3456789012" />
                                             <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -74,7 +75,7 @@
                                                 <span class="input-group-text" asp-for="BeneficiaryIncome">Annual Income</span>
                                             </div>
                                             <select required asp-for="BeneficiaryIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
-                                                <option value="">--- SELECT BENEFICIARY INCOME ---</option>
+                                                <option value="">--- SELECT---</option>
                                             </select>
                                             <span asp-validation-for="BeneficiaryIncome" class="text-danger"></span>
                                         </div>
@@ -98,7 +99,7 @@
                                                 <span class="input-group-text" for="CountryId">Country</span>
                                             </div>
                                             <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                                <option value="">--- SELECT COUNTRY ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                         </div>
@@ -110,7 +111,7 @@
                                                 <span class="input-group-text" for="StateId">State</span>
                                             </div>
                                             <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                                <option value="">--- SELECT STATE ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                             <span asp-validation-for="StateId" class="text-danger"></span>
@@ -123,7 +124,7 @@
                                                 <span class="input-group-text" for="DistrictId">District</span>
                                             </div>
                                             <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                                <option value="">--- SELECT DISTRICT ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                             <span asp-validation-for="DistrictId" class="text-danger"></span>
@@ -136,7 +137,7 @@
                                                 <span class="input-group-text" for="PinCodeId">Pincode</span>
                                             </div>
                                             <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                                <option value="">--- SELECT PINCODE ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                         </div>

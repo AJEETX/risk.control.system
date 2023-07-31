@@ -1,5 +1,16 @@
-﻿@{
+﻿@using System.Security.Claims;
+@using risk.control.system.Helpers;
+@inject ApplicationDbContext _context
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ApplicationUser appUser = (await UserManager.GetUserAsync(User));
     ViewData["Title"] = "Dashboard";
+    var userEmail = User?.Identity?.Name;
+    var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+    var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+    var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
 }
 
 <style>
@@ -29,6 +40,7 @@
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
             </div>
             <div class="card-body">
+                
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card card-light">
@@ -80,6 +92,26 @@
                     </div>
                     
                 </div>
+                @{
+                    if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorAdmin.ToString()))
+                    {
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card card-light">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Agency Current Case Count: Pie Chart</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="container-agency-pie" class="container-agency">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                
             </div>
         </div>
     </div>
@@ -90,6 +122,7 @@
         GetWeekly('Claim', 'GetWeeklyClaim', 'container-claim');
         GetWeeklyTat('Claim', 'GetClaimWeeklyTat', 'container-claim-tat');
         GetWeeklyPie('Claim', 'GetWeeklyClaim', 'container-claim-pie');
+        GetWeeklyPie('Agency ', 'GetAgentClaim', 'container-agency-pie');
 
         GetChart('Claim', 'GetClaimChart', 'container-monthly-claim')
 

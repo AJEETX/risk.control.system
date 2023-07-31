@@ -282,7 +282,26 @@
 
         <div class="row">
             <div class="col-md-12 text-right">
-                <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+
+                <form asp-action="CaseReadyToAssign">
+                    <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
+                    @{
+                        if (Model.CaseLocations != null && Model.CaseLocations.Count > 0 )
+                        {
+                            <input type="hidden" asp-for="ClaimsInvestigationId" />
+                            <span class="fas fa-thumbtack input-fa"></span>
+
+                            <input type="submit" value="Set Ready" class="btn btn-danger" style="width:8rem" />
+                        }
+                        else
+                        {
+                            <input disabled type="submit" value="Set Ready" class="btn btn-outline-danger" style="width:8rem" />
+
+                        }
+
+                        }
+                    
+                </form>
             </div>
         </div>
     </div>

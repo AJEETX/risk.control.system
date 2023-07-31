@@ -3,11 +3,16 @@
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
     public interface IDashboardService
     {
+        Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail);
+
+        Dictionary<string, int> CalculateAgentCaseStatus(string userEmail);
+
         Dictionary<string, int> CalculateWeeklyCaseStatus(string userEmail);
 
         Dictionary<string, int> CalculateMonthlyCaseStatus(string userEmail);
@@ -24,6 +29,161 @@ namespace risk.control.system.Services
         public DashboardService(ApplicationDbContext context)
         {
             this._context = context;
+        }
+
+        public Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail)
+        {
+            var vendorCaseCount = new Dictionary<string, int>();
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            List<Vendor> existingVendors = _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .ToList();
+
+            if (companyUser == null || !companyUser.IsClientAdmin)
+            {
+                return vendorCaseCount;
+            }
+
+            var claimsCases = _context.ClaimsInvestigation
+               .Include(c => c.Vendors)
+               .Include(c => c.CaseLocations);
+
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+            var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            int countOfCases = 0;
+            foreach (var claimsCase in claimsCases)
+            {
+                if (claimsCase.CaseLocations.Count > 0)
+                {
+                    foreach (var CaseLocation in claimsCase.CaseLocations)
+                    {
+                        if (!string.IsNullOrEmpty(CaseLocation.VendorId))
+                        {
+                            if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                    CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                    CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
+                                    )
+                            {
+                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId, out countOfCases))
+                                {
+                                    vendorCaseCount.Add(CaseLocation.VendorId, 1);
+                                }
+                                else
+                                {
+                                    int currentCount = vendorCaseCount[CaseLocation.VendorId];
+                                    ++currentCount;
+                                    vendorCaseCount[CaseLocation.VendorId] = currentCount;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Dictionary<string,int> vendorWithCaseCounts = new();
+
+            foreach (var existingVendor in existingVendors)
+            {
+                foreach (var vendorCase in vendorCaseCount)
+                {
+                    if (vendorCase.Key == existingVendor.VendorId)
+                    {
+                        vendorWithCaseCounts.Add(existingVendor.Name, vendorCase.Value);
+                    }
+                }
+            }
+            return vendorWithCaseCounts;
+        }
+
+        public Dictionary<string, int> CalculateAgentCaseStatus(string userEmail)
+        {
+            var vendorCaseCount = new Dictionary<string, int>();
+
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            if (vendorUser == null || !vendorUser.IsVendorAdmin)
+            {
+                return vendorCaseCount;
+            }
+
+            var existingVendor = _context.Vendor
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.State)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.LineOfBusiness)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.InvestigationServiceType)
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+
+            var claimsCases = _context.ClaimsInvestigation
+               .Include(c => c.Vendors)
+               .Include(c => c.CaseLocations)
+               .Where(c => c.VendorId == existingVendor.VendorId);
+
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+            var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            int countOfCases = 0;
+
+            var agentCaseCount = new Dictionary<string, int>();
+
+            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == existingVendor.VendorId);
+
+            foreach (var claimsCase in claimsCases)
+            {
+                if (claimsCase.CaseLocations.Count > 0)
+                {
+                    foreach (var CaseLocation in claimsCase.CaseLocations)
+                    {
+                        if (!string.IsNullOrEmpty(CaseLocation.VendorId))
+                        {
+                            if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                    CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                    CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
+                                    )
+                            {
+                                if (!vendorCaseCount.TryGetValue(CaseLocation.AssignedAgentUserEmail, out countOfCases))
+                                {
+                                    vendorCaseCount.Add(CaseLocation.AssignedAgentUserEmail, 1);
+                                }
+                                else
+                                {
+                                    int currentCount = vendorCaseCount[CaseLocation.AssignedAgentUserEmail];
+                                    ++currentCount;
+                                    vendorCaseCount[CaseLocation.AssignedAgentUserEmail] = currentCount;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return vendorCaseCount;
         }
 
         public Dictionary<string, int> CalculateCaseChart(string userEmail)

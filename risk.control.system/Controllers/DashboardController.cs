@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
@@ -22,6 +23,23 @@ namespace risk.control.system.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        public JsonResult GetAgentClaim()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            {
+                Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyCaseStatus(userEmail);
+                return new JsonResult(monthlyExpense);
+            }
+            else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()))
+            {
+                Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgentCaseStatus(userEmail);
+                return new JsonResult(monthlyExpense);
+            }
+            return new JsonResult(null);
         }
 
         public JsonResult GetMonthlyClaim()

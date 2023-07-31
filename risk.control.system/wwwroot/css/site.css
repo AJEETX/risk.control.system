@@ -327,3 +327,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     top: 0;
     width: auto;
 }
+.input-fa {
+    margin-right: -20px;
+    margin-top: 1rem;
+    position: relative;
+    z-index: 2;
+    color: whitesmoke;
+}

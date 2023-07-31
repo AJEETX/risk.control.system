@@ -46,7 +46,8 @@
                                                 <th>
                                                     Day since Drafted
                                                 </th>
-                                                <th></th>
+                                            <th><i class="fas fa-thumbtack"></i></th>
+                                            <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -96,7 +97,7 @@
                                                         @{
                                                             foreach (var caseLocation in item.CaseLocations)
                                                             {
-                                                                <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
+                                                                <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation?.InvestigationCaseSubStatus?.Name</span>
                                                             }
                                                         }
                                                     </td>
@@ -106,6 +107,25 @@
                                                 <td>
                                                     @Html.DisplayFor(modelItem => timePending )
                                                 </td>
+                                                <td>
+                                                    @{
+                                                        if (item.CaseLocations.Count > 0)
+                                                        {
+                                                            <a class="btn btn-xs btn-danger" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
+                                                                <i class="fas fa-thumbtack"></i>
+                                                            </a>
+                                                        }
+                                                        else
+                                                        {
+                                                            <a style="cursor:pointer;" class="btn btn-xs btn-outline-danger">
+                                                                <i class="fas fa-thumbtack"></i>
+                                                            </a>
+                                                        }
+                                                    }
+
+                                                    
+                                                </td>
+
                                                     <td>
                                                         <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
                                                             <i class="fa fa-search"></i> @Applicationsettings.DETAILS

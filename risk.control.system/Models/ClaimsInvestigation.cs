@@ -133,7 +133,7 @@ namespace risk.control.system.Models
 
         [Required]
         [Display(Name = "Customer type")]
-        public CustomerType CustomerType { get; set; }
+        public CustomerType? CustomerType { get; set; }
 
         [Required]
         [Display(Name = "Budget centre")]
@@ -191,6 +191,7 @@ namespace risk.control.system.Models
         public IFormFile? ProfileImage { get; set; }
 
         public bool IsReviewCase { get; set; } = false;
+        public bool IsReady2Assign { get; set; } = false;
     }
 
     public enum Income

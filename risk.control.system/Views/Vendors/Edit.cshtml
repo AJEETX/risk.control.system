@@ -125,7 +125,7 @@
                                                 <label class="input-group-text" for="CountryId">Country</label>
                                             </div>
                                             <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                                <option selected>--- SELECT COUNTRY ---</option>
+                                                <option selected>--- SELECT ---</option>
                                             </select>
 
                                         </div>
@@ -137,7 +137,7 @@
                                                 <label class="input-group-text" for="StateId">State</label>
                                             </div>
                                             <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                                <option>--- SELECT STATE ---</option>
+                                                <option>--- SELECT ---</option>
                                             </select>
 
                                             <span asp-validation-for="StateId" class="text-danger"></span>
@@ -150,7 +150,7 @@
                                                 <label class="input-group-text" for="DistrictId">District</label>
                                             </div>
                                             <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                                <option>--- SELECT DISTRICT ---</option>
+                                                <option>--- SELECT ---</option>
                                             </select>
 
                                             <span asp-validation-for="DistrictId" class="text-danger"></span>
@@ -163,7 +163,7 @@
                                                 <label class="input-group-text" for="PinCodeId">Pincode</label>
                                             </div>
                                             <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                                <option>--- SELECT PINCODE ---</option>
+                                                <option>--- SELECT ---</option>
                                             </select>
 
                                         </div>
@@ -188,7 +188,7 @@
                                             }
                                             else
                                             {
-                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                <img id="documentImage" class="form-Image" src="/img/no-photo.png">
                                             }
                                             <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                         </div>
@@ -198,7 +198,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Comments">Remarks</span>
                                             </div>
-                                            <input type="text" asp-for="Description" class="form-control" type="text" placeholder="Enter Remarks" />
+                                            <input type="text" asp-for="Description" class="form-control" placeholder="Enter Remarks" />
                                         </div>
                                     </div>
                                    
@@ -208,7 +208,7 @@
                                             @Applicationsettings.CANCEL
                                         </a>
                                         <button type="submit" class="btn btn-warning">
-                                            <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                            <i class="fas fa-pen"></i>  @Applicationsettings.EDIT Agency
                                         </button>
                                     </div>
                                 </div>
