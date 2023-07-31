@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class AddImagesDOBValidate : Migration
+    public partial class setmandatory : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -916,6 +916,7 @@ namespace risk.control.system.Migrations
                     AgentQrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     QrData = table.Column<string>(type: "TEXT", nullable: true),
                     LongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    SupervisorPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     SupervisorRemarks = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
                     AssessorRemarks = table.Column<string>(type: "TEXT", nullable: true),
@@ -967,8 +968,8 @@ namespace risk.control.system.Migrations
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
                     InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: false),
+                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
+                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
                     ContractIssueDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CustomerName = table.Column<string>(type: "TEXT", nullable: false),
                     CustomerDateOfBirth = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -976,7 +977,7 @@ namespace risk.control.system.Migrations
                     ClaimType = table.Column<int>(type: "INTEGER", nullable: false),
                     DateOfIncident = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CauseOfLoss = table.Column<string>(type: "TEXT", nullable: false),
-                    Gender = table.Column<int>(type: "INTEGER", nullable: false),
+                    Gender = table.Column<int>(type: "INTEGER", nullable: true),
                     SumAssuredValue = table.Column<decimal>(type: "decimal(15,2)", nullable: false),
                     Addressline = table.Column<string>(type: "TEXT", nullable: false),
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
@@ -995,6 +996,7 @@ namespace risk.control.system.Migrations
                     ProfilePictureUrl = table.Column<string>(type: "TEXT", nullable: true),
                     ProfilePicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     IsReviewCase = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsReady2Assign = table.Column<bool>(type: "INTEGER", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
@@ -1036,14 +1038,12 @@ namespace risk.control.system.Migrations
                         name: "FK_ClaimsInvestigation_InvestigationCaseStatus_InvestigationCaseStatusId",
                         column: x => x.InvestigationCaseStatusId,
                         principalTable: "InvestigationCaseStatus",
-                        principalColumn: "InvestigationCaseStatusId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "InvestigationCaseStatusId");
                     table.ForeignKey(
                         name: "FK_ClaimsInvestigation_InvestigationCaseSubStatus_InvestigationCaseSubStatusId",
                         column: x => x.InvestigationCaseSubStatusId,
                         principalTable: "InvestigationCaseSubStatus",
-                        principalColumn: "InvestigationCaseSubStatusId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "InvestigationCaseSubStatusId");
                     table.ForeignKey(
                         name: "FK_ClaimsInvestigation_InvestigationServiceType_InvestigationServiceTypeId",
                         column: x => x.InvestigationServiceTypeId,

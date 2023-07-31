@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230726151608_AddImagesDOBValidate")]
-    partial class AddImagesDOBValidate
+    [Migration("20230731214722_setmandatory")]
+    partial class setmandatory
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -523,6 +523,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("QrData")
                         .HasColumnType("TEXT");
 
+                    b.Property<byte[]>("SupervisorPicture")
+                        .HasColumnType("BLOB");
+
                     b.Property<int?>("SupervisorRemarkType")
                         .HasColumnType("INTEGER");
 
@@ -622,20 +625,21 @@ namespace risk.control.system.Migrations
                     b.Property<byte[]>("DocumentImage")
                         .HasColumnType("BLOB");
 
-                    b.Property<int>("Gender")
+                    b.Property<int?>("Gender")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("InvestigationCaseStatusId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("InvestigationCaseSubStatusId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("InvestigationServiceTypeId")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsReady2Assign")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsReviewCase")
                         .HasColumnType("INTEGER");
@@ -2331,15 +2335,11 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.InvestigationCaseStatus", "InvestigationCaseStatus")
                         .WithMany()
-                        .HasForeignKey("InvestigationCaseStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InvestigationCaseStatusId");
 
                     b.HasOne("risk.control.system.Models.InvestigationCaseSubStatus", "InvestigationCaseSubStatus")
                         .WithMany()
-                        .HasForeignKey("InvestigationCaseSubStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InvestigationCaseSubStatusId");
 
                     b.HasOne("risk.control.system.Models.InvestigationServiceType", "InvestigationServiceType")
                         .WithMany()
