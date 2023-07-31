@@ -33,7 +33,7 @@
                                                     <span class="input-group-text" for="LineOfBusinessId">Line Of Business</span>
                                                 </div>
                                                 <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
-                                                    <option>--SELECT LINE OF BUSINESS--</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
                                             </div>
@@ -45,7 +45,7 @@
                                                     <span class="input-group-text" for="InvestigationServiceTypeId">Service Type</span>
                                                 </div>
                                                 <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" onchange="setInvestigationServices(this)" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
-                                                    <option>--SELECT TYPE OF INVESTIGATION--</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
                                             </div>
@@ -79,7 +79,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="CountryId">State</span>
+                                                    <span class="input-group-text" for="StateId">State</span>
                                                 </div>
                                                 <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)">
                                                     <option value="">--- SELECT ---</option>
@@ -91,12 +91,12 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="CountryId">State</span>
+                                                    <span class="input-group-text" for="DistrictId">State</span>
                                                 </div>
                                                 <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.StateId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')">
                                                     <option value="">--- SELECT ---</option>
                                                 </select>
-                                                <span asp-validation-for="StateId" class="text-danger"></span>
+                                                <span asp-validation-for="DistrictId" class="text-danger"></span>
                                             </div>
                                         </div>
                                        

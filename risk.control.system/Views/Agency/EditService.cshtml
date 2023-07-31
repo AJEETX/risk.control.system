@@ -31,7 +31,7 @@
                                                     <span class="input-group-text" for="LineOfBusinessId">Line Of Business</span>
                                                 </div>
                                                 <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
-                                                    <option>--SELECT LINE OF BUSINESS--</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
                                             </div>
@@ -44,7 +44,7 @@
                                                     <span class="input-group-text" for="InvestigationServiceTypeId">Service Type</span>
                                                 </div>
                                                 <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" onchange="setInvestigationServices(this)" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
-                                                    <option>--SELECT TYPE OF INVESTIGATION--</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
                                             </div>

@@ -110,9 +110,9 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="ContractNumber">Contract Number</span>
+                                                    <span class="input-group-text" asp-for="ContractNumber">Contract #</span>
                                                 </div>
-                                                <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract Number" />
+                                                <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract #" />
                                                 <span asp-validation-for="ContractNumber" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -204,10 +204,10 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="ContactNumber">Phone Number</span>
+                                                    <span class="input-group-text" asp-for="ContactNumber">Phone #</span>
                                                 </div>
-                                                <input required asp-for="ContactNumber" class="form-control" type="number" min="3000000000" max="9999999999" maxlength="10" value=""
-                                                       placeholder="10 digit e.g 3456789012" />
+                                                
+                                                <input type="number" asp-for="ContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)" />
                                                 <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
 
                                             </div>
