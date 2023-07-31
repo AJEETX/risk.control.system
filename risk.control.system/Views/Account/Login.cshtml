@@ -35,7 +35,7 @@
 
         form {
             box-sizing: border-box;
-            padding: 2rem;
+            padding: 3rem;
             border-radius: 1rem;
             background-color: whitesmoke;
             gap: 2rem;
@@ -45,54 +45,40 @@
         .full-width {
             grid-column: span 2;
         }
-        .image{
+
+        .image {
             object-fit: cover;
+            width:100%;
+            height:430px;
+        }
+
+        .form-control {
+            height: 2.5rem;
+        }
+        button{
+            height: 3rem;
+            border-radius: .5rem;
         }
     </style>
 </head>
 
 <body class="transition">
-    <div class="container-fluid mx-auto">
-        <div class="card">
+    <div class="container mx-auto">
             <div class="row d-flex">
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="row">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                            </div>
-                            <div class="col-md-3">
-                                <img src="/img/logo.png" width="150" class="logo">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                            </div>
-                            <div class="col-md-3">
-                            </div>
-                        </div>
-                        <div class="row justify-content-center">
-                            <img width="100%" src="/img/why-us.png" class="image">
-                        </div>
-                    </div>
-                </div>
                 <div class="col-lg-6">
                     <div class="p-5">
                         <div class="mb-5" style="text-align: -webkit-center;">
                             <h3 class="h4 font-weight-bold text-theme"><i class="fas fa-bug"></i> checkify </h3>
                         </div>
-                       
+
                         <div class="row">
                             <div class="col-md-2">
-                                
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-2">
-                                
+                            <div class="col-md-1">
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-10">
                                 <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -123,7 +109,7 @@
                                             </div>
 
 
-                                            
+
                                         </div>
                                     </div>
                                     <div class="row">
@@ -140,42 +126,68 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-
-                                           
-
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <button type="submit" class="btn btn-secondary btn-block"><i class="fas fa-key"></i>&nbsp; @Applicationsettings.WEBSITE_SIGNIN</button>
+                                            <button type="submit" style="" class="btn btn-secondary btn-block"><i class="fas fa-key"></i>&nbsp; @Applicationsettings.WEBSITE_SIGNIN</button>
                                         </div>
                                     </div>
 
                                 </form>
 
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                             </div>
                         </div>
                     </div>
-                    <hr />
-                    <br />
-                    <hr />
                     <div style="text-align: -webkit-center;">
-
                         @if (Model?.Error != null)
                         {
                             <div class="alert alert-warning">
                                 @Model?.Error
                             </div>
                         }
-                        <br />
                         <div class="alert">
                             <span class="badge badge-default"><i class="fas fa-bug"></i> <a style="color:black;text-decoration:none;" href="https://checkify.co.in"><i><b>i</b></i>checkify</a></span>
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-6">
+                    <div class="p-5">
+                        <div class="mb-5" style="text-align: -webkit-center;">
+                            <h3 class="h4 font-weight-bold text-theme"><i class="fas fa-thumbtack"></i> simple solution... </h3>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="row">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                        </div>
+                                        <div class="col-md-3">
+                                            @*<img src="/img/logo.png" width="150" class="logo">*@
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                        </div>
+                                        <div class="col-md-3">
+                                        </div>
+                                    </div>
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-12">
+                                            <img height="450" src="/img/why-us.png" class="image">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
             <div class="bg-gradient-gray py-4">
                 <div class="row px-3">
@@ -188,7 +200,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 </body>
 

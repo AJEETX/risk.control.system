@@ -70,7 +70,7 @@ namespace risk.control.system.Models
         public string CustomerName { get; set; }
 
         [Required]
-        [Display(Name = "Customer date of birth")]
+        [Display(Name = "Date of birth")]
         [DataType(DataType.Date)]
         public DateTime CustomerDateOfBirth { get; set; } = DateTime.UtcNow;
 
@@ -81,7 +81,7 @@ namespace risk.control.system.Models
 
         [Required]
         [Display(Name = "Claim type")]
-        public ClaimType ClaimType { get; set; }
+        public ClaimType? ClaimType { get; set; }
 
         [Required]
         [Display(Name = "Date of incident")]
@@ -92,7 +92,7 @@ namespace risk.control.system.Models
         [Display(Name = "Cause of loss")]
         public string CauseOfLoss { get; set; }
 
-        public Gender Gender { get; set; }
+        public Gender? Gender { get; set; }
 
         [Required]
         [Display(Name = "Sum assured value")]
