@@ -93,6 +93,7 @@ namespace risk.control.system.Controllers
                 .ThenInclude(v => v.State)
                 .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.Country)
+                .Include(i => i.Country)
                 .Include(i => i.District)
                 .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(i => i.InvestigationServiceType)
