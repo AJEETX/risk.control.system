@@ -17,7 +17,7 @@ namespace risk.control.system.Seeds
             var TataAig = new ClientCompany
             {
                 ClientCompanyId = Guid.NewGuid().ToString(),
-                Name = "TATA AIG INSURANCE",
+                Name = "XYZ INSURANCE",
                 Addressline = "100 GOOD STREET ",
                 Branch = "FOREST HILL CHASE",
                 Code = "TA001",
@@ -41,7 +41,7 @@ namespace risk.control.system.Seeds
 
             var abcVendor = new Vendor
             {
-                Name = "abc investigation agency",
+                Name = "Abc agency",
                 Addressline = "1, Main Road  ",
                 Branch = "MAHATTAN",
                 Code = "VA001",
@@ -83,27 +83,27 @@ namespace risk.control.system.Seeds
 
             //var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);
 
-            //var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
-            //{
-            //    new VendorInvestigationServiceType{
-            //        VendorId = abcVendorCompany.Entity.VendorId,
-            //        InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
-            //        Price = 99,
-            //        StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-            //        DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-            //        LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-            //        PincodeServices = new List<ServicedPinCode>
-            //        {
-            //            new ServicedPinCode
-            //            {
-            //                Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-            //                Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
-            //            }
-            //        }
-            //    }
-            //};
+            var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            {
+                new VendorInvestigationServiceType{
+                    VendorId = abcVendorCompany.Entity.VendorId,
+                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
+                    Price = 99,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                }
+            };
 
-            //await context.SaveChangesAsync(null, false);
+            await context.SaveChangesAsync(null, false);
             return (abcVendorCompany.Entity.VendorId, tataAigCompany.Entity.ClientCompanyId);
         }
     }
