@@ -85,7 +85,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="BankAccountNumber">Bank Account #</span>
                                             </div>
-                                            <input type="text" asp-for="BankAccountNumber" class="form-control" required placeholder="Bank Account #">
+                                            <input type="number" asp-for="BankAccountNumber" class="form-control" required placeholder="Bank Account #">
                                             <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -97,6 +97,23 @@
                                             </div>
                                             <input type="text" asp-for="IFSCCode" class="form-control" required placeholder="Bank IFSC Code">
                                             <span asp-validation-for="IFSCCode" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="documentImage">Document Image</span>
+                                            </div>
+                                            @if (Model?.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                            <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                         </div>
                                     </div>
                                 </div>
@@ -138,7 +155,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="CountryId">Country</label>
+                                                <span class="input-group-text" for="CountryId">Country</span>
                                             </div>
                                             <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
                                                 <option value="">--- SELECT ---</option>
@@ -150,7 +167,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="StateId">State</label>
+                                                <span class="input-group-text" for="StateId">State</span>
                                             </div>
                                             <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
                                                 <option value="">--- SELECT ---</option>
@@ -163,7 +180,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="DistrictId">District</label>
+                                                <span class="input-group-text" for="DistrictId">District</span>
                                             </div>
                                             <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                                 <option value="">--- SELECT ---</option>
@@ -176,7 +193,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <label class="input-group-text" for="PinCodeId">Pincode</label>
+                                                <span class="input-group-text" for="PinCodeId">Pincode</span>
                                             </div>
                                             <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                                 <option value="">--- SELECT ---</option>
@@ -194,22 +211,6 @@
                                     </div>
 
 
-                                    <div class="form-group">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="documentImage">Document Image</span>
-                                            </div>
-                                            @if (Model?.DocumentImage is not null)
-                                            {
-                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
-                                            }
-                                            else
-                                            {
-                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                            <input asp-for="DocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
-                                        </div>
-                                    </div>
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">

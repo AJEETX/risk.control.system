@@ -72,37 +72,37 @@
                         roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;
                         <span class="badge badge-danger">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    else if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ADMIN.CODE;
                         <span class="badge badge-warning">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
+                    else if (User.IsInRole(AppRoles.AgencyAdmin.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_ADMIN.CODE;
                         <span class="badge badge-info">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientCreator.ToString()))
+                    else if (User.IsInRole(AppRoles.Creator.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_CREATOR.CODE;
                         <span class="badge badge-primary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
+                    else if (User.IsInRole(AppRoles.Assigner.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ASSIGNER.CODE;
                         <span class="badge badge-secondary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
+                    else if (User.IsInRole(AppRoles.Assessor.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ASSESSOR.CODE;
                         <span class="badge badge-secondary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorSupervisor.ToString()))
+                    else if (User.IsInRole(AppRoles.Supervisor.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_SUPERVISOR.CODE;
                         <span class="badge badge-dark">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorAgent.ToString()))
+                    else if (User.IsInRole(AppRoles.Agent.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_AGENT.CODE;
                         <span class="badge badge-dark">@roleCode</span>
@@ -220,7 +220,7 @@
                 </li>*@
                 @{
                     
-                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
@@ -370,7 +370,7 @@
                     </a>
                 </li>
                 @{
-                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    if (User.IsInRole(AppRoles.PortalAdmin.ToString()) || User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
                         if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                         {

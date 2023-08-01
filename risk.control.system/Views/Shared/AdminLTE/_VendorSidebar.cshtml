@@ -88,37 +88,37 @@
                         roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;
                         <span class="badge badge-danger">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    else if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ADMIN.CODE;
                         <span class="badge badge-warning">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
+                    else if (User.IsInRole(AppRoles.AgencyAdmin.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_ADMIN.CODE;
                         <span class="badge badge-info">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientCreator.ToString()))
+                    else if (User.IsInRole(AppRoles.Creator.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_CREATOR.CODE;
                         <span class="badge badge-primary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
+                    else if (User.IsInRole(AppRoles.Assigner.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ASSIGNER.CODE;
                         <span class="badge badge-secondary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
+                    else if (User.IsInRole(AppRoles.Assessor.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ASSESSOR.CODE;
                         <span class="badge badge-secondary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorSupervisor.ToString()))
+                    else if (User.IsInRole(AppRoles.Supervisor.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_SUPERVISOR.CODE;
                         <span class="badge badge-dark">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorAgent.ToString()))
+                    else if (User.IsInRole(AppRoles.Agent.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_AGENT.CODE;
                         <span class="badge badge-dark">@roleCode</span>
@@ -208,7 +208,7 @@
                     </a>
                 </li>
                 @{
-                    if (User.IsInRole(AppRoles.VendorAdmin.ToString()) || User.IsInRole(AppRoles.VendorSupervisor.ToString()))
+                    if (User.IsInRole(AppRoles.AgencyAdmin.ToString()) || User.IsInRole(AppRoles.Supervisor.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")
@@ -228,7 +228,7 @@
                             </a>
                         </li>
                     <li class="nav-item">
-                        <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open") @Url.MakeActiveClass("ClaimsVendor","VendorAgent")">
+                        <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open") @Url.MakeActiveClass("ClaimsVendor","Agent")">
                             <i class="fas fa-rupee-sign nav-icon"></i>
                             <p>
                                 <span class="badge badge-warning">Active</span>
@@ -238,7 +238,7 @@
                     }
                 }
                 @{
-                    if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
+                    if (User.IsInRole(AppRoles.AgencyAdmin.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Agency","")">

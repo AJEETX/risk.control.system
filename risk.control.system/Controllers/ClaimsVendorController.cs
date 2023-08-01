@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.CaseLocations)
                 .Include(c => c.Vendors)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.VendorAgent.ToString()));
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
             var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsCaseLocation.VendorId);
 
@@ -179,7 +179,7 @@ namespace risk.control.system.Controllers
                 applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
             }
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
                 var claimsAssigned = new List<ClaimsInvestigation>();
 
@@ -196,7 +196,7 @@ namespace risk.control.system.Controllers
                 }
                 return View(claimsAssigned);
             }
-            else if (userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
             {
                 var claimsAssigned = new List<ClaimsInvestigation>();
 
@@ -210,7 +210,7 @@ namespace risk.control.system.Controllers
                         claimsAssigned.Add(item);
                     }
                 }
-                return View("VendorAgent", claimsAssigned);
+                return View("Agent", claimsAssigned);
             }
 
             return View(await applicationDbContext.ToListAsync());
@@ -258,7 +258,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId || c.IsReviewCaseLocation
                     );
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.VendorAgent.ToString()));
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
             List<VendorApplicationUser> agents = new List<VendorApplicationUser>();
             var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimCase.VendorId);
@@ -397,10 +397,10 @@ namespace risk.control.system.Controllers
             var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
-            if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                if (userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+                if (userRole.Value.Contains(AppRoles.Supervisor.ToString()))
                 {
                     applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId));
                 }
@@ -473,7 +473,7 @@ namespace risk.control.system.Controllers
             }
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
                 foreach (var item in applicationDbContext)
                 {
@@ -487,7 +487,7 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
-            //else if (userRole.Value.Contains(AppRoles.VendorAgent.ToString()))
+            //else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
             //{
             //    foreach (var item in applicationDbContext)
             //    {
@@ -550,7 +550,7 @@ namespace risk.control.system.Controllers
             }
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
                 foreach (var item in applicationDbContext)
                 {

@@ -89,37 +89,37 @@
                         roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;
                         <span class="badge badge-danger">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    else if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ADMIN.CODE;
                         <span class="badge badge-warning">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorAdmin.ToString()))
+                    else if (User.IsInRole(AppRoles.AgencyAdmin.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_ADMIN.CODE;
                         <span class="badge badge-info">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientCreator.ToString()))
+                    else if (User.IsInRole(AppRoles.Creator.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_CREATOR.CODE;
                         <span class="badge badge-primary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
+                    else if (User.IsInRole(AppRoles.Assigner.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ASSIGNER.CODE;
                         <span class="badge badge-secondary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
+                    else if (User.IsInRole(AppRoles.Assessor.ToString()))
                     {
                         roleCode = @Applicationsettings.CLIENT_ASSESSOR.CODE;
                         <span class="badge badge-secondary">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorSupervisor.ToString()))
+                    else if (User.IsInRole(AppRoles.Supervisor.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_SUPERVISOR.CODE;
                         <span class="badge badge-dark">@roleCode</span>
                     }
-                    else if (User.IsInRole(AppRoles.VendorAgent.ToString()))
+                    else if (User.IsInRole(AppRoles.Agent.ToString()))
                     {
                         roleCode = @Applicationsettings.VENDOR_AGENT.CODE;
                         <span class="badge badge-dark">@roleCode</span>
@@ -200,7 +200,7 @@
                     </a>
                 </li>
                 @{
-                    if (User.IsInRole(AppRoles.ClientCreator.ToString()))
+                    if (User.IsInRole(AppRoles.Creator.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Create")">
@@ -230,7 +230,7 @@
                             </a>
                         </li>
                     }
-                    if (User.IsInRole(AppRoles.ClientAssigner.ToString()))
+                    if (User.IsInRole(AppRoles.Assigner.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assigner")
@@ -267,7 +267,7 @@
                         //    </a>
                         //</li>
                     }
-                    if (User.IsInRole(AppRoles.ClientAssessor.ToString()))
+                    if (User.IsInRole(AppRoles.Assessor.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assessor" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assessor")">
@@ -307,7 +307,7 @@
                 </li>
                  @{
 
-                    if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","Index") @Url.MakeActiveClass("CompanyUserRoles","") ">
@@ -395,7 +395,7 @@
                     }
                 }
                 @{
-                    if (User.IsInRole(AppRoles.ClientAdmin.ToString()))
+                    if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
                         <li class="nav-item">
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","")

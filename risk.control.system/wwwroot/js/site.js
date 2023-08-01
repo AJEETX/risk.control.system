@@ -157,19 +157,19 @@ function checkIfAnyChecked(elements) {
 function loadState(obj, showDefaultOption = true) {
     var value = obj.value;
     $.post("/MasterData/GetStatesByCountryId", { countryId: value }, function (data) {
-        PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option>--SELECT STATE--</option>", "<option>--SELECT DISTRICT--</option>", "<option>--SELECT PINCODE--</option>", showDefaultOption);
+        PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", showDefaultOption);
     });
 }
 function loadDistrict(obj, showDefaultOption = true) {
     var value = obj.value;
     $.post("/MasterData/GetDistrictByStateId", { stateId: value }, function (data) {
-        PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option>--SELECT PINCODE--</option>", "<option>--SELECT DISTRICT--</option>", showDefaultOption);
+        PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", showDefaultOption);
     });
 }
 function loadPinCode(obj, showDefaultOption = true) {
     var value = obj.value;
     $.post("/MasterData/GetPinCodesByDistrictId", { districtId: value }, function (data) {
-        PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
+        PopulatePinCodeDropDown("#PinCodeId", data, "<option>--- SELECT ---</option>", showDefaultOption);
     });
 }
 

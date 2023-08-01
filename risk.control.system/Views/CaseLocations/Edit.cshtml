@@ -67,7 +67,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="BeneficiaryContactNumber">Contact #</span>
                                                 </div>
-                                                <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)" />
+                                                <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required maxlength="10" min="1111111111" placeholder="Enter Phone # (10 digit)" />
                                                 <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
                                             </div>
                                         </div>

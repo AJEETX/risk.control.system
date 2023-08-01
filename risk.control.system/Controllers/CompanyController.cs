@@ -227,7 +227,7 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
 
-            var userFullEmail = user.Email + emailSuffix;
+            var userFullEmail = user.Email.Trim().ToLower() + emailSuffix;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
@@ -363,7 +363,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb("Available Agency(s) ")]
+        [Breadcrumb("Available Agencies")]
         public async Task<IActionResult> AvailableVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -442,7 +442,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb("Empanelled Agency(s)")]
+        [Breadcrumb("Empanelled Agencies")]
         public async Task<IActionResult> EmpanelledVendors()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -608,10 +608,10 @@ namespace risk.control.system.Controllers
             }
             //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.ClientAdmin.ToString()) ||
-                r.Name.Contains(AppRoles.ClientCreator.ToString()) ||
-                r.Name.Contains(AppRoles.ClientAssigner.ToString()) ||
-                r.Name.Contains(AppRoles.ClientAssessor.ToString())))
+                r.Name.Contains(AppRoles.CompanyAdmin.ToString()) ||
+                r.Name.Contains(AppRoles.Creator.ToString()) ||
+                r.Name.Contains(AppRoles.Assigner.ToString()) ||
+                r.Name.Contains(AppRoles.Assessor.ToString())))
             {
                 var userRoleViewModel = new CompanyUserRoleViewModel
                 {

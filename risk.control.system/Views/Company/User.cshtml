@@ -30,7 +30,7 @@
                                         Phone
                                     </th>
                                     <th>
-                                        Addresline
+                                        Addressline
                                     </th>
                                     <th>
                                         Pincode
@@ -75,31 +75,31 @@
                                                 {
                                                     <span class="badge badge-light">PA</span>
                                                 }
-                                                else if (user.Roles.Contains(AppRoles.ClientAdmin.ToString()))
+                                                else if (user.Roles.Contains(AppRoles.CompanyAdmin.ToString()))
                                                 {
                                                     <span class="badge badge-light">CA</span>
                                                 }
-                                                else if (user.Roles.Contains(AppRoles.ClientCreator.ToString()))
+                                                else if (user.Roles.Contains(AppRoles.Creator.ToString()))
                                                 {
                                                     <span class="badge badge-warning">CC</span>
                                                 }
-                                                else if (user.Roles.Contains(AppRoles.ClientAssigner.ToString()))
+                                                else if (user.Roles.Contains(AppRoles.Assigner.ToString()))
                                                 {
                                                     <span class="badge badge-info">CS</span>
                                                 }
-                                                else if (user.Roles.Contains(AppRoles.ClientAssessor.ToString()))
+                                                else if (user.Roles.Contains(AppRoles.Assessor.ToString()))
                                                 {
                                                     <span class="badge badge-success">CAS</span>
                                                 }
-                                                else if (user.Roles.Contains(AppRoles.VendorAdmin.ToString()))
+                                                else if (user.Roles.Contains(AppRoles.AgencyAdmin.ToString()))
                                                 {
                                                     <span class="badge badge-danger">VA</span>
                                                 }
-                                                else if (user.Roles.Contains(AppRoles.VendorSupervisor.ToString()))
+                                                else if (user.Roles.Contains(AppRoles.Supervisor.ToString()))
                                                 {
                                                     <span class="badge badge-warning">VS</span>
                                                 }
-                                                else if (user.Roles.Contains(AppRoles.VendorAgent.ToString()))
+                                                else if (user.Roles.Contains(AppRoles.Agent.ToString()))
                                                 {
                                                     <span class="badge badge-success">VA</span>
                                                 }

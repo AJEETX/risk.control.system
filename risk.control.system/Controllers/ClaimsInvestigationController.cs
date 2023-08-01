@@ -104,12 +104,12 @@ namespace risk.control.system.Controllers
             var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            if (userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
@@ -119,7 +119,7 @@ namespace risk.control.system.Controllers
                 || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
                 || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
@@ -136,13 +136,13 @@ namespace risk.control.system.Controllers
                 }
                 return View(claimsSubmitted);
             }
-            else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
                 openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
             }
-            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
@@ -200,7 +200,7 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
 
@@ -219,7 +219,7 @@ namespace risk.control.system.Controllers
                 }
                 return View(claimsAssigned);
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
 
@@ -236,7 +236,7 @@ namespace risk.control.system.Controllers
                 }
                 return View(claimsAssigned);
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
@@ -303,7 +303,7 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
 
@@ -319,7 +319,7 @@ namespace risk.control.system.Controllers
                 }
                 return View(claimsAssigned);
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
 
@@ -336,7 +336,7 @@ namespace risk.control.system.Controllers
                 }
                 return View(claimsAssigned);
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
@@ -470,7 +470,7 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientAdmin.ToString()) || userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !a.IsReady2Assign);
                 return View(await applicationDbContext.ToListAsync());
@@ -781,7 +781,7 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
@@ -848,7 +848,7 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
@@ -917,7 +917,7 @@ namespace risk.control.system.Controllers
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()) || userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            if (userRole.Value.Contains(AppRoles.Assessor.ToString()) || userRole.Value.Contains(AppRoles.Assigner.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
 
@@ -982,12 +982,12 @@ namespace risk.control.system.Controllers
             var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            if (userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
@@ -997,7 +997,7 @@ namespace risk.control.system.Controllers
                 || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
                 || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssessor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
@@ -1014,13 +1014,13 @@ namespace risk.control.system.Controllers
                 }
                 return View(claimsSubmitted);
             }
-            else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
                 openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
             }
-            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
@@ -1058,25 +1058,25 @@ namespace risk.control.system.Controllers
             var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
 
-            if (userRole.Value.Contains(AppRoles.ClientCreator.ToString()))
+            if (userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
             }
-            else if (userRole.Value.Contains(AppRoles.ClientAssigner.ToString()))
+            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
                 openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
                 || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
             }
-            else if (userRole.Value.Contains(AppRoles.VendorAdmin.ToString()) || userRole.Value.Contains(AppRoles.VendorSupervisor.ToString()))
+            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a =>
                 openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
             }
-            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.ClientAdmin.ToString()))
+            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
             {
                 return View(new List<ClaimsInvestigation> { });
             }
@@ -1311,7 +1311,7 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.ClientAssigner.ToString()));
+                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
                 var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 

@@ -40,10 +40,10 @@ namespace risk.control.system.Controllers
             }
             //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles.Where(r =>
-                r.Name.Contains(AppRoles.ClientAdmin.ToString()) ||
-                r.Name.Contains(AppRoles.ClientCreator.ToString()) ||
-                r.Name.Contains(AppRoles.ClientAssigner.ToString()) ||
-                r.Name.Contains(AppRoles.ClientAssessor.ToString())))
+                r.Name.Contains(AppRoles.CompanyAdmin.ToString()) ||
+                r.Name.Contains(AppRoles.Creator.ToString()) ||
+                r.Name.Contains(AppRoles.Assigner.ToString()) ||
+                r.Name.Contains(AppRoles.Assessor.ToString())))
             {
                 var userRoleViewModel = new CompanyUserRoleViewModel
                 {

@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("test")]
         public IActionResult Test()
         {
-            return Ok();
+            return Ok("This is a test endpoint");
         }
 
         [AllowAnonymous]

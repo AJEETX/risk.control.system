@@ -31,6 +31,8 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = true,
+                Addressline = "123 Benaras Gali",
+                PhoneNumber = "9876543210",
                 VendorId = vendorId,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
@@ -44,16 +46,16 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(vendorAdmin, Password);
-                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAdmin.ToString());
-                    //var vendorAdminRole = new ApplicationRole(AppRoles.VendorAdmin.ToString(), AppRoles.VendorAdmin.ToString());
+                    await userManager.AddToRoleAsync(vendorAdmin, AppRoles.AgencyAdmin.ToString());
+                    //var vendorAdminRole = new ApplicationRole(AppRoles.AgencyAdmin.ToString(), AppRoles.AgencyAdmin.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorAdminRole);
 
-                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorSupervisor.ToString());
-                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
+                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.Supervisor.ToString());
+                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.Supervisor.ToString(), AppRoles.Supervisor.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorSuperVisorRole);
 
-                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.VendorAgent.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    //await userManager.AddToRoleAsync(vendorAdmin, AppRoles.Agent.ToString());
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.Agent.ToString(), AppRoles.Agent.ToString());
                     //vendorAdmin.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
@@ -73,9 +75,11 @@ namespace risk.control.system.Seeds
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
+                PhoneNumber = "9876543210",
                 VendorId = vendorId,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
+                Addressline = "123 Pakki Gali",
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
@@ -89,12 +93,12 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(vendorSupervisor, Password);
-                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorSupervisor.ToString());
-                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.VendorSupervisor.ToString(), AppRoles.VendorSupervisor.ToString());
+                    await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.Supervisor.ToString());
+                    //var vendorSuperVisorRole = new ApplicationRole(AppRoles.Supervisor.ToString(), AppRoles.Supervisor.ToString());
                     //vendorSupervisor.ApplicationRoles.Add(vendorSuperVisorRole);
 
-                    //await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.VendorAgent.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    //await userManager.AddToRoleAsync(vendorSupervisor, AppRoles.Agent.ToString());
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.Agent.ToString(), AppRoles.Agent.ToString());
                     //vendorSupervisor.ApplicationRoles.Add(vendorAgentRole);
                 }
             }
@@ -115,9 +119,11 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Password,
                 VendorId = vendorId,
+                PhoneNumber = "9876543210",
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
+                Addressline = "99 Naaley ke paas",
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
@@ -130,8 +136,8 @@ namespace risk.control.system.Seeds
                 if (user == null)
                 {
                     await userManager.CreateAsync(vendorAgent, Password);
-                    await userManager.AddToRoleAsync(vendorAgent, AppRoles.VendorAgent.ToString());
-                    //var vendorAgentRole = new ApplicationRole(AppRoles.VendorAgent.ToString(), AppRoles.VendorAgent.ToString());
+                    await userManager.AddToRoleAsync(vendorAgent, AppRoles.Agent.ToString());
+                    //var vendorAgentRole = new ApplicationRole(AppRoles.Agent.ToString(), AppRoles.Agent.ToString());
                     //vendorAgent.ApplicationRoles.Add(vendorAgentRole);
                 }
             }

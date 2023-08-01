@@ -17,7 +17,7 @@ namespace risk.control.system.Seeds
             var TataAig = new ClientCompany
             {
                 ClientCompanyId = Guid.NewGuid().ToString(),
-                Name = "XYZ INSURANCE",
+                Name = "XYZ Insurance",
                 Addressline = "100 GOOD STREET ",
                 Branch = "FOREST HILL CHASE",
                 Code = "TA001",
@@ -31,8 +31,9 @@ namespace risk.control.system.Seeds
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "CORPORATE OFFICE ",
-                Email = "tata-aig@mail.com",
-                PhoneNumber = "(03) 88004739",
+                Email = "xyz@insurance.com",
+                DocumentUrl = "/img/company.png",
+                PhoneNumber = "9988004739",
             };
 
             var tataAigCompany = await context.ClientCompany.AddAsync(TataAig);
@@ -55,8 +56,9 @@ namespace risk.control.system.Seeds
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "HEAD OFFICE ",
-                Email = "abc@vendor.com",
-                PhoneNumber = "(04) 123 234",
+                Email = "abc@agency.com",
+                PhoneNumber = "8888004739",
+                DocumentUrl = "/img/agency.png"
             };
 
             var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
@@ -102,6 +104,8 @@ namespace risk.control.system.Seeds
                     }
                 }
             };
+
+            abcVendor.VendorInvestigationServiceTypes = listOfSericesWithPinCodes;
 
             await context.SaveChangesAsync(null, false);
             return (abcVendorCompany.Entity.VendorId, tataAigCompany.Entity.ClientCompanyId);

@@ -48,6 +48,7 @@ namespace risk.control.system.Controllers
                     await clientCompany.Document.CopyToAsync(dataStream);
                     clientCompany.DocumentImage = dataStream.ToArray();
                 }
+                clientCompany.Email = clientCompany.Email.Trim().ToLower();
                 clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(clientCompany);

@@ -41,63 +41,13 @@ namespace risk.control.system.Controllers
             UserList = new List<UsersViewModel>();
         }
 
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index()
         {
-            ViewBag.EmailSortParm = string.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
-            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.PincodeSortParm = string.IsNullOrEmpty(sortOrder) ? "pincode_desc" : "";
-            if (searchString != null)
-            {
-                currentPage = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-
-            ViewBag.CurrentFilter = searchString;
-
-            var applicationDbContext = userManager.Users
+            var users = await userManager.Users
                 .Include(u => u.Country)
                 .Include(u => u.State)
                 .Include(u => u.District)
-                .Include(u => u.PinCode).AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                applicationDbContext = applicationDbContext.Where(a =>
-                a.FirstName.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.LastName.ToLower().Contains(searchString.Trim().ToLower()));
-            }
-
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => new { s.FirstName, s.LastName });
-                    break;
-
-                case "email_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Email);
-                    break;
-
-                case "pincode_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.PinCode.Code);
-                    break;
-
-                default:
-                    applicationDbContext.OrderByDescending(s => s.Email);
-                    break;
-            }
-            int pageNumber = (currentPage ?? 1);
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-
-            var users = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+                .Include(u => u.PinCode).ToListAsync();
 
             foreach (Models.ApplicationUser user in users)
             {
@@ -141,6 +91,7 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
             user.EmailConfirmed = true;
+            user.Email = user.Email.Trim().ToLower();
             user.UserName = user.Email;
             user.Mailbox = new Mailbox { Name = user.Email };
             user.Updated = DateTime.UtcNow;
