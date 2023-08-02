@@ -22,9 +22,10 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Email">Email Address <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                <span class="input-group-text" id="emailid">Email Address <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input asp-for="Email" class="form-control" type="email" required placeholder="Enter Agency Email" maxlength="50" value="">
+                                            <input asp-for="Email" id="email" class="form-control" type="email" required placeholder="Enter Agency Email" maxlength="50" value="">
+                                            <span asp-validation-for="Name" class="text-danger" id="result"></span>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -236,4 +237,24 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script type="text/jscript">
+        $('#email').blur(function () {
+            var url = "/Account/CheckUserName";
+            var name = $('#email').val();
+            $.get(url, { input: name }, function (data) {
+                if (data == "Available") {
+                    $("#result").html("<span style='color:green;padding-top:.5rem;'>Available</span>");
+                    $('#result').css('padding','.5rem')
+                    $('#result').fadeOut(1500); // 1.5 seconds
+                    $("#email").css('background-color', '');
+                    $("#email").css('border-color', '');
+                }
+                else {
+                    $("#result").html("<span style='color:red;padding-top:.5rem;'>Email exists</span>");
+                    $('#result').css('padding','.5rem')
+                    $("#email").css('border-color', '#e97878');
+                }
+            });
+        })
+    </script>
 }
