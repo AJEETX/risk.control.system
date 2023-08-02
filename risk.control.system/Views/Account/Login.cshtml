@@ -16,6 +16,7 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <partial name="AdminLTE/_Styles" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         html {
             font-size: 14px;
@@ -57,9 +58,26 @@
         }
         button{
             height: 2.5rem;
-            
+        }
+
+        .fa-eye {
+            position: absolute;
+            top: 28%;
+            right: 16%;
+            cursor: pointer;
+            color: lightgray;
         }
     </style>
+    <script>
+        function myFunction() {
+            var x = document.getElementById("password");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
 </head>
 
 <body class="transition">
@@ -103,7 +121,7 @@
                                                     <input name="Email" placeholder="Email" type="email" id="email" class="form-control"
                                                            value="creator@company.com">
                                                     <div class="input-group-append">
-                                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                                        <span class="input-group-text"><i class="fas fa-envelope" onclick="myFunction()"></i></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -118,7 +136,7 @@
                                             <div class="form-group">
                                                 <div class="mb-3 input-group">
                                                     <input name="password" placeholder="Password" type="password"
-                                                           id="password" class="form-control" value="@Applicationsettings.TestPassword">
+                                                       id="password" class="form-control" value="@Applicationsettings.TestPassword"><i class="fa-solid fa-eye" id="eye"></i>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text">
                                                             <i class="fas fa-lock"></i>

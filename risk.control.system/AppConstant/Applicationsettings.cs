@@ -197,7 +197,7 @@
             public const string DISPLAY_NAME = "ASSESSOR";
             public const string CODE = "assessor";
             public const string USERNAME = "assessor@company.com";
-            public const string EMAIL = "assessor@admin.com";
+            public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Damien";
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/assessor.png";
