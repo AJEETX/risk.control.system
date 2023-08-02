@@ -289,7 +289,7 @@ namespace risk.control.system.Controllers
             }
             var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Delete", "Vendors", $"Delete Agency") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
             return View(vendor);
         }

@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers
             return View(clientCompany);
         }
 
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Company")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -248,7 +248,7 @@ namespace risk.control.system.Controllers
             return View(user);
         }
 
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit User")]
         public async Task<IActionResult> EditUser(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
@@ -595,7 +595,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        [Breadcrumb("Role", FromAction = "User")]
+        [Breadcrumb("Edit Role", FromAction = "User")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<CompanyUserRoleViewModel>();

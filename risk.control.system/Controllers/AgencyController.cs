@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Edit/5
-        [Breadcrumb("Edit", FromAction = "Index")]
+        [Breadcrumb("Edit Agency", FromAction = "Index")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -197,7 +197,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Add", FromAction = "User")]
+        [Breadcrumb("Add User", FromAction = "User")]
         public IActionResult CreateUser()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -243,7 +243,7 @@ namespace risk.control.system.Controllers
             return View(user);
         }
 
-        [Breadcrumb("Edit", FromAction = "User")]
+        [Breadcrumb("Edit User", FromAction = "User")]
         public async Task<IActionResult> EditUser(long? userId)
         {
             if (userId == null || _context.VendorApplicationUser == null)
@@ -351,7 +351,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(AgencyController.User), "Agency");
         }
 
-        [Breadcrumb("Role", FromAction = "User")]
+        [Breadcrumb("Edit Role", FromAction = "User")]
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<VendorUserRoleViewModel>();
@@ -442,7 +442,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContext);
         }
 
-        [Breadcrumb("Add", FromAction = "Service")]
+        [Breadcrumb("Add Service", FromAction = "Service")]
         public IActionResult CreateService()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -494,7 +494,7 @@ namespace risk.control.system.Controllers
             return View(vendorInvestigationServiceType);
         }
 
-        [Breadcrumb("Edit", FromAction = "Service")]
+        [Breadcrumb("Edit Service", FromAction = "Service")]
         public async Task<IActionResult> EditService(string id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
@@ -593,7 +593,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Delete/5
-        [Breadcrumb("Delete", FromAction = "Service")]
+        [Breadcrumb("Delete Service", FromAction = "Service")]
         public async Task<IActionResult> DeleteService(string id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)

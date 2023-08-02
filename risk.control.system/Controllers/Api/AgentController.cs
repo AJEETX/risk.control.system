@@ -41,7 +41,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("agent")]
         public async Task<IActionResult> Index()
         {
-            string email = "vendor-agent@admin.com";
+            string email = "agent@agency.com";
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.ClaimReport)

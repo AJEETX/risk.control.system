@@ -166,7 +166,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerType">Customer Type</span>
+                                                    <span class="input-group-text" asp-for="CustomerType">Customer Type <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
                                     <select required asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
                                         <option>--- SELECT ---</option>
@@ -178,7 +178,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerName">Customer Name</span>
+                                                    <span class="input-group-text" asp-for="CustomerName">Customer Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
                                     <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" />
                                     <span asp-validation-for="CustomerName" class="text-danger"></span>
@@ -187,7 +187,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth</span>
+                                                    <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
                                                 <input required asp-for="CustomerDateOfBirth" id="dateCustomerId" class="form-control" type="date" />
                                     <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
@@ -196,7 +196,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="Gender">Gender</span>
+                                                    <span class="input-group-text" asp-for="Gender">Gender <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
                                     <select required asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
                                         <option value="">--- SELECT ---</option>
@@ -208,9 +208,9 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="ContactNumber">Phone #</span>
+                                        <span class="input-group-text" asp-for="ContactNumber">Phone # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <input type="number" asp-for="ContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)" />
+                                    <input type="number" asp-for="ContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)" value=""/>
                                     <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
 
                                 </div>
@@ -218,11 +218,12 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerIncome">Income</span>
+                                                    <span class="input-group-text" asp-for="CustomerIncome">Income <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
                                     <select required asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
                                         <option value="">--- SELECT ---</option>
                                     </select>
+                                                <span asp-validation-for="CustomerIncome" class="text-danger"></span>
 
                                 </div>
                             </div>
@@ -230,22 +231,24 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerOccupation">Occupation</span>
+                                                    <span class="input-group-text" asp-for="CustomerOccupation">Occupation <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
                                     <select required asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
                                         <option value="">--- SELECT ---</option>
                                     </select>
+                                                <span asp-validation-for="CustomerOccupation" class="text-danger"></span>
 
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerEducation">Education</span>
+                                        <span class="input-group-text" asp-for="CustomerEducation">Education <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
                                     <select required asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
                                         <option value="">--- SELECT ---</option>
                                     </select>
+                                                <span asp-validation-for="CustomerEducation" class="text-danger"></span>
 
                                 </div>
                             </div>
@@ -255,11 +258,12 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" for="CountryId">Country</span>
+                                                    <span class="input-group-text" for="CountryId">Country <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                    <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
                                         <option value="">--- SELECT ---</option>
                                     </select>
+                                                <span asp-validation-for="CountryId" class="text-danger"></span>
 
                                 </div>
                             </div>
@@ -267,9 +271,9 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" for="StateId">State</span>
+                                                    <span class="input-group-text" for="StateId">State <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                    <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
                                         <option value="">--- SELECT ---</option>
                                     </select>
 
@@ -280,9 +284,9 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" for="DistrictId">District</span>
+                                                    <span class="input-group-text" for="DistrictId">District <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                    <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
                                         <option value="">--- SELECT ---</option>
                                     </select>
 
@@ -293,27 +297,29 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" for="PinCodeId">Pincode</span>
+                                                    <span class="input-group-text" for="PinCodeId">Pincode <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                    <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId" required>
                                         <option value="">--- SELECT ---</option>
                                     </select>
+                                                <span asp-validation-for="PinCodeId" class="text-danger"></span>
 
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Addressline">Address line</span>
+                                                    <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" />
-                                </div>
+                                    <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" required value=""/>
+                                                <span asp-validation-for="Addressline" class="text-danger"></span>
+                                            </div>
                             </div>
 
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Addressline">Remarks</span>
+                                                    <span class="input-group-text" id="Description">Remarks <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
                                     <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" />
                                     <span asp-validation-for="Description" class="text-danger"></span>
