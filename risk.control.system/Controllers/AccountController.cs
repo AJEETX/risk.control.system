@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers
             var emailSuffix = input.IndexOf("@");
             var email = input.Substring(emailSuffix);
 
-            var allUsers = _userManager.Users.Where(u => u.Email.Contains(email))?.ToList();
+            var allUsers = _userManager.Users.Where(u => u.Email.Substring(u.Email.IndexOf("@")) == email)?.ToList();
 
             if (allUsers?.Count == 0)
             {

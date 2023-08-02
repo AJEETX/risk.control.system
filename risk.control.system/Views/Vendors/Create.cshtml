@@ -245,12 +245,13 @@
                 if (data == "Available") {
                     $("#result").html("<span style='color:green;padding-top:.5rem;'>Available</span>");
                     $('#result').css('padding','.5rem')
-                    $('#result').fadeOut(1500); // 1.5 seconds
+                    $('#result').fadeOut(2000); // 1.5 seconds
+                    $('#result').fadeOut('slow'); // 1.5 seconds
                     $("#email").css('background-color', '');
                     $("#email").css('border-color', '');
                 }
                 else {
-                    $("#result").html("<span style='color:red;padding-top:.5rem;'>Email exists</span>");
+                    $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'>Email exists</span>");
                     $('#result').css('padding','.5rem')
                     $("#email").css('border-color', '#e97878');
                 }
