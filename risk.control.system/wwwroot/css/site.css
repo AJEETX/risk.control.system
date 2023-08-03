@@ -154,7 +154,7 @@ table {
 }
 
 .card {
-    box-shadow: rgba(0, 0, 0, 0.2) 3px 3px 2px 1px;
+    box-shadow: rgba(0, 0, 0, 0.12) 1px 1px 1px 1px;
     border: 1px solid #ccc;
 }
 
