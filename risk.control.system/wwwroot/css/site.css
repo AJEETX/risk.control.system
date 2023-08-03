@@ -30,8 +30,8 @@ a {
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-    font-size: 14px;
-    font-family: "Arial Narrow" !important;
+    font-size: 1em;
+    font-family: "Arial" !important;
 }
 
 @media (min-width: 768px) {
@@ -116,7 +116,7 @@ table {
 
 .form-Image {
     height: 40px;
-    border:.1px ridge #ccc;
+    border: .1px ridge #ccc;
 }
 
 .profile-image {
@@ -154,15 +154,18 @@ table {
 }
 
 .card {
-    box-shadow: rgba(0, 0, 0, 0.2) 5px 5px 4px 1px;
+    box-shadow: rgba(0, 0, 0, 0.2) 3px 3px 2px 1px;
     border: 1px solid #ccc;
 }
-.card tbody a {
-    display: inline-block;
-}
+
+    .card tbody a {
+        display: inline-block;
+    }
+
 .btn-warning {
     box-shadow: 2px 4px #ccc;
 }
+
 .hide-id {
     display: none;
 }
@@ -323,9 +326,11 @@ textarea {
     position: absolute;
     top: 0;
 }
+
 .form-control.date-width {
     width: 50px;
 }
+
 input[type="date"]::-webkit-calendar-picker-indicator {
     background: transparent;
     bottom: 0;
@@ -338,6 +343,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     top: 0;
     width: auto;
 }
+
 .input-fa {
     margin-right: -20px;
     margin-top: 1rem;
@@ -345,15 +351,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     z-index: 2;
     color: whitesmoke;
 }
-.email-address{
-    text-align:right;
+
+.email-address {
+    text-align: right;
 }
+
 .breadcrumb {
     font-weight: bold;
     border: .5px solid #ccc;
     background: linear-gradient(#fff, #ccc);
     animation: gradient 15s ease infinite;
 }
+
 @keyframes gradient {
     0% {
         background-position: 0% 50%;
@@ -367,6 +376,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         background-position: 0% 50%;
     }
 }
-.breadcrumb-item.active{
-    color:black;
+
+.breadcrumb-item.active {
+    color: black;
 }

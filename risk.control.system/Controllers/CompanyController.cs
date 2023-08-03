@@ -241,11 +241,11 @@ namespace risk.control.system.Controllers
                 toastNotification.AddSuccessToastMessage("User created successfully!");
                 return RedirectToAction(nameof(CompanyController.User), "Company");
             }
-            toastNotification.AddErrorToastMessage("Error to create user!");
             foreach (IdentityError error in result.Errors)
                 ModelState.AddModelError("", error.Description);
             GetCountryStateEdit(user);
-                toastNotification.AddErrorToastMessage("Error to User!");
+            toastNotification.AddErrorToastMessage("Error to create user!");
+            await Task.Delay(1000);
             return View(user);
         }
 
