@@ -30,7 +30,7 @@ a {
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-    font-size: 1em;
+    font-size: 12px;
     font-family: "Arial" !important;
 }
 
@@ -162,8 +162,9 @@ table {
         display: inline-block;
     }
 
-.btn-warning {
+.btn-success, .btn-warning, .btn-info, .btn-danger, btn-secondary {
     box-shadow: 2px 4px #ccc;
+    background: linear-gradient(white #ccc);
 }
 
 .hide-id {
@@ -304,7 +305,7 @@ textarea {
 
 .input-group-prepend {
     display: block;
-    width: 8rem;
+    width: 9rem;
 }
 
 .input-validation-error {
