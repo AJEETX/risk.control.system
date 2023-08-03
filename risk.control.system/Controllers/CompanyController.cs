@@ -245,6 +245,7 @@ namespace risk.control.system.Controllers
             foreach (IdentityError error in result.Errors)
                 ModelState.AddModelError("", error.Description);
             GetCountryStateEdit(user);
+                toastNotification.AddErrorToastMessage("Error to User!");
             return View(user);
         }
 

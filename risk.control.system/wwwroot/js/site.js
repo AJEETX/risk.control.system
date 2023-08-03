@@ -176,7 +176,7 @@ function loadPinCode(obj, showDefaultOption = true) {
 function loadSubStatus(obj) {
     var value = obj.value;
     $.post("/InvestigationCaseSubStatus/GetSubstatusBystatusId", { InvestigationCaseStatusId: value }, function (data) {
-        PopulateSubStatus("#InvestigationCaseSubStatusId", data, "<option>--SELECT SUB STATUS--</option>");
+        PopulateSubStatus("#InvestigationCaseSubStatusId", data, "<option>--- SELECT ---</option>");
     });
 }
 
@@ -195,7 +195,7 @@ function loadInvestigationServices(obj) {
     lobObj = value;
     localStorage.setItem('lobId', value);
     $.post("/VendorService/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
-        PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--SELECT TYPE OF INVESTIGATION--</option>");
+        PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
     });
 }
 

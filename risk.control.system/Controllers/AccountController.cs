@@ -100,6 +100,10 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<string> CheckUserName(string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
             var emailSuffix = input.IndexOf("@");
             var email = input.Substring(emailSuffix);
 

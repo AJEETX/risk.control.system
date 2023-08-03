@@ -153,10 +153,16 @@ table {
     right: -75rem;
 }
 
+.card {
+    box-shadow: rgba(0, 0, 0, 0.2) 5px 5px 4px 1px;
+    border: 1px solid #ccc;
+}
 .card tbody a {
     display: inline-block;
 }
-
+.btn-warning {
+    box-shadow: 2px 4px #ccc;
+}
 .hide-id {
     display: none;
 }
