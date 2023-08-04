@@ -54,7 +54,8 @@
                                             @foreach (var item in Model)
                                             {
                                                 var timePending = DateTime.Now.Subtract(item.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Created).Days.ToString();
-                                                <tr>
+                                                var dateOnly = item.Created.ToString("dd-MM-yyyy");
+                                            <tr>
                                                 <td>
                                                     @if (item?.DocumentImage is not null)
                                                     {
@@ -102,7 +103,7 @@
                                                         }
                                                     </td>
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.Created)
+                                                    @Html.DisplayFor(modelItem => dateOnly)
                                                 </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => timePending )
@@ -117,7 +118,7 @@
                                                         }
                                                         else
                                                         {
-                                                            <i class="fas fa-map-pin" style='font-size:36px' title="ADD LOCATION"></i>
+                                                            <i class="fas fa-map-pin" style='font-size:24px' title="ADD LOCATION"></i>
                                                         }
                                                     }
 
