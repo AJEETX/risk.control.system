@@ -93,6 +93,7 @@ namespace risk.control.system.Controllers.Api
                     claimId = c.ClaimsInvestigationId,
                     CustomerName = c.CustomerName,
                     CustomerEmail = email,
+                    PolicyNumber = c.ContractNumber,
                     c.Gender,
                     c.Addressline,
                     c.PinCode.Code,

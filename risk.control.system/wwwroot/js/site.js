@@ -173,6 +173,11 @@ function loadPinCode(obj, showDefaultOption = true) {
     });
 }
 
+function enableSubmitButton(obj, showDefaultOption = true) {
+    var value = obj.value;
+    $('#create-pincode').prop('disabled', false);
+}
+
 function loadSubStatus(obj) {
     var value = obj.value;
     $.post("/InvestigationCaseSubStatus/GetSubstatusBystatusId", { InvestigationCaseStatusId: value }, function (data) {
@@ -244,7 +249,6 @@ function PopulateStateDropDown(pinCodedropDownId, districtDropDownId, stateDropD
     $(stateDropDownId).append(stateOption);
     $(districtDropDownId).append(districtOption);
     $(pinCodedropDownId).append(pincodeOption);
-
 
     $.each(list, function (index, row) {
         $(stateDropDownId).append("<option value='" + row.stateId + "'>" + row.name + "</option>")

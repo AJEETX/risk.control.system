@@ -22,10 +22,14 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="emailid">Email Address <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                <span class="input-group-text" id="emailid">Agency Domain <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input asp-for="Email" id="email" class="form-control" type="email" required placeholder="Enter Agency Email" maxlength="50" value="">
+                                            <input asp-for="Email" id="email" class="form-control email-address" type="text" min="5" required placeholder="Enter Agency Domain e.g. agency" maxlength="10" value="">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text" id="Email">.com</span>
+                                            </div>
                                             <span asp-validation-for="Name" class="text-danger" id="result"></span>
+
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -33,7 +37,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="FirstName">Agency Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Name" class="form-control" required placeholder="Enter Agency Name" maxlength="50" value="">
+                                            <input type="text" asp-for="Name" class="form-control" required placeholder="Enter Agency Name" maxlength="30" value="">
                                             <span asp-validation-for="Name" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -52,7 +56,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber">Phone # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="number" asp-for="PhoneNumber" class="form-control" required maxlength="10" value="" placeholder="Enter Phone # (10 digit)" />
+                                            <input type="number" asp-for="PhoneNumber" class="form-control" required value="" placeholder="Enter Phone # (10 digit)" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -104,9 +108,9 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="AgreementDate">Agreement Date <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                <span class="input-group-text" id="AgreementDateId">Agreement Date <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="date" asp-for="AgreementDate" class="form-control" required placeholder="Agreement Date">
+                                            <input type="date" asp-for="AgreementDate" id="AgreementDate" class="form-control" required placeholder="Agreement Date">
                                             <span asp-validation-for="AgreementDate" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -138,7 +142,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="CountryId">Country <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
+                                            <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="CountryId" class="text-danger"></span>
@@ -218,7 +222,7 @@
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
                                         </a>
-                                        <button disabled id="create-pincode" type="submit" class="btn btn-success">
+                                        <button disabled id="create-agency" type="submit" class="btn btn-success">
                                             <i class="fas fa-building"></i> Add Agency
                                         </button>
                                     </div>
@@ -238,25 +242,46 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script type="text/jscript">
+        AgreementDate.max = new Date().toISOString().split("T")[0];
+        $("input#email").on({
+            keydown: function (e) {
+                if (e.which === 32)
+                    return false;
+            },
+            change: function () {
+                this.value = this.value.replace(/\s/g, "");
+            }
+        });
+
+
         $('#email').blur(function () {
             var url = "/Account/CheckUserName";
             var name = $('#email').val();
-            $.get(url, { input: name }, function (data) {
-                if (data == "Available") {
-                    $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> Available</span>");
-                    $('#result').css('padding','.5rem')
-                    $('#result').fadeOut(2000); // 1.5 seconds
-                    $('#result').fadeOut('slow'); // 1.5 seconds
-                    $("#email").css('background-color', '');
-                    $("#email").css('border-color', '');
-                }
-                else {
-                    $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i> Email exists </span>");
-                    $('#result').css('padding','.5rem')
-                    $("#email").css('border-color', '#e97878');
-                    $('#create-pincode').prop('disabled', true );
-                }
-            });
+            if(name){
+                $.get(url, { input: name }, function (data) {
+                    
+                    if (data == 0) { //available
+                        $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> Available</span>");
+                        $('#result').css('padding', '.5rem')
+                        $('#result').fadeOut(2000); // 1.5 seconds
+                        $('#result').fadeOut('slow'); // 1.5 seconds
+                        $("#email").css('background-color', '');
+                        $("#email").css('border-color', '');
+                        $('#create-agency').prop('disabled', false);
+                    }
+                    else if (data == 1) {//domain exists
+                        $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i> Domain exists </span>");
+                        $('#result').css('padding', '.5rem')
+                        $('#result').css('display', 'inline')
+                        $("#email").css('border-color', '#e97878');
+                        $('#create-agency').prop('disabled', 'true !important');
+                    }
+                    else if (data = null || data == undefined) {
+
+                    }
+                });
+            }
+           
         })
     </script>
 }

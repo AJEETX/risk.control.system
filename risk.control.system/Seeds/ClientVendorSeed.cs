@@ -33,6 +33,7 @@ namespace risk.control.system.Seeds
                 Description = "CORPORATE OFFICE ",
                 Email = "info@company.com",
                 DocumentUrl = "/img/company.png",
+                //DocumentImage = File.ReadAllBytes("./img/company.png"),
                 PhoneNumber = "9988004739",
             };
 
@@ -56,9 +57,10 @@ namespace risk.control.system.Seeds
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "HEAD OFFICE ",
-                Email = "info@agency.com",
+                Email = "agency.com",
                 PhoneNumber = "8888004739",
-                DocumentUrl = "/img/agency.png"
+                DocumentUrl = "/img/agency.png",
+                //DocumentImage = File.ReadAllBytes("./img/agency.png"),
             };
 
             var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);

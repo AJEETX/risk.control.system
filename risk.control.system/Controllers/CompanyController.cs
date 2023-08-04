@@ -130,6 +130,7 @@ namespace risk.control.system.Controllers
                         if (existingClientCompany.DocumentImage != null)
                         {
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
+                            clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
                         }
                     }
 
@@ -215,7 +216,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientCompanyApplicationUser user, string emailSuffix)
+        public async Task<IActionResult> CreateUser(ClientCompanyApplicationUser user, string emailSuffix)
         {
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {

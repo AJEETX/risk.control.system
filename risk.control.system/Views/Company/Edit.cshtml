@@ -103,11 +103,11 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="documentImage">Document Image</span>
+                                                <span class="input-group-text" id="documentImageId">Document Image</span>
                                             </div>
-                                            @if (Model?.DocumentImage is not null)
+                                            @if (Model?.DocumentUrl is not null)
                                             {
-                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                                <img id="documentImage" class="form-Image" src="@Model?.DocumentUrl">
                                             }
                                             else
                                             {

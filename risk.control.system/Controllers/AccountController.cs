@@ -98,24 +98,27 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<string> CheckUserName(string input)
+        public async Task<int?> CheckUserName(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {
-                return string.Empty;
+                return null;
             }
-            var emailSuffix = input.IndexOf("@");
-            var email = input.Substring(emailSuffix);
+            //var emailSuffix = input.IndexOf("@");
+            //var email = input.Substring(emailSuffix);
+            var newDomain = input.Trim().ToLower() + ".com";
 
-            var allUsers = _userManager.Users.Where(u => u.Email.Substring(u.Email.IndexOf("@")) == email)?.ToList();
+            var allUsers = _userManager.Users.Where(u =>
+            u.Email.Substring(u.Email.IndexOf("@") + 1) == newDomain
+            )?.ToList();
 
             if (allUsers?.Count == 0)
             {
-                return "Available";
+                return 0;
             }
             else
             {
-                return "Domain exists";
+                return 1;
             }
         }
 
