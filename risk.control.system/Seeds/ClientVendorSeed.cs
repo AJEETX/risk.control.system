@@ -8,7 +8,7 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task<(Vendor abcVendor, Vendor xyzVendor, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
+        public static async Task<(Vendor abcVendor, Vendor xyzVendor, Vendor xyz1Vendor, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
         {
             //CREATE VENDOR COMPANY
 
@@ -96,6 +96,7 @@ namespace risk.control.system.Seeds
                     StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    CountryId = indiaCountry.Entity.CountryId,
                     PincodeServices = new List<ServicedPinCode>
                     {
                         new ServicedPinCode
@@ -115,6 +116,7 @@ namespace risk.control.system.Seeds
                     Price = 299,
                     StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    CountryId = indiaCountry.Entity.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     PincodeServices = new List<ServicedPinCode>
                     {
@@ -130,8 +132,31 @@ namespace risk.control.system.Seeds
             abcVendor.VendorInvestigationServiceTypes = abcSericesWithPinCodes;
             xyzVendor.VendorInvestigationServiceTypes = listOfSericesWithPinCodes;
 
+            var xyz1Vendor = new Vendor
+            {
+                Name = "Agency 3",
+                Addressline = "1, Main Road  ",
+                Branch = "KANPUR",
+                Code = "XY100",
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "HDFC BANK",
+                BankAccountNumber = "9876543",
+                IFSCCode = "IFSC999",
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                Description = "HEAD OFFICE ",
+                Email = "agency3.com",
+                PhoneNumber = "7964404160",
+                DocumentUrl = "/img/agency1.png"
+            };
+
+            var xyz1VendorCompany = await context.Vendor.AddAsync(xyz1Vendor);
+
             await context.SaveChangesAsync(null, false);
-            return (abcVendor, xyzVendor, tataAigCompany.Entity.ClientCompanyId);
+            return (abcVendor, xyzVendor, xyz1Vendor, tataAigCompany.Entity.ClientCompanyId);
         }
     }
 }

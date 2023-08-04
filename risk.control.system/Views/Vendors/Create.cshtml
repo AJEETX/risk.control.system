@@ -6,7 +6,7 @@
 }
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="Create" enctype="multipart/form-data">
+        <form asp-action="Create" enctype="multipart/form-data" method="post" autocomplete="off">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -24,20 +24,20 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="emailid">Agency Domain <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input asp-for="Email" id="email" class="form-control email-address" type="text" min="5" required placeholder="Enter Agency Domain e.g. agency" maxlength="10" value="">
+                                            <input asp-for="Email" id="email" class="form-control email-address" type="text" value="" required placeholder="Enter Agency Domain e.g. agency" maxlength="10" onkeydown='return alphaOnly(event);'>
                                             <div class="input-group-append">
                                                 <span class="input-group-text" id="Email">.com</span>
                                             </div>
-                                            <span asp-validation-for="Name" class="text-danger" id="result"></span>
+                                            <span asp-validation-for="Email" class="text-danger" id="result"></span>
 
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="FirstName">Agency Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                <span class="input-group-text" id="Name">Agency Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Name" class="form-control" required placeholder="Enter Agency Name" maxlength="30" value="">
+                                            <input type="text" asp-for="Name" class="form-control" required placeholder="Enter Agency Name" maxlength="30">
                                             <span asp-validation-for="Name" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -210,9 +210,9 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Comments">Remarks <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                <span class="input-group-text" id="Description">Remarks <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Description" class="form-control" placeholder="Enter Remarks" required value="" />
+                                            <input type="text" asp-for="Description" class="form-control" value="" placeholder="Enter remarks" required />
                                             <span asp-validation-for="Description" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -242,6 +242,10 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script type="text/jscript">
+        function alphaOnly(event) {
+            var key = event.keyCode;
+            return ((key >= 65 && key <= 90) || key == 8);
+        };
         AgreementDate.max = new Date().toISOString().split("T")[0];
         $("input#email").on({
             keydown: function (e) {
@@ -268,6 +272,7 @@
                         $("#email").css('background-color', '');
                         $("#email").css('border-color', '#ccc');
                         $('#create-agency').prop('disabled', false);
+                        $("#Name").focus();
                     }
                     else if (data == 1) {//domain exists
                         $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i> Domain exists </span>");
@@ -277,7 +282,6 @@
                         $('#create-agency').prop('disabled', 'true !important');
                     }
                     else if (data = null || data == undefined) {
-
                     }
                 });
             }

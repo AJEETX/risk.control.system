@@ -115,7 +115,7 @@ namespace risk.control.system.Controllers
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
-            var userFullEmail = user.Email.Trim().ToLower() + emailSuffix;
+            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;

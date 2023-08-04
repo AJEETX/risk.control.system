@@ -270,7 +270,7 @@ namespace risk.control.system.Seeds
 
             #region CLIENT/ VENDOR COMPANY
 
-            var (abcVendor, xyzVendor, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
+            var (abcVendor, xyzVendor, xyz1Vendor, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
 
             #endregion CLIENT/ VENDOR COMPANY
 
@@ -283,6 +283,8 @@ namespace risk.control.system.Seeds
             await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, abcVendor);
 
             await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, xyzVendor);
+
+            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, xyz1Vendor);
 
             await context.SaveChangesAsync(null, false);
 

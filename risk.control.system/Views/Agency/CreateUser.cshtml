@@ -8,7 +8,7 @@
 
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="CreateUser" enctype="multipart/form-data">
+        <form asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -34,7 +34,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="emailid">Email <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i> </span>
                                             </div>
-                                            <input type="text" asp-for="Email" id="email" class="form-control email-address" value="" min="5" required placeholder="Enter User Email prefix" maxlength="20">
+                                            <input type="text" asp-for="Email" id="email" class="form-control email-address" value="" min="5" required placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);'>
                                             <div class="input-group-append">
                                                 <span class="input-group-text" id="Email">@@@email</span>
                                             </div>
@@ -190,6 +190,11 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+
+        function alphaOnly(event) {
+            var key = event.keyCode;
+            return ((key >= 65 && key <= 90) || key == 8);
+        };
         $("input#email").on({
             keydown: function (e) {
                 if (e.which === 32)
