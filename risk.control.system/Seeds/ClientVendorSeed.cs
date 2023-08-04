@@ -82,7 +82,7 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = "agency2.com",
                 PhoneNumber = "4444404739",
-                DocumentUrl = "/img/2.jpg"
+                DocumentUrl = "/img/2.png"
             };
 
             var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);

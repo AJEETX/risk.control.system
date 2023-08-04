@@ -34,7 +34,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="FirstName">Agency Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Name" class="form-control" required placeholder="Enter Agency Name" maxlength="50">
+                                            <input type="text" asp-for="Name" class="form-control" required placeholder="Enter Agency Name" maxlength="20">
                                             <span asp-validation-for="Name" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -64,7 +64,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Branch">Branch Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Branch" class="form-control" required placeholder="Enter Branch Name">
+                                            <input type="text" asp-for="Branch" class="form-control" required placeholder="Enter Branch Name" maxlength="20">
                                             <span asp-validation-for="Branch" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -74,7 +74,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="BankName">Bank Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="BankName" class="form-control" required placeholder="Enter Bank Name">
+                                            <input type="text" asp-for="BankName" class="form-control" required placeholder="Enter Bank Name" maxlength="20">
                                             <span asp-validation-for="BankName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -84,7 +84,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="BankAccountNumber">Bank Account # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="BankAccountNumber" class="form-control" required placeholder="Bank Account #">
+                                            <input type="text" asp-for="BankAccountNumber" class="form-control" required placeholder="Bank Account #" maxlength="20">
                                             <span asp-validation-for="BankAccountNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -94,7 +94,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="IFSCCode">Bank IFSC Code <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="IFSCCode" class="form-control" required placeholder="Bank IFSC Code">
+                                            <input type="text" asp-for="IFSCCode" class="form-control" required placeholder="Bank IFSC Code" maxlength="10">
                                             <span asp-validation-for="IFSCCode" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -124,9 +124,10 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="CountryId">Country <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                            <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
+                                            <span asp-validation-for="CountryId" class="text-danger"></span>
 
                                         </div>
                                     </div>
@@ -136,7 +137,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="StateId">State <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                            <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
 
@@ -149,7 +150,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="DistrictId">District <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
 
@@ -162,9 +163,10 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="PinCodeId">Pincode <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
+                                            <span asp-validation-for="PinCodeId" class="text-danger"></span>
 
                                         </div>
                                     </div>
@@ -173,7 +175,8 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" />
+                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line"  required/>
+                                            <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
 
@@ -199,6 +202,7 @@
                                                 <span class="input-group-text" id="Comments">Remarks <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
                                             <input type="text" asp-for="Description" class="form-control"  placeholder="Enter Remarks" />
+                                            <span asp-validation-for="Description" class="text-danger"></span>
                                         </div>
                                     </div>
 

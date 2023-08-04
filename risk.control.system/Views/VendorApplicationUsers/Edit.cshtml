@@ -91,7 +91,8 @@
                                             <select asp-for="CountryId" class="form-control" id="inputGroupSelect01" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
-                                            
+                                            <span asp-validation-for="CountryId" class="text-danger"></span>
+
                                         </div>
                                     </div>
 
@@ -129,6 +130,7 @@
                                             <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId" required>
                                                 <option value="">--- SELECT PINCODE ---</option>
                                             </select>
+                                            <span asp-validation-for="PinCodeId" class="text-danger"></span>
 
                                         </div>
                                     </div>

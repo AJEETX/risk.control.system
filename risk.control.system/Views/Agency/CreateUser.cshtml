@@ -34,7 +34,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="emailid">Email <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i> </span>
                                             </div>
-                                            <input type="text" asp-for="Email" id="email" class="form-control email-address" value="" min="5" required placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);'>
+                                            <input type="text" asp-for="Email" id="email" class="form-control email-address" value="" required placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);'>
                                             <div class="input-group-append">
                                                 <span class="input-group-text" id="Email">@@@email</span>
                                             </div>
@@ -47,7 +47,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="FirstName">First Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="FirstName" class="form-control" required placeholder="Enter First Name" value="" autocomplete="off" maxlength="20">
+                                            <input type="text" asp-for="FirstName" class="form-control" required placeholder="Enter First Name" value="" maxlength="20">
                                             <span asp-validation-for="FirstName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -57,7 +57,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="LastName">Last Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="LastName" class="form-control" required placeholder="Enter Last Name" value="" autocomplete="off" maxlength="20">
+                                            <input type="text" asp-for="LastName" class="form-control" required placeholder="Enter Last Name" value=""  maxlength="20">
                                             <span asp-validation-for="LastName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -67,7 +67,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Password">Password <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="password" asp-for="Password" class="form-control" required placeholder="Enter Password" value="" min="5" maxlength="20">
+                                            <input type="password" asp-for="Password" class="form-control" required placeholder="Enter Password" value="" maxlength="20">
                                             <span asp-validation-for="Password" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -150,7 +150,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" value="" required min="5" maxlength="20" />
+                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" value="" maxlength="20" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -159,7 +159,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Comments">Remarks</span>
                                             </div>
-                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" value="" maxlength="50" />
+                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" value="" maxlength="20" />
                                         </div>
                                     </div>
                                 </div>

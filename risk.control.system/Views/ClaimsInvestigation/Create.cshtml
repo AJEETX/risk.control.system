@@ -110,7 +110,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="ContractNumber">Contract # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="ContractNumber">Policy # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
                                                 <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract #" maxlength="15"  value=""/>
                                                 <span asp-validation-for="ContractNumber" class="text-danger"></span>
@@ -121,7 +121,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="SumAssuredValue">Insured Amount <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
-                                                <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum (Rs.)" value="" min="1"  maxlength="10"/>
+                                                <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Insured Sum" value="" min="1"  maxlength="10"/>
                                                 <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -132,7 +132,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
-                                                <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" value="" maxlength="50"/>
+                                                <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" value="" maxlength="20"/>
                                                 <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -176,7 +176,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="CustomerName">Customer Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
-                                                <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" value="" maxlength="40"/>
+                                                <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" value="" maxlength="20"/>
                                                 <span asp-validation-for="CustomerName" class="text-danger"></span>
                                             </div>
                                         </div>

@@ -106,7 +106,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="ContractNumber">Policy # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
-                                                <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract Number" />
+                                                <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Contract Number" max="20" />
                                                 <span asp-validation-for="ContractNumber" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -126,7 +126,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
-                                                <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" />
+                                                <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" maxlength="20" />
                                                 <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -180,7 +180,7 @@
                                     <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="CustomerName">Customer Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" />
+                                    <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" maxlength="20" />
                                     <span asp-validation-for="CustomerName" class="text-danger"></span>
                                 </div>
                             </div>
@@ -311,7 +311,7 @@
                                     <div class="input-group-prepend">
                                                     <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" required value=""/>
+                                    <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" maxlength="20" required value=""/>
                                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                                             </div>
                             </div>
@@ -321,7 +321,7 @@
                                     <div class="input-group-prepend">
                                                     <span class="input-group-text" id="Description">Remarks <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" />
+                                    <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" maxlength="20" />
                                     <span asp-validation-for="Description" class="text-danger"></span>
                                 </div>
                             </div>
