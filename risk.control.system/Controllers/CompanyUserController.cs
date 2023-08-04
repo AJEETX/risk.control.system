@@ -194,7 +194,7 @@ namespace risk.control.system.Controllers
                 newFileName += fileExtension;
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                user.ProfilePictureUrl = "upload/" + newFileName;
+                user.ProfilePictureUrl = "/upload/" + newFileName;
             }
             user.EmailConfirmed = true;
             user.UserName = user.Email;
@@ -280,7 +280,7 @@ namespace risk.control.system.Controllers
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "upload/" + newFileName;
+                        applicationUser.ProfilePictureUrl = "/upload/" + newFileName;
                     }
 
                     if (user != null)

@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 
 using NToastNotify;
 
+using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers
@@ -98,15 +99,15 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<int?> CheckUserName(string input)
+        public async Task<int?> CheckUserName(string input, string domain)
         {
-            if (string.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(domain))
             {
                 return null;
             }
-            //var emailSuffix = input.IndexOf("@");
-            //var email = input.Substring(emailSuffix);
-            var newDomain = input.Trim().ToLower() + ".com";
+            Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
+
+            var newDomain = input.Trim().ToLower() + domainData.GetEnumDisplayName();
 
             var allUsers = _userManager.Users.Where(u =>
             u.Email.Substring(u.Email.IndexOf("@") + 1) == newDomain

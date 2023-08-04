@@ -115,7 +115,7 @@ table {
 }
 
 .form-Image {
-    height: 40px;
+    height: 2.4rem;
     border: .1px ridge #ccc;
 }
 
@@ -386,4 +386,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 #email {
     text-transform: lowercase;
+}
+#Email{
+    background-color:white;
+}
+#check-email {
+    background-color: grey;
+    border-radius: 5px;
+    color: white;
+    cursor: no-drop;
 }

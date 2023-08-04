@@ -15,93 +15,94 @@
                     <div class="card-body">
                         <form id="checkboxes" asp-action="GetInvestigateReportReview" method="get" enctype="multipart/form-data">
                             <div class="col-md-12">
-                                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                        <thead>
-                                            <tr>
-                                                <th style="display:@hasClientCompany">
-                                                    @Html.DisplayNameFor(model => model.ClientCompany)
-                                                </th>
-                                                <th></th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.LineOfBusiness)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerName)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.ContactNumber)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.ClaimType)
-                                                </th>
-                                                <th>
-                                                    Location - SubStatus
-                                                </th>
-                                                 <th>
-                                                    Allocated Date
-                                                </th>
-                                                <th>
-                                                    Waiting days
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var item in Model)
-                                            {
-                                                var timePending = DateTime.Now.Subtract(item.Updated.Value).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Updated.Value).Days.ToString();
+                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                    <thead>
+                                        <tr>
+                                            <th style="display:@hasClientCompany">
+                                                @Html.DisplayNameFor(model => model.ClientCompany)
+                                            </th>
+                                            <th></th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                            </th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                            </th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.CustomerName)
+                                            </th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.ContactNumber)
+                                            </th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.ClaimType)
+                                            </th>
+                                            <th>
+                                                Location - SubStatus
+                                            </th>
+                                            <th>
+                                                Allocated Date
+                                            </th>
+                                            <th>
+                                                Waiting days
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            var timePending = DateTime.Now.Subtract(item.Updated.Value).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Updated.Value).Days.ToString();
+                                            var dateOnly = item.Created.ToString("dd-MM-yyyy");
 
-                                                <tr>
-                                                    <td style="display:@hasClientCompany">
-                                                        @Html.DisplayFor(modelItem => item.ClientCompany.Name)
-                                                    </td>
-                                                    <td>
-                                                        <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerName)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.ContactNumber)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.ClaimType)
-                                                    </td>
-                                                    <td>
-                                                        @{
-                                                            foreach (var caseLocation in item.CaseLocations)
-                                                            {
-                                                                <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
-                                                            }
+                                            <tr>
+                                                <td style="display:@hasClientCompany">
+                                                    @Html.DisplayFor(modelItem => item.ClientCompany.Name)
+                                                </td>
+                                                <td>
+                                                    <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.ContactNumber)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.ClaimType)
+                                                </td>
+                                                <td>
+                                                    @{
+                                                        foreach (var caseLocation in item.CaseLocations)
+                                                        {
+                                                            <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
                                                         }
-                                                    </td>
-                                                         <td>
-                                                    @Html.DisplayFor(modelItem => item.Updated)
-                                                        </td>
-                                                        <td>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => dateOnly)
+                                                </td>
+                                                <td>
                                                     @Html.DisplayFor(modelItem => timePending )
-                                                        </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                        
-                                    </table>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                                <button disabled id="allocate-case" type="submit" class="btn btn-success">
-                                                    <i class="fas fa-thumbs-up" aria-hidden="true"></i>
-                                                    @Applicationsettings.SELECT_CASE_REPORT
-                                                </button>
-                                        </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+
+                                </table>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button disabled id="allocate-case" type="submit" class="btn btn-success">
+                                            <i class="fas fa-thumbs-up" aria-hidden="true"></i>
+                                            @Applicationsettings.SELECT_CASE_REPORT
+                                        </button>
                                     </div>
+                                </div>
                             </div>
                         </form>
                     </div>

@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -123,7 +125,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Vendor vendor)
+        public async Task<IActionResult> Create(Vendor vendor, string domain)
         {
             try
             {
@@ -135,15 +137,18 @@ namespace risk.control.system.Controllers
                         string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         vendor.Document = vendorDocument;
 
                         using var dataStream = new MemoryStream();
                         await vendor.Document.CopyToAsync(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
-                        vendor.DocumentUrl = newFileName;
+                        vendor.Document.CopyTo(new FileStream(upload, FileMode.Create));
+                        vendor.DocumentUrl = "/img/" + newFileName;
                     }
-                    vendor.Email = vendor.Email.Trim().ToLower() + ".com";
+                    Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
+
+                    vendor.Email = vendor.Email.Trim().ToLower() + domainData.GetEnumDisplayName();
                     vendor.Status = VendorStatus.ACTIVE;
                     vendor.ActivatedDate = DateTime.UtcNow;
                     vendor.Updated = DateTime.UtcNow;
@@ -226,7 +231,7 @@ namespace risk.control.system.Controllers
                         using var dataStream = new MemoryStream();
                         await vendor.Document.CopyToAsync(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
-                        vendor.DocumentUrl = newFileName;
+                        vendor.DocumentUrl = "/upload/" + newFileName;
                     }
                     else
                     {

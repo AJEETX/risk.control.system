@@ -122,7 +122,7 @@ namespace risk.control.system.Controllers
                         using var dataStream = new MemoryStream();
                         await clientCompany.Document.CopyToAsync(dataStream);
                         clientCompany.DocumentImage = dataStream.ToArray();
-                        clientCompany.DocumentUrl = newFileName;
+                        clientCompany.DocumentUrl = "/upload/" + newFileName;
                     }
                     else
                     {
@@ -246,7 +246,10 @@ namespace risk.control.system.Controllers
                 ModelState.AddModelError("", error.Description);
             GetCountryStateEdit(user);
             toastNotification.AddErrorToastMessage("Error to create user!");
-            await Task.Delay(1000);
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == companyUser.ClientCompanyId);
+            user.ClientCompany = company;
             return View(user);
         }
 

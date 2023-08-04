@@ -56,6 +56,7 @@
                                     @foreach (var item in Model)
                                     {
                                         var timePending = DateTime.Now.Subtract(item.Updated.Value).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Updated.Value).Days.ToString();
+                                    var dateOnly = item.Created.ToString("dd-MM-yyyy");
 
                                         <tr>
                                             
@@ -106,7 +107,7 @@
                                                 }
                                             </td>
                                         <td>
-                                            @Html.DisplayFor(modelItem => item.Updated)
+                                            @Html.DisplayFor(modelItem => dateOnly)
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => timePending )
