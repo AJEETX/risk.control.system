@@ -150,7 +150,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" value="" required placeholder="Enter Address line" />
+                                            <input type="text" asp-for="Addressline" class="form-control" value="" required placeholder="Enter Address line" min="5" maxlength="20"/>
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -209,7 +209,7 @@
                         $('#result').fadeOut(2000); // 1.5 seconds
                         $('#result').fadeOut('slow'); // 1.5 seconds
                         $("#email").css('background-color', '');
-                        $("#email").css('border-color', '');
+                        $("#email").css('border-color', '#ccc');
                         $('#create-agency').prop('disabled', false);
                     }
                     else if (data == 1) {//domain exists
