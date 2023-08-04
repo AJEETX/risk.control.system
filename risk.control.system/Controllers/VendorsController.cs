@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers
                         vendor.DocumentImage = dataStream.ToArray();
                         vendor.DocumentUrl = newFileName;
                     }
-                    vendor.Email = vendor.Email.Trim().ToLower();
+                    vendor.Email = vendor.Email.Trim().ToLower() + ".com";
                     vendor.Status = VendorStatus.ACTIVE;
                     vendor.ActivatedDate = DateTime.UtcNow;
                     vendor.Updated = DateTime.UtcNow;
