@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -64,7 +65,7 @@ namespace risk.control.system.Seeds
 
             var underwritingCaseType = await context.LineOfBusiness.AddAsync(underwriting);
 
-            #endregion
+            #endregion LINE OF BUSINESS
 
             #region INVESTIGATION SERVICE TYPES
 
@@ -77,7 +78,6 @@ namespace risk.control.system.Seeds
             };
             var claimComprehensiveService = await context.InvestigationServiceType.AddAsync(claimComprehensive);
 
-
             var claimNonComprehensive = new InvestigationServiceType
             {
                 Name = "NON-COMPREHENSIVE",
@@ -87,7 +87,6 @@ namespace risk.control.system.Seeds
             };
 
             var claimNonComprehensiveService = await context.InvestigationServiceType.AddAsync(claimNonComprehensive);
-
 
             var claimDocumentCollection = new InvestigationServiceType
             {
@@ -99,7 +98,6 @@ namespace risk.control.system.Seeds
 
             var claimDocumentCollectionService = await context.InvestigationServiceType.AddAsync(claimDocumentCollection);
 
-
             var claimDiscreet = new InvestigationServiceType
             {
                 Name = "DISCREET",
@@ -109,7 +107,6 @@ namespace risk.control.system.Seeds
             };
 
             var claimDiscreetService = await context.InvestigationServiceType.AddAsync(claimDiscreet);
-
 
             var underWritingPreVerification = new InvestigationServiceType
             {
@@ -121,7 +118,6 @@ namespace risk.control.system.Seeds
 
             var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);
 
-
             var underWritingPostVerification = new InvestigationServiceType
             {
                 Name = "POST-ONBOARDING-VERIFICATION",
@@ -132,9 +128,7 @@ namespace risk.control.system.Seeds
 
             var underWritingPostVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPostVerification);
 
-
-            #endregion
-
+            #endregion INVESTIGATION SERVICE TYPES
 
             #region //CREATE RISK CASE DETAILS
 
@@ -237,7 +231,6 @@ namespace risk.control.system.Seeds
 
             var approvededSubStatus = await context.InvestigationCaseSubStatus.AddAsync(approved);
 
-
             var rejected = new InvestigationCaseSubStatus
             {
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR,
@@ -267,20 +260,19 @@ namespace risk.control.system.Seeds
 
             var withdrawnByCompanySubStatus = await context.InvestigationCaseSubStatus.AddAsync(withdrawnByCompany);
 
-            #endregion
+            #endregion //CREATE RISK CASE DETAILS
 
             #region BENEFICIARY-RELATION
 
             await ClientCompanySetupSeed.Seed(context);
 
-            #endregion
-
+            #endregion BENEFICIARY-RELATION
 
             #region CLIENT/ VENDOR COMPANY
 
-            var (abcVendorId, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
+            var (abcVendor, xyzVendor, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry, claimComprehensiveService.Entity, claimCaseType.Entity);
 
-            #endregion
+            #endregion CLIENT/ VENDOR COMPANY
 
             #region APPLICATION USERS ROLES
 
@@ -288,13 +280,13 @@ namespace risk.control.system.Seeds
 
             await ClientApplicationUserSeed.Seed(context, indiaCountry, clientUserManager, clientCompanyId);
 
-            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, abcVendorId);
+            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, abcVendor);
 
-            //await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, xyzVendorId);
+            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, xyzVendor);
 
             await context.SaveChangesAsync(null, false);
 
-            #endregion
+            #endregion APPLICATION USERS ROLES
         }
     }
 }

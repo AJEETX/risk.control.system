@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = Applicationsettings.CREATE;
-    var email = Model.ClientCompany.Email.Substring(Model.ClientCompany.Email.IndexOf('@'));
+    var email = Model.ClientCompany.Email;
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
 
@@ -16,9 +16,7 @@
                             <h3 class="card-title"><i class="fas fa-user-plus"></i>  Add User</h3>
                         </div>
                         <div class="card-body">
-                            <input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompany.ClientCompanyId" />
                             <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
-                            
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -33,13 +31,13 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="emailid">Email Address <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i> </span>
+                                                <span class="input-group-text" id="emailid">Email <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i> </span>
                                             </div>
-                                            <input type="text" asp-for="Email" id="email" class="form-control email-address" value="" required placeholder="Enter User Email prefix" maxlength="20">
-                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                            <input type="text" asp-for="Email" id="email" class="form-control email-address" value="" min="5" required placeholder="Enter User Email prefix" maxlength="20">
                                             <div class="input-group-append">
-                                                <span class="input-group-text" id="Email">@email</span>
+                                                <span class="input-group-text" id="Email">@@@email</span>
                                             </div>
+                                            <span asp-validation-for="Email" class="text-danger" id="result"></span>
                                         </div>
                                     </div>
 
@@ -170,7 +168,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group text-right">
                                         <a asp-controller="Company" asp-action="User" class="btn btn-secondary"><i class="fas fa-window-close"></i> Cancel</a>
-                                        <button disabled id="create-pincode" type="submit" class="btn btn-success">
+                                        <button disabled id="create-agency" type="submit" class="btn btn-success">
                                             <i class="fas fa-user-plus"></i> Add User
                                         </button>
                                     </div>
@@ -198,5 +196,35 @@
                 this.value = this.value.replace(/\s/g, "");
             }
         });
+        $('#email').blur(function () {
+            var url = "/Account/CheckUserEmail";
+            var name = $('#email').val();
+            var emailSuffix = $('#emailSuffix').val();
+            if (name) {
+                $.get(url, { input: name +'@@'+ emailSuffix }, function (data) {
+
+                    if (data == 0) { //available
+                        $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> Available</span>");
+                        $('#result').css('padding', '.5rem')
+                        $('#result').fadeOut(2000); // 1.5 seconds
+                        $('#result').fadeOut('slow'); // 1.5 seconds
+                        $("#email").css('background-color', '');
+                        $("#email").css('border-color', '');
+                        $('#create-agency').prop('disabled', false);
+                    }
+                    else if (data == 1) {//domain exists
+                        $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i> Email exists </span>");
+                        $('#result').css('padding', '.5rem')
+                        $('#result').css('display', 'inline')
+                        $("#email").css('border-color', '#e97878');
+                        $('#create-agency').prop('disabled', 'true !important');
+                    }
+                    else if (data = null || data == undefined) {
+
+                    }
+                });
+            }
+
+        })
     </script>
 }

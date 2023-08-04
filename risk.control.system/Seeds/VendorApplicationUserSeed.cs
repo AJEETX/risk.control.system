@@ -11,20 +11,21 @@ namespace risk.control.system.Seeds
 {
     public static class VendorApplicationUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, string vendorId)
+        public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, Vendor vendor)
         {
+            string adminEmailwithSuffix = AGENCY_ADMIN.USERNAME + "@" + vendor.Email;
             //Seed Vendor Admin
             var vaMailBox = new Mailbox
             {
-                Name = VENDOR_ADMIN.EMAIL
+                Name = adminEmailwithSuffix
             };
             var vendorAdmin = new VendorApplicationUser()
             {
                 Mailbox = vaMailBox,
-                UserName = VENDOR_ADMIN.USERNAME,
-                Email = VENDOR_ADMIN.EMAIL,
-                FirstName = VENDOR_ADMIN.FIRST_NAME,
-                LastName = VENDOR_ADMIN.LAST_NAME,
+                UserName = adminEmailwithSuffix,
+                Email = adminEmailwithSuffix,
+                FirstName = AGENCY_ADMIN.FIRST_NAME,
+                LastName = AGENCY_ADMIN.LAST_NAME,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
@@ -33,12 +34,12 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = true,
                 Addressline = "123 Benaras Gali",
                 PhoneNumber = "9876543210",
-                VendorId = vendorId,
+                VendorId = vendor.VendorId,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
-                ProfilePictureUrl = VENDOR_ADMIN.PROFILE_IMAGE
+                ProfilePictureUrl = AGENCY_ADMIN.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
             {
@@ -61,22 +62,25 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Supervisor
+
+            string supervisorEmailwithSuffix = SUPERVISOR.USERNAME + "@" + vendor.Email;
+
             var vsMailBox = new Mailbox
             {
-                Name = VENDOR_SUPERVISOR.EMAIL
+                Name = supervisorEmailwithSuffix
             };
             var vendorSupervisor = new VendorApplicationUser()
             {
                 Mailbox = vsMailBox,
-                UserName = VENDOR_SUPERVISOR.USERNAME,
-                Email = VENDOR_SUPERVISOR.EMAIL,
-                FirstName = VENDOR_SUPERVISOR.FIRST_NAME,
-                LastName = VENDOR_SUPERVISOR.LAST_NAME,
+                UserName = supervisorEmailwithSuffix,
+                Email = supervisorEmailwithSuffix,
+                FirstName = SUPERVISOR.FIRST_NAME,
+                LastName = SUPERVISOR.LAST_NAME,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
                 PhoneNumber = "9876543210",
-                VendorId = vendorId,
+                VendorId = vendor.VendorId,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 Addressline = "123 Pakki Gali",
@@ -85,7 +89,7 @@ namespace risk.control.system.Seeds
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
-                ProfilePictureUrl = VENDOR_SUPERVISOR.PROFILE_IMAGE
+                ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
             {
@@ -104,21 +108,22 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Agent
+            string agentEmailwithSuffix = AGENT.USERNAME + "@" + vendor.Email;
             var faMailBox = new Mailbox
             {
-                Name = VENDOR_AGENT.EMAIL
+                Name = agentEmailwithSuffix
             };
             var vendorAgent = new VendorApplicationUser()
             {
                 Mailbox = faMailBox,
-                UserName = VENDOR_AGENT.USERNAME,
-                Email = VENDOR_AGENT.EMAIL,
-                FirstName = VENDOR_AGENT.FIRST_NAME,
-                LastName = VENDOR_AGENT.LAST_NAME,
+                UserName = agentEmailwithSuffix,
+                Email = agentEmailwithSuffix,
+                FirstName = AGENT.FIRST_NAME,
+                LastName = AGENT.LAST_NAME,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
-                VendorId = vendorId,
+                VendorId = vendor.VendorId,
                 PhoneNumber = "9876543210",
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
@@ -128,7 +133,7 @@ namespace risk.control.system.Seeds
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
-                ProfilePictureUrl = VENDOR_AGENT.PROFILE_IMAGE
+                ProfilePictureUrl = AGENT.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))
             {

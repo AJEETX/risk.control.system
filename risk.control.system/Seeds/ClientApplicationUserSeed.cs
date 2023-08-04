@@ -16,15 +16,15 @@ namespace risk.control.system.Seeds
             //Seed client admin
             var caMailBox = new Mailbox
             {
-                Name = CLIENT_ADMIN.EMAIL
+                Name = ADMIN.EMAIL
             };
             var clientAdmin = new ClientCompanyApplicationUser()
             {
                 Mailbox = caMailBox,
-                UserName = CLIENT_ADMIN.USERNAME,
-                Email = CLIENT_ADMIN.EMAIL,
-                FirstName = CLIENT_ADMIN.FIRST_NAME,
-                LastName = CLIENT_ADMIN.LAST_NAME,
+                UserName = ADMIN.USERNAME,
+                Email = ADMIN.EMAIL,
+                FirstName = ADMIN.FIRST_NAME,
+                LastName = ADMIN.LAST_NAME,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
@@ -38,7 +38,7 @@ namespace risk.control.system.Seeds
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
-                ProfilePictureUrl = CLIENT_ADMIN.PROFILE_IMAGE
+                ProfilePictureUrl = ADMIN.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientAdmin.Id))
             {
@@ -67,15 +67,15 @@ namespace risk.control.system.Seeds
             //Seed client creator
             var ccMailBox = new Mailbox
             {
-                Name = CLIENT_CREATOR.EMAIL
+                Name = CREATOR.EMAIL
             };
             var clientCreator = new ClientCompanyApplicationUser()
             {
                 Mailbox = ccMailBox,
-                UserName = CLIENT_CREATOR.USERNAME,
-                Email = CLIENT_CREATOR.EMAIL,
-                FirstName = CLIENT_CREATOR.FIRST_NAME,
-                LastName = CLIENT_CREATOR.LAST_NAME,
+                UserName = CREATOR.USERNAME,
+                Email = CREATOR.EMAIL,
+                FirstName = CREATOR.FIRST_NAME,
+                LastName = CREATOR.LAST_NAME,
                 EmailConfirmed = true,
                 Password = Password,
                 ClientCompanyId = clientCompanyId,
@@ -89,7 +89,7 @@ namespace risk.control.system.Seeds
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
-                ProfilePictureUrl = CLIENT_CREATOR.PROFILE_IMAGE
+                ProfilePictureUrl = CREATOR.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
             {
@@ -106,15 +106,15 @@ namespace risk.control.system.Seeds
             //Seed client assigner
             var asMailBox = new Mailbox
             {
-                Name = CLIENT_ASSIGNER.EMAIL
+                Name = ASSIGNER.EMAIL
             };
             var clientAssigner = new ClientCompanyApplicationUser()
             {
                 Mailbox = asMailBox,
-                UserName = CLIENT_ASSIGNER.USERNAME,
-                Email = CLIENT_ASSIGNER.EMAIL,
-                FirstName = CLIENT_ASSIGNER.FIRST_NAME,
-                LastName = CLIENT_ASSIGNER.LAST_NAME,
+                UserName = ASSIGNER.USERNAME,
+                Email = ASSIGNER.EMAIL,
+                FirstName = ASSIGNER.FIRST_NAME,
+                LastName = ASSIGNER.LAST_NAME,
                 EmailConfirmed = true,
                 ClientCompanyId = clientCompanyId,
                 PhoneNumberConfirmed = true,
@@ -128,7 +128,7 @@ namespace risk.control.system.Seeds
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
-                ProfilePictureUrl = CLIENT_ASSIGNER.PROFILE_IMAGE
+                ProfilePictureUrl = ASSIGNER.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientAssigner.Id))
             {
@@ -145,15 +145,15 @@ namespace risk.control.system.Seeds
             //Seed client assessor
             var ssMailBox = new Mailbox
             {
-                Name = CLIENT_ASSESSOR.EMAIL
+                Name = ASSESSOR.EMAIL
             };
             var clientAssessor = new ClientCompanyApplicationUser()
             {
                 Mailbox = ssMailBox,
-                UserName = CLIENT_ASSESSOR.USERNAME,
-                Email = CLIENT_ASSESSOR.EMAIL,
-                FirstName = CLIENT_ASSESSOR.FIRST_NAME,
-                LastName = CLIENT_ASSESSOR.LAST_NAME,
+                UserName = ASSESSOR.USERNAME,
+                Email = ASSESSOR.EMAIL,
+                FirstName = ASSESSOR.FIRST_NAME,
+                LastName = ASSESSOR.LAST_NAME,
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
@@ -167,7 +167,7 @@ namespace risk.control.system.Seeds
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
-                ProfilePictureUrl = CLIENT_ASSESSOR.PROFILE_IMAGE
+                ProfilePictureUrl = ASSESSOR.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientAssessor.Id))
             {

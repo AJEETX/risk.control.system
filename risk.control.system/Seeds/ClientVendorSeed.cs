@@ -8,8 +8,33 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task<(string abcVendorId, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
+        public static async Task<(Vendor abcVendor, Vendor xyzVendor, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
         {
+            //CREATE VENDOR COMPANY
+
+            var abcVendor = new Vendor
+            {
+                Name = "Agency 1",
+                Addressline = "1, Main Road  ",
+                Branch = "MAHATTAN",
+                Code = "VA001",
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "WESTPAC",
+                BankAccountNumber = "1234567",
+                IFSCCode = "IFSC100",
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                Description = "HEAD OFFICE ",
+                Email = "agency1.com",
+                PhoneNumber = "8888004739",
+                DocumentUrl = "/img/agency.png"
+            };
+
+            var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
+
             //CREATE CLIENT COMPANY
             var currentPinCode = "515631";
             var currentDistrict = "ANANTAPUR";
@@ -31,68 +56,43 @@ namespace risk.control.system.Seeds
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "CORPORATE OFFICE ",
-                Email = "info@company.com",
+                Email = "company.com",
                 DocumentUrl = "/img/company.png",
-                //DocumentImage = File.ReadAllBytes("./img/company.png"),
                 PhoneNumber = "9988004739",
+                EmpanelledVendors = new List<Vendor> { abcVendor }
             };
 
             var tataAigCompany = await context.ClientCompany.AddAsync(TataAig);
 
-            //CREATE VENDOR COMPANY
-
-            var abcVendor = new Vendor
+            var xyzVendor = new Vendor
             {
-                Name = "Abc agency",
+                Name = "Agency 2",
                 Addressline = "1, Main Road  ",
-                Branch = "MAHATTAN",
-                Code = "VA001",
+                Branch = "KANPUR",
+                Code = "XY001",
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
-                BankName = "WESTPAC",
-                BankAccountNumber = "1234567",
-                IFSCCode = "IFSC100",
+                BankName = "SBI BANK",
+                BankAccountNumber = "9876543",
+                IFSCCode = "IFSC999",
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "HEAD OFFICE ",
-                Email = "agency.com",
-                PhoneNumber = "8888004739",
-                DocumentUrl = "/img/agency.png",
-                //DocumentImage = File.ReadAllBytes("./img/agency.png"),
+                Email = "agency2.com",
+                PhoneNumber = "4444404739",
+                DocumentUrl = "/img/2.jpg"
             };
 
-            var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
+            var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);
 
-            //var xyzVendor = new Vendor
-            //{
-            //    Name = "abc investigation agency",
-            //    Addressline = "1, Main Road  ",
-            //    Branch = "MAHATTAN",
-            //    Code = "VA001",
-            //    ActivatedDate = DateTime.Now,
-            //    AgreementDate = DateTime.Now,
-            //    BankName = "WESTPAC",
-            //    BankAccountNumber = "1234567",
-            //    IFSCCode = "IFSC100",
-            //    CountryId = indiaCountry.Entity.CountryId,
-            //    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-            //    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
-            //    PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
-            //    Description = "HEAD OFFICE ",
-            //    Email = "abc@vendor.com",
-            //    PhoneNumber = "(04) 123 234",
-            //};
-
-            //var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);
-
-            var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            var abcSericesWithPinCodes = new List<VendorInvestigationServiceType>
             {
                 new VendorInvestigationServiceType{
                     VendorId = abcVendorCompany.Entity.VendorId,
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
-                    Price = 99,
+                    Price = 199,
                     StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
@@ -107,10 +107,31 @@ namespace risk.control.system.Seeds
                 }
             };
 
-            abcVendor.VendorInvestigationServiceTypes = listOfSericesWithPinCodes;
+            var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            {
+                new VendorInvestigationServiceType{
+                    VendorId = xyzVendorCompany.Entity.VendorId,
+                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
+                    Price = 299,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                }
+            };
+
+            abcVendor.VendorInvestigationServiceTypes = abcSericesWithPinCodes;
+            xyzVendor.VendorInvestigationServiceTypes = listOfSericesWithPinCodes;
 
             await context.SaveChangesAsync(null, false);
-            return (abcVendorCompany.Entity.VendorId, tataAigCompany.Entity.ClientCompanyId);
+            return (abcVendor, xyzVendor, tataAigCompany.Entity.ClientCompanyId);
         }
     }
 }

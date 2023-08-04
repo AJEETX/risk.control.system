@@ -159,10 +159,10 @@
             public const string PROFILE_IMAGE = "/img/superadmin.jpg";
         }
 
-        public static class CLIENT_ADMIN
+        public static class ADMIN
         {
             public const string DISPLAY_NAME = "ADMIN";
-            public const string CODE = "company-admin";
+            public const string CODE = "admin";
             public const string USERNAME = "admin@company.com";
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Amit";
@@ -170,7 +170,7 @@
             public const string PROFILE_IMAGE = "/img/admin.png";
         }
 
-        public static class CLIENT_CREATOR
+        public static class CREATOR
         {
             public const string DISPLAY_NAME = "CREATOR";
             public const string CODE = "creator";
@@ -181,57 +181,54 @@
             public const string PROFILE_IMAGE = "/img/creator.jpg";
         }
 
-        public static class CLIENT_ASSIGNER
+        public static class ASSIGNER
         {
             public const string DISPLAY_NAME = "ASSIGNER";
             public const string CODE = "assigner";
             public const string USERNAME = "assigner@company.com";
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Christian";
+            public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/assigner.png";
         }
 
-        public static class CLIENT_ASSESSOR
+        public static class ASSESSOR
         {
             public const string DISPLAY_NAME = "ASSESSOR";
             public const string CODE = "assessor";
             public const string USERNAME = "assessor@company.com";
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Damien";
+            public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/assessor.png";
         }
 
-        public static class VENDOR_ADMIN
+        public static class AGENCY_ADMIN
         {
             public const string DISPLAY_NAME = "ADMIN";
-            public const string CODE = "agency-admin";
-            public const string USERNAME = "admin@agency.com";
-            public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Gopal";
+            public const string CODE = "admin";
+            public const string USERNAME = "admin";
+            public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/vendor-admin.png";
         }
 
-        public static class VENDOR_SUPERVISOR
+        public static class SUPERVISOR
         {
             public const string DISPLAY_NAME = "SUPERVISOR";
             public const string CODE = "supervisor";
-            public const string USERNAME = "supervisor@agency.com";
-            public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Lala";
+            public const string USERNAME = "supervisor";
+            public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/supervisor.png";
         }
 
-        public static class VENDOR_AGENT
+        public static class AGENT
         {
             public const string DISPLAY_NAME = "AGENT";
             public const string CODE = "agent";
-            public const string USERNAME = "agent@agency.com";
-            public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Gogo";
+            public const string USERNAME = "agent";
+            public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/agent.jpg";
         }

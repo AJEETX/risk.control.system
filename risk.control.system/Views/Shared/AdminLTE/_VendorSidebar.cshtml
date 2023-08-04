@@ -42,9 +42,9 @@
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
         <div>
-            @if (Model?.DocumentImage is not null)
+            @if (Model?.DocumentUrl is not null)
             {
-                <img src="data:image/*;base64,@(Convert.ToBase64String(@Model.DocumentImage))" alt="logo" class="brand-image elevation-2" style="opacity: .8">
+                <img src="@Model.DocumentUrl" alt="logo" class="brand-image elevation-2" style="opacity: .8">
             }
             else
             {
@@ -90,37 +90,37 @@
                     }
                     else if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
-                        roleCode = @Applicationsettings.CLIENT_ADMIN.CODE;
+                        roleCode = @Applicationsettings.ADMIN.CODE;
                         <span class="badge badge-warning">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.AgencyAdmin.ToString()))
                     {
-                        roleCode = @Applicationsettings.VENDOR_ADMIN.CODE;
+                        roleCode = @Applicationsettings.AGENCY_ADMIN.CODE;
                         <span class="badge badge-info">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.Creator.ToString()))
                     {
-                        roleCode = @Applicationsettings.CLIENT_CREATOR.CODE;
+                        roleCode = @Applicationsettings.CREATOR.CODE;
                         <span class="badge badge-primary">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.Assigner.ToString()))
                     {
-                        roleCode = @Applicationsettings.CLIENT_ASSIGNER.CODE;
+                        roleCode = @Applicationsettings.ASSIGNER.CODE;
                         <span class="badge badge-secondary">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.Assessor.ToString()))
                     {
-                        roleCode = @Applicationsettings.CLIENT_ASSESSOR.CODE;
+                        roleCode = @Applicationsettings.ASSESSOR.CODE;
                         <span class="badge badge-secondary">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.Supervisor.ToString()))
                     {
-                        roleCode = @Applicationsettings.VENDOR_SUPERVISOR.CODE;
+                        roleCode = @Applicationsettings.SUPERVISOR.CODE;
                         <span class="badge badge-dark">@roleCode</span>
                     }
                     else if (User.IsInRole(AppRoles.Agent.ToString()))
                     {
-                        roleCode = @Applicationsettings.VENDOR_AGENT.CODE;
+                        roleCode = @Applicationsettings.AGENT.CODE;
                         <span class="badge badge-dark">@roleCode</span>
                     }
                 </a>

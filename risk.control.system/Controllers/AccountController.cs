@@ -124,6 +124,29 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        public async Task<int?> CheckUserEmail(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+
+            var allUsers = _userManager.Users.Where(u =>
+            u.Email == input
+            )?.ToList();
+
+            if (allUsers?.Count == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
         public IActionResult Lockout()
         {
             return View();
