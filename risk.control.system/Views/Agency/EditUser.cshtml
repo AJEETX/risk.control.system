@@ -2,9 +2,7 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
-    var emailString = Model.Vendor.Email.IndexOf('@');
-    var email = Model.Vendor.Email.Substring(emailString
-    );
+    var email = Model.Vendor.Email;
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
 <section class="content pt-2">
