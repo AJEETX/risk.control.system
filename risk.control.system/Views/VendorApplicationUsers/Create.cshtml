@@ -5,58 +5,63 @@
     var email = Model.Vendor.Email;
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
+
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="Create" enctype="multipart/form-data" autocomplete="off">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-user-plus"></i>  Add @Applicationsettings.USER</h3>
-                        </div>
-                        <div class="card-body">
-                            <input hidden asp-for="VendorId" value="@Model.Vendor.VendorId" />
-                            <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
-                            <div class="row">
-                                <div class="col-md-3">
-                                </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user-plus"></i>  Add User</h3>
+                    </div>
+                    <div class="card-body">
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="emailid">Email <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i> </span>
-                                            </div>
-                                            <input type="text" asp-for="Email" id="email" class="form-control email-address" value="" onblur="CheckIfEmailValid();" required placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);' autocomplete="off">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text" id="Email">@@@email</span>
-                                            </div>
-                                            <div class="input-group-append">
-                                                <button disabled id="check-email" class="input-group-text" onclick="checkUserEmail();">
-                                                    <span class="badge badge-default">CHECK</span>
-                                                </button>
-                                                <span id="result"></span>
-                                            </div>
-                                            <span asp-validation-for="Email" class="text-danger"></span>
+                        <div class="row">
+                            <div class="col-md-3">
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="emailid">Email <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i> </span>
                                         </div>
+                                        <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" value="" onblur="CheckIfEmailValid();" required placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);' autocomplete="off">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="Email">@@@email</span>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <button disabled id="check-email" class="input-group-text" onclick="checkUserEmail();">
+                                                <span class="badge badge-default">CHECK</span>
+                                            </button>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <span id="result"></span>
+                                        </div>
+                                        <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                </div>
-
                             </div>
+                            <div class="col-md-3">
+                            </div>
+
                         </div>
+                    </div>
+
+                    <form asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
+                        <input type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
+                        <input type="hidden" asp-for="Email" id="mailAddress" />
+                        <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <div class="card-body">
+
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <div class="form-group hide-id">
                                         <label asp-for="VendorId" class="control-label"></label>
                                         <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
                                         <span asp-validation-for="VendorId" class="text-danger"></span>
                                     </div>
-
-                                    
 
                                     <div class="form-group">
                                         <div class="input-group mb-3">
@@ -100,7 +105,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="basic-addon1">Profile Photo</span>
+                                                <span class="input-group-text" id="ProfileImageLabel">Profile Photo</span>
                                             </div>
                                             <img id="ProfileImage" class="form-Image" src="/img/no-photo.png">
 
@@ -110,7 +115,6 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -167,7 +171,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" value="" required maxlength="20"/>
+                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" value="" maxlength="20" required />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -176,7 +180,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Comments">Remarks</span>
                                             </div>
-                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" maxlength="20"/>
+                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" value="" maxlength="20" />
                                         </div>
                                     </div>
                                 </div>
@@ -184,7 +188,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group text-right">
-                                        <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                                        <a asp-controller="Agency" asp-action="User" class="btn btn-secondary">
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
                                         </a>
@@ -195,10 +199,11 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
+
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </section>
 
@@ -209,7 +214,7 @@
     <script>
 
         $(document).ready(function () {
-            $('input#email').on('input change', function () {
+            $('input#emailAddress').on('input change', function () {
                 if ($(this).val() != '' && $(this).val().length > 4) {
                     $('#check-email').prop('disabled', false);
                     $("#check-email").css('color', 'white');
@@ -222,6 +227,16 @@
                     $("#check-email").css('cursor', 'not-allowed');
                 }
             });
+
+            $("input#emailAddress").on({
+                keydown: function (e) {
+                    if (e.which === 32)
+                        return false;
+                },
+                change: function () {
+                    this.value = this.value.replace(/\s/g, "");
+                }
+            });
         });
 
 
@@ -229,37 +244,30 @@
             var key = event.keyCode;
             return ((key >= 65 && key <= 90) || key == 8);
         };
-        $("input#email").on({
-            keydown: function (e) {
-                if (e.which === 32)
-                    return false;
-            },
-            change: function () {
-                this.value = this.value.replace(/\s/g, "");
-            }
-        });
+
 
         function checkUserEmail() {
             var url = "/Account/CheckUserEmail";
-            var name = $('#email').val();
+            var name = $('#emailAddress').val();
             var emailSuffix = $('#emailSuffix').val();
             if (name) {
                 $.get(url, { input: name + '@@' + emailSuffix }, function (data) {
 
                     if (data == 0) { //available
+                        $('#mailAddress').val($('#emailAddress').val());
                         $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> Available</span>");
                         $('#result').css('padding', '.5rem')
                         //$('#result').fadeOut(10000); // 1.5 seconds
                         //$('#result').fadeOut('slow'); // 1.5 seconds
-                        $("#email").css('background-color', '');
-                        $("#email").css('border-color', '#ccc');
+                        $("#emailAddress").css('background-color', '');
+                        $("#emailAddress").css('border-color', '#ccc');
                         $('#create-agency').prop('disabled', false);
                     }
                     else if (data == 1) {//domain exists
                         $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i> Email exists </span>");
                         $('#result').css('padding', '.5rem')
                         $('#result').css('display', 'inline')
-                        $("#email").css('border-color', '#e97878');
+                        $("#emailAddress").css('border-color', '#e97878');
                         $('#create-agency').prop('disabled', 'true !important');
                     }
                     else if (data = null || data == undefined) {

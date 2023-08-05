@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Vendor vendor, string domain)
+        public async Task<IActionResult> Create(Vendor vendor)
         {
             try
             {
@@ -146,9 +146,8 @@ namespace risk.control.system.Controllers
                         vendor.Document.CopyTo(new FileStream(upload, FileMode.Create));
                         vendor.DocumentUrl = "/img/" + newFileName;
                     }
-                    Domain domainData = (Domain)Enum.Parse(typeof(Domain), domain, true);
 
-                    vendor.Email = vendor.Email.Trim().ToLower() + domainData.GetEnumDisplayName();
+                    vendor.Email = vendor.Email.Trim().ToLower() + vendor.DomainName.GetEnumDisplayName();
                     vendor.Status = VendorStatus.ACTIVE;
                     vendor.ActivatedDate = DateTime.UtcNow;
                     vendor.Updated = DateTime.UtcNow;
