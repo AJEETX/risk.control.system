@@ -1,5 +1,4 @@
 ﻿@model LoginViewModel
-@inject SignInManager<ApplicationUser> SignInManager
 
 @{
     ViewData["Title"] = "login: checkify";
@@ -7,221 +6,78 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html>
-
+<html lang="en" dir="ltr">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title> checkify</title>
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <partial name="AdminLTE/_Styles" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <style>
-        html {
-            font-size: 14px;
-            font-family: Verdana !important;
-        }
-
-        body {
-            margin: 0;
-            background-color: hsl(0, 0%, 98%);
-            color: #333;
-        }
-
-        main {
-            margin: 0 auto;
-            border-radius: .5rem;
-        }
-
-        form {
-            box-sizing: border-box;
-            padding: 3rem;
-            border-radius: 1rem;
-            background-color: whitesmoke;
-            gap: 2rem;
-            border: 1px solid #ccc;
-        }
-
-        .full-width {
-            grid-column: span 2;
-        }
-
-        .image {
-            object-fit: cover;
-            width:100%;
-            height:430px;
-        }
-
-        .form-control {
-            height: 2.5rem;
-        }
-        button{
-            height: 2.5rem;
-        }
-
-        .fa-eye {
-            position: absolute;
-            top: 28%;
-            right: 16%;
-            cursor: pointer;
-            color: lightgray;
-        }
-    </style>
-    <script>
-        function myFunction() {
-            var x = document.getElementById("password");
-            if (x.type === "password") {
-                x.type = "text";
-            } else {
-                x.type = "password";
-            }
-        }
-    </script>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="~/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-
-<body class="transition">
-    <div class="container mx-auto">
-            <div class="row d-flex">
-                <div class="col-lg-6">
-                    <div class="p-5">
-                        <div class="mb-5" style="text-align: -webkit-center;">
-                            <h3 class="h4 font-weight-bold text-theme"><i class="fas fa-bug"></i> checkify </h3>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-2">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-1">
-                            </div>
-                            <div class="col-md-10">
-                                <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
-                                    <div class="row">
-                                        <div class="col-md-12">
-
-                                            <div style="text-align: -webkit-center;">
-                                                <h6 class="h5 mb-0">Welcome back!</h6>
-                                                <p class="text-muted mt-2 mb-5">Enter your email address and password.</p>
-                                                <div class="alert">
-                                                    <div class="login-logo">
-                                                        <i class="fas fa-bug"></i> checkify
-                                                    </div>
-                                                </div>
-                                                <br />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-
-                                            <div class="form-group">
-                                                <div class="mb-3 input-group">
-                                                    <input name="Email" placeholder="Email" type="email" id="email" class="form-control"
-                                                           value="creator@company.com">
-                                                <div class="input-group-append" onclick="myFunction()">
-                                                    <span class="input-group-text" onclick="myFunction()"><i class="fas fa-envelope"></i></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-
-
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-
-                                            <div class="form-group">
-                                                <div class="mb-3 input-group">
-                                                    <input name="password" placeholder="Password" type="password"
-                                                       id="password" class="form-control" value="@Applicationsettings.TestPassword"><i class="fa-solid fa-eye" id="eye"></i>
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text">
-                                                            <i class="fas fa-lock"></i>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                        <button type="submit" style="border-radius: .5rem;" class="btn btn-secondary btn-block"><i class="fas fa-key"></i>&nbsp; @Applicationsettings.WEBSITE_SIGNIN</button>
-                                        </div>
-                                    </div>
-
-                                </form>
-
-                            </div>
-                            <div class="col-md-1">
-                            </div>
-                        </div>
-                    </div>
-                    <div style="text-align: -webkit-center;">
-                        @if (Model?.Error != null)
-                        {
-                            <div class="alert alert-warning">
-                                @Model?.Error
-                            </div>
-                        }
-                        <div class="alert">
-                            <span class="badge badge-default"><i class="fas fa-bug"></i> <a style="color:black;text-decoration:none;" href="https://checkify.co.in"><i><b>i</b></i>checkify</a></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="p-5">
-                        <div class="mb-5" style="text-align: -webkit-center;">
-                            <h3 class="h4 font-weight-bold text-theme"><i class="fas fa-thumbtack"></i> simple solution... </h3>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="card">
-                                    <div class="row">
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                        </div>
-                                        <div class="col-md-3">
-                                            @*<img src="/img/logo.png" width="150" class="logo">*@
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                        </div>
-                                        <div class="col-md-3">
-                                        </div>
-                                    </div>
-                                    <div class="row justify-content-center">
-                                        <div class="col-md-12">
-                                            <img height="450" src="/img/why-us.png" class="image">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-            <div class="bg-gradient-gray py-4">
-                <div class="row px-3">
-                    <small class="ml-4 ml-sm-5 mb-2">Copyright &copy; @DateTime.Now.Year. All rights reserved.</small>
-                    <div class="social-contact ml-4 ml-sm-auto">
-                        <span class="fa fa-facebook mr-4 text-sm"></span>
-                        <span class="fa fa-google-plus mr-4 text-sm"></span>
-                        <span class="fa fa-linkedin mr-4 text-sm"></span>
-                        <span class="fa fa-twitter mr-4 mr-sm-5 text-sm"></span>
-                    </div>
+<body>
+    <div class="container">
+        <input type="checkbox" id="flip">
+        <div class="cover">
+            <div class="front">
+                <img src="~/agency/bg.jpg" alt="">
+                <div class="text">
+                    <span class="text-1">Simplify <br> business process</span>
+                    <span class="text-2">checkify does...</span>
                 </div>
             </div>
+            <div class="back">
+                <img class="backImg" src="images/backImg.jpg" alt="">
+                <div class="text">
+                    <span class="text-1">Complete miles of journey <br> with one step</span>
+                    <span class="text-2">Let's get started</span>
+                </div>
+            </div>
+        </div>
+        <div class="forms">
+            <div class="form-content">
+                <div class="login-form">
+                    <div class="title">Login to checkify <i class="fas fa-bug"></i> </div>
+                    <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                        <div class="input-boxes">
+                            <div class="input-box">
+                                <i class="fas fa-envelope"></i>
+                                <input asp-for=Email id="email" type="text" placeholder="Enter your email" autocomplete="off" required>
+                            </div>
+                            <div class="input-box">
+                                <i class="fas fa-lock"></i>
+                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" autocomplete="off" required>
+                            </div>
+                            <div class="button input-box">
+                                <button type="submit" class="btn btn-secondary btn-block"> Login</button>
+                            </div>
+                            <div class="text sign-up-text"><label for="flip">Forgot Password?</label></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="signup-form">
+                    <div class="title">Forgot Password</div>
+                    <form action="#">
+                        <div class="input-boxes">
+                            <div class="input-box">
+                                <i class="fas fa-user"></i>
+                                <input type="text" placeholder="Enter your name" required>
+                            </div>
+                            <div class="input-box">
+                                <i class="fas fa-envelope"></i>
+                                <input type="text" placeholder="Enter your email" required>
+                            </div>
+                            <div class="input-box">
+                                <i class="fa fa-mobile" aria-hidden="true"></i>
+                                <input type="number" placeholder="Enter 10 digit mobile number" required>
+                            </div>
+                            <div class="button input-box">
+                                <button type="submit" class="btn btn-secondary btn-block"> Reset Password</button>
+                            </div>
+                            <div class="text sign-up-text">Already have an account? <label for="flip">Login now</label></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
-
 </html>
-@section Scripts{
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-}
