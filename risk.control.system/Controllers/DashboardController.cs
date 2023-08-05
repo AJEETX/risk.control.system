@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers
                 Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyCaseStatus(userEmail);
                 return new JsonResult(monthlyExpense);
             }
-            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()))
+            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
                 Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgentCaseStatus(userEmail);
                 return new JsonResult(monthlyExpense);

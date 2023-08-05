@@ -46,8 +46,10 @@
                                 <i class="fas fa-lock"></i>
                                 <input asp-for=Password id="password" type="password" placeholder="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required>
                             </div>
+                            
+                            <p class="account">By clicking login, you agree to our <a href="#">Terms & Conditions!</a></p>
                             <div class="button input-box">
-                                <button type="submit" class="btn btn-secondary btn-block"> Login</button>
+                                <button type="submit" class="btn btn-secondary btn-block"><span class="fa fa-key" aria-hidden="true"></span> Login</button>
                             </div>
                             <div class="text sign-up-text"><label for="flip">Forgot Password?</label></div>
                         </div>

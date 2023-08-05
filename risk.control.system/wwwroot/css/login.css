@@ -265,3 +265,20 @@ body {
         display: none;
     }
 }
+
+p.account, p.account1 {
+    padding-top: 20px;
+    padding-bottom: 0px;
+    line-height: 1.5em;
+    font-size: 13px;
+}
+
+    p.account a, p.account1 a {
+        color: #ff4040;
+        font-size: 11px;
+        text-decoration: underline;
+    }
+
+        p.account a:hover, p.account1 a:hover {
+            text-decoration: none;
+        }
