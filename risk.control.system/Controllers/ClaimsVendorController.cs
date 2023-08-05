@@ -22,15 +22,22 @@ namespace risk.control.system.Controllers
     {
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly IDashboardService dashboardService;
         private readonly IMailboxService mailboxService;
         private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext _context;
 
-        public ClaimsVendorController(IClaimsInvestigationService claimsInvestigationService, UserManager<VendorApplicationUser> userManager, IMailboxService mailboxService, IToastNotification toastNotification,
+        public ClaimsVendorController(
+            IClaimsInvestigationService claimsInvestigationService,
+            UserManager<VendorApplicationUser> userManager,
+            IDashboardService dashboardService,
+            IMailboxService mailboxService,
+            IToastNotification toastNotification,
             ApplicationDbContext context)
         {
             this.claimsInvestigationService = claimsInvestigationService;
             this.userManager = userManager;
+            this.dashboardService = dashboardService;
             this.mailboxService = mailboxService;
             this.toastNotification = toastNotification;
             this._context = context;
@@ -106,17 +113,42 @@ namespace risk.control.system.Controllers
 
             var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsCaseLocation.VendorId);
 
-            List<VendorApplicationUser> agents = new List<VendorApplicationUser>();
+            List<VendorUserClaim> agents = new List<VendorUserClaim>();
+            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+
             foreach (var vendorUser in vendorUsers)
             {
                 var isTrue = await userManager.IsInRoleAsync(vendorUser, agentRole?.Name);
                 if (isTrue)
                 {
-                    agents.Add(vendorUser);
+                    int claimCount = 0;
+                    if (result.TryGetValue(vendorUser.Email, out claimCount))
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = vendorUser,
+                            CurrentCaseCount = claimCount,
+                        };
+                        agents.Add(agentData);
+                    }
+                    else
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = vendorUser,
+                            CurrentCaseCount = 0,
+                        };
+                        agents.Add(agentData);
+                    }
                 }
             }
 
-            var model = new ClaimsInvestigationVendorAgentModel { CaseLocation = claimsCaseLocation, ClaimsInvestigation = claimsCaseToAllocateToVendorAgent, VendorApplicationUser = agents };
+            var model = new ClaimsInvestigationVendorAgentModel
+            {
+                CaseLocation = claimsCaseLocation,
+                ClaimsInvestigation = claimsCaseToAllocateToVendorAgent,
+                VendorUserClaims = agents
+            };
             return View(model);
         }
 
@@ -260,18 +292,44 @@ namespace risk.control.system.Controllers
                     );
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
-            List<VendorApplicationUser> agents = new List<VendorApplicationUser>();
             var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimCase.VendorId);
+
+            List<VendorUserClaim> agents = new List<VendorUserClaim>();
+            var result = dashboardService.CalculateAgentCaseStatus(currentUserEmail);
 
             foreach (var vendorUser in vendorUsers)
             {
                 var isTrue = await userManager.IsInRoleAsync(vendorUser, agentRole?.Name);
                 if (isTrue)
                 {
-                    agents.Add(vendorUser);
+                    int claimCount = 0;
+                    if (result.TryGetValue(vendorUser.Email, out claimCount))
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = vendorUser,
+                            CurrentCaseCount = claimCount,
+                        };
+                        agents.Add(agentData);
+                    }
+                    else
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = vendorUser,
+                            CurrentCaseCount = 0,
+                        };
+                        agents.Add(agentData);
+                    }
                 }
             }
-            return View(new ClaimsInvestigationVendorAgentModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation, VendorApplicationUser = agents });
+            return View(new ClaimsInvestigationVendorAgentModel
+            {
+                CaseLocation = claimCase,
+                ClaimsInvestigation = claimsInvestigation,
+                VendorUserClaims = agents
+            }
+            );
         }
 
         [Breadcrumb("  Report")]

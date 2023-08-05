@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 using Newtonsoft.Json.Linq;
 
@@ -30,15 +33,39 @@ namespace risk.control.system.Services
     public class ClaimsInvestigationService : IClaimsInvestigationService
     {
         private readonly ApplicationDbContext _context;
+        private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public ClaimsInvestigationService(ApplicationDbContext context)
+        public ClaimsInvestigationService(ApplicationDbContext context, RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             this._context = context;
+            this.roleManager = roleManager;
+            this.userManager = userManager;
+        }
+
+        private async Task<VendorApplicationUser> GetSupervisor(string vendorId)
+        {
+            var vendorNonAdminUsers = _context.VendorApplicationUser.Where(u =>
+            u.VendorId == vendorId && !u.IsVendorAdmin);
+
+            var supervisor = roleManager.Roles.FirstOrDefault(r =>
+                r.Name.Contains(AppRoles.Supervisor.ToString()));
+
+            foreach (var vendorNonAdminUser in vendorNonAdminUsers)
+            {
+                if (await userManager.IsInRoleAsync(vendorNonAdminUser, supervisor?.Name))
+                {
+                    return vendorNonAdminUser;
+                }
+            }
+            return null;
         }
 
         public async Task AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
+
+            var supervisor = await GetSupervisor(vendorId);
 
             if (vendor != null)
             {
@@ -54,6 +81,7 @@ namespace risk.control.system.Services
 
                 claimsCaseLocation.Vendor = vendor;
                 claimsCaseLocation.VendorId = vendorId;
+                claimsCaseLocation.AssignedAgentUserEmail = supervisor.Email;
                 claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId;
                 _context.CaseLocation.Update(claimsCaseLocation);

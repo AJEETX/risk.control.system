@@ -1101,6 +1101,10 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.LineOfBusiness)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.PinCode)
+                .Include(c => c.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);

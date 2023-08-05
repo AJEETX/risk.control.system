@@ -195,19 +195,22 @@
                                         <th>
                                             Email
                                         </th>
+                                        <th>
+                                            Current Claims
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model.VendorApplicationUser)
+                                    @foreach (var item in Model.VendorUserClaims)
                                     {
                                         <tr>
                                             <td>
-                                                <input id="@item.Id" name="selectedcase" class="selected-case" type="radio" value="@item.Id" />
+                                                <input id="@item.AgencyUser.Id" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" />
                                             </td>
                                             <td>
-                                                @if (item?.ProfilePictureUrl is not null)
+                                                @if (item?.AgencyUser.ProfilePictureUrl is not null)
                                                 {
-                                                    <img id="documentImage" class="form-Image" src="@item?.ProfilePictureUrl">
+                                                    <img id="documentImage" class="form-Image" src="@item?.AgencyUser.ProfilePictureUrl">
                                                 }
                                                 else
                                                 {
@@ -215,16 +218,19 @@
                                                 }
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.FirstName)
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.FirstName)
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.LastName)
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.LastName)
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Email)
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.Email)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.CurrentCaseCount)
                                             </td>
                                         </tr>
                                     }

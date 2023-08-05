@@ -211,21 +211,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var item in Model.VendorApplicationUser)
+                                        @foreach (var item in Model.VendorUserClaims)
                                         {
                                             <tr>
                                                 <td>
-                                                    <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.Id" />
+                                                <input id="selectedcase" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" />
                                                 </td>
 
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.FirstName)
+                                                    @Html.DisplayFor(modelItem => item.AgencyUser.FirstName)
                                                 </td>
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
                                                 </td>
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.Email)
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.Email)
                                                 </td>
 
                                             </tr>
