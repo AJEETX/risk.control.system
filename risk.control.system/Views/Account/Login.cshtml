@@ -40,11 +40,11 @@
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope"></i>
-                                <input asp-for=Email id="email" type="text" placeholder="Enter your email" autocomplete="off" required>
+                                <input asp-for=Email id="email" type="text" placeholder="Enter your email" value="creator@company.com" autocomplete="off" required>
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock"></i>
-                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" autocomplete="off" required>
+                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required>
                             </div>
                             <div class="button input-box">
                                 <button type="submit" class="btn btn-secondary btn-block"> Login</button>
