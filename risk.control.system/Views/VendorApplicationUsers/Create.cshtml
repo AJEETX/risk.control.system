@@ -48,7 +48,7 @@
                         </div>
                     </div>
 
-                    <form asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
+                    <form asp-action="Create" enctype="multipart/form-data" autocomplete="off">
                         <input type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
                         <input type="hidden" asp-for="Email" id="mailAddress" />
                         <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
