@@ -17,6 +17,12 @@
                             <div class="col-md-6">
                                 <dl class="row">
                                     <dt class="col-sm-3">
+                                        Domain
+                                    </dt>
+                                    <dd class="col-sm-8">
+                                        <a href=""> @Html.DisplayFor(model => model.Email)</a>
+                                    </dd>
+                                    <dt class="col-sm-3">
                                         @Html.DisplayNameFor(model => model.Name)
                                     </dt>
                                     <dd class="col-sm-8">
@@ -40,12 +46,7 @@
                                     <dd class="col-sm-8">
                                         @Html.DisplayFor(model => model.PhoneNumber)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.Email)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(model => model.Email)
-                                    </dd>
+                                    
                                     <dt class="col-sm-3">
                                         @Html.DisplayNameFor(model => model.Branch)
                                     </dt>
@@ -139,9 +140,9 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12 text-right">
-                                <a asp-controller="Vendors" asp-action="Edit" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-pen'></i> @Applicationsettings.PROFILE</a>
-                                <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-plus"></i>  @Applicationsettings.USER</a>
-                                <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-plus"></i>  @Applicationsettings.SERVICE</a>
+                                <a asp-controller="Vendors" asp-action="Edit" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-building'></i> @Applicationsettings.PROFILE</a>
+                                <a asp-controller="VendorUser" asp-action="Index" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-friends"></i>  @Applicationsettings.USER</a>
+                                <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE</a>
                             </div>
                         </div>
                     </div>

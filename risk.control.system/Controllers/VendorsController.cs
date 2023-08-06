@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Details/5
-        [Breadcrumb(" Agency")]
+        [Breadcrumb(" Manage Agency")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.Vendor == null)

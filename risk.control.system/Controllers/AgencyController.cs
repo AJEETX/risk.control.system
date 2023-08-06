@@ -14,7 +14,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Agency ")]
+    [Breadcrumb("Manage Agency ")]
     public class AgencyController : Controller
     {
         public List<UsersViewModel> UserList;

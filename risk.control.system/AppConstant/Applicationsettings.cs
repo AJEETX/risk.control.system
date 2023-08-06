@@ -44,6 +44,7 @@
         public const string DISTRICT = "District";
         public const string CASE_STATUS = "Case status";
         public const string SERVICE = "Service";
+        public const string SERVICES = "Services";
         public const string VERIFY_LOCATION = "Verify location";
         public const string CUSTOMER_VERIFY_LOCATION = "Customer Verification location detail";
         public const string INVESTIGATION_SERVICE = "Type of service";
