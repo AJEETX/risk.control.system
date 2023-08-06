@@ -312,7 +312,7 @@ textarea {
 
 .input-group-prepend {
     display: block;
-    width: 9rem;
+    width: 10rem;
 }
 
 .input-validation-error {
@@ -330,7 +330,6 @@ textarea {
 :not(.layout-fixed) .main-sidebar {
     height: inherit;
     min-height: 100%;
-    border-right: .4rem solid #ccc;
     position: absolute;
     top: 0;
 }
