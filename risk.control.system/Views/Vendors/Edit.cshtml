@@ -24,7 +24,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="email">Email Address <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                <span class="input-group-text" id="email">Domain <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
                                             <input readonly asp-for="Email" class="form-control readonly-input" />
                                             <span asp-validation-for="Email" class="text-danger"></span>
@@ -107,7 +107,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="AgreementDate">Agreement Date <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input readonly type="date" asp-for="AgreementDate" class="form-control" required placeholder="Agreement Date">
+                                            <input readonly type="date" asp-for="AgreementDate" class="form-control readonly-input" required placeholder="Agreement Date">
                                             <span asp-validation-for="AgreementDate" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -116,7 +116,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="ActivatedDate">Activated Date <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input readonly type="date" asp-for="ActivatedDate" class="form-control" required placeholder="Agreement Date">
+                                            <input readonly type="date" asp-for="ActivatedDate" class="form-control readonly-input" required placeholder="Agreement Date">
                                             <span asp-validation-for="ActivatedDate" class="text-danger"></span>
                                         </div>
                                     </div>

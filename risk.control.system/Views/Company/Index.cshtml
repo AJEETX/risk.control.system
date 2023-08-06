@@ -16,13 +16,19 @@
                             <div class="col-md-6">
                                 <dl class="row">
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Name)
+                                        Company Domain
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        <a href="#" > @Html.DisplayFor(model => model.Email)</a>
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Name
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Code)
+                                        Code
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Code)
@@ -39,12 +45,7 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.PhoneNumber)
                                     </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Email)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Email)
-                                    </dd>
+                                    
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Branch)
                                     </dt>
