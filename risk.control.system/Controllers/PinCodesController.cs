@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add Pincode")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -137,7 +137,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Pincode")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.PinCode == null)
@@ -193,7 +193,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Delete/5
-        [Breadcrumb("Delete")]
+        [Breadcrumb("Delete Pincode")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.PinCode == null)

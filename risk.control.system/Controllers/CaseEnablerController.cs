@@ -10,7 +10,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Case Enabler ")]
+    [Breadcrumb("Reason To Verify ")]
     public class CaseEnablerController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseEnabler/Create
-        [Breadcrumb("Create ")]
+        [Breadcrumb("Add Reason To Verify ")]
         public IActionResult Create()
         {
             return View();
@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseEnabler/Edit/5
-        [Breadcrumb("Edit ")]
+        [Breadcrumb("Edit Reason To Verify ")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.CaseEnabler == null)
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseEnabler/Delete/5
-        [Breadcrumb("Delete ")]
+        [Breadcrumb("Delete Reason To Verify ")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.CaseEnabler == null)

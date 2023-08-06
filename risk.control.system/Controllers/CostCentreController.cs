@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add Cost Centre")]
         public IActionResult Create()
         {
             return View();
@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Cost Centre")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.CostCentre == null)
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre/Delete/5
-        [Breadcrumb("Delete")]
+        [Breadcrumb("Delete  Cost Centre")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.CostCentre == null)

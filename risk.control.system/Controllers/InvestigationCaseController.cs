@@ -1,8 +1,11 @@
 ﻿using System.Data;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -56,12 +59,15 @@ namespace risk.control.system.Controllers
                 case "name_desc":
                     cases = cases.OrderByDescending(s => s.Name);
                     break;
+
                 case "Date":
                     cases = cases.OrderBy(s => s.Created);
                     break;
+
                 case "date_desc":
                     cases = cases.OrderByDescending(s => s.Created);
                     break;
+
                 default:
                     cases = cases.OrderBy(s => s.Created);
                     break;
@@ -101,6 +107,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCases/Create
+        [Breadcrumb("Add Case")]
         public IActionResult Create()
         {
             ViewBag.InvestigationCaseStatusId = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
@@ -122,6 +129,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCases/Edit/5
+        [Breadcrumb("Edit Case")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.InvestigationCase == null)
@@ -213,7 +221,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("district deleted successfully!");
+            toastNotification.AddSuccessToastMessage("district deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
 
@@ -268,7 +276,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddSuccessToastMessage("upload successfull!");
                 return View(new { DataTable = dt });
             }
-                toastNotification.AddErrorToastMessage("Error in upload!");
+            toastNotification.AddErrorToastMessage("Error in upload!");
             return View();
         }
 
@@ -278,6 +286,7 @@ namespace risk.control.system.Controllers
             await Task.Delay(1);
             return Ok();
         }
+
         private bool InvestigationCaseExists(string id)
         {
             return (_context.InvestigationCase?.Any(e => e.InvestigationId == id)).GetValueOrDefault();

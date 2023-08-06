@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseSubStatus/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add Case SubStatus")]
         public IActionResult Create()
         {
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseSubStatus/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Case SubStatus")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.InvestigationCaseSubStatus == null)
@@ -153,7 +153,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationCaseSubStatus/Delete/5
-        [Breadcrumb("Delete")]
+        [Breadcrumb("Delete Case SubStatus")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.InvestigationCaseSubStatus == null)

@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add Case Status")]
         public IActionResult Create()
         {
             return View();
@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Case Status")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.InvestigationCaseStatus == null)

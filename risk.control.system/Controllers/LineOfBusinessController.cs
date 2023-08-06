@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add Line of Business")]
         public IActionResult Create()
         {
             return View();
@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Line of Business")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.LineOfBusiness == null)
@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes/Delete/5
-        [Breadcrumb("Delete")]
+        [Breadcrumb("Delete Line of Business")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.LineOfBusiness == null)

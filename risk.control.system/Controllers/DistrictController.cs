@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add District")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit District")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.District == null)

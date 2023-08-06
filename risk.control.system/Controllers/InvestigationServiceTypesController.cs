@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationServiceTypes/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add Service Type")]
         public IActionResult Create()
         {
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationServiceTypes/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Service Type")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.InvestigationServiceType == null)
@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationServiceTypes/Delete/5
-        [Breadcrumb("Delete")]
+        [Breadcrumb("Delete Service Type")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.InvestigationServiceType == null)

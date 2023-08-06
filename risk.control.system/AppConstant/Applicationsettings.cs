@@ -27,7 +27,7 @@
         public const string RESET = "Reset";
         public const string APPROVE = "Approve";
         public const string SEARCH = "Search";
-        public const string CREATE = "Create";
+        public const string CREATE = "Add";
         public const string EDIT = "Edit";
         public const string DELETE = "Delete";
         public const string ALLOCATE = "Allocate";
@@ -47,8 +47,8 @@
         public const string VERIFY_LOCATION = "Verify location";
         public const string CUSTOMER_VERIFY_LOCATION = "Customer Verification location detail";
         public const string INVESTIGATION_SERVICE = "Type of service";
-        public const string BENEFICIARY = "Claims beneficiary";
-        public const string CASE_ENABLER = "Case enabler";
+        public const string BENEFICIARY = "Beneficiary Relation";
+        public const string CASE_ENABLER = "Reason To Verify";
         public const string COST_CENTRE = "Cost centre";
         public const string CASE_OUTCOME = "Case outcome";
         public const string CASE_SUBSTATUS = "Case sub status";

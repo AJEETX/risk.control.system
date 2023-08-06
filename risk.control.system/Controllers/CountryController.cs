@@ -109,7 +109,7 @@ namespace risk.control.system.Controllers
             return View(country);
         }
 
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add Country")]
         public IActionResult Create()
         {
             return View();
@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Country")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Country == null)
@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Delete/5
-        [Breadcrumb("Delete")]
+        [Breadcrumb("Delete Country")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Country == null)

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +17,16 @@ namespace risk.control.system.Controllers
     public class ClientCompanyController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
 
-        public ClientCompanyController(ApplicationDbContext context, IToastNotification toastNotification)
+        public ClientCompanyController(
+            ApplicationDbContext context,
+            IWebHostEnvironment webHostEnvironment,
+            IToastNotification toastNotification)
         {
             _context = context;
+            this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
         }
 
@@ -43,20 +49,26 @@ namespace risk.control.system.Controllers
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                 if (companyDocument is not null)
                 {
+                    string newFileName = Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(companyDocument.FileName);
+                    newFileName += fileExtension;
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+
                     clientCompany.Document = companyDocument;
                     using var dataStream = new MemoryStream();
                     await clientCompany.Document.CopyToAsync(dataStream);
                     clientCompany.DocumentImage = dataStream.ToArray();
+                    clientCompany.DocumentUrl = "/img/" + newFileName;
                 }
                 clientCompany.Email = clientCompany.Email.Trim().ToLower();
                 clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(clientCompany);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("client company created successfully!");
+                toastNotification.AddSuccessToastMessage("Company created successfully!");
                 return RedirectToAction(nameof(Index));
             }
-            toastNotification.AddErrorToastMessage("client company not found!");
+            toastNotification.AddErrorToastMessage("Company not found!");
             return Problem();
         }
 
@@ -174,10 +186,16 @@ namespace risk.control.system.Controllers
                     IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                     if (companyDocument is not null)
                     {
+                        string newFileName = Guid.NewGuid().ToString();
+                        string fileExtension = Path.GetExtension(companyDocument.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+
                         clientCompany.Document = companyDocument;
                         using var dataStream = new MemoryStream();
                         await clientCompany.Document.CopyToAsync(dataStream);
                         clientCompany.DocumentImage = dataStream.ToArray();
+                        clientCompany.DocumentUrl = "/img/" + newFileName;
                     }
                     else
                     {
@@ -203,10 +221,10 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("client company edited successfully!");
+                toastNotification.AddSuccessToastMessage("Company edited successfully!");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
-            toastNotification.AddErrorToastMessage("Error to edit client company!");
+            toastNotification.AddErrorToastMessage("Error to edit Company!");
             return Problem();
         }
 

@@ -50,7 +50,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Create
-        [Breadcrumb("Create ")]
+        [Breadcrumb("Add Beneficairy Relation ")]
         public IActionResult Create()
         {
             return View();
@@ -76,7 +76,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Edit/5
-        [Breadcrumb("Edit ")]
+        [Breadcrumb("Edit Beneficairy Relation")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)
@@ -131,7 +131,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Delete/5
-        [Breadcrumb("Delete ")]
+        [Breadcrumb("Delete Beneficairy Relation")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)
