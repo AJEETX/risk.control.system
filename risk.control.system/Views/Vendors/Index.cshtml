@@ -20,6 +20,9 @@
                                 @Html.DisplayNameFor(model => model.Document)
                             </th>
                             <th>
+                                Domain
+                            </th>
+                            <th>
                                 Name
                             </th>
                             <th>
@@ -28,9 +31,7 @@
                             <th>
                                 Phone Number
                             </th>
-                            <th>
-                                Email
-                            </th>
+                            
                             <th>
                                 Address line
                             </th>
@@ -56,6 +57,9 @@
                                     }
                                 </td>
                                 <td>
+                                    <a href="#"> @Html.DisplayFor(modelItem => item.Email)</a>
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.Name)
                                 </td>
                                 <td>
@@ -64,9 +68,7 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.PhoneNumber)
                                 </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Email)
-                                </td>
+                                
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Addressline)
                                 </td>

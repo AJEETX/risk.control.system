@@ -73,13 +73,13 @@
                 @if (UserManager.GetUserAsync(User).Result?.ProfilePictureUrl != null)
                 {
                     <div class="image">
-                        <img class="elevation-2 sidebar-profile" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
+                        <img class="elevation-2 sidebar-profile img-circle" src="@UserManager.GetUserAsync(User).Result.ProfilePictureUrl">
                     </div>
                 }
                 else
                 {
                     <div class="image">
-                        <img class="elevation-0 sidebar-profile" src="@Applicationsettings.NO_IMAGE">
+                        <img class="elevation-0 sidebar-profile img-circle" src="/img/user.png">
                     </div>
                 }
                 <a href="/companyuserprofile" class="d-block">
