@@ -116,13 +116,13 @@ namespace risk.control.system.Controllers
                         string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(companyDocument.FileName);
                         newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "upload", newFileName);
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
 
                         clientCompany.Document = companyDocument;
                         using var dataStream = new MemoryStream();
                         await clientCompany.Document.CopyToAsync(dataStream);
                         clientCompany.DocumentImage = dataStream.ToArray();
-                        clientCompany.DocumentUrl = "/upload/" + newFileName;
+                        clientCompany.DocumentUrl = "/img/" + newFileName;
                     }
                     else
                     {
