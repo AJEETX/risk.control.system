@@ -56,7 +56,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" for="Price">Service Price (Rs.) <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
-                                                <input asp-for="Price" class="form-control" type="number" placeholder="Enter Service Price" value=""  required/>
+                                                <input asp-for="Price" class="form-control" type="number" placeholder="Enter Service Price" value=""  required min="1" max="999999999"/>
                                                 <span asp-validation-for="Price" class="text-danger"></span>
                                             </div>
                                         </div>

@@ -207,7 +207,8 @@
                                                     <span class="input-group-text" asp-for="ContactNumber">Phone # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
                                                 
-                                                <input type="number" asp-for="ContactNumber" class="form-control" required maxlength="10" value="" placeholder="Enter Phone # (10 digit)" />
+                                                <input type="number" asp-for="ContactNumber" class="form-control" required maxlength="10" value="" placeholder="Enter Phone # (10 digit)" 
+                                                min="2222222222" max="9999999999" />
                                                 <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
 
                                             </div>
@@ -306,7 +307,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
-                                                <input type="text" asp-for="Addressline" class="form-control" type="text" required placeholder="Enter Address line" value=""/>
+                                                <input type="text" asp-for="Addressline" class="form-control" type="text" required placeholder="Enter Address line" value="" maxlength="20"/>
                                                 <span asp-validation-for="Addressline" class="text-danger"></span>
                                             </div>
                                         </div>
@@ -317,7 +318,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" id="Addressline">Remarks <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                                 </div>
-                                                <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" value=""/>
+                                                <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" value="" maxlength="20"/>
                                                 <span asp-validation-for="Description" class="text-danger"></span>
                                             </div>
                                         </div>

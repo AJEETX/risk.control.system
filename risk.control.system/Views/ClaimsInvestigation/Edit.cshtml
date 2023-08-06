@@ -180,7 +180,7 @@
                                     <div class="input-group-prepend">
                                                     <span class="input-group-text" asp-for="CustomerName">Customer Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <input required asp-for="CustomerName" class="form-control" type="text" placeholder="Enter Customer Name" maxlength="20" />
+                                    <input required asp-for="CustomerName" class="form-control title-name" type="text" placeholder="Enter Customer Name" maxlength="20" />
                                     <span asp-validation-for="CustomerName" class="text-danger"></span>
                                 </div>
                             </div>
@@ -210,8 +210,9 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="ContactNumber">Phone # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                     </div>
-                                    <input type="number" asp-for="ContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)" value=""/>
-                                    <span asp-validation-for="ContactNumber" class="text-danger field-validation-valid"></span>
+                                    <input type="number" asp-for="ContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)"
+                                    min="2222222222" max="9999999999" value=""/>
+                                    <span asp-validation-for="ContactNumber" class="text-danger"></span>
 
                                 </div>
                             </div>

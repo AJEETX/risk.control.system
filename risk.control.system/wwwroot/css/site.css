@@ -30,8 +30,7 @@ a {
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-    font-size: 12px;
-    font-family: "Arial" !important;
+    font-size: 13px;
 }
 
 @media (min-width: 768px) {
@@ -395,4 +394,26 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 5px;
     color: white;
     cursor: no-drop;
+}
+.asterikx {
+    text-transform: uppercase;
+}
+
+input.title-name {
+    text-transform: capitalize;
+}
+::-webkit-input-placeholder {
+    text-transform: none;
+}
+
+:-moz-placeholder {
+    text-transform: none;
+}
+
+::-moz-placeholder {
+    text-transform: none;
+}
+
+:-ms-input-placeholder {
+    text-transform: none;
 }

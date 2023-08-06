@@ -238,7 +238,9 @@ body {
     text-align: center;
     margin-top: 25px;
 }
-
+.forms .form-content label.login-link {
+    color: rgba(0, 0, 238);
+}
 .container #flip {
     display: none;
 }
