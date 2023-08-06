@@ -57,7 +57,9 @@ builder.Services.AddControllersWithViews()
     .AddNToastNotifyNoty(new NotyOptions
     {
         ProgressBar = true,
-        Timeout = 1000
+        Timeout = 1000,
+        Modal = true,
+        Type = Enums.NotificationTypesNoty.Info
     })
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
