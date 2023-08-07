@@ -428,12 +428,12 @@ input.title-name {
 }
 dl.row {
     box-shadow: 0 0 10px white, 0 1px 3px #ebebef;
+    background: linear-gradient(180deg, #ebebef, transparent);
     border-radius: .5rem;
     padding: 1.5rem;
 }
     dl.row dt, dl.row dd {
         box-shadow: 0 0 10px white, 0 1px 3px #ebebef;
-        background: linear-gradient(270deg, #ebebef, transparent);
+        background: linear-gradient(0deg, #ebebef, transparent);
         border-radius: .5rem;
-        padding: .5rem;
     }
