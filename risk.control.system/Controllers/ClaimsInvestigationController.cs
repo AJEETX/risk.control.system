@@ -1404,7 +1404,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Edit/5
-        [Breadcrumb(title: " Edit", FromAction = "Incomplete")]
+        [Breadcrumb(title: " Edit Claim", FromAction = "Incomplete")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1590,7 +1590,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Delete/5
-        [Breadcrumb(title: " Delete", FromAction = "Incomplete")]
+        [Breadcrumb(title: " Delete Claim", FromAction = "Incomplete")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)

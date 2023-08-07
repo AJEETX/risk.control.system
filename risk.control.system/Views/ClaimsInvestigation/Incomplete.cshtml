@@ -21,15 +21,15 @@
                                             <tr>
 
                                             <th>
-                                                Claim Document
+                                                Policy Doc
                                             </th>
                                             <th>Customer Photo</th>
 
                                                 <th>
-                                                    Line Of Business
+                                                    LOB
                                                 </th>
                                                 <th>
-                                                    Claim Status
+                                                    Status
                                                 </th>
                                                 <th>
                                                     Customer Name
@@ -41,12 +41,11 @@
                                                     Location - Status
                                                 </th>
                                                 <th>
-                                                    Created Date
+                                                    Created On
                                                 </th>
                                                 <th>
                                                     Day since Drafted
                                                 </th>
-                                            <th><i class="fas fa-thumbtack"></i></th>
                                             <th></th>
                                             </tr>
                                         </thead>
@@ -92,7 +91,9 @@
                                                         @{
                                                             if (item.CaseLocations.Count == 0)
                                                             {
-                                                                <span class="badge badge-danger">ADD LOCATION</span>
+                                                            <i class="fas fa-thumbtack"></i>
+
+                                                            <span class="badge badge-danger"> ADD LOCATION</span>
                                                             }
                                                         }
                                                         @{
@@ -108,23 +109,7 @@
                                                 <td>
                                                     @Html.DisplayFor(modelItem => timePending )
                                                 </td>
-                                                <td>
-                                                    @{
-                                                        if (item.CaseLocations.Count > 0)
-                                                        {
-                                                            <a class="btn btn-xs btn-danger" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
-                                                                <i class="fas fa-thumbtack"></i>
-                                                            </a>
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class="fas fa-map-pin" style='font-size:24px' title="ADD LOCATION"></i>
-                                                        }
-                                                    }
-
-                                                    
-                                                </td>
-
+                                                
                                                     <td>
                                                         <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
                                                             <i class="fa fa-search"></i> @Applicationsettings.DETAILS
