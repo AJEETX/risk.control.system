@@ -29,6 +29,16 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.ActiveLiClasses = "breadcrumb-item active";
 });
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
@@ -40,16 +50,6 @@ builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-
-builder.Services.AddCors(opt =>
-{
-    opt.AddDefaultPolicy(builder =>
-    {
-        builder.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews()
@@ -94,30 +94,39 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-                {
-                    options.Events.OnRedirectToLogin = (context) =>
-                    {
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        return Task.CompletedTask;
-                    };
-                    options.Cookie.Name = "UserLoginCookie";
-                    options.LoginPath = "/Account/Login";
-                    options.LogoutPath = "/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
-                    options.AccessDeniedPath = "/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
-                    options.Cookie.HttpOnly = true;
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                    options.Cookie.SameSite = SameSiteMode.None;
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-                    options.SlidingExpiration = true;
-                });
+    .AddCookie(options =>
+    {
+        options.Events.OnRedirectToLogin = (context) =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+    });
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+//                {
+//                    options.Events.OnRedirectToLogin = (context) =>
+//                    {
+//                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+//                        return Task.CompletedTask;
+//                    };
+//                    options.Cookie.Name = "UserLoginCookie";
+//                    options.LoginPath = "/Account/Login";
+//                    options.LogoutPath = "/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
+//                    options.AccessDeniedPath = "/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
+//                    options.Cookie.HttpOnly = true;
+//                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+//                    options.Cookie.SameSite = SameSiteMode.None;
+//                    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+//                    options.SlidingExpiration = true;
+//                });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-});
+//builder.Services.AddAuthorization(options =>
+//{
+//    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+//        .RequireAuthenticatedUser()
+//        .Build();
+//});
 
 var app = builder.Build();
 
@@ -135,11 +144,11 @@ app.UseHttpLogging();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseCookiePolicy(
-    new CookiePolicyOptions
-    {
-        Secure = CookieSecurePolicy.Always
-    });
+//app.UseCookiePolicy(
+//    new CookiePolicyOptions
+//    {
+//        Secure = CookieSecurePolicy.Always
+//    });
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

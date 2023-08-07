@@ -415,7 +415,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(AgencyController.User), "Agency");
         }
 
-        [Breadcrumb(" Service")]
+        [Breadcrumb("Manage Service")]
         public async Task<IActionResult> Service()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
