@@ -16,7 +16,7 @@ using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Company ")]
+    [Breadcrumb("Company Profile")]
     public class CompanyController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -157,7 +157,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb("Users ")]
+        [Breadcrumb("Manage Users ")]
         public async Task<IActionResult> User()
         {
             var userEmail = HttpContext.User?.Identity?.Name;

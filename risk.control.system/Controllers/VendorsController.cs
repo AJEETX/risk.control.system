@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors
-        [Breadcrumb(" Agencies")]
+        [Breadcrumb("All Agencies")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = await _context.Vendor
@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        [Breadcrumb(" Service")]
+        [Breadcrumb("Manage Service")]
         public async Task<IActionResult> Service(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -184,8 +184,8 @@ namespace risk.control.system.Controllers
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", vendor.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendor.StateId);
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit Agency") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
 

@@ -73,10 +73,10 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorApplicationUsers", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Details", "VendorApplicationUsers", $"Details") { Parent = usersPage, RouteValues = new { id = id } };
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorApplicationUsers", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Details", "VendorApplicationUsers", $"User Details") { Parent = usersPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendorApplicationUser);
@@ -90,9 +90,9 @@ namespace risk.control.system.Controllers
             var model = new VendorApplicationUser { Vendor = vendor };
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Create", "VendorApplicationUsers", $"Add User") { Parent = usersPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
 
@@ -176,10 +176,10 @@ namespace risk.control.system.Controllers
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", vendor.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendor.StateId);
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = vendor.VendorId } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
-            var editPage = new MvcBreadcrumbNode("Edit", "VendorApplicationUsers", $"Edit") { Parent = usersPage, RouteValues = new { id = userId } };
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendor.VendorId } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = vendor.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Edit", "VendorApplicationUsers", $"Edit User") { Parent = usersPage, RouteValues = new { id = userId } };
             ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendorApplicationUser);
@@ -296,9 +296,9 @@ namespace risk.control.system.Controllers
                 UserName = user.UserName,
                 VendorUserRoleViewModel = userRoles
             };
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = user.VendorId } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Users") { Parent = agencyPage, RouteValues = new { id = user.VendorId } };
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = user.VendorId } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = user.VendorId } };
             var editPage = new MvcBreadcrumbNode("UserRoles", "VendorApplicationUsers", $"Edit Role") { Parent = usersPage, RouteValues = new { id = user.Id } };
             ViewData["BreadcrumbNode"] = editPage;
             return View(model);
@@ -345,10 +345,10 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var usersPage = new MvcBreadcrumbNode("Index", "VendorApplicationUsers", $"Users") { Parent = agencyPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Delete", "VendorApplicationUsers", $"Delete") { Parent = usersPage, RouteValues = new { id = id } };
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            var usersPage = new MvcBreadcrumbNode("Index", "VendorApplicationUsers", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Delete", "VendorApplicationUsers", $"Delete User") { Parent = usersPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendorApplicationUser);

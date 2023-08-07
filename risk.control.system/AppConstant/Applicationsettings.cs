@@ -59,7 +59,7 @@
         public const string ROLE = "Role";
         public const string STATE = "State";
         public const string USER = "User";
-        public const string COMPANY_USERS = "Company Users";
+        public const string COMPANY_USERS = "Manage Users";
         public const string VENDOR_USERS = "Agency Users";
         public const string VENDOR = "Agency";
         public const string VENDORS = "Agency";

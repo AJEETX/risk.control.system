@@ -68,9 +68,9 @@ namespace risk.control.system.Controllers
                 VendorUserRoleViewModel = userRoles
             };
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = user.VendorId } };
-            var editPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Users") { Parent = agencyPage, RouteValues = new { id = user.VendorId } };
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = user.VendorId } };
+            var editPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = user.VendorId } };
             var userRolePage = new MvcBreadcrumbNode("Index", "VendorUserRoles", $"Edit Role") { Parent = editPage, RouteValues = new { userid = userId } };
             ViewData["BreadcrumbNode"] = userRolePage;
 
