@@ -440,3 +440,8 @@ dl.row {
         background: linear-gradient(0deg, #ebebef, transparent);
         border-radius: .5rem;
     }
+.asterik-style {
+    font-size: .4rem;
+    color: red;
+    padding-bottom: 1rem;
+}

@@ -30,7 +30,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="LineOfBusinessId">Line Of Business <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="LineOfBusinessId">Line Of Business <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)" required>
                                                     <option value="">--SELECT--</option>
@@ -42,7 +42,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="InvestigationServiceTypeId">Service Type <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="InvestigationServiceTypeId">Service Type <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" onchange="setInvestigationServices(this)" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId" required>
                                                     <option value="">--SELECT--</option>
@@ -54,7 +54,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="Price">Service Price (Rs.) <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="Price">Service Price (Rs.) <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <input asp-for="Price" class="form-control" type="number" placeholder="Enter Service Price" value=""  required min="1" max="999999999"/>
                                                 <span asp-validation-for="Price" class="text-danger"></span>
@@ -66,7 +66,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="CountryId">Country <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="CountryId">Country <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)" required>
                                                     <option value="">--SELECT--</option>
@@ -79,7 +79,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="CountryId">State <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="CountryId">State <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)" required>
                                                     <option value="">--SELECT--</option>
@@ -91,7 +91,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="DistrictId">District <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="DistrictId">District <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select id="DistrictId" asp-for="DistrictId" class="form-control" required asp-items="ViewBag.DistrictId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId', '@Model.LineOfBusinessId')">
                                                     <option value="">--SELECT --</option>

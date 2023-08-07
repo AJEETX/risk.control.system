@@ -35,7 +35,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select required id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
                                                 <option value="">--- SELECT ---</option>
@@ -47,7 +47,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="ClaimType">Claim Type <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="ClaimType">Claim Type <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select required asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
                                                 <option value="">--- SELECT ---</option>
@@ -59,7 +59,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="CostCentreId">Budget Centre <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="CostCentreId">Budget Centre <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select required asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
                                                     <option value="">--- SELECT ---</option>
@@ -71,7 +71,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="CaseEnablerId">Reason To Verify <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="CaseEnablerId">Reason To Verify <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select required asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
                                                     <option value="">--- SELECT ---</option>
@@ -83,7 +83,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="ContractIssueDate">Issue Date <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="ContractIssueDate">Issue Date <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <input required asp-for="ContractIssueDate" id="dateContractId" class="form-control" type="date" />
                                                 <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
@@ -95,7 +95,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="DateOfIncident">Date Of Incident <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="DateOfIncident">Date Of Incident <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <input required asp-for="DateOfIncident" id="dateIncidentId" class="form-control" type="date" />
                                                 <span asp-validation-for="DateOfIncident" class="text-danger"></span>
@@ -104,7 +104,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="ContractNumber">Policy # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="ContractNumber">Policy # <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <input required asp-for="ContractNumber" class="form-control" type="text" placeholder="Enter Policy #" maxlength="20" />
                                                 <span asp-validation-for="ContractNumber" class="text-danger"></span>
@@ -113,7 +113,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="SumAssuredValue">Insured Amount <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="SumAssuredValue">Insured Amount <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum" min="1" />
                                                 <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
@@ -124,7 +124,7 @@
                                         <div class="form-group">
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" maxlength="20" />
                                                 <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
@@ -141,7 +141,7 @@
                                                 }
                                                 else
                                                 {
-                                                    <img id="documentImage" class="form-Image" src="/img/no-photo.png">
+                                                    <img id="documentImage" class="form-Image" src="/img/document.jpeg">
                                                 }
                                                 <input asp-for="Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                             </div>
@@ -166,7 +166,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="CustomerType">Customer Type <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="CustomerType">Customer Type <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select required asp-for="CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
                                         <option>--- SELECT ---</option>
@@ -178,7 +178,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="CustomerName">Customer Name <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="CustomerName">Customer Name <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <input required asp-for="CustomerName" class="form-control title-name" type="text" placeholder="Enter Customer Name" maxlength="20" />
                                     <span asp-validation-for="CustomerName" class="text-danger"></span>
@@ -187,7 +187,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="CustomerDateOfBirth">Date Of Birth <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                                 <input required asp-for="CustomerDateOfBirth" id="dateCustomerId" class="form-control" type="date" />
                                     <span asp-validation-for="CustomerDateOfBirth" class="text-danger"></span>
@@ -196,7 +196,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="Gender">Gender <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="Gender">Gender <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select required asp-for="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
                                         <option value="">--- SELECT ---</option>
@@ -208,7 +208,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="ContactNumber">Phone # <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                        <span class="input-group-text" asp-for="ContactNumber">Phone # <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <input type="number" asp-for="ContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)"
                                     min="2222222222" max="9999999999" />
@@ -219,7 +219,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="CustomerIncome">Income <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="CustomerIncome">Income <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select required asp-for="CustomerIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
                                         <option value="">--- SELECT ---</option>
@@ -232,7 +232,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" asp-for="CustomerOccupation">Occupation <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" asp-for="CustomerOccupation">Occupation <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select required asp-for="CustomerOccupation" class="form-control" asp-items="Html.GetEnumSelectList<Occupation>()">
                                         <option value="">--- SELECT ---</option>
@@ -244,7 +244,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="CustomerEducation">Education <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                        <span class="input-group-text" asp-for="CustomerEducation">Education <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select required asp-for="CustomerEducation" class="form-control" asp-items="Html.GetEnumSelectList<Education>()">
                                         <option value="">--- SELECT ---</option>
@@ -259,7 +259,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="CountryId">Country <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="CountryId">Country <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
                                         <option value="">--- SELECT ---</option>
@@ -272,7 +272,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="StateId">State <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="StateId">State <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
                                         <option value="">--- SELECT ---</option>
@@ -285,7 +285,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="DistrictId">District <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="DistrictId">District <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
                                         <option value="">--- SELECT ---</option>
@@ -298,7 +298,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="PinCodeId">Pincode <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" for="PinCodeId">Pincode <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId" required>
                                         <option value="">--- SELECT ---</option>
@@ -310,7 +310,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <input type="text" asp-for="Addressline" class="form-control" type="text" placeholder="Enter Address line" maxlength="20" required />
                                                 <span asp-validation-for="Addressline" class="text-danger"></span>
@@ -320,7 +320,7 @@
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="Description">Remarks <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
+                                                    <span class="input-group-text" id="Description">Remarks <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <input required asp-for="Description" class="form-control" type="text" placeholder="Enter Comment" maxlength="20" />
                                     <span asp-validation-for="Description" class="text-danger"></span>
