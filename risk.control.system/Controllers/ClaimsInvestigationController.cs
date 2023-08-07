@@ -421,7 +421,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClaimsInvestigation
 
-        [Breadcrumb(" Incomplete", FromAction = "Index")]
+        [Breadcrumb(" Incomplete Claims", FromAction = "Index")]
         public async Task<IActionResult> Incomplete()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation

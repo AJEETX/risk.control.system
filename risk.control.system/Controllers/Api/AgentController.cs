@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Api
                     c.Gender,
                     c.Addressline,
                     c.PinCode.Code,
-                    Photo = c.ProfilePicture,
+                    Photo = c?.ProfilePicture,
                     Country = c.Country.Name,
                     State = c.State.Name,
                     District = c.District.Name,
@@ -104,11 +104,11 @@ namespace risk.control.system.Controllers.Api
                     Locations = c.CaseLocations.Select(l => new
                     {
                         l.CaseLocationId,
-                        Photo = l.ProfilePicture,
+                        Photo = l?.ProfilePicture,
                         l.Country,
                         l.BeneficiaryName,
                         l.Addressline,
-                        l.Addressline2,
+                        l?.Addressline2,
                         l.PinCode.Code,
                         District = l.District.Name,
                         State = l.State.Name
