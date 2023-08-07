@@ -2,12 +2,14 @@
 for details on configuring this project to bundle and minify static web assets. */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: "Poppins", sans-serif;
 }
+
 a.navbar-brand {
     white-space: normal;
     text-align: center;
@@ -276,10 +278,9 @@ textarea {
     overflow-y: auto;
 }
 
-#dataTbl tbody {
-    overflow-y: auto;
+#table-header {
+    background-color: white !important;
 }
-
 .empty-table-message {
     text-align: center;
 }
@@ -426,12 +427,14 @@ input.title-name {
 :-ms-input-placeholder {
     text-transform: none;
 }
+
 dl.row {
     box-shadow: 0 0 10px white, 0 1px 3px #ebebef;
     background: linear-gradient(180deg, #ebebef, transparent);
     border-radius: .5rem;
     padding: 1.5rem;
 }
+
     dl.row dt, dl.row dd {
         box-shadow: 0 0 10px white, 0 1px 3px #ebebef;
         background: linear-gradient(0deg, #ebebef, transparent);

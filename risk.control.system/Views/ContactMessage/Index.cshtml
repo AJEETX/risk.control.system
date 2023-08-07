@@ -3,7 +3,14 @@
 @{
     ViewData["Title"] = "Inbox";
 }
-
+<style>
+    #dataTbl tbody {
+        overflow-y: auto;
+    }
+    #table-header{
+        background-color:white !important;
+    }
+</style>
 <section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
@@ -15,10 +22,10 @@
                     <form id="checkboxes" asp-controller="ContactMessage" asp-action="InboxDelete" method="post" id="listForm">
                         <div class="card-body">
                             <div class="table-responsive mailbox-messages">
-                                <table id="dataTbl" class="table message-table table-bordered">
+                                <table id="datatable" class="table message-table table-bordered dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th colspan="6">
+                                            <th id="table-header" colspan="6" style="background-color:#fff !important;">
                                                 <input style="margin-right:10px;" type="checkbox" id="checkall" />
                                                 <div class="btn-group">
                                                     <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-default"><i class="fa fa-trash"></i> Delete</button>

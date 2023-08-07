@@ -52,6 +52,12 @@ namespace risk.control.system.Controllers.Api
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.Vendor)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
                 .Include(c => c.Vendor)
                 .Include(c => c.CostCentre)
                 .Include(c => c.Country)
@@ -60,6 +66,8 @@ namespace risk.control.system.Controllers.Api
                 .Include(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.InvestigationServiceType)
             .Include(c => c.LineOfBusiness)
+            .Include(c => c.District)
+            .Include(c => c.Country)
             .Include(c => c.PinCode)
             .Include(c => c.State);
 
@@ -105,7 +113,7 @@ namespace risk.control.system.Controllers.Api
                     {
                         l.CaseLocationId,
                         Photo = l?.ProfilePicture,
-                        l.Country,
+                        l.Country.Name,
                         l.BeneficiaryName,
                         l.Addressline,
                         l?.Addressline2,

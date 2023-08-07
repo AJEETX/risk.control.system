@@ -640,7 +640,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Service", "Agency");
         }
 
-        [Breadcrumb("Detail", FromAction = "Service")]
+        [Breadcrumb("Services", FromAction = "Service")]
         public async Task<IActionResult> ServiceDetail(string id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
