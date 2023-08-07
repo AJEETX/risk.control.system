@@ -69,7 +69,7 @@ namespace risk.control.system.Controllers
             return View(clientCompany);
         }
 
-        [Breadcrumb("Edit Company")]
+        [Breadcrumb("Edit Company Profile")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -117,17 +117,14 @@ namespace risk.control.system.Controllers
                         string fileExtension = Path.GetExtension(companyDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
-
-                        clientCompany.Document = companyDocument;
-                        using var dataStream = new MemoryStream();
-                        await clientCompany.Document.CopyToAsync(dataStream);
-                        clientCompany.DocumentImage = dataStream.ToArray();
+                        companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                         clientCompany.DocumentUrl = "/img/" + newFileName;
+                        clientCompany.Document = companyDocument;
                     }
                     else
                     {
                         var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                        if (existingClientCompany.DocumentImage != null)
+                        if (existingClientCompany.DocumentUrl != null)
                         {
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                             clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
@@ -283,7 +280,7 @@ namespace risk.control.system.Controllers
 
             var companyPage = new MvcBreadcrumbNode("Index", "Company", "Company");
             var usersPage = new MvcBreadcrumbNode("User", "Company", "Users") { Parent = companyPage };
-            var userEditPage = new MvcBreadcrumbNode("UserEdit", "Company", $"Edit") { Parent = usersPage, RouteValues = new { userid = userId } };
+            var userEditPage = new MvcBreadcrumbNode("UserEdit", "Company", $"Edit User") { Parent = usersPage, RouteValues = new { userid = userId } };
             ViewData["BreadcrumbNode"] = userEditPage;
 
             return View(clientCompanyApplicationUser);

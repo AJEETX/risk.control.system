@@ -12,7 +12,7 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-building"></i>  @Applicationsettings.CLIENT_COMPANY Profile</h3>
+                            <h3 class="card-title"><i class="fas fa-building"></i> Edit @Applicationsettings.CLIENT_COMPANY Profile</h3>
                         </div>
                         <div class="card-body">
                         </div>
@@ -96,7 +96,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="IFSCCode">Bank IFSC Code <i class="fa fa-asterisk" style="font-size:.4rem;color:red"></i></span>
                                             </div>
-                                            <input type="text" asp-for="IFSCCode" class="form-control asterikx" required placeholder="Bank IFSC Code" maxlength="5">
+                                            <input type="text" asp-for="IFSCCode" class="form-control asterikx" required placeholder="Bank IFSC Code" maxlength="20">
                                             <span asp-validation-for="IFSCCode" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -104,7 +104,7 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="documentImageId">Document Image</span>
+                                                <span class="input-group-text" id="documentImageId">Company Document</span>
                                             </div>
                                             @if (Model?.DocumentUrl is not null)
                                             {
