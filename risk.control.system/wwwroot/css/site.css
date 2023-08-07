@@ -426,3 +426,9 @@ input.title-name {
 :-ms-input-placeholder {
     text-transform: none;
 }
+dl.row {
+    box-shadow: 0 0 10px white, 0 1px 3px #ebebef;
+    background: linear-gradient(90deg, #ebebef, transparent);
+    border-radius: .5rem;
+    padding: 1.5rem;
+}
