@@ -275,6 +275,9 @@
                     $("#check-email").css('cursor', 'not-allowed');
                 }
             });
+            $('input#emailAddress').on('focus',function(){
+
+            });
         });
         function alphaOnly(event) {
             var key = event.keyCode;
@@ -339,6 +342,8 @@
                 $("#check-email").css('background-color', 'grey');
                 $("#check-email").css('cursor', 'not-allowed');
             }
+            $('#result').fadeOut(1000); // 1.5 seconds
+            $('#result').fadeOut('slow'); // 1.5 seconds
         }
     </script>
 }

@@ -98,6 +98,7 @@ namespace risk.control.system.Controllers.Api
                 new
                 {
                     claimId = c.ClaimsInvestigationId,
+                    claimType = c.ClaimType,
                     CustomerName = c.CustomerName,
                     CustomerEmail = email,
                     PolicyNumber = c.ContractNumber,
