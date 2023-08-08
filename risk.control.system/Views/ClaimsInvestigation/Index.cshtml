@@ -94,13 +94,15 @@
                                                     @{
                                                         if (item.CaseLocations.Count == 0)
                                                         {
-                                                            <span class="badge badge-danger">Add verification location</span>
+                                                            <span class="badge badge-danger"><img class="form-Image" src="/img/timer.gif" /> </span>
                                                         }
                                                     }
                                                     @{
                                                         foreach (var caseLocation in item.CaseLocations)
                                                         {
-                                                            <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus?.Name</span>
+                                                            <span class="badge badge-light">@caseLocation.PinCode.Code </span>
+                                                            <span class="badge badge-success"> @caseLocation.InvestigationCaseSubStatus?.Name
+                                                    </span>
                                                         }
                                                     }
                                                 </td>

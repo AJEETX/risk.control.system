@@ -231,10 +231,31 @@
                         <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open") @Url.MakeActiveClass("ClaimsVendor","Agent")">
                             <i class="fas fa-rupee-sign nav-icon"></i>
                             <p>
-                                <span class="badge badge-warning">ACTIVE</span>
+                                <span class="badge badge-warning">ACTIVE CLAIMS</span>
                             </p>
                         </a>
                     </li>
+
+                        <li class="nav-item">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsVendor","AgentLoad")">
+                                <i class="nav-icon fas fa-shield-alt"></i>
+                                <p class="sidebar-menu-header-label">
+                                    AGENTS - CLAIMS 
+                                    <i class="right fas fa-angle-right"></i>
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsVendor" asp-action="AgentLoad" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","AgentLoad")
+                            @Url.MakeActiveClass("ClaimsVendor","Agent")">
+                                <i class="fas fa-rupee-sign nav-icon"></i>
+                                <p>
+                                    <span class="badge badge-warning">AGENT WORKLOAD</span>
+                                </p>
+                            </a>
+                        </li>
+
                     }
                 }
                 @{
