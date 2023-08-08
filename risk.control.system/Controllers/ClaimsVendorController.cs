@@ -107,6 +107,8 @@ namespace risk.control.system.Controllers
 
             var claimsCaseToAllocateToVendorAgent = _context.ClaimsInvestigation
                 .Include(c => c.CaseLocations)
+                .Include(c => c.PinCode)
+                .Include(c => c.District)
                 .Include(c => c.Vendors)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
