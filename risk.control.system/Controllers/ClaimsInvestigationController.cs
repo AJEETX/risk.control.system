@@ -520,18 +520,23 @@ namespace risk.control.system.Controllers
                 .ThenInclude(v => v.PincodeServices)
                 .ToListAsync();
 
-            var claimsCases = _context.ClaimsInvestigation
-                .Include(c => c.Vendors)
-                .Include(c => c.CaseLocations);
-
-            var vendorCaseCount = new Dictionary<string, int>();
-
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var claimsCases = _context.ClaimsInvestigation
+                .Include(c => c.Vendors)
+                .Include(c => c.CaseLocations.Where(c =>
+                !string.IsNullOrWhiteSpace(c.VendorId) &&
+                (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                    c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                    c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
+                ));
+
+            var vendorCaseCount = new Dictionary<string, int>();
 
             int countOfCases = 0;
             foreach (var claimsCase in claimsCases)
@@ -1482,7 +1487,7 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    var existingClaim= await _context.ClaimsInvestigation.AsNoTracking().FirstOrDefaultAsync(c => 
+                    var existingClaim = await _context.ClaimsInvestigation.AsNoTracking().FirstOrDefaultAsync(c =>
                     c.ClaimsInvestigationId == id);
                     if (existingClaim.DocumentImage != null)
                     {
