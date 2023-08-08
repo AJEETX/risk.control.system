@@ -20,6 +20,7 @@ namespace risk.control.system.Controllers
     [Breadcrumb(" Claims")]
     public class ClaimsVendorController : Controller
     {
+        public List<UsersViewModel> UserList;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
@@ -41,6 +42,7 @@ namespace risk.control.system.Controllers
             this.mailboxService = mailboxService;
             this.toastNotification = toastNotification;
             this._context = context;
+            UserList = new List<UsersViewModel>();
         }
 
         [Breadcrumb(" Allocate To Agent")]
@@ -631,6 +633,57 @@ namespace risk.control.system.Controllers
             }
 
             return View(claimsSubmitted);
+        }
+
+        [Breadcrumb("Agent Workload")]
+        public async Task<IActionResult> AgentLoad()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var vendor = _context.Vendor
+                .Include(c => c.VendorApplicationUser)
+                .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+            var model = new VendorUsersViewModel
+            {
+                Vendor = vendor,
+            };
+            var users = vendor.VendorApplicationUser.AsQueryable();
+            foreach (var user in users)
+            {
+                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                var state = _context.State.FirstOrDefault(c => c.StateId == user.StateId);
+                var district = _context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
+                var pinCode = _context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
+
+                var thisViewModel = new UsersViewModel();
+                thisViewModel.UserId = user.Id.ToString();
+                thisViewModel.Email = user?.Email;
+                thisViewModel.UserName = user?.UserName;
+                thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? "/img/user.png";
+                thisViewModel.FirstName = user.FirstName;
+                thisViewModel.LastName = user.LastName;
+                thisViewModel.PhoneNumber = user.PhoneNumber;
+                thisViewModel.Addressline = user.Addressline;
+                thisViewModel.Country = country.Name;
+                thisViewModel.CountryId = user.CountryId;
+                thisViewModel.StateId = user.StateId;
+                thisViewModel.State = state.Name;
+                thisViewModel.PinCode = pinCode.Name;
+                thisViewModel.PinCodeId = pinCode.PinCodeId;
+                thisViewModel.VendorName = vendor.Name;
+                thisViewModel.VendorId = user.VendorId;
+                thisViewModel.ProfileImageInByte = user.ProfilePicture;
+                thisViewModel.Roles = await GetUserRoles(user);
+                UserList.Add(thisViewModel);
+            }
+            model.Users = UserList;
+            return View(model);
+        }
+
+        private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
+        {
+            return new List<string>(await userManager.GetRolesAsync(user));
         }
     }
 }
