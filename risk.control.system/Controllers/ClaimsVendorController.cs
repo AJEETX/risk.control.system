@@ -255,6 +255,8 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.LineOfBusiness)
+                .Include(c => c.District)
+                .Include(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.CurrentUserEmail == currentUserEmail);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -278,6 +280,8 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.LineOfBusiness)
+                .Include(c => c.District)
+                .Include(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var submittedToSupervisortStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
@@ -338,6 +342,8 @@ namespace risk.control.system.Controllers
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.District)
+                .Include(c => c.PinCode)
                 .Include(c => c.LineOfBusiness)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var submittedToSupervisortStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
