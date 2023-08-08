@@ -22,6 +22,81 @@
                                         @Html.DisplayFor(model => model.LineOfBusiness.Name)
                                     </dd>
                                     <dt class="col-sm-5">
+                                        Policy Type
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimType)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Policy #
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ContractNumber)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Issue Date
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ContractIssueDate)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Policy Document
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.DocumentImage is not null)
+                                        {
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                        }
+                                        else
+                                        {
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
+
+
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CostCentre)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CostCentre.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseEnabler)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseEnabler.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.Description)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.Description)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Status
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.InvestigationCaseStatus.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Customer Photo
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ProfilePicture is not null)
+                                        {
+                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                        }
+                                        else
+                                        {
+                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CustomerName)
                                     </dt>
                                     <dd class="col-sm-5">
@@ -34,23 +109,13 @@
                                         @Html.DisplayFor(model => model.CustomerDateOfBirth)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ContactNumber)
+                                        Phone #
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ContactNumber)
                                     </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ContractNumber)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ContractNumber)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ContractIssueDate)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ContractIssueDate)
-                                    </dd>
+
+
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Addressline)
                                     </dt>
@@ -82,36 +147,6 @@
                                         @Html.DisplayFor(model => model.PinCode.Code)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.InvestigationCaseStatus.Name)
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="col-md-6">
-                                <dl class="row">
-                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimType)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ClaimType)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        Claim Document
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @if (Model?.DocumentImage is not null)
-                                        {
-                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                    </dd>
-
-                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CustomerIncome)
                                     </dt>
                                     <dd class="col-sm-5">
@@ -136,46 +171,12 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CustomerType)
                                     </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CostCentre)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CostCentre.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseEnabler)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CaseEnabler.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Description)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Description)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        Customer Photo
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @if (Model?.ProfilePicture is not null)
-                                        {
-                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
-                                        }
-                                        else
-                                        {
-                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                    </dd>
                                 </dl>
-
                             </div>
                         </div>
                         @{
                             var locationAdded = Model.CaseLocations?.Count != null && Model.CaseLocations?.Count > 0;
-                        }
-                        @{
-                            if(!locationAdded)
+                            if (!locationAdded)
                             {
                                 <div class="row">
 
@@ -186,7 +187,7 @@
                                 </div>
                             }
                         }
-                        
+
                     </div>
                 </div>
             </div>
@@ -261,7 +262,7 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.PinCode.Code)
                                         </td>
-                                        
+
                                         <td>
                                             @*<a class="btn btn-xs btn-info" asp-controller="CaseLocations" asp-action="Details" asp-route-id="@item.CaseLocationId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;*@
                                             <a class="btn btn-xs btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@item.CaseLocationId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
@@ -296,7 +297,7 @@
                 <form asp-action="CaseReadyToAssign">
                     <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
                     @{
-                        if (Model.CaseLocations != null && Model.CaseLocations.Count > 0 )
+                        if (Model.CaseLocations != null && Model.CaseLocations.Count > 0)
                         {
                             <input type="hidden" asp-for="ClaimsInvestigationId" />
                             <span class="fas fa-thumbtack input-fa"></span>
@@ -308,9 +309,7 @@
                             <input disabled type="submit" value="Set Ready" class="btn btn-outline-danger" style="width:8rem" />
 
                         }
-
-                        }
-                    
+                    }
                 </form>
             </div>
         </div>

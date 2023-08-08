@@ -24,14 +24,14 @@
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerName)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.ContactNumber)
+                                        Phone #
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.ContactNumber)
                                     </dd>
 
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.PinCode)
+                                        PinCode
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.PinCode.Name)
@@ -44,7 +44,7 @@
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        Claim Document
+                                        Policy Document
                                     </dt>
                                     <dd class="col-sm-5">
                                         @if (Model?.ClaimsInvestigation.DocumentImage is not null)
@@ -96,10 +96,6 @@
 
                             </div>
                         </div>
-                    </div>
-                    <hr />
-                    <div class="card-body">
-
                         <div class="row">
                             <div class="col-md-6">
                                 <dl class="row">

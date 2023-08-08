@@ -15,228 +15,226 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.LineOfBusiness)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.LineOfBusiness.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerName)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerName)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDateOfBirth)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDateOfBirth)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.ContactNumber)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.ContactNumber)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.ContractNumber)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.ContractNumber)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.ContractIssueDate)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.ContractIssueDate)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Addressline)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Addressline)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.District)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.State)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.State.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Country)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Country.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.PinCode)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.PinCode.Code)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.InvestigationCaseStatus)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.InvestigationCaseStatus.Name)
-                                        </dd>
-                                    </dl>
-                                </div>
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.ClaimType)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.ClaimType)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            Claim Document
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @if (Model?.ClaimsInvestigation.DocumentImage is not null)
-                                            {
-                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.DocumentImage))">
-                                            }
-                                            else
-                                            {
-                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                        </dd>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.LineOfBusiness)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.LineOfBusiness.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Policy Type
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.ClaimType)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Policy #
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.ContractNumber)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Issue Date
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.ContractIssueDate)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Policy Document
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ClaimsInvestigation.DocumentImage is not null)
+                                        {
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.DocumentImage))">
+                                        }
+                                        else
+                                        {
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
 
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerIncome)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerIncome)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerOccupation)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerOccupation)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerEducation)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerEducation)
-                                        </dd>
 
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerType)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerType)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CostCentre)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CostCentre.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CaseEnabler)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CaseEnabler.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Description)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Description)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            Customer Photo
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @if (Model?.ClaimsInvestigation.ProfilePicture is not null)
-                                            {
-                                                <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.ProfilePicture))">
-                                            }
-                                            else
-                                            {
-                                                <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                        </dd>
-                                    </dl>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CostCentre)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.CostCentre.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CaseEnabler)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.CaseEnabler.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.Description)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.Description)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Status
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.InvestigationCaseStatus.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Customer Photo
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ClaimsInvestigation.ProfilePicture is not null)
+                                        {
+                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.ProfilePicture))">
+                                        }
+                                        else
+                                        {
+                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
 
-                                </div>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerName)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerName)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDateOfBirth)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDateOfBirth)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Phone #
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.ContactNumber)
+                                    </dd>
+
+
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.Addressline)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.Addressline)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.District)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.State)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.State.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.Country)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.Country.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.PinCode)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.PinCode.Code)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerIncome)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerIncome)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerOccupation)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerOccupation)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerEducation)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerEducation)
+                                    </dd>
+
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerType)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerType)
+                                    </dd>
+                                </dl>
+
                             </div>
                         </div>
-                        <hr />
-                        <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-5">
+                                        Beneficiary Photo
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.CaseLocation?.ProfilePicture is not null)
+                                        {
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CaseLocation?.ProfilePicture))">
+                                        }
+                                        else
+                                        {
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-5">
-                                            Beneficiary Photo
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @if (Model?.CaseLocation?.ProfilePicture is not null)
-                                            {
-                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CaseLocation?.ProfilePicture))">
-                                            }
-                                            else
-                                            {
-                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                        </dd>
-                                    </dl>
-                                </div>
-                                <div class="col-md-6">
-                                    <dl class="row">
-
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.Addressline)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.District.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.State.Name)
-                                        </dd>
-                                    </dl>
-                                </div>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.Addressline)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.District.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                    </dd>
+                                </dl>
                             </div>
                         </div>
                     </div>

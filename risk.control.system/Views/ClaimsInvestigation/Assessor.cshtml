@@ -18,31 +18,30 @@
                             <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                 <thead>
                                     <tr>
-                                        
                                         <th></th>
                                     <th>
-                                        Claim Document
+                                        Document
                                     </th>
                                     <th>
-                                        Customer Photo Document
+                                        Customer Photo
                                     </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                            LOB
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                           Status
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.CustomerName)
+                                            Customer Name
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.ContactNumber)
+                                            Phone #
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.ClaimType)
+                                            ClaimType
                                         </th>
                                         <th>
-                                            Location - SubStatus
+                                            Location - Status
                                         </th>
                                         <th>
                                                 Created Date
@@ -59,7 +58,6 @@
                                     var dateOnly = item.Created.ToString("dd-MM-yyyy");
 
                                         <tr>
-                                            
                                             <td>
                                                 <input id="@item.ClaimsInvestigationId" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
                                             </td>
@@ -102,7 +100,10 @@
                                                 @{
                                                     foreach (var caseLocation in item.CaseLocations)
                                                     {
-                                                        <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
+                                                    <span class="badge badge-light">@caseLocation.PinCode.Code</span> 
+                                                    <span class="badge badge-light">
+                                                        @caseLocation.InvestigationCaseSubStatus.Name
+                                                    </span>
                                                     }
                                                 }
                                             </td>

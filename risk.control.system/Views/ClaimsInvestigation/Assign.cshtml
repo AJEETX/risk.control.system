@@ -21,23 +21,23 @@
                                         <thead>
                                             <tr>
                                                 <th><input type="checkbox" id="checkall" /></th>
-                                                <th>Claim Document</th>
+                                                <th>Policy Document</th>
                                             <th>Customer Photo</th>
-
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.CustomerName)
+                                            </th>
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.LineOfBusiness)
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                                    Status
                                                 </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerName)
-                                                </th>
+                                                
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.ClaimType)
                                                 </th>
                                                 <th>
-                                                    Location-Status
+                                                    Location
                                                 </th>
                                             <th>
                                                 Created Date
@@ -78,14 +78,15 @@
                                                     }
                                                 </td>
                                                 <td>
+                                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                                </td>
+                                                <td>
                                                         @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
                                                     </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                                     </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerName)
-                                                    </td>
+                                                    
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.ClaimType)
                                                     </td>

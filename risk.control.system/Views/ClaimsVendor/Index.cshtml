@@ -20,23 +20,24 @@
                                             <tr>
                                                 <th></th>
                                                 <th style="display:@hasClientCompany">
-                                                    @Html.DisplayNameFor(model => model.ClientCompany)
+                                                    Company
                                                 </th>
                                             <th>
-                                                Claim Document
+                                                Policy Document
                                             </th>
                                             <th>
                                                 Customer Photo
+                                            </th>
+                                            <th>
+                                                @Html.DisplayNameFor(model => model.CustomerName)
                                             </th>
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.LineOfBusiness)
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                                    Status
                                                 </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerName)
-                                                </th>
+                                               
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.ClaimType)
                                                 </th>
@@ -83,15 +84,16 @@
                                                         <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                                     }
                                                 </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                                </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
                                                     </td>
                                                     <td>
                                                     <span class="badge badge-info"> @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)</span>
                                                     </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerName)
-                                                    </td>
+                                                   
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.ClaimType)
                                                     </td>

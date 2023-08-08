@@ -6,7 +6,6 @@
 }
 <section class="content pt-2">
     <div class="container-fluid">
-        
         <div class="row ">
             <div class="col-md-12">
                 <div class="card card-secondary">
@@ -24,16 +23,16 @@
                                                 Policy Document
                                             </th>
                                             <th>Customer Photo</th>
-
+                                            <th>
+                                                Customer Name
+                                            </th>
                                                 <th>
                                                     Line Of Business
                                                 </th>
                                                 <th>
                                                     Status
                                                 </th>
-                                                <th>
-                                                    Customer Name
-                                                </th>
+                                                
                                                 <th>
                                                     Claim Type
                                                 </th>
@@ -72,8 +71,11 @@
                                                     }
                                                     else
                                                     {
-                                                        <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                        <img id="profileImage" class="form-Image" src="/img//user.png">
                                                     }
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.CustomerName)
                                                 </td>
                                                 <td>
                                                         @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
@@ -81,9 +83,7 @@
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                                     </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerName)
-                                                    </td>
+                                                    
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.ClaimType)
                                                     </td>
@@ -124,9 +124,7 @@
                                                 </tr>
                                             }
                                         </tbody>
-
                                     </table>
-                                
                             </div>
                         </form>
                     </div>

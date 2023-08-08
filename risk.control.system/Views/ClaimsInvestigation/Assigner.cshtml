@@ -20,20 +20,20 @@
                                         <thead>
                                             <tr>
                                             <th></th>
-                                            <th>Claim Document</th>
+                                            <th>Policy Document</th>
                                             <th>Customer Photo</th>
-                                               
+                                            <th>
+                                                Customer Name
+                                            </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                                    Line Of Business
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
+                                                    Status
                                                 </th>
+                                                
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerName)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.ClaimType)
+                                                    ClaimType
                                                 </th>
                                             <th>
                                                 Location-Status
@@ -76,15 +76,16 @@
                                                     }
                                                 </td>
                                                 <td>
+                                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                                </td>
+                                                <td>
                                                     @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
                                                 </td>
                                                     
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                                     </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerName)
-                                                    </td>
+                                                    
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.ClaimType)
                                                     </td>

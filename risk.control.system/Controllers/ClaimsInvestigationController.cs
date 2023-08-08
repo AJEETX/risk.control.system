@@ -1480,7 +1480,16 @@ namespace risk.control.system.Controllers
                     await claimsInvestigation.Document.CopyToAsync(dataStream);
                     claimsInvestigation.DocumentImage = dataStream.ToArray();
                 }
-
+                else
+                {
+                    var existingClaim= await _context.ClaimsInvestigation.AsNoTracking().FirstOrDefaultAsync(c => 
+                    c.ClaimsInvestigationId == id);
+                    if (existingClaim.DocumentImage != null)
+                    {
+                        claimsInvestigation.DocumentImage = existingClaim.DocumentImage;
+                        claimsInvestigation.Document = existingClaim.Document;
+                    }
+                }
                 var customerDocument = Request.Form?.Files?.Skip(1).Take(1)?.FirstOrDefault();
                 if (customerDocument is not null)
                 {
@@ -1490,6 +1499,16 @@ namespace risk.control.system.Controllers
                     using var dataStream = new MemoryStream();
                     await claimsInvestigation.ProfileImage.CopyToAsync(dataStream);
                     claimsInvestigation.ProfilePicture = dataStream.ToArray();
+                }
+                else
+                {
+                    var existingClaim = await _context.ClaimsInvestigation.AsNoTracking().FirstOrDefaultAsync(c =>
+                    c.ClaimsInvestigationId == id);
+                    if (existingClaim.ProfilePictureUrl != null)
+                    {
+                        claimsInvestigation.ProfilePictureUrl = existingClaim.ProfilePictureUrl;
+                        claimsInvestigation.ProfilePicture = existingClaim.ProfilePicture;
+                    }
                 }
                 _context.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
