@@ -119,31 +119,31 @@
 
 
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.Addressline)
+                                        Address
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.Addressline)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.District)
+                                        District
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.State)
+                                        State
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.State.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.Country)
+                                        Country
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.Country.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.PinCode)
+                                        PinCode
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.PinCode.Code)
@@ -155,13 +155,13 @@
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerIncome)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerOccupation)
+                                        Occupation
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerOccupation)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerEducation)
+                                        Education
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerEducation)
@@ -199,8 +199,15 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
                                     </dd>
+
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryRelation)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryRelation.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Phone #
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
@@ -216,23 +223,30 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.Addressline)
                                     </dd>
+                                    
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
+                                        District
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.District.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
+                                        State
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Country
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.Country.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        PinCode
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
                                     </dd>
                                 </dl>
                             </div>
@@ -263,11 +277,11 @@
                                         </th>
 
                                         <th>
-                                            Vendor Name
+                                            Agency Name
                                         </th>
 
                                         <th>
-                                            PhoneNumber
+                                            Phone #
                                         </th>
                                         <th>
                                             Email
@@ -305,7 +319,7 @@
                                             @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)
                                             </td>
                                             <td>
-                                            @Html.DisplayFor(modelItem => item.Vendor.Email)
+                                                <a href="#"> @Html.DisplayFor(modelItem => item.Vendor.Email)</a>
                                             </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.CaseCount)

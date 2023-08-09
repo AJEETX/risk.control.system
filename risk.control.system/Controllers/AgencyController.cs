@@ -231,15 +231,17 @@ namespace risk.control.system.Controllers
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
+            {
+                toastNotification.AddSuccessToastMessage("User created successfully!");
                 return RedirectToAction(nameof(AgencyController.User), "Agency");
+            }
             else
             {
-                toastNotification.AddErrorToastMessage("Error to create user!");
                 foreach (IdentityError error in result.Errors)
                     ModelState.AddModelError("", error.Description);
             }
             GetCountryStateEdit(user);
-            toastNotification.AddSuccessToastMessage("User created successfully!");
+            toastNotification.AddErrorToastMessage("Error to create user!");
             return View(user);
         }
 

@@ -123,6 +123,12 @@
                                                 Benficiary Relation
                                             </th>
                                             <th>
+                                                Phone #
+                                            </th>
+                                            <th>
+                                                Date of Birth
+                                            </th>
+                                            <th>
                                                 Address
                                             </th>
                                             <th>
@@ -133,9 +139,11 @@
                                             </th>
 
                                             <th>
-                                                Verification Pincodes
+                                                Country
                                             </th>
-
+                                            <th>
+                                                Pincode
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -152,7 +160,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                        <img id="documentImage" class="form-Image" src="/img/user.png">
                                                     }
                                                 </td>
                                                 <td>
@@ -162,7 +170,13 @@
                                                     @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
                                                 </td>
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.Addressline)
+                                                    @Html.DisplayFor(modelItem => item.BeneficiaryContactNumber)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.BeneficiaryDateOfBirth)
+                                                </td>
+                                                <td>
+                                                    @item.Addressline @item.Addressline2
                                                 </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.District.Name)
@@ -172,9 +186,12 @@
                                                 </td>
 
                                                 <td>
+                                                    @Html.DisplayFor(modelItem => item.Country.Name)
+                                                </td>
+                                                <td>
                                                     @Html.DisplayFor(modelItem => item.PinCode.Code)
                                                 </td>
-
+                                               
 
                                             </tr>
                                         }

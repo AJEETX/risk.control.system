@@ -209,9 +209,11 @@
                                                 <th>
                                                     State
                                                 </th>
-
+                                            <th>
+                                                Country
+                                            </th>
                                                 <th>
-                                                    Verification Pincodes
+                                                    Pincode
                                                 </th>
 
                                             </tr>
@@ -249,7 +251,10 @@
                                                         @Html.DisplayFor(modelItem => item.State.Name)
                                                     </td>
 
-                                                    <td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Country.Name)
+                                                </td>
+                                                <td>
                                                         @Html.DisplayFor(modelItem => item.PinCode.Code)
                                                     </td>
 

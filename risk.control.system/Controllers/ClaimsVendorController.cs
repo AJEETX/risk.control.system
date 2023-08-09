@@ -102,15 +102,18 @@ namespace risk.control.system.Controllers
                 .Include(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.Vendor)
                 .Include(c => c.PinCode)
+                .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.District)
                 .Include(c => c.State)
-                .Include(c => c.State)
+                .Include(c => c.Country)
                 .FirstOrDefault(c => c.CaseLocationId == selectedcase && c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
 
             var claimsCaseToAllocateToVendorAgent = _context.ClaimsInvestigation
                 .Include(c => c.CaseLocations)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.Country)
                 .Include(c => c.Vendors)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
@@ -154,6 +157,50 @@ namespace risk.control.system.Controllers
                 VendorUserClaims = agents
             };
             return View(model);
+        }
+
+        [Breadcrumb("Agent Workload")]
+        public async Task<IActionResult> AgentLoad()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            List<VendorUserClaim> agents = new List<VendorUserClaim>();
+
+            var vendor = _context.Vendor
+                .Include(c => c.VendorApplicationUser)
+                .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+
+            var users = vendor.VendorApplicationUser.AsQueryable();
+            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+
+            foreach (var user in users)
+            {
+                var isAgent = await userManager.IsInRoleAsync(user, agentRole?.Name);
+                if (isAgent)
+                {
+                    int claimCount = 0;
+                    if (result.TryGetValue(user.Email, out claimCount))
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = user,
+                            CurrentCaseCount = claimCount,
+                        };
+                        agents.Add(agentData);
+                    }
+                    else
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = user,
+                            CurrentCaseCount = 0,
+                        };
+                        agents.Add(agentData);
+                    }
+                }
+            }
+            return View(agents);
         }
 
         [HttpPost]
@@ -212,7 +259,9 @@ namespace risk.control.system.Controllers
 
             if (vendorUser != null)
             {
-                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                applicationDbContext = applicationDbContext
+                    .Include(a => a.LineOfBusiness)
+                    .Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
             }
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
@@ -418,7 +467,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
-        [Breadcrumb(" Active")]
+        [Breadcrumb(" Active Claims")]
         public async Task<IActionResult> Open()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -633,52 +682,6 @@ namespace risk.control.system.Controllers
             }
 
             return View(claimsSubmitted);
-        }
-
-        [Breadcrumb("Agent Workload")]
-        public async Task<IActionResult> AgentLoad()
-        {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            var vendor = _context.Vendor
-                .Include(c => c.VendorApplicationUser)
-                .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-            var model = new VendorUsersViewModel
-            {
-                Vendor = vendor,
-            };
-            var users = vendor.VendorApplicationUser.AsQueryable();
-            foreach (var user in users)
-            {
-                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                var state = _context.State.FirstOrDefault(c => c.StateId == user.StateId);
-                var district = _context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
-                var pinCode = _context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
-
-                var thisViewModel = new UsersViewModel();
-                thisViewModel.UserId = user.Id.ToString();
-                thisViewModel.Email = user?.Email;
-                thisViewModel.UserName = user?.UserName;
-                thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? "/img/user.png";
-                thisViewModel.FirstName = user.FirstName;
-                thisViewModel.LastName = user.LastName;
-                thisViewModel.PhoneNumber = user.PhoneNumber;
-                thisViewModel.Addressline = user.Addressline;
-                thisViewModel.Country = country.Name;
-                thisViewModel.CountryId = user.CountryId;
-                thisViewModel.StateId = user.StateId;
-                thisViewModel.State = state.Name;
-                thisViewModel.PinCode = pinCode.Name;
-                thisViewModel.PinCodeId = pinCode.PinCodeId;
-                thisViewModel.VendorName = vendor.Name;
-                thisViewModel.VendorId = user.VendorId;
-                thisViewModel.ProfileImageInByte = user.ProfilePicture;
-                thisViewModel.Roles = await GetUserRoles(user);
-                UserList.Add(thisViewModel);
-            }
-            model.Users = UserList;
-            return View(model);
         }
 
         private async Task<List<string>> GetUserRoles(VendorApplicationUser user)

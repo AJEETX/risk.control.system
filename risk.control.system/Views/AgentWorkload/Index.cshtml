@@ -33,11 +33,15 @@
                                     <th>
                                         Address
                                     </th>
+                                    
                                     <th>
-                                        Pincode
+                                        District
                                     </th>
                                     <th>State</th>
                                     <th>Country</th>
+                                    <th>
+                                        Pincode
+                                    </th>
                                     <th>
                                         Current Claims
                                     </th>
@@ -68,15 +72,16 @@
                                             @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
                                         </td>
                                         <td>@item.AgencyUser.Addressline</td>
-                                        <td>@item.AgencyUser.PinCode.Code</td>
                                         <td>@item.AgencyUser.State.Name</td>
                                         <td>@item.AgencyUser.Country.Name</td>
+                                        <td>@item.AgencyUser.PinCode.Code</td>
+
                                         <td>
                                             @Html.DisplayFor(modelItem => item.CurrentCaseCount)
                                         </td>
 
                                         <td>
-                                             <a class="btn btn-xs btn-info" asp-controller="Company" asp-action="EditUser" asp-route-userId="@item.AgencyUser.Id">
+                                            <a class="btn btn-xs btn-info" asp-controller="AgentWorkload" asp-action="Open" asp-route-email="@item.AgencyUser.Email">
                                                 <i class="fas fa-search"></i> Details
                                             </a>
                                         </td>

@@ -109,7 +109,7 @@
                                         }
                                         else
                                         {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            <img id="documentImage" class="form-Image" src="/img/user.png">
                                         }
                                     </dd>
                                     <dt class="col-sm-5">
@@ -119,10 +119,16 @@
                                         @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                        Phone #
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Beneficiary Relation
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.BeneficiaryRelation.Name)
                                     </dd>
                                 </dl>
                             </div>
@@ -136,22 +142,29 @@
                                         @Html.DisplayFor(model => model.CaseLocation.Addressline)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                    </dd>
-                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.District.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseLocation.State.Name)
+                                        State
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Country
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.CaseLocation.Country.Name)
+                                    </dd>
+
+                                    <dt class="col-sm-5">
+                                        PinCode
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
                                     </dd>
                                 </dl>
                             </div>
@@ -180,16 +193,28 @@
                                             Agent Photo
                                         </th>
                                         <th>
-                                            First Name
+                                            Agent Name
                                         </th>
                                         <th>
-                                            Last Name
-                                        </th>
-                                        <th>
-                                            PhoneNumber
+                                            Phone #
                                         </th>
                                         <th>
                                             Email
+                                        </th>
+                                        <th>
+                                            Address
+                                        </th>
+                                        <th>
+                                            District
+                                        </th>
+                                        <th>
+                                            State
+                                        </th>
+                                        <th>
+                                            Country
+                                        </th>
+                                        <th>
+                                            Pincode
                                         </th>
                                         <th>
                                             Current Claims
@@ -210,20 +235,33 @@
                                                 }
                                                 else
                                                 {
-                                                    <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                    <img id="documentImage" class="form-Image" src="/img//user.png">
                                                 }
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.AgencyUser.FirstName)
+                                                @item.AgencyUser.FirstName @item.AgencyUser.LastName
                                             </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.AgencyUser.LastName)
-                                            </td>
+                                            
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.AgencyUser.Email)
+                                                <a href="#">  @Html.DisplayFor(modelItem => item.AgencyUser.Email)</a>
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.Addressline)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.District.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.State.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.Country.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.AgencyUser.PinCode.Code)
                                             </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.CurrentCaseCount)
