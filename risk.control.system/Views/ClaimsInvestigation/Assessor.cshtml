@@ -25,18 +25,19 @@
                                     <th>
                                         Customer Photo
                                     </th>
+                                    <th>
+                                        Customer Name
+                                    </th>
+                                    <th>
+                                        Phone #
+                                    </th>
                                         <th>
                                             LOB
                                         </th>
                                         <th>
                                            Status
                                         </th>
-                                        <th>
-                                            Customer Name
-                                        </th>
-                                        <th>
-                                            Phone #
-                                        </th>
+                                        
                                         <th>
                                             ClaimType
                                         </th>
@@ -44,10 +45,10 @@
                                             Location - Status
                                         </th>
                                         <th>
-                                                Created Date
+                                                Created on
                                             </th>
                                             <th>
-                                                Waiting days
+                                        Day(s)<span class="badge badge-danger"> <i class="fa fa-asterisk" title="Waiting days"></i></span>
                                             </th>
                                     </tr>
                                 </thead>
@@ -78,8 +79,14 @@
                                             }
                                             else
                                             {
-                                                <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                <img id="profileImage" class="form-Image" src="/img//user.png">
                                             }
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.CustomerName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ContactNumber)
                                         </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
@@ -87,12 +94,7 @@
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                             </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.CustomerName)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.ContactNumber)
-                                            </td>
+                                            
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.ClaimType)
                                             </td>

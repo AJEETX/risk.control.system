@@ -47,13 +47,14 @@
                                         Phone
                                     </th>
                                     <th>
-                                        Addresline
+                                        Address
                                     </th>
+                                    
+                                    <th>State</th>
+                                    <th>Country</th>
                                     <th>
                                         Pincode
                                     </th>
-                                    <th>State</th>
-                                    <th>Country</th>
                                     <th>Roles</th>
                                     <th>Code</th>
                                     <th>Action</th>
@@ -70,9 +71,9 @@
                                         <td>@user.FirstName @user.LastName</td>
                                         <td>@user.PhoneNumber</td>
                                         <td>@user.Addressline</td>
-                                        <td>@user.PinCode</td>
                                         <td>@user.State</td>
                                         <td>@user.Country</td>
+                                        <td>@user.PinCode</td>
                                         <td>
                                             @if (user.Roles.Count() == 0)
                                             {

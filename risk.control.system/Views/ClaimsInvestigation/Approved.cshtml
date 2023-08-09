@@ -14,38 +14,50 @@
             <div class="card-body">
                 <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
                     <div class="col-md-12">
-                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                <thead>
+                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Document
+                                    </th>
+                                    <th>
+                                        Customer Photo
+                                    </th>
+                                    <th>
+                                        Customer Name
+                                    </th>
+                                    <th>
+                                        Phone #
+                                    </th>
+                                    <th>
+                                        LOB
+                                    </th>
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        ClaimType
+                                    </th>
+                                    <th>
+                                        Location - Status
+                                    </th>
+                                    <th>
+                                        Created on
+                                    </th>
+                                    <th>
+                                        Day(s)<span class="badge badge-danger"> <i class="fa fa-asterisk" title="Waiting days"></i></span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    var timePending = DateTime.Now.Subtract(item.Updated.Value).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Updated.Value).Days.ToString();
+                                    var dateOnly = item.Created.ToString("dd-MM-yyyy");
+
                                     <tr>
-                                        
-                                    <th>
-                                        Claim Document
-                                    </th>
-                                    <th>
-                                        Customer Photo Document
-                                    </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.LineOfBusiness)
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.CustomerName)
-                                        </th>
-                                        <th>
-                                            @Html.DisplayNameFor(model => model.ClaimType)
-                                        </th>
-                                        <th>
-                                            Location - SubStatus
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model)
-                                    {
-                                        <tr>
-                                           
+                                       
                                         <td>
                                             @if (item?.DocumentImage is not null)
                                             {
@@ -63,33 +75,47 @@
                                             }
                                             else
                                             {
-                                                <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                <img id="profileImage" class="form-Image" src="/img//user.png">
                                             }
                                         </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.CustomerName)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.ClaimType)
-                                            </td>
-                                            <td>
-                                                @{
-                                                    foreach (var caseLocation in item.CaseLocations)
-                                                    {
-                                                        <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
-                                                    }
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.CustomerName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ContactNumber)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ClaimType)
+                                        </td>
+                                        <td>
+                                            @{
+                                                foreach (var caseLocation in item.CaseLocations)
+                                                {
+                                                    <span class="badge badge-light">@caseLocation.PinCode.Code</span>
+                                                    <span class="badge badge-light">
+                                                        @caseLocation.InvestigationCaseSubStatus.Name
+                                                    </span>
                                                 }
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                                            }
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => dateOnly)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => timePending )
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
                     </div>
                 </form>
             </div>

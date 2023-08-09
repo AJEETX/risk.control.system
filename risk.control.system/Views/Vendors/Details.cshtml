@@ -64,35 +64,25 @@
                                         line of business
                                     </dt>
                                     <dd class="col-sm-8">
-                                        @foreach (var service in Model.VendorInvestigationServiceTypes)
+                                        @if(Model.VendorInvestigationServiceTypes.Count > 0)
                                         {
-                                            <span class="badge badge-light">@service.LineOfBusiness.Name</span> <span class="badge badge-light">@service.Price</span>
-                                            foreach (var pincode in service.PincodeServices)
+                                            @foreach (var service in Model.VendorInvestigationServiceTypes)
                                             {
-                                                <span class="badge badge-light">@pincode.Pincode : @pincode.Name</span>
+                                                <span class="badge badge-light">@service.LineOfBusiness.Name</span> <span class="badge badge-light">@service.Price</span>
+                                                foreach (var pincode in service.PincodeServices)
+                                                {
+                                                    <span class="badge badge-light">@pincode.Pincode : @pincode.Name</span>
+                                                }
                                             }
                                         }
+                                        else
+                                        {
+                                        <span class="badge badge-danger">No service added</span>
+                                        }
+                                        
                                     </dd>
 
-                                    <dt class="col-sm-3">
-                                        Prices
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @foreach (var service in Model.VendorInvestigationServiceTypes)
-                                        {
-                                            <span class="badge badge-light">@service.Price</span>
-                                        }
-                                    </dd>
-
-                                    <dt class="col-sm-3">
-                                        Services
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @foreach (var service in Model.VendorInvestigationServiceTypes)
-                                        {
-                                            <span class="badge badge-light">@service.LineOfBusiness.Name</span>
-                                        }
-                                    </dd>
+                                   
                                 </dl>
                             </div>
                             <div class="col-md-6">

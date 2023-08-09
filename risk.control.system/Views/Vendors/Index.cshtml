@@ -29,14 +29,18 @@
                                 Code
                             </th>
                             <th>
-                                Phone Number
+                                Phone #
                             </th>
                             
                             <th>
-                                Address line
+                                Address
                             </th>
                             <th>
                                 State
+                            </th>
+
+                            <th>
+                                Country
                             </th>
                             <th></th>
                         </tr>
@@ -74,6 +78,9 @@
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.State.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Country.Name)
                                 </td>
                                 <td>
                                     <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.VendorId">
