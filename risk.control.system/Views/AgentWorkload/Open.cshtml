@@ -141,6 +141,7 @@
                                             <th>
                                                 Waiting days
                                             </th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -198,6 +199,11 @@
                                                 </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => timePending )
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
+                                                        <i class="fa fa-search"></i> @Applicationsettings.DETAILS
+                                                    </a>
                                                 </td>
                                             </tr>
                                         }

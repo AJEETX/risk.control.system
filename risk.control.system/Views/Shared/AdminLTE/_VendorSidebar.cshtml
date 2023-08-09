@@ -240,7 +240,7 @@
                             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("AgentWorkload","")">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
-                                    AGENTS - CLAIMS 
+                                    AGENTS 
                                     <i class="right fas fa-angle-right"></i>
                                 </p>
                             </a>
@@ -248,7 +248,7 @@
 
                         <li class="nav-item">
                             <a is-active-page asp-controller="AgentWorkload" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("AgentWorkload","Index")
-                                @Url.MakeActiveClass("AgentWorkload","Open")">
+                                    @Url.MakeActiveClass("AgentWorkload","Open") @Url.MakeActiveClass("AgentWorkload","Details")">
                                 <i class="fas fa-rupee-sign nav-icon"></i>
                                 <p>
                                     <span class="badge badge-warning">AGENT WORKLOAD</span>

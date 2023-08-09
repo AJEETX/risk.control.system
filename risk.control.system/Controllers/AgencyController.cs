@@ -9,6 +9,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -22,6 +23,7 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly IDashboardService dashboardService;
         private readonly IToastNotification toastNotification;
         private readonly IWebHostEnvironment webHostEnvironment;
 
@@ -29,12 +31,14 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
+            IDashboardService dashboardService,
             IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             this.signInManager = signInManager;
             this.userManager = userManager;
             this.roleManager = roleManager;
+            this.dashboardService = dashboardService;
             this.toastNotification = toastNotification;
             this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
@@ -665,6 +669,57 @@ namespace risk.control.system.Controllers
             }
 
             return View(vendorInvestigationServiceType);
+        }
+
+        [Breadcrumb("Agent Load", FromAction = "User")]
+        public async Task<IActionResult> AgentLoad()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            List<VendorUserClaim> agents = new List<VendorUserClaim>();
+
+            var vendor = _context.Vendor
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.PinCode)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.State)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.District)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.Country)
+                .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+
+            var users = vendor.VendorApplicationUser.AsQueryable();
+            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+
+            foreach (var user in users)
+            {
+                var isAgent = await userManager.IsInRoleAsync(user, agentRole?.Name);
+                if (isAgent)
+                {
+                    int claimCount = 0;
+                    if (result.TryGetValue(user.Email, out claimCount))
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = user,
+                            CurrentCaseCount = claimCount,
+                        };
+                        agents.Add(agentData);
+                    }
+                    else
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = user,
+                            CurrentCaseCount = 0,
+                        };
+                        agents.Add(agentData);
+                    }
+                }
+            }
+            return View(agents);
         }
 
         private bool VendorInvestigationServiceTypeExists(string id)

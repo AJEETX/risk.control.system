@@ -111,6 +111,13 @@
                                             }
                                         </td>
                                         <td>
+                                            @*@if (user.Roles.Contains(AppRoles.Agent.ToString()))
+                                            {
+                                                <a class="btn btn-xs btn-info" asp-controller="Agency" asp-action="Agentload">
+                                                    <i class="fas fa-lightbulb"></i> Workload
+                                                </a>
+                                            }
+*@
                                             <a class="btn btn-xs btn-warning" asp-controller="Agency" asp-action="EditUser" asp-route-userId="@user.UserId">
                                                 <i class="fas fa-pen"></i> @Applicationsettings.EDIT
                                             </a>&nbsp;
