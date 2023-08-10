@@ -158,7 +158,12 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Ready to Assign", FromAction = "Index")]
-        public async Task<IActionResult> Assign()
+        public IActionResult Assign()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> GetAssign()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
@@ -222,42 +227,28 @@ namespace risk.control.system.Controllers
                         }
                     }
                 }
-                return View(claimsAssigned);
-            }
-            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
-
-                var claimsAssigned = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
-                        && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
+                var response = claimsAssigned
+                    .Select(a => new
                     {
-                        claimsAssigned.Add(item);
-                    }
-                }
-                return View(claimsAssigned);
-            }
-            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+                        Id = a.ClaimsInvestigationId,
+                        SelectedToAssign = false,
+                        Document = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)),
+                        Customer = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)),
+                        Name = a.CustomerName,
+                        Policy = a.LineOfBusiness.Name,
+                        Status = a.InvestigationCaseStatus.Name,
+                        ServiceType = a.ClaimType.GetEnumDisplayName(),
+                        Location = a.CaseLocations.Count == 0 ?
+                        "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                        Created = a.Created.ToString("dd-MM-yyyy"),
+                        timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
+                    })
+                    .ToList();
 
-                var claimsSubmitted = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsSubmitted.Add(item);
-                    }
-                }
-                return View("Assessor", claimsSubmitted);
+                return Json(response);
             }
-            return View(await applicationDbContext.ToListAsync());
+            return Json(null);
         }
 
         [Breadcrumb(" Assess", FromAction = "Index")]
