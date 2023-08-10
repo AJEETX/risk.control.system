@@ -4,15 +4,20 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
+using Humanizer.Bytes;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+using Newtonsoft.Json;
+
 using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -420,9 +425,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation
-
-        [Breadcrumb(" Incomplete Claims", FromAction = "Index")]
-        public async Task<IActionResult> Incomplete()
+        public async Task<JsonResult> GetIncomplete()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
@@ -473,10 +476,35 @@ namespace risk.control.system.Controllers
             if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !a.IsReady2Assign);
-                return View(await applicationDbContext.ToListAsync());
+
+                var response = await applicationDbContext
+                    .Select(a => new
+                    {
+                        Id = a.ClaimsInvestigationId,
+                        Document = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)),
+                        Customer = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)),
+                        Name = a.CustomerName,
+                        Policy = a.LineOfBusiness.Name,
+                        Status = a.InvestigationCaseStatus.Name,
+                        ServiceType = a.ClaimType.GetEnumDisplayName(),
+                        Location = a.CaseLocations.Count == 0 ?
+                        "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                        Created = a.Created.ToString("dd-MM-yyyy"),
+                        timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
+                    })
+                    .ToListAsync();
+
+                return Json(response);
             }
 
-            return View(await applicationDbContext.ToListAsync());
+            return Json(await applicationDbContext.ToListAsync());
+        }
+
+        [Breadcrumb(" Incomplete Claims", FromAction = "Index")]
+        public async Task<IActionResult> Incomplete()
+        {
+            return View();
         }
 
         [HttpGet]

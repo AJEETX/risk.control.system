@@ -1,11 +1,9 @@
-﻿@using risk.control.system.AppConstant;
-@using risk.control.system.Models.ViewModel;
-@model VendorUsersViewModel
-
-@{
+﻿@{
     ViewData["Title"] = @Applicationsettings.USER;
 }
+<style>
 
+</style>
 <section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
@@ -13,124 +11,93 @@
                 <div class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-user-friends"></i> Manage Users</h3>
-                    </div>
-                    <div class="card-body">
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        </div>                    
+                        <div class="card-body">
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
-                                    <th></th>
-                                    <th>
-                                        Email
-                                    </th>
-                                    <th>
-                                        Name
-                                    </th>
-
-                                    <th>
-                                        Phone
-                                    </th>
-                                    <th>
-                                        Addresline
-                                    </th>
-                                    <th>
-                                        Pincode
-                                    </th>
+                                    <th>Id</th>
+                                    <th>Photo</th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Addressline</th>
+                                    <th>District</th>
                                     <th>State</th>
                                     <th>Country</th>
-                                    <th>Roles</th>
-                                    <th>Code</th>
-                                    <th>Action</th>
+                                    <th></th>
+                                                                   
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach (var user in Model.Users)
-                                {
-                                    <tr>
-                                        <td>
-                                            <img src="@user?.ProfileImage" height="30" alt="No image" />
-                                        </td>
-                                        <td style="width: 10%;"><a href=""> @user.Email</a></td>
-                                        <td>@user.FirstName @user.LastName</td>
-                                        <td>@user.PhoneNumber</td>
-                                        <td>@user.Addressline</td>
-                                        <td>@user.PinCode</td>
-                                        <td>@user.State</td>
-                                        <td>@user.Country</td>
-                                        <td>
-                                            @if (user.Roles.Count() == 0)
-                                            {
-                                                <span class="badge badge-danger">No role Added</span>
-                                            }
-                                            else
-                                            {
-                                                @foreach (var role in user.Roles)
-                                                {
-                                                    <span class="badge badge-light">@role</span>
-                                                }
-                                            }
-                                        </td>
-                                        <td>
-                                            @{
-                                                if (user.Roles.Contains(AppRoles.PortalAdmin.ToString()))
-                                                {
-                                                    <span class="badge badge-light">PA</span>
-                                                }
-                                                else if (user.Roles.Contains(AppRoles.CompanyAdmin.ToString()))
-                                                {
-                                                    <span class="badge badge-light">CA</span>
-                                                }
-                                                else if (user.Roles.Contains(AppRoles.Creator.ToString()))
-                                                {
-                                                    <span class="badge badge-warning">CC</span>
-                                                }
-                                                else if (user.Roles.Contains(AppRoles.Assigner.ToString()))
-                                                {
-                                                    <span class="badge badge-info">CS</span>
-                                                }
-                                                else if (user.Roles.Contains(AppRoles.Assessor.ToString()))
-                                                {
-                                                    <span class="badge badge-success">CAS</span>
-                                                }
-                                                else if (user.Roles.Contains(AppRoles.AgencyAdmin.ToString()))
-                                                {
-                                                    <span class="badge badge-danger">VA</span>
-                                                }
-                                                else if (user.Roles.Contains(AppRoles.Supervisor.ToString()))
-                                                {
-                                                    <span class="badge badge-warning">VS</span>
-                                                }
-                                                else if (user.Roles.Contains(AppRoles.Agent.ToString()))
-                                                {
-                                                    <span class="badge badge-success">VA</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge badge-light">...</span>
-                                                }
+                            <tfoot>
+                                <tr>
 
-                                            }
-                                        </td>
-                                        <td>
-                                            @*@if (user.Roles.Contains(AppRoles.Agent.ToString()))
-                                            {
-                                                <a class="btn btn-xs btn-info" asp-controller="Agency" asp-action="Agentload">
-                                                    <i class="fas fa-lightbulb"></i> Workload
-                                                </a>
-                                            }
-*@
-                                            <a class="btn btn-xs btn-warning" asp-controller="Agency" asp-action="EditUser" asp-route-userId="@user.UserId">
-                                                <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                            </a>&nbsp;
-                                            <a class="btn btn-xs btn-info" asp-controller="Agency" asp-action="UserRoles"
-                                           asp-route-userId="@user.UserId"><i class="fas fa-pen"></i> @Applicationsettings.ROLE</a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
+                                    <th>Id</th>
+                                    <th>Photo</th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Addressline</th>
+                                    <th>District</th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
                         </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </div>               
+                </div>           
+            </div>       
+        </div>   
     </div>
 </section>
+@section Scripts    {
+        <script>
+            $(document).ready(function () {
+                $("#customerTable").DataTable({
+                    ajax: { 
+                        url: '/Agency/AllUsers', 
+                        dataSrc: '' 
+                    },
+                    fixedHeader: true,
+                    processing: true, 
+                    paging: true,
+                    language: { loadingRecords: '&nbsp;', 
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>' }, 
+                    columns: [
+                        /* Name of the keys from
+                        data file source */
+                    {
+                        "data": "id", "name": "Id", "bVisible": false
+                    },
+                    {
+                            "sDefaultContent": "",
+                            "bSortable": false,
+                            "mRender": function (data, type, row) {
+                                var img = '<img src="' + row.photo + '" src height="30" width="30" />';
+                                return img;
+                            }
+                        },
+                    { "data": "email" },
+                    { "data": "name" },
+                    { "data": "phone" },
+                    { "data": "addressline" },
+                    { "data": "district" },
+                    { "data": "state" },
+                    { "data": "country" },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var buttons = "";
+                            buttons += '<a href="/Agency/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                            buttons += '<a href="/Agency/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
+                            return buttons;
+                        }
+                    }
+                ], 
+                    error: function (xhr, status, error) { alert('err ' + error) }
+                });
+            });
+            </script>
+}

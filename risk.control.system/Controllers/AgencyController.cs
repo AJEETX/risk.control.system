@@ -155,50 +155,48 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb("Manage Users ")]
-        public async Task<IActionResult> User()
+        public async Task<JsonResult> AllUsers()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var vendor = _context.Vendor
                 .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.District)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.State)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.Country)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.PinCode)
                 .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-            var model = new VendorUsersViewModel
-            {
-                Vendor = vendor,
-            };
-            var users = vendor.VendorApplicationUser.AsQueryable();
-            foreach (var user in users)
-            {
-                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                var state = _context.State.FirstOrDefault(c => c.StateId == user.StateId);
-                var district = _context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
-                var pinCode = _context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
 
-                var thisViewModel = new UsersViewModel();
-                thisViewModel.UserId = user.Id.ToString();
-                thisViewModel.Email = user?.Email;
-                thisViewModel.UserName = user?.UserName;
-                thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
-                thisViewModel.FirstName = user.FirstName;
-                thisViewModel.LastName = user.LastName;
-                thisViewModel.PhoneNumber = user.PhoneNumber;
-                thisViewModel.Addressline = user.Addressline;
-                thisViewModel.Country = country.Name;
-                thisViewModel.CountryId = user.CountryId;
-                thisViewModel.StateId = user.StateId;
-                thisViewModel.State = state.Name;
-                thisViewModel.PinCode = pinCode.Name;
-                thisViewModel.PinCodeId = pinCode.PinCodeId;
-                thisViewModel.VendorName = vendor.Name;
-                thisViewModel.VendorId = user.VendorId;
-                thisViewModel.ProfileImageInByte = user.ProfilePicture;
-                thisViewModel.Roles = await GetUserRoles(user);
-                UserList.Add(thisViewModel);
-            }
-            model.Users = UserList;
-            return View(model);
+            var users = vendor.VendorApplicationUser.AsQueryable();
+            var result =
+                users.Select(u =>
+                new
+                {
+                    Id = u.Id,
+                    Name = u.FirstName + u.LastName,
+                    Email = "<a href=''>" + u.Email + "</a>",
+                    Phone = u.PhoneNumber,
+                    Photo = u.ProfilePictureUrl,
+                    Addressline = u.Addressline,
+                    District = u.District.Name,
+                    State = u.State.Name,
+                    Country = u.Country.Name
+                });
+            await Task.Delay(1000);
+
+            return Json(result.ToArray());
+        }
+
+        [Breadcrumb("Manage Users ")]
+        public async Task<IActionResult> User()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            return View();
         }
 
         [Breadcrumb("Add User", FromAction = "User")]

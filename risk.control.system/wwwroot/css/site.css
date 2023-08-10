@@ -281,6 +281,7 @@ textarea {
 #table-header {
     background-color: white !important;
 }
+
 .empty-table-message {
     text-align: center;
 }
@@ -440,8 +441,34 @@ dl.row {
         background: linear-gradient(0deg, #ebebef, transparent);
         border-radius: .5rem;
     }
+
 .asterik-style {
     font-size: .4rem;
     color: red;
     padding-bottom: 1rem;
+}
+
+div. {
+    min-height: 70vh;
+}
+
+div.fg-toolbar.ui-toolbar.ui-corner-tl {
+    position: inherit;
+}
+
+div.fg-toolbar.ui-toolbar.ui-corner-bl {
+    position: absolute;
+    bottom: 0;
+    width: 100%
+}
+
+div.dataTables_paginate {
+    position: relative;
+    float: right;
+}
+
+footer {
+    position: fixed;
+    bottom: 10;
+    width: 100%;
 }
