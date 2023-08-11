@@ -176,73 +176,15 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Allocate", FromAction = "Active")]
-        public async Task<IActionResult> Assigner()
+        public IActionResult Assigner()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-
-            ViewBag.HasClientCompany = true;
-            ViewBag.HasVendorCompany = true;
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (companyUser == null && vendorUser == null)
-            {
-                ViewBag.HasClientCompany = false;
-                ViewBag.HasVendorCompany = false;
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
-            }
-            else if (companyUser != null && vendorUser == null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
-                ViewBag.HasVendorCompany = false;
-            }
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
-
-            var claimsAssigned = new List<ClaimsInvestigation>();
-
-            foreach (var item in applicationDbContext)
-            {
-                item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
-                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
-                if (item.CaseLocations.Any())
-                {
-                    claimsAssigned.Add(item);
-                }
-            }
-            return View(claimsAssigned);
+            return View();
         }
 
         // GET: ClaimsInvestigation
 
         [Breadcrumb(" Incomplete Claims", FromAction = "Active")]
-        public async Task<IActionResult> Incomplete()
+        public IActionResult Incomplete()
         {
             return View();
         }
