@@ -25,7 +25,7 @@
                                     <th>District</th>
                                     <th>State</th>
                                     <th>Country</th>
-                                    <th></th>
+                                    <th>Actions</th>
                                                                    
                                 </tr>
                             </thead>
@@ -41,7 +41,7 @@
                                     <th>District</th>
                                     <th>State</th>
                                     <th>Country</th>
-                                    <th></th>
+                                    <th>Actions</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -56,7 +56,7 @@
             $(document).ready(function () {
                 $("#customerTable").DataTable({
                     ajax: { 
-                        url: '/Agency/AllUsers', 
+                        url: '/api/Agency/AllUsers', 
                         dataSrc: '' 
                     },
                     fixedHeader: true,

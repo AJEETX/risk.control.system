@@ -1,8 +1,5 @@
-﻿@model IEnumerable<risk.control.system.Models.ClaimsInvestigation>
-
-@{
+﻿@{
     ViewData["Title"] = "Claim: Active ";
-    var hasClientCompany = @ViewBag.HasClientCompany ? "none" : "";
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -10,117 +7,47 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-list"></i>  Active Claims</h3>
+                        <h3 class="card-title"><i class="fas fa-list"></i>  Claims</h3>
                     </div>
                     <div class="card-body">
                         <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
                             <div class="col-md-12">
-                               
-                                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                        <thead>
-                                            <tr>
+
+                                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                    <thead>
+                                        <tr>
+
+                                            <th>Id</th>
+                                            <th>
+                                                Policy Document
+                                            </th>
+                                            <th>Customer Photo</th>
+                                            <th>
+                                                Customer Name
+                                            </th>
+                                            <th>
+                                                Line Of Business
+                                            </th>
+                                            <th>
+                                                Status
+                                            </th>
 
                                             <th>
-                                                Claim Document
+                                                Claim Type
                                             </th>
                                             <th>
-                                                Customer Photo Document
-                                            </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.LineOfBusiness)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerName)
-                                                </th>
-                                                <th>
-                                                    @Html.DisplayNameFor(model => model.ClaimType)
-                                                </th>
-                                            <th>
-                                                Location-Status
+                                                Location
                                             </th>
                                             <th>
-                                                Created Date
+                                                Created On
                                             </th>
                                             <th>
-                                                Active days
+                                                Day(s) <i class="fa fa-asterisk" style="color:red;font-size:12px" title="Days since Active"></i>
                                             </th>
-                                            <th>
-                                                
-                                            </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var item in Model)
-                                            {
-                                                var timePending = DateTime.Now.Subtract(item.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Created).Days.ToString();
-                                                var dateOnly = item.Created.ToString("dd-MM-yyyy");
-
-                                                <tr>
-
-                                                <td>
-                                                    @if (item?.DocumentImage is not null)
-                                                    {
-                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
-                                                    }
-                                                    else
-                                                    {
-                                                        <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                                    }
-                                                </td>
-                                                <td>
-                                                    @if (item?.ProfilePicture is not null)
-                                                    {
-                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
-                                                    }
-                                                    else
-                                                    {
-                                                        <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                                    }
-                                                </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerName)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.ClaimType)
-                                                    </td>
-                                                    <td>
-                                                        @{
-                                                            if (item.CaseLocations.Count == 0)
-                                                            {
-                                                                <span class="badge badge-danger">Add verification location</span>
-                                                            }
-                                                        }
-                                                        @{
-                                                            foreach (var caseLocation in item.CaseLocations)
-                                                            {
-                                                                <span class="badge badge-light">@caseLocation.PinCode.Code - @caseLocation.InvestigationCaseSubStatus.Name</span>
-                                                            }
-                                                        }
-                                                    </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => dateOnly)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => timePending )
-                                                </td>
-                                                    <td>
-                                                        <a class="btn btn-xs btn-info" asp-action="Detail" asp-route-id="@item.ClaimsInvestigationId">
-                                                            <i class="fa fa-search"></i> @Applicationsettings.DETAILS
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                </table>
                             </div>
                         </form>
                     </div>
@@ -129,3 +56,62 @@
         </div>
     </div>
 </section>
+@section Scripts    {
+    <script>
+        $(document).ready(function () {
+            $("#customerTable").DataTable({
+                ajax: {
+                    url: '/api/ClaimsInvestigation/GetActive',
+                    dataSrc: ''
+                },
+                fixedHeader: true,
+                processing: true,
+                paging: true,
+                language: {
+                    loadingRecords: '&nbsp;',
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                columns: [
+                    /* Name of the keys from
+                    data file source */
+                    {
+                        "data": "id", "name": "Id", "bVisible": false
+                    },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var img = '<img src="' + row.document + '" src height="30" width="30" />';
+                            return img;
+                        }
+                    },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var img = '<img src="' + row.customer + '" src height="30" width="30" />';
+                            return img;
+                        }
+                    },
+                    { "data": "name" },
+                    { "data": "policy" },
+                    { "data": "status" },
+                    { "data": "serviceType" },
+                    { "data": "location" },
+                    { "data": "created" },
+                    { "data": "timePending" },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var buttons = "";
+                            buttons += '<a href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                            return buttons;
+                        }
+                    }
+                ],
+                error: function (xhr, status, error) { alert('err ' + error) }
+            });
+        });
+    </script>
+}

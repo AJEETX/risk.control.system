@@ -31,12 +31,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("All Agencies")]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = await _context.Vendor
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes).ToListAsync();
-            return View(applicationDbContext);
+            return View();
         }
 
         // GET: Vendors/Details/5

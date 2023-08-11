@@ -64,194 +64,18 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Claims")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CostCentre)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-            ViewBag.HasClientCompany = true;
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            if (clientCompany == null)
-            {
-                ViewBag.HasClientCompany = false;
-            }
-            else
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
-            }
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-
-            if (userRole.Value.Contains(AppRoles.Creator.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
-            }
-            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a =>
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
-            }
-            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
-
-                var claimsSubmitted = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsSubmitted.Add(item);
-                    }
-                }
-                return View(claimsSubmitted);
-            }
-            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a =>
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
-            }
-            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
-                return View(await applicationDbContext.ToListAsync());
-            }
-
-            return View(await applicationDbContext.ToListAsync());
+            return View();
         }
 
-        [Breadcrumb(" Ready to Assign", FromAction = "Index")]
+        [Breadcrumb(" Ready to Assign", FromAction = "Active")]
         public IActionResult Assign()
         {
             return View();
         }
 
-        public async Task<IActionResult> GetAssign()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-
-            ViewBag.HasClientCompany = true;
-            ViewBag.HasVendorCompany = true;
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (companyUser == null && vendorUser == null)
-            {
-                ViewBag.HasClientCompany = false;
-                ViewBag.HasVendorCompany = false;
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
-            }
-            else if (companyUser != null && vendorUser == null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
-                ViewBag.HasVendorCompany = false;
-            }
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
-
-                var claimsAssigned = new List<ClaimsInvestigation>();
-                foreach (var item in applicationDbContext)
-                {
-                    if (item.IsReady2Assign)
-                    {
-                        item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
-                        && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
-                        if (item.CaseLocations.Any())
-                        {
-                            claimsAssigned.Add(item);
-                        }
-                    }
-                }
-                var response = claimsAssigned
-                    .Select(a => new
-                    {
-                        Id = a.ClaimsInvestigationId,
-                        SelectedToAssign = false,
-                        Document = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)),
-                        Customer = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)),
-                        Name = a.CustomerName,
-                        Policy = a.LineOfBusiness.Name,
-                        Status = a.InvestigationCaseStatus.Name,
-                        ServiceType = a.ClaimType.GetEnumDisplayName(),
-                        Location = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
-                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
-                        Created = a.Created.ToString("dd-MM-yyyy"),
-                        timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
-                    })
-                    .ToList();
-
-                return Json(response);
-            }
-            return Json(null);
-        }
-
-        [Breadcrumb(" Assess", FromAction = "Index")]
+        [Breadcrumb(" Assess", FromAction = "Active")]
         public async Task<IActionResult> Assessor()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -351,7 +175,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [Breadcrumb(" Allocate", FromAction = "Index")]
+        [Breadcrumb(" Allocate", FromAction = "Active")]
         public async Task<IActionResult> Assigner()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -416,83 +240,8 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation
-        public async Task<JsonResult> GetIncomplete()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CostCentre)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
 
-            ViewBag.HasClientCompany = true;
-            ViewBag.HasVendorCompany = true;
-
-            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (companyUser == null && vendorUser == null)
-            {
-                ViewBag.HasClientCompany = false;
-                ViewBag.HasVendorCompany = false;
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
-            }
-            else if (companyUser != null && vendorUser == null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
-                ViewBag.HasVendorCompany = false;
-            }
-            else if (companyUser != null && vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId && i.VendorId == vendorUser.VendorId);
-            }
-
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !a.IsReady2Assign);
-
-                var response = await applicationDbContext
-                    .Select(a => new
-                    {
-                        Id = a.ClaimsInvestigationId,
-                        Document = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)),
-                        Customer = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)),
-                        Name = a.CustomerName,
-                        Policy = a.LineOfBusiness.Name,
-                        Status = a.InvestigationCaseStatus.Name,
-                        ServiceType = a.ClaimType.GetEnumDisplayName(),
-                        Location = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
-                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
-                        Created = a.Created.ToString("dd-MM-yyyy"),
-                        timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
-                    })
-                    .ToListAsync();
-
-                return Json(response);
-            }
-
-            return Json(await applicationDbContext.ToListAsync());
-        }
-
-        [Breadcrumb(" Incomplete Claims", FromAction = "Index")]
+        [Breadcrumb(" Incomplete Claims", FromAction = "Active")]
         public async Task<IActionResult> Incomplete()
         {
             return View();
@@ -892,7 +641,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(" Review", FromAction = "Index")]
+        [Breadcrumb(" Review", FromAction = "Active")]
         public async Task<IActionResult> Review()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -961,101 +710,13 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(title: " Active")]
-        public async Task<IActionResult> Active()
+        [Breadcrumb(title: " Active Claims")]
+        public IActionResult Active()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CostCentre)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-            ViewBag.HasClientCompany = true;
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            if (clientCompany == null)
-            {
-                ViewBag.HasClientCompany = false;
-            }
-            else
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == clientCompany.ClientCompanyId);
-            }
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-
-            if (userRole.Value.Contains(AppRoles.Creator.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
-            }
-            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a =>
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
-            }
-            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
-
-                var claimsSubmitted = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsSubmitted.Add(item);
-                    }
-                }
-                return View(claimsSubmitted);
-            }
-            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a =>
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId);
-            }
-            else if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) && !userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
-                return View(await applicationDbContext.ToListAsync());
-            }
-
-            return View(await applicationDbContext.ToListAsync());
+            return View();
         }
 
-        [Breadcrumb(title: "Yet To Investigate", FromAction = "Index")]
+        [Breadcrumb(title: "Yet To Investigate", FromAction = "Active")]
         public async Task<IActionResult> ToInvestigate()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -1119,7 +780,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [Breadcrumb(title: " Report")]
+        [Breadcrumb(title: " Report", FromAction = "Active")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -1246,7 +907,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Incomplete));
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Index")]
+        [Breadcrumb(title: " Detail", FromAction = "Active")]
         public async Task<IActionResult> Detail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1462,7 +1123,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ClaimsInvestigation claimsInvestigation)
+        public async Task<IActionResult> Edit(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
         {
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
@@ -1477,7 +1138,7 @@ namespace risk.control.system.Controllers
             claimsInvestigation.InvestigationCaseSubStatus = subStatus;
             claimsInvestigation.ClientCompanyId = companyUser?.ClientCompanyId;
 
-            if (id != claimsInvestigation.ClaimsInvestigationId || !ModelState.IsValid)
+            if (claimsInvestigationId != claimsInvestigation.ClaimsInvestigationId || !ModelState.IsValid)
             {
                 ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.ClientCompanyId);
                 ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.InvestigationServiceTypeId);
@@ -1508,7 +1169,7 @@ namespace risk.control.system.Controllers
                 else
                 {
                     var existingClaim = await _context.ClaimsInvestigation.AsNoTracking().FirstOrDefaultAsync(c =>
-                    c.ClaimsInvestigationId == id);
+                    c.ClaimsInvestigationId == claimsInvestigationId);
                     if (existingClaim.DocumentImage != null)
                     {
                         claimsInvestigation.DocumentImage = existingClaim.DocumentImage;
@@ -1528,8 +1189,8 @@ namespace risk.control.system.Controllers
                 else
                 {
                     var existingClaim = await _context.ClaimsInvestigation.AsNoTracking().FirstOrDefaultAsync(c =>
-                    c.ClaimsInvestigationId == id);
-                    if (existingClaim.ProfilePictureUrl != null)
+                    c.ClaimsInvestigationId == claimsInvestigationId);
+                    if (existingClaim.ProfilePicture != null)
                     {
                         claimsInvestigation.ProfilePictureUrl = existingClaim.ProfilePictureUrl;
                         claimsInvestigation.ProfilePicture = existingClaim.ProfilePicture;
@@ -1554,7 +1215,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Edit/5
-        [Breadcrumb(title: " Withdraw")]
+        [Breadcrumb(title: " Withdraw Claim")]
         public async Task<IActionResult> Withdraw(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)

@@ -19,8 +19,8 @@
                                     <thead>
                                         <tr>
 
+                                            <th><input type="checkbox" name="select_all" id="checkall" value="0" /></th>
                                             <th>Id</th>
-                                            <th><input type="checkbox" name="select_all" id="checkall" value="1" /></th>
                                             <th>
                                                 Policy Document
                                             </th>
@@ -73,7 +73,7 @@
         $(document).ready(function () {
             var table = $("#customerTable").DataTable({
                 ajax: {
-                    url: '/ClaimsInvestigation/GetAssign',
+                    url: '/api/ClaimsInvestigation/GetAssign',
                     dataSrc: ''
                 },
                 columnDefs: [{
@@ -97,15 +97,15 @@
                     /* Name of the keys from
                     data file source */
                     {
-                        "data": "id", "name": "Id", "bVisible": false
-                    },
-                    {
                         "sDefaultContent": "",
                         "bSortable": false,
                         "mRender": function (data, type, row) {
-                            var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '" checked= "' + row.selectedToAssign + '" />';
+                            var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
                             return img;
                         }
+                    },
+                    {
+                        "data": "id", "name": "Id", visible:false
                     },
                     {
                         "sDefaultContent": "",

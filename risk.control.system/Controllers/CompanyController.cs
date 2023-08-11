@@ -155,49 +155,9 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Manage Users ")]
-        public async Task<IActionResult> User()
+        public IActionResult User()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            var company = _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-            var model = new CompanyUsersViewModel
-            {
-                Company = company,
-            };
-            var users = company.CompanyApplicationUser.AsQueryable();
-            foreach (var user in users)
-            {
-                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                var state = _context.State.FirstOrDefault(c => c.StateId == user.StateId);
-                var district = _context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
-                var pinCode = _context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
-
-                var thisViewModel = new UsersViewModel();
-                thisViewModel.UserId = user.Id.ToString();
-                thisViewModel.Email = user?.Email;
-                thisViewModel.Addressline = user?.Addressline;
-                thisViewModel.PhoneNumber = user?.PhoneNumber;
-                thisViewModel.UserName = user?.UserName;
-                thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
-                thisViewModel.FirstName = user.FirstName;
-                thisViewModel.LastName = user.LastName;
-                thisViewModel.Country = country.Name;
-                thisViewModel.CountryId = user.CountryId;
-                thisViewModel.StateId = user.StateId;
-                thisViewModel.State = state.Name;
-                thisViewModel.PinCode = pinCode.Name;
-                thisViewModel.PinCodeId = pinCode.PinCodeId;
-                thisViewModel.CompanyName = company.Name;
-                thisViewModel.CompanyId = user.ClientCompanyId;
-                thisViewModel.ProfileImageInByte = user.ProfilePicture;
-                thisViewModel.Roles = await GetUserRoles(user);
-                UserList.Add(thisViewModel);
-            }
-            model.Users = UserList;
-            return View(model);
+            return View();
         }
 
         [Breadcrumb("Add User", FromAction = "User")]
@@ -364,36 +324,10 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(CompanyController.User), "Company");
         }
 
-        [HttpGet]
         [Breadcrumb("Available Agencies")]
         public async Task<IActionResult> AvailableVendors()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            var company = _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-            var applicationDbContext = _context.Vendor
-                .Where(v => v.ClientCompanyId != companyUser.ClientCompanyId
-                && (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.District)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
-                .AsQueryable();
-
-            ViewBag.CompanyId = companyUser.ClientCompanyId;
-            return View(applicationDbContext);
+            return View();
         }
 
         [HttpPost]
@@ -443,36 +377,10 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [HttpGet]
         [Breadcrumb("Empanelled Agencies")]
         public async Task<IActionResult> EmpanelledVendors()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            var company = _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .Include(c => c.EmpanelledVendors)
-                .ThenInclude(c => c.State)
-                .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-            var applicationDbContext = _context.Vendor
-                .Where(v => v.ClientCompanyId == company.ClientCompanyId)
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
-                .AsQueryable();
-            ViewBag.CompanyId = companyUser.ClientCompanyId;
-
-            return View(company.EmpanelledVendors);
+            return View();
         }
 
         [HttpPost]
