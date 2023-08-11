@@ -55,7 +55,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
 
-                                        <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
+                                        <button id="managevendors" type="submit" class="btn btn-success">
                                             <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.ASSIGN
                                         </button>
                                     </div>
@@ -138,7 +138,7 @@
                             buttons += '<a href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
                             return buttons;
                         }
-                    }
+                    }  
                 ],
                 error: function (xhr, status, error) { alert('err ' + error) }
             });
@@ -186,5 +186,41 @@
                 });
             });
         });
+        function Delete(userId, status) {
+            $.confirm({
+                title: 'Change Status!',
+                content: 'Do you want to Change Status!',
+                buttons: {
+                    confirm: function () {
+                        $.ajax({
+                            url: "/Administration/User/ChangeUserStatus",
+                            type: "POST",
+                            data: { UserId: userId, Status: status },
+                            success: function (data, textStatus, xhr) {
+                                if (data.Result == "success") {
+                                    location.reload();
+                                }
+                                if (data.Result == "failed") {
+                                    $.alert('Something Went Wrong');
+                                }
+                            },
+                            error: function (xhr, status, err) {
+                                if (xhr.status == 401) {
+                                    alert('Error');
+                                    window.location.href = "/Portal/Logout";
+                                }
+                                if (xhr.status == 500) {
+                                    alert('Error');
+                                    window.location.href = "/Portal/Logout";
+                                }
+                            }
+                        });
+                    },
+                    cancel: function () {
+                        $.alert('Canceled!');
+                    }
+                }
+            });
+        }
     </script>
 }
