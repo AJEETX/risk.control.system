@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers
 
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("verification location created successfully!");
+                toastNotification.AddSuccessToastMessage("Location added successfully!");
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);

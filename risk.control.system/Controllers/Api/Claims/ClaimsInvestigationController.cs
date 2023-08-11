@@ -259,8 +259,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
-                        Document = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)),
-                        Customer = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)),
+                        Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
+                        Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
                         Name = a.CustomerName,
                         Policy = a.LineOfBusiness.Name,
                         Status = a.InvestigationCaseStatus.Name,

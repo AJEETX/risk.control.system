@@ -9,6 +9,7 @@ using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -468,77 +469,9 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Active Claims")]
-        public async Task<IActionResult> Open()
+        public IActionResult Open()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-            ViewBag.HasClientCompany = true;
-
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
-            }
-
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
-            var openSubstatusesForSupervisor = _context.InvestigationCaseSubStatus.Where(i =>
-            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR) ||
-            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
-            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
-            ).Select(s => s.InvestigationCaseSubStatusId).ToList();
-
-            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                if (userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-                {
-                    applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId));
-                }
-
-                var claimsAllocated = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => !string.IsNullOrWhiteSpace(c.VendorId)
-                        && c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
-                        || c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                        || c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsAllocated.Add(item);
-                    }
-                }
-                return View(claimsAllocated);
-            }
-
-            return View(await applicationDbContext.ToListAsync());
+            return View();
         }
 
         [Breadcrumb(" Report")]

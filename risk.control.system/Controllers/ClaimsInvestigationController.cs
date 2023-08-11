@@ -841,6 +841,11 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> Assign(List<string> claims)
         {
+            if(claims == null || claims.Count == 0)
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be assigned.");
+                return RedirectToAction(nameof(Assign));
+            }
             await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, claims);
 
             await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
@@ -1076,7 +1081,7 @@ namespace risk.control.system.Controllers
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
                 ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
                 ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.StateId);
-                toastNotification.AddErrorToastMessage("Error: Claim case edited!");
+                toastNotification.AddErrorToastMessage("Error!!!");
                 return View(claimsInvestigation);
             }
 
