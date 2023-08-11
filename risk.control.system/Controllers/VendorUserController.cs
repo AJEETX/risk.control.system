@@ -44,49 +44,13 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> Index(string id)
         {
-            var vendor = await context.Vendor.Include(v => v.VendorApplicationUser).FirstOrDefaultAsync(v => v.VendorId == id);
-
-            var applicationDbContext = vendor.VendorApplicationUser.AsQueryable();
-            var model = new VendorUsersViewModel
-            {
-                Vendor = vendor,
-            };
-            foreach (var user in applicationDbContext)
-            {
-                var country = context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                var state = context.State.FirstOrDefault(c => c.StateId == user.StateId);
-                var district = context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
-                var pinCode = context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
-
-                var thisViewModel = new UsersViewModel();
-                thisViewModel.UserId = user.Id.ToString();
-                thisViewModel.Email = user?.Email;
-                thisViewModel.Addressline = user?.Addressline;
-                thisViewModel.PhoneNumber = user?.PhoneNumber;
-                thisViewModel.UserName = user?.UserName;
-                thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
-                thisViewModel.FirstName = user.FirstName;
-                thisViewModel.LastName = user.LastName;
-                thisViewModel.Country = country.Name;
-                thisViewModel.CountryId = user.CountryId;
-                thisViewModel.StateId = user.StateId;
-                thisViewModel.State = state.Name;
-                thisViewModel.PinCode = pinCode.Name;
-                thisViewModel.PinCodeId = pinCode.PinCodeId;
-                thisViewModel.VendorName = vendor.Name;
-                thisViewModel.VendorId = vendor.VendorId;
-                thisViewModel.ProfileImageInByte = user.ProfilePicture;
-                thisViewModel.Roles = await GetUserRoles(user);
-                UserList.Add(thisViewModel);
-            }
-            model.Users = UserList;
-
+            ViewData["vendorId"] = id;
             var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
 
-            return View(model);
+            return View();
         }
 
         private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
