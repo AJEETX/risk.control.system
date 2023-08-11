@@ -23,6 +23,56 @@ namespace risk.control.system.Seeds
             };
             var fatherEntity = await context.AddAsync(father);
 
+            var mother = new BeneficiaryRelation
+            {
+                Name = "MOTHER",
+                Code = "MOTHER",
+            };
+            var motherEntity = await context.AddAsync(mother);
+
+
+            var sister = new BeneficiaryRelation
+            {
+                Name = "SISTER",
+                Code = "SISTER",
+            };
+            var sisterEntity = await context.AddAsync(sister);
+
+            var uncle = new BeneficiaryRelation
+            {
+                Name = "UNCLE",
+                Code = "UNCLE",
+            };
+            var uncleEntity = await context.AddAsync(uncle);
+
+            var aunty = new BeneficiaryRelation
+            {
+                Name = "AUNTY",
+                Code = "AUNTY",
+            };
+            var auntyEntity = await context.AddAsync(aunty);
+
+            var newphew = new BeneficiaryRelation
+            {
+                Name = "NEWPHEW",
+                Code = "NEWPHEW",
+            };
+            var newphewEntity = await context.AddAsync(newphew);
+
+            var niece = new BeneficiaryRelation
+            {
+                Name = "NIECE",
+                Code = "NIECE",
+            };
+            var nieceEntity = await context.AddAsync(niece);
+
+            var inlaw = new BeneficiaryRelation
+            {
+                Name = "INLAW",
+                Code = "INLAW",
+            };
+            var inlawEntity = await context.AddAsync(inlaw);
+
             #endregion
 
             #region CASE ENABLER

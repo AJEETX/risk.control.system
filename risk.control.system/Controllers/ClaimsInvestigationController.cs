@@ -313,6 +313,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Allocate to agency")]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
+            if (string.IsNullOrWhiteSpace(selectedcase))
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
+                return RedirectToAction(nameof(Assigner));
+            }
+
             if (_context.ClaimsInvestigation == null)
             {
                 return NotFound();
@@ -783,7 +789,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> Assign(List<string> claims)
         {
-            if(claims == null || claims.Count == 0)
+            if (claims == null || claims.Count == 0)
             {
                 toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be assigned.");
                 return RedirectToAction(nameof(Assign));
