@@ -205,9 +205,8 @@
                                     </th>
 
                                     <th>
-                                        Verification Pincodes
+                                        Pincode
                                     </th>
-                                    <th>Status</th>
 
                                 </tr>
                             </thead>
@@ -245,9 +244,7 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.PinCode.Code)
                                         </td>
-                                        <td>
-                                            <span class="badge badge-info">   @Html.DisplayFor(modelItem => item.InvestigationCaseSubStatus.Name)</span>
-                                        </td>
+                                        
                                     </tr>
                                 }
                             </tbody>

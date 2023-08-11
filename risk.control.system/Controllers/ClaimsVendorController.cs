@@ -16,6 +16,9 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
+using static risk.control.system.AppConstant.Applicationsettings;
+using static risk.control.system.Helpers.Permissions;
+
 namespace risk.control.system.Controllers
 {
     [Breadcrumb(" Claims")]
@@ -49,6 +52,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Allocate To Agent")]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase)
         {
+            if (string.IsNullOrWhiteSpace(selectedcase))
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
+                return RedirectToAction(nameof(Index));
+            }
+
             if (_context.ClaimsInvestigation == null)
             {
                 return NotFound();
@@ -93,8 +102,14 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SelectVendorAgent(long selectedcase, string claimId, long caseLocationId)
+        public async Task<IActionResult> SelectVendorAgent(long selectedcase, string claimId)
         {
+            if (selectedcase < 1 || string.IsNullOrWhiteSpace(claimId))
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
+                return RedirectToAction(nameof(Index));
+            }
+
             var userEmail = HttpContext.User?.Identity?.Name;
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -207,6 +222,12 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, long caseLocationId)
         {
+            if (string.IsNullOrWhiteSpace(selectedcase) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
+                return RedirectToAction(nameof(Index));
+            }
+
             var userEmail = HttpContext.User?.Identity?.Name;
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
@@ -220,91 +241,25 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
-        public async Task<IActionResult> Index()
+        public ActionResult Index()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.ClaimReport)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.Vendor)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-
-            ViewBag.HasClientCompany = true;
-            ViewBag.HasVendorCompany = true;
-
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            //var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
-
-            if (vendorUser != null)
+            if (userRole.Value.Contains(AppRoles.Agent.ToString()))
             {
-                applicationDbContext = applicationDbContext
-                    .Include(a => a.LineOfBusiness)
-                    .Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                return View("Agent");
             }
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-            {
-                var claimsAssigned = new List<ClaimsInvestigation>();
-
-                applicationDbContext = applicationDbContext.Where(a =>
-                a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                    && !c.IsReviewCaseLocation)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsAssigned.Add(item);
-                    }
-                }
-                return View(claimsAssigned);
-            }
-            else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
-            {
-                var claimsAssigned = new List<ClaimsInvestigation>();
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                        && c.AssignedAgentUserEmail == currentUserEmail)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsAssigned.Add(item);
-                    }
-                }
-                return View("Agent", claimsAssigned);
-            }
-
-            return View(await applicationDbContext.ToListAsync());
+            return View();
         }
 
         [Breadcrumb(" Report")]
         public async Task<IActionResult> GetInvestigate(string selectedcase)
         {
+            if (string.IsNullOrWhiteSpace(selectedcase))
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be investigate.");
+                return RedirectToAction(nameof(Index));
+            }
+
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var claimsInvestigation = _context.ClaimsInvestigation
@@ -330,6 +285,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Review Report")]
         public async Task<IActionResult> GetInvestigateReportReview(string selectedcase)
         {
+            if (string.IsNullOrWhiteSpace(selectedcase))
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be review.");
+                return RedirectToAction(nameof(Index));
+            }
+
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var claimsInvestigation = _context.ClaimsInvestigation
@@ -393,6 +354,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb("  Report")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
+            if (string.IsNullOrWhiteSpace(selectedcase))
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be assess.");
+                return RedirectToAction(nameof(ClaimReport));
+            }
+
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var claimsInvestigation = _context.ClaimsInvestigation
@@ -417,6 +384,12 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitReport(string remarks, string claimId, long caseLocationId)
         {
+            if (string.IsNullOrWhiteSpace(remarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+            {
+                toastNotification.AddAlertToastMessage("No Agent remarks entered!!!. Please enter remarks.");
+                return RedirectToAction(nameof(GetInvestigate), new { selectedcase = claimId });
+            }
+
             string userEmail = HttpContext?.User?.Identity.Name;
 
             await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks);
@@ -431,6 +404,11 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
         {
+            if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+            {
+                toastNotification.AddAlertToastMessage("No Supervisor remarks entered!!!. Please enter remarks.");
+                return RedirectToAction(nameof(GetInvestigateReport), new { selectedcase = claimId });
+            }
             string userEmail = HttpContext?.User?.Identity.Name;
             var reportUpdateStatus = SupervisorRemarkType.OK;
 
@@ -451,6 +429,11 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> ReAllocateReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
         {
+            if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+            {
+                toastNotification.AddAlertToastMessage("No remarks entered!!!. Please enter remarks.");
+                return RedirectToAction(nameof(GetInvestigate), new { selectedcase = claimId });
+            }
             string userEmail = HttpContext?.User?.Identity.Name;
             var reportUpdateStatus = SupervisorRemarkType.REVIEW;
 
@@ -477,144 +460,13 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Report")]
         public async Task<IActionResult> ClaimReport()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.ClaimReport)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.ClaimReport)
-                .Include(c => c.Vendor)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-
-            ViewBag.HasClientCompany = true;
-            ViewBag.HasVendorCompany = true;
-
-            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
-            }
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-            {
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                        && c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId
-                        && !c.IsReviewCaseLocation
-                        )?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsSubmitted.Add(item);
-                    }
-                }
-            }
-            //else if (userRole.Value.Contains(AppRoles.Agent.ToString()))
-            //{
-            //    foreach (var item in applicationDbContext)
-            //    {
-            //        item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-            //            && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId && c.AssignedAgentUserEmail == currentUserEmail)?.ToList();
-            //        if (item.CaseLocations.Any())
-            //        {
-            //            claimsSubmitted.Add(item);
-            //        }
-            //    }
-            //}
-
-            return View(claimsSubmitted);
+            return View();
         }
 
         [Breadcrumb(" Review")]
         public async Task<IActionResult> ClaimReportReview()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.ClaimReport)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.ClaimReport)
-                .Include(c => c.Vendor)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
-
-            ViewBag.HasClientCompany = true;
-            ViewBag.HasVendorCompany = true;
-
-            var allocatedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
-            var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-            i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-
-            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
-
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (vendorUser != null)
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
-            }
-            // SHOWING DIFFERRENT PAGES AS PER ROLES
-            var claimsSubmitted = new List<ClaimsInvestigation>();
-            if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-            {
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId && c.IsReviewCaseLocation == true
-                        && (c.InvestigationCaseSubStatusId == allocatedToVendorSupervisorStatus.InvestigationCaseSubStatusId
-                        || c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId))?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsSubmitted.Add(item);
-                    }
-                }
-            }
-
-            return View(claimsSubmitted);
+            return View();
         }
 
         private async Task<List<string>> GetUserRoles(VendorApplicationUser user)

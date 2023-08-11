@@ -369,7 +369,6 @@ namespace risk.control.system.Controllers.Api.Claims
              .Include(c => c.PinCode)
              .Include(c => c.State);
 
-
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -422,6 +421,267 @@ namespace risk.control.system.Controllers.Api.Claims
                         timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
                     })
                     ?.ToList();
+
+            return Ok(response);
+        }
+
+        [HttpGet("GetAssessor")]
+        public async Task<IActionResult> GetAssessor()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State);
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+
+            var claimsAssigned = new List<ClaimsInvestigation>();
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+            }
+            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                        && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+            }
+            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+            }
+
+            var response = claimsAssigned
+            .Select(a => new
+            {
+                Id = a.ClaimsInvestigationId,
+                Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
+                Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
+                Name = a.CustomerName,
+                Policy = a.LineOfBusiness.Name,
+                Status = a.InvestigationCaseStatus.Name,
+                ServiceType = a.ClaimType.GetEnumDisplayName(),
+                Location = a.CaseLocations.Count == 0 ?
+                "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
+                string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                Created = a.Created.ToString("dd-MM-yyyy"),
+                timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
+            })
+            ?.ToList();
+
+            return Ok(response);
+        }
+
+        [HttpGet("GetApproved")]
+        public async Task<IActionResult> GetApproved()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+             .Include(c => c.ClientCompany)
+             .Include(c => c.CaseEnabler)
+             .Include(c => c.CaseLocations)
+            .ThenInclude(c => c.PinCode)
+             .Include(c => c.CaseLocations).
+             ThenInclude(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.CostCentre)
+             .Include(c => c.Country)
+             .Include(c => c.District)
+             .Include(c => c.InvestigationCaseStatus)
+             .Include(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.InvestigationServiceType)
+             .Include(c => c.LineOfBusiness)
+             .Include(c => c.PinCode)
+             .Include(c => c.State);
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+
+            if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+            }
+            var response = claimsSubmitted
+            .Select(a => new
+            {
+                Id = a.ClaimsInvestigationId,
+                Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
+                Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
+                Name = a.CustomerName,
+                Policy = a.LineOfBusiness.Name,
+                Status = a.InvestigationCaseStatus.Name,
+                ServiceType = a.ClaimType.GetEnumDisplayName(),
+                Location = a.CaseLocations.Count == 0 ?
+                "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
+                string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                Created = a.Created.ToString("dd-MM-yyyy"),
+                timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
+            })
+            ?.ToList();
+
+            return Ok(response);
+        }
+
+        [HttpGet("GetReview")]
+        public async Task<IActionResult> GetReview()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                 .Include(c => c.ClientCompany)
+                 .Include(c => c.CaseEnabler)
+                 .Include(c => c.CaseLocations)
+                 .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations)
+                 .ThenInclude(c => c.ClaimReport)
+                 .Include(c => c.CaseLocations).
+                 ThenInclude(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.CostCentre)
+             .Include(c => c.Country)
+             .Include(c => c.District)
+             .Include(c => c.InvestigationCaseStatus)
+             .Include(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.InvestigationServiceType)
+             .Include(c => c.LineOfBusiness)
+             .Include(c => c.PinCode)
+             .Include(c => c.State);
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var reassignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+
+            if (userRole.Value.Contains(AppRoles.Assessor.ToString()) || userRole.Value.Contains(AppRoles.Assigner.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+            }
+
+                var response = claimsSubmitted
+            .Select(a => new
+            {
+                Id = a.ClaimsInvestigationId,
+                Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
+                Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
+                Name = a.CustomerName,
+                Policy = a.LineOfBusiness.Name,
+                Status = a.InvestigationCaseStatus.Name,
+                ServiceType = a.ClaimType.GetEnumDisplayName(),
+                Location = a.CaseLocations.Count == 0 ?
+                "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
+                string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                Created = a.Created.ToString("dd-MM-yyyy"),
+                timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
+            })
+            ?.ToList();
 
             return Ok(response);
         }

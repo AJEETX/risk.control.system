@@ -1,12 +1,8 @@
-﻿@model IEnumerable<risk.control.system.Models.ClaimsInvestigation>
-
-@{
+﻿@{
     ViewData["Title"] = "Index";
-    var hasClientCompany = @ViewBag.HasClientCompany ? "none" : "";
 }
 <section class="content pt-2">
     <div class="container-fluid">
-
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-secondary">
@@ -16,111 +12,24 @@
                     <div class="card-body">
                         <form id="radioButtons" asp-action="ReAllocateToVendor" method="get" enctype="multipart/form-data">
                             <div class="col-md-12">
-                                <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
                                             <th></th>
-                                            <th>
-                                                Policy Document
-                                            </th>
+                                            <th>Id</th>
+                                            <th>Policy Document</th>
                                             <th>Customer Photo</th>
-
+                                            <th>Customer Name</th>
+                                            <th>Line Of Business</th>
+                                            <th>Status</th>
+                                            <th>Claim Type</th>
+                                            <th>Location</th>
+                                            <th>Created On</th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                                Day(s) <i class="fa fa-asterisk" style="color:red;font-size:12px" title="Day in assigned"></i>
                                             </th>
-                                            <th>
-                                                Status
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.CustomerName)
-                                            </th>
-                                            <th>
-                                                @Html.DisplayNameFor(model => model.ClaimType)
-                                            </th>
-                                            <th>
-                                                Location-Status
-                                            </th>
-                                            <th>
-                                                Re assigned Date
-                                            </th>
-                                            <th>
-                                                Day(s)<span class="badge badge-danger"> <i class="fa fa-asterisk" title="Waiting days"></i></span>
-                                            </th>
-                                            @*<th></th>*@
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        @foreach (var item in Model)
-                                        {
-                                            var timePending = DateTime.Now.Subtract(item.Updated.Value).Days == 0 ? "< 1" : DateTime.Now.Subtract(item.Updated.Value).Days.ToString();
-                                            var dateOnly = item.Created.ToString("dd-MM-yyyy");
-
-                                            <tr>
-                                                <td>
-                                                    <input id="@item.ClaimsInvestigationId" name="selectedcase" class="selected-case" type="radio" value="@item.ClaimsInvestigationId" />
-                                                </td>
-                                                <td>
-                                                    @if (item?.DocumentImage is not null)
-                                                    {
-                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
-                                                    }
-                                                    else
-                                                    {
-                                                        <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                                    }
-                                                </td>
-                                                <td>
-                                                    @if (item?.ProfilePicture is not null)
-                                                    {
-                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
-                                                    }
-                                                    else
-                                                    {
-                                                        <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                                    }
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.CustomerName)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.ClaimType)
-                                                </td>
-                                                <td>
-                                                    @{
-                                                        foreach (var caseLocation in item.CaseLocations)
-                                                        {
-                                                            <div>
-                                                                <span class="badge badge-info">@caseLocation.PinCode.Code = @caseLocation.InvestigationCaseSubStatus.Name</span>
-                                                            </div>
-                                                        }
-                                                    }
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => dateOnly)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => timePending )
-                                                </td>
-                                                @*<td>
-                                                    <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClaimsInvestigationId">
-                                                        <i class="fa fa-search"></i> @Applicationsettings.DETAILS
-                                                    </a> &nbsp;
-                                                    <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClaimsInvestigationId">
-                                                        <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                                    </a> &nbsp;
-                                                    <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClaimsInvestigationId">
-                                                        <i class="fas fa-trash"></i> @Applicationsettings.DELETE
-                                                    </a>
-                                                </td>*@
-                                            </tr>
-                                        }
-                                    </tbody>
                                 </table>
                                 <div class="row">
                                     <div class="col-md-12">
@@ -138,3 +47,131 @@
         </div>
     </div>
 </section>
+@section Scripts    {
+    <script>
+        $(document).ready(function () {
+            var table = $("#customerTable").DataTable({
+                ajax: {
+                    url: '/api/ClaimsInvestigation/GetReview',
+                    dataSrc: ''
+                },
+                columnDefs: [{
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    'render': function (data, type, full, meta) {
+                        return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
+                    }
+                }],
+                order: [[1, 'asc']],
+                fixedHeader: true,
+                processing: true,
+                paging: true,
+                language: {
+                    loadingRecords: '&nbsp;',
+                    processing: '<i class="fa fa-spinner fa-spin fa-6x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                columns: [
+                    /* Name of the keys from
+                    data file source */
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
+                            return img;
+                        }
+                    },
+                    {
+                        "data": "id", "name": "Id", visible: false
+                    },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var img = '<img src="' + row.document + '" src height="30" width="30" />';
+                            return img;
+                        }
+                    },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var img = '<img src="' + row.customer + '" src height="30" width="30" />';
+                            return img;
+                        }
+                    },
+                    { "data": "name" },
+                    { "data": "policy" },
+                    { "data": "status" },
+                    { "data": "serviceType" },
+                    { "data": "location" },
+                    { "data": "created" },
+                    { "data": "timePending" }
+                ],
+                error: function (xhr, status, error) { alert('err ' + error) }
+            });
+
+            if ($(".selected-case:checked").length) {
+                $("#allocate-case").prop('disabled', false);
+            }
+            else {
+                $("#allocate-case").prop('disabled', true);
+            }
+
+            // When user checks a radio button, Enable submit button
+            $(".selected-case").change(function (e) {
+                if ($(this).is(":checked")) {
+                    $("#allocate-case").prop('disabled', false);
+                }
+                else {
+                    $("#allocate-case").prop('disabled', true);
+                }
+            });
+            // Handle click on "Select all" control
+            $('#checkall').on('click', function () {
+                // Get all rows with search applied
+                var rows = table.rows({ 'search': 'applied' }).nodes();
+                // Check/uncheck checkboxes for all rows in the table
+                $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            });
+
+            // Handle click on checkbox to set state of "Select all" control
+            $('#customerTable tbody').on('change', 'input[type="checkbox"]', function () {
+                // If checkbox is not checked
+                if (!this.checked) {
+                    var el = $('#checkall').get(0);
+                    // If "Select all" control is checked and has 'indeterminate' property
+                    if (el && el.checked && ('indeterminate' in el)) {
+                        // Set visual state of "Select all" control
+                        // as 'indeterminate'
+                        el.indeterminate = true;
+                    }
+                }
+            });
+
+            // Handle form submission event
+            $('#checkboxes').on('submit', function (e) {
+                var form = this;
+
+                // Iterate over all checkboxes in the table
+                table.$('input[type="checkbox"]').each(function () {
+                    // If checkbox doesn't exist in DOM
+                    if (!$.contains(document, this)) {
+                        // If checkbox is checked
+                        if (this.checked) {
+                            // Create a hidden element
+                            $(form).append(
+                                $('<input>')
+                                    .attr('type', 'hidden')
+                                    .attr('name', this.name)
+                                    .val(this.value)
+                            );
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
