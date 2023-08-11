@@ -386,28 +386,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Manage Service")]
         public async Task<IActionResult> Service()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
-
-            var applicationDbContext = _context.Vendor
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.LineOfBusiness)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                 .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.State)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.Country)
-                .Include(i => i.District)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.InvestigationServiceType)
-                .Include(i => i.State)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.PincodeServices)
-                .FirstOrDefault(a => a.VendorId == vendor.VendorId);
-
-            return View(applicationDbContext);
+            return View();
         }
 
         [Breadcrumb("Add Service", FromAction = "Service")]

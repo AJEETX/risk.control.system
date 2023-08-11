@@ -1,120 +1,81 @@
-﻿@model Vendor
-
-@{
+﻿@{
     ViewData["Title"] = @Applicationsettings.DETAILS;
 }
-
 <section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-truck"></i> @Applicationsettings.SERVICES</h3>
+                        <h3 class="card-title"><i class="fas fas fa-list-ol"></i> Manage @Applicationsettings.SERVICE</h3>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-12 text-right">
-                                @*<a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.VendorId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>*@
-                                <a class="btn btn-success" asp-controller="VendorService" asp-action="Create" asp-route-id="@Model.VendorId"><i class="fas fa-truck"></i> Add</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-list"></i> @Applicationsettings.SERVICE List</h3>
-                    </div>
-                    <div class="card-body">
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <input type="hidden" id="vendorId" value="@ViewData["vendorId"]" />
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
-                                    <th>
-                                        Line of Business
-                                    </th>
-                                    <th>
-                                        Type of Investigation Service
-                                    </th>
-                                    <th>
-                                        District
-                                    </th>
-                                    <th>
-                                        State
-                                    </th>
-
-                                    <th>
-                                        Country
-                                    </th>
-                                    <th>
-                                        Rate
-                                    </th>
-
-                                    <th>
-                                        Pincode Services
-                                    </th>
-                                    <th>
-                                        UpdatedBy
-                                    </th>
+                                    <th></th>
+                                    <th>CaseType</th>
+                                    <th>ServiceType</th>
+                                    <th>Rate</th>
+                                    <th>District</th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                    <th>Pincodes</th>
+                                    <th>UpdatedBy</th>
                                     <th></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach (var item in Model.VendorInvestigationServiceTypes)
-                                {
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.District.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.State.Name)
-                                        </td>
-
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Country.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Price)
-                                        </td>
-                                        <td>
-                                            @foreach (var svc in item?.PincodeServices)
-                                            {
-                                                var pinCodeDetail = svc.Pincode;
-                                                <span class="badge badge-light">@Html.DisplayFor(modelItem => pinCodeDetail)</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.UpdatedBy)
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-xs btn-info" asp-controller="VendorService" asp-action="Details" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;
-                                            <a class="btn btn-xs btn-warning" asp-controller="VendorService" asp-action="Edit" asp-route-id="@item.VendorInvestigationServiceTypeId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-controller="VendorService" asp-action="Delete" asp-route-id="@item.VendorInvestigationServiceTypeId"> <i class="fas fa-trash"></i>   @Applicationsettings.DELETE</a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group text-right">
-
-                    <a asp-controller="Vendors" asp-action="Details" asp-route-id="@Model.VendorId" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                </div>
-            </div>
-        </div>
     </div>
 </section>
+@section Scripts    {
+    <script>
+        $(document).ready(function () {
+            $("#customerTable").DataTable({
+                ajax: {
+                    url: '/api/Company/AllServices?id=' + $('#vendorId').val(),
+                    dataSrc: ''
+                },
+                fixedHeader: true,
+                processing: true,
+                paging: true,
+                language: {
+                    loadingRecords: '&nbsp;',
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                columns: [
+                    /* Name of the keys from
+                    data file source */
+                    {
+                        "data": "id", "name": "Id", "bVisible": false
+                    },
+                    { "data": "caseType" },
+                    { "data": "serviceType" },
+                    { "data": "rate" },
+                    { "data": "district" },
+                    { "data": "state" },
+                    { "data": "country" },
+                    { "data": "pincodes" },
+                    { "data": "updatedBy" },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var buttons = "";
+                            buttons += '<a href="/Agency/ServiceDetail?id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                            buttons += '<a href="/Agency/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                            buttons += '<a href="/Agency/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                            return buttons;
+                        }
+                    }
+                ],
+                error: function (xhr, status, error) { alert('err ' + error) }
+            });
+        });
+    </script>
+}

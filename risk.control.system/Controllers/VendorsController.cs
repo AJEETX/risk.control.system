@@ -80,31 +80,13 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
-
-            var applicationDbContext = await _context.Vendor
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.LineOfBusiness)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                 .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.State)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.Country)
-                .Include(i => i.Country)
-                .Include(i => i.District)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.InvestigationServiceType)
-                .Include(i => i.State)
-                .Include(i => i.VendorInvestigationServiceTypes)
-                .ThenInclude(i => i.PincodeServices)
-                .FirstOrDefaultAsync(a => a.VendorId == id);
-
+            ViewData["vendorId"] = id;
             var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Services") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
 
-            return View(applicationDbContext);
+            return View();
         }
 
         // GET: Vendors/Create

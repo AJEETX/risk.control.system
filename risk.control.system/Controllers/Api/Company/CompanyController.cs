@@ -169,5 +169,47 @@ namespace risk.control.system.Controllers.Api.Company
 
             return Ok(result.ToArray());
         }
+
+        [HttpGet("AllServices")]
+        public async Task<IActionResult> AllServices(string id)
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var vendor = _context.Vendor
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(i => i.LineOfBusiness)
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                 .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.State)
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.Country)
+                .Include(i => i.District)
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(i => i.InvestigationServiceType)
+                .Include(i => i.State)
+                .Include(i => i.VendorInvestigationServiceTypes)
+                .ThenInclude(i => i.PincodeServices)
+                .FirstOrDefault(a => a.VendorId == id);
+
+            var result = vendor.VendorInvestigationServiceTypes.Select(s => new
+            {
+                VendorId = s.VendorId,
+                Id = s.VendorInvestigationServiceTypeId,
+                CaseType = s.LineOfBusiness.Name,
+                ServiceType = s.InvestigationServiceType.Name,
+                District = s.District.Name,
+                State = s.State.Name,
+                Country = s.Country.Name,
+                Pincodes = s.PincodeServices.Count == 0 ?
+                    "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
+                     string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
+                Rate = s.Price,
+                UpdatedBy = s.UpdatedBy,
+            });
+
+            return Ok(result);
+        }
     }
 }
