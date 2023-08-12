@@ -41,7 +41,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 new
                 {
                     Id = u.Id,
-                    Name = u.FirstName + u.LastName,
+                    Name = u.FirstName + " "+ u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
                     Photo = u.ProfilePictureUrl,
