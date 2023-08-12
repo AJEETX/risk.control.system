@@ -83,7 +83,8 @@ namespace risk.control.system.Controllers
             var vendor = await _context.Vendor.FindAsync(vendorUser.VendorId);
             if (vendor == null)
             {
-                return NotFound();
+                toastNotification.AddErrorToastMessage("agency not found!");
+                return RedirectToAction(nameof(AgencyController.Index), "Agency");
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", vendor.CountryId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name");
@@ -102,7 +103,7 @@ namespace risk.control.system.Controllers
             if (vendor == null || string.IsNullOrWhiteSpace(vendor.VendorId))
             {
                 toastNotification.AddErrorToastMessage("agency not found!");
-                return NotFound();
+                return RedirectToAction(nameof(AgencyController.Index), "Agency");
             }
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -217,21 +218,21 @@ namespace risk.control.system.Controllers
             if (userId == null || _context.VendorApplicationUser == null)
             {
                 toastNotification.AddErrorToastMessage("agency not found");
-                return NotFound();
+                return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
 
             var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
             if (vendorApplicationUser == null)
             {
                 toastNotification.AddErrorToastMessage("agency not found");
-                return NotFound();
+                return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
 
             if (vendor == null)
             {
                 toastNotification.AddErrorToastMessage("agency not found");
-                return NotFound();
+                return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
             vendorApplicationUser.Vendor = vendor;
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", vendor.CountryId);
@@ -250,8 +251,8 @@ namespace risk.control.system.Controllers
         {
             if (id != applicationUser.Id.ToString())
             {
-                toastNotification.AddErrorToastMessage("agency not found!");
-                return NotFound();
+                toastNotification.AddErrorToastMessage("Err !!!");
+                return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
 
             if (applicationUser is not null)
