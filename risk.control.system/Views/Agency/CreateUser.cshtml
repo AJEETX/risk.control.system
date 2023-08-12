@@ -49,7 +49,7 @@
                             </div>
                         </div>
 
-                        <form asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
+                    <form id="create-form" asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
                         <input type="hidden" asp-for="VendorId" value="@Model.Vendor.VendorId" />
                         <input type="hidden" asp-for="Email" id="mailAddress"/>
                         <input type="hidden" id="emailSuffix" name="emailSuffix" value="@email" />
@@ -215,6 +215,33 @@
     <script>
 
         $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Add",
+                        content: "Are you sure to add user?",
+                        buttons: {
+                            confirm: {
+                                text: "Add user",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+
+
             $('input#emailAddress').on('input change', function () {
                 if ($(this).val() != '' && $(this).val().length > 4) {
                     $('#check-email').prop('disabled', false);

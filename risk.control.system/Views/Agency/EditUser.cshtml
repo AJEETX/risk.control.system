@@ -7,7 +7,7 @@
 }
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="EditUser" enctype="multipart/form-data">
+        <form id="create-form" asp-action="EditUser" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -54,7 +54,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber">Phone # <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="number" asp-for="PhoneNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)"min="2222222222"  max="9999999999"/>
+                                            <input type="number" asp-for="PhoneNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)" min="2222222222" max="9999999999" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -134,7 +134,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline">Address line <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" required maxlength="20"/>
+                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" required maxlength="20" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -174,4 +174,35 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+<script>
+    $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Edit",
+                        content: "Are you sure to edit user?",
+                        buttons: {
+                            confirm: {
+                                text: "Edit user",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+      });
+    </script>
+
 }

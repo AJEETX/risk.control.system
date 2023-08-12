@@ -7,7 +7,7 @@
 
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="EditService" enctype="multipart/form-data">
+        <form id="create-form" asp-action="EditService" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -157,6 +157,32 @@
 
         <script>
             $(document).ready(function () {
+
+                var askConfirmation = true;
+                $('#create-form').submit(function (e) {
+                    if (askConfirmation) {
+                        e.preventDefault();
+                        $.confirm({
+                            title: "Confirm Add",
+                            content: "Are you sure to edit service?",
+                            buttons: {
+                                confirm: {
+                                    text: "Edit Service",
+                                    btnClass: 'btn-success',
+                                    action: function () {
+                                        askConfirmation = false;
+                                        $('#create-form').submit();
+                                    }
+                                },
+                                cancel: {
+                                    text: "Cancel",
+                                    btnClass: 'btn-default'
+                                }
+                            }
+                        });
+                    }
+                })
+
                 $('.selectPincode').attr('data-live-search', true);
 
                 // Enable multiple select.

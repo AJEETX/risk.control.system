@@ -49,7 +49,7 @@
                         </div>
                     </div>
 
-                    <form asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
+                    <form id="create-form" asp-action="CreateUser" enctype="multipart/form-data" autocomplete="off">
 
                         <div class="card-body">
                             <div class="row">
@@ -216,6 +216,32 @@
     <script>
 
         $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm User Creation",
+                        content: "Are you sure?",
+                        buttons: {
+                            confirm: {
+                                text: "Add User",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+
             $('input#emailAddress').on('input change', function () {
                 if ($(this).val() != '' && $(this).val().length > 4) {
                     $('#check-email').prop('disabled', false);

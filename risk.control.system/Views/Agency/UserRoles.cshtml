@@ -2,7 +2,7 @@
 @model VendorUserRolesViewModel
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form method="post" action="update">
+        <form id="create-form" method="post" action="update">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -48,3 +48,41 @@
         </form>
     </div>
 </section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Edit",
+                        content: "Are you sure to edit user role?",
+                        closeIcon: true,
+                        buttons: {
+                            confirm: {
+                                text: "Edit user role",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+        });
+    </script>
+
+}

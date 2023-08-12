@@ -43,7 +43,7 @@
                             </div>
                         </div>
                     </div>
-                    <form asp-action="Create" enctype="multipart/form-data" method="post" autocomplete="off">
+                    <form id="create-form" asp-action="Create" enctype="multipart/form-data" method="post" autocomplete="off">
                         <input type="hidden" asp-for="Email" id="mailAddress" />
                         <input type="hidden" asp-for="DomainName" id="domainAddress" />
                         <div class="card-body">
@@ -262,6 +262,34 @@
     }
     <script type="text/jscript">
         $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Create",
+                        content: "Are you sure to create?",
+                        closeIcon: true,
+                        buttons: {
+                            confirm: {
+                                text: "Create item",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+
+
             $('input#emailAddress').on('input change', function () {
                 if ($(this).val() != '' && $(this).val().length > 4) {
                     $('#check-email').prop('disabled', false);

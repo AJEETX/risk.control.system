@@ -8,7 +8,7 @@
 
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="CreateService" enctype="multipart/form-data">
+        <form id="create-form" asp-action="CreateService" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -156,15 +156,30 @@
             $('#PinCodeId').attr('multiple', true);
             $('#PinCodeId').attr('data-selected-text-format', 'count');
 
-            //$('.selectPincode').selectpicker(
-            //    {
-            //        width: '100%',
-            //        title: '- [Choose Multiple Pincodes] -',
-            //        style: 'btn-warning',
-            //        size: 6,
-            //        iconBase: 'fa',
-            //        tickIcon: 'fa-check'
-            //    });
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Add",
+                        content: "Are you sure to add service?",
+                        buttons: {
+                            confirm: {
+                                text: "Add Service",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
         });
     </script>
 

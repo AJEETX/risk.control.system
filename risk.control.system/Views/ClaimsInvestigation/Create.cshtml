@@ -7,7 +7,7 @@
 }
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="Create" enctype="multipart/form-data">
+        <form id="create-form" asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="card card-secondary">
                 <div class="card-header">
@@ -367,7 +367,7 @@
         $(document).ready(function () {
 
             var askConfirmation = true;
-            $('#create-claim').submit(function (e) {
+            $('#create-form').submit(function (e) {
                 if (askConfirmation) {
                     e.preventDefault();
                     $.confirm({
@@ -379,7 +379,7 @@
                                 btnClass: 'btn-success',
                                 action: function () {
                                     askConfirmation = false;
-                                    alert("The Claim has been created.");
+                                    $('#create-form').submit();
                                 }
                             },
                             cancel: {

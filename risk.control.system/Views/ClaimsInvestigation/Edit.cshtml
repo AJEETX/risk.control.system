@@ -8,7 +8,7 @@
 
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="Edit" enctype="multipart/form-data">
+        <form id="create-form" asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ClaimsInvestigationId" />
             <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
@@ -381,7 +381,34 @@
     }
     <script>
         $("#InvestigationServiceTypeId").focus();
+        $(document).ready(function () {
 
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Claim Edit",
+                        content: "Are you sure?",
+                        buttons: {
+                            confirm: {
+                                text: "Edit Claim",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+
+        });
         dateContractId.max = new Date().toISOString().split("T")[0];
         dateIncidentId.max = new Date().toISOString().split("T")[0];
         dateCustomerId.max = new Date().toISOString().split("T")[0];

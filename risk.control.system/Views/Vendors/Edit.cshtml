@@ -6,7 +6,7 @@
 }
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="Edit" enctype="multipart/form-data">
+        <form id="create-form" asp-action="Edit" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -233,6 +233,31 @@
             $('#txtInput').on("cut copy paste", function (e) {
                 e.preventDefault();
             });
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Edit",
+                        content: "Are you sure to edit?",
+                        closeIcon: true,
+                        buttons: {
+                            confirm: {
+                                text: "Edit item",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
         });
     </script>
 }

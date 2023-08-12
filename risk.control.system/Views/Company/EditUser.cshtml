@@ -8,7 +8,7 @@
 
 <section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="EditUser" enctype="multipart/form-data">
+        <form id="create-form" asp-action="EditUser" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -178,4 +178,32 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(document).ready(function () {
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Edit",
+                        content: "Are you sure to edit?",
+                        buttons: {
+                            confirm: {
+                                text: "Edit Item",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+        });
+    </script>
 }
