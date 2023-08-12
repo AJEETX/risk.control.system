@@ -11,7 +11,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="card card-secondary">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="far fa-file-alt"></i> Create Claim </h3>
+                    <h3 class="card-title"><i class="fas fa-pen-alt"></i> Create Claim </h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -347,7 +347,7 @@
                                     @Applicationsettings.CANCEL
                                 </a>
                                 <button  type="submit" class="btn btn-success">
-                                    <i class="far fa-file-alt"></i> @Applicationsettings.CREATE Claim
+                                    <i class="fas fa-pen-alt"></i> Create Claim
                                 </button>
                             </div>
                         </div>
@@ -364,6 +364,34 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+        $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-claim').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Claim Creation",
+                        content: "Are you sure?",
+                        buttons: {
+                            confirm: {
+                                text: "Create",
+                                btnClass: 'btn-success',
+                                action: function () {
+                                    askConfirmation = false;
+                                    alert("The Claim has been created.");
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+
+        });
         $("#InvestigationServiceTypeId").focus();
 
         dateContractId.max = new Date().toISOString().split("T")[0];

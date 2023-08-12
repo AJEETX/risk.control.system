@@ -15,13 +15,13 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 using static risk.control.system.AppConstant.Applicationsettings;
 using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb(" Claims")]
     public class ClaimsVendorController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -241,8 +241,13 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
+        [Breadcrumb(" Claims")]
         public ActionResult Index()
         {
+            var activePage = new MvcBreadcrumbNode("Open", "ClaimsVendor", "Claims");
+            var newPage = new MvcBreadcrumbNode("Index", "ClaimsVendor", "Allocate New") { Parent = activePage };
+            ViewData["BreadcrumbNode"] = newPage;
+
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (userRole.Value.Contains(AppRoles.Agent.ToString()))
             {
@@ -251,7 +256,17 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Report")]
+        [Breadcrumb(" Investigations")]
+        public ActionResult Agent()
+        {
+            //var activePage = new MvcBreadcrumbNode("Open", "ClaimsVendor", "Claims");
+            //var newPage = new MvcBreadcrumbNode("Index", "ClaimsVendor", "Allocate New") { Parent = activePage };
+            //ViewData["BreadcrumbNode"] = newPage;
+            return View();
+        }
+
+
+        [Breadcrumb(" Reports")]
         public async Task<IActionResult> GetInvestigate(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
@@ -457,13 +472,13 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Report")]
+        [Breadcrumb("New Reports")]
         public async Task<IActionResult> ClaimReport()
         {
             return View();
         }
 
-        [Breadcrumb(" Review")]
+        [Breadcrumb(" Review Reports")]
         public async Task<IActionResult> ClaimReportReview()
         {
             return View();

@@ -15,7 +15,7 @@
             <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
             <div class="card card-secondary">
                 <div class="card-header">
-                    <h3 class="card-title"><i class="far fa-file-alt"></i> Edit Claim</h3>
+                    <h3 class="card-title"><i class="fas fa-pen-alt"></i> Edit Claim</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -363,7 +363,7 @@
                                 @Applicationsettings.CANCEL
                             </a>
                             <button type="submit" class="btn btn-warning">
-                                    <i class="far fa-file-alt"></i> Edit Claim
+                                    <i class="fas fa-pen-alt"></i> Edit Claim
                             </button>
                         </div>
                     </div>
@@ -377,6 +377,7 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
     }
     <script>
         $("#InvestigationServiceTypeId").focus();

@@ -31,11 +31,21 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group text-right">
+                    <a id="back-button" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 @section Scripts    {
     <script>
         $(document).ready(function () {
+            var vendor = $('#vendorId').val();
+            $('a#back-button').attr("href", "/Vendors/Details/" + vendor + "");
+
             $("#customerTable").DataTable({
                 ajax: {
                     url: '/api/Company/AllServices?id=' + $('#vendorId').val(),

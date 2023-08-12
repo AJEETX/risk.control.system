@@ -204,9 +204,9 @@
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Create")">
-                                <i class="fas fa-search-dollar nav-icon"></i>
+                                <i class="fas fa-pen-alt nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-success">CREATE CLAIM</span>
+                                    <span class="badge badge-success">CREATE NEW</span>
                                 </p>
                             </a>
                         </li>
@@ -215,7 +215,7 @@
                                         @Url.MakeActiveClass("ClaimsInvestigation","Details") @Url.MakeActiveClass("ClaimsInvestigation","Edit") 
                                         @Url.MakeActiveClass("CaseLocations","Create") @Url.MakeActiveClass("CaseLocations","Edit")
                                             @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete")">
-                                <i class="fas fa-search-dollar nav-icon"></i>
+                                <i class="far fa-clone nav-icon"></i>
                                 <p>
                                     <span class="badge badge-warning">INCOMPLETE CLAIMS</span>
                                 </p>
@@ -223,7 +223,7 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assign" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assign") @Url.MakeActiveClass("ClaimsInvestigation","AssignDetail") ">
-                                <i class="fas fa-funnel-dollar nav-icon"></i>
+                                <i class="fas fa-thumbtack nav-icon"></i>
                                 <p>
                                     <span class="badge badge-danger">READY TO ASSIGN</span>
                                 </p>
@@ -235,7 +235,7 @@
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assigner")
                                     @Url.MakeActiveClass("ClaimsInvestigation","AllocateToVendor") @Url.MakeActiveClass("ClaimsInvestigation","EmpanelledVendors")">
-                                <i class="fas fa-funnel-dollar nav-icon"></i>
+                                <i class="fas fa-external-link-alt nav-icon"></i>
                                 <p>
                                     <span class="badge badge-danger">ALLOCATE</span>
                                 </p>
@@ -243,7 +243,7 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
-                                <i class="fas fa-glasses nav-icon"></i>
+                                <i class="fas fa-random nav-icon"></i>
                                 <p>
                                     <span class="badge badge-warning">RE ALLOCATE</span>
                                 </p>
@@ -278,30 +278,31 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")">
-                                <i class="fas fa-glasses nav-icon"></i>
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
+                                <i class="fas fa-random nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-success">APPROVED</span>
+                                    <span class="badge badge-warning">RE ASSIGN</span>
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
-                                <i class="fas fa-glasses nav-icon"></i>
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")">
+                                <i class="fas fa-thumbs-up nav-icon"></i>
                                 <p>
-                                     <span class="badge badge-warning">REVIEWED</span>
+                                    <span class="badge badge-success">APPROVED CLAIMS</span>
                                 </p>
                             </a>
                         </li>
+                        
                     }
                 }
                 
                 <li class="nav-item">
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")
                     @Url.MakeActiveClass("ClaimsInvestigation","Detail")">
-                        <i class="fas fa-rupee-sign nav-icon"></i>
+                        <i class="fa fa-toggle-on nav-icon"></i>
                         <p>
-                             <span class="badge badge-light">ACTIVE</span>
+                             <span class="badge badge-info">ACTIVE CLAIMS</span>
                         </p>
                     </a>
                 </li>

@@ -364,10 +364,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
     animation: gradient 5s ease infinite;
 }
-
-.email-address {
-    text-align: right;
+.input-fa-pinned {
+    margin-right: -1.8rem;
+    position: relative;
+    z-index: 2;
+    color: whitesmoke;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    animation: gradient 5s ease infinite;
 }
+
+    .email-address {
+        text-align: right;
+    }
 
 .breadcrumb {
     font-weight: bold;

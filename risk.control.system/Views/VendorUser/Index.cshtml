@@ -10,6 +10,22 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user-friends"></i> Manage Agency User</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <a id="create-agency-user" class="btn btn-success" href='#'><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-user-friends"></i> Manage Users</h3>
                     </div>
                     <div class="card-body">
@@ -50,13 +66,23 @@
                 </div>
             </div>
         </div>
-
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group text-right">
+                    <a id="back-button" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 @section Scripts    
 {
     <script>
         $(document).ready(function () {
+            var vendor =  $('#vendorId').val();
+            $('a#create-agency-user').attr("href", "/VendorApplicationUsers/Create" + vendor + "");
+            $('a#back-button').attr("href", "/Vendors/Details/" + vendor + "");
+
             $("#customerTable").DataTable({
                 ajax: {
                     url: '/api/Company/GetCompanyVendors?id=' + $('#vendorId').val(),

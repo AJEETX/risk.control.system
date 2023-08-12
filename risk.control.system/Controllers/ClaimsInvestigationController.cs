@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Assess", FromAction = "Active")]
+        [Breadcrumb("Ready To Assess", FromAction = "Active")]
         public async Task<IActionResult> Assessor()
         {
             return View();
@@ -434,7 +434,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(" Review", FromAction = "Active")]
+        [Breadcrumb(" Re Assign", FromAction = "Active")]
         public async Task<IActionResult> Review()
         {
             return View();
@@ -446,7 +446,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(title: "Yet To Investigate", FromAction = "Active")]
+        [Breadcrumb(title: "To Investigate", FromAction = "Active")]
         public async Task<IActionResult> ToInvestigate()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
