@@ -1,5 +1,8 @@
-﻿using System.Security.Claims;
+﻿using System.Net.Mail;
+using System.Security.Claims;
 using System.Text;
+
+using Azure.Communication.Sms;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -59,7 +62,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded && returnUrl != mobileAppUrl)
             {
                 _logger.LogInformation("User logged in.");
-                toastNotification.AddSuccessToastMessage("login successful!");
+                toastNotification.AddSuccessToastMessage("<i class='fa fa-key'></i> login successful!");
                 return RedirectToLocal(returnUrl);
             }
 
@@ -86,6 +89,15 @@ namespace risk.control.system.Controllers
                 model.Error = "Invalid login attempt.";
                 return View(model);
             }
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public IActionResult Forgot(string useremail, long mobile)
+        {
+            string connectionString = "";
+            SmsClient smsClient = new SmsClient(connectionString);
+            return Ok();
         }
 
         [HttpPost]

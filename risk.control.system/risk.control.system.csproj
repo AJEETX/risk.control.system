@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Communication.PhoneNumbers" Version="1.1.0" />
+    <PackageReference Include="Azure.Communication.Sms" Version="1.0.1" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.0.1.1" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.9" />

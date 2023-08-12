@@ -54,22 +54,27 @@
                             <div class="text"><label for="flip" class="login-link">Forgot Password?</label></div>
                         </div>
                     </form>
+                    <div style="text-align: -webkit-center;">
+
+                        @if (Model?.Error != null)
+                        {
+                            <p class="account">
+                                <a  class="error"> @Model?.Error</a>
+                            </p>
+                        }
+                    </div>
                 </div>
                 <div class="signup-form">
                     <div class="title">Forgot Password</div>
-                    <form action="#">
+                    <form action="Forgot" method="post">
                         <div class="input-boxes">
                             <div class="input-box">
-                                <i class="fas fa-user"></i>
-                                <input type="text" placeholder="Enter your name" required>
-                            </div>
-                            <div class="input-box">
                                 <i class="fas fa-envelope"></i>
-                                <input type="text" placeholder="Enter your email" required>
+                                <input name="useremail" id="useremail" type="text" placeholder="Enter your email" autocomplete="off" required>
                             </div>
                             <div class="input-box">
                                 <i class="fa fa-mobile" aria-hidden="true"></i>
-                                <input type="number" placeholder="Enter 10 digit mobile number" required>
+                                <input id="mobile" name="mobile" type="number" placeholder="Enter 10 digit mobile number" required>
                             </div>
                             <div class="button input-box">
                                 <button type="submit" class="btn btn-secondary btn-block"> Reset Password</button>
