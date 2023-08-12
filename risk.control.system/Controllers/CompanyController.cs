@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(CompanyController.Index), "Company");
             }
             toastNotification.AddErrorToastMessage("Error to edit company profile!");
-            return Problem();
+            return RedirectToAction(nameof(CompanyController.Index), "Company");
         }
 
         [Breadcrumb("Manage Users ")]
@@ -256,7 +256,7 @@ namespace risk.control.system.Controllers
             if (id != applicationUser.Id.ToString())
             {
                 toastNotification.AddErrorToastMessage("company not found!");
-                return NotFound();
+                return RedirectToAction(nameof(CompanyController.User), "Company");
             }
 
             if (applicationUser is not null)
@@ -445,7 +445,7 @@ namespace risk.control.system.Controllers
             if (id == null || _context.Vendor == null)
             {
                 toastNotification.AddErrorToastMessage("agency not found!");
-                return NotFound();
+                return RedirectToAction(nameof(CompanyController.User), "Company");
             }
 
             var vendor = await _context.Vendor
@@ -465,7 +465,8 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.VendorId == id);
             if (vendor == null)
             {
-                return NotFound();
+                toastNotification.AddErrorToastMessage("agency not found!");
+                return RedirectToAction(nameof(CompanyController.User), "Company");
             }
             ViewBag.Backurl = backurl;
 
@@ -560,7 +561,8 @@ namespace risk.control.system.Controllers
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return NotFound();
+                toastNotification.AddErrorToastMessage("user not found!");
+                return RedirectToAction(nameof(CompanyController.User), "Company");
             }
             user.SecurityStamp = Guid.NewGuid().ToString();
             user.Updated = DateTime.UtcNow;

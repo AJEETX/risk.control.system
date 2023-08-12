@@ -41,10 +41,10 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser
-                .Include(u=>u.PinCode)
-                .Include(u=>u.Country)
-                .Include(u=>u.State)
-                .Include(u=>u.District)
+                .Include(u => u.PinCode)
+                .Include(u => u.Country)
+                .Include(u => u.State)
+                .Include(u => u.District)
                 .FirstOrDefault(c => c.Email == userEmail);
 
             return View(vendorUser);
@@ -138,7 +138,6 @@ namespace risk.control.system.Controllers
                             toastNotification.AddSuccessToastMessage("User profile edited successfully!");
                             return RedirectToAction(nameof(Index), "Dashboard");
                         }
-                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
                         Errors(result);
                     }
                 }
@@ -155,7 +154,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            toastNotification.AddErrorToastMessage("Error to create Agency user!");
+            toastNotification.AddErrorToastMessage("Error to create edit user!");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 

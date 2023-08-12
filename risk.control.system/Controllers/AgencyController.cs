@@ -328,7 +328,7 @@ namespace risk.control.system.Controllers
             if (user == null)
             {
                 toastNotification.AddErrorToastMessage("user not found!");
-                return NotFound();
+                return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
             //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles.Where(r =>
