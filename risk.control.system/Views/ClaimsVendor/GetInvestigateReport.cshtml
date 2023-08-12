@@ -28,7 +28,7 @@
                                                 @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerName)
                                             </dd>
                                             <dt class="col-sm-5">
-                                                Contact Number
+                                                Phone #
                                             </dt>
                                             <dd class="col-sm-5">
                                                 @Html.DisplayFor(model => model.ClaimsInvestigation.ContactNumber)
@@ -48,7 +48,7 @@
                                                 @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
                                             </dd>
                                             <dt class="col-sm-5">
-                                                Case Document
+                                                Document
                                             </dt>
                                             <dd class="col-sm-5">
                                                 @if (Model?.ClaimsInvestigation.DocumentImage is not null)
@@ -140,12 +140,7 @@
                                         <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.Addressline)
                                         </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                        </dd>
+                                        
                                         <dt class="col-sm-5">
                                             @Html.DisplayNameFor(model => model.CaseLocation.District.Name)
                                         </dt>
@@ -157,6 +152,12 @@
                                         </dt>
                                         <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
                                         </dd>
                                     </dl>
                                 </div>

@@ -124,7 +124,9 @@ table {
     height: 2.4rem;
     border: .1px ridge #ccc;
 }
-
+.timer-image {
+    height: 1rem;
+}
 .profile-image {
     height: 110px;
     border: .1px ridge #ccc;
@@ -354,11 +356,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .input-fa {
-    margin-right: -1.6rem;
+    margin-right: -1.8rem;
     margin-top: 1rem;
     position: relative;
     z-index: 2;
     color: whitesmoke;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    animation: gradient 5s ease infinite;
 }
 
 .email-address {

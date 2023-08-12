@@ -174,9 +174,9 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Vendor vendor)
+        public async Task<IActionResult> Edit(string vendorId, Vendor vendor)
         {
-            if (id != vendor.VendorId)
+            if (vendorId != vendor.VendorId)
             {
                 toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
@@ -211,10 +211,11 @@ namespace risk.control.system.Controllers
                     }
                     else
                     {
-                        var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == id);
+                        var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorId);
                         if (existingVendor.DocumentImage != null)
                         {
                             vendor.DocumentImage = existingVendor.DocumentImage;
+                            vendor.DocumentUrl = existingVendor.DocumentUrl;
                         }
                     }
                     vendor.Updated = DateTime.UtcNow;
@@ -246,7 +247,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 toastNotification.AddSuccessToastMessage("agency edited successfully!");
-                return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = id });
+                return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = vendorId });
             }
             return Problem();
         }

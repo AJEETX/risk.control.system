@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers.Api.Company
                 State = s.State.Name,
                 Country = s.Country.Name,
                 Pincodes = s.PincodeServices.Count == 0 ?
-                    "<span class=\"badge badge-danger\"><img class=\"form-Image\" src=\"/img/timer.gif\" /> </span>" :
+                    "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                      string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
                 Rate = s.Price,
                 UpdatedBy = s.UpdatedBy,

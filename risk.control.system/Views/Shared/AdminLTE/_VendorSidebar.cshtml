@@ -82,7 +82,7 @@
                     </div>
                 }
                 <a href="/agencyuserprofile" class="d-block">
-                    Hi @UserManager.GetUserAsync(User).Result?.FirstName 
+                    @UserManager.GetUserAsync(User).Result?.FirstName 
                     @if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                     {
                         roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;

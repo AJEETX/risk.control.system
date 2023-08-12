@@ -51,7 +51,7 @@ namespace risk.control.system.Services
                 .ThenInclude(v => v.PincodeServices)
                 .ToList();
 
-            if (companyUser == null || !companyUser.IsClientAdmin)
+            if (companyUser == null)
             {
                 return vendorCaseCount;
             }

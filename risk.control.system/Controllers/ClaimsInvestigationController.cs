@@ -814,8 +814,25 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("Error!!!");
                 return View(claimsInvestigation);
             }
+            IFormFile documentFile = null;
+            IFormFile profileFile = null;
+            var files = Request.Form?.Files;
 
-            await claimsInvestigationService.Create(userEmail, claimsInvestigation, Request.Form?.Files?.FirstOrDefault(), Request.Form?.Files?.Skip(1).Take(1)?.FirstOrDefault());
+            if (files != null && files.Count > 0)
+            {
+                var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.Document?.FileName && f.Name == claimsInvestigation.Document?.Name);
+                if (file != null)
+                {
+                    documentFile = file;
+                }
+                file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.ProfileImage?.FileName && f.Name == claimsInvestigation.ProfileImage?.Name);
+                if (file != null)
+                {
+                    profileFile = file;
+                }
+            }
+
+            await claimsInvestigationService.Create(userEmail, claimsInvestigation, documentFile, profileFile);
 
             await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
@@ -886,53 +903,31 @@ namespace risk.control.system.Controllers
                 ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.LineOfBusinessId);
                 ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.PinCodeId);
                 ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.StateId);
+                toastNotification.AddErrorToastMessage("Error!!!");
+
                 return View(claimsInvestigation);
             }
             try
             {
-                claimsInvestigation.Updated = DateTime.UtcNow;
-                claimsInvestigation.UpdatedBy = userEmail;
-                claimsInvestigation.CurrentUserEmail = userEmail;
-                IFormFile? claimDocument = Request.Form?.Files?.FirstOrDefault();
-                if (claimDocument is not null)
+                IFormFile documentFile = null;
+                IFormFile profileFile = null;
+                var files = Request.Form?.Files;
+
+                if (files != null && files.Count > 0)
                 {
-                    claimsInvestigation.Document = claimDocument;
-                    using var dataStream = new MemoryStream();
-                    await claimsInvestigation.Document.CopyToAsync(dataStream);
-                    claimsInvestigation.DocumentImage = dataStream.ToArray();
-                }
-                else
-                {
-                    var existingClaim = await _context.ClaimsInvestigation.AsNoTracking().FirstOrDefaultAsync(c =>
-                    c.ClaimsInvestigationId == claimsInvestigationId);
-                    if (existingClaim.DocumentImage != null)
+                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.Document?.FileName && f.Name == claimsInvestigation.Document?.Name);
+                    if (file != null)
                     {
-                        claimsInvestigation.DocumentImage = existingClaim.DocumentImage;
-                        claimsInvestigation.Document = existingClaim.Document;
+                        documentFile = file;
+                    }
+                    file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.ProfileImage?.FileName && f.Name == claimsInvestigation.ProfileImage?.Name);
+                    if (file != null)
+                    {
+                        profileFile = file;
                     }
                 }
-                var customerDocument = Request.Form?.Files?.Skip(1).Take(1)?.FirstOrDefault();
-                if (customerDocument is not null)
-                {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
-                    var extension = Path.GetExtension(customerDocument.FileName);
-                    claimsInvestigation.ProfileImage = customerDocument;
-                    using var dataStream = new MemoryStream();
-                    await claimsInvestigation.ProfileImage.CopyToAsync(dataStream);
-                    claimsInvestigation.ProfilePicture = dataStream.ToArray();
-                }
-                else
-                {
-                    var existingClaim = await _context.ClaimsInvestigation.AsNoTracking().FirstOrDefaultAsync(c =>
-                    c.ClaimsInvestigationId == claimsInvestigationId);
-                    if (existingClaim.ProfilePicture != null)
-                    {
-                        claimsInvestigation.ProfilePictureUrl = existingClaim.ProfilePictureUrl;
-                        claimsInvestigation.ProfilePicture = existingClaim.ProfilePicture;
-                    }
-                }
-                _context.Update(claimsInvestigation);
-                await _context.SaveChangesAsync();
+
+                await claimsInvestigationService.Create(userEmail, claimsInvestigation, documentFile, profileFile, false);
                 toastNotification.AddSuccessToastMessage("claim case edited successfully!");
             }
             catch (Exception ex)

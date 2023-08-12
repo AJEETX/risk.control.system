@@ -29,7 +29,10 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) 
+                || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
+                || userRole.Value.Contains(AppRoles.Assigner.ToString())
+                )
             {
                 Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyCaseStatus(userEmail);
                 return new JsonResult(monthlyExpense);

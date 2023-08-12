@@ -15,7 +15,7 @@ namespace risk.control.system.Services
     {
         List<ClaimsInvestigation> GetAll();
 
-        Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument);
+        Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
 
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
 
@@ -201,7 +201,7 @@ namespace risk.control.system.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument)
+        public async Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
         {
             if (claimsInvestigation is not null)
             {
@@ -232,18 +232,39 @@ namespace risk.control.system.Services
                         claimsInvestigation.DocumentImage = dataStream.ToArray();
                     }
 
-                    _context.ClaimsInvestigation.Add(claimsInvestigation);
-                    var log = new InvestigationTransaction
+                    if (create)
                     {
-                        ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                        Created = DateTime.UtcNow,
-                        Time2Update = 0,
-                        InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                        InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
-                        UpdatedBy = userEmail
-                    };
+                        _context.ClaimsInvestigation.Add(claimsInvestigation);
+                        var log = new InvestigationTransaction
+                        {
+                            ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                            Created = DateTime.UtcNow,
+                            Time2Update = 0,
+                            InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                            InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                            UpdatedBy = userEmail
+                        };
 
-                    _context.InvestigationTransaction.Add(log);
+                        _context.InvestigationTransaction.Add(log);
+                    }
+                    else
+                    {
+                        var existingClaim = await _context.ClaimsInvestigation.AsNoTracking()
+                            .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
+                        if (claimDocument == null && existingClaim.DocumentImage != null)
+                        {
+                            claimsInvestigation.DocumentImage = existingClaim.DocumentImage;
+                            claimsInvestigation.Document = existingClaim.Document;
+                        }
+                        if (customerDocument == null && existingClaim.ProfilePicture != null)
+                        {
+                            claimsInvestigation.ProfilePictureUrl = existingClaim.ProfilePictureUrl;
+                            claimsInvestigation.ProfilePicture = existingClaim.ProfilePicture;
+                            claimsInvestigation.ProfileImage = existingClaim.ProfileImage;
+                        }
+                        _context.ClaimsInvestigation.Update(claimsInvestigation);
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (Exception ex)

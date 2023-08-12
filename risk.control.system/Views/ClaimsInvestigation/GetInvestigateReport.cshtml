@@ -60,7 +60,7 @@
                                 <div class="col-md-6">
                                     <dl class="row">
                                         <dt class="col-sm-5">
-                                            Claim Document
+                                            Document
                                         </dt>
                                         <dd class="col-sm-5">
                                             @if (Model?.ClaimsInvestigation.DocumentImage is not null)
@@ -140,12 +140,7 @@
                                         <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.Addressline)
                                         </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                        </dd>
+                                        
                                         <dt class="col-sm-5">
                                             District
                                         </dt>
@@ -157,6 +152,12 @@
                                         </dt>
                                         <dd class="col-sm-5">
                                             @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
                                         </dd>
                                     </dl>
                                 </div>

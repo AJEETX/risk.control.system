@@ -93,7 +93,10 @@
                     
                 </div>
                 @{
-                    if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()))
+                    if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString())
+                    || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
+                    || userRole.Value.Contains(AppRoles.Assigner.ToString())
+                    || userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()))
                     {
                         <div class="row">
                             <div class="col-md-12">

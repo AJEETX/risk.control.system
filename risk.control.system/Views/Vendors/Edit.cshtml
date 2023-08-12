@@ -19,7 +19,7 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                    <input type="hidden" asp-for="VendorId" />
+                                    <input type="hidden" name="vendorId" asp-for="VendorId" />
                                     
                                     <div class="form-group">
                                         <div class="input-group mb-3">
@@ -228,4 +228,11 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $('#txtInput').on("cut copy paste", function (e) {
+                e.preventDefault();
+            });
+        });
+    </script>
 }

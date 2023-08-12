@@ -23,8 +23,8 @@
                                         <div class="input-group-append">
                                             <span class="input-group-text" id="emailid">Domain <i class="fa fa-asterisk asterik-style"></i></span>
                                         </div>
-                                        <input asp-for="Email" id="emailAddress" class="form-control email-address" type="text" value="" onblur="CheckIfEmailValid();" required 
-                                        placeholder="alphabets only [maximum 10 characters]" maxlength="10" onkeydown='return alphaOnly(event);'>
+                                        <input asp-for="Email" id="emailAddress" class="form-control email-address" type="text" value="" onblur="CheckIfEmailValid();" required
+                                               placeholder="alphabets only [maximum 10 characters]" maxlength="10" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="off">
                                         <div class="input-group-append">
                                             <select id="domain" name="domain" asp-for="DomainName" required class="form-control" asp-items="Html.GetEnumSelectList<Domain>()">
                                             </select>
@@ -269,15 +269,29 @@
                     $("#check-email").css('background-color', '#004788');
                     $("#check-email").css('cursor', 'default');
                 } else {
+                    $('#create-agency').prop('disabled', 'true !important');
                     $('#check-email').prop('disabled', true);
                     $("#check-email").css('color', '#ccc');
                     $("#check-email").css('background-color', 'grey');
                     $("#check-email").css('cursor', 'not-allowed');
                 }
             });
-            $('input#emailAddress').on('focus',function(){
 
+            $('input#emailAddress').on('input focus', function () {
+                if ($(this).val() != '' && $(this).val().length > 4) {
+                    $('#check-email').prop('disabled', false);
+                    $("#check-email").css('color', 'white');
+                    $("#check-email").css('background-color', '#004788');
+                    $("#check-email").css('cursor', 'default');
+                } else {
+                    $('#create-agency').prop('disabled', 'true !important');
+                    $('#check-email').prop('disabled', true);
+                    $("#check-email").css('color', '#ccc');
+                    $("#check-email").css('background-color', 'grey');
+                    $("#check-email").css('cursor', 'not-allowed');
+                }
             });
+            
         });
         function alphaOnly(event) {
             var key = event.keyCode;
@@ -300,6 +314,8 @@
             var name = $('#emailAddress').val();
             var domain = $('#domain').val();
             if (name) {
+                $('#result').fadeOut(1000); // 1.5 seconds
+                $('#result').fadeOut('slow'); // 1.5 seconds
                 $.get(url, { input: name, domain: domain }, function (data) {
 
                     if (data == 0) { //available
@@ -312,6 +328,8 @@
                         $("#emailAddress").css('background-color', '');
                         $("#emailAddress").css('border-color', '#ccc');
                         $('#create-agency').prop('disabled', false);
+                        $('#result').fadeIn(1000); // 1.5 seconds
+                        $('#result').fadeIn('slow'); // 1.5 seconds
                         $("#Name").focus();
                     }
                     else if (data == 1) {//domain exists
@@ -320,6 +338,8 @@
                         $('#result').css('display', 'inline')
                         $("#emailAddress").css('border-color', '#e97878');
                         $('#create-agency').prop('disabled', 'true !important');
+                        $('#result').fadeIn(1000); // 1.5 seconds
+                        $('#result').fadeIn('slow'); // 1.5 seconds
                     }
                     else if (data = null || data == undefined) {
                     }
@@ -329,6 +349,8 @@
         }
 
         function CheckIfEmailValid() {
+            $('#result').fadeOut(1000); // 1.5 seconds
+            $('#result').fadeOut('slow'); // 1.5 seconds
             var name = $('#emailAddress').val();
             if (name && name.length > 4) {
                 $('#check-email').prop('disabled', false);
@@ -342,8 +364,8 @@
                 $("#check-email").css('background-color', 'grey');
                 $("#check-email").css('cursor', 'not-allowed');
             }
-            $('#result').fadeOut(1000); // 1.5 seconds
-            $('#result').fadeOut('slow'); // 1.5 seconds
+            $('#result').fadeIn(1000); // 1.5 seconds
+            $('#result').fadeIn('slow'); // 1.5 seconds
         }
     </script>
 }

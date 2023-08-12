@@ -22,7 +22,7 @@
                                         @Html.DisplayFor(model => model.LineOfBusiness.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        Policy Type
+                                        Claim Type
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ClaimType)
@@ -40,7 +40,7 @@
                                         @Html.DisplayFor(model => model.ContractIssueDate)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        Policy Document
+                                        Document
                                     </dt>
                                     <dd class="col-sm-5">
                                         @if (Model?.DocumentImage is not null)
@@ -302,11 +302,11 @@
                             <input type="hidden" asp-for="ClaimsInvestigationId" />
                             <span class="fas fa-thumbtack input-fa"></span>
 
-                            <input type="submit" value="Set Ready" class="btn btn-danger" style="width:8rem" />
+                            <input type="submit" value="Set Ready" class="btn btn-danger" style="width:10rem" />
                         }
                         else
                         {
-                            <input disabled type="submit" value="Set Ready" class="btn btn-outline-danger" style="width:8rem" />
+                            <input disabled type="submit" value="Set Ready" class="btn btn-outline-danger" style="width:10rem" />
 
                         }
                     }

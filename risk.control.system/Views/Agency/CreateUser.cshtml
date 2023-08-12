@@ -26,8 +26,8 @@
                                             <div class="input-group-append">
                                                 <span class="input-group-text" id="emailid">Email <i class="fa fa-asterisk asterik-style"></i> </span>
                                             </div>
-                                            <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" value="" onblur="CheckIfEmailValid();" 
-                                            required placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);' autocomplete="off">
+                                            <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" value="" onblur="CheckIfEmailValid();"
+                                               required placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="off">
                                             <div class="input-group-append">
                                                 <span class="input-group-text" id="Email">@@@email</span>
                                             </div>
@@ -222,6 +222,22 @@
                     $("#check-email").css('background-color', '#004788');
                     $("#check-email").css('cursor', 'default');
                 } else {
+                    $('#create-agency').prop('disabled', 'true !important');
+                    $('#check-email').prop('disabled', true);
+                    $("#check-email").css('color', '#ccc');
+                    $("#check-email").css('background-color', 'grey');
+                    $("#check-email").css('cursor', 'not-allowed');
+                }
+            });
+
+            $('input#emailAddress').on('input focus', function () {
+                if ($(this).val() != '' && $(this).val().length > 4) {
+                    $('#check-email').prop('disabled', false);
+                    $("#check-email").css('color', 'white');
+                    $("#check-email").css('background-color', '#004788');
+                    $("#check-email").css('cursor', 'default');
+                } else {
+                    $('#create-agency').prop('disabled', 'true !important');
                     $('#check-email').prop('disabled', true);
                     $("#check-email").css('color', '#ccc');
                     $("#check-email").css('background-color', 'grey');
@@ -248,20 +264,24 @@
 
 
         function checkUserEmail() {
-            $('#result').fadeOut(1000); // 1.5 seconds
             var url = "/Account/CheckUserEmail";
             var name = $('#emailAddress').val();
             var emailSuffix = $('#emailSuffix').val();
             if (name) {
+                $('#result').fadeOut(1000); // 1.5 seconds
+                $('#result').fadeOut('slow'); // 1.5 seconds
                 $.get(url, { input: name + '@@' + emailSuffix }, function (data) {
 
                     if (data == 0) { //available
                         $('#mailAddress').val($('#emailAddress').val());
-                        $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i></span>");
+                        $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> </span>");
                         $('#result').css('padding', '.5rem')
+
                         $("#emailAddress").css('background-color', '');
                         $("#emailAddress").css('border-color', '#ccc');
                         $('#create-agency').prop('disabled', false);
+                        $('#result').fadeIn(1000); // 1.5 seconds
+                        $('#result').fadeIn('slow'); // 1.5 seconds
                     }
                     else if (data == 1) {//domain exists
                         $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i> </span>");
@@ -269,16 +289,21 @@
                         $('#result').css('display', 'inline')
                         $("#emailAddress").css('border-color', '#e97878');
                         $('#create-agency').prop('disabled', 'true !important');
+                        $('#result').fadeIn(1000); // 1.5 seconds
+                        $('#result').fadeIn('slow'); // 1.5 seconds
                     }
                     else if (data = null || data == undefined) {
 
                     }
+
                 });
             }
 
         }
 
         function CheckIfEmailValid() {
+            $('#result').fadeOut(1000); // 1.5 seconds
+            $('#result').fadeOut('slow'); // 1.5 seconds
             var name = $('#emailAddress').val();
             if (name && name.length > 4) {
                 $('#check-email').prop('disabled', false);
@@ -292,6 +317,8 @@
                 $("#check-email").css('background-color', 'grey');
                 $("#check-email").css('cursor', 'not-allowed');
             }
+            $('#result').fadeIn(1000); // 1.5 seconds
+            $('#result').fadeIn('slow'); // 1.5 seconds
         }
 
     </script>
