@@ -331,10 +331,13 @@
                     $.confirm({
                         title: "Confirm Set To Ready",
                         content: "Are you sure?",
+                        icon: 'fas fa-thumbtack',
+                        closeIcon: true,
+                        type: 'red',
                         buttons: {
                             confirm: {
-                                text: "Set To Ready",
-                                btnClass: 'btn-success',
+                                text: "Set Ready To Assign",
+                                btnClass: 'btn-danger',
                                 action: function () {
                                     askConfirmation = false;
                                     $('#create-form').submit();

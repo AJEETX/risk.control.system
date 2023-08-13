@@ -13,7 +13,7 @@
 
                         <div class="row">
                             <div class="col-md-12 text-right">
-                                <a class="btn btn-success" asp-controller="State" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
+                                <a class="btn btn-success" asp-controller="State" asp-action="Create"><i class="fas fa-map-marker-alt"></i> @Applicationsettings.CREATE</a>
                             </div>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
                                         <td>@state.Code</td>
                                         <td>@state.Country.Name</td>
                                         <td>
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@state.StateId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a> &nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@state.StateId"><i class="fas fa-map-marker-alt"></i> @Applicationsettings.EDIT</a> &nbsp;
                                             <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@state.StateId"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
                                             <input type="hidden" value="@state.StateId" />
                                         </td>

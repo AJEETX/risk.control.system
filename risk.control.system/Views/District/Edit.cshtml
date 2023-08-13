@@ -9,7 +9,7 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"> <i class="fas fa-pen"></i> @Applicationsettings.DISTRICT</h3>
+                        <h3 class="card-title"> <i class="fas fa-city"></i> @Applicationsettings.DISTRICT</h3>
                     </div>
                     <div class="card-body">
                         <form id="create-form" asp-action="Edit">
@@ -45,7 +45,7 @@
                                     @Applicationsettings.CANCEL
                                 </a>
                                 <button type="submit" class="btn btn-warning">
-                                    <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                    <i class="fas fa-city"></i>  @Applicationsettings.EDIT
                                 </button>
                             </div>
                         </form>
@@ -68,6 +68,7 @@
                     $.confirm({
                         title: "Confirm Edit",
                         content: "Are you sure to edit?",
+                        icon: 'fas fa-city',
                         type: 'orange',
                         closeIcon: true,
                         buttons: {

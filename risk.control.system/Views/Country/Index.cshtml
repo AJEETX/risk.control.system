@@ -11,7 +11,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12 text-right">
-                                <a class="btn btn-success" asp-controller="Country" asp-action="Create"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
+                                <a class="btn btn-success" asp-controller="Country" asp-action="Create"><i class="fas fa-map-marked-alt"></i> @Applicationsettings.CREATE</a>
                             </div>
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                                         <td>@country.Code</td>
                                         <td>@country.Name</td>
                                         <td>
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@country.CountryId"><i class="fas fa-pen"></i> @Applicationsettings.EDIT</a> &nbsp;
+                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@country.CountryId"><i class="fas fa-map-marked-alt"></i> @Applicationsettings.EDIT</a> &nbsp;
                                             <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@country.CountryId"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
                                             <input type="hidden" value="@country.CountryId" />
                                         </td>
