@@ -4,7 +4,7 @@
     ViewData["Title"] = "Details";
 }
 <section class="content pt-2">
-    <form asp-action="SetWithdraw" enctype="multipart/form-data">
+    <form id="create-form" asp-action="SetWithdraw" enctype="multipart/form-data">
         <input type="hidden" asp-for="ClaimsInvestigationId" />
         <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
         <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
@@ -249,3 +249,42 @@
         <
     </form>
 </section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Claim Withdrawl",
+                        content: "Are you sure?",
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            confirm: {
+                                text: "Withdraw Claim",
+                                btnClass: 'btn-danger',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+
+        });
+        $("#InvestigationServiceTypeId").focus();
+    </script>
+}

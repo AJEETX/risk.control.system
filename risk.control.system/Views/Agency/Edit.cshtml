@@ -239,10 +239,13 @@
                     $.confirm({
                         title: "Confirm Edit",
                         content: "Are you sure to edit agency?",
+                        type: 'orange',
+                        closeIcon: true,
+                        typeAnimated: true,
                         buttons: {
                             confirm: {
                                 text: "Edit agency",
-                                btnClass: 'btn-success',
+                                btnClass: 'btn-warning',
                                 action: function () {
                                     askConfirmation = false;
                                     $('#create-form').submit();

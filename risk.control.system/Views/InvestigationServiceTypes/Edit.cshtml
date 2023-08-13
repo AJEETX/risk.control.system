@@ -36,7 +36,7 @@
                                     <i class="fa fa-window-close"></i>
                                     @Applicationsettings.CANCEL
                                 </a>
-                                <button type="submit" class="btn btn-success">
+                                <button type="submit" class="btn btn-warning">
                                     <i class="fas fa-tools"></i> @Applicationsettings.EDIT @Applicationsettings.SERVICE
                                 </button>
                             </div>
@@ -60,11 +60,12 @@
                     $.confirm({
                         title: "Confirm Edit",
                         content: "Are you sure to edit?",
+                        type: 'orange',
                         closeIcon: true,
                         buttons: {
                             confirm: {
                                 text: "Edit item",
-                                btnClass: 'btn-success',
+                                btnClass: 'btn-warning',
                                 action: function () {
                                     askConfirmation = false;
                                     $('#create-form').submit();

@@ -165,10 +165,14 @@
                         $.confirm({
                             title: "Confirm Add",
                             content: "Are you sure to edit service?",
+                            type: 'orange',
+                            closeIcon: true,
+                            typeAnimated: true,
+
                             buttons: {
                                 confirm: {
                                     text: "Edit Service",
-                                    btnClass: 'btn-success',
+                                    btnClass: 'btn-warning',
                                     action: function () {
                                         askConfirmation = false;
                                         $('#create-form').submit();

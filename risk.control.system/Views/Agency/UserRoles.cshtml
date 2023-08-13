@@ -64,11 +64,12 @@
                     $.confirm({
                         title: "Confirm Edit",
                         content: "Are you sure to edit user role?",
+                        type: 'orange',
                         closeIcon: true,
                         buttons: {
                             confirm: {
                                 text: "Edit user role",
-                                btnClass: 'btn-success',
+                                btnClass: 'btn-warning',
                                 action: function () {
                                     askConfirmation = false;
                                     $('#create-form').submit();

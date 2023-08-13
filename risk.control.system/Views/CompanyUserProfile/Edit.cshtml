@@ -172,13 +172,16 @@
                 if (askConfirmation) {
                     e.preventDefault();
                     $.confirm({
+                        icon: 'fas fa-user-plus',
                         title: "Confirm Edit",
                         content: "Are you sure to edit user profile?",
+                        type: 'orange',
                         closeIcon: true,
+                        typeAnimated: true,
                         buttons: {
                             confirm: {
                                 text: "Edit user profile",
-                                btnClass: 'btn-success',
+                                btnClass: 'btn-warning',
                                 action: function () {
                                     askConfirmation = false;
                                     $('#create-form').submit();

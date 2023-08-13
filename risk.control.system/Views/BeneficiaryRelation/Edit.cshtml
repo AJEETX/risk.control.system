@@ -49,10 +49,12 @@
                     $.confirm({
                         title: "Confirm Edit",
                         content: "Are you sure to edit?",
+                        type: 'orange',
+                        closeIcon: true,
                         buttons: {
                             confirm: {
                                 text: "Edit Item",
-                                btnClass: 'btn-success',
+                                btnClass: 'btn-warning',
                                 action: function () {
                                     askConfirmation = false;
                                     $('#create-form').submit(); 
