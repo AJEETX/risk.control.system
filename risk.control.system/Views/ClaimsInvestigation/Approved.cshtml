@@ -85,7 +85,7 @@
                         "bSortable": false,
                         "mRender": function (data, type, row) {
                             var buttons = "";
-                            buttons += '<a href="Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                            buttons += '<a href="GetApprovedReport?selectedcase=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Report</a>&nbsp;'
                             return buttons;
                         }
                     }
