@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 
 using NToastNotify;
 
+using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 
@@ -26,16 +27,19 @@ namespace risk.control.system.Controllers
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IToastNotification toastNotification;
         private readonly ILogger _logger;
+        private readonly ApplicationDbContext _context;
 
         public AccountController(
             UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
             IToastNotification toastNotification,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            ApplicationDbContext context)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.toastNotification = toastNotification ?? throw new ArgumentNullException();
+            this._context = context;
             _logger = logger;
         }
 
@@ -59,11 +63,16 @@ namespace risk.control.system.Controllers
         {
             ViewData["ReturnUrl"] = returnUrl;
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-            if (result.Succeeded && returnUrl != mobileAppUrl)
+            if (result.Succeeded)
             {
-                _logger.LogInformation("User logged in.");
-                toastNotification.AddSuccessToastMessage("<i class='fa fa-key'></i> login successful!");
-                return RedirectToLocal(returnUrl);
+                var vendorUsers = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == model.Email.Trim().ToLower() && u.Active);
+
+                if (vendorUsers != null)
+                {
+                    _logger.LogInformation("User logged in.");
+                    toastNotification.AddSuccessToastMessage("<i class='fas fa-envelope fa-lg'></i> login successful!");
+                    return RedirectToLocal(returnUrl);
+                }
             }
 
             if (result.IsLockedOut && returnUrl != mobileAppUrl)

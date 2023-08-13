@@ -4,11 +4,11 @@
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.Vendor.Email;
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
-
-}
+}   
 <section class="content pt-2">
     <div class="container-fluid ">
         <form id="create-form" asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row mb-2">
                 <div class="col-sm-12">
                     <div class="card card-secondary">
@@ -21,7 +21,6 @@
                             <div class="row">
                                 <input type="hidden" asp-for="Id" />
                                 <div class="col-md-6">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <div class="form-group hide-id">
                                         <label asp-for="VendorId" class="control-label"></label>
                                         <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
@@ -36,6 +35,21 @@
                                         </div>
                                     </div>
 
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="ProfilePictureUrl">Profile Photo</span>
+                                        </div>
+                                        @if (Model?.ProfilePictureUrl is not null)
+                                        {
+                                            <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
+                                        }
+                                        else
+                                        {
+                                            <img id="ProfileImage" class="form-Image" src="/img/user.png">
+                                        }
+
+                                        <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                    </div>
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -67,23 +81,20 @@
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="ProfilePictureUrl">Profile Photo</span>
+                                                <span class="input-group-text" id="Comments">Remarks</span>
                                             </div>
-                                            @if (Model?.ProfilePictureUrl is not null)
-                                        {
-                                            <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
-                                        }
-                                        else
-                                        {
-                                            <img id="ProfileImage" class="form-Image" src="/img/user.png">
-                                        }
-
-                                        <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" maxlength="20" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="form-group text-right">
+                                        <span class="checkbox">
+                                            <span class="badge badge-danger"><i class="fa fa-asterisk" title="activate user with caution"></i> </span>
+                                            <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
+
+                                        </span>
+                                    </div>
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -143,14 +154,7 @@
                                             <input type="text" asp-for="Addressline" class="form-control" required placeholder="Enter Address line" maxlength="20" />
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Comments">Remarks</span>
-                                            </div>
-                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" maxlength="20" />
-                                        </div>
-                                    </div>
+                                    
 
                                 </div>
                             </div>

@@ -1,7 +1,10 @@
 using System.Reflection;
 
+using Highsoft.Web.Mvc.Charts;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
@@ -34,9 +37,17 @@ builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(builder =>
     {
         builder.AllowAnyOrigin()
-            .AllowAnyHeader()
+        .AllowAnyHeader()
             .AllowAnyMethod();
     });
+});
+// For FileUpload
+builder.Services.Configure<FormOptions>(x =>
+{
+    x.ValueLengthLimit = int.MaxValue;
+    x.MultipartBodyLengthLimit = int.MaxValue; // In case of multipart
+    x.ValueLengthLimit = int.MaxValue; //not recommended value
+    x.MemoryBufferThreshold = Int32.MaxValue;
 });
 
 builder.Services.AddHttpContextAccessor();

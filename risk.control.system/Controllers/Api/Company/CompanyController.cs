@@ -41,10 +41,11 @@ namespace risk.control.system.Controllers.Api.Company
                 new
                 {
                     Id = u.Id,
-                    Name = u.FirstName + " "+ u.LastName,
+                    Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
                     Photo = u.ProfilePictureUrl,
+                    Active = u.Active,
                     Addressline = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
@@ -136,8 +137,8 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(result);
         }
 
-        [HttpGet("GetCompanyVendors")]
-        public async Task<IActionResult> GetCompanyVendors(string id)
+        [HttpGet("GetCompanyAgencyUser")]
+        public async Task<IActionResult> GetCompanyAgencyUser(string id)
         {
             var vendor = _context.Vendor
                 .Include(c => c.VendorApplicationUser)
@@ -156,11 +157,12 @@ namespace risk.control.system.Controllers.Api.Company
                 new
                 {
                     Id = u.Id,
-                    Name = u.FirstName + " "+ u.LastName,
+                    Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
                     Photo = u.ProfilePictureUrl,
                     Addressline = u.Addressline,
+                    Active = u.Active,
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name

@@ -22,6 +22,7 @@
                                     <th>District</th>
                                     <th>State</th>
                                     <th>Country</th>
+                                    <th>Active</th>
                                     <th>Actions</th>
 
                                 </tr>
@@ -38,6 +39,7 @@
                                     <th>District</th>
                                     <th>State</th>
                                     <th>Country</th>
+                                    <th>Active</th>
                                     <th>Actions</th>
                                 </tr>
                             </tfoot>
@@ -84,6 +86,21 @@
                     { "data": "district" },
                     { "data": "state" },
                     { "data": "country" },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var buttons = "";
+                            buttons += '<span class="checkbox">'
+                            if (row.active) {
+                                buttons += '<input type="checkbox" checked disabled />'
+                            }else{
+                                buttons += '<input type="checkbox" disabled/>'
+                            }
+                            buttons += '</span>'
+                            return buttons;
+                        }
+                    },
                     {
                         "sDefaultContent": "",
                         "bSortable": false,

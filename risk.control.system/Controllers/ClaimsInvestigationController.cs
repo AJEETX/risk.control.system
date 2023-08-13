@@ -316,7 +316,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimAllocationToVendor(userEmail, claimId, selectedcase, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage("claim case allocated to agent successfully!");
+            toastNotification.AddSuccessToastMessage("Claim allocated to agency successfully!");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
         }

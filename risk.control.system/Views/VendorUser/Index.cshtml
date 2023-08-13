@@ -85,7 +85,7 @@
 
             $("#customerTable").DataTable({
                 ajax: {
-                    url: '/api/Company/GetCompanyVendors?id=' + $('#vendorId').val(),
+                    url: '/api/Company/GetCompanyAgencyUser?id=' + $('#vendorId').val(),
                     dataSrc: ''
                 },
                 fixedHeader: true,
@@ -116,6 +116,21 @@
                     { "data": "district" },
                     { "data": "state" },
                     { "data": "country" },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var buttons = "";
+                            buttons += '<span class="checkbox">'
+                            if (row.active) {
+                                buttons += '<input type="checkbox" checked disabled />'
+                            } else {
+                                buttons += '<input type="checkbox" disabled/>'
+                            }
+                            buttons += '</span>'
+                            return buttons;
+                        }
+                    },
                     {
                         "sDefaultContent": "",
                         "bSortable": false,

@@ -12,7 +12,7 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"> <i class="fas fa-user-plus"></i> Edit  User </h3>
+                            <h3 class="card-title"><i class="fas fa-user-plus"></i> Edit  User </h3>
                         </div>
                         <div class="card-body">
                         </div>
@@ -21,41 +21,12 @@
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <input type="hidden" asp-for="Id" />
-
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="email">Email </span>
                                             </div>
                                             <input readonly asp-for="Email" class="form-control readonly-input" />
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="FirstName">First Name <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" asp-for="FirstName" class="form-control title-name" required placeholder="Enter First Name" maxlength="20">
-                                            <span asp-validation-for="FirstName" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="LastName">Last Name <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" asp-for="LastName" class="form-control title-name" required placeholder="Enter Last Name" maxlength="20">
-                                            <span asp-validation-for="LastName" class="text-danger"></span>
-                                        </div>
-                                    </div><div class="form-group">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="PhoneNumber">Phone # <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="number" asp-for="PhoneNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)" min="2222222222" max="9999999999" />
-                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -75,9 +46,52 @@
                                             <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="FirstName">First Name <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="FirstName" class="form-control title-name" required placeholder="Enter First Name" maxlength="20">
+                                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="LastName">Last Name <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="LastName" class="form-control title-name" required placeholder="Enter Last Name" maxlength="20">
+                                            <span asp-validation-for="LastName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="PhoneNumber">Phone # <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="number" asp-for="PhoneNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)" min="2222222222" max="9999999999" />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="Comments">Remarks</span>
+                                            </div>
+                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" maxlength="20" />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="form-group text-right">
+                                        <span class="checkbox">
+                                            <span class="badge badge-danger"> <i class="fa fa-asterisk" title="activate user with caution"></i> </span>
+                                            <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
+
+                                        </span>
+                                    </div>
                                     <div class="form-group">
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -138,14 +152,7 @@
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Comments">Remarks</span>
-                                            </div>
-                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks (optional)" maxlength="20" />
-                                        </div>
-                                    </div>
+                                    
 
                                 </div>
                             </div>

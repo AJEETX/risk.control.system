@@ -45,6 +45,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
                     Photo = u.ProfilePictureUrl,
+                    Active = u.Active,
                     Addressline = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,

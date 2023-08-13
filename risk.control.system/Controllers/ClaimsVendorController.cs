@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
-            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsCaseLocation.VendorId);
+            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsCaseLocation.VendorId && u.Active);
 
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
@@ -264,7 +264,6 @@ namespace risk.control.system.Controllers
             //ViewData["BreadcrumbNode"] = newPage;
             return View();
         }
-
 
         [Breadcrumb(" Reports")]
         public async Task<IActionResult> GetInvestigate(string selectedcase)

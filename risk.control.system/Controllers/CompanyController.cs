@@ -285,6 +285,7 @@ namespace risk.control.system.Controllers
                         {
                             user.Password = applicationUser.Password;
                         }
+                        user.Active = applicationUser.Active;
                         user.Addressline = applicationUser.Addressline;
                         user.Country = applicationUser.Country;
                         user.CountryId = applicationUser.CountryId;
