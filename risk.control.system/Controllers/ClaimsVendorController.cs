@@ -134,7 +134,12 @@ namespace risk.control.system.Controllers
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
-            var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == claimsCaseLocation.VendorId && u.Active);
+            var vendorUsers = _context.VendorApplicationUser
+                .Include(u => u.District)
+                .Include(u => u.State)
+                .Include(u => u.Country)
+                .Include(u => u.PinCode)
+                .Where(u => u.VendorId == claimsCaseLocation.VendorId && u.Active);
 
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
