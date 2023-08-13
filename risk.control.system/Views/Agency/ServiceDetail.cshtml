@@ -13,16 +13,16 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <dl class="row">
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                        Line Of Business
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.LineOfBusiness.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.InvestigationServiceType)
+                                        Service type
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.InvestigationServiceType.Name)
@@ -58,6 +58,11 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Country.Name)
                                     </dd>
+
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Price)
                                     </dt>

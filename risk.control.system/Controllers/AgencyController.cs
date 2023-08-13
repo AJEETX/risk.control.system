@@ -484,9 +484,9 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditService(string id, VendorInvestigationServiceType vendorInvestigationServiceType)
+        public async Task<IActionResult> EditService(string vendorInvestigationServiceTypeId, VendorInvestigationServiceType vendorInvestigationServiceType)
         {
-            if (id != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
+            if (vendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
             {
                 return NotFound();
             }
