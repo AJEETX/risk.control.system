@@ -357,7 +357,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContext);
         }
 
-        [Breadcrumb(" Approved")]
+        [Breadcrumb(" Approved Claims")]
         public async Task<IActionResult> Approved()
         {
             return View();
@@ -506,7 +506,7 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [Breadcrumb(title: " Report", FromAction = "Active")]
+        [Breadcrumb(title: "Claim Report", FromAction = "Active")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -528,6 +528,31 @@ namespace risk.control.system.Controllers
                 .Include(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
+                    );
+            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
+        }
+
+        [Breadcrumb(title: "Report", FromAction = "Approved")]
+        public async Task<IActionResult> GetApprovedReport(string selectedcase)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.PinCode)
+                .Include(c => c.Country)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var claimCase = _context.CaseLocation
+                .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.PinCode)
+                .Include(c => c.ClaimReport)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                     );
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }

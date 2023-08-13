@@ -1,0 +1,267 @@
+﻿@model ClaimsInvestigationVendorsModel
+
+@{
+    ViewData["Title"] = @Applicationsettings.SERVICE;
+}
+
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <form method="post">
+                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                    <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-prescription"></i> Claim Report</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.LineOfBusiness)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.LineOfBusiness.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerName)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerName)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.ClaimType)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.ClaimType)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.PinCode)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.PinCode.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.State)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.State.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.District)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.District.Name)
+                                        </dd>
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">
+                                            Document
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @if (Model?.ClaimsInvestigation.DocumentImage is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.DocumentImage))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </dd>
+
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerIncome)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerIncome)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerOccupation)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerOccupation)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerEducation)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerEducation)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.Description)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.ClaimsInvestigation.Description)
+                                        </dd>
+                                    </dl>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">
+                                            Beneficiary Photo
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @if (Model?.CaseLocation.ProfilePicture is not null)
+                                            {
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CaseLocation.ProfilePicture))">
+                                            }
+                                            else
+                                            {
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            }
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            Phone #
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
+                                        </dd>
+                                        
+                                    </dl>
+                                </div>
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.Addressline)
+                                        </dd>
+                                        
+                                        <dt class="col-sm-5">
+                                            District
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.District.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            State
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            @Html.DisplayFor(model => model.CaseLocation.State.Name)
+                                        </dd>
+                                        <dt class="col-sm-5">
+                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
+                                        </dt>
+                                        <dd class="col-sm-5">
+                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-prescription"></i> Agency complete report</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <fieldset>
+                                        <legend>
+                                            Ocr Image
+                                        </legend>
+                                        <div class="form-group">
+                                            <img id="agentLocationPicture" class="report-image" src="/img/no-photo.png">
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>
+                                            Image Location
+                                        </legend>
+                                        <div class="form-group">
+                                            <input readonly name="agentLonglat" id="agentLonglat" asp-for="CaseLocation.ClaimReport.LongLat" value="Lucknow road, Kanpur UP 101010" type="text" class="form-control" />
+                                        </div>
+                                    </fieldset>
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <fieldset>
+                                        <legend>
+                                            QR Image
+                                        </legend>
+                                        <div class="form-group">
+                                            <img id="agentQrPicture" class="report-image" src="/img/user.png">
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>
+                                            OCR Data
+                                        </legend>
+                                        <div class="form-group">
+                                            <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" value="PAN Card: ABCXNX10101" type="text" class="form-control" />
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+
+                            <div class="=row">
+                                <div class="col-md-12">
+                                    <fieldset>
+                                        <legend>
+                                            Agent Remarks
+                                        </legend>
+                                        <input readonly asp-for="CaseLocation.ClaimReport.AgentRemarks" name="agentRemarks" id="remarks" type="text" class="form-control" value="@Model.CaseLocation.ClaimReport.AgentRemarks" />
+                                    </fieldset>
+                                </div>
+
+                            </div>
+                            <div class="=row">
+                                <div class="col-md-12">
+                                    <fieldset>
+                                        <legend>
+                                            Additional Document / File
+                                        </legend>
+                                        <div class="form-group">
+                                            <img id="supervisorPicture" asp-for="" class="report-image" src="/img/no-image.png">
+                                        </div>
+                                    </fieldset>
+                                    <fieldset>
+                                        <legend>
+                                            Supervisor Remarks
+                                        </legend>
+                                        <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-list-alt"></i> ASSESSOR REPORT</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="=row">
+                                <div class="col-md-12">
+                                    <input readonly asp-for="CaseLocation.ClaimReport.AssessorRemarks" id="assessorRemarks" type="text" class="form-control" value="@Model.CaseLocation.ClaimReport.AssessorRemarks" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <a asp-action="Approved" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+            </div>
+        </div>
+    </div>
+</section>

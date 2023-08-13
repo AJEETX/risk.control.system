@@ -286,7 +286,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")
+                                @Url.MakeActiveClass("ClaimsInvestigation","GetApprovedReport")">
                                 <i class="fas fa-thumbs-up nav-icon"></i>
                                 <p>
                                     <span class="badge badge-success">APPROVED CLAIMS</span>
