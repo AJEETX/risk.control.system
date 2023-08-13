@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230813060936_activeuser")]
+    [Migration("20230813143335_activeuser")]
     partial class activeuser
     {
         /// <inheritdoc />
