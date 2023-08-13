@@ -178,7 +178,7 @@
 
         <div class="row">
             <div class="col-md-12 text-right">
-                <form asp-action="Delete">
+                <form id="create-form" asp-action="Delete">
                     <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
                     <input type="hidden" asp-for="ClaimsInvestigationId" />
                     <input type="submit" value="Delete" class="btn btn-danger" />
@@ -187,6 +187,44 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Claim Deletion",
+                        content: "Are you sure to <i class='fa fa- trash'></i>?",
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            confirm: {
+                                text: "DELETE",
+                                btnClass: 'btn-danger',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+
+        });
+    </script>
+}
 
 
 

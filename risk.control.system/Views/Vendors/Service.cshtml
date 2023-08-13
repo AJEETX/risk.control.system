@@ -7,6 +7,22 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user-friends"></i> Manage Agency Service</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <a id="create-agency-service" class="btn btn-success" href='#'><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE Service</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
                         <h3 class="card-title"><i class="fas fas fa-list-ol"></i> Manage @Applicationsettings.SERVICE</h3>
                     </div>
                     <div class="card-body">
@@ -45,6 +61,7 @@
         $(document).ready(function () {
             var vendor = $('#vendorId').val();
             $('a#back-button').attr("href", "/Vendors/Details/" + vendor + "");
+            $('a#create-agency-service').attr("href", "/VendorService/Create?id=" + vendor + "");
 
             $("#customerTable").DataTable({
                 ajax: {
