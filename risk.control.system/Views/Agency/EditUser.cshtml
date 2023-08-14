@@ -186,15 +186,15 @@
         $.validator.setDefaults({
             submitHandler: function (form) {
                 $.confirm({
-                    title: "Confirm User Creation",
+                    title: "Confirm User Edit",
                     content: "Are you sure?",
                     icon: 'fas fa-user-plus',
-                    type: 'green',
+                    type: 'orange',
                     closeIcon: true,
                     buttons: {
                         confirm: {
-                            text: "Create",
-                            btnClass: 'btn-success',
+                            text: "Edit",
+                            btnClass: 'btn-warning',
                             action: function () {
                                 form.submit();
                             }

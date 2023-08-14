@@ -38,11 +38,13 @@
                                     <th>Email</th>
                                     <th>Name</th>
                                     <th>Phone</th>
-                                    <th>Addressline</th>
+                                    <th>Address</th>
                                     <th>District</th>
                                     <th>State</th>
                                     <th>Country</th>
+                                    <th>Pincode</th>
                                     <th>Active</th>
+                                    <th>Roles</th>
                                     <th>Actions</th>
 
                                 </tr>
@@ -55,11 +57,13 @@
                                     <th>Email</th>
                                     <th>Name</th>
                                     <th>Phone</th>
-                                    <th>Addressline</th>
+                                    <th>Address</th>
                                     <th>District</th>
                                     <th>State</th>
                                     <th>Country</th>
+                                    <th>Pincode</th>
                                     <th>Active</th>
+                                    <th>Roles</th>
                                     <th>Actions</th>
                                 </tr>
                             </tfoot>
@@ -87,7 +91,7 @@
 
             $("#customerTable").DataTable({
                 ajax: {
-                    url: '/api/Company/GetCompanyAgencyUser?id=' + $('#vendorId').val(),
+                    url: '/api/Agency/GetCompanyAgencyUser?id=' + $('#vendorId').val(),
                     dataSrc: ''
                 },
                 fixedHeader: true,
@@ -118,6 +122,7 @@
                     { "data": "district" },
                     { "data": "state" },
                     { "data": "country" },
+                    { "data": "pincode" },
                     {
                         "sDefaultContent": "",
                         "bSortable": false,
@@ -133,6 +138,7 @@
                             return buttons;
                         }
                     },
+                    { "data": "roles" },
                     {
                         "sDefaultContent": "",
                         "bSortable": false,

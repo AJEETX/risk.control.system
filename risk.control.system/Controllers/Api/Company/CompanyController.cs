@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.Data;
+using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers.Api.Company
@@ -12,9 +14,11 @@ namespace risk.control.system.Controllers.Api.Company
     public class CompanyController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
-        public CompanyController(ApplicationDbContext context)
+        public CompanyController(ApplicationDbContext context, UserManager<ClientCompanyApplicationUser> userManager)
         {
+            this.userManager = userManager;
             _context = context;
         }
 
@@ -49,7 +53,9 @@ namespace risk.control.system.Controllers.Api.Company
                     Addressline = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
-                    Country = u.Country.Name
+                    Country = u.Country.Name,
+                    Roles = string.Join(",", GetUserRoles(u).Result),
+                    Pincode = u.PinCode.Code,
                 });
             await Task.Delay(1000);
 
@@ -137,41 +143,6 @@ namespace risk.control.system.Controllers.Api.Company
             return Ok(result);
         }
 
-        [HttpGet("GetCompanyAgencyUser")]
-        public async Task<IActionResult> GetCompanyAgencyUser(string id)
-        {
-            var vendor = _context.Vendor
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.District)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.State)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.Country)
-                .Include(c => c.VendorApplicationUser)
-                .ThenInclude(u => u.PinCode)
-                .FirstOrDefault(c => c.VendorId == id);
-
-            var users = vendor.VendorApplicationUser.AsQueryable();
-            var result =
-                users.Select(u =>
-                new
-                {
-                    Id = u.Id,
-                    Name = u.FirstName + " " + u.LastName,
-                    Email = "<a href=''>" + u.Email + "</a>",
-                    Phone = u.PhoneNumber,
-                    Photo = u.ProfilePictureUrl,
-                    Addressline = u.Addressline,
-                    Active = u.Active,
-                    District = u.District.Name,
-                    State = u.State.Name,
-                    Country = u.Country.Name
-                });
-            await Task.Delay(1000);
-
-            return Ok(result.ToArray());
-        }
-
         [HttpGet("AllServices")]
         public async Task<IActionResult> AllServices(string id)
         {
@@ -212,6 +183,11 @@ namespace risk.control.system.Controllers.Api.Company
             });
 
             return Ok(result);
+        }
+
+        private async Task<List<string>> GetUserRoles(ClientCompanyApplicationUser user)
+        {
+            return new List<string>(await userManager.GetRolesAsync(user));
         }
     }
 }

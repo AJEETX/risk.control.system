@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api.Agency
 {
@@ -12,9 +17,13 @@ namespace risk.control.system.Controllers.Api.Agency
     public class AgencyController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly IDashboardService dashboardService;
 
-        public AgencyController(ApplicationDbContext context)
+        public AgencyController(ApplicationDbContext context, UserManager<VendorApplicationUser> userManager, IDashboardService dashboardService)
         {
+            this.userManager = userManager;
+            this.dashboardService = dashboardService;
             _context = context;
         }
 
@@ -41,7 +50,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 new
                 {
                     Id = u.Id,
-                    Name = u.FirstName + " "+ u.LastName,
+                    Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
                     Photo = u.ProfilePictureUrl,
@@ -49,7 +58,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     Addressline = u.Addressline,
                     District = u.District.Name,
                     State = u.State.Name,
-                    Country = u.Country.Name
+                    Country = u.Country.Name,
+                    Pincode = u.PinCode.Code,
+                    Roles = string.Join(",", GetUserRoles(u).Result)
                 });
             await Task.Delay(1000);
 
@@ -125,6 +136,115 @@ namespace risk.control.system.Controllers.Api.Agency
             });
 
             return Ok(result);
+        }
+
+        [HttpGet("GetCompanyAgencyUser")]
+        public async Task<IActionResult> GetCompanyAgencyUser(string id)
+        {
+            var vendor = _context.Vendor
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.District)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.State)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.Country)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.PinCode)
+                .FirstOrDefault(c => c.VendorId == id);
+
+            var users = vendor.VendorApplicationUser.AsQueryable();
+            var result =
+                users.Select(u =>
+                new
+                {
+                    Id = u.Id,
+                    Name = u.FirstName + " " + u.LastName,
+                    Email = "<a href=''>" + u.Email + "</a>",
+                    Phone = u.PhoneNumber,
+                    Photo = u.ProfilePictureUrl,
+                    Addressline = u.Addressline,
+                    Active = u.Active,
+                    District = u.District.Name,
+                    State = u.State.Name,
+                    Country = u.Country.Name,
+                    Pincode = u.PinCode.Code,
+                    Roles = string.Join(",", GetUserRoles(u).Result)
+                });
+            await Task.Delay(1000);
+
+            return Ok(result.ToArray());
+        }
+
+        [HttpGet("GetAgentLoad")]
+        public async Task<IActionResult> GetAgentLoad()
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            List<VendorUserClaim> agents = new List<VendorUserClaim>();
+
+            var vendor = _context.Vendor
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.PinCode)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.State)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.District)
+                .Include(c => c.VendorApplicationUser)
+                .ThenInclude(u => u.Country)
+                .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
+
+            var users = vendor.VendorApplicationUser.AsQueryable();
+            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+
+            foreach (var user in users)
+            {
+                var isAgent = await userManager.IsInRoleAsync(user, agentRole?.Name);
+                if (isAgent)
+                {
+                    int claimCount = 0;
+                    if (result.TryGetValue(user.Email, out claimCount))
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = user,
+                            CurrentCaseCount = claimCount,
+                        };
+                        agents.Add(agentData);
+                    }
+                    else
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = user,
+                            CurrentCaseCount = 0,
+                        };
+                        agents.Add(agentData);
+                    }
+                }
+            }
+            var agentWithLoad = agents.Select(u => new
+            {
+                Id = u.AgencyUser.Id,
+                Photo = u.AgencyUser.ProfilePictureUrl,
+                Email = "<a href=''>" + u.AgencyUser.Email + "</a>",
+                Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
+                Phone = u.AgencyUser.PhoneNumber,
+                Addressline = u.AgencyUser.Addressline,
+                District = u.AgencyUser.District.Name,
+                State = u.AgencyUser.State.Name,
+                Country = u.AgencyUser.Country.Name,
+                Pincode = u.AgencyUser.PinCode.Code,
+                Active = u.AgencyUser.Active,
+                Roles = string.Join(",", GetUserRoles(u.AgencyUser).Result),
+                Count = u.CurrentCaseCount
+            });
+            return Ok(agentWithLoad);
+        }
+
+        private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
+        {
+            return new List<string>(await userManager.GetRolesAsync(user));
         }
     }
 }
