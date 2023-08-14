@@ -364,36 +364,32 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        $(document).ready(function () {
-
-            var askConfirmation = true;
-            $('#create-form').submit(function (e) {
-                if (askConfirmation) {
-                    e.preventDefault();
-                    $.confirm({
-                        title: "Confirm Claim Creation",
-                        content: "Are you sure?",
-                        icon: 'fas fa-pen-alt',
-                        type: 'green',
-                        closeIcon: true,
-                        buttons: {
-                            confirm: {
-                                text: "Create",
-                                btnClass: 'btn-success',
-                                action: function () {
-                                    askConfirmation = false;
-                                    $('#create-form').submit();
-                                }
-                            },
-                            cancel: {
-                                text: "Cancel",
-                                btnClass: 'btn-default'
+        $.validator.setDefaults({
+            submitHandler: function (form) {
+                $.confirm({
+                    title: "Confirm Claim Creation",
+                    content: "Are you sure?",
+                    icon: 'fas fa-pen-alt',
+                    type: 'green',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: "Create",
+                            btnClass: 'btn-success',
+                            action: function () {
+                                form.submit();
                             }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
                         }
-                    });
-                }
-            })
-
+                    }
+                });
+            }
+        });
+        $(document).ready(function () {
+            $("#create-form").validate();
         });
         $("#InvestigationServiceTypeId").focus();
 

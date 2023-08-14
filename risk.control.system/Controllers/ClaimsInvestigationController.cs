@@ -1093,7 +1093,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Incomplete));
         }
 
         [Breadcrumb(title: " Agency detail", FromAction = "Incomplete")]

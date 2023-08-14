@@ -261,36 +261,36 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script type="text/jscript">
+
+        $.validator.setDefaults({
+            submitHandler: function (form) {
+                $.confirm({
+                    title: "Confirm Create",
+                    content: "Are you sure to create?",
+                    icon: 'fas fa-building',
+                    type: 'green',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: "Create",
+                            btnClass: 'btn-success',
+                            action: function () {
+                                askConfirmation = false;
+                                form.submit();
+                            }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
+                        }
+                    }
+                });
+            }
+        });
+
         $(document).ready(function () {
 
-            var askConfirmation = true;
-            $('#create-form').submit(function (e) {
-                if (askConfirmation) {
-                    e.preventDefault();
-                    $.confirm({
-                        title: "Confirm Create",
-                        content: "Are you sure to create?",
-                        icon: 'fas fa-building',
-                        type: 'green',
-                        closeIcon: true,
-                        buttons: {
-                            confirm: {
-                                text: "Create item",
-                                btnClass: 'btn-success',
-                                action: function () {
-                                    askConfirmation = false;
-                                    $('#create-form').submit();
-                                }
-                            },
-                            cancel: {
-                                text: "Cancel",
-                                btnClass: 'btn-default'
-                            }
-                        }
-                    });
-                }
-            })
-
+            $("#create-form").validate();
 
             $('input#emailAddress').on('input change', function () {
                 if ($(this).val() != '' && $(this).val().length > 4) {

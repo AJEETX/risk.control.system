@@ -183,37 +183,33 @@
     }
 
 <script>
-    $(document).ready(function () {
-
-            var askConfirmation = true;
-            $('#create-form').submit(function (e) {
-                if (askConfirmation) {
-                    e.preventDefault();
-                    $.confirm({
-                        title: "Confirm Edit",
-                        content: "Are you sure to edit user?",
-                        icon: 'fas fa-user-plus',
-                        type: 'orange',
-                        closeIcon: true,
-                        typeAnimated: true,
-
-                        buttons: {
-                            confirm: {
-                                text: "Edit user",
-                                btnClass: 'btn-warning fas fa-pencil-alt',
-                                action: function () {
-                                    askConfirmation = false;
-                                    $('#create-form').submit();
-                                }
-                            },
-                            cancel: {
-                                text: "Cancel",
-                                btnClass: 'btn-default'
+        $.validator.setDefaults({
+            submitHandler: function (form) {
+                $.confirm({
+                    title: "Confirm User Creation",
+                    content: "Are you sure?",
+                    icon: 'fas fa-user-plus',
+                    type: 'green',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: "Create",
+                            btnClass: 'btn-success',
+                            action: function () {
+                                form.submit();
                             }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
                         }
-                    });
-                }
-            })
+                    }
+                });
+            }
+        });
+    $(document).ready(function () {
+            $("#create-form").validate();
+
       });
     </script>
 
