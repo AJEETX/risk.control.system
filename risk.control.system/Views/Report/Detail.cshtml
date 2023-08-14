@@ -1,0 +1,46 @@
+﻿@model ClaimTransactionModel
+
+@{
+    ViewData["Title"] = "Claim: Report ";
+}
+<section class="page-content">
+    <div id="article" class="card card-default">
+
+        <div class="card-body">
+            <article>
+                <div class="bb-blog-inner">
+                    <header class="bb-blog-header">
+                        <h3 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim.CustomerName</h3>
+                    </header>
+                    <div class="bb-blog-content" itemprop="articleBody">
+                        <div class="timeline">
+                            @{
+                                foreach (var log in Model.Log)
+                                {
+                                    <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
+
+                                    <div>
+                                        <i class="nav-icon fas fa-envelope bg-blue"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
+                                            <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name.</span></h3>
+                                            <div class="timeline-body">
+                                                The status has been updated to <span class="badge badge-info">@log.InvestigationCaseSubStatus.Name</span>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
+                                    
+                                }
+                            }
+
+                            <div><i class="nav-icon fas fa-clock bg-gray"></i></div>
+                        </div>
+                    </div> <!-- class bb-blog-content -->
+
+                </div> <!-- class bb-blog-inner -->
+            </article>
+        </div>
+    </div>
+</section>

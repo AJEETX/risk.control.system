@@ -762,5 +762,47 @@ namespace risk.control.system.Controllers.Api.Claims
             await Task.Delay(1000);
             return Ok(response);
         }
+
+        [HttpGet("GetReport")]
+        public async Task<IActionResult> GetReport()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+             .Include(c => c.ClientCompany)
+             .Include(c => c.CaseEnabler)
+             .Include(c => c.CaseLocations)
+            .ThenInclude(c => c.PinCode)
+             .Include(c => c.CaseLocations).
+             ThenInclude(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.CostCentre)
+             .Include(c => c.Country)
+             .Include(c => c.District)
+             .Include(c => c.InvestigationCaseStatus)
+             .Include(c => c.InvestigationCaseSubStatus)
+             .Include(c => c.InvestigationServiceType)
+             .Include(c => c.LineOfBusiness)
+             .Include(c => c.PinCode)
+             .Include(c => c.State);
+            var claimsSubmitted = await applicationDbContext.ToListAsync();
+
+            var response = claimsSubmitted
+            .Select(a => new
+            {
+                Id = a.ClaimsInvestigationId,
+                Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
+                Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
+                Name = a.CustomerName,
+                Policy = a.LineOfBusiness.Name,
+                Status = a.InvestigationCaseStatus.Name,
+                ServiceType = a.ClaimType.GetEnumDisplayName(),
+                Location = a.CaseLocations.Count == 0 ?
+                "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                Created = a.Created.ToString("dd-MM-yyyy"),
+                timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
+            })
+            ?.ToList();
+
+            return Ok(response);
+        }
     }
 }
