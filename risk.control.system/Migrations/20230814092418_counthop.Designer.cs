@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230813143335_activeuser")]
-    partial class activeuser
+    [Migration("20230814092418_counthop")]
+    partial class counthop
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1345,6 +1345,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("HopCount")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("InvestigationCaseStatusId")
                         .HasColumnType("TEXT");

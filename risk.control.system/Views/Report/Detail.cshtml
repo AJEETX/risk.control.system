@@ -15,6 +15,8 @@
                     <div class="bb-blog-content" itemprop="articleBody">
                         <div class="timeline">
                             @{
+                                var firstOnly = true;
+                                var lastOnly = true;
                                 foreach (var log in Model.Log)
                                 {
                                     <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
@@ -23,15 +25,21 @@
                                         <i class="nav-icon fas fa-envelope bg-blue"></i>
                                         <div class="timeline-item">
                                             <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
-                                            <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name.</span></h3>
+                                            @if (@firstOnly)
+                                            {
+                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name.</span></h3>
+                                            }
+                                            else
+                                            {
+                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name.</span></h3>
+                                            }
                                             <div class="timeline-body">
                                                 The status has been updated to <span class="badge badge-info">@log.InvestigationCaseSubStatus.Name</span>
                                             </div>
-                                            
+
                                         </div>
                                     </div>
-
-                                    
+                                    firstOnly = false;
                                 }
                             }
 

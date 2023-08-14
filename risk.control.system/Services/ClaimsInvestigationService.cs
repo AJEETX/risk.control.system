@@ -100,8 +100,11 @@ namespace risk.control.system.Services
                 var lastLog = _context.InvestigationTransaction.Where(i =>
                 i.ClaimsInvestigationId == claimsCaseToAllocateToVendor.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
+                var lastLogHop = _context.InvestigationTransaction.AsNoTracking().Max(s => s.HopCount);
+
                 var log = new InvestigationTransaction
                 {
+                    HopCount = lastLogHop + 1,
                     ClaimsInvestigationId = claimsCaseToAllocateToVendor.ClaimsInvestigationId,
                     Created = DateTime.UtcNow,
                     Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
@@ -139,8 +142,11 @@ namespace risk.control.system.Services
                     var lastLog = _context.InvestigationTransaction.Where(i =>
                     i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
+                    var lastLogHop = _context.InvestigationTransaction.AsNoTracking().Max(s => s.HopCount);
+
                     var log = new InvestigationTransaction
                     {
+                        HopCount = lastLogHop + 1,
                         ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
                         Created = DateTime.UtcNow,
                         Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
@@ -186,8 +192,11 @@ namespace risk.control.system.Services
                 var lastLog = _context.InvestigationTransaction.Where(i =>
                 i.ClaimsInvestigationId == claim.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
+                var lastLogHop = _context.InvestigationTransaction.AsNoTracking().Max(s => s.HopCount);
+
                 var log = new InvestigationTransaction
                 {
+                    HopCount = lastLogHop + 1,
                     ClaimsInvestigationId = claim.ClaimsInvestigationId,
                     Created = DateTime.UtcNow,
                     Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
@@ -239,6 +248,7 @@ namespace risk.control.system.Services
                         {
                             ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
                             Created = DateTime.UtcNow,
+                            HopCount = 0,
                             Time2Update = 0,
                             InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
                             InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
@@ -333,8 +343,11 @@ namespace risk.control.system.Services
             var lastLog = _context.InvestigationTransaction.Where(i =>
                             i.ClaimsInvestigationId == claimsCaseToReassign.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
+            var lastLogHop = _context.InvestigationTransaction.AsNoTracking().Max(s => s.HopCount);
+
             var log = new InvestigationTransaction
             {
+                HopCount = lastLogHop + 1,
                 ClaimsInvestigationId = claimsCaseToReassign.ClaimsInvestigationId,
                 Created = DateTime.UtcNow,
                 Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
@@ -369,8 +382,11 @@ namespace risk.control.system.Services
             var lastLog = _context.InvestigationTransaction.Where(i =>
                  i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
 
+            var lastLogHop = _context.InvestigationTransaction.AsNoTracking().Max(s => s.HopCount);
+
             var log = new InvestigationTransaction
             {
+                HopCount = lastLogHop + 1,
                 ClaimsInvestigationId = claimsInvestigationId,
                 Created = DateTime.UtcNow,
                 Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
@@ -393,8 +409,11 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId;
                     _context.ClaimsInvestigation.Update(claim);
 
+                    var finalHop = _context.InvestigationTransaction.AsNoTracking().Max(s => s.HopCount);
+
                     var finalLog = new InvestigationTransaction
                     {
+                        HopCount = finalHop + 1,
                         ClaimsInvestigationId = claimsInvestigationId,
                         Created = DateTime.UtcNow,
                         Time2Update = DateTime.UtcNow.Subtract(claim.Created).Days,

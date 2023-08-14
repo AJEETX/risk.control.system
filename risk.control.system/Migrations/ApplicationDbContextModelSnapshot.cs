@@ -1343,6 +1343,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("HopCount")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("InvestigationCaseStatusId")
                         .HasColumnType("TEXT");
 

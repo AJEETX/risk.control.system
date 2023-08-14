@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class activeuser : Migration
+    public partial class counthop : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1100,6 +1100,7 @@ namespace risk.control.system.Migrations
                     InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
                     InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
                     Time2Update = table.Column<int>(type: "INTEGER", nullable: true),
+                    HopCount = table.Column<int>(type: "INTEGER", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)

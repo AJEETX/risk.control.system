@@ -40,7 +40,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.ClaimsInvestigation)
                 .ThenInclude(i => i.InvestigationCaseSubStatus)
                 .Where(t => t.ClaimsInvestigationId == id)
-                .OrderBy(c => c.Updated)?.ToListAsync();
+                .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
