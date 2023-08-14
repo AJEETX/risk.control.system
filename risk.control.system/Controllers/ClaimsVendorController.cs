@@ -237,7 +237,7 @@ namespace risk.control.system.Controllers
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
 
-            await claimsInvestigationService.AssignToVendorAgent(vendorUser.Email, vendorUser.VendorId, claimId);
+            await claimsInvestigationService.AssignToVendorAgent(vendorUser.Email, userEmail, vendorUser.VendorId, claimId);
 
             await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorUser.Email, vendorUser.VendorId, caseLocationId);
 
