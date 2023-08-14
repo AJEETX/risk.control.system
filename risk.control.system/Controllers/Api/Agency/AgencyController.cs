@@ -244,7 +244,16 @@ namespace risk.control.system.Controllers.Api.Agency
 
         private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
         {
-            return new List<string>(await userManager.GetRolesAsync(user));
+            var roles = await userManager.GetRolesAsync(user);
+
+            var decoratedRoles = new List<string>();
+
+            foreach (var role in roles)
+            {
+                var decoratedRole = "<span class=\"badge badge-danger\">" + role + "</span>";
+                decoratedRoles.Add(decoratedRole);
+            }
+            return decoratedRoles;
         }
     }
 }
