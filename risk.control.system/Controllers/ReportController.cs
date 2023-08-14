@@ -23,6 +23,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
+        [Breadcrumb(" Detail")]
         public async Task<IActionResult> Detail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
