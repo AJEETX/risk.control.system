@@ -235,11 +235,11 @@ namespace risk.control.system.Controllers
 
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
+            var vendorAgent = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
 
-            await claimsInvestigationService.AssignToVendorAgent(vendorUser.Email, userEmail, vendorUser.VendorId, claimId);
+            await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, userEmail, vendorAgent.VendorId, claimId);
 
-            await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorUser.Email, vendorUser.VendorId, caseLocationId);
+            await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorAgent.Email, vendorAgent.VendorId, caseLocationId);
 
             toastNotification.AddSuccessToastMessage("claim case allocated to agency agent successfully!");
 
@@ -285,8 +285,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.LineOfBusiness)
                 .Include(c => c.District)
                 .Include(c => c.PinCode)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
-                && c.CurrentUserEmail == currentUserEmail);
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var claimCase = _context.CaseLocation
@@ -394,8 +393,16 @@ namespace risk.control.system.Controllers
                 .Include(c => c.ClaimReport)
                 .Include(c => c.District)
                 .Include(c => c.State)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId || c.IsReviewCaseLocation
+                .FirstOrDefault(c => (
+                c.ClaimsInvestigationId == selectedcase
+                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId
+                )
+                ||
+                (
+                c.ClaimsInvestigationId == selectedcase
+                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId &&
+                c.IsReviewCaseLocation
+                )
                     );
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
@@ -417,7 +424,7 @@ namespace risk.control.system.Controllers
 
             toastNotification.AddSuccessToastMessage("report submitted to supervisor successfully");
 
-            return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+            return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
         }
 
         [HttpPost]

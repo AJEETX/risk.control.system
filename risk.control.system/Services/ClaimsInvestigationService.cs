@@ -223,7 +223,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task AssignToVendorAgent(string userEmail, string currentUser, string vendorId, string claimsInvestigationId)
+        public async Task AssignToVendorAgent(string vendorAgent, string currentUser, string vendorId, string claimsInvestigationId)
         {
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.CaseLocations)
@@ -240,14 +240,14 @@ namespace risk.control.system.Services
                     .Include(c => c.State)
                     .Include(c => c.State)
                     .FirstOrDefault(c => c.VendorId == vendorId && c.ClaimsInvestigationId == claimsInvestigationId);
-                claimsCaseLocation.AssignedAgentUserEmail = userEmail;
+                claimsCaseLocation.AssignedAgentUserEmail = vendorAgent;
                 claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
                 _context.CaseLocation.Update(claimsCaseLocation);
 
                 claim.Updated = DateTime.UtcNow;
-                claim.UpdatedBy = userEmail;
-                claim.CurrentUserEmail = userEmail;
+                claim.UpdatedBy = currentUser;
+                claim.CurrentUserEmail = currentUser;
                 claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
                 claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
 
@@ -276,6 +276,10 @@ namespace risk.control.system.Services
 
         public async Task SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks)
         {
+            var agent = _context.VendorApplicationUser.FirstOrDefault(a=>a.Email.Trim().ToLower() == userEmail.ToLower());
+
+            var supervisor = await GetSupervisor(agent.VendorId);
+
             var claim = _context.ClaimsInvestigation
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
@@ -295,7 +299,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId;
             caseLocation.Updated = DateTime.UtcNow;
             caseLocation.UpdatedBy = userEmail;
-            caseLocation.AssignedAgentUserEmail = userEmail;
+            caseLocation.AssignedAgentUserEmail = supervisor.Email;
             caseLocation.IsReviewCaseLocation = false;
             _context.CaseLocation.Update(caseLocation);
 
@@ -527,7 +531,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR).InvestigationCaseSubStatusId;
             caseLocation.Updated = DateTime.UtcNow;
             caseLocation.UpdatedBy = userEmail;
-            caseLocation.AssignedAgentUserEmail = userEmail;
+            caseLocation.AssignedAgentUserEmail = string.Empty;
             _context.CaseLocation.Update(caseLocation);
 
             var lastLog = _context.InvestigationTransaction.Where(i =>

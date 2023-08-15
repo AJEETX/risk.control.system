@@ -208,6 +208,7 @@ namespace risk.control.system.Controllers
 
             ViewBag.CompanyId = claimCase.ClaimsInvestigation.ClientCompanyId;
 
+            ViewBag.Selectedcase = selectedcase;
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation });
         }
 
@@ -430,7 +431,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(" Re Assign", FromAction = "Active")]
+        [Breadcrumb(" Re Allocate", FromAction = "Active")]
         public async Task<IActionResult> Review()
         {
             return View();
@@ -1039,7 +1040,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Agency detail", FromAction = "Incomplete")]
-        public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
+        public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl, string selectedcase)
         {
             if (id == null || _context.Vendor == null)
             {
@@ -1068,6 +1069,7 @@ namespace risk.control.system.Controllers
             }
             ViewBag.CompanyId = companyId;
             ViewBag.Backurl = backurl;
+            ViewBag.Selectedcase = selectedcase;
 
             return View(vendor);
         }
