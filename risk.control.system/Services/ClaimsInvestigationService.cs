@@ -390,28 +390,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId;
             caseLocation.Updated = DateTime.UtcNow;
             caseLocation.UpdatedBy = userEmail;
-            caseLocation.AssignedAgentUserEmail = userEmail;
             _context.CaseLocation.Update(caseLocation);
-
-            var lastLog = _context.InvestigationTransaction.Where(i =>
-                 i.ClaimsInvestigationId == claimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();
-
-            var lastLogHop = _context.InvestigationTransaction
-                                       .Where(i => i.ClaimsInvestigationId == claimsInvestigationId)
-                                       .AsNoTracking().Max(s => s.HopCount);
-
-            var log = new InvestigationTransaction
-            {
-                HopCount = lastLogHop + 1,
-                ClaimsInvestigationId = claimsInvestigationId,
-                Created = DateTime.UtcNow,
-                Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
-                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId,
-                UpdatedBy = userEmail
-            };
-            _context.InvestigationTransaction.Add(log);
-
             try
             {
                 await _context.SaveChangesAsync();
@@ -424,7 +403,7 @@ namespace risk.control.system.Services
                     claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId;
                     claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseStatusId;
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId;
                     _context.ClaimsInvestigation.Update(claim);
 
                     var finalHop = _context.InvestigationTransaction
@@ -438,13 +417,13 @@ namespace risk.control.system.Services
                         Created = DateTime.UtcNow,
                         Time2Update = DateTime.UtcNow.Subtract(claim.Created).Days,
                         InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId,
-                        InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId,
+                        InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                        i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId,
                         UpdatedBy = userEmail
                     };
 
                     _context.InvestigationTransaction.Add(finalLog);
 
-                    _context.ClaimsInvestigation.Update(claim);
                     return await _context.SaveChangesAsync() > 0 ? true : false;
                 }
             }
