@@ -276,12 +276,19 @@ namespace risk.control.system.Services
 
         public async Task SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks)
         {
-            var agent = _context.VendorApplicationUser.FirstOrDefault(a=>a.Email.Trim().ToLower() == userEmail.ToLower());
+            var agent = _context.VendorApplicationUser.FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
 
             var supervisor = await GetSupervisor(agent.VendorId);
 
             var claim = _context.ClaimsInvestigation
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+
+            claim.Updated = DateTime.UtcNow;
+            claim.UpdatedBy = userEmail;
+            claim.CurrentUserEmail = userEmail;
+            claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
+            claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
+                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId;
 
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
@@ -321,6 +328,8 @@ namespace risk.control.system.Services
                 UpdatedBy = userEmail
             };
             _context.InvestigationTransaction.Add(log);
+
+            _context.ClaimsInvestigation.Update(claim);
 
             try
             {
@@ -414,6 +423,8 @@ namespace risk.control.system.Services
                 {
                     claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId;
+                    claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseStatusId;
                     _context.ClaimsInvestigation.Update(claim);
 
                     var finalHop = _context.InvestigationTransaction
@@ -433,6 +444,7 @@ namespace risk.control.system.Services
 
                     _context.InvestigationTransaction.Add(finalLog);
 
+                    _context.ClaimsInvestigation.Update(claim);
                     return await _context.SaveChangesAsync() > 0 ? true : false;
                 }
             }
@@ -521,6 +533,17 @@ namespace risk.control.system.Services
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
                 .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
+
+            var claim = _context.ClaimsInvestigation
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
+
+            claim.Updated = DateTime.UtcNow;
+            claim.UpdatedBy = userEmail;
+            claim.CurrentUserEmail = userEmail;
+            claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
+            claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
+                .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR).InvestigationCaseSubStatusId;
+
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
             report.SupervisorRemarkType = reportUpdateStatus;
             report.SupervisorRemarks = supervisorRemarks;
@@ -552,7 +575,7 @@ namespace risk.control.system.Services
                 UpdatedBy = userEmail
             };
             _context.InvestigationTransaction.Add(log);
-
+            _context.ClaimsInvestigation.Update(claim);
             try
             {
                 return await _context.SaveChangesAsync() > 0 ? true : false;

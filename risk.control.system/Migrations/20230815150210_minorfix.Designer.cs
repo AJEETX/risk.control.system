@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230815123137_minorfix")]
+    [Migration("20230815150210_minorfix")]
     partial class minorfix
     {
         /// <inheritdoc />

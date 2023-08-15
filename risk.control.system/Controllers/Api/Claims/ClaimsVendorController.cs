@@ -71,13 +71,10 @@ namespace risk.control.system.Controllers.Api.Claims
             var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
 
+            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                if (userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-                {
-                    applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId));
-                }
+                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId));
 
                 var claimsAllocated = new List<ClaimsInvestigation>();
 
@@ -114,7 +111,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 return Ok(response);
             }
-            return BadRequest();
+            return Ok(null);
         }
 
         [HttpGet("GetNew")]

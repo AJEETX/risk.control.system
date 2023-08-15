@@ -65,6 +65,9 @@ namespace risk.control.system.Controllers
                 .Include(c => c.PinCode)
                 .Include(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+
+            var location = await _context.CaseLocation.FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
+
             if (claimsInvestigation == null)
             {
                 return NotFound();
@@ -72,7 +75,8 @@ namespace risk.control.system.Controllers
             var model = new ClaimTransactionModel
             {
                 Claim = claimsInvestigation,
-                Log = caseLogs
+                Log = caseLogs,
+                Location = location
             };
 
             return View(model);
