@@ -210,6 +210,14 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReportReview" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReportReview")">
+                                <i class="far fa-file-excel nav-icon"></i>
+                                <p>
+                                    <span class="badge badge-danger">RE ALLOCATE</span>
+                                </p>
+                            </a>
+                        </li>
                     }
                     else
                     {
@@ -232,18 +240,11 @@
                                             @Url.MakeActiveClass("ClaimsVendor","GetInvestigateReport")">
                                 <i class="far fa-file-archive nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-info">NEW REPORTS</span>
+                                    <span class="badge badge-info">AGENT REPORT</span>
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReportReview" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReportReview")">
-                                <i class="far fa-file-excel nav-icon"></i>
-                                <p>
-                                    <span class="badge badge-danger">REVIEW REPORTS</span>
-                                </p>
-                            </a>
-                        </li>
+                        
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open") 
                             @Url.MakeActiveClass("ClaimsVendor","Detail")">

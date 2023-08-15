@@ -521,13 +521,13 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
-        [Breadcrumb("New Reports")]
+        [Breadcrumb("Agent Report")]
         public async Task<IActionResult> ClaimReport()
         {
             return View();
         }
 
-        [Breadcrumb(" Review Reports")]
+        [Breadcrumb(" Re Allocate")]
         public async Task<IActionResult> ClaimReportReview()
         {
             return View();
