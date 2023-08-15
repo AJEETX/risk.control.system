@@ -186,13 +186,19 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        Benficiary Photo
+                                        Photo
                                     </th>
                                     <th>
                                         Benficiary Name
                                     </th>
                                     <th>
                                         Benficiary Relation
+                                    </th>
+                                    <th>
+                                        Phone
+                                    </th>
+                                    <th>
+                                        Income
                                     </th>
                                     <th>
                                         Address
@@ -203,7 +209,9 @@
                                     <th>
                                         State
                                     </th>
-
+                                    <th>
+                                        Country
+                                    </th>
                                     <th>
                                         Pincode
                                     </th>
@@ -217,11 +225,11 @@
                                         <td>
                                             @if (item?.ProfilePicture is not null)
                                             {
-                                                <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
+                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
                                             }
                                             else
                                             {
-                                                <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                             }
                                         </td>
 
@@ -232,6 +240,12 @@
                                             @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
                                         </td>
                                         <td>
+                                            @Html.DisplayFor(modelItem => item.BeneficiaryContactNumber)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.BeneficiaryIncome)
+                                        </td>
+                                        <td>
                                             @Html.DisplayFor(modelItem => item.Addressline)
                                         </td>
                                         <td>
@@ -240,11 +254,12 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.State.Name)
                                         </td>
-
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Country.Name)
+                                        </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.PinCode.Code)
                                         </td>
-                                        
                                     </tr>
                                 }
                             </tbody>

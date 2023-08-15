@@ -124,9 +124,11 @@ table {
     height: 2.4rem;
     border: .1px ridge #ccc;
 }
+
 .timer-image {
     height: 1rem;
 }
+
 .profile-image {
     height: 110px;
     border: .1px ridge #ccc;
@@ -361,24 +363,22 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     position: relative;
     z-index: 2;
     color: whitesmoke;
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-    animation: gradient 5s ease infinite;
 }
+
 .input-fa-pinned {
     margin-right: -1.8rem;
     position: relative;
     z-index: 2;
     color: whitesmoke;
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-    animation: gradient 5s ease infinite;
 }
 
-    .email-address {
-        text-align: right;
-    }
+.email-address {
+    text-align: right;
+}
 
 .breadcrumb {
     font-weight: bold;
+    font-family: 'Arial Narrow';
     border: .5px solid #ccc;
     background: linear-gradient(#fff, #ccc);
     animation: gradient 15s ease infinite;
@@ -464,20 +464,20 @@ div. {
     min-height: 70vh;
 }
 
-div.fg-toolbar.ui-toolbar.ui-corner-tl {
-    position: inherit;
-}
+    div.fg-toolbar.ui-toolbar.ui-corner-tl {
+        position: inherit;
+    }
 
-div.fg-toolbar.ui-toolbar.ui-corner-bl {
-    position: absolute;
-    bottom: 0;
-    width: 100%
-}
+    div.fg-toolbar.ui-toolbar.ui-corner-bl {
+        position: absolute;
+        bottom: 0;
+        width: 100%
+    }
 
-div.dataTables_paginate {
-    position: relative;
-    float: right;
-}
+    div.dataTables_paginate {
+        position: relative;
+        float: right;
+    }
 
 footer {
     position: fixed;

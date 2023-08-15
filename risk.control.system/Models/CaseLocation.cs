@@ -12,32 +12,31 @@ namespace risk.control.system.Models
         [Display(Name = "Beneficiary name")]
         public string BeneficiaryName { get; set; }
 
-        [Display(Name = "Beneficiary relation")]
+        [Display(Name = "BRelation")]
         public long BeneficiaryRelationId { get; set; }
 
-        [Display(Name = "Beneficiary relation")]
+        [Display(Name = "Relation")]
         public BeneficiaryRelation BeneficiaryRelation { get; set; }
 
         [DataType(DataType.PhoneNumber)]
-        [Display(Name = "Beneficiary contact number")]
+        [Display(Name = "Phone")]
         public long BeneficiaryContactNumber { get; set; }
 
-        [Display(Name = "Beneficiary income")]
-        [Column(TypeName = "decimal(15,2)")]
-        public decimal? BeneficiaryIncome { get; set; }
+        [Display(Name = "Income")]
+        public Income? BeneficiaryIncome { get; set; }
 
         [FileExtensions(Extensions = "jpg,jpeg,png")]
         [Display(Name = "Beneficiary Photo")]
         public string? ProfilePictureUrl { get; set; }
 
-        [Display(Name = "Beneficiary Photo")]
+        [Display(Name = "Photo")]
         public byte[]? ProfilePicture { get; set; }
 
-        [Display(Name = "Beneficiary Photo")]
+        [Display(Name = "Photo")]
         [NotMapped]
         public IFormFile? ProfileImage { get; set; }
 
-        [Display(Name = "Beneficiary Date of birth")]
+        [Display(Name = "Date of birth")]
         [DataType(DataType.Date)]
         public DateTime BeneficiaryDateOfBirth { get; set; } = DateTime.UtcNow;
 
@@ -56,16 +55,16 @@ namespace risk.control.system.Models
 
         public District District { get; set; } = default!;
 
-        [Display(Name = "PinCode name")]
+        [Display(Name = "PinCode")]
         public string PinCodeId { get; set; } = default!;
 
-        [Display(Name = "PinCode name")]
+        [Display(Name = "PinCode")]
         public PinCode PinCode { get; set; } = default!;
 
-        [Display(Name = "Address line")]
+        [Display(Name = "Address")]
         public string Addressline { get; set; }
 
-        [Display(Name = "Address line1")]
+        [Display(Name = "Address2")]
         public string? Addressline2 { get; set; }
 
         public string ClaimsInvestigationId { get; set; }

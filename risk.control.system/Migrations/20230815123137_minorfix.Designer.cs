@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230815101022_minorfix")]
+    [Migration("20230815123137_minorfix")]
     partial class minorfix
     {
         /// <inheritdoc />
@@ -406,8 +406,8 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("BeneficiaryDateOfBirth")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal?>("BeneficiaryIncome")
-                        .HasColumnType("decimal(15,2)");
+                    b.Property<int?>("BeneficiaryIncome")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("BeneficiaryName")
                         .IsRequired()
@@ -1355,6 +1355,15 @@ namespace risk.control.system.Migrations
                     b.Property<string>("InvestigationCaseSubStatusId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Message")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Receiver")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Sender")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("Time2Update")
                         .HasColumnType("INTEGER");
 
@@ -1362,6 +1371,21 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("footerIcon")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("footerMessage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("headerIcon")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("headerMessage")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("messageIcon")
                         .HasColumnType("TEXT");
 
                     b.HasKey("InvestigationTransactionId");

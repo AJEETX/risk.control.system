@@ -17,5 +17,13 @@ namespace risk.control.system.Models
         public InvestigationCaseSubStatus? InvestigationCaseSubStatus { get; set; }
         public int? Time2Update { get; set; } = int.MinValue;
         public int? HopCount { get; set; } = 0;
+        public string? Sender { get; set; }
+        public string? Receiver { get; set; }
+        public string? Message { get; set; }
+        public string? headerIcon { get; set; }
+        public string? headerMessage { get; set; }
+        public string? messageIcon { get; set; }
+        public string? footerIcon { get; set; }
+        public string? footerMessage { get; set; }
     }
 }

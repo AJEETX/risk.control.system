@@ -22,81 +22,6 @@
                                         @Html.DisplayFor(model => model.LineOfBusiness.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        Claim Type
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ClaimType)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        Policy #
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ContractNumber)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        Issue Date
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ContractIssueDate)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        Document
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @if (Model?.DocumentImage is not null)
-                                        {
-                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                    </dd>
-
-
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CostCentre)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CostCentre.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseEnabler)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CaseEnabler.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Description)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Description)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        Status
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.InvestigationCaseStatus.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        Customer Photo
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @if (Model?.ProfilePicture is not null)
-                                        {
-                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
-                                        }
-                                        else
-                                        {
-                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="col-md-6">
-                                <dl class="row">
-
-                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CustomerName)
                                     </dt>
                                     <dd class="col-sm-5">
@@ -109,13 +34,11 @@
                                         @Html.DisplayFor(model => model.CustomerDateOfBirth)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        Phone #
+                                        @Html.DisplayNameFor(model => model.ContactNumber)
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.ContactNumber)
                                     </dd>
-
-
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Addressline)
                                     </dt>
@@ -146,6 +69,30 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.PinCode.Code)
                                     </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.ClaimType)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.ClaimType)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Document
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.DocumentImage is not null)
+                                        {
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                        }
+                                        else
+                                        {
+                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </dd>
+
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.CustomerIncome)
                                     </dt>
@@ -166,39 +113,28 @@
                                     </dd>
 
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CustomerType)
+                                        @Html.DisplayNameFor(model => model.Description)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CustomerType)
+                                        @Html.DisplayFor(model => model.Description)
+                                    </dd>
+                                    <dt class="col-sm-5">
+                                        Customer Photo
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @if (Model?.ProfilePicture is not null)
+                                        {
+                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                        }
+                                        else
+                                        {
+                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
                                     </dd>
                                 </dl>
+
                             </div>
                         </div>
-                        @{
-                            var locationAdded = Model.CaseLocations?.Count != null && Model.CaseLocations?.Count > 0;
-                            if (!locationAdded)
-                            {
-                                <div class="row">
-
-                                    <div class="col-md-12 text-right">
-                                        <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.ClaimsInvestigationId"><i class="fas fa-map-marker-alt"></i> Add Location</a>
-                                        @*<a class="btn btn-success" asp-action="CaseLocation" asp-route-id="@Model?.ClaimsInvestigationId"><i class="fas fa-pen"></i> @Applicationsettings.VERIFY_LOCATIONS</a>*@
-                                    </div>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="row">
-
-                                    <div class="col-md-12 text-right">
-                                        <span class="fas fa-map-marker-alt input-fa"></span>
-                                        <input disabled type="submit" value="Add Location" class="btn btn-outline-secondary" style="width:10rem" />
-                                        @*<a class="btn btn-success" asp-action="CaseLocation" asp-route-id="@Model?.ClaimsInvestigationId"><i class="fas fa-pen"></i> @Applicationsettings.VERIFY_LOCATIONS</a>*@
-                                    </div>
-                                </div>
-                            }
-                        }
-
                     </div>
                 </div>
             </div>
@@ -244,7 +180,6 @@
                                         Pincode
                                     </th>
 
-                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -289,29 +224,9 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.PinCode.Code)
                                         </td>
-
-                                        <td>
-                                            @*<a class="btn btn-xs btn-info" asp-controller="CaseLocations" asp-action="Details" asp-route-id="@item.CaseLocationId"> <i class="fa fa-search"></i>   @Applicationsettings.DETAILS</a>&nbsp;*@
-                                            <a class="btn btn-xs btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@item.CaseLocationId"><i class="fas fa-pen"></i>   @Applicationsettings.EDIT</a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-controller="CaseLocations" asp-action="Delete" asp-route-id="@item.CaseLocationId"> <i class="fas fa-trash"></i>   @Applicationsettings.DELETE</a>
-                                            @*<button disabled class="btn btn-danger" asp-controller="CaseLocations" asp-action="Delete" asp-route-id="@item.CaseLocationId"> <i class="fas fa-rss"></i>   @Applicationsettings.ALLOCATE</button>*@
-                                        </td>
                                     </tr>
                                 }
                             </tbody>
-                            @*<tfoot>
-                            <tr>
-                            <td colspan="10">
-                            <a asp-action="Index" class="btn btn-secondary">
-                            <i class="fa fa-window-close"></i>
-                            @Applicationsettings.CANCEL
-                            </a>
-                            <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
-                            <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.ASSIGN_VENDOR
-                            </button>
-                            </td>
-                            </tr>
-                            </tfoot>*@
                         </table>
                     </div>
                 </div>
@@ -320,65 +235,8 @@
 
         <div class="row">
             <div class="col-md-12 text-right">
-
-                <form id="create-form" asp-action="CaseReadyToAssign">
-                    <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
-                    @{
-                        if (Model.CaseLocations != null && Model.CaseLocations.Count > 0)
-                        {
-                            <input type="hidden" asp-for="ClaimsInvestigationId" />
-                            <span class="fas fa-thumbtack input-fa"></span>
-
-                            <input type="submit" value="Set Ready" class="btn btn-danger" style="width:10rem" />
-                        }
-                        else
-                        {
-                            <input disabled type="submit" value="Set Ready" class="btn btn-outline-danger" style="width:10rem" />
-
-                        }
-                    }
-                </form>
+                <a asp-action="Open" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
             </div>
         </div>
     </div>
 </section>
-
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    <script>
-        $(document).ready(function () {
-
-            var askConfirmation = true;
-            $('#create-form').submit(function (e) {
-                if (askConfirmation) {
-                    e.preventDefault();
-                    $.confirm({
-                        title: "Confirm Set To Ready",
-                        content: "Are you sure?",
-                        icon: 'fas fa-thumbtack',
-                        closeIcon: true,
-                        type: 'red',
-                        buttons: {
-                            confirm: {
-                                text: "Set Ready To Assign",
-                                btnClass: 'btn-danger',
-                                action: function () {
-                                    askConfirmation = false;
-                                    $('#create-form').submit();
-                                }
-                            },
-                            cancel: {
-                                text: "Cancel",
-                                btnClass: 'btn-default'
-                            }
-                        }
-                    });
-                }
-            })
-
-        });
-    </script>
-}

@@ -193,28 +193,36 @@
                                         <thead>
                                             <tr>
                                             <th></th>
-                                            <th>Benficiary Photo</th>
-                                                <th>
-                                                    Benficiary Name
-                                                </th>
-                                                <th>
-                                                    Benficiary Relation
-                                                </th>
-                                                <th>
-                                                    Address
-                                                </th>
-                                                <th>
-                                                    District
-                                                </th>
-                                                <th>
-                                                    State
-                                                </th>
+                                            <th>
+                                                Photo
+                                            </th>
+                                            <th>
+                                                Benficiary Name
+                                            </th>
+                                            <th>
+                                                Benficiary Relation
+                                            </th>
+                                            <th>
+                                                Phone
+                                            </th>
+                                            <th>
+                                                Income
+                                            </th>
+                                            <th>
+                                                Address
+                                            </th>
+                                            <th>
+                                                District
+                                            </th>
+                                            <th>
+                                                State
+                                            </th>
                                             <th>
                                                 Country
                                             </th>
-                                                <th>
-                                                    Pincode
-                                                </th>
+                                            <th>
+                                                Pincode
+                                            </th>
 
                                             </tr>
                                         </thead>
@@ -235,29 +243,34 @@
                                                         <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                                     }
                                                 </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.BeneficiaryName)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Addressline)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.District.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.State.Name)
-                                                    </td>
 
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.BeneficiaryName)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.BeneficiaryRelation.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.BeneficiaryContactNumber)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.BeneficiaryIncome)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Addressline)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.District.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.State.Name)
+                                                </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.Country.Name)
                                                 </td>
                                                 <td>
-                                                        @Html.DisplayFor(modelItem => item.PinCode.Code)
-                                                    </td>
-
+                                                    @Html.DisplayFor(modelItem => item.PinCode.Code)
+                                                </td>
                                                 </tr>
                                             }
                                         </tbody>
