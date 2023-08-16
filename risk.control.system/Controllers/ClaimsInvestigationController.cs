@@ -59,6 +59,20 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
+        public async Task<IActionResult> CreateClaim()
+        {
+            var claim = new ClaimsInvestigation { LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId };
+
+            var model = new ClaimTransactionModel
+            {
+                Claim = claim,
+                Log = null,
+                Location = new CaseLocation { }
+            };
+
+            return View(model);
+        }
+
         [Breadcrumb(" Claims")]
         public IActionResult Index()
         {
@@ -558,6 +572,18 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
+            var caseLogs = await _context.InvestigationTransaction
+                .Include(i => i.InvestigationCaseStatus)
+                .Include(i => i.InvestigationCaseSubStatus)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.CaseLocations)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.InvestigationCaseStatus)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.InvestigationCaseSubStatus)
+                .Where(t => t.ClaimsInvestigationId == id)
+                .OrderByDescending(c => c.HopCount)?.ToListAsync();
+
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.ClientCompany)
                 .Include(c => c.CaseLocations)
@@ -580,16 +606,72 @@ namespace risk.control.system.Controllers
                 .Include(c => c.PinCode)
                 .Include(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+
+            var location = await _context.CaseLocation.FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
+
             if (claimsInvestigation == null)
             {
                 return NotFound();
             }
+            var model = new ClaimTransactionModel
+            {
+                Claim = claimsInvestigation,
+                Log = caseLogs,
+                Location = location
+            };
 
-            return View(claimsInvestigation);
+            return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CaseReadyToAssign(string claimsInvestigationId)
+        [Breadcrumb("Create Claim", FromAction = "Incomplete")]
+        public async Task<IActionResult> CreatedPolicy(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+
+            var location = await _context.CaseLocation.FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
+
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            var model = new ClaimTransactionModel
+            {
+                Claim = claimsInvestigation,
+                Log = null,
+                Location = location
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CaseReadyToAssign(string claimsInvestigationId, string testid)
         {
             if (claimsInvestigationId == null || _context.ClaimsInvestigation == null)
             {
@@ -680,6 +762,110 @@ namespace risk.control.system.Controllers
             }
 
             return View(claimsInvestigation);
+        }
+
+        [Breadcrumb(title: " Create Policy")]
+        public async Task<IActionResult> CreatePolicy()
+        {
+            var userEmailToSend = string.Empty;
+            var model = new ClaimsInvestigation { LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId };
+
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (clientCompanyUser == null)
+            {
+                model.HasClientCompany = false;
+                userEmailToSend = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin).Email;
+            }
+            else
+            {
+                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+
+                var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+
+                foreach (var assignedUser in assignerUsers)
+                {
+                    var isTrue = await userManager.IsInRoleAsync(assignedUser, assignerRole.Name);
+                    if (isTrue)
+                    {
+                        userEmailToSend = assignedUser.Email;
+                        break;
+                    }
+                }
+
+                model.ClientCompanyId = clientCompanyUser.ClientCompanyId;
+            }
+            ViewBag.ClientCompanyId = clientCompanyUser.ClientCompanyId;
+            //mailboxService.InsertMessage(new ContactMessage
+            //{
+            //    ApplicationUserId = clientCompanyUser != null ? clientCompanyUser.Id : _context.ApplicationUser.First(u => u.isSuperAdmin).Id,
+            //    ReceipientEmail = userEmailToSend,
+            //    Created = DateTime.UtcNow,
+            //    Message = "start",
+            //    Subject = "New case created: case Id = " + userEmailToSend,
+            //    SenderEmail = clientCompanyUser != null ? clientCompanyUser.FirstName : _context.ApplicationUser.First(u => u.isSuperAdmin).FirstName,
+            //    Priority = ContactMessagePriority.NORMAL,
+            //    SendDate = DateTime.UtcNow,
+            //    Updated = DateTime.UtcNow,
+            //    Read = false,
+            //    UpdatedBy = userEmail.Value
+            //});
+
+            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
+            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
+            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == model.LineOfBusinessId), "InvestigationServiceTypeId", "Name", model.InvestigationServiceTypeId);
+            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
+            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name");
+            ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name");
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreatePolicy(ClaimsInvestigation claimsInvestigation)
+        {
+            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
+
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
+            claimsInvestigation.InvestigationCaseStatus = status;
+            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
+            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
+            claimsInvestigation.ClientCompanyId = companyUser?.ClientCompanyId;
+
+            IFormFile documentFile = null;
+            IFormFile profileFile = null;
+            var files = Request.Form?.Files;
+
+            if (files != null && files.Count > 0)
+            {
+                var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.Document?.FileName && f.Name == claimsInvestigation.Document?.Name);
+                if (file != null)
+                {
+                    documentFile = file;
+                }
+                file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.ProfileImage?.FileName && f.Name == claimsInvestigation.ProfileImage?.Name);
+                if (file != null)
+                {
+                    profileFile = file;
+                }
+            }
+
+            var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
+
+            await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+
+            toastNotification.AddSuccessToastMessage("Policy (s) created successfully!");
+
+            return RedirectToAction(nameof(CreatedPolicy), new { id = claimId });
         }
 
         // GET: ClaimsInvestigation/Create
@@ -796,13 +982,13 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            await claimsInvestigationService.Create(userEmail, claimsInvestigation, documentFile, profileFile);
+            var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
 
             await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
             toastNotification.AddSuccessToastMessage("case(s) created successfully!");
 
-            return RedirectToAction(nameof(Incomplete));
+            return RedirectToAction(nameof(CreatedPolicy), new { id = claimId });
         }
 
         // GET: ClaimsInvestigation/Edit/5

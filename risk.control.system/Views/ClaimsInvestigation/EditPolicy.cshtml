@@ -1,0 +1,206 @@
+﻿@model risk.control.system.Models.ClaimsInvestigation
+
+@{
+    ViewData["Title"] = "Edit";
+    var hasClientCompany = @Model.HasClientCompany ? "none" : "";
+    Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
+}
+
+<section class="content pt-2">
+    <div class="container-fluid ">
+        <form id="create-form" asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ClaimsInvestigationId" />
+            <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
+            <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
+            <div class="card card-secondary">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="far fa-file-powerpoint"></i> Policy detail</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div style="display:@hasClientCompany;" class="form-group">
+                                <label asp-for="ClientCompanyId" class="control-label"></label>
+                                <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <select required id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                        <option value="">--- SELECT ---</option>
+                                    </select>
+                                    <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="ClaimType">Claim Type <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <select required asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
+                                        <option value="">--- SELECT ---</option>
+                                    </select>
+                                    <span asp-validation-for="ClaimType" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="CostCentreId">Budget Centre <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <select required asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
+                                        <option value="">--- SELECT ---</option>
+                                    </select>
+                                    <span asp-validation-for="CostCentreId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="CaseEnablerId">Reason To Verify <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <select required asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
+                                        <option value="">--- SELECT ---</option>
+                                    </select>
+                                    <span asp-validation-for="CaseEnablerId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="ContractIssueDate">Issue Date <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input required asp-for="ContractIssueDate" id="dateContractId" class="form-control" type="date" />
+                                    <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="DateOfIncident">Date Of Incident <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input required asp-for="DateOfIncident" id="dateIncidentId" class="form-control" type="date" />
+                                    <span asp-validation-for="DateOfIncident" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="ContractNumber">Policy # <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input required asp-for="ContractNumber" style="text-transform:uppercase" class="form-control" type="text" placeholder="Enter Policy #" maxlength="20" />
+                                    <span asp-validation-for="ContractNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="SumAssuredValue">Insured Amount <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Sum" min="1" />
+                                    <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" maxlength="20" />
+                                    <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="Document">Policy Document</span>
+                                    </div>
+                                    @if (Model?.DocumentImage is not null)
+                                    {
+                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                    }
+                                    else
+                                    {
+                                        <img id="documentImage" class="form-Image" src="/img/document.jpeg">
+                                    }
+                                    <input asp-for="Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-12">
+
+
+                            <div class="form-group text-right">
+                                <a asp-action="Incomplete" class="btn btn-secondary">
+                                    <i class="fa fa-window-close"></i>
+                                    @Applicationsettings.CANCEL
+                                </a>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-pen-alt"></i> Edit Policy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
+    }
+    <script>
+        $("#InvestigationServiceTypeId").focus();
+        $.validator.setDefaults({
+            submitHandler: function (form) {
+                $.confirm({
+                    title: "Confirm Claim Edit",
+                    content: "Are you sure?",
+                    icon: 'fas fa-pen-alt',
+                    type: 'orange',
+                    closeIcon: true,
+                    buttons: {
+                        confirm: {
+                            text: "Edit",
+                            btnClass: 'btn-warning',
+                            action: function () {
+                                form.submit();
+                            }
+                        },
+                        cancel: {
+                            text: "Cancel",
+                            btnClass: 'btn-default'
+                        }
+                    }
+                });
+            }
+        });
+        $(document).ready(function () {
+            $("#create-form").validate();
+        });
+        dateContractId.max = new Date().toISOString().split("T")[0];
+        dateIncidentId.max = new Date().toISOString().split("T")[0];
+        dateCustomerId.max = new Date().toISOString().split("T")[0];
+    </script>
+}

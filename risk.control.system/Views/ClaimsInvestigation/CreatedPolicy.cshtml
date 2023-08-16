@@ -1,7 +1,7 @@
 ﻿@model ClaimTransactionModel
 
 @{
-    ViewData["Title"] = "Claim: Report ";
+    ViewData["Title"] = "Create";
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -9,22 +9,74 @@
             <div class="col-md-12">
                 <div id="article" class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-newspaper"></i> Claim detail Timeline</h3>
+                        <h3 class="card-title"><i class="fas fa-newspaper"></i> Claim detail</h3>
                     </div>
                     @{
-                        var address = @Model.Claim.Addressline + " " + @Model.Claim.District.Name + " " + @Model.Claim.State.Name + " " + @Model.Claim.Country.Name + " " + @Model.Claim.PinCode.Code;
-                        var baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
-                        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
-                        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-                        var age = DateTime.Now.Subtract(Model.Claim.CustomerDateOfBirth).TotalDays;
-                        var currentAgeinYrs = (int)age / 365;
+                        string address = string.Empty;
+                        string baddress = string.Empty;
+                        int currentAgeinYrs = 0;
+                        bool customerExist = false;
+                        bool beneficiaryExist = false;
+                        if (Model.Claim != null)
+                        {
+                            address = @Model.Claim?.Addressline + " " + @Model.Claim?.District.Name + " " + @Model.Claim?.State.Name + " " + @Model.Claim?.Country.Name + " " + @Model.Claim?.PinCode.Code;
+                            baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
+                            @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
+                            @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
+                            if (Model.Claim?.CustomerDateOfBirth != null)
+                            {
+                                var age = DateTime.Now.Subtract(Model.Claim.CustomerDateOfBirth).TotalDays;
+                                currentAgeinYrs = (int)age / 365;
+                            }
+                        }
+                        if (!string.IsNullOrWhiteSpace(Model.Claim.ContractNumber))
+                        {
+                            customerExist = true;
+                        }
+                        if (Model.Location?.CaseLocationId > 0)
+                        {
+                            beneficiaryExist = true;
+                        }
+                        string customerProgressColor = "grey";
+                        if (@customerExist)
+                        {
+                            customerProgressColor = "green";
+                        }
+                        string benficiaryProgressColor = "lightgrey";
+                        if (@customerExist && @beneficiaryExist)
+                        {
+                            benficiaryProgressColor = "green";
+                        }
+                        if (@customerExist && !@beneficiaryExist)
+                        {
+                            benficiaryProgressColor = "grey";
+                        }
+                        if (!@customerExist && !@beneficiaryExist)
+                        {
+                            benficiaryProgressColor = "lightgrey";
+                        }
                         <div class="card-body">
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim.CustomerName</h5>
+                                        <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim?.CustomerName </h5>
                                     </header>
                                     <div class="card card-solid">
+                                        <div class="progress">
+                                            <div class="progress-bar" role="progressbar" style="width:33%;background-color:green;">
+                                                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+                                                edit policy
+                                            </div>
+                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+                                            <div class="progress-bar" role="progressbar" style="width:32%;background-color:@customerProgressColor">
+                                                edit customer
+                                            </div>
+                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+
+                                            <div class="progress-bar" role="progressbar" style="width:33%;background-color:@benficiaryProgressColor">
+                                                add beneficiary
+                                            </div>
+                                        </div>
                                         <div class="card-body pb-0">
                                             <div class="row">
                                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -35,45 +87,45 @@
                                                         <div class="card-body pt-0">
                                                             <div class="row">
                                                                 <div class="col-7">
-                                                                    <h2 class="lead"><b>@Model.Claim.LineOfBusiness.Name</b></h2>
+                                                                    <h2 class="lead"><b>@Model.Claim?.LineOfBusiness.Name</b></h2>
                                                                     <p class="text-muted text-sm">
-                                                                        <b>Claim Type: </b>@Model.Claim.ClaimType
+                                                                        <b>Claim Type: </b>@Model.Claim?.ClaimType
                                                                     </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-money-bill-wave"></i>
                                                                             </span>
-                                                                            Amount: <i class="fas fa-rupee-sign"></i>@Model.Claim.SumAssuredValue
+                                                                            Amount: <i class="fas fa-rupee-sign"></i>@Model.Claim?.SumAssuredValue
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-tools"></i>
                                                                             </span>
-                                                                            Service: @Model.Claim.InvestigationServiceType.Name
+                                                                            Service: @Model.Claim?.InvestigationServiceType.Name
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-money-check-alt"></i>
                                                                             </span>
-                                                                            Budget center: @Model.Claim.CostCentre.Name
+                                                                            Budget center: @Model.Claim?.CostCentre.Name
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-sun"></i>
                                                                             </span>
-                                                                            Reason: @Model.Claim.CaseEnabler.Name;
+                                                                            Reason: @Model.Claim?.CaseEnabler.Name;
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="far fa-clock"></i>
                                                                             </span>
-                                                                            Issue Date: @Model.Claim.ContractIssueDate.ToString("dd-MMM-yyyy")
+                                                                            Issue Date: @Model.Claim?.ContractIssueDate.ToString("dd-MMM-yyyy")
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                                 <div class="col-5 text-center">
-                                                                    @if (Model?.Claim.DocumentImage is not null)
+                                                                    @if (Model?.Claim?.DocumentImage is not null)
                                                                     {
                                                                         <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim.DocumentImage))">
                                                                     }
@@ -87,12 +139,20 @@
                                                         </div>
                                                         <div class="card-footer">
                                                             <div class="text-right">
-                                                                <a href="#" class="btn btn-sm bg-teal">
-                                                                    <i class="fas fa-comments"></i>
-                                                                </a>
-                                                                <a href="#" class="btn btn-sm btn-primary">
-                                                                    <i class="fas fa-print"></i> Details ...
-                                                                </a>
+
+                                                                <form id="create-form" asp-action="CaseReadyToAssign">
+                                                                    @{
+                                                                        if (Model.Claim != null)
+                                                                        {
+                                                                            <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                            <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="far fa-file-powerpoint"></i> Add Policy</a>
+                                                                        }
+                                                                    }
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -100,7 +160,7 @@
                                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                     <div class="card bg-light d-flex flex-fill">
                                                         <div class="card-header text-muted border-bottom-0">
-                                                            Customer Details
+                                                            <i class="fa fa-user-plus"></i> Customer Details
                                                         </div>
                                                         <div class="card-body pt-0">
                                                             <div class="row">
@@ -152,9 +212,19 @@
                                                         <div class="card-footer">
                                                             <div class="text-right">
 
-                                                                <a href="#" class="btn btn-sm btn-success">
-                                                                    <i class="fas fa-user"></i> Customer ...
-                                                                </a>
+                                                                <form id="create-form" asp-action="CaseReadyToAssign">
+                                                                    @{
+                                                                        if (Model.Claim != null)
+                                                                        {
+                                                                            <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                            <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i>  Edit Customer</a>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fa fa-user-plus"></i> Add Customer</a>
+                                                                        }
+                                                                    }
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -163,7 +233,7 @@
                                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                     <div class="card bg-light d-flex flex-fill">
                                                         <div class="card-header text-muted border-bottom-0">
-                                                            Beneficiary Details
+                                                            <i class="fas fa-user-tie"></i>  Beneficiary Details
                                                         </div>
                                                         <div class="card-body pt-0">
                                                             <div class="row">
@@ -211,9 +281,19 @@
                                                         <div class="card-footer">
                                                             <div class="text-right">
 
-                                                                <a href="#" class="btn btn-sm btn-warning">
-                                                                    <i class="fas fa-user"></i> Beneficiary...
-                                                                </a>
+                                                                <form id="create-form" asp-action="CaseReadyToAssign">
+                                                                    @{
+                                                                        if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
+                                                                        {
+                                                                            <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                            <a class="btn btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Edit Beneficiary</a>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                                                                        }
+                                                                    }
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -222,46 +302,26 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bb-blog-content" itemprop="articleBody">
-                                        <div class="timeline">
-                                            @{
-                                                var firstOnly = false;
-                                                var lastOnly = true;
-                                                foreach (var log in Model.Log)
-                                                {
-                                                    <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
-
-                                                    <div>
-                                                        <i class="nav-icon fas fa-envelope bg-blue"></i>
-                                                        <div class="timeline-item">
-                                                            <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
-                                                            @if (@firstOnly)
-                                                            {
-                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name.</span></h3>
-                                                            }
-                                                            else
-                                                            {
-                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case: <span class="badge badge-success"> ....</span></h3>
-                                                            }
-                                                            <div class="timeline-body">
-                                                                The status has been updated to <span class="badge badge-info">@log.InvestigationCaseSubStatus.Name</span>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                    firstOnly = true;
-                                                }
-                                            }
-
-                                            <div><i class="nav-icon fas fa-clock bg-gray"></i></div>
-                                        </div>
-                                    </div> <!-- class bb-blog-content -->
-
                                 </div> <!-- class bb-blog-inner -->
                             </article>
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <a asp-asp-controller="Report" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
+
+                                    <form id="create-form" asp-action="CaseReadyToAssign">
+                                        <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i>Go To List</a> &nbsp;&nbsp;&nbsp;
+                                        @{
+                                            if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
+                                            {
+                                                <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+
+                                                <a asp-action="CaseReadyToAssign" asp-route-claimsInvestigationId="@Model.Claim.ClaimsInvestigationId" class="btn btn-danger"><i class="fas fa-thumbtack"></i>Set Ready</a>
+                                            }
+                                            else
+                                            {
+                                                <input disabled type="submit" value="Set Ready" class="btn btn-outline-danger" style="width:10rem" />
+                                            }
+                                        }
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -269,5 +329,46 @@
                 </div>
             </div>
         </div>
+
     </div>
 </section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+
+            var askConfirmation = true;
+            $('#create-form').submit(function (e) {
+                if (askConfirmation) {
+                    e.preventDefault();
+                    $.confirm({
+                        title: "Confirm Set To Ready",
+                        content: "Are you sure?",
+                        icon: 'fas fa-thumbtack',
+                        closeIcon: true,
+                        type: 'red',
+                        buttons: {
+                            confirm: {
+                                text: "Set Ready To Assign",
+                                btnClass: 'btn-danger',
+                                action: function () {
+                                    askConfirmation = false;
+                                    $('#create-form').submit();
+                                }
+                            },
+                            cancel: {
+                                text: "Cancel",
+                                btnClass: 'btn-default'
+                            }
+                        }
+                    });
+                }
+            })
+
+        });
+    </script>
+}

@@ -15,6 +15,8 @@ namespace risk.control.system.Services
     {
         List<ClaimsInvestigation> GetAll();
 
+        Task<string> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
+
         Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
 
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
@@ -41,6 +43,82 @@ namespace risk.control.system.Services
             this._context = context;
             this.roleManager = roleManager;
             this.userManager = userManager;
+        }
+
+        public async Task<string> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
+        {
+            string addedClaimId = string.Empty;
+            if (claimsInvestigation is not null)
+            {
+                try
+                {
+                    claimsInvestigation.Updated = DateTime.UtcNow;
+                    claimsInvestigation.UpdatedBy = userEmail;
+                    claimsInvestigation.CurrentUserEmail = userEmail;
+                    claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                    claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
+
+                    if (claimDocument is not null)
+                    {
+                        var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimDocument.FileName);
+                        var extension = Path.GetExtension(claimDocument.FileName);
+                        claimsInvestigation.Document = claimDocument;
+                        using var dataStream = new MemoryStream();
+                        await claimsInvestigation.Document.CopyToAsync(dataStream);
+                        claimsInvestigation.DocumentImage = dataStream.ToArray();
+                    }
+                    if (customerDocument is not null)
+                    {
+                        var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
+                        var extension = Path.GetExtension(customerDocument.FileName);
+                        claimsInvestigation.ProfileImage = customerDocument;
+                        using var dataStream = new MemoryStream();
+                        await claimsInvestigation.ProfileImage.CopyToAsync(dataStream);
+                        claimsInvestigation.ProfilePicture = dataStream.ToArray();
+                    }
+                    if (create)
+                    {
+                        var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
+                        addedClaimId = aaddedClaimId.Entity.ClaimsInvestigationId;
+                        var log = new InvestigationTransaction
+                        {
+                            ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                            Created = DateTime.UtcNow,
+                            HopCount = 0,
+                            Time2Update = 0,
+                            InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                            InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                            UpdatedBy = userEmail
+                        };
+
+                        _context.InvestigationTransaction.Add(log);
+                    }
+                    else
+                    {
+                        var existingClaim = await _context.ClaimsInvestigation.AsNoTracking()
+                            .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
+                        if (claimDocument == null && existingClaim.DocumentImage != null)
+                        {
+                            claimsInvestigation.DocumentImage = existingClaim.DocumentImage;
+                            claimsInvestigation.Document = existingClaim.Document;
+                        }
+                        if (customerDocument == null && existingClaim.ProfilePicture != null)
+                        {
+                            claimsInvestigation.ProfilePictureUrl = existingClaim.ProfilePictureUrl;
+                            claimsInvestigation.ProfilePicture = existingClaim.ProfilePicture;
+                            claimsInvestigation.ProfileImage = existingClaim.ProfileImage;
+                        }
+                        _context.ClaimsInvestigation.Update(claimsInvestigation);
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
+            return addedClaimId;
         }
 
         public async Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
