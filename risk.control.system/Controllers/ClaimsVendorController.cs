@@ -101,10 +101,10 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SelectVendorAgent(long selectedcase, string claimId)
+        [HttpGet]
+        public async Task<IActionResult> SelectVendorAgent(string selectedcase)
         {
-            if (selectedcase < 1 || string.IsNullOrWhiteSpace(claimId))
+            if (string.IsNullOrWhiteSpace(selectedcase))
             {
                 toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
                 return RedirectToAction(nameof(Index));
@@ -113,6 +113,20 @@ namespace risk.control.system.Controllers
             var userEmail = HttpContext.User?.Identity?.Name;
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+
+            var claimsCaseToAllocateToVendorAgent = _context.ClaimsInvestigation
+                .Include(c => c.CostCentre)
+                .Include(c => c.CaseLocations)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.PinCode)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.Country)
+                .Include(c => c.Vendors)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
+
             var claimsCaseLocation = _context.CaseLocation
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.InvestigationCaseSubStatus)
@@ -122,16 +136,9 @@ namespace risk.control.system.Controllers
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.CaseLocationId == selectedcase && c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
+                .FirstOrDefault(c => c.CaseLocationId == claimsCaseToAllocateToVendorAgent.CaseLocations.FirstOrDefault().CaseLocationId &&
+                c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
 
-            var claimsCaseToAllocateToVendorAgent = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
-                .Include(c => c.PinCode)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
-                .Include(c => c.Vendors)
-                .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
             var vendorUsers = _context.VendorApplicationUser
@@ -283,7 +290,12 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.LineOfBusiness)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.CostCentre)
+                .Include(c => c.CaseEnabler)
                 .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.Country)
                 .Include(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -291,8 +303,11 @@ namespace risk.control.system.Controllers
             var claimCase = _context.CaseLocation
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.ClaimReport)
                 .Include(c => c.ClaimReport)
                 .Include(c => c.District)
+                .Include(c => c.Country)
                 .Include(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
@@ -374,37 +389,36 @@ namespace risk.control.system.Controllers
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
             {
-                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be assess.");
-                return RedirectToAction(nameof(ClaimReport));
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be investigate.");
+                return RedirectToAction(nameof(Index));
             }
 
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.District)
-                .Include(c => c.PinCode)
                 .Include(c => c.LineOfBusiness)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
-            var submittedToSupervisortStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
-            var claimCase = _context.CaseLocation
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.PinCode)
-                .Include(c => c.ClaimReport)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.CostCentre)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport)
                 .Include(c => c.District)
                 .Include(c => c.State)
-                .FirstOrDefault(c => (
-                c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId
-                )
-                ||
-                (
-                c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId &&
-                c.IsReviewCaseLocation
-                )
-                    );
-            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
+                .Include(c => c.Country)
+                .Include(c => c.PinCode)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimsInvestigation.CaseLocations.FirstOrDefault(), ClaimsInvestigation = claimsInvestigation });
         }
 
         [HttpPost]

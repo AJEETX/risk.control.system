@@ -203,7 +203,8 @@
                     if (User.IsInRole(AppRoles.Creator.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Create")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="CreateClaim" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","CreateClaim")
+                                @Url.MakeActiveClass("ClaimsInvestigation","Create")">
                                 <i class="fas fa-pen-alt nav-icon"></i>
                                 <p>
                                     <span class="badge badge-success">CREATE NEW</span>

@@ -139,20 +139,17 @@
                                                         </div>
                                                         <div class="card-footer">
                                                             <div class="text-right">
-
-                                                                <form id="create-form" asp-action="CaseReadyToAssign">
-                                                                    @{
-                                                                        if (Model.Claim != null)
-                                                                        {
-                                                                            <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
-                                                                            <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="far fa-file-powerpoint"></i> Add Policy</a>
-                                                                        }
+                                                                @{
+                                                                    if (Model.Claim != null)
+                                                                    {
+                                                                        <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                        <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
                                                                     }
-                                                                </form>
+                                                                    else
+                                                                    {
+                                                                        <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="far fa-file-powerpoint"></i> Add Policy</a>
+                                                                    }
+                                                                }
                                                             </div>
                                                         </div>
                                                     </div>
@@ -211,20 +208,17 @@
                                                         </div>
                                                         <div class="card-footer">
                                                             <div class="text-right">
-
-                                                                <form id="create-form" asp-action="CaseReadyToAssign">
-                                                                    @{
-                                                                        if (Model.Claim != null)
-                                                                        {
-                                                                            <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
-                                                                            <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i>  Edit Customer</a>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fa fa-user-plus"></i> Add Customer</a>
-                                                                        }
+                                                                @{
+                                                                    if (Model.Claim != null)
+                                                                    {
+                                                                        <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                        <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i>  Edit Customer</a>
                                                                     }
-                                                                </form>
+                                                                    else
+                                                                    {
+                                                                        <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fa fa-user-plus"></i> Add Customer</a>
+                                                                    }
+                                                                }
                                                             </div>
                                                         </div>
                                                     </div>
@@ -280,20 +274,17 @@
                                                         </div>
                                                         <div class="card-footer">
                                                             <div class="text-right">
-
-                                                                <form id="create-form" asp-action="CaseReadyToAssign">
-                                                                    @{
-                                                                        if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
-                                                                        {
-                                                                            <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
-                                                                            <a class="btn btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Edit Beneficiary</a>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
-                                                                        }
+                                                                @{
+                                                                    if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
+                                                                    {
+                                                                        <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                        <a class="btn btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@Model.Location.CaseLocationId"><i class="fas fa-user-tie"></i> Edit Beneficiary</a>
                                                                     }
-                                                                </form>
+                                                                    else
+                                                                    {
+                                                                        <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                                                                    }
+                                                                }
                                                             </div>
                                                         </div>
                                                     </div>
@@ -307,7 +298,7 @@
                             <div class="row">
                                 <div class="col-md-12 text-right">
 
-                                    <form id="create-form" method="get" asp-action="CaseReadyToAssign" asp-route--testid="@Model.Claim.ClaimsInvestigationId">
+                                    <form id="create-form" method="post" asp-action="CaseReadyToAssign" asp-route--testid="@Model.Claim.ClaimsInvestigationId">
                                         <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
                                         @{
                                             if (Model.Claim.CaseLocations != null && Model.Claim.CaseLocations.Count > 0)

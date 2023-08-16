@@ -59,6 +59,7 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
+        [Breadcrumb(" Create New", FromAction = "Active")]
         public async Task<IActionResult> CreateClaim()
         {
             var claim = new ClaimsInvestigation { LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId };
@@ -107,10 +108,56 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [Breadcrumb(" Empanelled vendors")]
-        public async Task<IActionResult> EmpanelledVendors(long selectedcase)
+        public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+
+            if (string.IsNullOrWhiteSpace(selectedcase))
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
+                return RedirectToAction(nameof(Assigner));
+            }
+
+            if (_context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.ClientCompany)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseEnabler)
+                .Include(c => c.CostCentre)
+                .Include(c => c.Country)
+                .Include(c => c.District)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var caseLocations = claimsInvestigation.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+            && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId).ToList();
+
+            claimsInvestigation.CaseLocations = caseLocations;
+
+            var location = claimsInvestigation.CaseLocations.FirstOrDefault()?.CaseLocationId;
+
             var claimCase = _context.CaseLocation
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
@@ -118,19 +165,9 @@ namespace risk.control.system.Controllers
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.CaseLocationId == selectedcase
+                .FirstOrDefault(c => c.CaseLocationId == location
                 //&& c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId
                 );
-
-            var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.PinCode)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.CostCentre)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == claimCase.ClaimsInvestigationId);
 
             var existingVendors = await _context.Vendor
                 .Where(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.ClientCompanyId)
@@ -470,6 +507,9 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.LineOfBusiness)
+                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.CostCentre)
+                .Include(c => c.CaseEnabler)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.PinCode)
@@ -480,9 +520,11 @@ namespace risk.control.system.Controllers
             var claimCase = _context.CaseLocation
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.PinCode)
+                .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
                 .Include(c => c.District)
                 .Include(c => c.State)
+                .Include(c => c.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
                     );
@@ -670,15 +712,15 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> CaseReadyToAssign(string claimsInvestigationId, string testid)
+        [HttpPost]
+        public async Task<IActionResult> CaseReadyToAssign(ClaimTransactionModel model)
         {
-            if (claimsInvestigationId == null || _context.ClaimsInvestigation == null)
+            if (model == null || _context.ClaimsInvestigation == null)
             {
                 return NotFound();
             }
             var claimsInvestigation = await _context.ClaimsInvestigation
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimsInvestigationId);
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == model.Claim.ClaimsInvestigationId);
             claimsInvestigation.IsReady2Assign = true;
             _context.ClaimsInvestigation.Update(claimsInvestigation);
             await _context.SaveChangesAsync();
@@ -986,9 +1028,9 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
-            toastNotification.AddSuccessToastMessage("case(s) created successfully!");
+            toastNotification.AddSuccessToastMessage("<i class=\"fas fa-newspaper\"></i> Claim created successfully!");
 
-            return RedirectToAction(nameof(CreatedPolicy), new { id = claimId });
+            return RedirectToAction(nameof(Details), new { id = claimId });
         }
 
         // GET: ClaimsInvestigation/Edit/5
