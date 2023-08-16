@@ -649,7 +649,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
-            var location = await _context.CaseLocation.FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
+            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
 
             if (claimsInvestigation == null)
             {
