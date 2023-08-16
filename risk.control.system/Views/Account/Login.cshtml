@@ -13,6 +13,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<style>
+    #togglePassword {
+        cursor: pointer;
+        position: relative;
+        visibility: hidden;
+    }
+
+        #togglePassword:hover {
+            visibility: visible !important;
+        }
+</style>
 <body>
     <div class="container">
         <input type="checkbox" id="flip">
@@ -44,7 +55,11 @@
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock"></i>
-                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required>
+                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" value="@Applicationsettings.TestPassword"
+                                       autocomplete="off" required onfocus="myFunction(this, true)" onblur="myFunction(this, false)">
+                                       <span class="">
+                                    <i class="far fa-eye" id="togglePassword"></i>
+                                </span>
                             </div>
                             
                             <p class="account">By clicking login, you agree to our <a href="#">Terms & Conditions!</a></p>
@@ -87,4 +102,23 @@
         </div>
     </div>
 </body>
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    function myFunction(x, show) {
+        if (show) {
+            togglePassword.style.visibility = "visible";
+        } else {
+            togglePassword.style.visibility = "hidden";
+        }
+    }
+    const password = document.querySelector('#password');
+
+    togglePassword.addEventListener('click', function (e) {
+        // toggle the type attribute
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        // toggle the eye slash icon
+        this.classList.toggle('fa-eye-slash');
+    });
+</script>
 </html>

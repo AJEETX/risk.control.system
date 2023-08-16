@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Web.Helpers;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -196,11 +198,25 @@ namespace risk.control.system.Controllers
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
-
             if (result.Succeeded)
             {
-                toastNotification.AddSuccessToastMessage("User created successfully!");
-                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                if (!user.Active)
+                {
+                    var createdUser = await userManager.FindByEmailAsync(user.Email);
+                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                    if (lockUser.Succeeded && lockDate.Succeeded)
+                    {
+                        toastNotification.AddSuccessToastMessage("User created and locked successfully!");
+                        return RedirectToAction(nameof(AgencyController.User), "Agency");
+                    }
+                }
+                else
+                {
+                    toastNotification.AddSuccessToastMessage("User created successfully!");
+                    return RedirectToAction(nameof(AgencyController.User), "Agency");
+                }
             }
             else
             {
@@ -297,10 +313,34 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
+                            if (!user.Active)
+                            {
+                                var createdUser = await userManager.FindByEmailAsync(user.Email);
+                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                                var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+
+                                if (lockUser.Succeeded && lockDate.Succeeded)
+                                {
+                                    toastNotification.AddSuccessToastMessage("User edited and locked successfully!");
+                                    return RedirectToAction(nameof(AgencyController.User), "Agency");
+                                }
+                            }
+                            if (user.Active)
+                            {
+                                var createdUser = await userManager.FindByEmailAsync(user.Email);
+                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, false);
+                                var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+
+                                if (lockUser.Succeeded && lockDate.Succeeded)
+                                {
+                                    toastNotification.AddSuccessToastMessage("User edited and unlocked successfully!");
+                                    return RedirectToAction(nameof(AgencyController.User), "Agency");
+                                }
+                            }
                             toastNotification.AddSuccessToastMessage("Agency user edited successfully!");
                             return RedirectToAction(nameof(AgencyController.User), "Agency");
                         }
-                        toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
+                        toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
                         Errors(result);
                     }
                 }

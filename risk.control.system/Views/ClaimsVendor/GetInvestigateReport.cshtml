@@ -325,9 +325,9 @@
                         <div class="card-body">
                             <div class="=row">
                                 <div class="col-md-12 text-right">
-                                    <button type="submit" class="btn btn-default" asp-action="ReAllocateReport">
-                                        <i class="fa fa-window-close" aria-hidden="true"></i> Re Allocate
-                                    </button>
+                                    <a asp-controller="ClaimsVendor" class="btn btn-default" asp-action="ClaimReport">
+                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+                                    </a>
                                     <button disabled id="allocate-case" type="submit" asp-action="ProcessReport" class="btn btn-success">
                                         <i class="far fa-file-alt" aria-hidden="true"></i> @Applicationsettings.SUBMIT_CASE_TO_COMPANY
                                     </button>

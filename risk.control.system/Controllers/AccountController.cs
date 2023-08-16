@@ -65,14 +65,8 @@ namespace risk.control.system.Controllers
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                var vendorUsers = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == model.Email.Trim().ToLower() && u.Active);
-
-                if (vendorUsers != null)
-                {
-                    _logger.LogInformation("User logged in.");
-                    toastNotification.AddSuccessToastMessage("<i class='fas fa-envelope fa-lg'></i> login successful!");
-                    return RedirectToLocal(returnUrl);
-                }
+                toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> login successful!");
+                return RedirectToLocal(returnUrl);
             }
 
             if (result.IsLockedOut && returnUrl != mobileAppUrl)
