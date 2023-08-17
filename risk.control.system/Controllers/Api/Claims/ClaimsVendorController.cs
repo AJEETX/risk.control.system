@@ -29,23 +29,30 @@ namespace risk.control.system.Controllers.Api.Claims
         public async Task<IActionResult> GetOpen()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                            .Include(c => c.ClientCompany)
-                            .Include(c => c.CaseEnabler)
-                            .Include(c => c.CaseLocations)
-                            .ThenInclude(c => c.InvestigationCaseSubStatus)
-                            .Include(c => c.CaseLocations)
-                            .ThenInclude(c => c.PinCode)
-                            .Include(c => c.CaseLocations)
-                            .ThenInclude(c => c.Vendor)
-                            .Include(c => c.CostCentre)
-                            .Include(c => c.Country)
-                            .Include(c => c.District)
-                            .Include(c => c.InvestigationCaseStatus)
-                            .Include(c => c.InvestigationCaseSubStatus)
-                            .Include(c => c.InvestigationServiceType)
-                            .Include(c => c.LineOfBusiness)
-                            .Include(c => c.PinCode)
-                            .Include(c => c.State);
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State);
 
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
@@ -93,17 +100,16 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new
                    {
                        Id = a.ClaimsInvestigationId,
-                       Company = a.ClientCompany.Name,
                        SelectedToAssign = false,
-                       Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
-                       Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
-                       Name = a.CustomerName,
-                       Policy = a.LineOfBusiness.Name,
+                       Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
+                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
+                       Name = a.CustomerDetail.CustomerName,
+                       Policy = a.PolicyDetail.LineOfBusiness.Name,
                        Status = a.InvestigationCaseStatus.Name,
-                       ServiceType = a.ClaimType.GetEnumDisplayName(),
+                       ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
                        Location = a.CaseLocations.Count == 0 ?
-                       "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                       string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
                        Created = a.Created.ToString("dd-MM-yyyy"),
                        timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
                    })
@@ -118,26 +124,30 @@ namespace risk.control.system.Controllers.Api.Claims
         public async Task<IActionResult> GetNew()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.ClaimReport)
-               .Include(c => c.ClientCompany)
-               .Include(c => c.CaseEnabler)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.Vendor)
-               .Include(c => c.Vendor)
-               .Include(c => c.CostCentre)
-               .Include(c => c.Country)
-               .Include(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.InvestigationServiceType)
-               .Include(c => c.LineOfBusiness)
-               .Include(c => c.PinCode)
-               .Include(c => c.State);
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.ClientCompany)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.CaseEnabler)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.CostCentre)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.InvestigationCaseSubStatus)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.Country)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.District)
+              .Include(c => c.InvestigationCaseStatus)
+              .Include(c => c.InvestigationCaseSubStatus)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.InvestigationServiceType)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.LineOfBusiness)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.State);
 
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -189,17 +199,16 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new
                    {
                        Id = a.ClaimsInvestigationId,
-                       Company = a.ClientCompany.Name,
                        SelectedToAssign = false,
-                       Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
-                       Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
-                       Name = a.CustomerName,
-                       Policy = a.LineOfBusiness.Name,
+                       Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
+                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
+                       Name = a.CustomerDetail.CustomerName,
+                       Policy = a.PolicyDetail.LineOfBusiness.Name,
                        Status = a.InvestigationCaseStatus.Name,
-                       ServiceType = a.ClaimType.GetEnumDisplayName(),
+                       ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
                        Location = a.CaseLocations.Count == 0 ?
-                       "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                       string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
                        Created = a.Created.ToString("dd-MM-yyyy"),
                        timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
                    })
@@ -212,28 +221,30 @@ namespace risk.control.system.Controllers.Api.Claims
         public async Task<IActionResult> GetReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.ClaimReport)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.ClaimReport)
-                .Include(c => c.Vendor)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State);
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.ClientCompany)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.CaseEnabler)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.CostCentre)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.InvestigationCaseSubStatus)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.Country)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.District)
+              .Include(c => c.InvestigationCaseStatus)
+              .Include(c => c.InvestigationCaseSubStatus)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.InvestigationServiceType)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.LineOfBusiness)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.State);
 
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -272,17 +283,16 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new
                    {
                        Id = a.ClaimsInvestigationId,
-                       Company = a.ClientCompany.Name,
                        SelectedToAssign = false,
-                       Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
-                       Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
-                       Name = a.CustomerName,
-                       Policy = a.LineOfBusiness.Name,
+                       Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
+                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
+                       Name = a.CustomerDetail.CustomerName,
+                       Policy = a.PolicyDetail.LineOfBusiness.Name,
                        Status = a.InvestigationCaseStatus.Name,
-                       ServiceType = a.ClaimType.GetEnumDisplayName(),
+                       ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
                        Location = a.CaseLocations.Count == 0 ?
-                       "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                       string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
                        Created = a.Created.ToString("dd-MM-yyyy"),
                        timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
                    })
@@ -295,28 +305,30 @@ namespace risk.control.system.Controllers.Api.Claims
         public async Task<IActionResult> GetReviewReport()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.ClaimReport)
-               .Include(c => c.ClientCompany)
-               .Include(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
                .Include(c => c.CaseLocations)
                .ThenInclude(c => c.InvestigationCaseSubStatus)
                .Include(c => c.CaseLocations)
                .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.Vendor)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.ClaimReport)
-               .Include(c => c.Vendor)
-               .Include(c => c.CostCentre)
-               .Include(c => c.Country)
-               .Include(c => c.District)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
                .Include(c => c.InvestigationCaseStatus)
                .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.InvestigationServiceType)
-               .Include(c => c.LineOfBusiness)
-               .Include(c => c.PinCode)
-               .Include(c => c.State);
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State);
 
             var allocatedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -352,17 +364,16 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new
                    {
                        Id = a.ClaimsInvestigationId,
-                       Company = a.ClientCompany.Name,
                        SelectedToAssign = false,
-                       Document = a.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.DocumentImage)) : "/img/no-image.png",
-                       Customer = a.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.ProfilePicture)) : "/img/no-image.png",
-                       Name = a.CustomerName,
-                       Policy = a.LineOfBusiness.Name,
+                       Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
+                       Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
+                       Name = a.CustomerDetail.CustomerName,
+                       Policy = a.PolicyDetail.LineOfBusiness.Name,
                        Status = a.InvestigationCaseStatus.Name,
-                       ServiceType = a.ClaimType.GetEnumDisplayName(),
+                       ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
                        Location = a.CaseLocations.Count == 0 ?
-                       "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                       string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
                        Created = a.Created.ToString("dd-MM-yyyy"),
                        timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString()
                    })

@@ -39,16 +39,16 @@
                                                 <th><input type="checkbox" id="checkall" /></th>
 
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                                    @Html.DisplayNameFor(model => model.PolicyDetail.LineOfBusiness)
                                                 </th>
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.CustomerName)
+                                                    @Html.DisplayNameFor(model => model.CustomerDetail.CustomerName)
                                                 </th>
                                                 <th>
-                                                    @Html.DisplayNameFor(model => model.ClaimType)
+                                                    @Html.DisplayNameFor(model => model.PolicyDetail.ClaimType)
                                                 </th>
                                                 <th>
                                                     @Html.DisplayNameFor(model => model.CaseLocations)
@@ -65,16 +65,16 @@
                                                         <input id="@item.ClaimsInvestigationId" class="vendors" name="claims" type="checkbox" value="@item.ClaimsInvestigationId" checked="@item.SelectedToAssign" />
                                                     </td>
                                                     <td>
-                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                        @Html.DisplayFor(modelItem => item.PolicyDetail.LineOfBusiness.Name)
                                                     </td>
                                                     <td>
                                                         @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                                     </td>
                                                     <td>
-                                                        @Html.DisplayFor(modelItem => item.CustomerName)
+                                                        @Html.DisplayFor(modelItem => item.CustomerDetail.CustomerName)
                                                     </td>
                                                     <td>
-                                                        @Html.DisplayFor(modelItem => item.ClaimType)
+                                                        @Html.DisplayFor(modelItem => item.PolicyDetail.ClaimType)
                                                     </td>
                                                     <td>
                                                         @{

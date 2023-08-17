@@ -62,19 +62,19 @@ namespace risk.control.system.Services
                     {
                         var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimDocument.FileName);
                         var extension = Path.GetExtension(claimDocument.FileName);
-                        claimsInvestigation.Document = claimDocument;
+                        claimsInvestigation.PolicyDetail.Document = claimDocument;
                         using var dataStream = new MemoryStream();
-                        await claimsInvestigation.Document.CopyToAsync(dataStream);
-                        claimsInvestigation.DocumentImage = dataStream.ToArray();
+                        await claimsInvestigation.PolicyDetail.Document.CopyToAsync(dataStream);
+                        claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                     }
                     if (customerDocument is not null)
                     {
                         var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
                         var extension = Path.GetExtension(customerDocument.FileName);
-                        claimsInvestigation.ProfileImage = customerDocument;
+                        claimsInvestigation.CustomerDetail.ProfileImage = customerDocument;
                         using var dataStream = new MemoryStream();
-                        await claimsInvestigation.ProfileImage.CopyToAsync(dataStream);
-                        claimsInvestigation.ProfilePicture = dataStream.ToArray();
+                        await claimsInvestigation.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
+                        claimsInvestigation.CustomerDetail.ProfilePicture = dataStream.ToArray();
                     }
                     if (create)
                     {
@@ -97,16 +97,16 @@ namespace risk.control.system.Services
                     {
                         var existingClaim = await _context.ClaimsInvestigation.AsNoTracking()
                             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
-                        if (claimDocument == null && existingClaim.DocumentImage != null)
+                        if (claimDocument == null && existingClaim.PolicyDetail.DocumentImage != null)
                         {
-                            claimsInvestigation.DocumentImage = existingClaim.DocumentImage;
-                            claimsInvestigation.Document = existingClaim.Document;
+                            claimsInvestigation.PolicyDetail.DocumentImage = existingClaim.PolicyDetail.DocumentImage;
+                            claimsInvestigation.PolicyDetail.Document = existingClaim.PolicyDetail.Document;
                         }
-                        if (customerDocument == null && existingClaim.ProfilePicture != null)
+                        if (customerDocument == null && existingClaim.CustomerDetail.ProfilePicture != null)
                         {
-                            claimsInvestigation.ProfilePictureUrl = existingClaim.ProfilePictureUrl;
-                            claimsInvestigation.ProfilePicture = existingClaim.ProfilePicture;
-                            claimsInvestigation.ProfileImage = existingClaim.ProfileImage;
+                            claimsInvestigation.CustomerDetail.ProfilePictureUrl = existingClaim.CustomerDetail.ProfilePictureUrl;
+                            claimsInvestigation.CustomerDetail.ProfilePicture = existingClaim.CustomerDetail.ProfilePicture;
+                            claimsInvestigation.CustomerDetail.ProfileImage = existingClaim.CustomerDetail.ProfileImage;
                         }
                         _context.ClaimsInvestigation.Update(claimsInvestigation);
                     }
@@ -172,16 +172,16 @@ namespace risk.control.system.Services
                     {
                         var existingClaim = await _context.ClaimsInvestigation.AsNoTracking()
                             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
-                        if (claimDocument == null && existingClaim.DocumentImage != null)
+                        if (claimDocument == null && existingClaim.PolicyDetail.DocumentImage != null)
                         {
-                            claimsInvestigation.DocumentImage = existingClaim.DocumentImage;
-                            claimsInvestigation.Document = existingClaim.Document;
+                            claimsInvestigation.PolicyDetail.DocumentImage = existingClaim.PolicyDetail.DocumentImage;
+                            claimsInvestigation.PolicyDetail.Document = existingClaim.PolicyDetail.Document;
                         }
-                        if (customerDocument == null && existingClaim.ProfilePicture != null)
+                        if (customerDocument == null && existingClaim.CustomerDetail.ProfilePicture != null)
                         {
-                            claimsInvestigation.ProfilePictureUrl = existingClaim.ProfilePictureUrl;
-                            claimsInvestigation.ProfilePicture = existingClaim.ProfilePicture;
-                            claimsInvestigation.ProfileImage = existingClaim.ProfileImage;
+                            claimsInvestigation.CustomerDetail.ProfilePictureUrl = existingClaim.CustomerDetail.ProfilePictureUrl;
+                            claimsInvestigation.CustomerDetail.ProfilePicture = existingClaim.CustomerDetail.ProfilePicture;
+                            claimsInvestigation.CustomerDetail.ProfileImage = existingClaim.CustomerDetail.ProfileImage;
                         }
                         _context.ClaimsInvestigation.Update(claimsInvestigation);
                     }

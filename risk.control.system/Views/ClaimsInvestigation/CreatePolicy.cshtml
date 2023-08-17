@@ -13,13 +13,13 @@
                 <div class="card-header">
                     <h3 class="card-title"><i class="far fa-file-powerpoint"></i> Policy detail</h3>
                 </div>
-                <input type="hidden" asp-for="LineOfBusinessId" value="@Model.LineOfBusinessId" />
+                <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-6">
                             <div style="display:@hasClientCompany;" class="form-group">
                                 <span asp-for="ClientCompanyId" class="control-label"></span>
-                                <select id="ClientCompanyId" asp-for="ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
+                                <select id="ClientCompanyId" asp-for="PolicyDetail.ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
                                     <option>--- SELECT COMPANY ---</option>
                                 </select>
                             </div>
@@ -28,10 +28,10 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type <i class="fa fa-asterisk asterik-style"></i> </span>
                                     </div>
-                                    <select required asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                    <select required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
                                         <option value="">--- SELECT ---</option>
                                     </select>
-                                    <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
+                                    <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -42,10 +42,10 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="ClaimType">Claim Type <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <select required asp-for="ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
+                                    <select required asp-for="PolicyDetail.ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
                                         <option value="">--- SELECT ---</option>
                                     </select>
-                                    <span asp-validation-for="ClaimType" class="text-danger"></span>
+                                    <span asp-validation-for="PolicyDetail.ClaimType" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -58,10 +58,10 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="CostCentreId">Budget Centre <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <select required asp-for="CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
+                                    <select required asp-for="PolicyDetail.CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
                                         <option value="">--- SELECT ---</option>
                                     </select>
-                                    <span asp-validation-for="CostCentreId" class="text-danger"></span>
+                                    <span asp-validation-for="PolicyDetail.CostCentreId" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -70,10 +70,10 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="CaseEnablerId">Reason To Verify <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <select required asp-for="CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
+                                    <select required asp-for="PolicyDetail.CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
                                         <option value="">--- SELECT ---</option>
                                     </select>
-                                    <span asp-validation-for="CaseEnablerId" class="text-danger"></span>
+                                    <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -85,8 +85,8 @@
                                     @{
                                         var maxDate = @DateTime.Now.ToString("dd-MM-yyyy");
                                     }
-                                    <input required asp-for="ContractIssueDate" id="dateContractId" class="form-control date-width" min="2000-01-01" max="@maxDate" type="date" />
-                                    <span asp-validation-for="ContractIssueDate" class="text-danger"></span>
+                                    <input required asp-for="PolicyDetail.ContractIssueDate" id="dateContractId" class="form-control date-width" min="2000-01-01" max="@maxDate" type="date" />
+                                    <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -97,8 +97,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="DateOfIncident">Date Of Incident <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input required asp-for="DateOfIncident" id="dateIncidentId" class="form-control" type="date" />
-                                    <span asp-validation-for="DateOfIncident" class="text-danger"></span>
+                                    <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control" type="date" />
+                                    <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -106,8 +106,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="ContractNumber">Policy # <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input required asp-for="ContractNumber" style="text-transform:uppercase" class="form-control" type="text" placeholder="Enter Policy #" maxlength="20" value="" />
-                                    <span asp-validation-for="ContractNumber" class="text-danger"></span>
+                                    <input required asp-for="PolicyDetail.ContractNumber" style="text-transform:uppercase" class="form-control" type="text" placeholder="Enter Policy #" maxlength="20" value="" />
+                                    <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -115,8 +115,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="SumAssuredValue">Insured Amount <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input required asp-for="SumAssuredValue" class="form-control" type="number" placeholder="Enter Insured Sum" value="" min="1" maxlength="10" />
-                                    <span asp-validation-for="SumAssuredValue" class="text-danger"></span>
+                                    <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control" type="number" placeholder="Enter Insured Sum" value="" min="1" maxlength="10" />
+                                    <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -126,8 +126,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="CauseOfLoss">Cause Of Loss <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
-                                    <input required asp-for="CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" value="" maxlength="20" />
-                                    <span asp-validation-for="CauseOfLoss" class="text-danger"></span>
+                                    <input required asp-for="PolicyDetail.CauseOfLoss" class="form-control" type="text" placeholder="Enter Cause of loss" value="" maxlength="20" />
+                                    <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -136,7 +136,7 @@
                                         <span class="input-group-text" asp-for="Document">Document </span>
                                     </div>
                                     <img class="form-Image" id="documentImage" src="/img/document.jpeg">
-                                    <input asp-for="Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                    <input asp-for="PolicyDetail.Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                 </div>
                             </div>
 

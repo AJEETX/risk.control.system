@@ -7,7 +7,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ClaimCaseId { get; set; } = Guid.NewGuid().ToString();
+        public string PolicyDetailId { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
         [Display(Name = "Company name")]
@@ -29,18 +29,6 @@ namespace risk.control.system.Models
 
         [Display(Name = "Investigation type")]
         public InvestigationServiceType? InvestigationServiceType { get; set; } = default!;
-
-        [Display(Name = "Case status")]
-        public string? InvestigationCaseStatusId { get; set; } = default!;
-
-        [Display(Name = "Case status")]
-        public InvestigationCaseStatus? InvestigationCaseStatus { get; set; } = default!;
-
-        [Display(Name = "Case sub status")]
-        public string? InvestigationCaseSubStatusId { get; set; } = default!;
-
-        [Display(Name = "Case sub status")]
-        public InvestigationCaseSubStatus? InvestigationCaseSubStatus { get; set; } = default!;
 
         [Display(Name = "Contract number")]
         public string ContractNumber { get; set; } = default!;
@@ -87,5 +75,8 @@ namespace risk.control.system.Models
 
         [Display(Name = "Claim Document")]
         public byte[]? DocumentImage { get; set; } = default!;
+
+        [Display(Name = "Claim remarks")]
+        public string? Comments { get; set; }
     }
 }

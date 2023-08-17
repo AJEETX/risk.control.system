@@ -204,9 +204,11 @@ namespace risk.control.system.Services
             if (companyUser != null)
             {
                 var tdetail = _context.InvestigationTransaction
-                    .Include(i => i.ClaimsInvestigation).Where(d =>
+                    .Include(i => i.ClaimsInvestigation)
+                    .ThenInclude(i => i.PolicyDetail)
+                    .Where(d =>
                         (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
-                     d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId);
+                     d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var subStatuses = _context.InvestigationCaseSubStatus;
@@ -356,8 +358,10 @@ namespace risk.control.system.Services
             if (companyUser != null)
             {
                 var tdetail = _context.InvestigationTransaction
-                    .Include(i => i.ClaimsInvestigation).Where(d =>
-                    d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId &&
+                    .Include(i => i.ClaimsInvestigation)
+                    .ThenInclude(i => i.PolicyDetail)
+                    .Where(d =>
+                    d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                     (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.Now.AddDays(-28));
 

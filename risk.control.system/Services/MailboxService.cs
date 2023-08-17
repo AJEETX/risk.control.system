@@ -219,15 +219,15 @@ namespace risk.control.system.Services
                 Read = false,
                 UpdatedBy = applicationUser.Email
             };
-            if (claimsInvestigation.Document is not null)
+            if (claimsInvestigation.PolicyDetail.Document is not null)
             {
-                var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimsInvestigation.Document.FileName);
-                var extension = Path.GetExtension(claimsInvestigation.Document.FileName);
-                contactMessage.Document = claimsInvestigation.Document;
+                var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimsInvestigation.PolicyDetail.Document.FileName);
+                var extension = Path.GetExtension(claimsInvestigation.PolicyDetail.Document.FileName);
+                contactMessage.Document = claimsInvestigation.PolicyDetail.Document;
                 using var dataStream = new MemoryStream();
                 await contactMessage.Document.CopyToAsync(dataStream);
                 contactMessage.Attachment = dataStream.ToArray();
-                contactMessage.FileType = claimsInvestigation.Document.ContentType;
+                contactMessage.FileType = claimsInvestigation.PolicyDetail.Document.ContentType;
                 contactMessage.Extension = extension;
                 contactMessage.AttachmentName = messageDocumentFileName;
             }

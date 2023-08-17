@@ -42,34 +42,32 @@ namespace risk.control.system.Controllers.Api
         public async Task<IActionResult> Index(string email = "agent@agency1.com")
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.ClaimReport)
-                .Include(c => c.ClientCompany)
-                .Include(c => c.CaseEnabler)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.Country)
-                .Include(c => c.CaseLocations)
+                .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.Vendor)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
                 .Include(c => c.InvestigationCaseStatus)
                 .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.InvestigationServiceType)
-            .Include(c => c.LineOfBusiness)
-            .Include(c => c.District)
-            .Include(c => c.Country)
-            .Include(c => c.PinCode)
-            .Include(c => c.State);
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State);
 
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -98,18 +96,18 @@ namespace risk.control.system.Controllers.Api
                 new
                 {
                     claimId = c.ClaimsInvestigationId,
-                    claimType = c.ClaimType,
-                    CustomerName = c.CustomerName,
+                    claimType = c.PolicyDetail.ClaimType,
+                    CustomerName = c.CustomerDetail.CustomerName,
                     CustomerEmail = email,
-                    PolicyNumber = c.ContractNumber,
-                    c.Gender,
-                    c.Addressline,
-                    c.PinCode.Code,
-                    Photo = c?.ProfilePicture,
-                    Country = c.Country.Name,
-                    State = c.State.Name,
-                    District = c.District.Name,
-                    c.Description,
+                    PolicyNumber = c.PolicyDetail.ContractNumber,
+                    c.CustomerDetail.Gender,
+                    c.CustomerDetail.Addressline,
+                    c.CustomerDetail.PinCode.Code,
+                    Photo = c?.CustomerDetail.ProfilePicture,
+                    Country = c.CustomerDetail.Country.Name,
+                    State = c.CustomerDetail.State.Name,
+                    District = c.CustomerDetail.District.Name,
+                    c.CustomerDetail.Description,
                     Locations = c.CaseLocations.Select(l => new
                     {
                         l.CaseLocationId,
