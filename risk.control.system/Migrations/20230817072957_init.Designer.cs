@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230816162235_createpolicy")]
-    partial class createpolicy
+    [Migration("20230817072957_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -549,44 +549,7 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Addressline")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CaseEnablerId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CauseOfLoss")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ClaimType")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("ClientCompanyId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Comments")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("ContactNumber")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("ContractIssueDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ContractNumber")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CostCentreId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CountryId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
@@ -595,50 +558,13 @@ namespace risk.control.system.Migrations
                     b.Property<string>("CurrentUserEmail")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("CustomerDateOfBirth")
+                    b.Property<string>("CustomerDetailId")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("CustomerEducation")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CustomerIncome")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CustomerOccupation")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CustomerType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("DateOfIncident")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DistrictId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("DocumentImage")
-                        .HasColumnType("BLOB");
-
-                    b.Property<int?>("Gender")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("InvestigationCaseStatusId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("InvestigationCaseSubStatusId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("InvestigationServiceTypeId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsReady2Assign")
@@ -647,26 +573,8 @@ namespace risk.control.system.Migrations
                     b.Property<bool>("IsReviewCase")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LineOfBusinessId")
-                        .IsRequired()
+                    b.Property<string>("PolicyDetailId")
                         .HasColumnType("TEXT");
-
-                    b.Property<string>("PinCodeId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("ProfilePicture")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("ProfilePictureUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("StateId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("SumAssuredValue")
-                        .HasColumnType("decimal(15,2)");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");
@@ -679,27 +587,15 @@ namespace risk.control.system.Migrations
 
                     b.HasKey("ClaimsInvestigationId");
 
-                    b.HasIndex("CaseEnablerId");
-
                     b.HasIndex("ClientCompanyId");
 
-                    b.HasIndex("CostCentreId");
-
-                    b.HasIndex("CountryId");
-
-                    b.HasIndex("DistrictId");
+                    b.HasIndex("CustomerDetailId");
 
                     b.HasIndex("InvestigationCaseStatusId");
 
                     b.HasIndex("InvestigationCaseSubStatusId");
 
-                    b.HasIndex("InvestigationServiceTypeId");
-
-                    b.HasIndex("LineOfBusinessId");
-
-                    b.HasIndex("PinCodeId");
-
-                    b.HasIndex("StateId");
+                    b.HasIndex("PolicyDetailId");
 
                     b.HasIndex("VendorId");
 
@@ -855,6 +751,79 @@ namespace risk.control.system.Migrations
                     b.HasKey("CountryId");
 
                     b.ToTable("Country");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.CustomerDetail", b =>
+                {
+                    b.Property<string>("CustomerDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Addressline")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("ContactNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CountryId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CustomerDateOfBirth")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CustomerEducation")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CustomerIncome")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CustomerOccupation")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CustomerType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DistrictId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("Gender")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PinCodeId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("ProfilePicture")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StateId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CustomerDetailId");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("PinCodeId");
+
+                    b.HasIndex("StateId");
+
+                    b.ToTable("CustomerDetail");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.DeletedMessage", b =>
@@ -1582,6 +1551,73 @@ namespace risk.control.system.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("PinCode");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.PolicyDetail", b =>
+                {
+                    b.Property<string>("PolicyDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CaseEnablerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CauseOfLoss")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ClaimType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ClientCompanyId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ContractIssueDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ContractNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CostCentreId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateOfIncident")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("DocumentImage")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("InvestigationServiceTypeId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LineOfBusinessId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("SumAssuredValue")
+                        .HasColumnType("decimal(15,2)");
+
+                    b.HasKey("PolicyDetailId");
+
+                    b.HasIndex("CaseEnablerId");
+
+                    b.HasIndex("ClientCompanyId");
+
+                    b.HasIndex("CostCentreId");
+
+                    b.HasIndex("InvestigationServiceTypeId");
+
+                    b.HasIndex("LineOfBusinessId");
+
+                    b.ToTable("PolicyDetail");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
@@ -2336,35 +2372,13 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
                 {
-                    b.HasOne("risk.control.system.Models.CaseEnabler", "CaseEnabler")
-                        .WithMany()
-                        .HasForeignKey("CaseEnablerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
+                    b.HasOne("risk.control.system.Models.ClientCompany", null)
                         .WithMany("ClaimsInvestigations")
-                        .HasForeignKey("ClientCompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ClientCompanyId");
 
-                    b.HasOne("risk.control.system.Models.CostCentre", "CostCentre")
+                    b.HasOne("risk.control.system.Models.CustomerDetail", "CustomerDetail")
                         .WithMany()
-                        .HasForeignKey("CostCentreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("risk.control.system.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("risk.control.system.Models.District", "District")
-                        .WithMany()
-                        .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomerDetailId");
 
                     b.HasOne("risk.control.system.Models.InvestigationCaseStatus", "InvestigationCaseStatus")
                         .WithMany()
@@ -2374,55 +2388,21 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("InvestigationCaseSubStatusId");
 
-                    b.HasOne("risk.control.system.Models.InvestigationServiceType", "InvestigationServiceType")
+                    b.HasOne("risk.control.system.Models.PolicyDetail", "PolicyDetail")
                         .WithMany()
-                        .HasForeignKey("InvestigationServiceTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("risk.control.system.Models.LineOfBusiness", "LineOfBusiness")
-                        .WithMany()
-                        .HasForeignKey("LineOfBusinessId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("risk.control.system.Models.PinCode", "PinCode")
-                        .WithMany()
-                        .HasForeignKey("PinCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("risk.control.system.Models.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PolicyDetailId");
 
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId");
 
-                    b.Navigation("CaseEnabler");
-
-                    b.Navigation("ClientCompany");
-
-                    b.Navigation("CostCentre");
-
-                    b.Navigation("Country");
-
-                    b.Navigation("District");
+                    b.Navigation("CustomerDetail");
 
                     b.Navigation("InvestigationCaseStatus");
 
                     b.Navigation("InvestigationCaseSubStatus");
 
-                    b.Navigation("InvestigationServiceType");
-
-                    b.Navigation("LineOfBusiness");
-
-                    b.Navigation("PinCode");
-
-                    b.Navigation("State");
+                    b.Navigation("PolicyDetail");
 
                     b.Navigation("Vendor");
                 });
@@ -2444,6 +2424,41 @@ namespace risk.control.system.Migrations
                     b.HasOne("risk.control.system.Models.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId");
+
+                    b.Navigation("Country");
+
+                    b.Navigation("District");
+
+                    b.Navigation("PinCode");
+
+                    b.Navigation("State");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.CustomerDetail", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.PinCode", "PinCode")
+                        .WithMany()
+                        .HasForeignKey("PinCodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Country");
 
@@ -2618,6 +2633,49 @@ namespace risk.control.system.Migrations
                     b.Navigation("District");
 
                     b.Navigation("State");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.PolicyDetail", b =>
+                {
+                    b.HasOne("risk.control.system.Models.CaseEnabler", "CaseEnabler")
+                        .WithMany()
+                        .HasForeignKey("CaseEnablerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
+                        .WithMany()
+                        .HasForeignKey("ClientCompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.CostCentre", "CostCentre")
+                        .WithMany()
+                        .HasForeignKey("CostCentreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.InvestigationServiceType", "InvestigationServiceType")
+                        .WithMany()
+                        .HasForeignKey("InvestigationServiceTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.LineOfBusiness", "LineOfBusiness")
+                        .WithMany()
+                        .HasForeignKey("LineOfBusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CaseEnabler");
+
+                    b.Navigation("ClientCompany");
+
+                    b.Navigation("CostCentre");
+
+                    b.Navigation("InvestigationServiceType");
+
+                    b.Navigation("LineOfBusiness");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>

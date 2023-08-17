@@ -1,13 +1,9 @@
-﻿using System.Data;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
-using Newtonsoft.Json.Linq;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using System.Data;
 
 namespace risk.control.system.Services
 {
@@ -113,7 +109,7 @@ namespace risk.control.system.Services
 
                     await _context.SaveChangesAsync();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     throw;
                 }
@@ -136,20 +132,20 @@ namespace risk.control.system.Services
                     {
                         var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
                         var extension = Path.GetExtension(customerDocument.FileName);
-                        claimsInvestigation.ProfileImage = customerDocument;
+                        claimsInvestigation.CustomerDetail.ProfileImage = customerDocument;
                         using var dataStream = new MemoryStream();
-                        await claimsInvestigation.ProfileImage.CopyToAsync(dataStream);
-                        claimsInvestigation.ProfilePicture = dataStream.ToArray();
+                        await claimsInvestigation.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
+                        claimsInvestigation.CustomerDetail.ProfilePicture = dataStream.ToArray();
                     }
 
                     if (claimDocument is not null)
                     {
                         var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimDocument.FileName);
                         var extension = Path.GetExtension(claimDocument.FileName);
-                        claimsInvestigation.Document = claimDocument;
+                        claimsInvestigation.PolicyDetail.Document = claimDocument;
                         using var dataStream = new MemoryStream();
-                        await claimsInvestigation.Document.CopyToAsync(dataStream);
-                        claimsInvestigation.DocumentImage = dataStream.ToArray();
+                        await claimsInvestigation.PolicyDetail.Document.CopyToAsync(dataStream);
+                        claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                     }
 
                     if (create)
@@ -188,7 +184,7 @@ namespace risk.control.system.Services
 
                     await _context.SaveChangesAsync();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     throw;
                 }
@@ -413,7 +409,7 @@ namespace risk.control.system.Services
             {
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -502,10 +498,10 @@ namespace risk.control.system.Services
 
                     _context.InvestigationTransaction.Add(finalLog);
 
-                    return await _context.SaveChangesAsync() > 0 ? true : false;
+                    return await _context.SaveChangesAsync() > 0;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
@@ -635,9 +631,9 @@ namespace risk.control.system.Services
             _context.ClaimsInvestigation.Update(claim);
             try
             {
-                return await _context.SaveChangesAsync() > 0 ? true : false;
+                return await _context.SaveChangesAsync() > 0;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

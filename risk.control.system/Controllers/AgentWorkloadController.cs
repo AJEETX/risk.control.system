@@ -1,19 +1,14 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
+using System.Security.Claims;
 
 namespace risk.control.system.Controllers
 {
@@ -152,26 +147,32 @@ namespace risk.control.system.Controllers
             }
 
             var claimsInvestigation = await _context.ClaimsInvestigation
-                .Include(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
                 .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.BeneficiaryRelation)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.CostCentre)
-                .Include(c => c.Country)
-                .Include(c => c.District)
-                .Include(c => c.InvestigationServiceType)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Vendor)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
                 .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.PinCode)
-                .Include(c => c.State)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
             if (claimsInvestigation == null)
             {

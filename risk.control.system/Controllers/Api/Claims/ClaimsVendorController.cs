@@ -1,15 +1,10 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-
-using static risk.control.system.Helpers.Permissions;
-
+using System.Security.Claims;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Claims
@@ -87,8 +82,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => !string.IsNullOrWhiteSpace(c.VendorId)
-                        && c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
+                    item.CaseLocations = item.CaseLocations.Where(c => (!string.IsNullOrWhiteSpace(c.VendorId)
+                        && c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId)
                         || c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
                         || c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
@@ -163,7 +158,8 @@ namespace risk.control.system.Controllers.Api.Claims
             if (vendorUser != null)
             {
                 applicationDbContext = applicationDbContext
-                    .Include(a => a.LineOfBusiness)
+                    .Include(a => a.PolicyDetail)
+                    .ThenInclude(a => a.LineOfBusiness)
                     .Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
             }
             var claims = new List<ClaimsInvestigation>();

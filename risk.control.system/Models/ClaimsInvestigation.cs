@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace risk.control.system.Models
 {
@@ -16,10 +15,10 @@ namespace risk.control.system.Models
         [Display(Name = "Agency name")]
         public Vendor? Vendor { get; set; }
 
-        public string PolicyDetailId { get; set; }
-        public PolicyDetail PolicyDetail { get; set; }
-        public string CustomerDetailId { get; set; }
-        public CustomerDetail CustomerDetail { get; set; }
+        public string? PolicyDetailId { get; set; }
+        public PolicyDetail? PolicyDetail { get; set; }
+        public string? CustomerDetailId { get; set; }
+        public CustomerDetail? CustomerDetail { get; set; }
 
         [NotMapped]
         public bool HasClientCompany { get; set; } = true;
@@ -46,7 +45,7 @@ namespace risk.control.system.Models
 
         public override string ToString()
         {
-            return $"Case Id: {ClaimsInvestigationId}, <br /> ClaimType: {ClaimType}";
+            return $"Case Id: {ClaimsInvestigationId}, <br /> ";
         }
 
         public bool IsReviewCase { get; set; } = false;

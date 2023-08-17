@@ -1,6 +1,4 @@
-﻿using System.Web;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
@@ -245,10 +243,10 @@ namespace risk.control.system.Services
 
         public async Task NotifyClaimReportProcess(string senderUserEmail, string claimId, long caseLocationId)
         {
-            var claim = _context.ClaimsInvestigation.Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
+            var claim = _context.ClaimsInvestigation.Include(p => p.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
             {
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
 
                 var clientAdminrRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CompanyAdmin.ToString()));
 
@@ -292,10 +290,10 @@ namespace risk.control.system.Services
 
         public async Task NotifyClaimReportSubmitToCompany(string senderUserEmail, string claimId, long caseLocationId)
         {
-            var claim = _context.ClaimsInvestigation.Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
+            var claim = _context.ClaimsInvestigation.Include(i => i.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
             {
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
 
                 var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assessor.ToString()));
 

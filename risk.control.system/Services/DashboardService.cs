@@ -3,7 +3,6 @@
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
@@ -284,7 +283,7 @@ namespace risk.control.system.Services
                 var tdetail = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation).Where(d =>
                         (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
-                       d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId &&
+                       d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                        d.Created > DateTime.Now.AddMonths(-7));
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var subStatuses = _context.InvestigationCaseSubStatus;
@@ -362,7 +361,7 @@ namespace risk.control.system.Services
                     .ThenInclude(i => i.PolicyDetail)
                     .Where(d =>
                     d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
-                    (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
+                    (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.Now.AddDays(-28));
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
@@ -413,7 +412,7 @@ namespace risk.control.system.Services
                     .ThenInclude(i => i.CaseLocations)
                     .Where(d =>
                      d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId) &&
-                    (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
+                    (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
                     d.Created > DateTime.Now.AddDays(-28));
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
@@ -460,6 +459,8 @@ namespace risk.control.system.Services
 
             var tdetailDays = _context.InvestigationTransaction
                     .Include(i => i.ClaimsInvestigation)
+                    .ThenInclude(i => i.PolicyDetail)
+                    .Include(i => i.ClaimsInvestigation)
              .ThenInclude(i => i.CaseLocations)
              .Where(d =>
              d.Created > DateTime.Now.AddDays(-28));
@@ -471,8 +472,8 @@ namespace risk.control.system.Services
             {
                 var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
-                    (companyUser.IsClientAdmin ? true : d.UpdatedBy == userEmail) &&
-                    d.ClaimsInvestigation.ClientCompanyId == companyUser.ClientCompanyId);
+                    (companyUser.IsClientAdmin || d.UpdatedBy == userEmail) &&
+                    d.ClaimsInvestigation.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();
                 var subStatuses = _context.InvestigationCaseSubStatus;
@@ -505,7 +506,7 @@ namespace risk.control.system.Services
                    );
                 var statuses = _context.InvestigationCaseStatus;
                 var tdetail = tdetailDays.Where(d =>
-                    (vendorUser.IsVendorAdmin ? true : d.UpdatedBy == userEmail) &&
+                    (vendorUser.IsVendorAdmin || d.UpdatedBy == userEmail) &&
                     d.ClaimsInvestigation.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
 
                 var userSubStatuses = tdetail.Select(s => s.InvestigationCaseSubStatusId).Distinct()?.ToList();

@@ -28,7 +28,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" asp-for="InvestigationServiceTypeId">Service Type <i class="fa fa-asterisk asterik-style"></i> </span>
                                     </div>
-                                    <select required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                    <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
                                         <option value="">--- SELECT ---</option>
                                     </select>
                                     <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>

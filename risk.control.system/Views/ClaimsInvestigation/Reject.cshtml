@@ -45,19 +45,19 @@
                                             </th>
 
                                             <th style="display:@hasClientCompany">
-                                                @Html.DisplayNameFor(model => model.ClientCompany)
+                                                @Html.DisplayNameFor(model => model.PolicyDetail.ClientCompany)
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.LineOfBusiness)
+                                                @Html.DisplayNameFor(model => model.PolicyDetail.LineOfBusiness)
                                             </th>
                                             <th>
                                                 @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.CustomerName)
+                                                @Html.DisplayNameFor(model => model.CustomerDetail.CustomerName)
                                             </th>
                                             <th>
-                                                @Html.DisplayNameFor(model => model.ClaimType)
+                                                @Html.DisplayNameFor(model => model.PolicyDetail.ClaimType)
                                             </th>
                                             <th>
                                                 Location - SubStatus
@@ -69,12 +69,12 @@
                                         {
                                             <tr>
                                                 <td style="display:@hasClientCompany">
-                                                    @Html.DisplayFor(modelItem => item.ClientCompany.Name)
+                                                    @Html.DisplayFor(modelItem => item.PolicyDetail.ClientCompany.Name)
                                                 </td>
                                                 <td>
-                                                    @if (item?.DocumentImage is not null)
+                                                    @if (item?.PolicyDetail.DocumentImage is not null)
                                                     {
-                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.PolicyDetail.DocumentImage))">
                                                     }
                                                     else
                                                     {
@@ -82,9 +82,9 @@
                                                     }
                                                 </td>
                                                 <td>
-                                                    @if (item?.ProfilePicture is not null)
+                                                    @if (item?.CustomerDetail.ProfilePicture is not null)
                                                     {
-                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.ProfilePicture))">
+                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(item?.CustomerDetail.ProfilePicture))">
                                                     }
                                                     else
                                                     {
@@ -93,16 +93,16 @@
                                                 </td>
 
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                    @Html.DisplayFor(modelItem => item.PolicyDetail.LineOfBusiness.Name)
                                                 </td>
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.InvestigationCaseStatus.Name)
                                                 </td>
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.CustomerName)
+                                                    @Html.DisplayFor(modelItem => item.CustomerDetail.CustomerName)
                                                 </td>
                                                 <td>
-                                                    @Html.DisplayFor(modelItem => item.ClaimType)
+                                                    @Html.DisplayFor(modelItem => item.PolicyDetail.ClaimType)
                                                 </td>
                                                 <td>
                                                     @{

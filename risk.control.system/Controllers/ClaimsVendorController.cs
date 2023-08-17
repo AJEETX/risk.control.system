@@ -1,24 +1,15 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using NToastNotify;
-
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-
-using static risk.control.system.AppConstant.Applicationsettings;
-using static risk.control.system.Helpers.Permissions;
+using System.Security.Claims;
 
 namespace risk.control.system.Controllers
 {
@@ -306,14 +297,32 @@ namespace risk.control.system.Controllers
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.InvestigationServiceType)
-                .Include(c => c.CostCentre)
-                .Include(c => c.CaseEnabler)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
-                .Include(c => c.PinCode)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Vendor)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
@@ -344,9 +353,32 @@ namespace risk.control.system.Controllers
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.LineOfBusiness)
-                .Include(c => c.District)
-                .Include(c => c.PinCode)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Vendor)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var submittedToSupervisortStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
@@ -356,8 +388,8 @@ namespace risk.control.system.Controllers
                 .Include(c => c.ClaimReport)
                 .Include(c => c.District)
                 .Include(c => c.State)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId || c.IsReviewCaseLocation
+                .FirstOrDefault(c => (c.ClaimsInvestigationId == selectedcase
+                && c.InvestigationCaseSubStatusId == submittedToSupervisortStatus.InvestigationCaseSubStatusId) || c.IsReviewCaseLocation
                     );
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 

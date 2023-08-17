@@ -17,9 +17,9 @@
                         int currentAgeinYrs = 0;
                         bool customerExist = false;
                         bool beneficiaryExist = false;
-                        if (Model.Claim != null)
+                        if (Model.Claim != null && Model.Claim.CustomerDetail != null)
                         {
-                            address = @Model.Claim?.CustomerDetail.Addressline + " " + @Model.Claim?.CustomerDetail.District.Name + " " + @Model.Claim?.CustomerDetail.State.Name + " " + @Model.Claim?.CustomerDetail.Country.Name + " " + @Model.Claim?.CustomerDetail.PinCode.Code;
+                            address = @Model.Claim?.CustomerDetail?.Addressline + " " + @Model.Claim?.CustomerDetail.District.Name + " " + @Model.Claim?.CustomerDetail.State.Name + " " + @Model.Claim?.CustomerDetail.Country.Name + " " + @Model.Claim?.CustomerDetail.PinCode.Code;
                             baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
                             @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
                             @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
@@ -29,7 +29,7 @@
                                 currentAgeinYrs = (int)age / 365;
                             }
                         }
-                        if (!string.IsNullOrWhiteSpace(Model.Claim.CustomerDetail.ContractNumber))
+                        if (!string.IsNullOrWhiteSpace(Model.Claim.PolicyDetail.ContractNumber))
                         {
                             customerExist = true;
                         }
@@ -59,7 +59,7 @@
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim?.CustomerDetail.CustomerName </h5>
+                                        <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim?.CustomerDetail?.CustomerName </h5>
                                     </header>
                                     <div class="card card-solid">
                                         <div class="progress">
@@ -87,28 +87,28 @@
                                                         <div class="card-body pt-0">
                                                             <div class="row">
                                                                 <div class="col-7">
-                                                                    <h2 class="lead"><b>@Model.Claim?.PolicyDetail.LineOfBusiness.Name</b></h2>
+                                                                    <h2 class="lead"><b>@Model.Claim?.PolicyDetail?.LineOfBusiness.Name</b></h2>
                                                                     <p class="text-muted text-sm">
-                                                                        <b>Claim Type: </b>@Model.Claim?.PolicyDetail.ClaimType
+                                                                        <b>Claim Type: </b>@Model.Claim?.PolicyDetail?.ClaimType
                                                                     </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-money-bill-wave"></i>
                                                                             </span>
-                                                                            Amount: <i class="fas fa-rupee-sign"></i>@Model.Claim?.PolicyDetail.SumAssuredValue
+                                                                            Amount: <i class="fas fa-rupee-sign"></i>@Model.Claim?.PolicyDetail?.SumAssuredValue
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-tools"></i>
                                                                             </span>
-                                                                            Service: @Model.Claim?.PolicyDetail.InvestigationServiceType.Name
+                                                                            Service: @Model.Claim?.PolicyDetail?.InvestigationServiceType.Name
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-money-check-alt"></i>
                                                                             </span>
-                                                                            Budget center: @Model.Claim?.PolicyDetail.CostCentre.Name
+                                                                            Budget center: @Model.Claim?.PolicyDetail?.CostCentre.Name
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
@@ -165,16 +165,16 @@
                                                         <div class="card-body pt-0">
                                                             <div class="row">
                                                                 <div class="col-7">
-                                                                    <h2 class="lead"><b>@Model.Claim.CustomerDetail.CustomerName</b></h2>
+                                                                    <h2 class="lead"><b>@Model.Claim.CustomerDetail?.CustomerName</b></h2>
                                                                     <p class="text-muted text-sm">
-                                                                        <b>Occupation: </b> @Model.Claim.CustomerDetail.CustomerOccupation
+                                                                        <b>Occupation: </b> @Model.Claim.CustomerDetail?.CustomerOccupation
                                                                     </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-rupee-sign"></i>
                                                                             </span>
-                                                                            Income: @Model.Claim.CustomerDetail.CustomerIncome
+                                                                            Income: @Model.Claim.CustomerDetail?.CustomerIncome
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
@@ -193,14 +193,14 @@
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-lg fa-phone"></i>
                                                                             </span>
-                                                                            Phone #: + @Model.Claim.CustomerDetail.ContactNumber
+                                                                            Phone #: + @Model.Claim.CustomerDetail?.ContactNumber
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                                 <div class="col-5 text-center">
-                                                                    @if (Model?.Claim.CustomerDetail.ProfilePicture is not null)
+                                                                    @if (Model?.Claim.CustomerDetail?.ProfilePicture is not null)
                                                                     {
-                                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim.CustomerDetail.ProfilePicture))">
+                                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim.CustomerDetail?.ProfilePicture))">
                                                                     }
                                                                     else
                                                                     {

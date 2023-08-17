@@ -58,28 +58,28 @@
                                         @Html.DisplayFor(model => model.CustomerDetail.Addressline)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.District)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.District)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.District.Name)
+                                        @Html.DisplayFor(model => model.CustomerDetail.District.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.State)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.State)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.State.Name)
+                                        @Html.DisplayFor(model => model.CustomerDetail.State.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Country)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.Country)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Country.Name)
+                                        @Html.DisplayFor(model => model.CustomerDetail.Country.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.PinCode)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.PinCode)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.PinCode.Code)
+                                        @Html.DisplayFor(model => model.CustomerDetail.PinCode.Code)
                                     </dd>
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.InvestigationCaseStatus)
@@ -92,18 +92,18 @@
                             <div class="col-md-6">
                                 <dl class="row">
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.ClaimType)
+                                        @Html.DisplayNameFor(model => model.PolicyDetail.ClaimType)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.ClaimType)
+                                        @Html.DisplayFor(model => model.PolicyDetail.ClaimType)
                                     </dd>
                                     <dt class="col-sm-5">
                                         Claim Document
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @if (Model?.DocumentImage is not null)
+                                        @if (Model?.PolicyDetail.DocumentImage is not null)
                                         {
-                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.DocumentImage))">
+                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.PolicyDetail.DocumentImage))">
                                         }
                                         else
                                         {
@@ -112,55 +112,55 @@
                                     </dd>
 
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CustomerIncome)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.CustomerIncome)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CustomerIncome)
+                                        @Html.DisplayFor(model => model.CustomerDetail.CustomerIncome)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CustomerOccupation)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.CustomerOccupation)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CustomerOccupation)
+                                        @Html.DisplayFor(model => model.CustomerDetail.CustomerOccupation)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CustomerEducation)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.CustomerEducation)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CustomerEducation)
+                                        @Html.DisplayFor(model => model.CustomerDetail.CustomerEducation)
                                     </dd>
 
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CustomerType)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.CustomerType)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CustomerType)
+                                        @Html.DisplayFor(model => model.CustomerDetail.CustomerType)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CostCentre)
+                                        @Html.DisplayNameFor(model => model.PolicyDetail.CostCentre)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CostCentre.Name)
+                                        @Html.DisplayFor(model => model.PolicyDetail.CostCentre.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.CaseEnabler)
+                                        @Html.DisplayNameFor(model => model.PolicyDetail.CaseEnabler)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.CaseEnabler.Name)
+                                        @Html.DisplayFor(model => model.PolicyDetail.CaseEnabler.Name)
                                     </dd>
                                     <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Description)
+                                        @Html.DisplayNameFor(model => model.CustomerDetail.Description)
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Description)
+                                        @Html.DisplayFor(model => model.CustomerDetail.Description)
                                     </dd>
                                     <dt class="col-sm-5">
                                         Customer Photo
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @if (Model?.ProfilePicture is not null)
+                                        @if (Model?.CustomerDetail.ProfilePicture is not null)
                                         {
-                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CustomerDetail.ProfilePicture))">
                                         }
                                         else
                                         {

@@ -1,11 +1,6 @@
-﻿using System.Security.Claims;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -131,7 +126,8 @@ namespace risk.control.system.Controllers.Api
         public async Task<IActionResult> Get(string email, string claimId)
         {
             var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.LineOfBusiness)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId
                 && c.CurrentUserEmail == email);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
