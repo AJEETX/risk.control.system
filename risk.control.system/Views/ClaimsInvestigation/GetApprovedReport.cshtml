@@ -1,266 +1,405 @@
-﻿@model ClaimsInvestigationVendorsModel
+﻿@model ClaimTransactionModel
 
 @{
-    ViewData["Title"] = @Applicationsettings.SERVICE;
+    ViewData["Title"] = "Claim: Report ";
 }
-
 <section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form method="post">
-                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                    <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-prescription"></i> Claim Report</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.PolicyDetail.LineOfBusiness)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.PolicyDetail.LineOfBusiness.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDetail.CustomerName)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDetail.CustomerName)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.PolicyDetail.ClaimType)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.PolicyDetail.ClaimType)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDetail.PinCode)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDetail.PinCode.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDetail.State)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDetail.State.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDetail.District)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDetail.District.Name)
-                                        </dd>
-                                    </dl>
-                                </div>
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-5">
-                                            Document
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @if (Model?.ClaimsInvestigation.PolicyDetail.DocumentImage is not null)
-                                            {
-                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation.PolicyDetail.DocumentImage))">
-                                            }
-                                            else
-                                            {
-                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                        </dd>
-
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDetail.CustomerIncome)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDetail.CustomerIncome)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDetail.CustomerOccupation)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDetail.CustomerOccupation)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDetail.CustomerEducation)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDetail.CustomerEducation)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.ClaimsInvestigation.CustomerDetail.Description)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.ClaimsInvestigation.CustomerDetail.Description)
-                                        </dd>
-                                    </dl>
-
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-5">
-                                            Beneficiary Photo
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @if (Model?.CaseLocation.ProfilePicture is not null)
-                                            {
-                                                <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CaseLocation.ProfilePicture))">
-                                            }
-                                            else
-                                            {
-                                                <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.BeneficiaryName)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryName)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            Phone #
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.BeneficiaryContactNumber)
-                                        </dd>
-                                        
-                                    </dl>
-                                </div>
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.Addressline)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.Addressline)
-                                        </dd>
-                                        
-                                        <dt class="col-sm-5">
-                                            District
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.District.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            State
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            @Html.DisplayFor(model => model.CaseLocation.State.Name)
-                                        </dd>
-                                        <dt class="col-sm-5">
-                                            @Html.DisplayNameFor(model => model.CaseLocation.PinCode.Code)
-                                        </dt>
-                                        <dd class="col-sm-5">
-                                            <span class="badge badge-danger"> @Html.DisplayFor(model => model.CaseLocation.PinCode.Code)</span>
-                                        </dd>
-                                    </dl>
-                                </div>
-                            </div>
-                        </div>
+                <div id="article" class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-newspaper"></i> Claim detail Timeline</h3>
                     </div>
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-prescription"></i> Agency complete report</h3>
-                        </div>
+                    @{
+                        var address = @Model.Claim?.CustomerDetail.Addressline + " " + @Model.Claim?.CustomerDetail.District.Name + " " + @Model.Claim?.CustomerDetail.State.Name + " " + @Model.Claim?.CustomerDetail.Country.Name + " " + @Model.Claim?.CustomerDetail.PinCode.Code;
+                        var baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
+                        @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
+                        @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
+                        var age = DateTime.Now.Subtract(Model.Claim.CustomerDetail.CustomerDateOfBirth).TotalDays;
+                        var currentAgeinYrs = (int)age / 365;
                         <div class="card-body">
+                            <article>
+                                <div class="bb-blog-inner">
+                                    <header class="bb-blog-header">
+                                        <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim.CustomerDetail.CustomerName</h5>
+                                    </header>
+                                    <div class="card card-solid">
+                                        <div class="card-body pb-0">
+                                            <div class="row">
+                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                    <div class="card bg-light d-flex flex-fill">
+                                                        <div class="card-header text-muted border-bottom-0">
+                                                            <i class="far fa-file-powerpoint"></i> Policy Details
+                                                        </div>
+                                                        <div class="card-body pt-0">
+                                                            <div class="row">
+                                                                <div class="col-7">
+                                                                    <h2 class="lead"><b>@Model.Claim.PolicyDetail.LineOfBusiness.Name</b></h2>
+                                                                    <p class="text-muted text-sm">
+                                                                        <b>Claim Type: </b>@Model.Claim.PolicyDetail.ClaimType
+                                                                    </p>
+                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-money-bill-wave"></i>
+                                                                            </span>
+                                                                            Amount: <i class="fas fa-rupee-sign"></i>@Model.Claim.PolicyDetail.SumAssuredValue
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-tools"></i>
+                                                                            </span>
+                                                                            Service: @Model.Claim.PolicyDetail.InvestigationServiceType.Name
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-money-check-alt"></i>
+                                                                            </span>
+                                                                            Budget center: @Model.Claim.PolicyDetail.CostCentre.Name
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-sun"></i>
+                                                                            </span>
+                                                                            Reason: @Model.Claim.PolicyDetail.CaseEnabler.Name;
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="far fa-clock"></i>
+                                                                            </span>
+                                                                            Issue Date: @Model.Claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="col-5 text-center">
+                                                                    @if (Model?.Claim.PolicyDetail.DocumentImage is not null)
+                                                                    {
+                                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim.PolicyDetail.DocumentImage))">
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img id="documentImage" alt="user-avatar"
+                                                                             class="img-circle img-fluid form-Image" src="/img/document.jpeg">
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-footer">
+                                                            <div class="text-right">
+                                                                <a href="#" class="btn btn-sm bg-teal">
+                                                                    <i class="fas fa-comments"></i>
+                                                                </a>
+                                                                <a href="#" class="btn btn-sm btn-primary">
+                                                                    <i class="fas fa-print"></i> Details ...
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                    <div class="card bg-light d-flex flex-fill">
+                                                        <div class="card-header text-muted border-bottom-0">
+                                                            Customer Details
+                                                        </div>
+                                                        <div class="card-body pt-0">
+                                                            <div class="row">
+                                                                <div class="col-7">
+                                                                    <h2 class="lead"><b>@Model.Claim.CustomerDetail.CustomerName</b></h2>
+                                                                    <p class="text-muted text-sm">
+                                                                        <b>Occupation: </b> @Model.Claim.CustomerDetail.CustomerOccupation
+                                                                    </p>
+                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-rupee-sign"></i>
+                                                                            </span>
+                                                                            Income: @Model.Claim.CustomerDetail.CustomerIncome
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-rupee-sign"></i>
+                                                                            </span>
+                                                                            Age: @currentAgeinYrs
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-lg fa-building"></i>
+                                                                            </span>
+                                                                            Address: @address
+                                                                        </li>
+
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-lg fa-phone"></i>
+                                                                            </span>
+                                                                            Phone #: + @Model.Claim.CustomerDetail.ContactNumber
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="col-5 text-center">
+                                                                    @if (Model?.Claim.CustomerDetail.ProfilePicture is not null)
+                                                                    {
+                                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim.CustomerDetail.ProfilePicture))">
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img id="profileImage" class="form-Image" src="/img/user.png">
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-footer">
+                                                            <div class="text-right">
+
+                                                                <a href="#" class="btn btn-sm btn-success">
+                                                                    <i class="fas fa-user"></i> Customer ...
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                    <div class="card bg-light d-flex flex-fill">
+                                                        <div class="card-header text-muted border-bottom-0">
+                                                            Beneficiary Details
+                                                        </div>
+                                                        <div class="card-body pt-0">
+                                                            <div class="row">
+                                                                <div class="col-7">
+                                                                    <h2 class="lead"><b>@Model.Location?.BeneficiaryName</b></h2>
+                                                                    <p class="text-muted text-sm">
+                                                                        <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
+                                                                    </p>
+                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-rupee-sign"></i>
+                                                                            </span>
+                                                                            Income: @Model.Location?.BeneficiaryIncome
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-lg fa-building"></i>
+                                                                            </span>
+                                                                            Address: @baddress
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-lg fa-phone"></i>
+                                                                            </span>
+                                                                            Phone #: + @Model.Location?.BeneficiaryContactNumber
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="col-5 text-center">
+
+                                                                    @if (Model?.Location?.ProfilePicture is not null)
+                                                                    {
+                                                                        <img id="profileImage" alt="user-avatar"
+                                                                             class="img-circle img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <img class="form-Image" id="profileImage" src="/img/user.png">
+                                                                    }
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-footer">
+                                                            <div class="text-right">
+
+                                                                <a href="#" class="btn btn-sm btn-warning">
+                                                                    <i class="fas fa-user"></i> Beneficiary...
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                    <div class="card bg-light d-flex flex-fill">
+                                                        <div class="card-header text-muted border-bottom-0">
+                                                            <i class="far fa-file-powerpoint"></i> Investigation details
+                                                        </div>
+                                                        <div class="card-body pt-0">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <h2 class="lead"><b> @Model?.Claim.CustomerDetail?.CustomerName</b></h2>
+                                                                    <p class="text-muted text-sm">
+                                                                        @{
+                                                                            var QR1 = @Model.Location?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
+                                                                            var LongLat2 = @Model.Location?.ClaimReport?.LongLat ?? "SAMPLE CITY";
+                                                                        }
+                                                                        <b>QR data: </b> @QR1
+                                                                    </p>
+                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-money-bill-wave"></i>
+                                                                            </span>
+                                                                            Long Lat: <i class="fas fa-rupee-sign"></i> @LongLat2
+
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                                <div class="col-6 text-center">
+                                                                    Location Image: <i class="fas fa-rupee-sign"></i>
+                                                                    @{
+                                                                        if (Model.Location.ClaimReport?.AgentLocationPicture != null)
+                                                                        {
+                                                                            <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <img id="documentImage" alt="user-avatar"
+                                                                                 class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                        }
+                                                                    }
+                                                                    <br />
+                                                                    OCR Document: <i class="fas fa-rupee-sign"></i>
+                                                                    @{
+                                                                        if (Model.Location.ClaimReport?.AgentLocationPicture != null)
+                                                                        {
+                                                                            <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <img id="documentImage" alt="user-avatar"
+                                                                                 class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                    <div class="card bg-light d-flex flex-fill">
+                                                        <div class="card-header text-muted border-bottom-0">
+                                                            <i class="far fa-file-powerpoint"></i> Agent remarks
+                                                        </div>
+                                                        <div class="card-body pt-0">
+                                                            <div class="row">
+                                                                <div class="col-12">
+
+                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+
+                                                                        <div class="form-group">
+                                                                            <input disabled name="remarks" id="remarks" asp-for="Location.ClaimReport.AgentRemarks" type="text" class="form-control" />
+                                                                        </div>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                    <div class="card bg-light d-flex flex-fill">
+                                                        <div class="card-header text-muted border-bottom-0">
+                                                            <i class="far fa-file-powerpoint"></i> Supervisor comments
+                                                        </div>
+                                                        <div class="card-body pt-0">
+                                                            <div class="row">
+                                                                <div class="col-12">
+
+                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-money-bill-wave"></i>
+                                                                            </span>
+                                                                            <div class="form-group">
+                                                                                <input disabled name="supervisorRemarks" id="supervisorRemarks" asp-for="Location.ClaimReport.SupervisorRemarks" type="text" class="form-control" />
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12 d-flex align-items-stretch flex-column">
+                                                    <div class="card bg-light d-flex flex-fill">
+                                                        <div class="card-header text-muted border-bottom-0">
+                                                            <i class="far fa-file-powerpoint"></i> Investigation details
+                                                        </div>
+                                                        <div class="card-body pt-0">
+                                                            <div class="row">
+                                                                <div class="col-12">
+                                                                    <h2 class="lead"><b> @Model?.Claim.CustomerDetail?.CustomerName</b></h2>
+                                                                    <p class="text-muted text-sm">
+
+                                                                        <b>Assessor remarks: </b>
+                                                                    </p>
+                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-money-bill-wave"></i>
+                                                                            </span>
+                                                                            <i class="fas fa-rupee-sign"></i> @Model.Location.ClaimReport.AssessorRemarks
+
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bb-blog-content" itemprop="articleBody">
+                                        <div class="timeline">
+                                            @{
+                                                var firstOnly = false;
+                                                var lastOnly = true;
+                                                foreach (var log in Model.Log)
+                                                {
+                                                    <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
+
+                                                    <div>
+                                                        <i class="nav-icon fas fa-envelope bg-blue"></i>
+                                                        <div class="timeline-item">
+                                                            <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
+                                                            @if (@firstOnly)
+                                                            {
+                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name.</span></h3>
+                                                            }
+                                                            else
+                                                            {
+                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case: <span class="badge badge-success"> ....</span></h3>
+                                                            }
+                                                            <div class="timeline-body">
+                                                                The status has been updated to <span class="badge badge-info">@log.InvestigationCaseSubStatus.Name</span>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    firstOnly = true;
+                                                }
+                                            }
+
+                                            <div><i class="nav-icon fas fa-clock bg-gray"></i></div>
+                                        </div>
+                                    </div> <!-- class bb-blog-content -->
+
+                                </div> <!-- class bb-blog-inner -->
+                            </article>
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <fieldset>
-                                        <legend>
-                                            Ocr Image
-                                        </legend>
-                                        <div class="form-group">
-                                            <img id="agentLocationPicture" class="report-image" src="/img/no-photo.png">
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            Image Location
-                                        </legend>
-                                        <div class="form-group">
-                                            <input readonly name="agentLonglat" id="agentLonglat" asp-for="CaseLocation.ClaimReport.LongLat" value="Lucknow road, Kanpur UP 101010" type="text" class="form-control" />
-                                        </div>
-                                    </fieldset>
-
-                                </div>
-                                <div class="col-sm-6">
-                                    <fieldset>
-                                        <legend>
-                                            QR Image
-                                        </legend>
-                                        <div class="form-group">
-                                            <img id="agentQrPicture" class="report-image" src="/img/user.png">
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            OCR Data
-                                        </legend>
-                                        <div class="form-group">
-                                            <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" value="PAN Card: ABCXNX10101" type="text" class="form-control" />
-                                        </div>
-                                    </fieldset>
-                                </div>
-                            </div>
-
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <legend>
-                                            Agent Remarks
-                                        </legend>
-                                        <input readonly asp-for="CaseLocation.ClaimReport.AgentRemarks" name="agentRemarks" id="remarks" type="text" class="form-control" value="@Model.CaseLocation.ClaimReport.AgentRemarks" />
-                                    </fieldset>
-                                </div>
-
-                            </div>
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <legend>
-                                            Additional Document / File
-                                        </legend>
-                                        <div class="form-group">
-                                            <img id="supervisorPicture" asp-for="" class="report-image" src="/img/no-image.png">
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            Supervisor Remarks
-                                        </legend>
-                                        <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
-                                    </fieldset>
+                                <div class="col-md-12 text-right">
+                                    <a asp-action="Approved" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
                                 </div>
                             </div>
                         </div>
-
-                    </div>
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-list-alt"></i> ASSESSOR REPORT</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <input readonly asp-for="CaseLocation.ClaimReport.AssessorRemarks" id="assessorRemarks" type="text" class="form-control" value="@Model.CaseLocation.ClaimReport.AssessorRemarks" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-
-        <div class="row">
-            <div class="col-md-12 text-right">
-                <a asp-action="Approved" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+                    }
+                </div>
             </div>
         </div>
     </div>

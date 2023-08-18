@@ -18,7 +18,6 @@
                                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-
                                             <th><input type="checkbox" name="select_all" id="checkall" value="0" /></th>
                                             <th>Id</th>
                                             <th>Document</th>
@@ -120,7 +119,7 @@
                         "bSortable": false,
                         "mRender": function (data, type, row) {
                             var buttons = "";
-                            buttons += '<a href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                            buttons += '<a href="ReadyDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
                             return buttons;
                         }
                     }  

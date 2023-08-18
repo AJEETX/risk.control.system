@@ -568,38 +568,63 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
+            var caseLogs = await _context.InvestigationTransaction
+                .Include(i => i.InvestigationCaseStatus)
+                .Include(i => i.InvestigationCaseSubStatus)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.CaseLocations)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.InvestigationCaseStatus)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.InvestigationCaseSubStatus)
+                .Where(t => t.ClaimsInvestigationId == id)
+                .OrderByDescending(c => c.HopCount)?.ToListAsync();
+
             var claimsInvestigation = await _context.ClaimsInvestigation
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.ClientCompany)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CaseEnabler)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.Country)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.District)
-              .Include(c => c.InvestigationCaseStatus)
-              .Include(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.InvestigationServiceType)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.LineOfBusiness)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Vendor)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+
+            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
+
             if (claimsInvestigation == null)
             {
                 return NotFound();
             }
+            var model = new ClaimTransactionModel
+            {
+                Claim = claimsInvestigation,
+                Log = caseLogs,
+                Location = location
+            };
 
-            return View(claimsInvestigation);
+            return View(model);
         }
 
         [Breadcrumb("Agent Report")]
