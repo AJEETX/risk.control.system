@@ -13,7 +13,7 @@
                 <div class="col-md-12">
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-newspaper"></i> Claim detail</h3>
+                            <h3 class="card-title"><i class="fa fa-binoculars"></i> Investigation detail</h3>
                         </div>
                         @{
                             string address = string.Empty;
@@ -67,21 +67,7 @@
                                             <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.ClaimsInvestigation?.CustomerDetail.CustomerName</h5>
                                         </header>
                                         <div class="card card-solid">
-                                            <div class="progress">
-                                                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
-                                                <div class="progress-bar" role="progressbar" style="width:32.5%;background-color:green;">
-                                                    policy
-                                                </div>
-                                                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                                                <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:@customerProgressColor">
-                                                    customer
-                                                </div>
-                                                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-
-                                                <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:@benficiaryProgressColor">
-                                                    beneficiary
-                                                </div>
-                                            </div>
+                                            
                                             <div class="card-body pb-0">
                                                 <div class="row">
                                                     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -285,99 +271,152 @@
                                         </div>
                                     </div> <!-- class bb-blog-inner -->
                                 </article>
+                                <article>
+                                    <div class="bb-blog-inner">
+                                        <header class="bb-blog-header">
+                                            <h5 class="bb-blog-title" itemprop="name">Agent Report : @Model.CaseLocation?.AssignedAgentUserEmail</h5>
+                                        </header>
+                                        <div class="card card-solid">
+                                            <div class="progress">
+                                                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+                                                <div class="progress-bar" role="progressbar" style="width:49%;background-color:green;">
+                                                    investigation report
+                                                </div>
+                                                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+                                                <div class="progress-bar" role="progressbar" style="width:50%;background-color:red">
+                                                    agent remarks
+                                                </div>
+                                                
+                                            </div>
+                                            <div class="card-body pb-0">
+                                                <div class="row">
+                                                    <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Investigation details
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <h2 class="lead"><b> @Model.ClaimsInvestigation?.CustomerDetail.CustomerName</b></h2>
+                                                                        <p class="text-muted text-sm">
+                                                                            @{
+                                                                                var QR1 = @Model.CaseLocation?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
+                                                                                var LongLat2 = @Model.CaseLocation?.ClaimReport?.LongLat ?? "SAMPLE CITY";
+                                                                            }
+                                                                            <b>QR data: </b> @QR1
+                                                                        </p>
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="fas fa-money-bill-wave"></i>
+                                                                                </span>
+                                                                                Long Lat: <i class="fas fa-rupee-sign"></i> @LongLat2
+                                                                                
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                    <div class="col-6 text-center">
+                                                                        Location Image: <i class="fas fa-rupee-sign"></i>
+                                                                        @{
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            {
+                                                                                <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <img id="documentImage" alt="user-avatar"
+                                                                                     class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                            }
+                                                                        }
+                                                                        <br />
+                                                                        OCR Image: <i class="fas fa-rupee-sign"></i>
+                                                                        @{
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            {
+                                                                                <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <img id="documentImage" alt="user-avatar"
+                                                                                     class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Agent remarks
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-12">
+                                                                        
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+
+                                                                            <div class="form-group">
+                                                                                <input name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" />
+                                                                            </div>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-footer">
+                                                                <div class="text-right">
+                                                                    <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
+                                                                    <button id="submit-case" type="submit" class="btn btn-danger">
+                                                                        <i class="fa fa-binoculars" aria-hidden="true"></i> @Applicationsettings.SUBMIT_CASE_INVESTIGATE Investigation <i class="fa fa-binoculars" aria-hidden="true"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
                             </div>
                         }
                     </div>
                 </div>
             </div>
-            
-                @{
-                    @if (Model.CaseLocation.ClaimReport != null && Model.CaseLocation.ClaimReport.AgentRemarks != null)
-                    {
-                        <div class="card card-secondary">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-folder-open"></i> AGENT Report</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="=row">
-                                    <div class="col-md-12">
-                                        <textarea disabled name="@Model.CaseLocation.ClaimReport.AgentRemarks" id="remarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.AgentRemarks</textarea>
-                                    </div>
+
+            @{
+                @if (Model.CaseLocation.ClaimReport != null && Model.CaseLocation.ClaimReport.AgentRemarks != null)
+                {
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> AGENT Report</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="=row">
+                                <div class="col-md-12">
+                                    <textarea disabled name="@Model.CaseLocation.ClaimReport.AgentRemarks" id="remarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.AgentRemarks</textarea>
                                 </div>
                             </div>
                         </div>
-                        <div class="card card-success">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-folder-open"></i> Review Report</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="=row">
-                                    <div class="col-md-12">
-                                        <select disabled name="supervisorRemarkType" id="supervisorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<SupervisorRemarkType>()"></select>
-                                        <textarea disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.SupervisorRemarks</textarea>
-                                    </div>
+                    </div>
+                    <div class="card card-success">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-folder-open"></i> Review Report</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="=row">
+                                <div class="col-md-12">
+                                    <select disabled name="supervisorRemarkType" id="supervisorRemarkType" type="text" class="form-control" asp-items="Html.GetEnumSelectList<SupervisorRemarkType>()"></select>
+                                    <textarea disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control">@Model.CaseLocation.ClaimReport.SupervisorRemarks</textarea>
                                 </div>
                             </div>
                         </div>
-                    }
+                    </div>
                 }
+            }
 
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-file"></i> @Applicationsettings.SUBMIT_REPORT</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-sm-6">
-
-                                <div class="form-group">
-                                    <label asp-for="CaseLocation.ClaimReport.AgentOcrPicture" class="control-label"></label>
-                                    <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="CaseLocation.ClaimReport.LongLat" class="control-label"></label>
-                                    <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.LongLat" value="10101 Norrace Road Vermont VIC" type="text" class="form-control" />
-                                </div>
-
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label asp-for="CaseLocation.ClaimReport.AgentQrPicture" class="control-label"></label>
-                                    <img id="agentQrPicture" class="report-Image" id="documentImage" src="/img/no-image.png">
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="CaseLocation.ClaimReport.AgentOcrData" class="control-label"></label>
-                                    <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" type="text" value="OCR Sample Data" class="form-control" />
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label asp-for="CaseLocation.ClaimReport.AgentRemarks" class="control-label">Agent Remarks</label>
-                                    <input name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" />
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="=row">
-                            <div class="col-md-12">
-                                <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
-
-
-                                <button id="submit-case" type="submit" class="btn btn-success">
-                                    <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.SUBMIT_CASE_INVESTIGATE
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
         </form>
     </div>
 </section>

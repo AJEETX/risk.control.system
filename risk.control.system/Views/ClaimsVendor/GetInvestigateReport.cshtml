@@ -3,7 +3,12 @@
 @{
     ViewData["Title"] = @Applicationsettings.SERVICE;
 }
-
+<style>
+    .supervisor-doc{
+        height: 2.4rem;
+        border:1px solid #ccc;
+    }
+</style>
 <section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
@@ -285,178 +290,240 @@
                                         </div>
                                     </div> <!-- class bb-blog-inner -->
                                 </article>
+                                <article>
+                                    <div class="bb-blog-inner">
+                                        <header class="bb-blog-header">
+                                            <h5 class="bb-blog-title" itemprop="name">Agent Report</h5>
+                                        </header>
+                                        <div class="card card-solid">
+                                            <div class="progress">
+                                                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+                                                <div class="progress-bar" role="progressbar" style="width:49%;background-color:green;">
+                                                    investigation report
+                                                </div>
+                                                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+                                                <div class="progress-bar" role="progressbar" style="width:50%;background-color:red">
+                                                    agent remarks
+                                                </div>
+
+                                            </div>
+                                            <div class="card-body pb-0">
+                                                <div class="row">
+                                                    <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Investigation details
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <h2 class="lead"><b> @Model.ClaimsInvestigation?.CustomerDetail.CustomerName</b></h2>
+                                                                        <p class="text-muted text-sm">
+                                                                            @{
+                                                                                var QR1 = @Model.CaseLocation?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
+                                                                                var LongLat2 = @Model.CaseLocation?.ClaimReport?.LongLat ?? "SAMPLE CITY";
+                                                                            }
+                                                                            <b>QR data: </b> @QR1
+                                                                        </p>
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="fas fa-money-bill-wave"></i>
+                                                                                </span>
+                                                                                Long Lat: <i class="fas fa-rupee-sign"></i> @LongLat2
+
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                    <div class="col-6 text-center">
+                                                                        Location Image: <i class="fas fa-rupee-sign"></i>
+                                                                        @{
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            {
+                                                                                <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <img id="documentImage" alt="user-avatar"
+                                                                                     class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                            }
+                                                                        }
+                                                                        <br />
+                                                                        OCR Image: <i class="fas fa-rupee-sign"></i>
+                                                                        @{
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            {
+                                                                                <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <img id="documentImage" alt="user-avatar"
+                                                                                     class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Agent remarks
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-12">
+
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+
+                                                                            <div class="form-group">
+                                                                                <input disabled name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" />
+                                                                            </div>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                                <article>
+                                    <div class="bb-blog-inner">
+                                        <header class="bb-blog-header">
+                                            <h5 class="bb-blog-title" itemprop="name">Supervisor Report</h5>
+                                        </header>
+                                        <div class="card card-solid">
+                                            <div class="progress">
+                                                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+                                                <div class="progress-bar" role="progressbar" style="width:100%;">
+                                                    supervisor report
+                                                </div>
+                                                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+
+                                            </div>
+                                            <div class="card-body pb-0">
+
+                                                <div class="row">
+                                                    <div class="col-12 d-flex align-items-stretch flex-column">
+
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Supervisor comments
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-6">
+
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+
+                                                                            <div class="form-group">
+                                                                                <input name="supervisorRemarks" id="supervisorRemarks" asp-for="CaseLocation.ClaimReport.SupervisorRemarks" type="text" class="form-control" />
+                                                                            </div>
+                                                                        </ul>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                            <div class="form-group">
+                                                                                <div class="input-group mb-3">
+                                                                                    <div class="input-group-prepend">
+                                                                                        <span class="input-group-text" asp-for="SupervisorDocumentImage">Document</span>
+                                                                                    </div>
+                                                                                    <img id="documentImage" class="form-image supervisor-doc" src="/img/no-image.png">
+
+                                                                                    <input asp-for="CaseLocation.ClaimReport.SupervisorDocumentImage" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+
+                                                                                </div>
+                                                                            </div>
+                                                                        </ul>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-12 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Disclaimer
+                                                            </div>
+                                                            <div class="card-body pt-0 disclaimer-body">
+                                                                <div class="row report-disclaimer">
+
+
+                                                                    <div class="col-12">
+
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                            <label>
+                                                                                <p>Our Disclaimer was last updated on [___DATE___]</p>
+                                                                                <p><strong>Interpretation and Definitions</strong></p>
+                                                                                <p><strong>Interpretation</strong></p>
+                                                                                <p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
+                                                                                <p><strong>Definitions</strong></p>
+                                                                                <p>For the purposes of this Disclaimer:</p>
+                                                                                <ul>
+                                                                                    <li><strong>"Company"</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Disclaimer) refers to [___COMPANY_INFORMATION___]</li>
+                                                                                    <li><strong>"Service"</strong> refers to the Website.</li>
+                                                                                    <li><strong>"You"</strong> means the individual accessing the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
+                                                                                    <li><strong>"Website"</strong> refers to [___WEBSITE_NAME___], accessible from [___WEBSITE_URL___]</li>
+                                                                                </ul>
+                                                                                <p><strong>Disclaimer</strong></p>
+                                                                                <p>The information contained on the Service is for general information purposes only.</p>
+                                                                                <p>The Company assumes no responsibility for errors or omissions in the contents of the Service.</p>
+                                                                                <p><strong>Fitness & Nutritional Information Disclaimer</strong></p>
+                                                                                <p>The Service can offer health, fitness and nutritional information including, without limitation, advice and recommendation, that is provided solely as general education and informational purposes.</p>
+                                                                                <p><strong>FTC Affiliate Disclaimer</strong></p>
+                                                                                <p>The disclosure that follows is intended to fully comply with the Federal Trade Commission's policy of the United States that requires the Company to be transparent about any and all affiliate relations the Company may have on the Service.</p>
+                                                                                <p>In no event shall the Company or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever arising out of or in connection with your access or use or inability to access or use the Service.</p>
+                                                                                <p><strong>"Use at Your Own Risk" Disclaimer</strong></p>
+                                                                                <p>All information in the Service is provided "as is", with no guarantee of completeness, accuracy, timeliness or of the results obtained from the use of this information, and without warranty of any kind, express or implied, including, but not limited to warranties of performance, merchantability and fitness for a particular purpose.</p>
+                                                                                <p>The Company will not be liable to You or anyone else for any decision made or action taken in reliance on the information given by the Service or for any consequential, special or similar damages, even if advised of the possibility of such damages.</p>
+                                                                                <p><strong>Contact Us</strong></p>
+                                                                                <p>If you have any questions about this Disclaimer, You can contact Us:</p>
+                                                                                <ul>
+                                                                                    <li>By visiting this page on our website: [___WEBSITE_CONTACT_PAGE_URL___]</li>
+                                                                                    <li>By sending us an email: [___WEBSITE_CONTACT_EMAIL___]</li>
+                                                                                </ul>
+                                                                                <p></p>
+                                                                            </label>
+
+                                                                            <div class="form-group">
+                                                                                <div class="custom-control custom-checkbox mr-sm-2">
+                                                                                    <input type="checkbox" class="custom-control-input selected-case" id="selected-case" name="selected-case">
+                                                                                    <label class="custom-control-label" for="selected-case"> I hereby consent to agree to the term and conditions.</label>
+                                                                                </div>
+
+
+                                                                            </div>
+                                                                        </ul>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="card-footer">
+                                                                <div class="text-right">
+                                                                    <a asp-controller="ClaimsVendor" class="btn btn-default" asp-action="ClaimReport">
+                                                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+                                                                    </a>
+                                                                    <button disabled id="allocate-case" type="submit" asp-action="ProcessReport" class="btn btn-success">
+                                                                        <i class="far fa-file-alt" aria-hidden="true"></i> @Applicationsettings.SUBMIT_CASE_TO_COMPANY
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
                             </div>
                         }
-                    </div>
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> Agent Report</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <fieldset>
-                                        <legend>
-                                            Ocr Image
-                                        </legend>
-                                        <div class="form-group">
-                                            <img id="agentLocationPicture" class="report-image" src="/img/no-photo.png">
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            Image Location
-                                        </legend>
-                                        <div class="form-group">
-                                            <input readonly name="agentLonglat" id="agentLonglat" asp-for="CaseLocation.ClaimReport.LongLat" value="Lucknow road, Kanpur UP 101010" type="text" class="form-control" />
-                                        </div>
-                                    </fieldset>
-
-                                </div>
-                                <div class="col-sm-6">
-                                    <fieldset>
-                                        <legend>
-                                            QR Image
-                                        </legend>
-                                        <div class="form-group">
-                                            <img class="report-image" id="documentImage" src="/img/user.png">
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            OCR Data
-                                        </legend>
-                                        <div class="form-group">
-                                            <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" value="PAN Card: ABCXNX10101" type="text" class="form-control" />
-                                        </div>
-                                    </fieldset>
-                                </div>
-                            </div>
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <legend>
-                                            Report Summary
-                                        </legend>
-                                        <input readonly asp-for="CaseLocation.ClaimReport.AgentRemarks" name="agentRemarks" id="remarks" type="text" class="form-control" value="@Model.CaseLocation.ClaimReport.AgentRemarks" />
-                                    </fieldset>
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.SUBMIT_REPORT</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <legend>
-                                            Additional Document / File
-                                        </legend>
-                                        <div class="form-group">
-                                            <img id="supervisorPicture" class="report-image" id="documentImage" src="/img/no-image.png">
-                                            <input asp-for="CaseLocation.ClaimReport.SupervisorDocumentImage" type="file" class="form-control" onchange="document.getElementById('supervisorPicture').src = window.URL.createObjectURL(this.files[0])" />
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            Supervisor Remarks
-                                        </legend>
-                                        <div class="form-group">
-                                            <input name="supervisorRemarks" id="supervisorRemarks" class="form-control" />
-                                        </div>
-                                    </fieldset>
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body disclaimer-body">
-                            <fieldset><legend>Disclaimer</legend>
-                            <div class="row report-disclaimer">
-                                <div class="col-md-12">
-                                    <label>
-                                        <p>Our Disclaimer was last updated on [___DATE___]</p>
-                                        <p><strong>Interpretation and Definitions</strong></p>
-                                        <p><strong>Interpretation</strong></p>
-                                        <p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
-                                        <p><strong>Definitions</strong></p>
-                                        <p>For the purposes of this Disclaimer:</p>
-                                        <ul>
-                                            <li><strong>"Company"</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Disclaimer) refers to [___COMPANY_INFORMATION___]</li>
-                                            <li><strong>"Service"</strong> refers to the Website.</li>
-                                            <li><strong>"You"</strong> means the individual accessing the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
-                                            <li><strong>"Website"</strong> refers to [___WEBSITE_NAME___], accessible from [___WEBSITE_URL___]</li>
-                                        </ul>
-                                        <p><strong>Disclaimer</strong></p>
-                                        <p>The information contained on the Service is for general information purposes only.</p>
-                                        <p>The Company assumes no responsibility for errors or omissions in the contents of the Service.</p>
-                                        <p>In no event shall the Company be liable for any special, direct, indirect, consequential, or incidental damages or any damages whatsoever, whether in an action of contract, negligence or other tort, arising out of or in connection with the use of the Service or the contents of the Service. The Company reserves the right to make additions, deletions, or modifications to the contents on the Service at any time without prior notice.</p>
-                                        <p>The Company does not warrant that the Service is free of viruses or other harmful components. This Disclaimer was generated by <a href="https://www.termsfeed.com/blog/sample-disclaimer-template/">TermsFeed Disclaimer Template</a>.</p>
-                                        <p><strong>Fitness & Nutritional Information Disclaimer</strong></p>
-                                        <p>The Service can offer health, fitness and nutritional information including, without limitation, advice and recommendation, that is provided solely as general education and informational purposes.</p>
-                                        <p>Use of the advice and information contained herein is at your sole choice and risk. You should not rely on this information as a substitute for, nor does it replace, professional medical advice, diagnosis, or treatment. Always consult your physician or healthcare provider before beginning any nutrition or exercise program.</p>
-                                        <p>If You choose to use this information without prior consent of your physician, You are agreeing to accept full responsibility for your decisions and agreeing to hold harmless the Company.</p>
-                                        <p><strong>FTC Affiliate Disclaimer</strong></p>
-                                        <p>The disclosure that follows is intended to fully comply with the Federal Trade Commission's policy of the United States that requires the Company to be transparent about any and all affiliate relations the Company may have on the Service.</p>
-                                        <p>You should assume that some of the links are "affiliate links", a link with a special tracking code.</p>
-                                        <p>This means that if You click on an affiliate link and purchase the item, the Company may receive an affiliate commission. This is a legitimate way to monetize and pay for the operation of the Service and the Company gladly reveal its affiliate relationships to You.</p>
-                                        <p>The price of the item is the same whether it is an affiliate link or not. Regardless, the Company only recommends products or services the Company believes will add value to users.</p>
-                                        <p>Affiliate advertising programs that the Service uses are:</p>
-                                        <p>[___LIST___]</p>
-                                        <p><strong>External Links Disclaimer</strong></p>
-                                        <p>The Service may contain links to external websites that are not provided or maintained by or in any way affiliated with the Company.</p>
-                                        <p>Please note that the Company does not guarantee the accuracy, relevance, timeliness, or completeness of any information on these external websites.</p>
-                                        <p><strong>Fair Use Disclaimer</strong></p>
-                                        <p>The Company may use copyrighted material which has not always been specifically authorized by the copyright owner. The Company is making such material available for criticism, comment, news reporting, teaching, scholarship, or research.</p>
-                                        <p>The Company believes this constitutes a "fair use" of any such copyrighted material as provided for in section 107 of the United States Copyright law.</p>
-                                        <p>If You wish to use copyrighted material from the Service for your own purposes that go beyond fair use, You must obtain permission from the copyright owner.</p>
-                                        <p><strong>Views Expressed Disclaimer</strong></p>
-                                        <p>The Service may contain views and opinions which are those of the authors and do not necessarily reflect the official policy or position of any other author, agency, organization, employer or company, including the Company.</p>
-                                        <p>Comments published by users are their sole responsibility and the users will take full responsibility, liability and blame for any libel or litigation that results from something written in or as a direct result of something written in a comment. The Company is not liable for any comment published by users and reserves the right to delete any comment for any reason whatsoever.</p>
-                                        <p><strong>No Responsibility Disclaimer</strong></p>
-                                        <p>The information on the Service is provided with the understanding that the Company is not herein engaged in rendering legal, accounting, tax, or other professional advice and services. As such, it should not be used as a substitute for consultation with professional accounting, tax, legal or other competent advisers.</p>
-                                        <p>In no event shall the Company or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever arising out of or in connection with your access or use or inability to access or use the Service.</p>
-                                        <p><strong>"Use at Your Own Risk" Disclaimer</strong></p>
-                                        <p>All information in the Service is provided "as is", with no guarantee of completeness, accuracy, timeliness or of the results obtained from the use of this information, and without warranty of any kind, express or implied, including, but not limited to warranties of performance, merchantability and fitness for a particular purpose.</p>
-                                        <p>The Company will not be liable to You or anyone else for any decision made or action taken in reliance on the information given by the Service or for any consequential, special or similar damages, even if advised of the possibility of such damages.</p>
-                                        <p><strong>Contact Us</strong></p>
-                                        <p>If you have any questions about this Disclaimer, You can contact Us:</p>
-                                        <ul>
-                                            <li>By visiting this page on our website: [___WEBSITE_CONTACT_PAGE_URL___]</li>
-                                            <li>By sending us an email: [___WEBSITE_CONTACT_EMAIL___]</li>
-                                        </ul>
-                                        <p></p>
-                                    </label>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                            <div class="custom-control custom-checkbox mr-sm-2">
-                                                <input type="checkbox" class="custom-control-input selected-case" id="selected-case" name="selected-case">
-                                                <label class="custom-control-label" for="selected-case"> I hereby consent to agree to the term and conditions.</label>
-                                            </div>
-
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                            </fieldset>
-                        </div>
-                        <div class="card-body">
-                            <div class="=row">
-                                <div class="col-md-12 text-right">
-                                    <a asp-controller="ClaimsVendor" class="btn btn-default" asp-action="ClaimReport">
-                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
-                                    </a>
-                                    <button disabled id="allocate-case" type="submit" asp-action="ProcessReport" class="btn btn-success">
-                                        <i class="far fa-file-alt" aria-hidden="true"></i> @Applicationsettings.SUBMIT_CASE_TO_COMPANY
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </form>
             </div>
