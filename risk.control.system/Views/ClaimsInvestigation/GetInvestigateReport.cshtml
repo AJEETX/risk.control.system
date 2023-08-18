@@ -4,6 +4,12 @@
     ViewData["Title"] = @Applicationsettings.SERVICE;
 }
 
+<style>
+    .supervisor-doc {
+        height: 2.4rem;
+        border: 1px solid #ccc;
+    }
+</style>
 <section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
@@ -284,86 +290,136 @@
                                         </div>
                                     </div> <!-- class bb-blog-inner -->
                                 </article>
+                                <article>
+                                    <div class="bb-blog-inner">
+                                        <header class="bb-blog-header">
+                                            <h5 class="bb-blog-title" itemprop="name">Agent Report</h5>
+                                        </header>
+                                        <div class="card card-solid">
+                                            <div class="progress">
+                                                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+                                                <div class="progress-bar" role="progressbar" style="width:32.5%;background-color:green;">
+                                                    investigation report
+                                                </div>
+                                                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+                                                <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:@customerProgressColor">
+                                                    agent remarks
+                                                </div>
+                                                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+
+                                                <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:@benficiaryProgressColor">
+                                                    supervisor comments
+                                                </div>
+                                            </div>
+                                            <div class="card-body pb-0">
+                                                <div class="row">
+                                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Investigation details
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <h2 class="lead"><b> @Model.ClaimsInvestigation?.CustomerDetail.CustomerName</b></h2>
+                                                                        <p class="text-muted text-sm">
+                                                                            @{
+                                                                                var QR1 = @Model.CaseLocation?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
+                                                                                var LongLat2 = @Model.CaseLocation?.ClaimReport?.LongLat ?? "SAMPLE CITY";
+                                                                            }
+                                                                            <b>QR data: </b> @QR1
+                                                                        </p>
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="fas fa-money-bill-wave"></i>
+                                                                                </span>
+                                                                                Long Lat: <i class="fas fa-rupee-sign"></i> @LongLat2
+
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                    <div class="col-6 text-center">
+                                                                        Location Image: <i class="fas fa-rupee-sign"></i>
+                                                                        @{
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            {
+                                                                                <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <img id="documentImage" alt="user-avatar"
+                                                                                     class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                            }
+                                                                        }
+                                                                        <br />
+                                                                        OCR Document: <i class="fas fa-rupee-sign"></i>
+                                                                        @{
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            {
+                                                                                <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <img id="documentImage" alt="user-avatar"
+                                                                                     class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Agent remarks
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-12">
+
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+
+                                                                            <div class="form-group">
+                                                                                <input disabled name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" />
+                                                                            </div>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="far fa-file-powerpoint"></i> Supervisor comments
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-12">
+
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+
+                                                                            <div class="form-group">
+                                                                                <input disabled name="supervisorRemarks" id="supervisorRemarks" asp-for="CaseLocation.ClaimReport.SupervisorRemarks" type="text" class="form-control" />
+                                                                            </div>
+                                                                        </ul>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
                             </div>
                         }
                     </div>
-                    <div class="card card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-prescription"></i> Agency complete report</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <fieldset>
-                                        <legend>
-                                            Ocr Image
-                                        </legend>
-                                        <div class="form-group">
-                                            <img id="agentLocationPicture" class="report-image" src="/img/no-photo.png">
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            Image Location
-                                        </legend>
-                                        <div class="form-group">
-                                            <input readonly name="agentLonglat" id="agentLonglat" asp-for="CaseLocation.ClaimReport.LongLat" value="Lucknow road, Kanpur UP 101010" type="text" class="form-control" />
-                                        </div>
-                                    </fieldset>
-
-                                </div>
-                                <div class="col-sm-6">
-                                    <fieldset>
-                                        <legend>
-                                            QR Image
-                                        </legend>
-                                        <div class="form-group">
-                                            <img id="agentQrPicture" class="report-image" src="/img/user.png">
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            OCR Data
-                                        </legend>
-                                        <div class="form-group">
-                                            <input readonly name="agentOcrData" id="agentOcrData" asp-for="CaseLocation.ClaimReport.AgentOcrData" value="PAN Card: ABCXNX10101" type="text" class="form-control" />
-                                        </div>
-                                    </fieldset>
-                                </div>
-                            </div>
-
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <legend>
-                                            Agent Remarks
-                                        </legend>
-                                        <input readonly asp-for="CaseLocation.ClaimReport.AgentRemarks" name="agentRemarks" id="remarks" type="text" class="form-control" value="@Model.CaseLocation.ClaimReport.AgentRemarks" />
-                                    </fieldset>
-                                </div>
-
-                            </div>
-                            <div class="=row">
-                                <div class="col-md-12">
-                                    <fieldset>
-                                        <legend>
-                                            Additional Document / File
-                                        </legend>
-                                        <div class="form-group">
-                                            <img id="supervisorPicture" asp-for="" class="report-image" src="/img/no-image.png">
-                                        </div>
-                                    </fieldset>
-                                    <fieldset>
-                                        <legend>
-                                            Supervisor Remarks
-                                        </legend>
-                                        <input disabled name="supervisorRemarks" id="supervisorRemarks" type="text" class="form-control" value='@Model.CaseLocation.ClaimReport.SupervisorRemarks' />
-                                    </fieldset>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                   
                     <div class="card card-secondary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-list-alt"></i> PROCESS REPORT</h3>
@@ -371,7 +427,7 @@
                         <div class="card-body">
                             <div class="=row">
                                 <div class="col-md-12">
-                                    <textarea name="assessorRemarks" id="assessorRemarks" type="text" class="form-control"></textarea>
+                                    <input name="assessorRemarks" id="assessorRemarks" type="text" class="form-control" />
                                 </div>
                             </div>
                         </div>
