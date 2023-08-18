@@ -53,8 +53,9 @@ namespace risk.control.system.Services
                 try
                 {
                     var existingPolicy = await _context.ClaimsInvestigation
-                        .Include(c => c.PolicyDetail).AsNoTracking()
-                        .Include(c => c.CustomerDetail).AsNoTracking()
+                        .Include(c => c.PolicyDetail)
+                        .Include(c => c.CustomerDetail)
+                        .AsNoTracking()
                             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
                     if (existingPolicy != null)
                     {
@@ -77,20 +78,27 @@ namespace risk.control.system.Services
 
                     if (create)
                     {
+                        if (claimDocument == null && existingPolicy?.PolicyDetail?.DocumentImage != null)
+                        {
+                            claimsInvestigation.PolicyDetail.DocumentImage = existingPolicy.PolicyDetail.DocumentImage;
+                            claimsInvestigation.PolicyDetail.Document = existingPolicy.PolicyDetail.Document;
+                        }
                         var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
                         addedClaimId = aaddedClaimId.Entity.ClaimsInvestigationId;
-                        var log = new InvestigationTransaction
+                        if (existingPolicy == null)
                         {
-                            ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                            Created = DateTime.UtcNow,
-                            HopCount = 0,
-                            Time2Update = 0,
-                            InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                            InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
-                            UpdatedBy = userEmail
-                        };
-
-                        _context.InvestigationTransaction.Add(log);
+                            var log = new InvestigationTransaction
+                            {
+                                ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                                Created = DateTime.UtcNow,
+                                HopCount = 0,
+                                Time2Update = 0,
+                                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                                UpdatedBy = userEmail
+                            };
+                            _context.InvestigationTransaction.Add(log);
+                        }
                     }
                     else
                     {
@@ -101,6 +109,7 @@ namespace risk.control.system.Services
                         }
                         var addedClaim = _context.PolicyDetail.Update(claimsInvestigation.PolicyDetail);
                         existingPolicy.PolicyDetail = addedClaim.Entity;
+                        existingPolicy.PolicyDetailId = addedClaim.Entity.PolicyDetailId;
                         _context.ClaimsInvestigation.Update(existingPolicy);
                     }
 
@@ -142,6 +151,12 @@ namespace risk.control.system.Services
                     }
                     if (create)
                     {
+                        if (customerDocument == null && existingPolicy.CustomerDetail?.ProfilePicture != null)
+                        {
+                            claimsInvestigation.CustomerDetail.ProfilePictureUrl = existingPolicy.CustomerDetail.ProfilePictureUrl;
+                            claimsInvestigation.CustomerDetail.ProfilePicture = existingPolicy.CustomerDetail.ProfilePicture;
+                            claimsInvestigation.CustomerDetail.ProfileImage = existingPolicy.CustomerDetail.ProfileImage;
+                        }
                         var addedClaim = _context.CustomerDetail.Add(claimsInvestigation.CustomerDetail);
                         existingPolicy.CustomerDetail = addedClaim.Entity;
                     }

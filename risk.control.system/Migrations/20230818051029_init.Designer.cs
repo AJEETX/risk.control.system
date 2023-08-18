@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230818011421_init")]
+    [Migration("20230818051029_init")]
     partial class init
     {
         /// <inheritdoc />

@@ -1061,7 +1061,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile, false);
+            var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
 
             await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
@@ -1098,7 +1098,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
+        public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
@@ -1131,7 +1131,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            var claimId = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, true);
+            var claimId = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, create);
 
             await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
