@@ -807,7 +807,7 @@ namespace risk.control.system.Controllers
 
             toastNotification.AddSuccessToastMessage("claim set ready successfully!");
 
-            return RedirectToAction(nameof(Incomplete));
+            return RedirectToAction(nameof(Assign));
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Active")]

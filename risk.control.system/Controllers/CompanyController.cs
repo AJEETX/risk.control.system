@@ -363,7 +363,7 @@ namespace risk.control.system.Controllers
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
-                    toastNotification.AddSuccessToastMessage("Vendor(s) empanel successful!");
+                    toastNotification.AddSuccessToastMessage("Agency(s) empanel successful!");
                     try
                     {
                         return RedirectToAction("AvailableVendors");
@@ -419,7 +419,7 @@ namespace risk.control.system.Controllers
                     company.Updated = DateTime.UtcNow;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     var savedRows = await _context.SaveChangesAsync();
-                    toastNotification.AddSuccessToastMessage("Vendor(s) depanel sucessful!");
+                    toastNotification.AddSuccessToastMessage("Agency(s) depanel sucessful!");
                     try
                     {
                         if (savedRows > 0)
