@@ -204,18 +204,21 @@
                     {
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="CreateClaim" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","CreateClaim")
-                                @Url.MakeActiveClass("ClaimsInvestigation","Create")">
+                                    @Url.MakeActiveClass("ClaimsInvestigation","CreatePolicy") ">
                                 <i class="fas fa-pen-alt nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-success">START NEW</span>
+                                    <span class="badge badge-success">ADD NEW </span> <i class="fa fa-asterisk" style="color:red;" title="ADD NEW"></i>
                                 </p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Incomplete" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Incomplete") 
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft")
                                         @Url.MakeActiveClass("ClaimsInvestigation","Details") @Url.MakeActiveClass("ClaimsInvestigation","Edit") 
                                         @Url.MakeActiveClass("CaseLocations","Create") @Url.MakeActiveClass("CaseLocations","Edit")
-                                            @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete")">
+                                            @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete") 
+                                                @Url.MakeActiveClass("ClaimsInvestigation","EditPolicy")
+                                                @Url.MakeActiveClass("ClaimsInvestigation","CreateCustomer") @Url.MakeActiveClass("ClaimsInvestigation","EditCustomer")
+                                                        @Url.MakeActiveClass("CaseLocation","Create") @Url.MakeActiveClass("CaseLocation","Edit")">
                                 <i class="far fa-clone nav-icon"></i>
                                 <p>
                                     <span class="badge badge-warning">DRAFT</span>

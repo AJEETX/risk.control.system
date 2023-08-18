@@ -12,6 +12,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
+using SmartBreadcrumbs.Nodes;
 
 using System.Data;
 using System.Security.Claims;
@@ -56,7 +57,7 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        [Breadcrumb(" Create New", FromAction = "Active")]
+        [Breadcrumb(" Add New")]
         public async Task<IActionResult> CreateClaim()
         {
             var claim = new ClaimsInvestigation { PolicyDetail = new PolicyDetail { LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId } };
@@ -74,22 +75,24 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Claims")]
         public IActionResult Index()
         {
+            var claimsPage = new MvcBreadcrumbNode("Active", "Claims", "Claims");
+            ViewData["BreadcrumbNode"] = claimsPage;
             return View();
         }
 
-        [Breadcrumb(" Ready to Assign", FromAction = "Active")]
+        [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Assign()
         {
             return View();
         }
 
-        [Breadcrumb("Ready To Assess", FromAction = "Active")]
+        [Breadcrumb(" Assess", FromAction = "Index")]
         public async Task<IActionResult> Assessor()
         {
             return View();
         }
 
-        [Breadcrumb(" Allocate", FromAction = "Active")]
+        [Breadcrumb(" Allocate", FromAction = "Index")]
         public IActionResult Assigner()
         {
             return View();
@@ -97,14 +100,14 @@ namespace risk.control.system.Controllers
 
         // GET: ClaimsInvestigation
 
-        [Breadcrumb(" Incomplete Claims", FromAction = "Active")]
-        public IActionResult Incomplete()
+        [Breadcrumb(" Draft", FromAction = "Index")]
+        public IActionResult Draft()
         {
             return View();
         }
 
         [HttpGet]
-        [Breadcrumb(" Empanelled vendors")]
+        [Breadcrumb(" Empanelled Agencies")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -265,7 +268,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb(" Allocate to agency")]
+        [Breadcrumb(" Allocate (to agency)")]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
@@ -425,7 +428,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContext);
         }
 
-        [Breadcrumb(" Approved Claims")]
+        [Breadcrumb(" Closed")]
         public async Task<IActionResult> Approved()
         {
             return View();
@@ -509,25 +512,25 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb(" Re Allocate", FromAction = "Active")]
+        [Breadcrumb(" Re Allocate", FromAction = "Index")]
         public async Task<IActionResult> Review()
         {
             return View();
         }
 
-        [Breadcrumb(title: " Active Claims")]
+        [Breadcrumb(title: "Active Claims")]
         public IActionResult Active()
         {
             return View();
         }
 
-        [Breadcrumb(title: "To Investigate", FromAction = "Active")]
+        [Breadcrumb(title: "On-going", FromAction = "Index")]
         public async Task<IActionResult> ToInvestigate()
         {
             return View();
         }
 
-        [Breadcrumb(title: "Claim Report", FromAction = "Active")]
+        [Breadcrumb(title: "Report", FromAction = "Index")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -693,7 +696,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Details/5
-        [Breadcrumb("Detail", FromAction = "Incomplete")]
+        [Breadcrumb("Details", FromAction = "Draft")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -760,7 +763,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Create Claim", FromAction = "Incomplete")]
+        [Breadcrumb("Start New", FromAction = "Draft")]
         public async Task<IActionResult> CreatedPolicy(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -831,7 +834,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Assign));
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Active")]
+        [Breadcrumb(title: " Detail", FromAction = "Index")]
         public async Task<IActionResult> Detail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -898,7 +901,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Active")]
+        [Breadcrumb(title: " Detail", FromAction = "Index")]
         public async Task<IActionResult> ReadyDetail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1009,7 +1012,7 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
-        [Breadcrumb(title: " Create Policy")]
+        [Breadcrumb(title: " Add New")]
         public async Task<IActionResult> CreatePolicy()
         {
             var userEmailToSend = string.Empty;
@@ -1044,20 +1047,6 @@ namespace risk.control.system.Controllers
                 model.PolicyDetail.ClientCompanyId = clientCompanyUser.ClientCompanyId;
             }
             ViewBag.ClientCompanyId = clientCompanyUser.ClientCompanyId;
-            //mailboxService.InsertMessage(new ContactMessage
-            //{
-            //    ApplicationUserId = clientCompanyUser != null ? clientCompanyUser.Id : _context.ApplicationUser.First(u => u.isSuperAdmin).Id,
-            //    ReceipientEmail = userEmailToSend,
-            //    Created = DateTime.UtcNow,
-            //    Message = "start",
-            //    Subject = "New case created: case Id = " + userEmailToSend,
-            //    SenderEmail = clientCompanyUser != null ? clientCompanyUser.FirstName : _context.ApplicationUser.First(u => u.isSuperAdmin).FirstName,
-            //    Priority = ContactMessagePriority.NORMAL,
-            //    SendDate = DateTime.UtcNow,
-            //    Updated = DateTime.UtcNow,
-            //    Read = false,
-            //    UpdatedBy = userEmail.Value
-            //});
 
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
@@ -1114,7 +1103,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Details), new { id = claimId });
         }
 
-        [Breadcrumb(title: " Edit Policy", FromAction = "Incomplete")]
+        [Breadcrumb(title: " Edit Policy", FromAction = "Draft")]
         public async Task<IActionResult> EditPolicy(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1134,6 +1123,15 @@ namespace risk.control.system.Controllers
             ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+
+            var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
+            var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
+
+            var incompleteClaim = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", "Details") { Parent = incompleteClaims, RouteValues = new { id = id } };
+
+            var locationPage = new MvcBreadcrumbNode("Edit", "ClaimsInvestigation", "Edit Policy") { Parent = incompleteClaim, RouteValues = new { id = id } };
+
+            ViewData["BreadcrumbNode"] = locationPage;
 
             return View(claimsInvestigation);
         }
@@ -1181,7 +1179,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Details), new { id = claimId });
         }
 
-        [Breadcrumb(title: " Create Customer", FromAction = "Incomplete")]
+        [Breadcrumb(title: " Add Customer", FromAction = "Draft")]
         public async Task<IActionResult> CreateCustomer(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1205,6 +1203,13 @@ namespace risk.control.system.Controllers
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
+            var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
+            var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
+
+            var incompleteClaim = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", "Details") { Parent = incompleteClaims, RouteValues = new { id = id } };
+
+            var locationPage = new MvcBreadcrumbNode("CreateCustomer", "ClaimsInvestigation", "Add Customer") { Parent = incompleteClaim, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = locationPage;
             return View(claimsInvestigation);
         }
 
@@ -1251,7 +1256,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Details), new { id = claimId });
         }
 
-        [Breadcrumb(title: " Edit Policy", FromAction = "Incomplete")]
+        [Breadcrumb(title: " Edit Customer", FromAction = "Draft")]
         public async Task<IActionResult> EditCustomer(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1285,6 +1290,14 @@ namespace risk.control.system.Controllers
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
+
+            var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
+            var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
+
+            var incompleteClaim = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", "Details") { Parent = incompleteClaims, RouteValues = new { id = id } };
+
+            var locationPage = new MvcBreadcrumbNode("EditCustomer", "ClaimsInvestigation", "Edit Customer") { Parent = incompleteClaim, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = locationPage;
 
             return View(claimsInvestigation);
         }
@@ -1399,7 +1412,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Edit/5
-        [Breadcrumb(title: " Edit Claim", FromAction = "Incomplete")]
+        [Breadcrumb(title: " Edit Claim", FromAction = "Draft")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1497,7 +1510,7 @@ namespace risk.control.system.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(nameof(Incomplete));
+            return RedirectToAction(nameof(Draft));
         }
 
         // GET: ClaimsInvestigation/Edit/5
@@ -1626,7 +1639,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Delete/5
-        [Breadcrumb(title: " Delete Claim", FromAction = "Incomplete")]
+        [Breadcrumb(title: " Delete Claim", FromAction = "Draft")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1690,10 +1703,10 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Incomplete));
+            return RedirectToAction(nameof(Draft));
         }
 
-        [Breadcrumb(title: " Agency detail", FromAction = "Incomplete")]
+        [Breadcrumb(title: " Agency detail", FromAction = "Draft")]
         public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl, string selectedcase)
         {
             if (id == null || _context.Vendor == null)

@@ -9,7 +9,7 @@
             <div class="col-md-12">
                 <div id="article" class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-newspaper"></i> Claim detail</h3>
+                        <h3 class="card-title"><i class="fas fa-newspaper"></i> Details</h3>
                     </div>
                     @{
                         string address = string.Empty;
@@ -17,6 +17,8 @@
                         int currentAgeinYrs = 0;
                         bool customerExist = false;
                         bool beneficiaryExist = false;
+                        string customerProgressbarMessage = "add customer";
+                        string beneficiaryProgressbarMessage = "beneficiary";
                         if (Model.Claim != null && Model.Claim.CustomerDetail !=null)
                         {
                             address = @Model.Claim?.CustomerDetail.Addressline + " " + @Model.Claim?.CustomerDetail.District.Name + " " + @Model.Claim?.CustomerDetail.State.Name + " " + @Model.Claim?.CustomerDetail.Country.Name + " " + @Model.Claim?.CustomerDetail.PinCode.Code;
@@ -29,15 +31,17 @@
                                 currentAgeinYrs = (int)age / 365;
                             }
                         }
-                        if (!string.IsNullOrWhiteSpace(Model.Claim.PolicyDetail?.ContractNumber))
+                        if (Model.Claim.CustomerDetail != null)
                         {
                             customerExist = true;
+                            customerProgressbarMessage = "customer";
                         }
                         if (Model.Location?.CaseLocationId > 0)
                         {
                             beneficiaryExist = true;
+                            beneficiaryProgressbarMessage = "edit beneficiary";
                         }
-                        string customerProgressColor = "grey";
+                        string customerProgressColor = "lightgrey";
                         if (@customerExist)
                         {
                             customerProgressColor = "green";
@@ -46,10 +50,12 @@
                         if (@customerExist && @beneficiaryExist)
                         {
                             benficiaryProgressColor = "green";
+                            beneficiaryProgressbarMessage = "add beneficiary";
                         }
                         if (@customerExist && !@beneficiaryExist)
                         {
-                            benficiaryProgressColor = "grey";
+                            benficiaryProgressColor = "lightgrey";
+                            beneficiaryProgressbarMessage = "beneficiary";
                         }
                         if (!@customerExist && !@beneficiaryExist)
                         {
@@ -69,12 +75,12 @@
                                             </div>
                                             <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
                                             <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:@customerProgressColor">
-                                                customer
+                                                @customerProgressbarMessage
                                             </div>
                                             <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
 
                                             <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:@benficiaryProgressColor">
-                                                beneficiary
+                                                @beneficiaryProgressbarMessage
                                             </div>
                                         </div>
                                         <div class="card-body pb-0">
@@ -306,7 +312,7 @@
                                 <div class="col-md-12 text-right">
 
                                     <form id="create-form" method="post" asp-action="CaseReadyToAssign" asp-route--testid="@Model.Claim.ClaimsInvestigationId">
-                                        <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
+                                        <a asp-action="Draft" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
                                         @{
                                             if (Model.Claim.CaseLocations != null && Model.Claim.CaseLocations.Count > 0)
                                             {

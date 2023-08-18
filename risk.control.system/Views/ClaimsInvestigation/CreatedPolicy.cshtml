@@ -308,7 +308,7 @@
                                 <div class="col-md-12 text-right">
 
                                     <form id="create-form" asp-action="CaseReadyToAssign">
-                                        <a asp-action="Incomplete" class="btn btn-default"><i class="fas fa-arrow-left"></i>Go To List</a> &nbsp;&nbsp;&nbsp;
+                                        <a asp-action="Draft" class="btn btn-default"><i class="fas fa-arrow-left"></i>Go To List</a> &nbsp;&nbsp;&nbsp;
                                         @{
                                             if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
                                             {

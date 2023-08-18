@@ -13,30 +13,30 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen-alt"></i> Create New</h3>
+                            <h3 class="card-title"><i class="fas fa-pen-alt"></i> Add New</h3>
                         </div>
                         <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
                         <div class="card-body">
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name"> <i class="far fa-file-powerpoint"></i> Add Policy Detail </h5>
+                                        <h5 class="bb-blog-title" itemprop="name"> <i class="far fa-file-powerpoint"></i> Add Policy </h5>
                                     </header>
 
                                     <div class="card card-solid">
                                         <div class="progress">
                                             <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
                                             <div class="progress-bar" role="progressbar" style="width:33%;background-color:green;">
-                                                create policy
+                                                add policy
                                             </div>
                                             <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
                                             <div class="progress-bar" role="progressbar" style="width:33%;background-color:lightgrey">
-                                                add customer
+                                                customer
                                             </div>
                                             <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
 
                                             <div class="progress-bar" role="progressbar" style="width:34%;background-color:lightgray">
-                                                add beneficiary
+                                                beneficiary
                                             </div>
                                         </div>
                                         <div class="card-body pb-0">
@@ -171,7 +171,7 @@
                                                                 @Applicationsettings.CANCEL
                                                             </a>
                                                             <button type="submit" class="btn btn-success">
-                                                                <i class="fas fa-pen-alt"></i> Create Policy
+                                                                <i class="far fa-file-powerpoint"></i> Add Policy
                                                             </button>
 
                                                         </div>
@@ -199,14 +199,14 @@
         $.validator.setDefaults({
             submitHandler: function (form) {
                 $.confirm({
-                    title: "Confirm Policy Creation",
+                    title: "Confirm Add Policy",
                     content: "Are you sure?",
-                    icon: 'fas fa-pen-alt',
+                    icon: 'far fa-file-powerpoint',
                     type: 'green',
                     closeIcon: true,
                     buttons: {
                         confirm: {
-                            text: "Create",
+                            text: "Add",
                             btnClass: 'btn-success',
                             action: function () {
                                 form.submit();

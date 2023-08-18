@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations
-        [Breadcrumb("Location", FromController = typeof(ClaimsInvestigationController), FromAction = "Incomplete")]
+        [Breadcrumb("Location", FromController = typeof(ClaimsInvestigationController), FromAction = "Draft")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.CaseLocation.Include(c => c.District).Include(c => c.State);
@@ -82,6 +82,7 @@ namespace risk.control.system.Controllers
 
         // GET: CaseLocations/Create
         //[Breadcrumb("Create", FromController = typeof(ClaimsInvestigationController), FromAction = "Details")]
+        [Breadcrumb("Location", FromController = typeof(ClaimsInvestigationController), FromAction = "Draft")]
         public IActionResult Create(string id)
         {
             var claim = _context.ClaimsInvestigation
@@ -100,11 +101,11 @@ namespace risk.control.system.Controllers
             var model = new CaseLocation { ClaimsInvestigation = claim };
 
             var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
-            var incompleteClaims = new MvcBreadcrumbNode("Incomplete", "ClaimsInvestigation", "Incomplete") { Parent = activeClaims };
+            var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
 
             var incompleteClaim = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", "Details") { Parent = incompleteClaims, RouteValues = new { id = id } };
 
-            var locationPage = new MvcBreadcrumbNode("Create", "CaseLocations", "Location") { Parent = incompleteClaim, RouteValues = new { id = id } };
+            var locationPage = new MvcBreadcrumbNode("Add", "CaseLocations", "Add Beneficiary") { Parent = incompleteClaim, RouteValues = new { id = id } };
 
             ViewData["BreadcrumbNode"] = locationPage;
             return View(model);
@@ -174,6 +175,14 @@ namespace risk.control.system.Controllers
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", caseLocation.PinCodeId);
+
+            var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
+            var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
+
+            var incompleteClaim = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", "Details") { Parent = incompleteClaims, RouteValues = new { id = id } };
+
+            var locationPage = new MvcBreadcrumbNode("Add", "CaseLocations", "Edit Beneficiary") { Parent = incompleteClaim, RouteValues = new { id = id } };
+            ViewData["BreadcrumbNode"] = locationPage;
             return View(services);
         }
 
@@ -209,11 +218,11 @@ namespace risk.control.system.Controllers
                             caseLocation.ProfilePicture = dataStream.ToArray();
                         }
 
-                        var existingLocation = _context.CaseLocation.AsNoTracking().Where(c=>
-                        c.CaseLocationId == caseLocation.CaseLocationId && c.CaseLocationId == id ).FirstOrDefault();
+                        var existingLocation = _context.CaseLocation.AsNoTracking().Where(c =>
+                        c.CaseLocationId == caseLocation.CaseLocationId && c.CaseLocationId == id).FirstOrDefault();
                         if (existingLocation != null)
                         {
-                            if(existingLocation.ProfilePicture != null)
+                            if (existingLocation.ProfilePicture != null)
                             {
                                 caseLocation.ProfilePicture = existingLocation.ProfilePicture;
                             }

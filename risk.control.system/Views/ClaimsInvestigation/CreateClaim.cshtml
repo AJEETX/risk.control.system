@@ -9,7 +9,7 @@
             <div class="col-md-12">
                 <div id="article" class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-newspaper"></i> Create New</h3>
+                        <h3 class="card-title"><i class="fas fa-pen-alt"></i> Add New</h3>
                     </div>
                     @{
                         string address = string.Empty;
@@ -20,13 +20,13 @@
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name">Start </h5>
+                                        <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Add Policy </h5>
                                     </header>
                                     <div class="card card-solid">
                                         <div class="progress">
                                             <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:32.5%;background-color:green;">
-                                                policy
+                                            <div class="progress-bar" role="progressbar" style="width:32.5%;background-color:grey;">
+                                                add policy
                                             </div>
                                             <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
                                             <div class="progress-bar progress-bar-warning" role="progressbar" style="width:32.33%;background-color:lightgrey;">
@@ -95,7 +95,7 @@
                                                             <div class="text-right">
 
                                                                 <form id="create-form" asp-action="CaseReadyToAssign">
-                                                                    <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Create Policy</a>
+                                                                    <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Policy</a>
                                                                 </form>
                                                             </div>
                                                         </div>
@@ -150,7 +150,7 @@
                                                             <div class="text-right">
 
                                                                 <form id="create-form" asp-action="CaseReadyToAssign">
-                                                                    <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary"><i class="fa fa-user-plus"></i> Add Customer</a>
+                                                                    <a style="pointer-events:none;color:lightgrey;" class="btn btn-outline-secondary"><i class="fa fa-user-plus"></i> Customer</a>
                                                                 </form>
                                                             </div>
                                                         </div>
@@ -200,7 +200,7 @@
                                                             <div class="text-right">
 
                                                                 <form id="create-form" asp-action="CaseReadyToAssign">
-                                                                    <a style="pointer-events:none;color:lightgrey;" class="btn btn-outline-secondary"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                                                                    <a style="pointer-events:none;color:lightgrey;" class="btn btn-outline-secondary"><i class="fas fa-user-tie"></i> Beneficiary</a>
                                                                 </form>
                                                             </div>
                                                         </div>
@@ -216,7 +216,7 @@
                                 <div class="col-md-12 text-right">
 
                                     <form id="create-form" asp-action="CaseReadyToAssign">
-                                        <a asp-action="/" class="btn btn-secondary">
+                                        <a asp-action="Index" asp-controller="Dashboard" class="btn btn-secondary">
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
                                         </a> &nbsp;&nbsp;&nbsp;
