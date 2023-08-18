@@ -207,7 +207,7 @@
                                 @Url.MakeActiveClass("ClaimsInvestigation","Create")">
                                 <i class="fas fa-pen-alt nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-success">CREATE NEW</span>
+                                    <span class="badge badge-success">START NEW</span>
                                 </p>
                             </a>
                         </li>
@@ -218,7 +218,7 @@
                                             @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete")">
                                 <i class="far fa-clone nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-warning">INCOMPLETE CLAIMS</span>
+                                    <span class="badge badge-warning">DRAFT</span>
                                 </p>
                             </a>
                         </li>
@@ -226,7 +226,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assign" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assign") @Url.MakeActiveClass("ClaimsInvestigation","AssignDetail") ">
                                 <i class="fas fa-thumbtack nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-danger">READY TO ASSIGN</span>
+                                    <span class="badge badge-danger">ASSIGN</span>
                                 </p>
                             </a>
                         </li>
@@ -255,7 +255,7 @@
                                     @Url.MakeActiveClass("ClaimsInvestigation","withdraw")">
                                 <i class="fa fa-binoculars nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-warning">TO INVESTIGATE</span>
+                                    <span class="badge badge-warning">ON-GOING</span>
                                 </p>
                             </a>
                         </li>
@@ -274,7 +274,7 @@
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assessor" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assessor")">
                                 <i class="fas fa-glasses nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-danger">READY TO ASSESS</span>
+                                    <span class="badge badge-danger">ASSESS</span>
                                 </p>
                             </a>
                         </li>
@@ -291,7 +291,7 @@
                                     @Url.MakeActiveClass("ClaimsInvestigation","GetApprovedReport")">
                                 <i class="fas fa-thumbs-up nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-success">APPROVED CLAIMS</span>
+                                    <span class="badge badge-success">CLOSED</span>
                                 </p>
                             </a>
                         </li>
@@ -304,7 +304,7 @@
                     @Url.MakeActiveClass("ClaimsInvestigation","Detail")">
                         <i class="fa fa-toggle-on nav-icon"></i>
                         <p>
-                             <span class="badge badge-info">ACTIVE CLAIMS</span>
+                             <span class="badge badge-info">ACTIVE</span>
                         </p>
                     </a>
                 </li>
@@ -317,7 +317,7 @@
                             @Url.MakeActiveClass("Report","Detail")">
                                 <i class="fas fa-print nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-secondary"> REPORT TIMELINE</span>
+                                    <span class="badge badge-secondary"> REPORT <i class="fas fa-asterik"></i> </span>
                                 </p>
                             </a>
                         </li>

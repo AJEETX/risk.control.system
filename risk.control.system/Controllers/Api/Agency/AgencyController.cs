@@ -182,7 +182,7 @@ namespace risk.control.system.Controllers.Api.Agency
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            var adminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AgencyAdmin.ToString()));
             List<VendorUserClaim> agents = new List<VendorUserClaim>();
 
             var vendor = _context.Vendor
@@ -201,8 +201,8 @@ namespace risk.control.system.Controllers.Api.Agency
 
             foreach (var user in users)
             {
-                var isAgent = await userManager.IsInRoleAsync(user, agentRole?.Name);
-                if (isAgent)
+                var isAdmin = await userManager.IsInRoleAsync(user, adminRole?.Name);
+                if (!isAdmin)
                 {
                     int claimCount = 0;
                     if (result.TryGetValue(user.Email, out claimCount))
