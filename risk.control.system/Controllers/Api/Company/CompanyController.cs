@@ -39,7 +39,9 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(u => u.State)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-            var users = company.CompanyApplicationUser.AsQueryable();
+            var users = company.CompanyApplicationUser
+                .Where(u => !u.Deleted)
+                .AsQueryable();
             var result =
                 users.Select(u =>
                 new
@@ -79,7 +81,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var result =
-                company.EmpanelledVendors.Select(u =>
+                company.EmpanelledVendors.Where(v => !v.Deleted).Select(u =>
                 new
                 {
                     Id = u.VendorId,
@@ -123,7 +125,8 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
-            .AsQueryable();
+                .Where(v => !v.Deleted)
+                .AsQueryable();
 
             var result =
                 availableVendors.Select(u =>

@@ -68,6 +68,8 @@ namespace risk.control.system.Models
         public Mailbox? Mailbox { get; set; } = new();
 
         public List<ApplicationRole> ApplicationRoles { get; set; } = new();
+
+        public bool Deleted { get; set; } = false;
     }
 
     public class ApplicationRole : IdentityRole<long>

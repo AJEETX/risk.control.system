@@ -50,6 +50,7 @@ namespace risk.control.system.Models
 
         public bool IsReviewCase { get; set; } = false;
         public bool IsReady2Assign { get; set; } = false;
+        public bool Deleted { get; set; } = false;
     }
 
     public enum Income

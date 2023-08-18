@@ -50,7 +50,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State);
+                .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -129,12 +130,12 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
-                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
-                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-                        Name = a.CustomerDetail.CustomerName,
-                        Policy = a.PolicyDetail.LineOfBusiness.Name,
+                        Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : "/img/no-image.png",
+                        Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : "/img/no-image.png",
+                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
+                        Policy = a.PolicyDetail?.LineOfBusiness.Name,
                         Status = a.InvestigationCaseStatus.Name,
-                        ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                        ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
                         Location = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
@@ -173,7 +174,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State);
+                .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -219,12 +221,12 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
-                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
-                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-                        Name = a.CustomerDetail.CustomerName,
-                        Policy = a.PolicyDetail.LineOfBusiness.Name,
+                        Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
+                        Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
+                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
+                        Policy = a.PolicyDetail?.LineOfBusiness?.Name,
                         Status = a.InvestigationCaseStatus.Name,
-                        ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                        ServiceType = a.PolicyDetail?.ClaimType?.GetEnumDisplayName(),
                         Location = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "-" + c.PinCode.Code + "</span> ")),
@@ -265,8 +267,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State);
-
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
 
@@ -300,8 +302,8 @@ namespace risk.control.system.Controllers.Api.Claims
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
                         Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
-                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-                        Name = a.CustomerDetail.CustomerName,
+                        Customer = (a.CustomerDetail != null && a.CustomerDetail.ProfilePicture != null) ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
+                        Name = a.CustomerDetail != null ? a.CustomerDetail.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                         Policy = a.PolicyDetail.LineOfBusiness.Name,
                         Status = a.InvestigationCaseStatus.Name,
                         ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
@@ -346,7 +348,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State);
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -390,7 +393,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         SelectedToAssign = false,
                         Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                         Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-                        Name = a.CustomerDetail.CustomerName,
+                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                         Policy = a.PolicyDetail.LineOfBusiness.Name,
                         Status = a.InvestigationCaseStatus.Name,
                         ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
@@ -432,7 +435,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State);
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -505,7 +509,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 SelectedToAssign = false,
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                 Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-                Name = a.CustomerDetail.CustomerName,
+                Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                 Policy = a.PolicyDetail.LineOfBusiness.Name,
                 Status = a.InvestigationCaseStatus.Name,
                 ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
@@ -547,8 +551,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State);
-
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -591,7 +595,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 SelectedToAssign = false,
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                 Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-                Name = a.CustomerDetail.CustomerName,
+                Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                 Policy = a.PolicyDetail.LineOfBusiness.Name,
                 Status = a.InvestigationCaseStatus.Name,
                 ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
@@ -633,7 +637,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State);
+                .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -678,7 +683,7 @@ namespace risk.control.system.Controllers.Api.Claims
             SelectedToAssign = false,
             Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
             Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-            Name = a.CustomerDetail.CustomerName,
+            Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
             Policy = a.PolicyDetail.LineOfBusiness.Name,
             Status = a.InvestigationCaseStatus.Name,
             ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
@@ -720,8 +725,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State);
-
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -765,7 +770,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     SelectedToAssign = false,
                     Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                     Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-                    Name = a.CustomerDetail.CustomerName,
+                    Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                     Policy = a.PolicyDetail.LineOfBusiness.Name,
                     Status = a.InvestigationCaseStatus.Name,
                     ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),
@@ -808,7 +813,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State);
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var claimsSubmitted = await applicationDbContext.ToListAsync();
 
             var response = claimsSubmitted
@@ -818,7 +824,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 SelectedToAssign = false,
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                 Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
-                Name = a.CustomerDetail.CustomerName,
+                Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                 Policy = a.PolicyDetail.LineOfBusiness.Name,
                 Status = a.InvestigationCaseStatus.Name,
                 ServiceType = a.PolicyDetail.ClaimType.GetEnumDisplayName(),

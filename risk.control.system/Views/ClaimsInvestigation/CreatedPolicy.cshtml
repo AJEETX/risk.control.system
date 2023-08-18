@@ -29,7 +29,7 @@
                                 currentAgeinYrs = (int)age / 365;
                             }
                         }
-                        if (!string.IsNullOrWhiteSpace(Model.Claim.PolicyDetail.ContractNumber))
+                        if (!string.IsNullOrWhiteSpace(Model.Claim?.PolicyDetail?.ContractNumber))
                         {
                             customerExist = true;
                         }
@@ -59,7 +59,7 @@
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim?.CustomerDetail?.CustomerName </h5>
+                                        <h5 class="bb-blog-title" itemprop="name">Policy # : @Model.Claim?.PolicyDetail?.ContractNumber </h5>
                                     </header>
                                     <div class="card card-solid">
                                         <div class="progress">

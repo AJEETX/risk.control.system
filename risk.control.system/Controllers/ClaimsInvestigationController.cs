@@ -2,13 +2,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
+
 using System.Data;
 using System.Security.Claims;
 using System.Text.Json;
@@ -699,6 +703,8 @@ namespace risk.control.system.Controllers
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.Vendor)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -994,7 +1000,182 @@ namespace risk.control.system.Controllers
 
             toastNotification.AddSuccessToastMessage("Policy (s) created successfully!");
 
-            return RedirectToAction(nameof(CreatedPolicy), new { id = claimId });
+            return RedirectToAction(nameof(Details), new { id = claimId });
+        }
+
+        [Breadcrumb(title: " Edit Policy", FromAction = "Incomplete")]
+        public async Task<IActionResult> EditPolicy(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation.Include(c => c.PolicyDetail).FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
+            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
+            ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
+            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+
+            return View(claimsInvestigation);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
+        {
+            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
+
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
+            claimsInvestigation.InvestigationCaseStatus = status;
+            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
+            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
+            claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
+
+            IFormFile documentFile = null;
+            IFormFile profileFile = null;
+            var files = Request.Form?.Files;
+
+            if (files != null && files.Count > 0)
+            {
+                var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
+                if (file != null)
+                {
+                    documentFile = file;
+                }
+                file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
+                if (file != null)
+                {
+                    profileFile = file;
+                }
+            }
+
+            var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile, false);
+
+            await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+
+            toastNotification.AddSuccessToastMessage("Policy edited successfully!");
+
+            return RedirectToAction(nameof(Details), new { id = claimId });
+        }
+
+        [Breadcrumb(title: " Create Customer", FromAction = "Incomplete")]
+        public async Task<IActionResult> CreateCustomer(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
+            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
+            ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
+            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+
+            return View(claimsInvestigation);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
+        {
+            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
+
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
+            claimsInvestigation.InvestigationCaseStatus = status;
+            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
+            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
+            claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
+
+            IFormFile documentFile = null;
+            IFormFile profileFile = null;
+            var files = Request.Form?.Files;
+
+            if (files != null && files.Count > 0)
+            {
+                var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
+                if (file != null)
+                {
+                    documentFile = file;
+                }
+                file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
+                if (file != null)
+                {
+                    profileFile = file;
+                }
+            }
+
+            var claimId = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, true);
+
+            await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+
+            toastNotification.AddSuccessToastMessage("Policy edited successfully!");
+
+            return RedirectToAction(nameof(Details), new { id = claimId });
+        }
+
+        [Breadcrumb(title: " Edit Policy", FromAction = "Incomplete")]
+        public async Task<IActionResult> EditCustomer(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+
+            if (claimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
+            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
+            ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
+            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
+            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
+            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
+
+            return View(claimsInvestigation);
         }
 
         // GET: ClaimsInvestigation/Create
@@ -1032,20 +1213,6 @@ namespace risk.control.system.Controllers
                 model.PolicyDetail.ClientCompanyId = clientCompanyUser.ClientCompanyId;
             }
             ViewBag.ClientCompanyId = clientCompanyUser.ClientCompanyId;
-            //mailboxService.InsertMessage(new ContactMessage
-            //{
-            //    ApplicationUserId = clientCompanyUser != null ? clientCompanyUser.Id : _context.ApplicationUser.First(u => u.isSuperAdmin).Id,
-            //    ReceipientEmail = userEmailToSend,
-            //    Created = DateTime.UtcNow,
-            //    Message = "start",
-            //    Subject = "New case created: case Id = " + userEmailToSend,
-            //    SenderEmail = clientCompanyUser != null ? clientCompanyUser.FirstName : _context.ApplicationUser.First(u => u.isSuperAdmin).FirstName,
-            //    Priority = ContactMessagePriority.NORMAL,
-            //    SendDate = DateTime.UtcNow,
-            //    Updated = DateTime.UtcNow,
-            //    Read = false,
-            //    UpdatedBy = userEmail.Value
-            //});
 
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
@@ -1139,10 +1306,10 @@ namespace risk.control.system.Controllers
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
             ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
             ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
 
@@ -1372,19 +1539,20 @@ namespace risk.control.system.Controllers
         // POST: ClaimsInvestigation/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(string claimsInvestigationId)
         {
             if (_context.ClaimsInvestigation == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.ClaimsInvestigation'  is null.");
             }
-            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(id);
+            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(claimsInvestigationId);
             if (claimsInvestigation != null)
             {
                 string userEmail = HttpContext?.User?.Identity.Name;
                 claimsInvestigation.Updated = DateTime.UtcNow;
                 claimsInvestigation.UpdatedBy = userEmail;
-                _context.ClaimsInvestigation.Remove(claimsInvestigation);
+                claimsInvestigation.Deleted = true;
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
             }
 
             await _context.SaveChangesAsync();

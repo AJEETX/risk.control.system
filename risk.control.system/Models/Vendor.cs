@@ -100,6 +100,8 @@ namespace risk.control.system.Models
         [Display(Name = "Empanel")]
         [NotMapped]
         public bool SelectedByCompany { get; set; }
+
+        public bool Deleted { get; set; } = false;
     }
 
     public enum VendorStatus

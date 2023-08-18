@@ -1,14 +1,18 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
+
 using System.Security.Claims;
 
 namespace risk.control.system.Controllers
@@ -455,6 +459,10 @@ namespace risk.control.system.Controllers
               .ThenInclude(c => c.InvestigationCaseSubStatus)
               .Include(c => c.CaseLocations)
               .ThenInclude(c => c.PinCode)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.BeneficiaryRelation)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.ClaimReport)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
               .Include(c => c.CustomerDetail)

@@ -44,7 +44,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(u => u.PinCode)
                 .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
 
-            var users = vendor.VendorApplicationUser.AsQueryable();
+            var users = vendor.VendorApplicationUser.Where(u => !u.Deleted).AsQueryable();
             var result =
                 users.Select(u =>
                 new
@@ -75,7 +75,9 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
                 .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes).ToListAsync();
+                .Include(v => v.VendorInvestigationServiceTypes)
+                .Where(v => !v.Deleted)
+                .ToListAsync();
             var result =
                 agencies.Select(u =>
                 new
@@ -117,7 +119,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(i => i.State)
                 .Include(i => i.VendorInvestigationServiceTypes)
                 .ThenInclude(i => i.PincodeServices)
-                .FirstOrDefault(a => a.VendorId == vendorUser.VendorId);
+                .FirstOrDefault(a => a.VendorId == vendorUser.VendorId && !a.Deleted);
 
             var result = vendor.VendorInvestigationServiceTypes.Select(s => new
             {
@@ -150,7 +152,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(u => u.Country)
                 .Include(c => c.VendorApplicationUser)
                 .ThenInclude(u => u.PinCode)
-                .FirstOrDefault(c => c.VendorId == id);
+                .FirstOrDefault(c => c.VendorId == id && !c.Deleted);
 
             var users = vendor.VendorApplicationUser.AsQueryable();
             var result =

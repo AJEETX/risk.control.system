@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230817072957_init")]
+    [Migration("20230818011421_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -181,6 +181,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
@@ -560,6 +563,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("CustomerDetailId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("InvestigationCaseStatusId")
                         .HasColumnType("TEXT");
@@ -1899,6 +1905,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("DeListedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("DelistReason")
                         .HasColumnType("TEXT");
 
@@ -1977,6 +1986,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("DistrictId")
                         .HasColumnType("TEXT");

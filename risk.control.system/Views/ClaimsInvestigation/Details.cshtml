@@ -59,22 +59,22 @@
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim?.CustomerDetail?.CustomerName</h5>
+                                        <h5 class="bb-blog-title" itemprop="name">Policy # : @Model.Claim?.PolicyDetail?.ContractNumber</h5>
                                     </header>
                                     <div class="card card-solid">
                                         <div class="progress">
                                             <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
                                             <div class="progress-bar" role="progressbar" style="width:32.5%;background-color:green;">
-                                                edit policy
+                                                policy
                                             </div>
                                             <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
                                             <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:@customerProgressColor">
-                                                edit customer
+                                                customer
                                             </div>
                                             <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
 
                                             <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:@benficiaryProgressColor">
-                                                add beneficiary
+                                                beneficiary
                                             </div>
                                         </div>
                                         <div class="card-body pb-0">
@@ -143,11 +143,11 @@
                                                                     if (Model.Claim != null)
                                                                     {
                                                                         <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
-                                                                        <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
+                                                                        <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="EditPolicy" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
                                                                     }
                                                                     else
                                                                     {
-                                                                        <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="far fa-file-powerpoint"></i> Add Policy</a>
+                                                                        <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="CreatePolicy"><i class="far fa-file-powerpoint"></i> Add Policy</a>
                                                                     }
                                                                 }
                                                             </div>
@@ -209,14 +209,14 @@
                                                         <div class="card-footer">
                                                             <div class="text-right">
                                                                 @{
-                                                                    if (Model.Claim != null)
+                                                                    if (Model.Claim?.CustomerDetail != null)
                                                                     {
                                                                         <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
-                                                                        <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="Edit" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i>  Edit Customer</a>
+                                                                        <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="EditCustomer" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i>  Edit Customer</a>
                                                                     }
                                                                     else
                                                                     {
-                                                                        <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="Create"><i class="fa fa-user-plus"></i> Add Customer</a>
+                                                                        <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="CreateCustomer" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i> Add Customer</a>
                                                                     }
                                                                 }
                                                             </div>
@@ -275,14 +275,21 @@
                                                         <div class="card-footer">
                                                             <div class="text-right">
                                                                 @{
-                                                                    if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
+                                                                    if(Model.Claim?.CustomerDetail !=null)
                                                                     {
-                                                                        <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
-                                                                        <a class="btn btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@Model.Location.CaseLocationId"><i class="fas fa-user-tie"></i> Edit Beneficiary</a>
+                                                                        if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
+                                                                        {
+                                                                            <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                            <a class="btn btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@Model.Location.CaseLocationId"><i class="fas fa-user-tie"></i> Edit Beneficiary</a>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                                                                        }
                                                                     }
                                                                     else
                                                                     {
-                                                                        <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                                                                        <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
                                                                     }
                                                                 }
                                                             </div>

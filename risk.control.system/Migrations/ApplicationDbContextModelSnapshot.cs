@@ -179,6 +179,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -557,6 +560,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("CustomerDetailId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("InvestigationCaseStatusId")
                         .HasColumnType("TEXT");
@@ -1896,6 +1902,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("DeListedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("DelistReason")
                         .HasColumnType("TEXT");
 
@@ -1974,6 +1983,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("DistrictId")
                         .HasColumnType("TEXT");

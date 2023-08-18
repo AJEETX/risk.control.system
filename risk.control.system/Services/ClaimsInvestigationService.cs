@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+
 using System.Data;
 
 namespace risk.control.system.Services
@@ -12,6 +14,8 @@ namespace risk.control.system.Services
         List<ClaimsInvestigation> GetAll();
 
         Task<string> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
+
+        Task<string> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
 
         Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
 
@@ -48,11 +52,18 @@ namespace risk.control.system.Services
             {
                 try
                 {
-                    claimsInvestigation.Updated = DateTime.UtcNow;
-                    claimsInvestigation.UpdatedBy = userEmail;
-                    claimsInvestigation.CurrentUserEmail = userEmail;
-                    claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
-                    claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
+                    var existingPolicy = await _context.ClaimsInvestigation
+                        .Include(c => c.PolicyDetail).AsNoTracking()
+                        .Include(c => c.CustomerDetail).AsNoTracking()
+                            .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
+                    if (existingPolicy != null)
+                    {
+                        existingPolicy.Updated = DateTime.UtcNow;
+                        existingPolicy.UpdatedBy = userEmail;
+                        existingPolicy.CurrentUserEmail = userEmail;
+                        existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                        existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
+                    }
 
                     if (claimDocument is not null)
                     {
@@ -63,15 +74,7 @@ namespace risk.control.system.Services
                         await claimsInvestigation.PolicyDetail.Document.CopyToAsync(dataStream);
                         claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                     }
-                    if (customerDocument is not null)
-                    {
-                        var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
-                        var extension = Path.GetExtension(customerDocument.FileName);
-                        claimsInvestigation.CustomerDetail.ProfileImage = customerDocument;
-                        using var dataStream = new MemoryStream();
-                        await claimsInvestigation.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
-                        claimsInvestigation.CustomerDetail.ProfilePicture = dataStream.ToArray();
-                    }
+
                     if (create)
                     {
                         var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
@@ -91,30 +94,100 @@ namespace risk.control.system.Services
                     }
                     else
                     {
-                        var existingClaim = await _context.ClaimsInvestigation.AsNoTracking()
-                            .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
-                        if (claimDocument == null && existingClaim.PolicyDetail.DocumentImage != null)
+                        if (claimDocument == null && existingPolicy.PolicyDetail?.DocumentImage != null)
                         {
-                            claimsInvestigation.PolicyDetail.DocumentImage = existingClaim.PolicyDetail.DocumentImage;
-                            claimsInvestigation.PolicyDetail.Document = existingClaim.PolicyDetail.Document;
+                            claimsInvestigation.PolicyDetail.DocumentImage = existingPolicy.PolicyDetail.DocumentImage;
+                            claimsInvestigation.PolicyDetail.Document = existingPolicy.PolicyDetail.Document;
                         }
-                        if (customerDocument == null && existingClaim.CustomerDetail.ProfilePicture != null)
-                        {
-                            claimsInvestigation.CustomerDetail.ProfilePictureUrl = existingClaim.CustomerDetail.ProfilePictureUrl;
-                            claimsInvestigation.CustomerDetail.ProfilePicture = existingClaim.CustomerDetail.ProfilePicture;
-                            claimsInvestigation.CustomerDetail.ProfileImage = existingClaim.CustomerDetail.ProfileImage;
-                        }
-                        _context.ClaimsInvestigation.Update(claimsInvestigation);
+                        var addedClaim = _context.PolicyDetail.Update(claimsInvestigation.PolicyDetail);
+                        existingPolicy.PolicyDetail = addedClaim.Entity;
+                        _context.ClaimsInvestigation.Update(existingPolicy);
                     }
 
                     await _context.SaveChangesAsync();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     throw;
                 }
             }
-            return addedClaimId;
+            return claimsInvestigation.ClaimsInvestigationId;
+        }
+
+        public async Task<string> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
+        {
+            if (claimsInvestigation is not null)
+            {
+                try
+                {
+                    var existingPolicy = await _context.ClaimsInvestigation.Include(c => c.CustomerDetail).AsNoTracking()
+                            .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
+                    if (existingPolicy != null)
+                    {
+                        existingPolicy.Updated = DateTime.UtcNow;
+                        existingPolicy.UpdatedBy = userEmail;
+                        existingPolicy.CurrentUserEmail = userEmail;
+                        existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
+                        existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
+                    }
+
+                    if (customerDocument is not null)
+                    {
+                        var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
+                        var extension = Path.GetExtension(customerDocument.FileName);
+                        claimsInvestigation.CustomerDetail.ProfileImage = customerDocument;
+                        using var dataStream = new MemoryStream();
+                        await claimsInvestigation.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
+                        claimsInvestigation.CustomerDetail.ProfilePicture = dataStream.ToArray();
+                    }
+                    if (create)
+                    {
+                        var addedClaim = _context.CustomerDetail.Add(claimsInvestigation.CustomerDetail);
+                        existingPolicy.CustomerDetail = addedClaim.Entity;
+                    }
+                    else
+                    {
+                        if (customerDocument == null && existingPolicy.CustomerDetail?.ProfilePicture != null)
+                        {
+                            claimsInvestigation.CustomerDetail.ProfilePictureUrl = existingPolicy.CustomerDetail.ProfilePictureUrl;
+                            claimsInvestigation.CustomerDetail.ProfilePicture = existingPolicy.CustomerDetail.ProfilePicture;
+                            claimsInvestigation.CustomerDetail.ProfileImage = existingPolicy.CustomerDetail.ProfileImage;
+                        }
+
+                        var addedClaim = _context.CustomerDetail.Update(claimsInvestigation.CustomerDetail);
+                        existingPolicy.CustomerDetail = addedClaim.Entity;
+                    }
+                    var lastLog = _context.InvestigationTransaction
+                        .Where(i =>
+                            i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                            .OrderByDescending(o => o.Created)?.FirstOrDefault();
+                    var lastLogHop = _context.InvestigationTransaction
+                        .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                        .AsNoTracking().Max(s => s.HopCount);
+
+                    var log = new InvestigationTransaction
+                    {
+                        HopCount = lastLogHop + 1,
+                        Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                        ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                        Created = DateTime.UtcNow,
+
+                        InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                        InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                        UpdatedBy = userEmail
+                    };
+
+                    _context.InvestigationTransaction.Add(log);
+                    _context.ClaimsInvestigation.Update(existingPolicy);
+
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            }
+            return claimsInvestigation.ClaimsInvestigationId;
         }
 
         public async Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
@@ -224,9 +297,9 @@ namespace risk.control.system.Services
                     var log = new InvestigationTransaction
                     {
                         HopCount = lastLogHop + 1,
+                        Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
                         ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
                         Created = DateTime.UtcNow,
-                        Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
                         InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                         InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId,
                         UpdatedBy = userEmail

@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+
 using System.Security.Claims;
+
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 namespace risk.control.system.Controllers.Api.Claims
@@ -47,8 +50,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State);
-
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -96,6 +99,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
+                       Company = a.PolicyDetail.ClientCompany.Name,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
                        Name = a.CustomerDetail.CustomerName,
@@ -142,8 +146,8 @@ namespace risk.control.system.Controllers.Api.Claims
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State);
-
+              .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -195,6 +199,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new
                    {
                        Id = a.ClaimsInvestigationId,
+                       Company = a.PolicyDetail.ClientCompany.Name,
                        SelectedToAssign = false,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
@@ -240,8 +245,8 @@ namespace risk.control.system.Controllers.Api.Claims
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State);
-
+              .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -280,6 +285,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
+                       Company = a.PolicyDetail.ClientCompany.Name,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
                        Name = a.CustomerDetail.CustomerName,
@@ -324,8 +330,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State);
-
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
             var allocatedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -361,6 +367,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
+                       Company = a.PolicyDetail.ClientCompany.Name,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-image.png",
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/no-image.png",
                        Name = a.CustomerDetail.CustomerName,

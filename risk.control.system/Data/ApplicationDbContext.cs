@@ -57,5 +57,7 @@ namespace risk.control.system.Data
         public DbSet<VerificationLocation> VerificationLocation { get; set; } = default!;
         public DbSet<CaseLocation> CaseLocation { get; set; } = default!;
         public DbSet<VerifyPinCode> VerifyPinCode { get; set; } = default!;
+        public DbSet<PolicyDetail> PolicyDetail { get; set; } = default!;
+        public DbSet<CustomerDetail> CustomerDetail { get; set; } = default!;
     }
 }

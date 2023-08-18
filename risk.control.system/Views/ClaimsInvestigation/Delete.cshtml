@@ -101,7 +101,7 @@
                                         Claim Document
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @if (Model?.PolicyDetail.DocumentImage is not null)
+                                        @if (Model?.PolicyDetail?.DocumentImage is not null)
                                         {
                                             <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.PolicyDetail.DocumentImage))">
                                         }
@@ -158,7 +158,7 @@
                                         Customer Photo
                                     </dt>
                                     <dd class="col-sm-5">
-                                        @if (Model?.CustomerDetail.ProfilePicture is not null)
+                                        @if (Model?.CustomerDetail?.ProfilePicture is not null)
                                         {
                                             <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CustomerDetail.ProfilePicture))">
                                         }

@@ -54,6 +54,8 @@ namespace risk.control.system.Controllers
               .ThenInclude(c => c.InvestigationCaseSubStatus)
               .Include(c => c.CaseLocations)
               .ThenInclude(c => c.PinCode)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.BeneficiaryRelation)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
               .Include(c => c.CustomerDetail)

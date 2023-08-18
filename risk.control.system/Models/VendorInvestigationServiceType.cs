@@ -47,5 +47,6 @@ namespace risk.control.system.Models
 
         public string VendorId { get; set; }
         public Vendor Vendor { get; set; }
+        public bool Deleted { get; set; } = false;
     }
 }
