@@ -7,7 +7,7 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fa fa-toggle-on"></i> Active Claims</h3>
+                        <h3 class="card-title"><i class="fa fa-toggle-on"></i> Active</h3>
                     </div>
                     <div class="card-body">
                         <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
@@ -90,6 +90,10 @@
                         "mRender": function (data, type, row) {
                             var buttons = "";
                             buttons += '<a href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+
+                            if (row.withdrawable) {
+                                buttons += '<a href="withdraw?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Withdraw</a>&nbsp;'
+                            }
                             return buttons;
                         }
                     }

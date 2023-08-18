@@ -6,14 +6,14 @@
 
 <section class="content pt-2">
     <div class="container-fluid">
-        <form asp-action="SubmitReport" method="post">
+        <form id="create-form" asp-action="SubmitReport" method="post">
             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
             <div class="row">
                 <div class="col-md-12">
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fa fa-binoculars"></i> Investigation detail</h3>
+                            <h3 class="card-title"><i class="fa fa-binoculars"></i> Report</h3>
                         </div>
                         @{
                             string address = string.Empty;
@@ -359,7 +359,7 @@
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
 
                                                                             <div class="form-group">
-                                                                                <input name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" />
+                                                                                <input required name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" />
                                                                             </div>
                                                                         </ul>
                                                                     </div>
@@ -420,3 +420,69 @@
         </form>
     </div>
 </section>
+@section Scripts    {
+    <script>
+        $(document).ready(function () {
+
+            $('#create-form').on('submit', function (e) {
+                var report = $('#remarks').val();
+
+                var askConfirmation = true;
+                var submit = false;
+                if (report) {
+                    if (askConfirmation) {
+                        e.preventDefault();
+                        $.confirm({
+                            title: "Confirm Submit",
+                            content: "Are you sure to submit?",
+                            icon: 'fas fa-building',
+                            columnClass: 'small',
+                            useBootstrap: false,
+                            type: 'orange',
+                            closeIcon: true,
+                            typeAnimated: true,
+                            buttons: {
+                                confirm: {
+                                    text: "Submit",
+                                    btnClass: 'btn-warning',
+                                    action: function () {
+                                        askConfirmation = false;
+                                        $('#create-form').submit();
+                                    }
+                                },
+                                cancel: {
+                                    text: "Cancel",
+                                    btnClass: 'btn-default'
+                                }
+                            }
+                        });
+                    }
+
+
+                if(!report){
+                    e.preventDefault();
+                    $.alert({
+                        title: "Claim Assignment !!!",
+                        content: "Please enter remarks?",
+                        icon: 'fas fa-exclamation-triangle',
+                        boxWidth: '30%',
+                        useBootstrap: false,
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "SELECT",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    });
+                }
+
+                
+                }
+
+            });
+
+        });
+    </script>
+}

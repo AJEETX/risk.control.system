@@ -269,7 +269,7 @@ namespace risk.control.system.Controllers
         public ActionResult Index()
         {
             var activePage = new MvcBreadcrumbNode("Open", "ClaimsVendor", "Claims");
-            var newPage = new MvcBreadcrumbNode("Index", "ClaimsVendor", "Allocate New") { Parent = activePage };
+            var newPage = new MvcBreadcrumbNode("Index", "ClaimsVendor", "Allocate") { Parent = activePage };
             ViewData["BreadcrumbNode"] = newPage;
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -280,7 +280,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Investigations")]
+        [Breadcrumb(" Tasks")]
         public ActionResult Agent()
         {
             //var activePage = new MvcBreadcrumbNode("Open", "ClaimsVendor", "Claims");
@@ -289,7 +289,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Reports")]
+        [Breadcrumb(" Report", FromAction ="Agent")]
         public async Task<IActionResult> GetInvestigate(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
@@ -554,7 +554,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
-        [Breadcrumb(" Active Claims")]
+        [Breadcrumb(" Active")]
         public IActionResult Open()
         {
             return View();

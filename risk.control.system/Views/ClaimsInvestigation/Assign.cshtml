@@ -9,7 +9,7 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-thumbtack"></i> Ready to Assign</h3>
+                        <h3 class="card-title"><i class="fas fa-thumbtack"></i> Assign</h3>
                     </div>
                     <div class="card-body">
                         <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
@@ -39,8 +39,8 @@
                                 <div class="row">
                                     <div class="col-md-12">
 
-                                        <button id="managevendors" type="submit" class="btn btn-success">
-                                            <i class="fas fa-thumbtack" aria-hidden="true"></i> Ready to Assign
+                                        <button id="managevendors" type="submit" class="btn btn-danger">
+                                            <i class="fas fa-thumbtack" aria-hidden="true"></i> Assign
                                         </button>
                                     </div>
                                 </div>
@@ -178,6 +178,8 @@
                         title: "Claim Assignment !!!",
                         content: "Please select claim to assign?",
                         icon: 'fas fa-exclamation-triangle',
+                        boxWidth: '30%',
+                        useBootstrap: false,
                         type: 'red',
                         closeIcon: true,
                         buttons: {

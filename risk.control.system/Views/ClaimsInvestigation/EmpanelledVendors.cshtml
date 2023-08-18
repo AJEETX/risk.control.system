@@ -317,7 +317,19 @@
                                             Email
                                         </th>
                                         <th>
-                                            Current Cases
+                                            Address
+                                        </th>
+                                        <th>
+                                            District
+                                        </th>
+                                        <th>
+                                            State
+                                        </th>
+                                        <th>
+                                            Country
+                                        </th>
+                                        <th>
+                                            Load
                                         </th>
                                         <th>
                                             <span class="badge badge-success">Service-type = <span class="badge badge-light">Pincodes</span></span>
@@ -352,6 +364,18 @@
                                                 <a href="#"> @Html.DisplayFor(modelItem => item.Vendor.Email)</a>
                                             </td>
                                             <td>
+                                                @Html.DisplayFor(modelItem => item.Vendor.Addressline)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Vendor.District.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Vendor.State.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Vendor.Country.Name)
+                                            </td>
+                                            <td>
                                                 @Html.DisplayFor(modelItem => item.CaseCount)
                                             </td>
                                             <td>
@@ -382,8 +406,8 @@
                                 <div class="col-md-12">
                                     <a asp-action="Assigner" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
 
-                                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-success">
-                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i> @Applicationsettings.BROADCAST
+                                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                                        <i class="fas fa-external-link-alt" aria-hidden="true"></i> ALLOCATE 
                                     </button>
                                 </div>
                             </div>

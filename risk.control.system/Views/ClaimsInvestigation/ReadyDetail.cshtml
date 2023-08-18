@@ -282,12 +282,13 @@
                     $.confirm({
                         title: "Confirm Set To Ready",
                         content: "Are you sure?",
+                        columnClass: 'small',
                         icon: 'fas fa-thumbtack',
                         closeIcon: true,
                         type: 'red',
                         buttons: {
                             confirm: {
-                                text: "Set Ready To Assign",
+                                text: "Set Ready [to Assign]",
                                 btnClass: 'btn-danger',
                                 action: function () {
                                     askConfirmation = false;

@@ -71,12 +71,13 @@
                     e.preventDefault();
                     $.confirm({
                         title: "Confirm Create",
+                        columnClass: 'small',
                         content: "Are you sure to create?",
                         type: 'green',
                         closeIcon: true,
                         buttons: {
                             confirm: {
-                                text: "Create item",
+                                text: "Create",
                                 btnClass: 'btn-success',
                                 action: function () {
                                     askConfirmation = false;

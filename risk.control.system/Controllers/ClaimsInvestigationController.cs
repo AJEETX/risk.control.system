@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb(" Empanelled Agencies")]
+        [Breadcrumb(" Empanelled Agencies", FromAction ="Assigner")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -518,13 +518,13 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(title: "Active Claims")]
+        [Breadcrumb(title: "Active")]
         public IActionResult Active()
         {
             return View();
         }
 
-        [Breadcrumb(title: "On-going", FromAction = "Index")]
+        [Breadcrumb(title: "Withdraw", FromAction = "Index")]
         public async Task<IActionResult> ToInvestigate()
         {
             return View();
@@ -834,7 +834,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Assign));
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Index")]
+        [Breadcrumb(title: " Detail", FromAction = "Active")]
         public async Task<IActionResult> Detail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1514,7 +1514,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Edit/5
-        [Breadcrumb(title: " Withdraw Claim")]
+        [Breadcrumb(title: " Withdraw", FromAction ="Active")]
         public async Task<IActionResult> Withdraw(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
