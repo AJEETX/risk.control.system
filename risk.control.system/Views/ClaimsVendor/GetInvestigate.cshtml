@@ -21,6 +21,7 @@
                             int currentAgeinYrs = 0;
                             bool customerExist = false;
                             bool beneficiaryExist = false;
+                            int beneficaryAge = 0;
                             if (Model.ClaimsInvestigation != null)
                             {
                                 address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " +
@@ -33,6 +34,11 @@
                                     var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
                                     currentAgeinYrs = (int)age / 365;
                                 }
+                            }
+                            if(Model.CaseLocation.BeneficiaryDateOfBirth!= null)
+                            {
+                                var age = DateTime.Now.Subtract(Model.CaseLocation.BeneficiaryDateOfBirth).TotalDays;
+                                beneficaryAge = (int)age / 365;
                             }
                             if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail.ContractNumber))
                             {
@@ -85,6 +91,12 @@
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="small">
                                                                                 <span class="fa-li">
+                                                                                    <i class="far fa-clock"></i>
+                                                                                </span>
+                                                                                Incident Date: @Model.ClaimsInvestigation?.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy")
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
                                                                                     <i class="fas fa-money-bill-wave"></i>
                                                                                 </span>
                                                                                 Amount: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
@@ -113,6 +125,7 @@
                                                                                 </span>
                                                                                 Issue Date: @Model.ClaimsInvestigation?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
                                                                             </li>
+                                                                            
                                                                         </ul>
                                                                     </div>
                                                                     <div class="col-5 text-center">
@@ -155,23 +168,29 @@
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="small">
                                                                                 <span class="fa-li">
-                                                                                    <i class="fas fa-rupee-sign"></i>
-                                                                                </span>
-                                                                                Income: @Model.ClaimsInvestigation.CustomerDetail.CustomerIncome
-                                                                            </li>
-                                                                            <li class="small">
-                                                                                <span class="fa-li">
-                                                                                    <i class="fas fa-rupee-sign"></i>
+                                                                                    <i class="fas fa-user-clock"></i>
                                                                                 </span>
                                                                                 Age: @currentAgeinYrs
                                                                             </li>
                                                                             <li class="small">
                                                                                 <span class="fa-li">
-                                                                                    <i class="fas fa-lg fa-building"></i>
+                                                                                    <i class="fas fa-user-graduate"></i>
                                                                                 </span>
-                                                                                Address: @address
+                                                                                Education: @Model.ClaimsInvestigation.CustomerDetail.CustomerEducation
                                                                             </li>
-
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="fas fa-rupee-sign"></i>
+                                                                                </span>
+                                                                                Income: @Model.ClaimsInvestigation.CustomerDetail.CustomerIncome
+                                                                            </li>
+                                                                            
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="fas fa-home"></i>
+                                                                                </span>
+                                                                                Address:  @address
+                                                                            </li>
                                                                             <li class="small">
                                                                                 <span class="fa-li">
                                                                                     <i class="fas fa-lg fa-phone"></i>
@@ -220,13 +239,20 @@
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="small">
                                                                                 <span class="fa-li">
+                                                                                    <i class="fas fa-user-clock"></i>
+                                                                                </span>
+                                                                                Age: @beneficaryAge
+                                                                            </li>
+                                                                            
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
                                                                                     <i class="fas fa-rupee-sign"></i>
                                                                                 </span>
                                                                                 Income: @Model.CaseLocation?.BeneficiaryIncome
                                                                             </li>
                                                                             <li class="small">
                                                                                 <span class="fa-li">
-                                                                                    <i class="fas fa-lg fa-building"></i>
+                                                                                    <i class="fas fa-home"></i>
                                                                                 </span>
                                                                                 Address: @baddress
                                                                             </li>
