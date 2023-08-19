@@ -250,7 +250,7 @@
                                     </div>
                                 </div> <!-- class bb-blog-inner -->
                             </article>
-                            
+
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
@@ -262,10 +262,13 @@
                             </div>
                             <div class="row">
                                 <div class="col-md-12 text-right">
-                                    <a asp-action="ToInvestigate" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fa fa-window-close"></i> Withdraw &nbsp;
-                                    </button>
+                                    <form id="create-form" asp-action="SetWithdraw">
+
+                                        <a asp-action="ToInvestigate" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
+                                        <button type="submit" class="btn btn-danger">
+                                            <i class="fa fa-window-close"></i> Withdraw &nbsp;
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -290,15 +293,15 @@
                 if (askConfirmation) {
                     e.preventDefault();
                     $.confirm({
-                        title: "Confirm Set To Ready",
+                        title: "Confirm Withdrawl",
                         content: "Are you sure?",
                         columnClass: 'small',
-                        icon: 'fas fa-thumbtack',
+                        icon: 'fa fa-window-close',
                         closeIcon: true,
                         type: 'red',
                         buttons: {
                             confirm: {
-                                text: "Set Ready To Withdraw",
+                                text: " Withdraw",
                                 btnClass: 'btn-danger',
                                 action: function () {
                                     askConfirmation = false;

@@ -213,7 +213,7 @@
                         </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft")
-                                        @Url.MakeActiveClass("ClaimsInvestigation","Details") @Url.MakeActiveClass("ClaimsInvestigation","Edit") 
+                                        @Url.MakeActiveClass("ClaimsInvestigation","Details") @Url.MakeActiveClass("ClaimsInvestigation","Delete") 
                                         @Url.MakeActiveClass("CaseLocations","Create") @Url.MakeActiveClass("CaseLocations","Edit")
                                             @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete") 
                                                 @Url.MakeActiveClass("ClaimsInvestigation","EditPolicy")
@@ -253,15 +253,15 @@
                         //        </p>
                         //    </a>
                         //</li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="ToInvestigate" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","ToInvestigate")
-                                    @Url.MakeActiveClass("ClaimsInvestigation","withdraw")">
-                                <i class="fa fa-binoculars nav-icon"></i>
-                                <p>
-                                    <span class="badge badge-warning">WITHDRAW</span>
-                                </p>
-                            </a>
-                        </li>
+                        //<li class="nav-item">
+                        //    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="ToInvestigate" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","ToInvestigate")
+                        //            @Url.MakeActiveClass("ClaimsInvestigation","withdraw")">
+                        //        <i class="fa fa-binoculars nav-icon"></i>
+                        //        <p>
+                        //            <span class="badge badge-warning">WITHDRAW</span>
+                        //        </p>
+                        //    </a>
+                        //</li>
                         //<li class="nav-item">
                         //    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")">
                         //        <i class="fas fa-rupee-sign nav-icon"></i>
@@ -320,7 +320,7 @@
                             @Url.MakeActiveClass("Report","Detail")">
                                 <i class="fas fa-print nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-secondary"> REPORT <i class="fas fa-asterik"></i> </span>
+                                    <span class="badge badge-secondary"> INVESTIGATION REPORT <i class="fas fa-asterik"></i> </span>
                                 </p>
                             </a>
                         </li>

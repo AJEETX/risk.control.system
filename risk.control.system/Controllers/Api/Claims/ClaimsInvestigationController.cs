@@ -815,7 +815,9 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted &&
+                c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
+                c.CaseLocations.All(c => c.ClaimReport != null));
             var claimsSubmitted = await applicationDbContext.ToListAsync();
 
             var response = claimsSubmitted

@@ -107,7 +107,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb(" Empanelled Agencies", FromAction ="Assigner")]
+        [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -1514,7 +1514,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Edit/5
-        [Breadcrumb(title: " Withdraw", FromAction ="Active")]
+        [Breadcrumb(title: " Withdraw", FromAction = "Active")]
         public async Task<IActionResult> Withdraw(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1584,9 +1584,9 @@ namespace risk.control.system.Controllers
         // POST: ClaimsInvestigation/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public async Task<IActionResult> SetWithdraw(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
+        public async Task<IActionResult> SetWithdraw(ClaimsInvestigation claimsInvestigation)
         {
-            if (claimsInvestigationId == null || _context.ClaimsInvestigation == null)
+            if (claimsInvestigation == null || _context.ClaimsInvestigation == null)
             {
                 return NotFound();
             }
@@ -1597,55 +1597,49 @@ namespace risk.control.system.Controllers
             var withDrawnByCompanySubStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
 
-            var existingClaimsInvestigation = await _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State).AsNoTracking()
-               .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
+            var existingClaim = await _context.ClaimsInvestigation.FindAsync(claimsInvestigation.ClaimsInvestigationId);
+            if (existingClaim != null)
+            {
+                string userEmail = HttpContext?.User?.Identity.Name;
+                existingClaim.Updated = DateTime.UtcNow;
+                existingClaim.UpdatedBy = userEmail;
+                existingClaim.Deleted = true;
+                existingClaim.InvestigationCaseSubStatus = withDrawnByCompanySubStatus;
+                existingClaim.InvestigationCaseStatus = finishedStatus;
+                existingClaim.PolicyDetail.Comments = claimsInvestigation.PolicyDetail.Comments;
+                _context.ClaimsInvestigation.Update(existingClaim);
+                await _context.SaveChangesAsync();
 
-            existingClaimsInvestigation.InvestigationCaseSubStatus = withDrawnByCompanySubStatus;
-            existingClaimsInvestigation.InvestigationCaseStatus = finishedStatus;
-            existingClaimsInvestigation.PolicyDetail.Comments = claimsInvestigation.PolicyDetail.Comments;
-            _context.ClaimsInvestigation.Update(existingClaimsInvestigation);
+                toastNotification.AddSuccessToastMessage("claim case withdrawn successfully!");
 
-            await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(ToInvestigate));
+            }
 
-            toastNotification.AddSuccessToastMessage("claim case withdrawn successfully!");
+            toastNotification.AddErrorToastMessage("Err: claim withdrawl!");
 
             return RedirectToAction(nameof(ToInvestigate));
         }
 
         // GET: ClaimsInvestigation/Delete/5
-        [Breadcrumb(title: " Delete Claim", FromAction = "Draft")]
+        [Breadcrumb(title: " Delete", FromAction = "Draft")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
             {
                 return NotFound();
             }
+
+            var caseLogs = await _context.InvestigationTransaction
+                .Include(i => i.InvestigationCaseStatus)
+                .Include(i => i.InvestigationCaseSubStatus)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.CaseLocations)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.InvestigationCaseStatus)
+                .Include(c => c.ClaimsInvestigation)
+                .ThenInclude(i => i.InvestigationCaseSubStatus)
+                .Where(t => t.ClaimsInvestigationId == id)
+                .OrderByDescending(c => c.HopCount)?.ToListAsync();
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -1658,6 +1652,8 @@ namespace risk.control.system.Controllers
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.Vendor)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -1675,24 +1671,33 @@ namespace risk.control.system.Controllers
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+
+            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
+
             if (claimsInvestigation == null)
             {
                 return NotFound();
             }
+            var model = new ClaimTransactionModel
+            {
+                Claim = claimsInvestigation,
+                Log = caseLogs,
+                Location = location
+            };
 
-            return View(claimsInvestigation);
+            return View(model);
         }
 
         // POST: ClaimsInvestigation/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string claimsInvestigationId)
+        public async Task<IActionResult> DeleteConfirmed(ClaimTransactionModel model)
         {
-            if (_context.ClaimsInvestigation == null)
+            if (model == null || _context.ClaimsInvestigation == null)
             {
                 return Problem("Entity set 'ApplicationDbContext.ClaimsInvestigation'  is null.");
             }
-            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(claimsInvestigationId);
+            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.Claim.ClaimsInvestigationId);
             if (claimsInvestigation != null)
             {
                 string userEmail = HttpContext?.User?.Identity.Name;

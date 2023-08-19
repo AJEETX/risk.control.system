@@ -8,7 +8,6 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb(title: " Report Timeline")]
     public class ReportController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,6 +17,7 @@ namespace risk.control.system.Controllers
             this._context = context;
         }
 
+        [Breadcrumb(title: " Investigation Report", FromController = typeof(ClaimsInvestigationController))]
         public IActionResult Index()
         {
             return View();
@@ -73,7 +73,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = await _context.CaseLocation
-                .Include(l=>l.ClaimReport)
+                .Include(l => l.ClaimReport)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 
             if (claimsInvestigation == null)
