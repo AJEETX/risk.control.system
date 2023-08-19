@@ -9,7 +9,7 @@
             <div class="col-md-12">
                 <div id="article" class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-newspaper"></i> Claim detail Timeline</h3>
+                        <h3 class="card-title"><i class="fas fa-newspaper"></i> Detail</h3>
                     </div>
                     @{
                         string address = string.Empty;
@@ -29,7 +29,7 @@
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.Claim.CustomerDetail?.CustomerName</h5>
+                                        <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Policy # : @Model.Claim.PolicyDetail.ContractNumber</h5>
                                     </header>
                                     <div class="card card-solid">
                                         <div class="card-body pb-0">

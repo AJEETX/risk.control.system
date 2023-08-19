@@ -428,7 +428,7 @@ namespace risk.control.system.Controllers
             return View(applicationDbContext);
         }
 
-        [Breadcrumb(" Closed")]
+        [Breadcrumb(" Assessed")]
         public async Task<IActionResult> Approved()
         {
             return View();

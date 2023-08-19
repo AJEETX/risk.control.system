@@ -14,12 +14,12 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form method="post">
+                <form id="create-form" method="post">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-newspaper"></i> Report</h3>
+                            <h3 class="card-title"><i class="fas fa-newspaper"></i> Agency Report</h3>
                         </div>
                         @{
                             string address = string.Empty;
@@ -69,7 +69,7 @@
                                 <article>
                                     <div class="bb-blog-inner">
                                         <header class="bb-blog-header">
-                                            <h5 class="bb-blog-title" itemprop="name">Policy # : @Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</h5>
+                                            <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Policy # : @Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</h5>
                                         </header>
                                         <div class="card card-solid">
                                             <div class="progress">
@@ -321,13 +321,13 @@
                                                             <div class="card-body pt-0">
                                                                 <div class="row">
                                                                     <div class="col-6">
-                                                                        <h2 class="lead"><b> @Model.ClaimsInvestigation?.CustomerDetail.CustomerName</b></h2>
+                                                                        <h2 class="lead"><b> @Model.CaseLocation.BeneficiaryName</b></h2>
                                                                         <p class="text-muted text-sm">
                                                                             @{
                                                                                 var QR1 = @Model.CaseLocation?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
                                                                                 var LongLat2 = @Model.CaseLocation?.ClaimReport?.LongLat ?? "SAMPLE CITY";
                                                                             }
-                                                                            <b>QR data: </b> @QR1
+                                                                            <b>QR data:<i class="fas fa-paperclip"></i> </b> @QR1
                                                                         </p>
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="small">
@@ -340,7 +340,7 @@
                                                                         </ul>
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        Location Image: <i class="fas fa-rupee-sign"></i>
+                                                                        Location: <i class="fas fa-rupee-sign"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
                                                                             {
@@ -353,7 +353,7 @@
                                                                             }
                                                                         }
                                                                         <br />
-                                                                        OCR Document: <i class="fas fa-rupee-sign"></i>
+                                                                        OCR Doc: <i class="fas fa-rupee-sign"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
                                                                             {
@@ -385,7 +385,7 @@
                                                                                 <span class="fa-li">
                                                                                     <i class="far fa-comment"></i>
                                                                                 </span>
-                                                                                <i class="far fa-comment"></i> @Model.CaseLocation.ClaimReport?.AgentRemarks
+                                                                                @Model.CaseLocation.ClaimReport?.AgentRemarks <i class="far fa-comment"></i>
                                                                             </li>
                                                                         </ul>
                                                                     </div>
@@ -408,7 +408,7 @@
                                                                                 <span class="fa-li">
                                                                                     <i class="far fa-comment"></i>
                                                                                 </span>
-                                                                                <i class="far fa-comment"></i> @Model.CaseLocation.ClaimReport?.SupervisorRemarks
+                                                                                @Model.CaseLocation.ClaimReport?.SupervisorRemarks <i class="far fa-comment"></i>
                                                                             </li>
                                                                         </ul>
                                                                     </div>
@@ -433,7 +433,7 @@
                         <div class="card-body">
                             <div class="=row">
                                 <div class="col-md-12">
-                                    <input name="assessorRemarks" id="assessorRemarks" type="text" class="form-control" />
+                                    <input maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control" />
                                 </div>
                             </div>
                         </div>
@@ -441,7 +441,7 @@
                             <div class="=row">
                                 <div class="col-md-12 float-right">
                                     <a asp-controller="ClaimsInvestigation" class="btn btn-default" asp-action="Assessor">
-                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back &nbsp;&nbsp;&nbsp;
                                     </a>
                                     <button asp-action="ProcessCaseReport" id="approve-case" type="submit" class="btn btn-danger">
                                         <i class="fas fa-glasses" aria-hidden="true"></i> ASSESS REPORT
