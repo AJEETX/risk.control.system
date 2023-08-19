@@ -99,6 +99,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
+        [Breadcrumb("Allocate")]
         public async Task<IActionResult> SelectVendorAgent(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
@@ -199,7 +200,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Agent Workload")]
+        [Breadcrumb("Agency Workload")]
         public async Task<IActionResult> AgentLoad()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -289,7 +290,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Report", FromAction ="Agent")]
+        [Breadcrumb("Agent Report", FromAction ="Agent")]
         public async Task<IActionResult> GetInvestigate(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
@@ -437,7 +438,7 @@ namespace risk.control.system.Controllers
             );
         }
 
-        [Breadcrumb("  Report")]
+        [Breadcrumb("Agent Report")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))

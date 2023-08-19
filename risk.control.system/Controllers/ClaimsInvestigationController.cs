@@ -530,7 +530,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(title: "Report", FromAction = "Index")]
+        [Breadcrumb(title: "Report", FromAction = "Assessor")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;

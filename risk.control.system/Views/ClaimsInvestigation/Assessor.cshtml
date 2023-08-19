@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <div class="card card-secondary">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-list"></i> Ready To Assess</h3>
+                <h3 class="card-title"><i class="fas fa-glasses"></i> Assess</h3>
             </div>
             <div class="card-body">
                 <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
@@ -23,7 +23,7 @@
                                     <th>Line Of Business</th>
                                     <th>Status</th>
                                     <th>Claim Type</th>
-                                    <th>Location</th>
+                                    <th>Stage</th>
                                     <th>Created On</th>
                                     <th>
                                         Day(s) <i class="fa fa-asterisk" style="color:red;font-size:12px" title="Day in assigned"></i>
@@ -34,9 +34,9 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <button disabled id="allocatedcase" type="submit" class="btn btn-success">
-                                        <i class="fas fa-thumbs-up" aria-hidden="true"></i>
-                                        @Applicationsettings.SELECT_CASE_REPORT
+                                    <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                                    <i class="fas fa-glasses" aria-hidden="true"></i>
+                                        Assess
                                     </button>
                                 </div>
                             </div>

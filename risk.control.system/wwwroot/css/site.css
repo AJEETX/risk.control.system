@@ -417,6 +417,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: no-drop;
 }
 
+input[type="checkbox"]:checked {
+    accent-color: blue;
+}
+
+input[type="radio"]:checked {
+    accent-color: blue;
+}
 .asterikx {
     text-transform: uppercase;
 }

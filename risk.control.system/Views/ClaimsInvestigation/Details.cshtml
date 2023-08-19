@@ -319,11 +319,11 @@
                                                 <input type="hidden" id="testid" asp-for="Claim.ClaimsInvestigationId" />
                                                 <span class="fas fa-thumbtack input-fa"></span>
 
-                                                <input type="submit" value="Set Ready" class="btn btn-danger" style="width:10rem" />
+                                                <input type="submit" value="Set as Assign" class="btn btn-danger" style="width:10rem" />
                                             }
                                             else
                                             {
-                                                <input disabled type="submit" value="Set Ready" class="btn btn-outline-danger" style="width:10rem" />
+                                                <input disabled type="submit" value="Set as Assign" class="btn btn-outline-danger" style="width:10rem" />
 
                                             }
                                         }
@@ -352,16 +352,15 @@
                 if (askConfirmation) {
                     e.preventDefault();
                     $.confirm({
-                        title: "Confirm Set To Ready",
+                        title: "Confirm Set as <span class='fas fa-thumbtack'></span> <b> <u><i> Assign </i></u></b>",
                         content: "Are you sure?",
-                        icon: 'fas fa-thumbtack',
                         boxWidth: '30%',
                         useBootstrap: false,
                         closeIcon: true,
                         type: 'red',
                         buttons: {
                             confirm: {
-                                text: "Set Ready To Assign",
+                                text: "Set as <span class='fas fa-thumbtack'></span> <u><i> Assign </i></u></b>",
                                 btnClass: 'btn-danger',
                                 action: function () {
                                     askConfirmation = false;

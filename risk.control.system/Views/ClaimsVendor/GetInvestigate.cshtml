@@ -64,10 +64,10 @@
                                 <article>
                                     <div class="bb-blog-inner">
                                         <header class="bb-blog-header">
-                                            <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.ClaimsInvestigation?.CustomerDetail.CustomerName</h5>
+                                            <h5 class="bb-blog-title" itemprop="name">Policy # : @Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</h5>
                                         </header>
                                         <div class="card card-solid">
-                                            
+
                                             <div class="card-body pb-0">
                                                 <div class="row">
                                                     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -274,7 +274,7 @@
                                 <article>
                                     <div class="bb-blog-inner">
                                         <header class="bb-blog-header">
-                                            <h5 class="bb-blog-title" itemprop="name">Agent Report : @Model.CaseLocation?.AssignedAgentUserEmail</h5>
+                                            <h5 class="bb-blog-title" itemprop="name">Submit Report : @Model.CaseLocation?.AssignedAgentUserEmail</h5>
                                         </header>
                                         <div class="card card-solid">
                                             <div class="progress">
@@ -286,7 +286,7 @@
                                                 <div class="progress-bar" role="progressbar" style="width:50%;background-color:red">
                                                     agent remarks
                                                 </div>
-                                                
+
                                             </div>
                                             <div class="card-body pb-0">
                                                 <div class="row">
@@ -304,7 +304,7 @@
                                                                                 var QR1 = @Model.CaseLocation?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
                                                                                 var LongLat2 = @Model.CaseLocation?.ClaimReport?.LongLat ?? "SAMPLE CITY";
                                                                             }
-                                                                            <b>QR data: </b> @QR1
+                                                                            <b>QR data:<i class="fas fa-paperclip"></i> </b> @QR1
                                                                         </p>
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="small">
@@ -312,12 +312,12 @@
                                                                                     <i class="fas fa-money-bill-wave"></i>
                                                                                 </span>
                                                                                 Long Lat: <i class="fas fa-rupee-sign"></i> @LongLat2
-                                                                                
+
                                                                             </li>
                                                                         </ul>
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        Location Image: <i class="fas fa-rupee-sign"></i>
+                                                                        Location: <i class="fas fa-rupee-sign"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
                                                                             {
@@ -330,7 +330,7 @@
                                                                             }
                                                                         }
                                                                         <br />
-                                                                        OCR Document: <i class="fas fa-rupee-sign"></i>
+                                                                        OCR Doc: <i class="fas fa-rupee-sign"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
                                                                             {
@@ -355,11 +355,11 @@
                                                             <div class="card-body pt-0">
                                                                 <div class="row">
                                                                     <div class="col-12">
-                                                                        
+
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
 
                                                                             <div class="form-group">
-                                                                                <input required name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" />
+                                                                                <input maxlength="100" name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
                                                                             </div>
                                                                         </ul>
                                                                     </div>
@@ -427,39 +427,8 @@
             $('#create-form').on('submit', function (e) {
                 var report = $('#remarks').val();
 
-                var askConfirmation = true;
-                var submit = false;
-                if (report) {
-                    if (askConfirmation) {
-                        e.preventDefault();
-                        $.confirm({
-                            title: "Confirm Submit",
-                            content: "Are you sure to submit?",
-                            icon: 'fas fa-building',
-                            columnClass: 'small',
-                            useBootstrap: false,
-                            type: 'orange',
-                            closeIcon: true,
-                            typeAnimated: true,
-                            buttons: {
-                                confirm: {
-                                    text: "Submit",
-                                    btnClass: 'btn-warning',
-                                    action: function () {
-                                        askConfirmation = false;
-                                        $('#create-form').submit();
-                                    }
-                                },
-                                cancel: {
-                                    text: "Cancel",
-                                    btnClass: 'btn-default'
-                                }
-                            }
-                        });
-                    }
-
-
-                if(!report){
+                if (report == '') {
+                    askConfirmation = false;
                     e.preventDefault();
                     $.alert({
                         title: "Claim Assignment !!!",
@@ -471,18 +440,13 @@
                         closeIcon: true,
                         buttons: {
                             cancel: {
-                                text: "SELECT",
+                                text: "OK",
                                 btnClass: 'btn-danger'
                             }
                         }
                     });
                 }
-
-                
-                }
-
             });
-
         });
     </script>
 }
