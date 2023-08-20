@@ -56,14 +56,14 @@ namespace risk.control.system.Seeds
 
             var claimCaseType = await context.LineOfBusiness.AddAsync(claims);
 
-            var underwriting = new LineOfBusiness
-            {
-                Name = "UNDERWRITING",
-                Code = "UNDERWRITING",
-                MasterData = true,
-            };
+            //var underwriting = new LineOfBusiness
+            //{
+            //    Name = "UNDERWRITING",
+            //    Code = "UNDERWRITING",
+            //    MasterData = true,
+            //};
 
-            var underwritingCaseType = await context.LineOfBusiness.AddAsync(underwriting);
+            //var underwritingCaseType = await context.LineOfBusiness.AddAsync(underwriting);
 
             #endregion LINE OF BUSINESS
 
@@ -108,25 +108,25 @@ namespace risk.control.system.Seeds
 
             var claimDiscreetService = await context.InvestigationServiceType.AddAsync(claimDiscreet);
 
-            var underWritingPreVerification = new InvestigationServiceType
-            {
-                Name = "PRE-ONBOARDING-VERIFICATION",
-                Code = "PRE-ONBOARDING-VERIFICATION",
-                MasterData = true,
-                LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
-            };
+            //var underWritingPreVerification = new InvestigationServiceType
+            //{
+            //    Name = "PRE-ONBOARDING-VERIFICATION",
+            //    Code = "PRE-ONBOARDING-VERIFICATION",
+            //    MasterData = true,
+            //    LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
+            //};
 
-            var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);
+            //var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);
 
-            var underWritingPostVerification = new InvestigationServiceType
-            {
-                Name = "POST-ONBOARDING-VERIFICATION",
-                Code = "POST-ONBOARDING-VERIFICATION",
-                MasterData = true,
-                LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
-            };
+            //var underWritingPostVerification = new InvestigationServiceType
+            //{
+            //    Name = "POST-ONBOARDING-VERIFICATION",
+            //    Code = "POST-ONBOARDING-VERIFICATION",
+            //    MasterData = true,
+            //    LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
+            //};
 
-            var underWritingPostVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPostVerification);
+            //var underWritingPostVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPostVerification);
 
             #endregion INVESTIGATION SERVICE TYPES
 
