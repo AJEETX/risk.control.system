@@ -3,6 +3,54 @@
 @{
     ViewData["Title"] = "Details";
 }
+<style>
+    body {
+        background-color: #eee;
+        font-family: "Poppins", sans-serif;
+        font-weight: 300;
+    }
+
+    .container {
+        width: 100%;
+        padding-bottom: 1rem;
+    }
+
+    .progresses {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .line {
+        width: 100%;
+        height: 6px;
+        background: lightgrey;
+    }
+
+    .steps {
+        display: flex;
+        background-color: green;
+        color: #fff;
+        font-size: 14px;
+        width: 80px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .steps2 {
+        display: flex;
+        background-color: lightgray;
+        color: #fff;
+        font-size: 14px;
+        width: 80px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+</style>
 <section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
@@ -41,25 +89,16 @@
                             beneficiaryExist = true;
                             beneficiaryProgressbarMessage = "edit beneficiary";
                         }
-                        string customerProgressColor = "lightgrey";
+                        string customerProgressColor = "steps2";
                         if (@customerExist)
                         {
-                            customerProgressColor = "green";
+                            customerProgressColor = "steps";
                         }
-                        string benficiaryProgressColor = "lightgrey";
-                        if (@customerExist && @beneficiaryExist)
+                        string benficiaryProgressColor = "steps2";
+                        
+                        if (@beneficiaryExist)
                         {
-                            benficiaryProgressColor = "green";
-                            beneficiaryProgressbarMessage = "add beneficiary";
-                        }
-                        if (@customerExist && !@beneficiaryExist)
-                        {
-                            benficiaryProgressColor = "lightgrey";
-                            beneficiaryProgressbarMessage = "beneficiary";
-                        }
-                        if (!@customerExist && !@beneficiaryExist)
-                        {
-                            benficiaryProgressColor = "lightgrey";
+                            benficiaryProgressColor = "steps";
                         }
                         <div class="card-body">
                             <article>
@@ -67,22 +106,32 @@
                                     <header class="bb-blog-header">
                                         <h5 class="bb-blog-title" itemprop="name">Policy # : @Model.Claim?.PolicyDetail?.ContractNumber</h5>
                                     </header>
-                                    <div class="card card-solid">
-                                        <div class="progress">
-                                            <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:32.5%;background-color:green;">
-                                                policy
-                                            </div>
-                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:@customerProgressColor">
-                                                @customerProgressbarMessage
-                                            </div>
-                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+                                    <div class="container d-flex justify-content-center align-items-center">
 
-                                            <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:@benficiaryProgressColor">
-                                                @beneficiaryProgressbarMessage
+                                        <div class="progresses">
+
+                                            <div class="steps">
+                                                <span> <i class="far fa-file-powerpoint"></i></span>
                                             </div>
+
+                                            <span class="line"></span>
+
+                                            <div class="@customerProgressColor">
+                                                <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
+                                            </div>
+
+
+                                            <span class="line"></span>
+
+                                            <div class="@benficiaryProgressColor">
+                                                <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                                            </div>
+
                                         </div>
+
+                                    </div>
+                                    <div class="card card-solid">
+                                        
                                         <div class="card-body pb-0">
                                             <div class="row">
                                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
