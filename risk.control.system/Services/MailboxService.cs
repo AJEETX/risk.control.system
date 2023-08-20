@@ -56,7 +56,6 @@ namespace risk.control.system.Services
 
             List<string> userEmailsToSend = new();
 
-            userEmailsToSend.Add(userEmail);
             foreach (var assignedUser in vendorUsers)
             {
                 var isTrue = await userVendorManager.IsInRoleAsync(assignedUser, supervisorRole?.Name);
@@ -169,8 +168,8 @@ namespace risk.control.system.Services
 
                 foreach (var claimsInvestigation in claimsInvestigations)
                 {
-                    string claimsUrl = $"{BaseUrl + claimsInvestigation.ClaimsInvestigationId}";
-
+                    string claimsUrl = $"{BaseUrl + claimsInvestigation.ClaimsInvestigationId} ";
+                    contactMessage.Subject += claimsInvestigation.PolicyDetail.ContractNumber + ", ";
                     contactMessage.RawMessage += MailText
                         .Replace("[username]", recepientMailbox.Name)
                         .Replace("[email]", recepientMailbox.Name)
@@ -213,7 +212,7 @@ namespace risk.control.system.Services
                 //ReceipientEmail = userEmailToSend,
                 Created = DateTime.UtcNow,
                 Message = "New case allocated:" + claimId,
-                Subject = "New case allocated:" + claimId,
+                Subject = "New case(s) Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                 SenderEmail = userEmail,
                 Priority = ContactMessagePriority.URGENT,
                 SendDate = DateTime.Now,
@@ -343,7 +342,7 @@ namespace risk.control.system.Services
                         //ReceipientEmail = userEmailToSend,
                         Created = DateTime.UtcNow,
                         Message = "New case(s) report:",
-                        Subject = "New case(s) report:",
+                        Subject = "New case(s) Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
                         SendDate = DateTime.Now,
@@ -409,7 +408,7 @@ namespace risk.control.system.Services
                         //ReceipientEmail = userEmailToSend,
                         Created = DateTime.UtcNow,
                         Message = "New case(s) report:",
-                        Subject = "New case(s) report:",
+                        Subject = "New case(s) report Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
                         SendDate = DateTime.Now,
@@ -473,7 +472,7 @@ namespace risk.control.system.Services
                     //ReceipientEmail = userEmailToSend,
                     Created = DateTime.UtcNow,
                     Message = "New case(s) report:",
-                    Subject = "New case(s) report:",
+                    Subject = "New case(s) report Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                     SenderEmail = senderUserEmail,
                     Priority = ContactMessagePriority.NORMAL,
                     SendDate = DateTime.Now,
