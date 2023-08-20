@@ -84,8 +84,7 @@ namespace risk.control.system.Services
                 {
                     //ReceipientEmail = userEmailToSend,
                     Created = DateTime.UtcNow,
-                    Message = "New case allocated:" + claimsInvestigationId,
-                    Subject = "New case allocated: Policy #" + policy,
+                    Subject = "Claim(s) allocated: Policy #" + policy + " ",
                     SenderEmail = userEmail,
                     Priority = ContactMessagePriority.URGENT,
                     SendDate = DateTime.Now,
@@ -155,8 +154,7 @@ namespace risk.control.system.Services
                 {
                     //ReceipientEmail = userEmailToSend,
                     Created = DateTime.UtcNow,
-                    Message = "New case(s) assigned:",
-                    Subject = "New case(s) assigned:",
+                    Subject = "Claim(s) assigned:",
                     SenderEmail = clientCompanyUser?.Email ?? applicationUser.Email,
                     Priority = ContactMessagePriority.NORMAL,
                     SendDate = DateTime.Now,
@@ -211,8 +209,7 @@ namespace risk.control.system.Services
             {
                 //ReceipientEmail = userEmailToSend,
                 Created = DateTime.UtcNow,
-                Message = "New case allocated:" + claimId,
-                Subject = "New case(s) Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
+                Subject = "Allocated Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                 SenderEmail = userEmail,
                 Priority = ContactMessagePriority.URGENT,
                 SendDate = DateTime.Now,
@@ -269,7 +266,6 @@ namespace risk.control.system.Services
             {
                 //ReceipientEmail = userEmailToSend,
                 Created = DateTime.UtcNow,
-                Message = claimsUrl,
                 RawMessage = claimsUrl,
                 Subject = $"New case created: case Id = {claimsInvestigation.ClaimsInvestigationId}",
                 SenderEmail = clientCompanyUser?.Email ?? applicationUser.Email,
@@ -341,7 +337,6 @@ namespace risk.control.system.Services
                     {
                         //ReceipientEmail = userEmailToSend,
                         Created = DateTime.UtcNow,
-                        Message = "New case(s) report:",
                         Subject = "New case(s) Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
@@ -407,7 +402,6 @@ namespace risk.control.system.Services
                     {
                         //ReceipientEmail = userEmailToSend,
                         Created = DateTime.UtcNow,
-                        Message = "New case(s) report:",
                         Subject = "New case(s) report Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
@@ -471,7 +465,6 @@ namespace risk.control.system.Services
                 {
                     //ReceipientEmail = userEmailToSend,
                     Created = DateTime.UtcNow,
-                    Message = "New case(s) report:",
                     Subject = "New case(s) report Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                     SenderEmail = senderUserEmail,
                     Priority = ContactMessagePriority.NORMAL,
