@@ -41,6 +41,18 @@
 
     .steps2 {
         display: flex;
+        background-color: grey;
+        color: #fff;
+        font-size: 14px;
+        width: 80px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    .steps3 {
+        display: flex;
         background-color: lightgray;
         color: #fff;
         font-size: 14px;
@@ -94,9 +106,13 @@
                         {
                             customerProgressColor = "steps";
                         }
-                        string benficiaryProgressColor = "steps2";
-                        
-                        if (@beneficiaryExist)
+                        string benficiaryProgressColor = "steps3";
+
+                        if (@customerExist)
+                        {
+                            benficiaryProgressColor = "steps2";
+                        }
+                        if (@customerExist && @beneficiaryExist)
                         {
                             benficiaryProgressColor = "steps";
                         }
