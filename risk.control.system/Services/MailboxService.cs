@@ -11,7 +11,7 @@ namespace risk.control.system.Services
     {
         Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation);
 
-        Task NotifyClaimAllocationToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
+        Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, string vendorId, long caseLocationId);
 
         Task NotifyClaimAssignmentToAssigner(string userEmail, List<string> claims);
 
@@ -27,6 +27,7 @@ namespace risk.control.system.Services
     public class MailboxService : IMailboxService
     {
         private static string BaseUrl = string.Empty;
+        private static string AgencyBaseUrl = string.Empty;
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
@@ -40,11 +41,12 @@ namespace risk.control.system.Services
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
 
             BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/ClaimsInvestigation/Detail/";
+            AgencyBaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/ClaimsVendor/Detail/";
             this.userManager = userManager;
             this.userVendorManager = userVendorManager;
         }
 
-        public async Task NotifyClaimAllocationToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId)
+        public async Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, string vendorId, long caseLocationId)
         {
             //1. get vendor admin and supervisor email
 
@@ -64,6 +66,12 @@ namespace risk.control.system.Services
                 }
             }
 
+
+
+            string claimsUrl = $"<a href={AgencyBaseUrl + claimsInvestigationId}>click on link for claim details</a>";
+            claimsUrl = "<html><div> claim assigned : " + Environment.NewLine + claimsUrl + Environment.NewLine + "</div></html>";
+
+
             foreach (var userEmailToSend in userEmailsToSend)
             {
                 var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend);
@@ -72,7 +80,9 @@ namespace risk.control.system.Services
                     //ReceipientEmail = userEmailToSend,
                     Created = DateTime.UtcNow,
                     Message = "New case allocated:" + claimsInvestigationId,
-                    Subject = "New case allocated:" + claimsInvestigationId,
+                    Subject = "New case allocated: Policy #" + policy,
+                    RawMessage = claimsUrl,
+
                     SenderEmail = userEmail,
                     Priority = ContactMessagePriority.URGENT,
                     SendDate = DateTime.Now,
@@ -134,10 +144,13 @@ namespace risk.control.system.Services
                     UpdatedBy = applicationUser.Email,
                     ReceipientEmail = recepientMailbox.Name
                 };
+
                 foreach (var claimsInvestigation in claimsInvestigations)
                 {
-                    contactMessage.Message += BaseUrl + claimsInvestigation.ClaimsInvestigationId;
-                    contactMessage.Subject += BaseUrl + claimsInvestigation.ClaimsInvestigationId;
+                    string claimsUrl = $"<a href={BaseUrl + claimsInvestigation.ClaimsInvestigationId}>url</a>";
+                    claimsUrl = "<html><div> claim assigned : " + Environment.NewLine + claimsUrl + Environment.NewLine + "</div></html>";
+                    contactMessage.Message += claimsUrl;
+                    contactMessage.RawMessage += claimsUrl;
                 }
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);

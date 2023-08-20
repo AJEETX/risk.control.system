@@ -15,7 +15,7 @@
                         <h3 class="card-title"><i class="fas fa-pen-alt"></i> Update New</h3>
                     </div>
                     <div class="card-body">
-                        <form id="create-form" asp-action="Edit">
+                        <form id="create-form" asp-action="Edit"  enctype="multipart/form-data">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                             <article>
@@ -53,33 +53,27 @@
                                                                 <input type="hidden" asp-for="ClaimsInvestigationId" />
 
 
-                                                                <div class="form-group">
-                                                                    <div class="input-group mb-3">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text" id="documentImage">Beneficiary Photo</span>
-                                                                        </div>
-                                                                        @if (Model?.ProfilePicture is not null)
-                                                                        {
-                                                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <img class="form-Image" id="profileImage" src="/img/user.png">
-                                                                        }
-                                                                        <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
-                                                                    </div>
-                                                                </div>
+                                                                
 
                                                                 <div class="form-group">
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="BeneficiaryName">Beneficiary Name <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input required asp-for="BeneficiaryName" class="form-control" type="text" placeholder="Enter Beneficiary Name" maxlength="20" />
+                                                                        <input id="BeneficiaryName" required asp-for="BeneficiaryName" class="form-control" type="text" placeholder="Enter Beneficiary Name" maxlength="20" />
                                                                         <span asp-validation-for="BeneficiaryName" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
 
+                                                                <div class="form-group">
+                                                                    <div class="input-group mb-3">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text" asp-for="BeneficiaryDateOfBirth">Date Of Birth <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                        </div>
+                                                                        <input required asp-for="BeneficiaryDateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control" type="date" />
+                                                                        <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
+                                                                    </div>
+                                                                </div>
                                                                 <div class="form-group">
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
@@ -94,10 +88,10 @@
                                                                 <div class="form-group">
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
-                                                                            <span class="input-group-text" asp-for="BeneficiaryContactNumber">Contact # <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                            <span class="input-group-text" asp-for="BeneficiaryContactNumber">Phone # <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input type="number" asp-for="BeneficiaryContactNumber" class="form-control" required maxlength="10" min="2222222222" max="9999999999"
-                                                                               placeholder="Enter Phone # (10 digit)" />
+                                                                        <input type="text" asp-for="BeneficiaryContactNumber" class="form-control" required maxlength="10" min="2222222222" max="9999999999"
+                                                                               placeholder="Enter Phone # (10 digit)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                                                         <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -116,13 +110,19 @@
                                                                 <div class="form-group">
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
-                                                                            <span class="input-group-text" asp-for="BeneficiaryDateOfBirth">Date Of Birth <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                            <span class="input-group-text" id="documentImage">Beneficiary Photo</span>
                                                                         </div>
-                                                                        <input required asp-for="BeneficiaryDateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control" type="date" />
-                                                                        <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
+                                                                        @if (Model?.ProfilePicture is not null)
+                                                                        {
+                                                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ProfilePicture))">
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <img class="form-Image" id="profileImage" src="/img/user.png">
+                                                                        }
+                                                                        <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
                                                                     </div>
                                                                 </div>
-
                                                             </div>
                                                             <div class="col-md-6">
                                                                 <div class="form-group">
@@ -227,7 +227,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        $("#profileImage").focus();
+        $("#BeneficiaryName").focus();
         BeneficiaryDateOfBirthId.max = new Date().toISOString().split("T")[0];
 
         $.validator.setDefaults({

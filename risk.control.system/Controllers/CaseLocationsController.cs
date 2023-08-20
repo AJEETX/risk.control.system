@@ -140,7 +140,7 @@ namespace risk.control.system.Controllers
 
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("Location added successfully!");
+                toastNotification.AddSuccessToastMessage("Beneficiary added successfully!");
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
@@ -217,20 +217,18 @@ namespace risk.control.system.Controllers
                             await caseLocation.ProfileImage.CopyToAsync(dataStream);
                             caseLocation.ProfilePicture = dataStream.ToArray();
                         }
-
-                        var existingLocation = _context.CaseLocation.AsNoTracking().Where(c =>
-                        c.CaseLocationId == caseLocation.CaseLocationId && c.CaseLocationId == id).FirstOrDefault();
-                        if (existingLocation != null)
+                        else
                         {
+                            var existingLocation = _context.CaseLocation.AsNoTracking().Where(c =>
+                                c.CaseLocationId == caseLocation.CaseLocationId && c.CaseLocationId == id).FirstOrDefault();
                             if (existingLocation.ProfilePicture != null)
                             {
                                 caseLocation.ProfilePicture = existingLocation.ProfilePicture;
                             }
                         }
-
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
-                        toastNotification.AddSuccessToastMessage("verification location edited successfully!");
+                        toastNotification.AddSuccessToastMessage("Beneficiary edited successfully!");
                         return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
                     }
                 }
@@ -292,6 +290,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage("Beneficiary deleted successfully!");
             return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
         }
 

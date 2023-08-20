@@ -1,3 +1,4 @@
+using System.Configuration;
 using System.Reflection;
 
 using Highsoft.Web.Mvc.Charts;
@@ -13,6 +14,7 @@ using NToastNotify;
 
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
 using risk.control.system.Seeds;
 using risk.control.system.Services;
@@ -62,6 +64,8 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()

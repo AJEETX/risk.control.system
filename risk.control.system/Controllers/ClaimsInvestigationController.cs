@@ -378,9 +378,9 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 
-            await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId);
+            var policy = await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId);
 
-            await mailboxService.NotifyClaimAllocationToVendor(userEmail, claimId, selectedcase, caseLocationId);
+            await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimId, selectedcase, caseLocationId);
 
             toastNotification.AddSuccessToastMessage("Claim allocated to agency successfully!");
 
@@ -1096,7 +1096,7 @@ namespace risk.control.system.Controllers
 
             var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
 
-            await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
             toastNotification.AddSuccessToastMessage("Policy (s) created successfully!");
 
@@ -1111,7 +1111,9 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var claimsInvestigation = await _context.ClaimsInvestigation.Include(c => c.PolicyDetail).FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
 
             if (claimsInvestigation == null)
             {
@@ -1170,9 +1172,9 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
+            var claimId = await claimsInvestigationService.EdiPolicy(userEmail, claimsInvestigation, documentFile);
 
-            await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
             toastNotification.AddSuccessToastMessage("Policy edited successfully!");
 
@@ -1249,7 +1251,7 @@ namespace risk.control.system.Controllers
 
             var claimId = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, create);
 
-            await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
             toastNotification.AddSuccessToastMessage("Policy edited successfully!");
 
@@ -1300,6 +1302,49 @@ namespace risk.control.system.Controllers
             ViewData["BreadcrumbNode"] = locationPage;
 
             return View(claimsInvestigation);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
+        {
+            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
+
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
+            claimsInvestigation.InvestigationCaseStatus = status;
+            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
+            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
+            claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
+
+            IFormFile documentFile = null;
+            IFormFile profileFile = null;
+            var files = Request.Form?.Files;
+
+            if (files != null && files.Count > 0)
+            {
+                var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail?.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail?.Document?.Name);
+                if (file != null)
+                {
+                    documentFile = file;
+                }
+                file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail?.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail?.ProfileImage?.Name);
+                if (file != null)
+                {
+                    profileFile = file;
+                }
+            }
+
+            var claimId = await claimsInvestigationService.EditCustomer(userEmail, claimsInvestigation, profileFile);
+
+            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+
+            toastNotification.AddSuccessToastMessage("Policy edited successfully!");
+
+            return RedirectToAction(nameof(Details), new { id = claimId });
         }
 
         // GET: ClaimsInvestigation/Create
@@ -1404,7 +1449,7 @@ namespace risk.control.system.Controllers
 
             var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
 
-            await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
             toastNotification.AddSuccessToastMessage("<i class=\"fas fa-newspaper\"></i> Claim created successfully!");
 

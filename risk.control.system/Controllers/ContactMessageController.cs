@@ -58,7 +58,22 @@ namespace risk.control.system.Controllers
             return View(userMailboxMessages.OrderByDescending(o => o.SendDate));
         }
 
-        [Breadcrumb("Delete", FromAction = "Index")]
+        [Breadcrumb("Inbox", FromAction = "Index")]
+        public async Task<IActionResult> Inbox()
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+            if (applicationUser == null)
+            {
+                return NotFound();
+            }
+            var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
+
+            return View("Index", userMailboxMessages.OrderByDescending(o => o.SendDate));
+        }
+
+        [Breadcrumb("Delete", FromAction = "Inbox")]
         public async Task<IActionResult> InboxDelete(List<long> messages)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -74,7 +89,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Breadcrumb("Details", FromAction = "Index")]
+        [Breadcrumb("Details", FromAction = "Inbox")]
         public async Task<IActionResult> InboxDetails(long id)
         {
             if (id == 0)
@@ -93,7 +108,7 @@ namespace risk.control.system.Controllers
             return View(userMessage);
         }
 
-        [Breadcrumb("Reply", FromAction = "Index")]
+        [Breadcrumb("Reply", FromAction = "Inbox")]
         public async Task<IActionResult> InboxDetailsReply(long id, string actiontype)
         {
             if (id == 0)

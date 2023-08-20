@@ -150,9 +150,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a is-active-page asp-controller="ContactMessage" asp-action="Index" class="actual-link nav-link
-                        @Url.MakeActiveClass("ContactMessage","Index") @Url.MakeActiveClass("ContactMessage","InboxDetails") @Url.MakeActiveClass("ContactMessage","InboxDetailsReply")">
-                        <i class="fas fa-envelope-open nav-icon"></i>
+                    <a is-active-page asp-controller="ContactMessage" asp-action="Inbox" class="actual-link nav-link
+                        @Url.MakeActiveClass("ContactMessage","Inbox") @Url.MakeActiveClass("ContactMessage","InboxDetails") @Url.MakeActiveClass("ContactMessage","InboxDetailsReply")">
+                        <i class="fas fa-inbox nav-icon"></i>
                         <p>
                             @Applicationsettings.INBOX <span class="badge badge-danger">@newInboxMessgeDisplay</span>
                         </p>
@@ -207,7 +207,7 @@
                                     @Url.MakeActiveClass("ClaimsInvestigation","CreatePolicy") ">
                                 <i class="fas fa-pen-alt nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-success">ADD NEW </span> <i class="fa fa-asterisk" style="color:red;" title="ADD NEW"></i>
+                                    <span class="badge badge-success">ADD NEW </span> 
                                 </p>
                             </a>
                         </li>

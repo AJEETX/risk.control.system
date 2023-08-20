@@ -9,7 +9,7 @@
     <div class="container-fluid ">
         <div class="row">
             <div class="col-md-12">
-                <form id="create-form" asp-action="CreateCustomer?create=false" enctype="multipart/form-data">
+                <form id="create-form" asp-action="EditCustomer" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
@@ -98,8 +98,8 @@
                                                                             <span class="input-group-text" asp-for="ContactNumber">Phone # <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
 
-                                                                        <input type="number" asp-for="CustomerDetail.ContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)"
-                                                                               min="2222222222" max="9999999999" />
+                                                                        <input type="text" asp-for="CustomerDetail.ContactNumber" class="form-control" required maxlength="10" placeholder="Enter Phone # (10 digit)"
+                                                                               min="2222222222" max="9999999999" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                                                         <span asp-validation-for="CustomerDetail.ContactNumber" class="text-danger field-validation-valid"></span>
 
                                                                     </div>
@@ -227,7 +227,7 @@
                                                                         {
                                                                             <img id="profileImage" class="form-Image" src="/img/user.png">
                                                                         }
-                                                                        <input asp-for="CustomerDetail.ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                                        <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
 
                                                                     </div>
                                                                 </div>
