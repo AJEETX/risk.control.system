@@ -66,8 +66,17 @@ namespace risk.control.system.Services
                 }
             }
 
-            string claimsUrl = $"<a href={AgencyBaseUrl + claimsInvestigationId}>click on link for claim details</a>";
-            claimsUrl = "<html><div> claim assigned : " + Environment.NewLine + claimsUrl + Environment.NewLine + "</div></html>";
+            string claimsUrl = $"{AgencyBaseUrl + claimsInvestigationId}";
+
+            var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(i => i.PolicyDetail)
+                .Include(i => i.InvestigationCaseSubStatus)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+
+            string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
+            StreamReader str = new StreamReader(FilePath);
+            string MailText = str.ReadToEnd();
+            str.Close();
 
             foreach (var userEmailToSend in userEmailsToSend)
             {
@@ -78,15 +87,23 @@ namespace risk.control.system.Services
                     Created = DateTime.UtcNow,
                     Message = "New case allocated:" + claimsInvestigationId,
                     Subject = "New case allocated: Policy #" + policy,
-                    RawMessage = claimsUrl,
-
                     SenderEmail = userEmail,
                     Priority = ContactMessagePriority.URGENT,
                     SendDate = DateTime.Now,
                     Updated = DateTime.Now,
                     Read = false,
                     UpdatedBy = userEmail,
-                    ReceipientEmail = recepientMailbox.Name
+                    ReceipientEmail = recepientMailbox.Name,
+                    RawMessage = MailText
+                        .Replace("[username]", recepientMailbox.Name)
+                        .Replace("[email]", recepientMailbox.Name)
+                        .Replace("[url]", claimsUrl)
+                        .Replace("[stage]", claimsInvestigation.InvestigationCaseSubStatus.Name)
+                        .Replace("[policy]", claimsInvestigation.PolicyDetail.ContractNumber)
+                        .Replace("[logo]",
+                        claimsInvestigation.PolicyDetail?.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimsInvestigation.PolicyDetail?.DocumentImage))
+                        : "/img/no-image.png")
                 };
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
@@ -122,7 +139,10 @@ namespace risk.control.system.Services
                 }
             }
 
-            var claimsInvestigations = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationId));
+            var claimsInvestigations = _context.ClaimsInvestigation
+                .Include(i => i.PolicyDetail)
+                .Include(i => i.InvestigationCaseSubStatus)
+                .Where(v => claims.Contains(v.ClaimsInvestigationId));
 
             string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
             StreamReader str = new StreamReader(FilePath);
@@ -143,17 +163,25 @@ namespace risk.control.system.Services
                     SendDate = DateTime.Now,
                     Updated = DateTime.Now,
                     Read = false,
-                    RawMessage = MailText.Replace("[username]", recepientMailbox.Name).Replace("[email]", recepientMailbox.Name),
                     UpdatedBy = applicationUser.Email,
                     ReceipientEmail = recepientMailbox.Name
                 };
 
                 foreach (var claimsInvestigation in claimsInvestigations)
                 {
-                    string claimsUrl = $"<a href={BaseUrl + claimsInvestigation.ClaimsInvestigationId}>url</a>";
-                    claimsUrl = "<html><div> claim assigned : " + Environment.NewLine + claimsUrl + Environment.NewLine + "</div></html>";
-                    contactMessage.Message += claimsUrl;
-                    contactMessage.RawMessage += claimsUrl;
+                    string claimsUrl = $"{BaseUrl + claimsInvestigation.ClaimsInvestigationId}";
+
+                    contactMessage.RawMessage += MailText
+                        .Replace("[username]", recepientMailbox.Name)
+                        .Replace("[email]", recepientMailbox.Name)
+                        .Replace("[url]", claimsUrl)
+                        .Replace("[stage]", claimsInvestigation.InvestigationCaseSubStatus.Name)
+                        .Replace("[policy]", claimsInvestigation.PolicyDetail.ContractNumber)
+                        .Replace("[logo]",
+                        claimsInvestigation.PolicyDetail?.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimsInvestigation.PolicyDetail?.DocumentImage))
+                        : "/img/no-image.png")
+                        ;
                 }
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
@@ -168,22 +196,41 @@ namespace risk.control.system.Services
 
             var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == agentEmail);
 
-            string claimsUrl = $"<a href={BaseUrl + claimId}>url</a>";
-            claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+            string claimsUrl = $"{AgencyBaseUrl + claimId}";
+
+            string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
+            StreamReader str = new StreamReader(FilePath);
+            string MailText = str.ReadToEnd();
+            str.Close();
+
+            var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(i => i.PolicyDetail)
+                .Include(i => i.InvestigationCaseSubStatus)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+
             var contactMessage = new InboxMessage
             {
                 //ReceipientEmail = userEmailToSend,
                 Created = DateTime.UtcNow,
                 Message = "New case allocated:" + claimId,
                 Subject = "New case allocated:" + claimId,
-                RawMessage = "New case allocated:" + claimsUrl,
                 SenderEmail = userEmail,
                 Priority = ContactMessagePriority.URGENT,
                 SendDate = DateTime.Now,
                 Updated = DateTime.Now,
                 Read = false,
                 UpdatedBy = userEmail,
-                ReceipientEmail = recepientMailbox.Name
+                ReceipientEmail = recepientMailbox.Name,
+                RawMessage = MailText
+                        .Replace("[username]", recepientMailbox.Name)
+                        .Replace("[email]", recepientMailbox.Name)
+                        .Replace("[url]", claimsUrl)
+                        .Replace("[stage]", claimsInvestigation.InvestigationCaseSubStatus.Name)
+                        .Replace("[policy]", claimsInvestigation.PolicyDetail.ContractNumber)
+                        .Replace("[logo]",
+                        claimsInvestigation.PolicyDetail?.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimsInvestigation.PolicyDetail?.DocumentImage))
+                        : "/img/no-image.png")
             };
             recepientMailbox?.Inbox.Add(contactMessage);
             _context.Mailbox.Attach(recepientMailbox);
@@ -276,8 +323,18 @@ namespace risk.control.system.Services
                     }
                 }
 
-                string claimsUrl = $"<a href={BaseUrl + claimId}>url</a>";
-                claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+                string claimsUrl = $"{BaseUrl + claimId}";
+
+                string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
+                StreamReader str = new StreamReader(FilePath);
+                string MailText = str.ReadToEnd();
+                str.Close();
+
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .Include(i => i.PolicyDetail)
+                    .Include(i => i.InvestigationCaseSubStatus)
+                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+
                 foreach (var user in users)
                 {
                     var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == user.Email);
@@ -286,7 +343,6 @@ namespace risk.control.system.Services
                         //ReceipientEmail = userEmailToSend,
                         Created = DateTime.UtcNow,
                         Message = "New case(s) report:",
-                        RawMessage = "New case(s) report:" + claimsUrl,
                         Subject = "New case(s) report:",
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
@@ -294,7 +350,17 @@ namespace risk.control.system.Services
                         Updated = DateTime.Now,
                         Read = false,
                         UpdatedBy = senderUserEmail,
-                        ReceipientEmail = recepientMailbox.Name
+                        ReceipientEmail = recepientMailbox.Name,
+                        RawMessage = MailText
+                        .Replace("[username]", recepientMailbox.Name)
+                        .Replace("[email]", recepientMailbox.Name)
+                        .Replace("[url]", claimsUrl)
+                        .Replace("[stage]", claimsInvestigation.InvestigationCaseSubStatus.Name)
+                        .Replace("[policy]", claimsInvestigation.PolicyDetail.ContractNumber)
+                        .Replace("[logo]",
+                        claimsInvestigation.PolicyDetail?.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimsInvestigation.PolicyDetail?.DocumentImage))
+                        : "/img/no-image.png")
                     };
                     recepientMailbox?.Inbox.Add(contactMessage);
                     _context.Mailbox.Attach(recepientMailbox);
@@ -323,8 +389,18 @@ namespace risk.control.system.Services
                     }
                 }
 
-                string claimsUrl = $"<a href={BaseUrl + claimId}>url</a>";
-                claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+                string claimsUrl = $"{BaseUrl + claimId}";
+
+                string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
+                StreamReader str = new StreamReader(FilePath);
+                string MailText = str.ReadToEnd();
+                str.Close();
+
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .Include(i => i.PolicyDetail)
+                    .Include(i => i.InvestigationCaseSubStatus)
+                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+
                 foreach (var user in users)
                 {
                     var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == user.Email);
@@ -333,7 +409,6 @@ namespace risk.control.system.Services
                         //ReceipientEmail = userEmailToSend,
                         Created = DateTime.UtcNow,
                         Message = "New case(s) report:",
-                        RawMessage = "New case(s) report:" + claimsUrl,
                         Subject = "New case(s) report:",
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
@@ -341,7 +416,17 @@ namespace risk.control.system.Services
                         Updated = DateTime.Now,
                         Read = false,
                         UpdatedBy = senderUserEmail,
-                        ReceipientEmail = recepientMailbox.Name
+                        ReceipientEmail = recepientMailbox.Name,
+                        RawMessage = MailText
+                        .Replace("[username]", recepientMailbox.Name)
+                        .Replace("[email]", recepientMailbox.Name)
+                        .Replace("[url]", claimsUrl)
+                        .Replace("[stage]", claimsInvestigation.InvestigationCaseSubStatus.Name)
+                        .Replace("[policy]", claimsInvestigation.PolicyDetail.ContractNumber)
+                        .Replace("[logo]",
+                        claimsInvestigation.PolicyDetail?.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimsInvestigation.PolicyDetail?.DocumentImage))
+                        : "/img/no-image.png")
                     };
                     recepientMailbox?.Inbox.Add(contactMessage);
                     _context.Mailbox.Attach(recepientMailbox);
@@ -369,8 +454,17 @@ namespace risk.control.system.Services
                     users.Add(user);
                 }
             }
-            string claimsUrl = $"<a href={AgencyBaseUrl + claimId}>url</a>";
-            claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
+            string claimsUrl = $"{AgencyBaseUrl + claimId}";
+            string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
+            StreamReader str = new StreamReader(FilePath);
+            string MailText = str.ReadToEnd();
+            str.Close();
+
+            var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(i => i.PolicyDetail)
+                .Include(i => i.InvestigationCaseSubStatus)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+
             foreach (var user in users)
             {
                 var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == user.Email);
@@ -380,14 +474,23 @@ namespace risk.control.system.Services
                     Created = DateTime.UtcNow,
                     Message = "New case(s) report:",
                     Subject = "New case(s) report:",
-                    RawMessage = "New case(s) report:" + claimsUrl,
                     SenderEmail = senderUserEmail,
                     Priority = ContactMessagePriority.NORMAL,
                     SendDate = DateTime.Now,
                     Updated = DateTime.Now,
                     Read = false,
                     UpdatedBy = senderUserEmail,
-                    ReceipientEmail = recepientMailbox.Name
+                    ReceipientEmail = recepientMailbox.Name,
+                    RawMessage = MailText
+                        .Replace("[username]", recepientMailbox.Name)
+                        .Replace("[email]", recepientMailbox.Name)
+                        .Replace("[url]", claimsUrl)
+                        .Replace("[stage]", claimsInvestigation.InvestigationCaseSubStatus.Name)
+                        .Replace("[policy]", claimsInvestigation.PolicyDetail.ContractNumber)
+                        .Replace("[logo]",
+                        claimsInvestigation.PolicyDetail?.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimsInvestigation.PolicyDetail?.DocumentImage))
+                        : "/img/no-image.png")
                 };
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
