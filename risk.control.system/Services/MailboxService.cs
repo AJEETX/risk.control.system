@@ -66,11 +66,8 @@ namespace risk.control.system.Services
                 }
             }
 
-
-
             string claimsUrl = $"<a href={AgencyBaseUrl + claimsInvestigationId}>click on link for claim details</a>";
             claimsUrl = "<html><div> claim assigned : " + Environment.NewLine + claimsUrl + Environment.NewLine + "</div></html>";
-
 
             foreach (var userEmailToSend in userEmailsToSend)
             {
@@ -127,6 +124,11 @@ namespace risk.control.system.Services
 
             var claimsInvestigations = _context.ClaimsInvestigation.Where(v => claims.Contains(v.ClaimsInvestigationId));
 
+            string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
+            StreamReader str = new StreamReader(FilePath);
+            string MailText = str.ReadToEnd();
+            str.Close();
+
             foreach (var userEmailToSend in userEmailsToSend)
             {
                 var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend);
@@ -141,6 +143,7 @@ namespace risk.control.system.Services
                     SendDate = DateTime.Now,
                     Updated = DateTime.Now,
                     Read = false,
+                    RawMessage = MailText.Replace("[username]", recepientMailbox.Name).Replace("[email]", recepientMailbox.Name),
                     UpdatedBy = applicationUser.Email,
                     ReceipientEmail = recepientMailbox.Name
                 };
@@ -366,7 +369,7 @@ namespace risk.control.system.Services
                     users.Add(user);
                 }
             }
-            string claimsUrl = $"<a href={BaseUrl + claimId}>url</a>";
+            string claimsUrl = $"<a href={AgencyBaseUrl + claimId}>url</a>";
             claimsUrl = "<html>" + Environment.NewLine + claimsUrl + Environment.NewLine + "</html>";
             foreach (var user in users)
             {

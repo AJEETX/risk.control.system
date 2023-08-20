@@ -319,7 +319,7 @@
                                                     <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
                                                         <div class="card bg-light d-flex flex-fill">
                                                             <div class="card-header text-muted border-bottom-0">
-                                                                <i class="fas fa-mobile-alt"></i> Investigation data
+                                                                <i class="fas fa-mobile-alt"></i> Investigation data <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.AgentRemarksUpdated</span>
                                                             </div>
                                                             <div class="card-body pt-0">
                                                                 <div class="row">
@@ -376,7 +376,7 @@
                                                     <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
                                                         <div class="card bg-light d-flex flex-fill">
                                                             <div class="card-header text-muted border-bottom-0">
-                                                                <i class="far fa-file-powerpoint"></i> Agent remarks
+                                                                <i class="far fa-comment"></i> Agent remarks
                                                             </div>
                                                             <div class="card-body pt-0">
                                                                 <div class="row">
@@ -387,6 +387,9 @@
                                                                             <div class="form-group">
                                                                                 <input maxlength="100" name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
                                                                             </div>
+                                                                            <div class="form-group">
+                                                                                <input type="checkbox" id="terms_and_conditions" value="1" /> <label for="terms_and_conditions"> I agree to the Terms and Conditions:</label>
+                                                                            </div>
                                                                         </ul>
                                                                     </div>
                                                                 </div>
@@ -394,7 +397,7 @@
                                                             <div class="card-footer">
                                                                 <div class="text-right">
                                                                     <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
-                                                                    <button id="submit-case" type="submit" class="btn btn-danger">
+                                                                    <button disabled id="submit-case" type="submit" class="btn btn-danger">
                                                                         <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
                                                                     </button>
                                                                 </div>
@@ -448,7 +451,42 @@
 </section>
 @section Scripts    {
     <script>
+        $('#remarks').focus();
         $(document).ready(function () {
+            $('#remarks').focus();
+            //Add a JQuery click event handler onto our checkbox.
+            $('#terms_and_conditions').click(function () {
+                //If the checkbox is checked.
+                var report = $('#remarks').val();
+                if ($(this).is(':checked') && report != '') {
+                    //Enable the submit button.
+                    $('#submit-case').attr("disabled", false);
+                } else {
+                    //If it is not checked, disable the button.
+                    $('#submit-case').attr("disabled", true);
+                }
+            });
+
+            $('#remarks').on('keydown',function (){
+                var report = $('#remarks').val();
+                if ($('#terms_and_conditions').is(':checked') && report != '') {
+                    //Enable the submit button.
+                    $('#submit-case').attr("disabled", false);
+                } else {
+                    //If it is not checked, disable the button.
+                    $('#submit-case').attr("disabled", true);
+                }
+            })
+            $('#remarks').on('blur', function () {
+                var report = $('#remarks').val();
+                if ($('#terms_and_conditions').is(':checked') && report != '') {
+                    //Enable the submit button.
+                    $('#submit-case').attr("disabled", false);
+                } else {
+                    //If it is not checked, disable the button.
+                    $('#submit-case').attr("disabled", true);
+                }
+            })
 
             $('#create-form').on('submit', function (e) {
                 var report = $('#remarks').val();
@@ -467,7 +505,11 @@
                         buttons: {
                             cancel: {
                                 text: "OK",
-                                btnClass: 'btn-danger'
+                                btnClass: 'btn-danger',
+                                action:function(){
+                                    $.alert('Canceled!');
+                                    $('#remarks').focus();
+                                }
                             }
                         }
                     });

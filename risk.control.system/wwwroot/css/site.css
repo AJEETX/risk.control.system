@@ -151,7 +151,6 @@ table {
 .disclaimer-body {
     margin: 1rem;
     border: 1px solid darkgrey;
-    border: .1rem inset #ddd;
     box-shadow: 5px 5px #ccc;
     background: linear-gradient(45deg, #e3e3e3, transparent);
     border-radius: .3rem;

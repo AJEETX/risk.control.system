@@ -12,6 +12,29 @@ namespace risk.control.system.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "AgentReport",
+                columns: table => new
+                {
+                    AgentReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    AgentEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    AgentRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    AgentRemarks = table.Column<string>(type: "TEXT", nullable: true),
+                    AgentLocationPictureUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    AgentLocationPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    AgentOcrUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    AgentOcrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    AgentOcrData = table.Column<string>(type: "TEXT", nullable: true),
+                    AgentQrUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    AgentQrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    QrData = table.Column<string>(type: "TEXT", nullable: true),
+                    LongLat = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AgentReport", x => x.AgentReportId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AuditLogs",
                 columns: table => new
                 {
@@ -1009,10 +1032,33 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ClaimMessage",
+                columns: table => new
+                {
+                    ClaimMessageId = table.Column<string>(type: "TEXT", nullable: false),
+                    SenderEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    RecepicientEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    Message = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
+                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClaimMessage", x => x.ClaimMessageId);
+                    table.ForeignKey(
+                        name: "FK_ClaimMessage_CaseLocation_CaseLocationId",
+                        column: x => x.CaseLocationId,
+                        principalTable: "CaseLocation",
+                        principalColumn: "CaseLocationId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClaimReport",
                 columns: table => new
                 {
                     ClaimReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    AgentEmail = table.Column<string>(type: "TEXT", nullable: true),
+                    AgentRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     AgentRemarks = table.Column<string>(type: "TEXT", nullable: true),
                     AgentLocationPictureUrl = table.Column<string>(type: "TEXT", nullable: true),
                     AgentLocationPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
@@ -1023,9 +1069,14 @@ namespace risk.control.system.Migrations
                     AgentQrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     QrData = table.Column<string>(type: "TEXT", nullable: true),
                     LongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    AgentReportId = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    SupervisorRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    SupervisorEmail = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorRemarks = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
+                    AssessorRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    AssessorEmail = table.Column<string>(type: "TEXT", nullable: true),
                     AssessorRemarks = table.Column<string>(type: "TEXT", nullable: true),
                     AssessorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
                     CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false)
@@ -1033,6 +1084,11 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ClaimReport", x => x.ClaimReportId);
+                    table.ForeignKey(
+                        name: "FK_ClaimReport_AgentReport_AgentReportId",
+                        column: x => x.AgentReportId,
+                        principalTable: "AgentReport",
+                        principalColumn: "AgentReportId");
                     table.ForeignKey(
                         name: "FK_ClaimReport_CaseLocation_CaseLocationId",
                         column: x => x.CaseLocationId,
@@ -1477,6 +1533,16 @@ namespace risk.control.system.Migrations
                 name: "IX_CaseLocation_VendorId",
                 table: "CaseLocation",
                 column: "VendorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClaimMessage_CaseLocationId",
+                table: "ClaimMessage",
+                column: "CaseLocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClaimReport_AgentReportId",
+                table: "ClaimReport",
+                column: "AgentReportId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClaimReport_CaseLocationId",
@@ -1940,6 +2006,9 @@ namespace risk.control.system.Migrations
                 name: "AuditLogs");
 
             migrationBuilder.DropTable(
+                name: "ClaimMessage");
+
+            migrationBuilder.DropTable(
                 name: "ClaimReport");
 
             migrationBuilder.DropTable(
@@ -1989,6 +2058,9 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "AgentReport");
 
             migrationBuilder.DropTable(
                 name: "VendorInvestigationServiceType");

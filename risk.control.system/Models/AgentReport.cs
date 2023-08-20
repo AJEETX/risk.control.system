@@ -3,14 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-    public class ClaimReport
+    public class AgentReport
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ClaimReportId { get; set; } = Guid.NewGuid().ToString();
+        public string AgentReportId { get; set; } = Guid.NewGuid().ToString();
 
         public string? AgentEmail { get; set; }
-
         public DateTime? AgentRemarksUpdated { get; set; }
         public string? AgentRemarks { get; set; }
 
@@ -51,39 +50,5 @@ namespace risk.control.system.Models
         public string? QrData { get; set; }
 
         public string? LongLat { get; set; }
-        public string? AgentReportId { get; set; }
-
-        public AgentReport? AgentReport { get; set; }
-
-        [Display(Name = "Supervisor Document")]
-        public byte[]? SupervisorPicture { get; set; }
-
-        [Display(Name = "Supervisor Document")]
-        [NotMapped]
-        public IFormFile? SupervisorDocumentImage { get; set; }
-
-        public DateTime? SupervisorRemarksUpdated { get; set; }
-        public string? SupervisorEmail { get; set; }
-        public string? SupervisorRemarks { get; set; }
-        public SupervisorRemarkType? SupervisorRemarkType { get; set; }
-        public DateTime? AssessorRemarksUpdated { get; set; }
-        public string? AssessorEmail { get; set; }
-        public string? AssessorRemarks { get; set; }
-        public AssessorRemarkType? AssessorRemarkType { get; set; }
-
-        public long CaseLocationId { get; set; }
-        public CaseLocation CaseLocation { get; set; }
-    }
-
-    public enum SupervisorRemarkType
-    {
-        OK,
-        REVIEW
-    }
-
-    public enum AssessorRemarkType
-    {
-        OK,
-        REVIEW,
     }
 }

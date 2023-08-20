@@ -84,6 +84,7 @@ namespace risk.control.system.Models
 
         public string? AssignedAgentUserEmail { get; set; }
         public ClaimReport? ClaimReport { get; set; }
+        public List<ClaimMessage>? ClaimMessages { get; set; } = new();
         public bool IsReviewCaseLocation { get; set; } = false;
     }
 }

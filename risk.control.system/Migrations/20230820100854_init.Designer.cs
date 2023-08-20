@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230818051029_init")]
+    [Migration("20230820100854_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -117,6 +117,53 @@ namespace risk.control.system.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.AgentReport", b =>
+                {
+                    b.Property<string>("AgentReportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("AgentLocationPicture")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AgentLocationPictureUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentOcrData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("AgentOcrPicture")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AgentOcrUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("AgentQrPicture")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AgentQrUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("AgentRemarksUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("QrData")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("AgentReportId");
+
+                    b.ToTable("AgentReport");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ApplicationRole", b =>
@@ -484,10 +531,41 @@ namespace risk.control.system.Migrations
                     b.ToTable("CaseLocation");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.ClaimMessage", b =>
+                {
+                    b.Property<string>("ClaimMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("CaseLocationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ClaimsInvestigationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RecepicientEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderEmail")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ClaimMessageId");
+
+                    b.HasIndex("CaseLocationId");
+
+                    b.ToTable("ClaimMessage");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.ClaimReport", b =>
                 {
                     b.Property<string>("ClaimReportId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentEmail")
                         .HasColumnType("TEXT");
 
                     b.Property<byte[]>("AgentLocationPicture")
@@ -514,10 +592,22 @@ namespace risk.control.system.Migrations
                     b.Property<string>("AgentRemarks")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("AgentRemarksUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentReportId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AssessorEmail")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("AssessorRemarkType")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("AssessorRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("AssessorRemarksUpdated")
                         .HasColumnType("TEXT");
 
                     b.Property<long>("CaseLocationId")
@@ -529,6 +619,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("QrData")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("SupervisorEmail")
+                        .HasColumnType("TEXT");
+
                     b.Property<byte[]>("SupervisorPicture")
                         .HasColumnType("BLOB");
 
@@ -538,7 +631,12 @@ namespace risk.control.system.Migrations
                     b.Property<string>("SupervisorRemarks")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("SupervisorRemarksUpdated")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("ClaimReportId");
+
+                    b.HasIndex("AgentReportId");
 
                     b.HasIndex("CaseLocationId")
                         .IsUnique();
@@ -2371,13 +2469,26 @@ namespace risk.control.system.Migrations
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.ClaimMessage", b =>
+                {
+                    b.HasOne("risk.control.system.Models.CaseLocation", null)
+                        .WithMany("ClaimMessages")
+                        .HasForeignKey("CaseLocationId");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.ClaimReport", b =>
                 {
+                    b.HasOne("risk.control.system.Models.AgentReport", "AgentReport")
+                        .WithMany()
+                        .HasForeignKey("AgentReportId");
+
                     b.HasOne("risk.control.system.Models.CaseLocation", "CaseLocation")
                         .WithOne("ClaimReport")
                         .HasForeignKey("risk.control.system.Models.ClaimReport", "CaseLocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AgentReport");
 
                     b.Navigation("CaseLocation");
                 });
@@ -2889,6 +3000,8 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.CaseLocation", b =>
                 {
+                    b.Navigation("ClaimMessages");
+
                     b.Navigation("ClaimReport");
                 });
 

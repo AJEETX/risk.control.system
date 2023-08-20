@@ -595,6 +595,8 @@ namespace risk.control.system.Services
 
             var report = new ClaimReport
             {
+                AgentEmail = userEmail,
+                AgentRemarksUpdated = DateTime.UtcNow,
                 AgentRemarks = remarks,
                 CaseLocationId = caseLocationId,
             };
@@ -682,6 +684,8 @@ namespace risk.control.system.Services
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
             report.AssessorRemarkType = assessorRemarkType;
             report.AssessorRemarks = assessorRemarks;
+            report.AssessorRemarksUpdated = DateTime.UtcNow;
+            report.AssessorEmail = userEmail;
 
             _context.ClaimReport.Update(report);
             caseLocation.ClaimReport = report;
@@ -767,6 +771,8 @@ namespace risk.control.system.Services
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
             report.AssessorRemarkType = assessorRemarkType;
             report.AssessorRemarks = assessorRemarks;
+            report.AssessorRemarksUpdated = DateTime.UtcNow;
+            report.AssessorEmail = userEmail;
 
             _context.ClaimReport.Update(report);
             claimsCaseLocation.ClaimReport = report;
@@ -825,6 +831,8 @@ namespace risk.control.system.Services
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
             report.SupervisorRemarkType = reportUpdateStatus;
             report.SupervisorRemarks = supervisorRemarks;
+            report.SupervisorRemarksUpdated = DateTime.UtcNow;
+            report.SupervisorEmail = userEmail;
 
             _context.ClaimReport.Update(report);
             caseLocation.ClaimReport = report;
