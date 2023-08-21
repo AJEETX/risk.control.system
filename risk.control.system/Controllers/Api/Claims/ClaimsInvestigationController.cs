@@ -138,7 +138,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
                         Location = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
-                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name +"</span> ")),
+                        string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                         Created = a.Created.ToString("dd-MM-yyyy"),
                         timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString(),
                         Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false
@@ -840,6 +840,30 @@ namespace risk.control.system.Controllers.Api.Claims
             ?.ToList();
 
             return Ok(response);
+        }
+
+        [HttpGet("GetPolicyDetail")]
+        public async Task<IActionResult> GetPolicyDetail(string id)
+        {
+            var policy = await _context.PolicyDetail.FirstOrDefaultAsync(p => p.PolicyDetailId == id);
+
+            return Ok(policy);
+        }
+
+        [HttpGet("GetCustomerDetail")]
+        public async Task<IActionResult> GetCustomerDetail(string id)
+        {
+            var customer = await _context.CustomerDetail.FirstOrDefaultAsync(p => p.CustomerDetailId == id);
+
+            return Ok(customer);
+        }
+
+        [HttpGet("GetBeneficiaryDetail")]
+        public async Task<IActionResult> GetBeneficiaryDetail(long id, string claimId)
+        {
+            var beneficiary = await _context.CaseLocation.FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
+
+            return Ok(beneficiary);
         }
     }
 }

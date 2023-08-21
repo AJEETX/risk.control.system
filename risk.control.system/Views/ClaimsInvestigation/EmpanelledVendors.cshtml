@@ -57,6 +57,10 @@
                             benficiaryProgressColor = "lightgrey";
                         }
                         <div class="card-body">
+                        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+                        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+                        <input type="hidden" id="beneficiaryId" value="@Model.CaseLocation?.CaseLocationId" />
+                        <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
@@ -133,7 +137,7 @@
                                                                     else
                                                                     {
                                                                         <img id="documentImage" alt="user-avatar"
-                                                                             class="img-circle img-fluid form-Image" src="/img/document.jpeg">
+                                                                             class="img-circle img-fluid form-Image" src="/img/no-document.png">
                                                                     }
                                                                 </div>
                                                             </div>
@@ -432,13 +436,13 @@
                     content: function () {
                         var self = this;
                         return $.ajax({
-                            url: 'https://craftpip.github.io/jquery-confirm/bower.json',
+                            url: '/api/ClaimsInvestigation/GetPolicyDetail?id='+$('#policyDetailId').val(),
                             dataType: 'json',
                             method: 'get'
                         }).done(function (response) {
-                            self.setContent('Description: ' + response.description);
-                            self.setContentAppend('<br>Version: ' + response.version);
-                            self.setTitle(response.name);
+                            self.setContent('Policy #: ' + response.contractNumber);
+                            self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
+                            self.setTitle(response.causeOfLoss);
                         }).fail(function () {
                             self.setContent('Something went wrong.');
                         });
@@ -451,13 +455,13 @@
                     content: function () {
                         var self = this;
                         return $.ajax({
-                            url: 'https://craftpip.github.io/jquery-confirm/bower.json',
+                            url: '/api/ClaimsInvestigation/GetCustomerDetail?id='+$('#customerDetailId').val(),
                             dataType: 'json',
                             method: 'get'
                         }).done(function (response) {
-                            self.setContent('Description: ' + response.description);
-                            self.setContentAppend('<br>Version: ' + response.version);
-                            self.setTitle(response.name);
+                            self.setContent('Customer: ' + response.customerName);
+                            self.setContentAppend('<br>Phone #: ' + response.contactNumber);
+                            self.setTitle(response.addressline);
                         }).fail(function () {
                             self.setContent('Something went wrong.');
                         });
@@ -470,13 +474,13 @@
                     content: function () {
                         var self = this;
                         return $.ajax({
-                            url: 'https://craftpip.github.io/jquery-confirm/bower.json',
+                            url: '/api/ClaimsInvestigation/GetBeneficiaryDetail?id='+$('#beneficiaryId').val() +'&claimId='+ $('#claimId').val() ,
                             dataType: 'json',
                             method: 'get'
                         }).done(function (response) {
-                            self.setContent('Description: ' + response.description);
-                            self.setContentAppend('<br>Version: ' + response.version);
-                            self.setTitle(response.name);
+                            self.setContent('Beneficiary: ' + response.beneficiaryName);
+                            self.setContentAppend('<br>Phone #: ' + response.beneficiaryContactNumber);
+                            self.setTitle(response.beneficiaryIncome);
                         }).fail(function () {
                             self.setContent('Something went wrong.');
                         });
