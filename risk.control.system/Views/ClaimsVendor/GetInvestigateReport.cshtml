@@ -533,6 +533,21 @@
 
             $('#policy-detail').click(function () {
                 $.confirm({
+                    columnClass: 'medium',
+                    title: "Policy detail",
+                    icon: 'far fa-file-powerpoint',
+                    closeIcon: true,
+                    columnClass: 'medium',
+                    type: 'grey',
+                    buttons: {
+                        confirm: {
+                            text: "Ok",
+                            btnClass: 'btn-secondary',
+                            action: function () {
+                                askConfirmation = false;
+                            }
+                        }
+                    },
                     content: function () {
                         var self = this;
                         return $.ajax({
@@ -570,7 +585,7 @@
                     }
                 })
             })
-
+                
             $('#beneficiary-detail').click(function () {
                 $.confirm({
                     content: function () {

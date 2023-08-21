@@ -563,8 +563,9 @@
 
         $(document).ready(function () {
 
-            $('#policy-detail').on('click', function () {
+            $('#policy-detail').click(function () {
                 $.confirm({
+                    columnClass: 'medium',
                     content: function () {
                         var self = this;
                         return $.ajax({
@@ -582,8 +583,9 @@
                 })
             })
 
-            $('#customer-detail').on('click', function () {
+            $('#customer-detail').click(function () {
                 $.confirm({
+                    columnClass: 'medium',
                     content: function () {
                         var self = this;
                         return $.ajax({
@@ -601,8 +603,9 @@
                 })
             })
 
-            $('#beneficiary-detail').on('click', function () {
+            $('#beneficiary-detail').click(function () {
                 $.confirm({
+                    columnClass: 'medium',
                     content: function () {
                         var self = this;
                         return $.ajax({
@@ -619,7 +622,7 @@
                     }
                 })
             })
-            $('#policy-comments').on('click', function () {
+            $('#policy-comments').click(function () {
 
                 $.confirm({
                     title: 'Policy Note!!!',
@@ -659,7 +662,7 @@
                 });
             })
 
-            $('#customer-comments').on('click', function () {
+            $('#customer-comments').click(function () {
 
                 $.confirm({
                     title: 'Customer Note!!!',
@@ -700,7 +703,7 @@
             })
 
 
-            $('#beneficiary-comments').on('click', function () {
+            $('#beneficiary-comments').click(function () {
 
                 $.confirm({
                     title: 'Beneficiary Note!!!',
