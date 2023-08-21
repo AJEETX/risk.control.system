@@ -17,6 +17,9 @@
                 <form id="create-form" method="post">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
+                    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+                    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+                    <input type="hidden" id="beneficiaryId" value="@Model.CaseLocation?.CaseLocationId" />
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-newspaper"></i> Agency Report</h3>
@@ -149,10 +152,10 @@
                                                             </div>
                                                             <div class="card-footer">
                                                                 <div class="text-right">
-                                                                    <a href="#" class="btn btn-sm bg-teal">
+                                                                    <a id="policy-comments" class="btn btn-sm bg-teal">
                                                                         <i class="fas fa-comments"></i>
                                                                     </a>
-                                                                    <a href="#" class="btn btn-sm btn-danger">
+                                                                    <a id="policy-detail" class="btn btn-sm btn-danger">
                                                                         <i class="far fa-file-powerpoint"></i> ...
                                                                     </a>
                                                                 </div>
@@ -213,10 +216,10 @@
                                                             </div>
                                                             <div class="card-footer">
                                                                 <div class="text-right">
-                                                                    <a href="#" class="btn btn-sm bg-teal">
+                                                                    <a id="customer-comments" class="btn btn-sm bg-teal">
                                                                         <i class="fas fa-comments"></i>
                                                                     </a>
-                                                                    <a href="#" class="btn btn-sm btn-warning">
+                                                                    <a id="customer-detail" class="btn btn-sm btn-warning">
                                                                         <i class="fa fa-user-plus"></i> ...
                                                                     </a>
                                                                 </div>
@@ -274,10 +277,10 @@
                                                             </div>
                                                             <div class="card-footer">
                                                                 <div class="text-right">
-                                                                    <a href="#" class="btn btn-sm bg-teal">
+                                                                    <a id="beneficiary-comments" class="btn btn-sm bg-teal">
                                                                         <i class="fas fa-comments"></i>
                                                                     </a>
-                                                                    <a href="#" class="btn btn-sm btn-success">
+                                                                    <a id="beneficiary-detail" class="btn btn-sm btn-success">
                                                                         <i class="fas fa-user-tie"></i> ...
                                                                     </a>
                                                                 </div>
@@ -459,6 +462,185 @@
 @section Scripts    {
     <script>
         $(document).ready(function () {
+
+                       $('#policy-detail').click(function () {
+                $.confirm({
+                    content: function () {
+                        var self = this;
+                        return $.ajax({
+                            'type': 'GET',
+                            'url': '/api/ClaimsInvestigation/GetPolicyDetail?id=' + $('#policyDetailId').val(),
+                            'dataType': 'json',
+                            'success': function (response) {
+                                console.log(response);
+                                self.setContent('Policy #: ' + response.contractNumber);
+                                self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
+                                self.setTitle(response.causeOfLoss);
+                            }
+                        }, function () {
+                            //This function is for unhover.
+                        });
+                    }
+                })
+            });
+
+            $('#customer-detail').click(function () {
+                $.confirm({
+                    content: function () {
+                        var self = this;
+                        return $.ajax({
+                            url: '/api/ClaimsInvestigation/GetCustomerDetail?id=' + $('#customerDetailId').val(),
+                            dataType: 'json',
+                            method: 'get'
+                        }).done(function (response) {
+                            self.setContent('Customer: ' + response.customerName);
+                            self.setContentAppend('<br>Phone #: ' + response.contactNumber);
+                            self.setTitle(response.addressline);
+                        }).fail(function () {
+                            self.setContent('Something went wrong.');
+                        });
+                    }
+                })
+            })
+
+            $('#beneficiary-detail').click(function () {
+                $.confirm({
+                    content: function () {
+                        var self = this;
+                        return $.ajax({
+                            url: '/api/ClaimsInvestigation/GetBeneficiaryDetail?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                            dataType: 'json',
+                            method: 'get'
+                        }).done(function (response) {
+                            self.setContent('Beneficiary: ' + response.beneficiaryName);
+                            self.setContentAppend('<br>Phone #: ' + response.beneficiaryContactNumber);
+                            self.setTitle(response.beneficiaryIncome);
+                        }).fail(function () {
+                            self.setContent('Something went wrong.');
+                        });
+                    }
+                })
+            })
+            $('#policy-comments').click(function () {
+
+                $.confirm({
+                    title: 'Policy Note!!!',
+                    content: '' +
+                        '<form action="" class="formName">' +
+                        '<div class="form-group">' +
+                        '<label>Enter note about Policy</label>' +
+                        '<input type="text" placeholder="Enter note" class="name form-control" required />' +
+                        '</div>' +
+                        '</form>',
+                    buttons: {
+                        formSubmit: {
+                            text: 'Add Note',
+                            btnClass: 'btn-blue',
+                            action: function () {
+                                var name = this.$content.find('.name').val();
+                                if (!name) {
+                                    $.alert('provide a note on Policy !!!');
+                                    return false;
+                                }
+                                $.alert('Your name is ' + name);
+                            }
+                        },
+                        cancel: function () {
+                            //close
+                        },
+                    },
+                    onContentReady: function () {
+                        // bind to events
+                        var jc = this;
+                        this.$content.find('form').on('submit', function (e) {
+                            // if the user submits the form by pressing enter in the field.
+                            e.preventDefault();
+                            jc.$$formSubmit.trigger('click'); // reference the button and click it
+                        });
+                    }
+                });
+            })
+
+            $('#customer-comments').click(function () {
+
+                $.confirm({
+                    title: 'Customer Note!!!',
+                    content: '' +
+                        '<form action="" class="formName">' +
+                        '<div class="form-group">' +
+                        '<label>Enter note about Customer</label>' +
+                        '<input type="text" placeholder="Enter note" class="name form-control" required />' +
+                        '</div>' +
+                        '</form>',
+                    buttons: {
+                        formSubmit: {
+                            text: 'Add Note',
+                            btnClass: 'btn-blue',
+                            action: function () {
+                                var name = this.$content.find('.name').val();
+                                if (!name) {
+                                    $.alert('provide notes');
+                                    return false;
+                                }
+                                $.alert('Your name is ' + name);
+                            }
+                        },
+                        cancel: function () {
+                            //close
+                        },
+                    },
+                    onContentReady: function () {
+                        // bind to events
+                        var jc = this;
+                        this.$content.find('form').on('submit', function (e) {
+                            // if the user submits the form by pressing enter in the field.
+                            e.preventDefault();
+                            jc.$$formSubmit.trigger('click'); // reference the button and click it
+                        });
+                    }
+                });
+            })
+
+
+            $('#beneficiary-comments').click(function () {
+
+                $.confirm({
+                    title: 'Beneficiary Note!!!',
+                    content: '' +
+                        '<form action="" class="formName">' +
+                        '<div class="form-group">' +
+                        '<label>Enter note about Beneficiary</label>' +
+                        '<input type="text" placeholder="Enter note" class="name form-control" required />' +
+                        '</div>' +
+                        '</form>',
+                    buttons: {
+                        formSubmit: {
+                            text: 'Add Note',
+                            btnClass: 'btn-blue',
+                            action: function () {
+                                var name = this.$content.find('.name').val();
+                                if (!name) {
+                                    $.alert('provide notes');
+                                    return false;
+                                }
+                                $.alert('Your name is ' + name);
+                            }
+                        },
+                        cancel: function () {
+                            //close
+                        },
+                    },
+                    onContentReady: function () {
+                        // bind to events
+                        var jc = this;
+                        this.$content.find('form').on('submit', function (e) {
+                            // if the user submits the form by pressing enter in the field.
+                            e.preventDefault();
+                            jc.$$formSubmit.trigger('click'); // reference the button and click it
+                        });
+                    }
+                });
+            })
 
             $('#create-form').on('submit', function (e) {
                 var report = $('#assessorRemarks').val();

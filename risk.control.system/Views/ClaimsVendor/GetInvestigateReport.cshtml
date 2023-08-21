@@ -152,10 +152,10 @@
                                                             </div>
                                                             <div class="card-footer">
                                                                 <div class="text-right">
-                                                                    <a href="#" class="btn btn-sm bg-teal">
+                                                                    <a id="policy-comments" class="btn btn-sm bg-teal">
                                                                         <i class="fas fa-comments"></i>
                                                                     </a>
-                                                                    <a href="#" class="btn btn-sm btn-danger">
+                                                                    <a id="policy-detail" class="btn btn-sm btn-danger">
                                                                         <i class="far fa-file-powerpoint"></i> ...
                                                                     </a>
                                                                 </div>
@@ -216,10 +216,10 @@
                                                             </div>
                                                             <div class="card-footer">
                                                                 <div class="text-right">
-                                                                    <a href="#" class="btn btn-sm bg-teal">
+                                                                    <a id="customer-comments" class="btn btn-sm bg-teal">
                                                                         <i class="fas fa-comments"></i>
                                                                     </a>
-                                                                    <a href="#" class="btn btn-sm btn-warning">
+                                                                    <a id="customer-detail" class="btn btn-sm btn-warning">
                                                                         <i class="fa fa-user-plus"></i> ...
                                                                     </a>
                                                                 </div>
@@ -277,10 +277,10 @@
                                                             </div>
                                                             <div class="card-footer">
                                                                 <div class="text-right">
-                                                                    <a href="#" class="btn btn-sm bg-teal">
+                                                                    <a id="beneficiary-comments" class="btn btn-sm bg-teal">
                                                                         <i class="fas fa-comments"></i>
                                                                     </a>
-                                                                    <a href="#" class="btn btn-sm btn-success">
+                                                                    <a id="beneficiary-detail" class="btn btn-sm btn-success">
                                                                         <i class="fas fa-user-tie"></i> ...
                                                                     </a>
                                                                 </div>
@@ -531,26 +531,28 @@
     <script>
         $(document).ready(function () {
 
-            $('#policy-detail').on('click', function () {
+            $('#policy-detail').click(function () {
                 $.confirm({
                     content: function () {
                         var self = this;
                         return $.ajax({
-                            url: '/api/ClaimsInvestigation/GetPolicyDetail?id=' + $('#policyDetailId').val(),
-                            dataType: 'json',
-                            method: 'get'
-                        }).done(function (response) {
-                            self.setContent('Policy #: ' + response.contractNumber);
-                            self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
-                            self.setTitle(response.causeOfLoss);
-                        }).fail(function () {
-                            self.setContent('Something went wrong.');
+                            'type': 'GET',
+                            'url': '/api/ClaimsInvestigation/GetPolicyDetail?id=' + $('#policyDetailId').val(),
+                            'dataType': 'json',
+                            'success': function (response) {
+                                console.log(response);
+                                self.setContent('Policy #: ' + response.contractNumber);
+                                self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
+                                self.setTitle(response.causeOfLoss);
+                            }
+                        }, function () {
+                            //This function is for unhover.
                         });
                     }
                 })
-            })
+            });
 
-            $('#customer-detail').on('click', function () {
+            $('#customer-detail').click(function () {
                 $.confirm({
                     content: function () {
                         var self = this;
@@ -569,7 +571,7 @@
                 })
             })
 
-            $('#beneficiary-detail').on('click', function () {
+            $('#beneficiary-detail').click(function () {
                 $.confirm({
                     content: function () {
                         var self = this;
@@ -587,7 +589,7 @@
                     }
                 })
             })
-            $('#policy-comments').on('click', function () {
+            $('#policy-comments').click(function () {
 
                 $.confirm({
                     title: 'Policy Note!!!',
@@ -627,7 +629,7 @@
                 });
             })
 
-            $('#customer-comments').on('click', function () {
+            $('#customer-comments').click(function () {
 
                 $.confirm({
                     title: 'Customer Note!!!',
@@ -668,7 +670,7 @@
             })
 
 
-            $('#beneficiary-comments').on('click', function () {
+            $('#beneficiary-comments').click(function () {
 
                 $.confirm({
                     title: 'Beneficiary Note!!!',
