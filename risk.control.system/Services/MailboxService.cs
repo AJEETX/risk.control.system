@@ -84,6 +84,7 @@ namespace risk.control.system.Services
                 {
                     //ReceipientEmail = userEmailToSend,
                     Created = DateTime.UtcNow,
+                    Message = "Claim(s) allocated ",
                     Subject = "Claim(s) allocated: Policy #" + policy + " ",
                     SenderEmail = userEmail,
                     Priority = ContactMessagePriority.URGENT,
@@ -108,7 +109,14 @@ namespace risk.control.system.Services
                 _context.Mailbox.Update(recepientMailbox);
             }
 
-            var rows = await _context.SaveChangesAsync();
+            try
+            {
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task NotifyClaimAssignmentToAssigner(string senderUserEmail, List<string> claims)
@@ -153,6 +161,7 @@ namespace risk.control.system.Services
                 var contactMessage = new InboxMessage
                 {
                     //ReceipientEmail = userEmailToSend,
+                    Message = "Claim(s) assigned ",
                     Created = DateTime.UtcNow,
                     Subject = "Claim(s) assigned:",
                     SenderEmail = clientCompanyUser?.Email ?? applicationUser.Email,
@@ -184,7 +193,14 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
             }
-            var rows = await _context.SaveChangesAsync();
+            try
+            {
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task NotifyClaimAssignmentToVendorAgent(string userEmail, string claimId, string agentEmail, string vendorId, long caseLocationId)
@@ -208,8 +224,9 @@ namespace risk.control.system.Services
             var contactMessage = new InboxMessage
             {
                 //ReceipientEmail = userEmailToSend,
+                Message = "Claim tasked ",
                 Created = DateTime.UtcNow,
-                Subject = "Allocated Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
+                Subject = "Claim tasked [Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                 SenderEmail = userEmail,
                 Priority = ContactMessagePriority.URGENT,
                 SendDate = DateTime.Now,
@@ -231,7 +248,14 @@ namespace risk.control.system.Services
             recepientMailbox?.Inbox.Add(contactMessage);
             _context.Mailbox.Attach(recepientMailbox);
             _context.Mailbox.Update(recepientMailbox);
-            var rows = await _context.SaveChangesAsync();
+            try
+            {
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation)
@@ -265,9 +289,10 @@ namespace risk.control.system.Services
             var contactMessage = new InboxMessage
             {
                 //ReceipientEmail = userEmailToSend,
+                Message = "Claim created ",
                 Created = DateTime.UtcNow,
                 RawMessage = claimsUrl,
-                Subject = $"New case created: case Id = {claimsInvestigation.ClaimsInvestigationId}",
+                Subject = $"Claim created: case Id = {claimsInvestigation.ClaimsInvestigationId}",
                 SenderEmail = clientCompanyUser?.Email ?? applicationUser.Email,
                 Priority = ContactMessagePriority.NORMAL,
                 SendDate = DateTime.Now,
@@ -296,7 +321,14 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
             }
-            var rows = await _context.SaveChangesAsync();
+            try
+            {
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task NotifyClaimReportProcess(string senderUserEmail, string claimId, long caseLocationId)
@@ -336,8 +368,9 @@ namespace risk.control.system.Services
                     var contactMessage = new InboxMessage
                     {
                         //ReceipientEmail = userEmailToSend,
+                        Message = "Claim process ",
                         Created = DateTime.UtcNow,
-                        Subject = "New case(s) Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
+                        Subject = "Claim Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
                         SendDate = DateTime.Now,
@@ -360,7 +393,14 @@ namespace risk.control.system.Services
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
                 }
-                var rows = await _context.SaveChangesAsync();
+                try
+                {
+                    var rows = await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
             }
         }
 
@@ -401,8 +441,9 @@ namespace risk.control.system.Services
                     var contactMessage = new InboxMessage
                     {
                         //ReceipientEmail = userEmailToSend,
+                        Message = "Claim report ",
                         Created = DateTime.UtcNow,
-                        Subject = "New case(s) report Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
+                        Subject = "Claim report Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                         SenderEmail = senderUserEmail,
                         Priority = ContactMessagePriority.NORMAL,
                         SendDate = DateTime.Now,
@@ -425,7 +466,14 @@ namespace risk.control.system.Services
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
                 }
-                var rows = await _context.SaveChangesAsync();
+                try
+                {
+                    var rows = await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
             }
         }
 
@@ -464,8 +512,9 @@ namespace risk.control.system.Services
                 var contactMessage = new InboxMessage
                 {
                     //ReceipientEmail = userEmailToSend,
+                    Message = "Claim report ",
                     Created = DateTime.UtcNow,
-                    Subject = "New case(s) report Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
+                    Subject = "New Claim report Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
                     SenderEmail = senderUserEmail,
                     Priority = ContactMessagePriority.NORMAL,
                     SendDate = DateTime.Now,
@@ -488,7 +537,14 @@ namespace risk.control.system.Services
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
             }
-            var rows = await _context.SaveChangesAsync();
+            try
+            {
+                var rows = await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }
