@@ -27,6 +27,12 @@
         background: lightgrey;
     }
 
+    .line0 {
+        width: 100%;
+        height: 6px;
+        background: grey;
+    }
+
     .line1 {
         width: 100%;
         height: 6px;
@@ -109,18 +115,23 @@
                         }
                         string customerProgressColor = "steps2";
                         string customerLineColor = "line";
+                        if(Model.Claim.PolicyDetail !=null)
+                        {
+                            customerLineColor = "line0";
+                        }
                         if (@customerExist)
                         {
                             customerProgressColor = "steps";
                             customerLineColor = "line1";
                         }
                         string benficiaryProgressColor = "steps3";
+                        string beneficiaryLineColor = "line";
 
                         if (@customerExist)
                         {
                             benficiaryProgressColor = "steps2";
+                            beneficiaryLineColor = "line0";
                         }
-                        string beneficiaryLineColor = "line";
                         if (@customerExist && @beneficiaryExist)
                         {
                             benficiaryProgressColor = "steps";
