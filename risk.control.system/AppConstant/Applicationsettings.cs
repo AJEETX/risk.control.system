@@ -152,8 +152,8 @@
         public static class PORTAL_ADMIN
         {
             public const string DISPLAY_NAME = "ADMIN";
-            public const string CODE = "ichek-admin";
-            public const string USERNAME = "admin@ichek.co.in";
+            public const string CODE = "icheckify-admin";
+            public const string USERNAME = "admin@icheckify.co.in";
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Ajeet";
             public const string LAST_NAME = "Kumar";
