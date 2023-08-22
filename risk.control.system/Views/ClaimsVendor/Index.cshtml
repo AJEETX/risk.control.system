@@ -17,13 +17,14 @@
                                             <tr>
                                                 <th></th>
                                             <th>Id</th>
+                                            <th>Policy #</th>
                                             <th>Document</th>
-                                            <th>Customer Photo</th>
-                                            <th>Company</th>
+                                            <th>Customer</th>
                                             <th>Customer Name</th>
-                                            <th>Line Of Business</th>
-                                            <th>Status</th>
+                                            <th>Beneficiary</th>
+                                            <th>Beneficiary Name</th>
                                             <th>Claim Type</th>
+                                            <th>Status</th>
                                             <th>Stage</th>
                                             <th>Created On</th>
                                             <th>
@@ -86,8 +87,9 @@
                         }
                     },
                     {
-                        "data": "id", "name": "Id", visible: false
+                        "data": "id", "name": "Id", "bVisible": false
                     },
+                    { "data": "policyNum" },
                     {
                         "sDefaultContent": "",
                         "bSortable": false,
@@ -104,14 +106,21 @@
                             return img;
                         }
                     },
-                    { "data": "company" },
                     { "data": "name" },
-                    { "data": "policy" },
-                    { "data": "status" },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var img = '<img src="' + row.beneficiaryPhoto + '" src height="30" width="30" />';
+                            return img;
+                        }
+                    },
+                    { "data": "beneficiaryName" },
                     { "data": "serviceType" },
+                    { "data": "status" },
                     { "data": "location" },
                     { "data": "created" },
-                    { "data": "timePending" }
+                    { "data": "timePending" },
                 ],
                 error: function (xhr, status, error) { alert('err ' + error) }
             });

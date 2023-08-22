@@ -66,6 +66,7 @@ namespace risk.control.system.Services
                         existingPolicy.Updated = DateTime.UtcNow;
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
+                        existingPolicy.CurrentClaimOwner = userEmail;
                         existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
                         existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
                     }
@@ -87,6 +88,7 @@ namespace risk.control.system.Services
                             claimsInvestigation.PolicyDetail.DocumentImage = existingPolicy.PolicyDetail.DocumentImage;
                             claimsInvestigation.PolicyDetail.Document = existingPolicy.PolicyDetail.Document;
                         }
+                        claimsInvestigation.CurrentClaimOwner = userEmail;
                         var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
                         addedClaimId = aaddedClaimId.Entity.ClaimsInvestigationId;
                         if (existingPolicy == null)

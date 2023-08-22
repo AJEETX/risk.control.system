@@ -42,6 +42,9 @@ namespace risk.control.system.Models
 
         public string? CurrentUserEmail { get; set; }
         public List<CaseLocation>? CaseLocations { get; set; }
+        public List<ClaimNote>? ClaimNotes { get; set; } = new();
+        public string? CurrentClaimOwner { get; set; }
+        public List<ClaimMessage>? ClaimMessages { get; set; } = new();
 
         public override string ToString()
         {

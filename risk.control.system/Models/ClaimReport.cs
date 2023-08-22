@@ -9,6 +9,8 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ClaimReportId { get; set; } = Guid.NewGuid().ToString();
 
+        public string? VendorId { get; set; }
+        public Vendor? Vendor { get; set; }
         public string? AgentEmail { get; set; }
 
         public DateTime? AgentRemarksUpdated { get; set; }
