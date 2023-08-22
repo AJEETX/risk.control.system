@@ -197,7 +197,7 @@
                                                                     <span class="input-group-label"> Address line:</span>
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
-                                                                            <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                            <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i></span>
                                                                         </div>
                                                                         <input type="text" asp-for="Addressline2" class="form-control" placeholder="Address line (optional)" maxlength="20" />
                                                                     </div>
@@ -250,8 +250,7 @@
                     title: "Confirm Beneficary Add",
                     content: "Are you sure?",
                     icon: 'fas fa-user-tie',
-                    boxWidth: '30%',
-                    useBootstrap: false,
+                    columnClass: 'medium',
                     type: 'green',
                     closeIcon: true,
                     buttons: {
