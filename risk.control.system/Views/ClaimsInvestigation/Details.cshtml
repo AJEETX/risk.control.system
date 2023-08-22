@@ -27,6 +27,12 @@
         background: lightgrey;
     }
 
+    .line1 {
+        width: 100%;
+        height: 6px;
+        background: green;
+    }
+
     .steps {
         display: flex;
         background-color: green;
@@ -102,9 +108,11 @@
                             beneficiaryProgressbarMessage = "edit beneficiary";
                         }
                         string customerProgressColor = "steps2";
+                        string customerLineColor = "line";
                         if (@customerExist)
                         {
                             customerProgressColor = "steps";
+                            customerLineColor = "line1";
                         }
                         string benficiaryProgressColor = "steps3";
 
@@ -112,9 +120,11 @@
                         {
                             benficiaryProgressColor = "steps2";
                         }
+                        string beneficiaryLineColor = "line";
                         if (@customerExist && @beneficiaryExist)
                         {
                             benficiaryProgressColor = "steps";
+                            beneficiaryLineColor = "line1";
                         }
                         <div class="card-body">
                             <article>
@@ -130,14 +140,14 @@
                                                 <span> <i class="far fa-file-powerpoint"></i></span>
                                             </div>
 
-                                            <span class="line"></span>
+                                            <span class="@customerLineColor"></span>
 
                                             <div class="@customerProgressColor">
                                                 <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
                                             </div>
 
 
-                                            <span class="line"></span>
+                                            <span class="@beneficiaryLineColor"></span>
 
                                             <div class="@benficiaryProgressColor">
                                                 <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
