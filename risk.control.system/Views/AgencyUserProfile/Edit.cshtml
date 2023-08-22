@@ -27,7 +27,9 @@
                                         <span asp-validation-for="VendorId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
-                                        <label asp-for="ProfileImage" class="control-label"></label>
+                                        <span class="input-group-label"> Profile Photo:</span>
+                                        <div class="input-group mb-3">
+
                                         @if (Model?.ProfilePictureUrl is not null)
                                         {
                                             <img id="ProfileImage" class="profile-image" src="@Model?.ProfilePictureUrl">
@@ -38,20 +40,23 @@
                                         }
 
                                         <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        </div>
                                     </div>
                                     <div class="form-group">
+                                        <span class="input-group-label"> Email Address:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="email">Email Address</span>
+                                                <span class="input-group-text" id="email"> <i class="fas fa-at"></i></span>
                                             </div>
                                             <input readonly asp-for="Email" class="form-control readonly-input" />
                                         </div>
                                     </div>
 
                                     <div class="form-group">
+                                        <span class="input-group-label"> First Name:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="FirstName">First Name</span>
+                                                <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
                                             <input type="text" asp-for="FirstName" class="form-control" required placeholder="Enter First Name">
                                             <span asp-validation-for="FirstName" class="text-danger"></span>
@@ -59,17 +64,20 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <span class="input-group-label"> Last Name:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="LastName">Last Name</span>
+                                                <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
                                             <input type="text" asp-for="LastName" class="form-control" required placeholder="Enter Last Name">
                                             <span asp-validation-for="LastName" class="text-danger"></span>
                                         </div>
-                                    </div><div class="form-group">
+                                    </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Phone #:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="PhoneNumber">Phone Number</span>
+                                                <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
                                             <input type="number" asp-for="PhoneNumber" class="form-control" required maxlength="10" placeholder="Enter Phone Number (10 digit)" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
@@ -83,11 +91,11 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <span class="input-group-label"> Country:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" for="CountryId">Country</span>
-                                            </div>
-                                            <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                                <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>    <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)">
                                                 <option value="">--- SELECT ---</option>
                                             </select>
 
@@ -95,9 +103,10 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <span class="input-group-label"> State:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" for="StateId">State</span>
+                                                <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
                                             <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
                                                 <option value="">--- SELECT ---</option>
@@ -108,10 +117,12 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <span class="input-group-label"> District:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" for="DistrictId">District</span>
+                                                <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
+
                                             <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                                 <option>--- SELECT ---</option>
                                             </select>
@@ -121,9 +132,10 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <span class="input-group-label"> Pincode:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" for="PinCodeId">Pincode</span>
+                                                <span class="input-group-text" for="PinCodeId"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
                                             <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                                 <option value="">--- SELECT ---</option>
@@ -132,19 +144,21 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <span class="input-group-label"> Address:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Addressline">Address line</span>
+                                                <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" />
+                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Address line" />
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <span class="input-group-label"> Note:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Comments">Remarks</span>
+                                                <span class="input-group-text" id="Comments"><i class="fa fa-comment"></i> </span>
                                             </div>
-                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Enter Remarks" />
+                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Note" />
                                         </div>
                                     </div>
                                     <div class="form-group text-right">

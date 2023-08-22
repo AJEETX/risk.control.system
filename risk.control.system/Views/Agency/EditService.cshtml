@@ -26,9 +26,10 @@
                                             <span asp-validation-for="VendorId" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
+                                            <span class="input-group-label"> Line Of Business:</span>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="LineOfBusinessId">Line Of Business <i class="fa fa-asterisk asterik-style"></i></span>
+                                                    <span class="input-group-text" for="LineOfBusinessId"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)" required>
                                                     <option value="">--- SELECT ---</option>
@@ -39,9 +40,10 @@
 
 
                                         <div class="form-group">
+                                            <span class="input-group-label"> Type of Service:</span>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="InvestigationServiceTypeId">Service Type <i class="fa fa-asterisk asterik-style"></i></span>
+                                                    <span class="input-group-text" for="InvestigationServiceTypeId"><i class="fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select id="InvestigationServiceTypeId" name="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" onchange="setInvestigationServices(this)" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId" required>
                                                     <option value="">--- SELECT ---</option>
@@ -51,9 +53,10 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <span class="input-group-label"> Service Price (Rs.):</span>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="Price">Service Price (Rs.) <i class="fa fa-asterisk asterik-style"></i></span>
+                                                    <span class="input-group-text" for="Price"> <i class="fas fa-rupee-sign"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <input asp-for="Price" class="form-control" type="number" placeholder="Enter Service Price" required />
                                                 <span asp-validation-for="Price" class="text-danger"></span>
@@ -63,9 +66,10 @@
                                     <div class="col-md-6">
 
                                         <div class="form-group">
+                                            <span class="input-group-label"> Country:</span>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="CountryId">Country <i class="fa fa-asterisk asterik-style"></i></span>
+                                                    <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)" required>
                                                     <option>--- SELECT ---</option>
@@ -76,9 +80,10 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <span class="input-group-label"> State:</span>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="CountryId">State <i class="fa fa-asterisk asterik-style"></i></span>
+                                                    <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)" required>
                                                     <option>--- SELECT ---</option>
@@ -87,9 +92,10 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
+                                            <span class="input-group-label"> District:</span>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" for="DistrictId">District <i class="fa fa-asterisk asterik-style"></i></span>
+                                                    <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId')" required>
                                                     <option>--- SELECT ---</option>
