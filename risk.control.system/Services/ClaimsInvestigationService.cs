@@ -821,6 +821,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var claim = _context.ClaimsInvestigation
+                .Include(c => c.Vendor)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
             claim.Updated = DateTime.UtcNow;
@@ -835,7 +836,7 @@ namespace risk.control.system.Services
             report.SupervisorRemarks = supervisorRemarks;
             report.SupervisorRemarksUpdated = DateTime.UtcNow;
             report.SupervisorEmail = userEmail;
-
+            report.Vendor = claim.Vendor;
             _context.ClaimReport.Update(report);
             caseLocation.ClaimReport = report;
             caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
