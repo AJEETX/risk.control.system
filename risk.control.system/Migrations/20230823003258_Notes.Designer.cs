@@ -11,14 +11,14 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230821000014_ReSeed")]
-    partial class ReSeed
+    [Migration("20230823003258_Notes")]
+    partial class Notes
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.9");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.10");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
                 {
@@ -537,9 +537,6 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("CaseLocationId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("ClaimsInvestigationId")
                         .HasColumnType("TEXT");
 
@@ -554,9 +551,47 @@ namespace risk.control.system.Migrations
 
                     b.HasKey("ClaimMessageId");
 
-                    b.HasIndex("CaseLocationId");
+                    b.HasIndex("ClaimsInvestigationId");
 
                     b.ToTable("ClaimMessage");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ClaimNote", b =>
+                {
+                    b.Property<string>("ClaimNoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClaimsInvestigationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ParentClaimNoteClaimNoteId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Sender")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ClaimNoteId");
+
+                    b.HasIndex("ClaimsInvestigationId");
+
+                    b.HasIndex("ParentClaimNoteClaimNoteId");
+
+                    b.ToTable("ClaimNote");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimReport", b =>
@@ -634,12 +669,17 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("SupervisorRemarksUpdated")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("VendorId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("ClaimReportId");
 
                     b.HasIndex("AgentReportId");
 
                     b.HasIndex("CaseLocationId")
                         .IsUnique();
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("ClaimReport");
                 });
@@ -654,6 +694,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurrentClaimOwner")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CurrentUserEmail")
@@ -2471,9 +2514,22 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ClaimMessage", b =>
                 {
-                    b.HasOne("risk.control.system.Models.CaseLocation", null)
+                    b.HasOne("risk.control.system.Models.ClaimsInvestigation", null)
                         .WithMany("ClaimMessages")
-                        .HasForeignKey("CaseLocationId");
+                        .HasForeignKey("ClaimsInvestigationId");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ClaimNote", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ClaimsInvestigation", null)
+                        .WithMany("ClaimNotes")
+                        .HasForeignKey("ClaimsInvestigationId");
+
+                    b.HasOne("risk.control.system.Models.ClaimNote", "ParentClaimNote")
+                        .WithMany()
+                        .HasForeignKey("ParentClaimNoteClaimNoteId");
+
+                    b.Navigation("ParentClaimNote");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimReport", b =>
@@ -2488,9 +2544,15 @@ namespace risk.control.system.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("risk.control.system.Models.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId");
+
                     b.Navigation("AgentReport");
 
                     b.Navigation("CaseLocation");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
@@ -3000,14 +3062,16 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.CaseLocation", b =>
                 {
-                    b.Navigation("ClaimMessages");
-
                     b.Navigation("ClaimReport");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>
                 {
                     b.Navigation("CaseLocations");
+
+                    b.Navigation("ClaimMessages");
+
+                    b.Navigation("ClaimNotes");
 
                     b.Navigation("Vendors");
                 });
