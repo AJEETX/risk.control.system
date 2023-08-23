@@ -630,6 +630,7 @@ namespace risk.control.system.Controllers
 
             var location = await _context.CaseLocation
                 .Include(l => l.ClaimReport)
+                .Include(l => l.Vendor)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
 
             if (claimsInvestigation == null)

@@ -224,6 +224,9 @@
                                                 </div>
 
                                             </div>
+                                            <header class="bb-blog-header">
+                                                <h5 class="bb-blog-title" itemprop="name"> @Model.Location.Vendor.Name Report</h5>
+                                            </header>
                                             <div class="row">
                                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                     <div class="card bg-light d-flex flex-fill">
@@ -285,12 +288,16 @@
                                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                     <div class="card bg-light d-flex flex-fill">
                                                         <div class="card-header text-muted border-bottom-0">
-                                                            <i class="fas fa-user-shield"></i> Agent remarks <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AgentRemarksUpdated</span>
+                                                            <i class="fas fa-user-shield"></i> Agent  <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AgentRemarksUpdated</span>
                                                         </div>
                                                         <div class="card-body pt-0">
                                                             <div class="row">
                                                                 <div class="col-12">
+                                                                    <h2 class="lead"><b> @Model?.Location?.ClaimReport.AgentEmail</b></h2>
+                                                                    <p class="text-muted text-sm">
 
+                                                                        <b>Agent remarks: </b>
+                                                                    </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
 
                                                                         <li class="small">
@@ -301,6 +308,7 @@
                                                                         </li>
                                                                     </ul>
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -308,14 +316,17 @@
                                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                     <div class="card bg-light d-flex flex-fill">
                                                         <div class="card-header text-muted border-bottom-0">
-                                                            <i class="fas fa-user-edit"></i> Supervisor comments <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.SupervisorRemarksUpdated</span>
+                                                            <i class="fas fa-user-edit"></i> Supervisor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.SupervisorRemarksUpdated</span>
                                                         </div>
                                                         <div class="card-body pt-0">
                                                             <div class="row">
                                                                 <div class="col-12">
+                                                                    <h2 class="lead"><b> @Model?.Location?.ClaimReport.SupervisorEmail</b></h2>
+                                                                    <p class="text-muted text-sm">
 
+                                                                        <b>Supervisor comments: </b>
+                                                                    </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
-
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="far fa-comment"></i>
@@ -334,12 +345,12 @@
                                                 <div class="col-12 d-flex align-items-stretch flex-column">
                                                     <div class="card bg-light d-flex flex-fill">
                                                         <div class="card-header text-muted border-bottom-0">
-                                                            <i class="fas fa-user-check"></i> Assessor Remarks <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AssessorRemarksUpdated</span>
+                                                            <i class="fas fa-user-check"></i> Assessor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AssessorRemarksUpdated</span>
                                                         </div>
                                                         <div class="card-body pt-0">
                                                             <div class="row">
                                                                 <div class="col-12">
-                                                                    <h2 class="lead"><b> @Model?.Location?.BeneficiaryName</b></h2>
+                                                                    <h2 class="lead"><b> @Model?.Location?.ClaimReport.AssessorEmail</b></h2>
                                                                     <p class="text-muted text-sm">
 
                                                                         <b>Assessor remarks: </b>
@@ -353,6 +364,7 @@
                                                                         </li>
                                                                     </ul>
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     </div>
