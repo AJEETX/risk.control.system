@@ -222,27 +222,27 @@ namespace risk.control.system.Services
                             existingPolicy.CustomerDetail.ProfilePicture = dataStream.ToArray();
                         }
 
-                        var lastLog = _context.InvestigationTransaction
-                            .Where(i =>
-                                i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                                .OrderByDescending(o => o.Created)?.FirstOrDefault();
-                        var lastLogHop = _context.InvestigationTransaction
-                            .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                            .AsNoTracking().Max(s => s.HopCount);
+                        //var lastLog = _context.InvestigationTransaction
+                        //    .Where(i =>
+                        //        i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                        //        .OrderByDescending(o => o.Created)?.FirstOrDefault();
+                        //var lastLogHop = _context.InvestigationTransaction
+                        //    .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                        //    .AsNoTracking().Max(s => s.HopCount);
 
-                        var log = new InvestigationTransaction
-                        {
-                            HopCount = lastLogHop + 1,
-                            Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
-                            ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                            Created = DateTime.UtcNow,
+                        //var log = new InvestigationTransaction
+                        //{
+                        //    HopCount = lastLogHop + 1,
+                        //    Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                        //    ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                        //    Created = DateTime.UtcNow,
 
-                            InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                            InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
-                            UpdatedBy = userEmail
-                        };
+                        //    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                        //    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                        //    UpdatedBy = userEmail
+                        //};
 
-                        _context.InvestigationTransaction.Add(log);
+                        //_context.InvestigationTransaction.Add(log);
                         _context.ClaimsInvestigation.Update(existingPolicy);
 
                         await _context.SaveChangesAsync();
@@ -307,27 +307,27 @@ namespace risk.control.system.Services
                         var addedClaim = _context.CustomerDetail.Update(claimsInvestigation.CustomerDetail);
                         existingPolicy.CustomerDetail = addedClaim.Entity;
                     }
-                    var lastLog = _context.InvestigationTransaction
-                        .Where(i =>
-                            i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                            .OrderByDescending(o => o.Created)?.FirstOrDefault();
-                    var lastLogHop = _context.InvestigationTransaction
-                        .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                        .AsNoTracking().Max(s => s.HopCount);
+                    //var lastLog = _context.InvestigationTransaction
+                    //    .Where(i =>
+                    //        i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                    //        .OrderByDescending(o => o.Created)?.FirstOrDefault();
+                    //var lastLogHop = _context.InvestigationTransaction
+                    //    .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
+                    //    .AsNoTracking().Max(s => s.HopCount);
 
-                    var log = new InvestigationTransaction
-                    {
-                        HopCount = lastLogHop + 1,
-                        Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
-                        ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                        Created = DateTime.UtcNow,
+                    //var log = new InvestigationTransaction
+                    //{
+                    //    HopCount = lastLogHop + 1,
+                    //    Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
+                    //    ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
+                    //    Created = DateTime.UtcNow,
 
-                        InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                        InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
-                        UpdatedBy = userEmail
-                    };
+                    //    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                    //    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                    //    UpdatedBy = userEmail
+                    //};
 
-                    _context.InvestigationTransaction.Add(log);
+                    //_context.InvestigationTransaction.Add(log);
                     _context.ClaimsInvestigation.Update(existingPolicy);
 
                     await _context.SaveChangesAsync();

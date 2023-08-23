@@ -21,10 +21,16 @@
         margin:1rem 0;
     }
 
-    .line {
+    .line-grey {
         width: 100%;
         height: 6px;
         background: lightgrey;
+    }
+
+    .line-green {
+        width: 100%;
+        height: 6px;
+        background: green;
     }
 
     .steps {
@@ -87,6 +93,63 @@
                             @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
                             var age = DateTime.Now.Subtract(Model.Claim.CustomerDetail.CustomerDateOfBirth).TotalDays;
                             currentAgeinYrs = (int)age / 365;
+                        }
+                        string created = "steps";
+                        string createdLine = "line-green";
+                        string assignedLine = "line=green";
+                        string assigned = "steps";
+                        string allocated = "steps";
+                        string allocatedLine = "line-green";
+                        string tasked = "steps";
+                        string taskedLine = "line-grey";
+                        string investigatedLine = "line-green";
+                        string investigated = "steps";
+                        string submittedLine = "line-green";
+                        string submitted = "steps";
+                        string approved = "steps";
+                        string approvedLine = "line-green";
+
+
+
+
+                        if (Model.Log.Count > 0)
+                        {
+                            var statuses = Model.Log.Select(s => s.InvestigationCaseSubStatus.Name);
+                            if(!statuses.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR))
+                            {
+                                approved = "steps2";
+                                approved = "line-grey";
+                            }
+                            if (!statuses.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR))
+                            {
+                                submitted = "steps2";
+                                submittedLine = "line-grey";
+                            }
+                            if (!statuses.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR))
+                            {
+                                investigated = "steps2";
+                                investigatedLine  = "line-grey"; ;
+                            }
+                            if (!statuses.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT))
+                            {
+                                taskedLine = "line-green"; ;
+                                tasked = "steps2";
+                            }
+                            if (!statuses.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR))
+                            {
+                                allocatedLine = "line-grey";
+                                allocated = "steps2";
+                            }
+                            if (!statuses.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER))
+                            {
+                                assignedLine = "line-grey";
+                                assigned = "steps2";
+                            }
+                            if (!statuses.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR))
+                            {
+                                createdLine = "line-grey";
+                                created = "steps2";
+                            }
                         }
 
                         <div class="card-body">
@@ -462,42 +525,37 @@
                                             <div class="progresses">
 
                                                 <span class="font-weight-bold badge badge-success"><i class="fa fa-check-circle"></i> </span>
-                                                <div class="steps steps1">
+                                                <div class="steps @created">
                                                     <span> <i class="far fa-file-powerpoint"></i></span>
                                                 </div>
-
-                                                <span class="line"></span>
-
+                                                <span class="@createdLine"></span>
+                                                
                                                 <span class="font-weight-bold badge badge-success"><i class="fa fa-check-circle"></i> </span>
-                                                <div class="steps steps1">
+                                                <div class="steps @assigned">
                                                     <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
                                                 </div>
+                                                <span class="@allocatedLine"></span>
 
-
-                                                <span class="line"></span>
                                                 <span class="font-weight-bold badge badge-success"><i class="fa fa-check-circle"></i> </span>
-
-                                                <div class="steps steps1">
+                                                <div class="steps @allocated">
                                                     <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
                                                 </div>
-                                                <span class="line"></span>
-
-                                                <div class="steps steps4">
+                                                <div class="steps @tasked">
                                                     <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
                                                 </div>
-                                                <span class="line"></span>
+                                                <span class="@submitted"></span>
 
-                                                <div class="steps steps5">
+                                                <div class="steps @investigatedLine">
                                                     <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
                                                 </div>
-                                                <span class="line"></span>
+                                                <span class="@approved"></span>
 
-                                                <div class="steps steps6">
+                                                <div class="steps @submittedLine">
                                                     <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
                                                 </div>
-                                                <span class="line"></span>
+                                                <span class="@approvedLine"></span>
 
-                                                <div class="steps steps7">
+                                                <div class="steps @approved">
                                                     <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
                                                 </div>
                                             </div>
