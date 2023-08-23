@@ -1254,7 +1254,7 @@ namespace risk.control.system.Controllers
 
             //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
-            toastNotification.AddSuccessToastMessage("Policy edited successfully!");
+            toastNotification.AddSuccessToastMessage("Customer added successfully!");
 
             return RedirectToAction(nameof(Details), new { id = claimId });
         }
@@ -1343,7 +1343,7 @@ namespace risk.control.system.Controllers
 
             //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
-            toastNotification.AddSuccessToastMessage("Policy edited successfully!");
+            toastNotification.AddSuccessToastMessage("Customer edited successfully!");
 
             return RedirectToAction(nameof(Details), new { id = claimId });
         }

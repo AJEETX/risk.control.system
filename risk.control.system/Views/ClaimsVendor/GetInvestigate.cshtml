@@ -139,7 +139,7 @@
                                                                         else
                                                                         {
                                                                             <img id="documentImage" alt="user-avatar"
-                                                                                 class="img-circle img-fluid form-Image" src="/img/document.jpeg">
+                                                                                 class="img-circle img-fluid form-Image" src="/img/no-policy.jpg">
                                                                         }
                                                                     </div>
                                                                 </div>
@@ -348,27 +348,25 @@
                                                                     <div class="col-6 text-center">
                                                                         Location: <i class="fas fa-rupee-sign"></i>
                                                                         @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            if (Model.CaseLocation.ProfilePicture!= null)
                                                                             {
-                                                                                <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                                <img id="agentLocationPicture" class=" img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseLocation.ProfilePicture))">
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img id="documentImage" alt="user-avatar"
-                                                                                     class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                                <img id="agentLocationPicture" alt="user-avatar" class="img-fluid form-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                         <br />
                                                                         OCR Doc: <i class="fas fa-rupee-sign"></i>
                                                                         @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
                                                                             {
-                                                                                <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                                <img id="agentOcrPicture" class="img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img id="documentImage" alt="user-avatar"
-                                                                                     class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                                <img id="agentOcrPicture" alt="user-avatar" class="img-fluid form-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                     </div>
@@ -457,185 +455,6 @@
         $('#remarks').focus();
         $(document).ready(function () {
             $('#remarks').focus();
-
-            $('#policy-detail').click(function () {
-                $.confirm({
-                    content: function () {
-                        var self = this;
-                        return $.ajax({
-                            'type': 'GET',
-                            'url': '/api/ClaimsInvestigation/GetPolicyDetail?id=' + $('#policyDetailId').val(),
-                            'dataType': 'json',
-                            'success': function (response) {
-                                console.log(response);
-                                self.setContent('Policy #: ' + response.contractNumber);
-                                self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
-                                self.setTitle(response.causeOfLoss);
-                            }
-                        }, function () {
-                            //This function is for unhover.
-                        });
-                    }
-                })
-            });
-
-            $('#customer-detail').click(function () {
-                $.confirm({
-                    content: function () {
-                        var self = this;
-                        return $.ajax({
-                            url: '/api/ClaimsInvestigation/GetCustomerDetail?id=' + $('#customerDetailId').val(),
-                            dataType: 'json',
-                            method: 'get'
-                        }).done(function (response) {
-                            self.setContent('Customer: ' + response.customerName);
-                            self.setContentAppend('<br>Phone #: ' + response.contactNumber);
-                            self.setTitle(response.addressline);
-                        }).fail(function () {
-                            self.setContent('Something went wrong.');
-                        });
-                    }
-                })
-            })
-
-            $('#beneficiary-detail').click(function () {
-                $.confirm({
-                    content: function () {
-                        var self = this;
-                        return $.ajax({
-                            url: '/api/ClaimsInvestigation/GetBeneficiaryDetail?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
-                            dataType: 'json',
-                            method: 'get'
-                        }).done(function (response) {
-                            self.setContent('Beneficiary: ' + response.beneficiaryName);
-                            self.setContentAppend('<br>Phone #: ' + response.beneficiaryContactNumber);
-                            self.setTitle(response.beneficiaryIncome);
-                        }).fail(function () {
-                            self.setContent('Something went wrong.');
-                        });
-                    }
-                })
-            })
-            $('#policy-comments').click(function () {
-
-                $.confirm({
-                    title: 'Policy Note!!!',
-                    content: '' +
-                        '<form action="" class="formName">' +
-                        '<div class="form-group">' +
-                        '<label>Enter note about Policy</label>' +
-                        '<input type="text" placeholder="Enter note" class="name form-control" required />' +
-                        '</div>' +
-                        '</form>',
-                    buttons: {
-                        formSubmit: {
-                            text: 'Add Note',
-                            btnClass: 'btn-blue',
-                            action: function () {
-                                var name = this.$content.find('.name').val();
-                                if (!name) {
-                                    $.alert('provide a note on Policy !!!');
-                                    return false;
-                                }
-                                $.alert('Your name is ' + name);
-                            }
-                        },
-                        cancel: function () {
-                            //close
-                        },
-                    },
-                    onContentReady: function () {
-                        // bind to events
-                        var jc = this;
-                        this.$content.find('form').on('submit', function (e) {
-                            // if the user submits the form by pressing enter in the field.
-                            e.preventDefault();
-                            jc.$$formSubmit.trigger('click'); // reference the button and click it
-                        });
-                    }
-                });
-            })
-
-            $('#customer-comments').click(function () {
-
-                $.confirm({
-                    title: 'Customer Note!!!',
-                    content: '' +
-                        '<form action="" class="formName">' +
-                        '<div class="form-group">' +
-                        '<label>Enter note about Customer</label>' +
-                        '<input type="text" placeholder="Enter note" class="name form-control" required />' +
-                        '</div>' +
-                        '</form>',
-                    buttons: {
-                        formSubmit: {
-                            text: 'Add Note',
-                            btnClass: 'btn-blue',
-                            action: function () {
-                                var name = this.$content.find('.name').val();
-                                if (!name) {
-                                    $.alert('provide notes');
-                                    return false;
-                                }
-                                $.alert('Your name is ' + name);
-                            }
-                        },
-                        cancel: function () {
-                            //close
-                        },
-                    },
-                    onContentReady: function () {
-                        // bind to events
-                        var jc = this;
-                        this.$content.find('form').on('submit', function (e) {
-                            // if the user submits the form by pressing enter in the field.
-                            e.preventDefault();
-                            jc.$$formSubmit.trigger('click'); // reference the button and click it
-                        });
-                    }
-                });
-            })
-
-
-            $('#beneficiary-comments').click(function () {
-
-                $.confirm({
-                    title: 'Beneficiary Note!!!',
-                    content: '' +
-                        '<form action="" class="formName">' +
-                        '<div class="form-group">' +
-                        '<label>Enter note about Beneficiary</label>' +
-                        '<input type="text" placeholder="Enter note" class="name form-control" required />' +
-                        '</div>' +
-                        '</form>',
-                    buttons: {
-                        formSubmit: {
-                            text: 'Add Note',
-                            btnClass: 'btn-blue',
-                            action: function () {
-                                var name = this.$content.find('.name').val();
-                                if (!name) {
-                                    $.alert('provide notes');
-                                    return false;
-                                }
-                                $.alert('Your name is ' + name);
-                            }
-                        },
-                        cancel: function () {
-                            //close
-                        },
-                    },
-                    onContentReady: function () {
-                        // bind to events
-                        var jc = this;
-                        this.$content.find('form').on('submit', function (e) {
-                            // if the user submits the form by pressing enter in the field.
-                            e.preventDefault();
-                            jc.$$formSubmit.trigger('click'); // reference the button and click it
-                        });
-                    }
-                });
-            })
 
             //Add a JQuery click event handler onto our checkbox.
             $('#terms_and_conditions').click(function () {

@@ -936,9 +936,31 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetBeneficiaryDetail")]
         public async Task<IActionResult> GetBeneficiaryDetail(long id, string claimId)
         {
-            var beneficiary = await _context.CaseLocation.FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
+            var beneficiary = await _context.CaseLocation
+                .Include(c => c.ClaimReport)
+                .FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
 
             return Ok(beneficiary);
+        }
+
+        [HttpGet("GetInvestigationData")]
+        public async Task<IActionResult> GetInvestigationData(long id, string claimId)
+        {
+            var beneficiary = await _context.CaseLocation
+                .Include(c => c.ClaimReport)
+                .FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
+            var data = new
+            {
+                Title = "Investigation Data",
+                QrData = beneficiary.ClaimReport?.QrData,
+                LatLong = beneficiary.ClaimReport?.LongLat,
+                Location = beneficiary.ClaimReport?.AgentLocationPicture != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentLocationPicture)) : "/img/no-photo.png",
+                OcrData = beneficiary.ClaimReport?.AgentOcrPicture != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentOcrPicture)) : "/img/no-photo.png"
+            };
+
+            return Ok(data);
         }
     }
 }
