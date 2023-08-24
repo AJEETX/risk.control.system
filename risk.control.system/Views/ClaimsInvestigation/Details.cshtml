@@ -87,6 +87,7 @@
                         string address = string.Empty;
                         string baddress = string.Empty;
                         int currentAgeinYrs = 0;
+                        bool policyExist = true;
                         bool customerExist = false;
                         bool beneficiaryExist = false;
                         string customerProgressbarMessage = "add customer";
@@ -246,148 +247,278 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                                    <div class="card bg-light d-flex flex-fill">
-                                                        <div class="card-header text-muted border-bottom-0">
-                                                            <i class="fa fa-user-plus"></i> Customer Details
-                                                        </div>
-                                                        <div class="card-body pt-0">
-                                                            <div class="row">
-                                                                <div class="col-7">
-                                                                    <h2 class="lead"><b>@Model.Claim?.CustomerDetail?.CustomerName</b></h2>
-                                                                    <p class="text-muted text-sm">
-                                                                        <b>Occupation: </b> @Model.Claim?.CustomerDetail?.CustomerOccupation
-                                                                    </p>
-                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                                        <li class="small">
-                                                                            <span class="fa-li">
-                                                                                <i class="fas fa-rupee-sign"></i>
-                                                                            </span>
-                                                                            Income: @Model.Claim?.CustomerDetail?.CustomerIncome
-                                                                        </li>
-                                                                        <li class="small">
-                                                                            <span class="fa-li">
-                                                                                <i class="fas fa-rupee-sign"></i>
-                                                                            </span>
-                                                                            Age: @currentAgeinYrs
-                                                                        </li>
-                                                                        <li class="small">
-                                                                            <span class="fa-li">
-                                                                                <i class="fas fa-lg fa-building"></i>
-                                                                            </span>
-                                                                            Address: @address
-                                                                        </li>
-
-                                                                        <li class="small">
-                                                                            <span class="fa-li">
-                                                                                <i class="fas fa-lg fa-phone"></i>
-                                                                            </span>
-                                                                            Phone #: + @Model.Claim?.CustomerDetail?.ContactNumber
-                                                                        </li>
-                                                                    </ul>
+                                                
+                                                @{
+                                                    if(@customerExist)
+                                                    {
+                                                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                            <div class="card bg-light d-flex flex-fill">
+                                                                <div class="card-header text-muted border-bottom-0">
+                                                                    <i class="fa fa-user-plus"></i> Customer Details
                                                                 </div>
-                                                                <div class="col-5 text-center">
-                                                                    @if (Model?.Claim?.CustomerDetail?.ProfilePicture is not null)
-                                                                    {
-                                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim?.CustomerDetail?.ProfilePicture))">
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <img id="profileImage" class="form-Image" src="/img/user.png">
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-footer">
-                                                            <div class="text-right">
-                                                                @{
-                                                                    if (Model.Claim?.CustomerDetail != null)
-                                                                    {
-                                                                        <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
-                                                                        <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="EditCustomer" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i>  Edit Customer</a>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="CreateCustomer" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i> Add Customer</a>
-                                                                    }
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                                <div class="card-body pt-0">
+                                                                    <div class="row">
+                                                                        <div class="col-7">
+                                                                            <h2 class="lead"><b>@Model.Claim?.CustomerDetail?.CustomerName</b></h2>
+                                                                            <p class="text-muted text-sm">
+                                                                                <b>Occupation: </b> @Model.Claim?.CustomerDetail?.CustomerOccupation
+                                                                            </p>
+                                                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                        <i class="fas fa-rupee-sign"></i>
+                                                                                    </span>
+                                                                                    Income: @Model.Claim?.CustomerDetail?.CustomerIncome
+                                                                                </li>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                        <i class="fas fa-rupee-sign"></i>
+                                                                                    </span>
+                                                                                    Age: @currentAgeinYrs
+                                                                                </li>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                        <i class="fas fa-lg fa-building"></i>
+                                                                                    </span>
+                                                                                    Address: @address
+                                                                                </li>
 
-                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                                    <div class="card bg-light d-flex flex-fill">
-                                                        <div class="card-header text-muted border-bottom-0">
-                                                            <i class="fas fa-user-tie"></i>  Beneficiary Details
-                                                        </div>
-                                                        <div class="card-body pt-0">
-                                                            <div class="row">
-                                                                <div class="col-7">
-                                                                    <h2 class="lead"><b>@Model.Location?.BeneficiaryName</b></h2>
-                                                                    <p class="text-muted text-sm">
-                                                                        <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
-                                                                    </p>
-                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                                        <li class="small">
-                                                                            <span class="fa-li">
-                                                                                <i class="fas fa-rupee-sign"></i>
-                                                                            </span>
-                                                                            Income: @Model.Location?.BeneficiaryIncome
-                                                                        </li>
-                                                                        <li class="small">
-                                                                            <span class="fa-li">
-                                                                                <i class="fas fa-lg fa-building"></i>
-                                                                            </span>
-                                                                            Address: @baddress
-                                                                        </li>
-                                                                        <li class="small">
-                                                                            <span class="fa-li">
-                                                                                <i class="fas fa-lg fa-phone"></i>
-                                                                            </span>
-                                                                            Phone #: + @Model.Location?.BeneficiaryContactNumber
-                                                                        </li>
-                                                                    </ul>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                        <i class="fas fa-lg fa-phone"></i>
+                                                                                    </span>
+                                                                                    Phone #: + @Model.Claim?.CustomerDetail?.ContactNumber
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="col-5 text-center">
+                                                                            @if (Model?.Claim?.CustomerDetail?.ProfilePicture is not null)
+                                                                            {
+                                                                                <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim?.CustomerDetail?.ProfilePicture))">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <img id="profileImage" class="form-Image" src="/img/user.png">
+                                                                            }
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div class="col-5 text-center">
-
-                                                                    @if (Model?.Location?.ProfilePicture is not null)
-                                                                    {
-                                                                        <img id="profileImage" alt="user-avatar"
-                                                                             class="img-circle img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <img class="form-Image" id="profileImage" src="/img/user.png">
-                                                                    }
-
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-footer">
-                                                            <div class="text-right">
-                                                                @{
-                                                                    if(Model.Claim?.CustomerDetail !=null)
-                                                                    {
-                                                                        if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
-                                                                        {
-                                                                            <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
-                                                                            <a class="btn btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@Model.Location.CaseLocationId"><i class="fas fa-user-tie"></i> Edit Beneficiary</a>
+                                                                <div class="card-footer">
+                                                                    <div class="text-right">
+                                                                        @{
+                                                                            if (Model.Claim?.CustomerDetail != null)
+                                                                            {
+                                                                                <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                                <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="EditCustomer" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i>  Edit Customer</a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="CreateCustomer" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i> Add Customer</a>
+                                                                            }
                                                                         }
-                                                                        else
-                                                                        {
-                                                                            <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
-                                                                        }
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary"><i class="fas fa-user-tie"></i> Beneficiary</a>
-                                                                    }
-                                                                }
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                            <div class="card bg-light d-flex flex-fill">
+                                                                <div class="card-header text-muted border-bottom-0">
+                                                                    <i class="fa fa-user-plus"></i> Customer Details
+                                                                </div>
+                                                                <div class="card-body pt-0">
+                                                                    <div class="row">
+                                                                        <div class="col-7">
+                                                                            <h2 class="lead" style="color:lightgray"><b></b></h2>
+                                                                            <p class="text-muted text-sm">
+                                                                                <b style="color:lightgray"></b>
+                                                                            </p>
+                                                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                    </span>
+                                                                                </li>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                    </span>
+                                                                                </li>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                    </span>
+                                                                                </li>
+
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                    </span>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="col-5 text-center">
+                                                                            <img id="profileImage" class="form-Image" src="/img/user.png">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    <div class="text-right">
+                                                                        @{
+                                                                            if (Model.Claim?.CustomerDetail != null)
+                                                                            {
+                                                                                <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                                <a class="btn btn-warning" asp-controller="ClaimsInvestigation" asp-action="EditCustomer" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i>  Edit Customer</a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <a class="btn btn-success" asp-controller="ClaimsInvestigation" asp-action="CreateCustomer" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fa fa-user-plus"></i> Add Customer</a>
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+
+
+
+
+                                                    if(@customerExist && @beneficiaryExist)
+                                                    {
+                                                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                            <div class="card bg-light d-flex flex-fill">
+                                                                <div class="card-header text-muted border-bottom-0">
+                                                                    <i class="fas fa-user-tie"></i>  Beneficiary Details
+                                                                </div>
+                                                                <div class="card-body pt-0">
+                                                                    <div class="row">
+                                                                        <div class="col-7">
+                                                                            <h2 class="lead"><b>@Model.Location?.BeneficiaryName</b></h2>
+                                                                            <p class="text-muted text-sm">
+                                                                                <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
+                                                                            </p>
+                                                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                        <i class="fas fa-rupee-sign"></i>
+                                                                                    </span>
+                                                                                    Income: @Model.Location?.BeneficiaryIncome
+                                                                                </li>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                        <i class="fas fa-lg fa-building"></i>
+                                                                                    </span>
+                                                                                    Address: @baddress
+                                                                                </li>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                        <i class="fas fa-lg fa-phone"></i>
+                                                                                    </span>
+                                                                                    Phone #: + @Model.Location?.BeneficiaryContactNumber
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="col-5 text-center">
+
+                                                                            @if (Model?.Location?.ProfilePicture is not null)
+                                                                            {
+                                                                                <img id="profileImage" alt="user-avatar"
+                                                                                     class="img-circle img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <img class="form-Image" id="profileImage" src="/img/user.png">
+                                                                            }
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    <div class="text-right">
+                                                                        @{
+                                                                            if (Model.Claim?.CustomerDetail != null)
+                                                                            {
+                                                                                if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
+                                                                                {
+                                                                                    <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                                    <a class="btn btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@Model.Location.CaseLocationId"><i class="fas fa-user-tie"></i> Edit Beneficiary</a>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary"><i class="fas fa-user-tie"></i> Beneficiary</a>
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                            <div class="card bg-light d-flex flex-fill">
+                                                                <div class="card-header text-muted border-bottom-0">
+                                                                    <i class="fas fa-user-tie"></i>  Beneficiary Details
+                                                                </div>
+                                                                <div class="card-body pt-0">
+                                                                    <div class="row">
+                                                                        <div class="col-7">
+                                                                            <h2 class="lead" style="color:lightgray"><b></b></h2>
+                                                                            <p class="text-muted text-sm">
+                                                                                <b style="color:lightgray"></b>
+                                                                            </p>
+                                                                            <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                    </span>
+                                                                                </li>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                    </span>
+                                                                                </li>
+                                                                                <li class="small">
+                                                                                    <span class="fa-li">
+                                                                                    </span>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="col-5 text-center">
+
+                                                                            <img class="form-Image" id="profileImage" src="/img/user.png">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    <div class="text-right">
+                                                                        @{
+                                                                            if (Model.Claim?.CustomerDetail != null)
+                                                                            {
+                                                                                if (Model.Claim?.CaseLocations != null && Model.Claim?.CaseLocations.Count > 0)
+                                                                                {
+                                                                                    <input type="hidden" asp-for="Claim.ClaimsInvestigationId" />
+                                                                                    <a class="btn btn-warning" asp-controller="CaseLocations" asp-action="Edit" asp-route-id="@Model.Location.CaseLocationId"><i class="fas fa-user-tie"></i> Edit Beneficiary</a>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <a class="btn btn-success" asp-controller="CaseLocations" asp-action="Create" asp-route-id="@Model.Claim.ClaimsInvestigationId"><i class="fas fa-user-tie"></i> Add Beneficiary</a>
+                                                                                }
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <a style="pointer-events:none;color:grey;" class="btn btn-outline-secondary"><i class="fas fa-user-tie"></i> Beneficiary</a>
+                                                                            }
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                                
 
                                             </div>
                                         </div>
