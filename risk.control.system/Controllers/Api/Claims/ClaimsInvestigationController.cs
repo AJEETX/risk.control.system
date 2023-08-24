@@ -851,7 +851,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 })
                 ?.ToList();
 
-            await Task.Delay(1000);
             return Ok(response);
         }
 

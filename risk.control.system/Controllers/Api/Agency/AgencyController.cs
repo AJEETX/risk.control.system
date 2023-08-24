@@ -62,7 +62,6 @@ namespace risk.control.system.Controllers.Api.Agency
                     Pincode = u.PinCode.Code,
                     Roles = string.Join(",", GetUserRoles(u).Result)
                 });
-            await Task.Delay(1000);
 
             return Ok(result.ToArray());
         }
@@ -93,7 +92,6 @@ namespace risk.control.system.Controllers.Api.Agency
                     State = u.State.Name,
                     Country = u.Country.Name
                 });
-            await Task.Delay(1000);
 
             return Ok(result.ToArray());
         }
@@ -172,7 +170,6 @@ namespace risk.control.system.Controllers.Api.Agency
                     Pincode = u.PinCode.Code,
                     Roles = string.Join(",", GetUserRoles(u).Result)
                 });
-            await Task.Delay(1000);
 
             return Ok(result.ToArray());
         }
