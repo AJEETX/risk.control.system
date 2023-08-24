@@ -1099,7 +1099,7 @@ namespace risk.control.system.Controllers
 
             //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
-            toastNotification.AddSuccessToastMessage("Policy (s) created successfully!");
+            toastNotification.AddSuccessToastMessage("Policy created successfully!");
 
             return RedirectToAction(nameof(Details), new { id = claimId });
         }

@@ -145,6 +145,13 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("post")]
+        public async Task<IActionResult> Post(Data data)
+        {
+            return Ok(data);
+        }
+
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Post(string email, string remarks, string claimId, long locId)
         {
@@ -183,6 +190,17 @@ namespace risk.control.system.Controllers.Api
             };
             return Ok(response);
         }
+    }
+
+    public class Data
+    {
+        public string Email { get; set; }
+        public string ClaimId { get; set; }
+        public string BeneficiaryId { get; set; }
+        public string? LocationImage { get; set; }
+        public string? OcrImage { get; set; }
+        public string? LongLat { get; set; }
+        public string? Remarks { get; set; }
     }
 
     public class VendorData
