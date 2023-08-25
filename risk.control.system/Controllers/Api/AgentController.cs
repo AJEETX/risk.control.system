@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -47,6 +48,14 @@ namespace risk.control.system.Controllers.Api
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.Vendor)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.CostCentre)
                 .Include(c => c.CustomerDetail)
@@ -91,14 +100,15 @@ namespace risk.control.system.Controllers.Api
                 new
                 {
                     claimId = c.ClaimsInvestigationId,
-                    claimType = c.PolicyDetail.ClaimType,
+                    claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                    DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                     CustomerName = c.CustomerDetail.CustomerName,
                     CustomerEmail = email,
                     PolicyNumber = c.PolicyDetail.ContractNumber,
                     c.CustomerDetail.Gender,
                     c.CustomerDetail.Addressline,
                     c.CustomerDetail.PinCode.Code,
-                    Photo = c?.CustomerDetail.ProfilePicture,
+                    CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) : "/img/user.png",
                     Country = c.CustomerDetail.Country.Name,
                     State = c.CustomerDetail.State.Name,
                     District = c.CustomerDetail.District.Name,
@@ -106,7 +116,7 @@ namespace risk.control.system.Controllers.Api
                     Locations = c.CaseLocations.Select(l => new
                     {
                         l.CaseLocationId,
-                        Photo = l?.ProfilePicture,
+                        Photo = l?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(l.ProfilePicture)) : "/img/user.png",
                         l.Country.Name,
                         l.BeneficiaryName,
                         l.Addressline,
@@ -123,25 +133,80 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("get")]
-        public async Task<IActionResult> Get(string email, string claimId)
+        public async Task<IActionResult> Get(string claimId)
         {
-            var claimsInvestigation = _context.ClaimsInvestigation
+            var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId
-                && c.CurrentUserEmail == email);
+                );
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var claimCase = _context.CaseLocation
-                .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.PinCode)
                 .Include(c => c.ClaimReport)
                 .Include(c => c.District)
                 .Include(c => c.State)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId
-                && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
-                    );
-            return Ok(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
+                .Include(c => c.Country)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+            return Ok(
+                new
+                {
+                    Policy = new
+                    {
+                        PolicyNumber = claim.PolicyDetail.ContractNumber,
+                        ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName(),
+                        Document = claim.PolicyDetail.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.PolicyDetail.DocumentImage)) :
+                        "/img/no-policy.jpg",
+                        IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
+                        IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
+                        Amount = claim.PolicyDetail.SumAssuredValue,
+                        BudgetCentre = claim.PolicyDetail.CostCentre.Name,
+                        Reason = claim.PolicyDetail.CaseEnabler.Name
+                    },
+                    beneficiary = new
+                    {
+                        Name = claimCase.BeneficiaryName,
+                        Relation = claimCase.BeneficiaryRelation.Name,
+                        Income = claimCase.BeneficiaryIncome,
+                        Phone = claimCase.BeneficiaryContactNumber,
+                        DateOfBirth = claimCase.BeneficiaryDateOfBirth.ToString("dd-MMM-yyyy"),
+                        Address = claimCase.Addressline + " " + claimCase.District.Name + " " + claimCase.State.Name + " " + claimCase.Country.Name + " " + claimCase.PinCode.Code
+                    },
+                    Customer = new
+                    {
+                        Name = claim.CustomerDetail.CustomerName,
+                        Occupation = claim.CustomerDetail.CustomerOccupation,
+                        Income = claim.CustomerDetail.CustomerIncome,
+                        Phone = claim.CustomerDetail.ContactNumber,
+                        DateOfBirth = claim.CustomerDetail.CustomerDateOfBirth.ToString("dd-MMM-yyyy"),
+                        Address = claim.CustomerDetail.Addressline + " " + claim.CustomerDetail.District.Name + " " + claim.CustomerDetail.State.Name + " " + claim.CustomerDetail.Country.Name + " " + claim.CustomerDetail.PinCode.Code
+                    },
+                    InvestigationData = new
+                    {
+                        LocationImage = claimCase?.ClaimReport?.AgentLocationPicture != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.AgentLocationPicture)) : "/img/no-policy.jpg",
+                        OcrImage = claimCase?.ClaimReport?.AgentOcrPicture != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.AgentOcrPicture)) : "/img/no-policy.jpg",
+                        OcrData = claimCase?.ClaimReport?.AgentOcrData,
+                        LatLong = claimCase?.ClaimReport?.LongLat
+                    },
+                    Remarks = claimCase?.ClaimReport?.AgentRemarks
+                });
         }
 
         [AllowAnonymous]
