@@ -261,7 +261,6 @@ namespace risk.control.system.Controllers.Api
     {
         public string Email { get; set; }
         public string ClaimId { get; set; }
-        public string BeneficiaryId { get; set; }
         public string? LocationImage { get; set; }
         public string? OcrImage { get; set; }
         public string? LongLat { get; set; }
