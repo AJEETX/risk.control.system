@@ -253,6 +253,44 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("post")]
         public async Task<IActionResult> Post(Data data)
         {
+            var claimCase = _context.CaseLocation
+               .Include(c => c.BeneficiaryRelation)
+               .Include(c => c.PinCode)
+               .Include(c => c.ClaimReport)
+               .Include(c => c.District)
+               .Include(c => c.State)
+               .Include(c => c.Country)
+               .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            if (data.LocationImage != null)
+            {
+                var locationImage = await System.IO.File.ReadAllBytesAsync(data.LocationImage);
+                claimCase.ClaimReport.AgentLocationPicture = locationImage;
+                claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
+            }
+            if (data.OcrImage != null)
+            {
+                var locationImage = await System.IO.File.ReadAllBytesAsync(data.OcrImage);
+                claimCase.ClaimReport.AgentOcrPicture = locationImage;
+            }
+            if (data.LocationLongLat != null)
+            {
+                claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
+            }
+            if (data.OcrData != null)
+            {
+                claimCase.ClaimReport.AgentOcrData = data.OcrData;
+            }
+
+            if (data.OcrLongLat != null)
+            {
+                claimCase.ClaimReport.OcrLongLat = data.OcrLongLat;
+            }
+
+            _context.CaseLocation.Update(claimCase);
+
+            await _context.SaveChangesAsync();
+
             return Ok(data);
         }
 
