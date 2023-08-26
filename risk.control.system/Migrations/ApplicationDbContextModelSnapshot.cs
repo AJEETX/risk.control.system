@@ -645,7 +645,16 @@ namespace risk.control.system.Migrations
                     b.Property<long>("CaseLocationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LongLat")
+                    b.Property<string>("LocationLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LocationLongLatTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OcrLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("OcrLongLatTime")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("QrData")

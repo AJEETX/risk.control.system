@@ -430,7 +430,7 @@
                                                                             <p class="text-muted text-sm">
                                                                                 @{
                                                                                     var QR1 = @Model.Location?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
-                                                                                    var LongLat2 = @Model.Location?.ClaimReport?.LongLat ?? "SAMPLE CITY";
+                                                                                    var LongLat2 = @Model.Location?.ClaimReport?.LocationLongLat ?? "SAMPLE CITY";
                                                                                 }
                                                                                 <b>QR data:<i class="fas fa-paperclip"></i> </b> @QR1
                                                                             </p>

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class Notes : Migration
+    public partial class ReportUpdate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1109,7 +1109,10 @@ namespace risk.control.system.Migrations
                     AgentQrUrl = table.Column<string>(type: "TEXT", nullable: true),
                     AgentQrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     QrData = table.Column<string>(type: "TEXT", nullable: true),
-                    LongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    LocationLongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    LocationLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    OcrLongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    OcrLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
                     AgentReportId = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     SupervisorRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),

@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230823003258_Notes")]
-    partial class Notes
+    [Migration("20230826031842_ReportUpdate")]
+    partial class ReportUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -648,7 +648,16 @@ namespace risk.control.system.Migrations
                     b.Property<long>("CaseLocationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LongLat")
+                    b.Property<string>("LocationLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LocationLongLatTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OcrLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("OcrLongLatTime")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("QrData")

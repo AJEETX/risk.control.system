@@ -952,7 +952,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Title = "Investigation Data",
                 QrData = beneficiary.ClaimReport?.QrData,
-                LatLong = beneficiary.ClaimReport?.LongLat,
+                LatLong = beneficiary.ClaimReport?.LocationLongLat,
                 Location = beneficiary.ClaimReport?.AgentLocationPicture != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentLocationPicture)) : "/img/no-photo.png",
                 OcrData = beneficiary.ClaimReport?.AgentOcrPicture != null ?

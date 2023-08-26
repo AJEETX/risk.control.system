@@ -26,10 +26,10 @@ namespace risk.control.system.Models
         [NotMapped]
         public IFormFile? AgentLocationImage { get; set; }
 
-        [Display(Name = "Agent Location Image")]
+        [Display(Name = "Agent Ocr Image")]
         public string? AgentOcrUrl { get; set; }
 
-        [Display(Name = "Agent Location Image")]
+        [Display(Name = "Agent Ocr Image")]
         public byte[]? AgentOcrPicture { get; set; }
 
         [Display(Name = "Agent Ocr Image")]
@@ -39,7 +39,7 @@ namespace risk.control.system.Models
         [Display(Name = "Agent Ocr Data")]
         public string? AgentOcrData { get; set; }
 
-        [Display(Name = "Agent Ocr Image")]
+        [Display(Name = "Agent Qr Image")]
         public string? AgentQrUrl { get; set; }
 
         [Display(Name = "Agent Qr Image")]
@@ -52,7 +52,10 @@ namespace risk.control.system.Models
         [Display(Name = "Agent Qr Data")]
         public string? QrData { get; set; }
 
-        public string? LongLat { get; set; }
+        public string? LocationLongLat { get; set; }
+        public DateTime? LocationLongLatTime { get; set; } = DateTime.UtcNow;
+        public string? OcrLongLat { get; set; }
+        public DateTime? OcrLongLatTime { get; set; } = DateTime.UtcNow;
         public string? AgentReportId { get; set; }
 
         public AgentReport? AgentReport { get; set; }

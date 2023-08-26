@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.IO;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,12 +21,14 @@ namespace risk.control.system.Controllers.Api
         private readonly ApplicationDbContext _context;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public AgentController(ApplicationDbContext context, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService)
+        public AgentController(ApplicationDbContext context, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         [AllowAnonymous]
@@ -95,20 +100,30 @@ namespace risk.control.system.Controllers.Api
                         claimsAssigned.Add(item);
                     }
                 }
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
+
+                var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
+                var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
                 var claim2Agent = claimsAssigned
                     .Select(c =>
                 new
                 {
                     claimId = c.ClaimsInvestigationId,
                     claimType = c.PolicyDetail.ClaimType.GetEnumDisplayName(),
-                    DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
+                    DocumentPhoto = c.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c.PolicyDetail.DocumentImage)) :
+                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
                     CustomerName = c.CustomerDetail.CustomerName,
                     CustomerEmail = email,
                     PolicyNumber = c.PolicyDetail.ContractNumber,
-                    c.CustomerDetail.Gender,
+                    Gender = c.CustomerDetail.Gender.GetEnumDisplayName(),
                     c.CustomerDetail.Addressline,
                     c.CustomerDetail.PinCode.Code,
-                    CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) : "/img/user.png",
+                    CustomerPhoto = c?.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(c?.CustomerDetail.ProfilePicture)) :
+                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
                     Country = c.CustomerDetail.Country.Name,
                     State = c.CustomerDetail.State.Name,
                     District = c.CustomerDetail.District.Name,
@@ -116,7 +131,8 @@ namespace risk.control.system.Controllers.Api
                     Locations = c.CaseLocations.Select(l => new
                     {
                         l.CaseLocationId,
-                        Photo = l?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(l.ProfilePicture)) : "/img/user.png",
+                        Photo = l?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(l.ProfilePicture)) :
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
                         l.Country.Name,
                         l.BeneficiaryName,
                         l.Addressline,
@@ -162,16 +178,30 @@ namespace risk.control.system.Controllers.Api
                 .Include(c => c.State)
                 .Include(c => c.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
+
+            var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+            filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
+            var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+            filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.png");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
             return Ok(
                 new
                 {
                     Policy = new
                     {
+                        ClaimId = claim.ClaimsInvestigationId,
                         PolicyNumber = claim.PolicyDetail.ContractNumber,
                         ClaimType = claim.PolicyDetail.ClaimType.GetEnumDisplayName(),
                         Document = claim.PolicyDetail.DocumentImage != null ?
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.PolicyDetail.DocumentImage)) :
-                        "/img/no-policy.jpg",
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDocumentimage)),
                         IssueDate = claim.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy"),
                         IncidentDate = claim.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy"),
                         Amount = claim.PolicyDetail.SumAssuredValue,
@@ -180,10 +210,13 @@ namespace risk.control.system.Controllers.Api
                     },
                     beneficiary = new
                     {
-                        Id = claimCase.CaseLocationId,
+                        BeneficiaryId = claimCase.CaseLocationId,
                         Name = claimCase.BeneficiaryName,
+                        Photo = claimCase.ProfilePicture != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase.ProfilePicture)) :
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
                         Relation = claimCase.BeneficiaryRelation.Name,
-                        Income = claimCase.BeneficiaryIncome,
+                        Income = claimCase.BeneficiaryIncome.GetEnumDisplayName(),
                         Phone = claimCase.BeneficiaryContactNumber,
                         DateOfBirth = claimCase.BeneficiaryDateOfBirth.ToString("dd-MMM-yyyy"),
                         Address = claimCase.Addressline + " " + claimCase.District.Name + " " + claimCase.State.Name + " " + claimCase.Country.Name + " " + claimCase.PinCode.Code
@@ -191,8 +224,11 @@ namespace risk.control.system.Controllers.Api
                     Customer = new
                     {
                         Name = claim.CustomerDetail.CustomerName,
-                        Occupation = claim.CustomerDetail.CustomerOccupation,
-                        Income = claim.CustomerDetail.CustomerIncome,
+                        Occupation = claim.CustomerDetail.CustomerOccupation.GetEnumDisplayName(),
+                        Photo = claim.CustomerDetail.ProfilePicture != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claim.CustomerDetail.ProfilePicture)) :
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noCustomerimage)),
+                        Income = claim.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                         Phone = claim.CustomerDetail.ContactNumber,
                         DateOfBirth = claim.CustomerDetail.CustomerDateOfBirth.ToString("dd-MMM-yyyy"),
                         Address = claim.CustomerDetail.Addressline + " " + claim.CustomerDetail.District.Name + " " + claim.CustomerDetail.State.Name + " " + claim.CustomerDetail.Country.Name + " " + claim.CustomerDetail.PinCode.Code
@@ -200,11 +236,14 @@ namespace risk.control.system.Controllers.Api
                     InvestigationData = new
                     {
                         LocationImage = claimCase?.ClaimReport?.AgentLocationPicture != null ?
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.AgentLocationPicture)) : "/img/no-policy.jpg",
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.AgentLocationPicture)) :
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                         OcrImage = claimCase?.ClaimReport?.AgentOcrPicture != null ?
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.AgentOcrPicture)) : "/img/no-policy.jpg",
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.AgentOcrPicture)) :
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                         OcrData = claimCase?.ClaimReport?.AgentOcrData,
-                        LatLong = claimCase?.ClaimReport?.LongLat
+                        LocationLongLat = claimCase?.ClaimReport?.LocationLongLat,
+                        OcrLongLat = claimCase?.ClaimReport?.OcrLongLat,
                     },
                     Remarks = claimCase?.ClaimReport?.AgentRemarks
                 });
@@ -218,12 +257,12 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpPost]
-        public async Task<IActionResult> Post(string email, string remarks, string claimId, long locId)
+        [HttpPost("submit")]
+        public async Task<IActionResult> Submit(string email, string remarks, string claimId, long BeneficiaryId)
         {
-            await claimsInvestigationService.SubmitToVendorSupervisor(email, locId, claimId, remarks);
+            await claimsInvestigationService.SubmitToVendorSupervisor(email, BeneficiaryId, claimId, remarks);
 
-            await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(email, claimId, locId);
+            await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(email, claimId, BeneficiaryId);
 
             return Ok();
         }
@@ -263,8 +302,10 @@ namespace risk.control.system.Controllers.Api
         public string Email { get; set; }
         public string ClaimId { get; set; }
         public string? LocationImage { get; set; }
+        public string? LocationLongLat { get; set; }
         public string? OcrImage { get; set; }
-        public string? LongLat { get; set; }
+        public string? OcrLongLat { get; set; }
+        public string? OcrData { get; set; }
         public string? Remarks { get; set; }
     }
 
