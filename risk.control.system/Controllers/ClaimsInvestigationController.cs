@@ -20,6 +20,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
+using static risk.control.system.Helpers.Permissions;
+
 namespace risk.control.system.Controllers
 {
     public class ClaimsInvestigationController : Controller
@@ -380,9 +382,11 @@ namespace risk.control.system.Controllers
 
             var policy = await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId);
 
-            await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy, claimId, selectedcase, caseLocationId);
+            await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage("Claim allocated to agency successfully!");
+            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
+
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] investigation submitted to Agency {1} successfully !", policy.PolicyDetail.ContractNumber, vendor.Name));
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
         }
@@ -654,11 +658,11 @@ namespace risk.control.system.Controllers
 
             var reportUpdateStatus = AssessorRemarkType.OK;
 
-            await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
+            var claim = await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
             await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage("claim case processed successfully!");
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] investigation submitted to Company successfully !", claim.PolicyDetail.ContractNumber));
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor));
         }
@@ -691,7 +695,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
 
-            toastNotification.AddSuccessToastMessage("case(s) assigned successfully!");
+            toastNotification.AddSuccessToastMessage("<i class='far fa-file-powerpoint'></i> Claim(s) assigned successfully!");
 
             return RedirectToAction(nameof(Assign));
         }
@@ -830,7 +834,7 @@ namespace risk.control.system.Controllers
             _context.ClaimsInvestigation.Update(claimsInvestigation);
             await _context.SaveChangesAsync();
 
-            toastNotification.AddSuccessToastMessage("claim set ready successfully!");
+            toastNotification.AddSuccessToastMessage("<i class='far fa-file-powerpoint'></i> Claim set as <i>Assigned</i> successfully!");
 
             return RedirectToAction(nameof(Assign));
         }
@@ -1095,13 +1099,11 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
+            var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
 
-            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] created successfully !", claim.PolicyDetail.ContractNumber));
 
-            toastNotification.AddSuccessToastMessage("Policy created successfully!");
-
-            return RedirectToAction(nameof(Details), new { id = claimId });
+            return RedirectToAction(nameof(Details), new { id = claim.ClaimsInvestigationId });
         }
 
         [Breadcrumb(title: " Edit Policy", FromAction = "Draft")]
@@ -1175,9 +1177,7 @@ namespace risk.control.system.Controllers
 
             var claimId = await claimsInvestigationService.EdiPolicy(userEmail, claimsInvestigation, documentFile);
 
-            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
-
-            toastNotification.AddSuccessToastMessage("Policy edited successfully!");
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] edited successfully !", claimsInvestigation.PolicyDetail.ContractNumber));
 
             return RedirectToAction(nameof(Details), new { id = claimId });
         }
@@ -1250,13 +1250,11 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            var claimId = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, create);
+            var claim = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, create);
 
-            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-plus'></i> Customer {0} added successfully !", claimsInvestigation.CustomerDetail.CustomerName));
 
-            toastNotification.AddSuccessToastMessage("Customer added successfully!");
-
-            return RedirectToAction(nameof(Details), new { id = claimId });
+            return RedirectToAction(nameof(Details), new { id = claim.ClaimsInvestigationId });
         }
 
         [Breadcrumb(title: " Edit Customer", FromAction = "Draft")]
@@ -1343,7 +1341,7 @@ namespace risk.control.system.Controllers
 
             //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
-            toastNotification.AddSuccessToastMessage("Customer edited successfully!");
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-check'></i> Customer {0} edited successfully !", claimsInvestigation.CustomerDetail.CustomerName));
 
             return RedirectToAction(nameof(Details), new { id = claimId });
         }
@@ -1744,16 +1742,13 @@ namespace risk.control.system.Controllers
                 return Problem("Entity set 'ApplicationDbContext.ClaimsInvestigation'  is null.");
             }
             var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.Claim.ClaimsInvestigationId);
-            if (claimsInvestigation != null)
-            {
-                string userEmail = HttpContext?.User?.Identity.Name;
-                claimsInvestigation.Updated = DateTime.UtcNow;
-                claimsInvestigation.UpdatedBy = userEmail;
-                claimsInvestigation.Deleted = true;
-                _context.ClaimsInvestigation.Update(claimsInvestigation);
-            }
-
+            string userEmail = HttpContext?.User?.Identity.Name;
+            claimsInvestigation.Updated = DateTime.UtcNow;
+            claimsInvestigation.UpdatedBy = userEmail;
+            claimsInvestigation.Deleted = true;
+            _context.ClaimsInvestigation.Update(claimsInvestigation);
             await _context.SaveChangesAsync();
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] deleted successfully !", claimsInvestigation.PolicyDetail.ContractNumber));
             return RedirectToAction(nameof(Draft));
         }
 

@@ -208,13 +208,13 @@ namespace risk.control.system.Controllers
 
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
-                        toastNotification.AddSuccessToastMessage("User created and locked successfully!");
+                        toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
                         return RedirectToAction(nameof(AgencyController.User), "Agency");
                     }
                 }
                 else
                 {
-                    toastNotification.AddSuccessToastMessage("User created successfully!");
+                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
             }
@@ -317,11 +317,11 @@ namespace risk.control.system.Controllers
                             {
                                 var createdUser = await userManager.FindByEmailAsync(user.Email);
                                 var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                                var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                                var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.MaxValue);
 
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
-                                    toastNotification.AddSuccessToastMessage("User edited and locked successfully!");
+                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User edited and locked successfully!");
                                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                                 }
                             }
@@ -337,7 +337,7 @@ namespace risk.control.system.Controllers
                                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                                 }
                             }
-                            toastNotification.AddSuccessToastMessage("Agency user edited successfully!");
+                            toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> Agency user edited successfully!");
                             return RedirectToAction(nameof(AgencyController.User), "Agency");
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
@@ -421,7 +421,7 @@ namespace risk.control.system.Controllers
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
 
-            toastNotification.AddSuccessToastMessage("role(s) updated successfully!");
+            toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
             return RedirectToAction(nameof(AgencyController.User), "Agency");
         }
 
@@ -470,7 +470,7 @@ namespace risk.control.system.Controllers
                 vendorInvestigationServiceType.VendorId = vendor.VendorId;
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("service created successfully!");
+                toastNotification.AddSuccessToastMessage("<i class='fas fa-truck'></i> Service created successfully!");
 
                 return RedirectToAction(nameof(AgencyController.Service), "Agency");
             }
@@ -556,7 +556,7 @@ namespace risk.control.system.Controllers
                         vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                         _context.Update(vendorInvestigationServiceType);
                         await _context.SaveChangesAsync();
-                        toastNotification.AddSuccessToastMessage("service updated successfully!");
+                        toastNotification.AddSuccessToastMessage("<i class='fas fa-truck'></i> Service updated successfully!");
                         return RedirectToAction(nameof(AgencyController.Service), "Agency");
                     }
                 }

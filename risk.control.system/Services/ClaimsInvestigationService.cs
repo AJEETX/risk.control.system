@@ -13,27 +13,27 @@ namespace risk.control.system.Services
     {
         List<ClaimsInvestigation> GetAll();
 
-        Task<string> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
+        Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
 
-        Task<string> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
+        Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument);
 
-        Task<string> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
+        Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
 
-        Task<string> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument);
+        Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument);
 
         Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true);
 
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
 
-        Task<string> AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
+        Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
 
-        Task AssignToVendorAgent(string userEmail, string currentUser, string vendorId, string claimsInvestigationId);
+        Task<ClaimsInvestigation> AssignToVendorAgent(string userEmail, string currentUser, string vendorId, string claimsInvestigationId);
 
-        Task SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks);
+        Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks);
 
-        Task<bool> Process(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks);
+        Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks);
 
-        Task<bool> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType);
+        Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType);
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -49,7 +49,7 @@ namespace risk.control.system.Services
             this.userManager = userManager;
         }
 
-        public async Task<string> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
+        public async Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
         {
             string addedClaimId = string.Empty;
             if (claimsInvestigation is not null)
@@ -126,10 +126,10 @@ namespace risk.control.system.Services
                     throw;
                 }
             }
-            return claimsInvestigation.ClaimsInvestigationId;
+            return claimsInvestigation;
         }
 
-        public async Task<string> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument)
+        public async Task<ClaimsInvestigation> EdiPolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument)
         {
             string addedClaimId = string.Empty;
             if (claimsInvestigation is not null)
@@ -170,7 +170,7 @@ namespace risk.control.system.Services
 
                         await _context.SaveChangesAsync();
 
-                        return existingPolicy.ClaimsInvestigationId;
+                        return existingPolicy;
                     }
                 }
                 catch (Exception ex)
@@ -178,10 +178,10 @@ namespace risk.control.system.Services
                     throw;
                 }
             }
-            return string.Empty;
+            return claimsInvestigation;
         }
 
-        public async Task<string> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument)
+        public async Task<ClaimsInvestigation> EditCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? customerDocument)
         {
             if (claimsInvestigation is not null)
             {
@@ -247,7 +247,7 @@ namespace risk.control.system.Services
 
                         await _context.SaveChangesAsync();
 
-                        return existingPolicy.ClaimsInvestigationId;
+                        return existingPolicy;
                     }
                 }
                 catch (Exception ex)
@@ -255,10 +255,10 @@ namespace risk.control.system.Services
                     throw;
                 }
             }
-            return claimsInvestigation.ClaimsInvestigationId;
+            return claimsInvestigation;
         }
 
-        public async Task<string> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
+        public async Task<ClaimsInvestigation> CreateCustomer(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
         {
             if (claimsInvestigation is not null)
             {
@@ -331,13 +331,14 @@ namespace risk.control.system.Services
                     _context.ClaimsInvestigation.Update(existingPolicy);
 
                     await _context.SaveChangesAsync();
+                    return existingPolicy;
                 }
                 catch (Exception ex)
                 {
                     throw;
                 }
             }
-            return claimsInvestigation.ClaimsInvestigationId;
+            return claimsInvestigation;
         }
 
         public async Task Create(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)
@@ -461,7 +462,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<string> AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId)
+        public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
 
@@ -519,14 +520,15 @@ namespace risk.control.system.Services
                 _context.InvestigationTransaction.Add(log);
 
                 await _context.SaveChangesAsync();
-                return claimsCaseToAllocateToVendor.PolicyDetail.ContractNumber;
+                return claimsCaseToAllocateToVendor;
             }
-            return string.Empty;
+            return null;
         }
 
-        public async Task AssignToVendorAgent(string vendorAgent, string currentUser, string vendorId, string claimsInvestigationId)
+        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgent, string currentUser, string vendorId, string claimsInvestigationId)
         {
             var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.Vendor)
                 .Where(c => c.ClaimsInvestigationId == claimsInvestigationId).FirstOrDefault();
@@ -573,15 +575,17 @@ namespace risk.control.system.Services
             }
             _context.ClaimsInvestigation.Update(claim);
             await _context.SaveChangesAsync();
+            return claim;
         }
 
-        public async Task SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks)
+        public async Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks)
         {
             var agent = _context.VendorApplicationUser.FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
 
             var supervisor = await GetSupervisor(agent.VendorId);
 
             var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
             claim.Updated = DateTime.UtcNow;
@@ -637,6 +641,7 @@ namespace risk.control.system.Services
             try
             {
                 await _context.SaveChangesAsync();
+                return claim;
             }
             catch (Exception)
             {
@@ -644,7 +649,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task<bool> Process(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType reportUpdateStatus)
+        public async Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType reportUpdateStatus)
         {
             if (reportUpdateStatus == SupervisorRemarkType.OK)
             {
@@ -653,13 +658,11 @@ namespace risk.control.system.Services
             else
             {
                 //PUT th case back in review list :: Assign back to Agent
-                await ReAllocateToVendor(userEmail, claimsInvestigationId, caseLocationId, supervisorRemarks, reportUpdateStatus);
-
-                return false;
+                return await ReAllocateToVendor(userEmail, claimsInvestigationId, caseLocationId, supervisorRemarks, reportUpdateStatus);
             }
         }
 
-        public async Task<bool> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType reportUpdateStatus)
+        public async Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType reportUpdateStatus)
         {
             var claim = _context.ClaimsInvestigation
                  .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
@@ -671,13 +674,11 @@ namespace risk.control.system.Services
             else
             {
                 //PUT th case back in review list :: Assign back to Agent
-                await ReAssignToAssigner(userEmail, claimsInvestigationId, caseLocationId, assessorRemarks, reportUpdateStatus);
-
-                return false;
+                return await ReAssignToAssigner(userEmail, claimsInvestigationId, caseLocationId, assessorRemarks, reportUpdateStatus);
             }
         }
 
-        private async Task<bool> ApproveCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
+        private async Task<ClaimsInvestigation> ApproveCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType)
         {
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
@@ -700,6 +701,7 @@ namespace risk.control.system.Services
             {
                 await _context.SaveChangesAsync();
                 var claim = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
                 if (claim != null && claim.CaseLocations.All(c => c.InvestigationCaseSubStatusId == _context.InvestigationCaseSubStatus
@@ -729,14 +731,14 @@ namespace risk.control.system.Services
 
                     _context.InvestigationTransaction.Add(finalLog);
 
-                    return await _context.SaveChangesAsync() > 0;
+                    return await _context.SaveChangesAsync() > 0 ? claim : null;
                 }
             }
             catch (Exception)
             {
                 throw;
             }
-            return false;
+            return null;
         }
 
         private async Task<VendorApplicationUser> GetSupervisor(string vendorId)
@@ -757,7 +759,7 @@ namespace risk.control.system.Services
             return null;
         }
 
-        private async Task ReAssignToAssigner(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, AssessorRemarkType assessorRemarkType)
+        private async Task<ClaimsInvestigation> ReAssignToAssigner(string userEmail, string claimsInvestigationId, long caseLocationId, string assessorRemarks, AssessorRemarkType assessorRemarkType)
         {
             var claimsCaseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
@@ -783,7 +785,9 @@ namespace risk.control.system.Services
             claimsCaseLocation.IsReviewCaseLocation = true;
             _context.CaseLocation.Update(claimsCaseLocation);
 
-            var claimsCaseToReassign = _context.ClaimsInvestigation.FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+            var claimsCaseToReassign = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
             claimsCaseToReassign.Updated = DateTime.UtcNow;
             claimsCaseToReassign.UpdatedBy = userEmail;
             claimsCaseToReassign.CurrentUserEmail = userEmail;
@@ -811,10 +815,10 @@ namespace risk.control.system.Services
             };
             _context.InvestigationTransaction.Add(log);
 
-            await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync() > 0 ? claimsCaseToReassign : null;
         }
 
-        private async Task<bool> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
+        private async Task<ClaimsInvestigation> ApproveAgentReport(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
         {
             var caseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
@@ -822,6 +826,7 @@ namespace risk.control.system.Services
 
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.Vendor)
+                .Include(c => c.PolicyDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimsInvestigationId);
 
             claim.Updated = DateTime.UtcNow;
@@ -867,7 +872,7 @@ namespace risk.control.system.Services
             _context.ClaimsInvestigation.Update(claim);
             try
             {
-                return await _context.SaveChangesAsync() > 0;
+                return await _context.SaveChangesAsync() > 0 ? claim : null;
             }
             catch (Exception)
             {
@@ -875,7 +880,7 @@ namespace risk.control.system.Services
             }
         }
 
-        private async Task ReAllocateToVendor(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
+        private async Task<ClaimsInvestigation> ReAllocateToVendor(string userEmail, string claimsInvestigationId, long caseLocationId, string supervisorRemarks, SupervisorRemarkType reportUpdateStatus)
         {
             var claimsCaseLocation = _context.CaseLocation
             .Include(c => c.ClaimReport)
@@ -899,7 +904,9 @@ namespace risk.control.system.Services
             claimsCaseLocation.IsReviewCaseLocation = true;
             _context.CaseLocation.Update(claimsCaseLocation);
 
-            var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation.FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+            var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
             claimsCaseToAllocateToVendor.Updated = DateTime.UtcNow;
             claimsCaseToAllocateToVendor.UpdatedBy = userEmail;
             claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
@@ -930,7 +937,7 @@ namespace risk.control.system.Services
             };
             _context.InvestigationTransaction.Add(log);
 
-            await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync() > 0 ? claimsCaseToAllocateToVendor : null;
         }
 
         public List<ClaimsInvestigation> GetAll()

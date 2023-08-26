@@ -140,7 +140,7 @@ namespace risk.control.system.Controllers
 
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("Beneficiary added successfully!");
+                toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} added successfully !", caseLocation.BeneficiaryName));
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
@@ -228,7 +228,7 @@ namespace risk.control.system.Controllers
                         }
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
-                        toastNotification.AddSuccessToastMessage("Beneficiary edited successfully!");
+                        toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} edited successfully !", caseLocation.BeneficiaryName));
                         return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
                     }
                 }
@@ -290,7 +290,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("Beneficiary deleted successfully!");
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} deleted successfully !", caseLocation.BeneficiaryName));
             return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
         }
 

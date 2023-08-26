@@ -125,7 +125,24 @@ namespace risk.control.system.Controllers
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
+            {
+                if (!user.Active)
+                {
+                    var createdUser = await userManager.FindByEmailAsync(user.Email);
+                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                    if (lockUser.Succeeded && lockDate.Succeeded)
+                    {
+                        toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                    }
+                }
+                else
+                {
+                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
+                }
                 return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
+            }
             else
             {
                 toastNotification.AddErrorToastMessage("Error to create user!");
@@ -234,7 +251,28 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
-                            toastNotification.AddSuccessToastMessage("agency user edited successfully!");
+                            if (!user.Active)
+                            {
+                                var createdUser = await userManager.FindByEmailAsync(user.Email);
+                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                                var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                                if (lockUser.Succeeded && lockDate.Succeeded)
+                                {
+                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                                }
+                            }
+                            else
+                            {
+                                var createdUser = await userManager.FindByEmailAsync(user.Email);
+                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                                var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
+
+                                if (lockUser.Succeeded && lockDate.Succeeded)
+                                {
+                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> User edited and unlocked successfully!");
+                                }
+                            }
                             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");
@@ -323,7 +361,7 @@ namespace risk.control.system.Controllers
             //var currentUser = await userManager.GetUserAsync(HttpContext.User);
             //await signInManager.RefreshSignInAsync(currentUser);
 
-            toastNotification.AddSuccessToastMessage("role(s) updated successfully!");
+            toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = model.VendorId });
         }
 

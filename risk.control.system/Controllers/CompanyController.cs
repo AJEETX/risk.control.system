@@ -136,18 +136,12 @@ namespace risk.control.system.Controllers
                     _context.ClientCompany.Update(clientCompany);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception)
                 {
-                    if (!ClientCompanyExists(clientCompany.ClientCompanyId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    toastNotification.AddErrorToastMessage("Error to edit company profile!");
+                    return RedirectToAction(nameof(CompanyController.Index), "Company");
                 }
-                toastNotification.AddSuccessToastMessage("company Profile edited successfully!");
+                toastNotification.AddSuccessToastMessage("<i class='fas fa-building'></i> company Profile edited successfully!");
                 return RedirectToAction(nameof(CompanyController.Index), "Company");
             }
             toastNotification.AddErrorToastMessage("Error to edit company profile!");
@@ -196,6 +190,23 @@ namespace risk.control.system.Controllers
 
             if (result.Succeeded)
             {
+                if (!user.Active)
+                {
+                    var createdUser = await userManager.FindByEmailAsync(user.Email);
+                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                    if (lockUser.Succeeded && lockDate.Succeeded)
+                    {
+                        toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                        return RedirectToAction(nameof(CompanyController.User), "Company");
+                    }
+                }
+                else
+                {
+                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
+                    return RedirectToAction(nameof(CompanyController.User), "Company");
+                }
                 toastNotification.AddSuccessToastMessage("User created successfully!");
                 return RedirectToAction(nameof(CompanyController.User), "Company");
             }
@@ -301,11 +312,34 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
-                            toastNotification.AddSuccessToastMessage("Company user edited successfully!");
-                            return RedirectToAction(nameof(CompanyController.User), "Company");
+                            if (!user.Active)
+                            {
+                                var createdUser = await userManager.FindByEmailAsync(user.Email);
+                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                                var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                                if (lockUser.Succeeded && lockDate.Succeeded)
+                                {
+                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                                    return RedirectToAction(nameof(CompanyController.User), "Company");
+                                }
+                            }
+                            else
+                            {
+                                var createdUser = await userManager.FindByEmailAsync(user.Email);
+                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, false);
+                                var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+
+                                if (lockUser.Succeeded && lockDate.Succeeded)
+                                {
+                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> User edited and unlocked successfully!");
+                                    return RedirectToAction(nameof(CompanyController.User), "Company");
+                                }
+                            }
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
                         Errors(result);
+                        return RedirectToAction(nameof(CompanyController.User), "Company");
                     }
                 }
                 catch (DbUpdateConcurrencyException)
@@ -574,7 +608,7 @@ namespace risk.control.system.Controllers
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
 
-            toastNotification.AddSuccessToastMessage("User role(s) updated successfully!");
+            toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
             return RedirectToAction(nameof(CompanyController.EditUser), "Company", new { userid = userId });
         }
 

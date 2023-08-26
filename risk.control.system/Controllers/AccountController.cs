@@ -65,14 +65,15 @@ namespace risk.control.system.Controllers
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> login successful!");
+                toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
                 return RedirectToLocal(returnUrl);
             }
 
             if (result.IsLockedOut && returnUrl != mobileAppUrl)
             {
                 _logger.LogWarning("User account locked out.");
-                return RedirectToAction(nameof(Lockout));
+                model.Error = "User account locked out.";
+                return View(model);
             }
             else if (result.Succeeded && returnUrl == mobileAppUrl)
             {

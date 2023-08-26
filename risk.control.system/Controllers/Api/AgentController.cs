@@ -180,6 +180,7 @@ namespace risk.control.system.Controllers.Api
                     },
                     beneficiary = new
                     {
+                        Id = claimCase.CaseLocationId,
                         Name = claimCase.BeneficiaryName,
                         Relation = claimCase.BeneficiaryRelation.Name,
                         Income = claimCase.BeneficiaryIncome,

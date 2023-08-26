@@ -257,11 +257,11 @@ namespace risk.control.system.Controllers
 
             var vendorAgent = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
 
-            await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, userEmail, vendorAgent.VendorId, claimId);
+            var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, userEmail, vendorAgent.VendorId, claimId);
 
             await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorAgent.Email, vendorAgent.VendorId, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage("claim case allocated to agency agent successfully!");
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] tasked to {1} successfully!", claim.PolicyDetail.ContractNumber, vendorAgent.Email));
 
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
@@ -290,7 +290,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb("Agent Report", FromAction ="Agent")]
+        [Breadcrumb("Agent Report", FromAction = "Agent")]
         public async Task<IActionResult> GetInvestigate(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
@@ -496,11 +496,11 @@ namespace risk.control.system.Controllers
 
             string userEmail = HttpContext?.User?.Identity.Name;
 
-            await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks);
+            var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks);
 
             await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage("report submitted to supervisor successfully");
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] investigation submitted to supervisor successfully !", claim.PolicyDetail.ContractNumber));
 
             return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
         }
@@ -516,12 +516,12 @@ namespace risk.control.system.Controllers
             string userEmail = HttpContext?.User?.Identity.Name;
             var reportUpdateStatus = SupervisorRemarkType.OK;
 
-            var success = await claimsInvestigationService.Process(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
+            var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
-            if (success)
+            if (success != null)
             {
                 await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-                toastNotification.AddSuccessToastMessage("report submitted to Company successfully");
+                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] investigation submitted to Company successfully !", success.PolicyDetail.ContractNumber));
             }
             else
             {
@@ -541,9 +541,9 @@ namespace risk.control.system.Controllers
             string userEmail = HttpContext?.User?.Identity.Name;
             var reportUpdateStatus = SupervisorRemarkType.REVIEW;
 
-            var success = await claimsInvestigationService.Process(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
+            var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
-            if (success)
+            if (success != null)
             {
                 await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
                 toastNotification.AddSuccessToastMessage("report submitted to Company successfully");
