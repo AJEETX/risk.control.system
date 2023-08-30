@@ -273,7 +273,7 @@ namespace risk.control.system.Controllers.Api
                 AgentEmail = data.Email,
             };
 
-            if (data.LocationImage != null)
+            if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
                 var locationImage = regex.Replace(data.LocationImage, string.Empty);
                 locationImage = locationImage.Replace("/", string.Empty);
@@ -282,7 +282,7 @@ namespace risk.control.system.Controllers.Api
                 claimReport.LocationLongLatTime = DateTime.UtcNow;
             }
 
-            if (data.OcrImage != null)
+            if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
                 var locationImage = regex.Replace(data.OcrImage, string.Empty);
                 locationImage = locationImage.Replace("/", string.Empty);
@@ -291,7 +291,7 @@ namespace risk.control.system.Controllers.Api
                 claimReport.OcrLongLatTime = DateTime.UtcNow;
             }
 
-            if (data.LocationLongLat != null)
+            if (!string.IsNullOrWhiteSpace(data.LocationLongLat))
             {
                 claimReport.LocationLongLatTime = DateTime.UtcNow;
                 claimReport.LocationLongLat = data.LocationLongLat;
@@ -301,7 +301,7 @@ namespace risk.control.system.Controllers.Api
                 claimReport.AgentOcrData = data.OcrData;
             }
 
-            if (data.OcrLongLat != null)
+            if (!string.IsNullOrWhiteSpace(data.OcrLongLat))
             {
                 claimReport.OcrLongLat = data.OcrLongLat;
                 claimReport.OcrLongLatTime = DateTime.UtcNow;
