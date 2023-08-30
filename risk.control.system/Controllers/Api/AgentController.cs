@@ -257,6 +257,7 @@ namespace risk.control.system.Controllers.Api
         {
             var claimCase = _context.CaseLocation
                .Include(c => c.BeneficiaryRelation)
+               .Include(c => c.ClaimReport)
                .Include(c => c.PinCode)
                .Include(c => c.District)
                .Include(c => c.State)
