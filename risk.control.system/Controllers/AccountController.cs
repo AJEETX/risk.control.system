@@ -65,8 +65,20 @@ namespace risk.control.system.Controllers
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
-                return RedirectToLocal(returnUrl);
+                if (!model.Mobile)
+                {
+                    toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
+                    return RedirectToLocal(returnUrl);
+                }
+                var claims = new List<Claim> {
+                        new Claim(ClaimTypes.Name, model.Email) ,
+                        new Claim(ClaimTypes.Email, model.Email)
+                    };
+                var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                HttpContext.Response.Cookies.Append("UserLoginCookie", "UserLoginCookie", new CookieOptions() { HttpOnly = true });
+                return Ok(new { success = model.Email });
             }
 
             if (result.IsLockedOut && returnUrl != mobileAppUrl)

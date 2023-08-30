@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +19,7 @@ namespace risk.control.system.Controllers.Api
     [ApiController]
     public class AgentController : ControllerBase
     {
+        private Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
         private readonly ApplicationDbContext _context;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
@@ -256,38 +258,60 @@ namespace risk.control.system.Controllers.Api
             var claimCase = _context.CaseLocation
                .Include(c => c.BeneficiaryRelation)
                .Include(c => c.PinCode)
-               .Include(c => c.ClaimReport)
                .Include(c => c.District)
                .Include(c => c.State)
                .Include(c => c.Country)
                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+
+            if (claimCase == null)
+            {
+                return BadRequest();
+            }
+
+            var claimReport = new ClaimReport
+            {
+                AgentEmail = data.Email,
+            };
+
             if (data.LocationImage != null)
             {
-                var locationImage = await System.IO.File.ReadAllBytesAsync(data.LocationImage);
-                claimCase.ClaimReport.AgentLocationPicture = locationImage;
-                claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
+                var locationImage = regex.Replace(data.LocationImage, string.Empty);
+                locationImage = locationImage.Replace("/", string.Empty);
+                var image = Convert.FromBase64String(locationImage);
+                claimReport.AgentLocationPicture = image;
+                claimReport.LocationLongLatTime = DateTime.UtcNow;
             }
+
             if (data.OcrImage != null)
             {
-                var locationImage = await System.IO.File.ReadAllBytesAsync(data.OcrImage);
-                claimCase.ClaimReport.AgentOcrPicture = locationImage;
+                var locationImage = regex.Replace(data.OcrImage, string.Empty);
+                locationImage = locationImage.Replace("/", string.Empty);
+                var image = Convert.FromBase64String(locationImage);
+                claimReport.AgentOcrPicture = image;
+                claimReport.OcrLongLatTime = DateTime.UtcNow;
             }
+
             if (data.LocationLongLat != null)
             {
-                claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
-                claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
+                claimReport.LocationLongLatTime = DateTime.UtcNow;
+                claimReport.LocationLongLat = data.LocationLongLat;
             }
             if (data.OcrData != null)
             {
-                claimCase.ClaimReport.AgentOcrData = data.OcrData;
+                claimReport.AgentOcrData = data.OcrData;
             }
 
             if (data.OcrLongLat != null)
             {
-                claimCase.ClaimReport.OcrLongLat = data.OcrLongLat;
+                claimReport.OcrLongLat = data.OcrLongLat;
+                claimReport.OcrLongLatTime = DateTime.UtcNow;
             }
 
+            claimCase.ClaimReport = claimReport;
+
             _context.CaseLocation.Update(claimCase);
+
+            _context.ClaimReport.Add(claimReport);
 
             await _context.SaveChangesAsync();
 

@@ -330,7 +330,7 @@
                                                                         <h2 class="lead"><b> @Model.CaseLocation.BeneficiaryName</b></h2>
                                                                         <p class="text-muted text-sm">
                                                                             @{
-                                                                                var QR1 = @Model.CaseLocation?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
+                                                                                var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "QR SAMPLE DATA";
                                                                                 var LongLat2 = @Model.CaseLocation?.ClaimReport?.LocationLongLat ?? "SAMPLE CITY";
                                                                             }
                                                                             <b>QR data:<i class="fas fa-paperclip"></i> </b> @QR1
@@ -348,13 +348,13 @@
                                                                     <div class="col-6 text-center">
                                                                         Location: <i class="fas fa-rupee-sign"></i>
                                                                         @{
-                                                                            if (Model.CaseLocation.ProfilePicture!= null)
+                                                                            if (Model.CaseLocation.ClaimReport.AgentLocationPicture != null)
                                                                             {
-                                                                                <img id="agentLocationPicture" class=" img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseLocation.ProfilePicture))">
+                                                                                <img title="location image" id="agentLocationPicture" class=" img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseLocation.ClaimReport.AgentLocationPicture))">
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img id="agentLocationPicture" alt="user-avatar" class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                                <img title="location image" id="agentLocationPicture" alt="user-avatar" class="img-fluid form-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                         <br />
