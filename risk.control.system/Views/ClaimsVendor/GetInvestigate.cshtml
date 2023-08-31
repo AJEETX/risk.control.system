@@ -348,7 +348,7 @@
                                                                     <div class="col-6 text-center">
                                                                         Location: <i class="fas fa-rupee-sign"></i>
                                                                         @{
-                                                                            if (Model.CaseLocation.ClaimReport.AgentLocationPicture != null)
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
                                                                             {
                                                                                 <img title="location image" id="agentLocationPicture" class=" img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseLocation.ClaimReport.AgentLocationPicture))">
                                                                             }
@@ -389,14 +389,14 @@
                                                                                 <input maxlength="100" name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
                                                                             </div>
                                                                             <div class="form-group">
-                                                                                <input type="checkbox" id="terms_and_conditions" value="1" /> <label for="terms_and_conditions"> I agree to the Terms and Conditions:</label>
+                                                                                <input type="checkbox" id="terms_and_conditions" value="1" /> <label class="account" for="terms_and_conditions"> I agree to the Terms and Conditions:</label>
                                                                             </div>
                                                                         </ul>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div class="card-footer">
-                                                                <div class="text-right">
+                                                                <div class="text-right">">
                                                                     <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
                                                                     <button disabled id="submit-case" type="submit" class="btn btn-danger">
                                                                         <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
@@ -417,7 +417,7 @@
             </div>
 
             @{
-                @if (Model.CaseLocation.ClaimReport != null && Model.CaseLocation.ClaimReport.AgentRemarks != null)
+                @if (Model.CaseLocation.ClaimReport != null && Model.CaseLocation.ClaimReport?.AgentRemarks != null)
                 {
                     <div class="card card-secondary">
                         <div class="card-header">
