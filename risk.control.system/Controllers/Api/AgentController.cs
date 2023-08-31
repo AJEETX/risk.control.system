@@ -252,6 +252,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [RequestSizeLimit(100_000_000)]
         [HttpPost("post")]
         public async Task<IActionResult> Post(Data data)
         {
@@ -276,18 +277,18 @@ namespace risk.control.system.Controllers.Api
 
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
-                var locationImage = regex.Replace(data.LocationImage, string.Empty);
-                locationImage = locationImage.Replace("/", string.Empty);
-                var image = Convert.FromBase64String(locationImage);
+                //var locationImage = regex.Replace(data.LocationImage, string.Empty);
+                //locationImage = locationImage.Replace("/", string.Empty);
+                var image = Convert.FromBase64String(data.LocationImage);
                 claimReport.AgentLocationPicture = image;
                 claimReport.LocationLongLatTime = DateTime.UtcNow;
             }
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
-                var locationImage = regex.Replace(data.OcrImage, string.Empty);
-                locationImage = locationImage.Replace("/", string.Empty);
-                var image = Convert.FromBase64String(locationImage);
+                //var locationImage = regex.Replace(data.OcrImage, string.Empty);
+                //locationImage = locationImage.Replace("/", string.Empty);
+                var image = Convert.FromBase64String(data.OcrImage);
                 claimReport.AgentOcrPicture = image;
                 claimReport.OcrLongLatTime = DateTime.UtcNow;
             }
