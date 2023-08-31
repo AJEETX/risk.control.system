@@ -340,7 +340,7 @@
                                                                                 <span class="fa-li">
                                                                                     <i class="fas fa-money-bill-wave"></i>
                                                                                 </span>
-                                                                                Long Lat: <i class="fas fa-rupee-sign"></i> @LongLat2
+                                                                                Long Lat: <i class="fas fa-pin"></i> @LongLat2
 
                                                                             </li>
                                                                         </ul>
@@ -348,9 +348,9 @@
                                                                     <div class="col-6 text-center">
                                                                         Location: <i class="fas fa-rupee-sign"></i>
                                                                         @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPictureUrl != null)
                                                                             {
-                                                                                <img title="location image" id="agentLocationPicture" class=" img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseLocation.ClaimReport.AgentLocationPicture))">
+                                                                                <img title="location image" id="agentLocationPicture" class=" img-fluid form-Image" src="@Model.CaseLocation.ClaimReport?.AgentLocationPictureUrl))">
                                                                             }
                                                                             else
                                                                             {
@@ -360,9 +360,9 @@
                                                                         <br />
                                                                         OCR Doc: <i class="fas fa-rupee-sign"></i>
                                                                         @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentOcrUrl != null)
                                                                             {
-                                                                                <img id="agentOcrPicture" class="img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
+                                                                                <img id="agentOcrPicture" class="img-fluid form-Image" src="@Model.CaseLocation.ClaimReport?.AgentOcrUrl)">
                                                                             }
                                                                             else
                                                                             {

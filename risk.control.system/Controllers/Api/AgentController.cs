@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +14,8 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -256,6 +260,7 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("post")]
         public async Task<IActionResult> Post(Data data)
         {
+            ClaimReport claimReport = null;
             var claimCase = _context.CaseLocation
                .Include(c => c.BeneficiaryRelation)
                .Include(c => c.ClaimReport)
@@ -269,27 +274,39 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest();
             }
-
-            var claimReport = new ClaimReport
+            if (claimCase.ClaimReport == null)
             {
-                AgentEmail = data.Email,
-            };
+                claimReport = new ClaimReport
+                {
+                    AgentEmail = data.Email,
+                };
+            }
+            else
+            {
+                claimReport = claimCase.ClaimReport;
+            }
 
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
-                //var locationImage = regex.Replace(data.LocationImage, string.Empty);
-                //locationImage = locationImage.Replace("/", string.Empty);
                 var image = Convert.FromBase64String(data.LocationImage);
+                var locationRealImage = ByteArrayToImage(image);
+                MemoryStream stream = new MemoryStream(image);
                 claimReport.AgentLocationPicture = image;
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{data.ClaimId}.{locationRealImage.ImageType()}");
+                claimReport.AgentLocationPictureUrl = filePath;
+                CompressImage.Compressimage(stream, claimReport.AgentLocationPictureUrl);
                 claimReport.LocationLongLatTime = DateTime.UtcNow;
             }
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
-                //var locationImage = regex.Replace(data.OcrImage, string.Empty);
-                //locationImage = locationImage.Replace("/", string.Empty);
                 var image = Convert.FromBase64String(data.OcrImage);
+                var OcrRealImage = ByteArrayToImage(image);
+                MemoryStream stream = new MemoryStream(image);
                 claimReport.AgentOcrPicture = image;
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{data.ClaimId}.{OcrRealImage.ImageType()}");
+                claimReport.AgentOcrUrl = filePath;
+                CompressImage.Compressimage(stream, claimReport.AgentOcrUrl);
                 claimReport.OcrLongLatTime = DateTime.UtcNow;
             }
 
@@ -298,7 +315,7 @@ namespace risk.control.system.Controllers.Api
                 claimReport.LocationLongLatTime = DateTime.UtcNow;
                 claimReport.LocationLongLat = data.LocationLongLat;
             }
-            if (data.OcrData != null)
+            if (!string.IsNullOrWhiteSpace(data.OcrData))
             {
                 claimReport.AgentOcrData = data.OcrData;
             }
@@ -312,8 +329,6 @@ namespace risk.control.system.Controllers.Api
             claimCase.ClaimReport = claimReport;
 
             _context.CaseLocation.Update(claimCase);
-
-            _context.ClaimReport.Add(claimReport);
 
             await _context.SaveChangesAsync();
 
@@ -358,6 +373,13 @@ namespace risk.control.system.Controllers.Api
                 data = data.ToList()
             };
             return Ok(response);
+        }
+
+        public Image? ByteArrayToImage(byte[] data)
+        {
+            MemoryStream ms = new MemoryStream(data);
+            Image returnImage = Image.FromStream(ms);
+            return returnImage;
         }
     }
 

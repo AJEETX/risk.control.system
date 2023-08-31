@@ -172,7 +172,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\upload-pincodes\" />
-    <Folder Include="wwwroot\vendor-document\" />
+    <Folder Include="wwwroot\document\" />
     <Folder Include="wwwroot\upload\" />
   </ItemGroup>
 
