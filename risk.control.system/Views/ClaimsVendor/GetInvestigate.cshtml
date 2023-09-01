@@ -348,9 +348,9 @@
                                                                     <div class="col-6 text-center">
                                                                         Location: <i class="fas fa-rupee-sign"></i>
                                                                         @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPictureUrl != null)
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
                                                                             {
-                                                                                <img title="location image" id="agentLocationPicture" class=" img-fluid form-Image" src="@Model.CaseLocation.ClaimReport?.AgentLocationPictureUrl))">
+                                                                                <img title="location image" id="agentLocationPicture" class=" img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
                                                                             }
                                                                             else
                                                                             {
@@ -360,9 +360,9 @@
                                                                         <br />
                                                                         OCR Doc: <i class="fas fa-rupee-sign"></i>
                                                                         @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentOcrUrl != null)
+                                                                            if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
                                                                             {
-                                                                                <img id="agentOcrPicture" class="img-fluid form-Image" src="@Model.CaseLocation.ClaimReport?.AgentOcrUrl)">
+                                                                                <img id="agentOcrPicture" class="img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
                                                                             }
                                                                             else
                                                                             {
