@@ -337,6 +337,7 @@ namespace risk.control.system.Controllers.Api
 
             return Ok(new
             {
+                BeneficiaryId = claimCase.CaseLocationId,
                 LocationImage = !string.IsNullOrWhiteSpace(claimReport.AgentLocationPictureUrl) ?
                 Convert.ToBase64String(System.IO.File.ReadAllBytes(claimReport.AgentLocationPictureUrl)) :
                 Convert.ToBase64String(noDataimage),
