@@ -292,9 +292,9 @@ namespace risk.control.system.Controllers.Api
                 var locationRealImage = ByteArrayToImage(image);
                 MemoryStream stream = new MemoryStream(image);
                 claimReport.AgentLocationPicture = image;
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{data.ClaimId}.{locationRealImage.ImageType()}");
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
                 claimReport.AgentLocationPictureUrl = filePath;
-                CompressImage.Compressimage(stream, claimReport.AgentLocationPictureUrl);
+                CompressImage.Compressimage(stream, filePath);
                 claimReport.LocationLongLatTime = DateTime.UtcNow;
             }
 
@@ -304,7 +304,7 @@ namespace risk.control.system.Controllers.Api
                 var OcrRealImage = ByteArrayToImage(image);
                 MemoryStream stream = new MemoryStream(image);
                 claimReport.AgentOcrPicture = image;
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{data.ClaimId}.{OcrRealImage.ImageType()}");
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
                 claimReport.AgentOcrUrl = filePath;
                 CompressImage.Compressimage(stream, claimReport.AgentOcrUrl);
                 claimReport.OcrLongLatTime = DateTime.UtcNow;
@@ -332,7 +332,17 @@ namespace risk.control.system.Controllers.Api
 
             await _context.SaveChangesAsync();
 
-            return Ok(data);
+            return Ok(new
+            {
+                LocationImage = !string.IsNullOrWhiteSpace(claimReport.AgentLocationPictureUrl) ?
+                System.IO.File.ReadAllBytes(claimReport.AgentLocationPictureUrl) : null,
+                LocationLongLat = claimReport.LocationLongLat,
+                LocationTime = claimReport.LocationLongLatTime,
+                OcrImage = !string.IsNullOrWhiteSpace(claimReport.AgentOcrUrl) ?
+                System.IO.File.ReadAllBytes(claimReport.AgentOcrUrl) : null,
+                OcrLongLat = claimReport.OcrLongLat,
+                OcrTime = claimReport.OcrLongLatTime
+            });
         }
 
         [AllowAnonymous]
