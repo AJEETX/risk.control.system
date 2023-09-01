@@ -331,15 +331,20 @@ namespace risk.control.system.Controllers.Api
             _context.CaseLocation.Update(claimCase);
 
             await _context.SaveChangesAsync();
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.png");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
             return Ok(new
             {
                 LocationImage = !string.IsNullOrWhiteSpace(claimReport.AgentLocationPictureUrl) ?
-                System.IO.File.ReadAllBytes(claimReport.AgentLocationPictureUrl) : null,
+                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimReport.AgentLocationPictureUrl)) :
+                Convert.ToBase64String(noDataimage),
                 LocationLongLat = claimReport.LocationLongLat,
                 LocationTime = claimReport.LocationLongLatTime,
                 OcrImage = !string.IsNullOrWhiteSpace(claimReport.AgentOcrUrl) ?
-                System.IO.File.ReadAllBytes(claimReport.AgentOcrUrl) : null,
+                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimReport.AgentOcrUrl)) :
+                Convert.ToBase64String(noDataimage),
                 OcrLongLat = claimReport.OcrLongLat,
                 OcrTime = claimReport.OcrLongLatTime
             });
