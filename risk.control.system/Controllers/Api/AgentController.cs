@@ -353,14 +353,14 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("submit")]
-        public async Task<IActionResult> Submit(string email, string remarks, string claimId, long beneficiaryId)
+        public async Task<IActionResult> Submit(SubmitData data)
         {
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(remarks) || string.IsNullOrWhiteSpace(claimId) || beneficiaryId < 1)
+            if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || string.IsNullOrWhiteSpace(data.ClaimId) || data.BeneficiaryId < 1)
             {
                 throw new ArgumentNullException("Argument(s) is null");
             }
 
-            return Ok(new { email, remarks, claimId, beneficiaryId });
+            return Ok(new { data });
 
             //await claimsInvestigationService.SubmitToVendorSupervisor(email, beneficiaryId, claimId, remarks);
 
@@ -404,6 +404,14 @@ namespace risk.control.system.Controllers.Api
             Image returnImage = Image.FromStream(ms);
             return returnImage;
         }
+    }
+
+    public class SubmitData
+    {
+        public string Email { get; set; }
+        public string ClaimId { get; set; }
+        public long BeneficiaryId { get; set; }
+        public string Remarks { get; set; }
     }
 
     public class Data
