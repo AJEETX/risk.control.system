@@ -353,13 +353,20 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("submit")]
-        public async Task<IActionResult> Submit(string email, string remarks, string claimId, long BeneficiaryId)
+        public async Task<IActionResult> Submit(string email, string remarks, string claimId, long beneficiaryId)
         {
-            await claimsInvestigationService.SubmitToVendorSupervisor(email, BeneficiaryId, claimId, remarks);
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(remarks) || string.IsNullOrWhiteSpace(claimId) || beneficiaryId < 1)
+            {
+                throw new ArgumentNullException("Argument(s) is null");
+            }
 
-            await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(email, claimId, BeneficiaryId);
+            return Ok(new { email, remarks, claimId, beneficiaryId });
 
-            return Ok();
+            //await claimsInvestigationService.SubmitToVendorSupervisor(email, beneficiaryId, claimId, remarks);
+
+            //await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(email, claimId, beneficiaryId);
+
+            //return Ok();
         }
 
         [AllowAnonymous]
