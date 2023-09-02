@@ -125,6 +125,11 @@ table {
     border: .1px ridge #ccc;
 }
 
+.investigation-Image {
+    height: 2.4rem;
+    border: .1px ridge #ccc;
+}
+
 .timer-image {
     height: 1rem;
 }
@@ -423,6 +428,7 @@ input[type="checkbox"]:checked {
 input[type="radio"]:checked {
     accent-color: blue;
 }
+
 .asterikx {
     text-transform: uppercase;
 }

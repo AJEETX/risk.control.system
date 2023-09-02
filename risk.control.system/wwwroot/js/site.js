@@ -137,7 +137,7 @@
         });
     });
 
-    $('.form-Image').click(function () {
+    $('.investigation-Image').click(function () {
         $.confirm({
             columnClass: 'medium',
             content: function () {
@@ -149,8 +149,8 @@
                 }).done(function (response) {
                     self.setContent('QRData : ' + response.qrData);
                     self.setContentAppend('<br>Latitude/Longitude #: ' + response.latLong);
-                    self.setContentAppend('<br>Location Image #:<img id="agentOcrPicture" class="img-fluid form-Image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br>Ocr Image #: ' + response.ocrData);
+                    self.setContentAppend('<br>Location Image #:<img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.location + '" /> ');
+                    self.setContentAppend('<br>Ocr Image #: <img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.OcrData + '" /> ');
                     self.setTitle(response.title);
                 }).fail(function () {
                     self.setContent('Something went wrong.');

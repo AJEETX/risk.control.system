@@ -346,27 +346,27 @@
                                                                         </ul>
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        Location: <i class="fas fa-rupee-sign"></i>
+                                                                        Location: <i class="fas fa-pin"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
                                                                             {
-                                                                                <img title="location image" id="agentLocationPicture" class=" img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
+                                                                                <img title="location image" id="agentLocationPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img title="location image" id="agentLocationPicture" alt="user-avatar" class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                                <img title="location image" id="agentLocationPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                         <br />
-                                                                        OCR Doc: <i class="fas fa-rupee-sign"></i>
+                                                                        OCR Doc: <i class="fas fa-pinn"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
                                                                             {
-                                                                                <img id="agentOcrPicture" class="img-fluid form-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
+                                                                                <img id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img id="agentOcrPicture" alt="user-avatar" class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                                <img id="agentOcrPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                     </div>
@@ -385,19 +385,19 @@
 
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
 
-                                                                            <div class="form-group">
+                                                                            <li class="form-group">
                                                                                 <input maxlength="100" name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
-                                                                            </div>
-                                                                            <div class="form-group">
+                                                                            </li>
+                                                                            <li class="form-group">
                                                                                 <input type="checkbox" id="terms_and_conditions" value="1" /> <label class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>
-                                                                            </div>
+                                                                            </li>
                                                                         </ul>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div class="card-footer">
-                                                                <div class="text-right">">
-                                                                    <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
+                                                                <div class="text-right">
+                                                                    <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;
                                                                     <button disabled id="submit-case" type="submit" class="btn btn-danger">
                                                                         <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
                                                                     </button>

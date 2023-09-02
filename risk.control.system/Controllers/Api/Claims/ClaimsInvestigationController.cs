@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,10 +18,12 @@ namespace risk.control.system.Controllers.Api.Claims
     public class ClaimsInvestigationController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public ClaimsInvestigationController(ApplicationDbContext context)
+        public ClaimsInvestigationController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet("GetActive")]
@@ -948,15 +951,22 @@ namespace risk.control.system.Controllers.Api.Claims
             var beneficiary = await _context.CaseLocation
                 .Include(c => c.ClaimReport)
                 .FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
             var data = new
             {
                 Title = "Investigation Data",
                 QrData = beneficiary.ClaimReport?.QrData,
                 LatLong = beneficiary.ClaimReport?.LocationLongLat,
                 Location = beneficiary.ClaimReport?.AgentLocationPicture != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentLocationPicture)) : "/img/no-photo.png",
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentLocationPicture)) :
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 OcrData = beneficiary.ClaimReport?.AgentOcrPicture != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentOcrPicture)) : "/img/no-photo.png"
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentOcrPicture)) :
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage))
             };
 
             return Ok(data);
