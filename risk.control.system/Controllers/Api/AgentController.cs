@@ -357,16 +357,14 @@ namespace risk.control.system.Controllers.Api
         {
             if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || string.IsNullOrWhiteSpace(data.ClaimId) || data.BeneficiaryId < 1)
             {
-                throw new ArgumentNullException("Argument(s) is null");
+                throw new ArgumentNullException("Argument(s) can't be null");
             }
 
+            await claimsInvestigationService.SubmitToVendorSupervisor(data.Email, data.BeneficiaryId, data.ClaimId, data.Remarks);
+
+            await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
+
             return Ok(new { data });
-
-            //await claimsInvestigationService.SubmitToVendorSupervisor(email, beneficiaryId, claimId, remarks);
-
-            //await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(email, claimId, beneficiaryId);
-
-            //return Ok();
         }
 
         [AllowAnonymous]
