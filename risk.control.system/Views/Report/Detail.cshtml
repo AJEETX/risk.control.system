@@ -10,7 +10,6 @@
 
     .progresses {
         display: flex;
-        align-items: center;
         width: 100%;
         margin: 1rem 0;
     }
@@ -51,6 +50,17 @@
         margin-right: -40px;
     }
 
+    .timeline-end::after {
+        border-radius: 0.25rem;
+        background: #dee2e6;
+        bottom: 0;
+        content: '';
+        left: 31px;
+        margin: 0;
+        position: absolute;
+        top: 0;
+        width: 4px;
+    }
 </style>
 <section class="content pt-2">
     <div class="container-fluid">
@@ -160,15 +170,18 @@
                                                             foreach (var log in Model.Log.OrderBy(o=>o.HopCount))
                                                             {
                                                                 <div class="timeline">
-                                                                    <div class="time-label"><span class="badge">@log.Created.ToString("dd-MMM-yyyy")</span></div>
+                                                                        <div class="time-label"><span class="badge">@log.Created.ToString("dd-MMM-yyyy")</span></div>
                                                                     <div>
                                                                         <i class="fa fa-check bg-green"></i>
                                                                         <div class="timeline-item">
-                                                                            <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
+                                                                                <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
                                                                         </div>
                                                                     </div>
-                                                                    <span class="badge badge-light">@log.InvestigationCaseSubStatus.Name</span>
-                                                                </div>
+                                                                        <div class="time-label"><span class="badge badge-light">@log.InvestigationCaseSubStatus.Name</span></div>
+
+                                                                    </div>
+                                                                    <div class="timeline-end">
+                                                                    </div>
                                                             }
                                                         }
                                                         </div>
@@ -398,7 +411,7 @@
                                                                             <h2 class="lead"><b> @Model.Location.BeneficiaryName</b></h2>
                                                                             <p class="text-muted text-sm">
                                                                                 @{
-                                                                                    var QR1 = @Model.Location?.ClaimReport?.QrData ?? "QR SAMPLE DATA";
+                                                                                    var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "QR SAMPLE DATA";
                                                                                     var LongLat2 = @Model.Location?.ClaimReport?.LocationLongLat ?? "SAMPLE CITY";
                                                                                 }
                                                                                 <b>QR data:<i class="fas fa-paperclip"></i> </b> @QR1
@@ -408,35 +421,33 @@
                                                                                     <span class="fa-li">
                                                                                         <i class="fas fa-money-bill-wave"></i>
                                                                                     </span>
-                                                                                    Long Lat: <i class="fas fa-rupee-sign"></i> @LongLat2
+                                                                                    Long Lat: <i class="fas fa-pin"></i> @LongLat2
 
                                                                                 </li>
                                                                             </ul>
                                                                         </div>
                                                                         <div class="col-6 text-center">
-                                                                            Location: <i class="fas fa-rupee-sign"></i>
+                                                                            Location: <i class="fas fa-pin"></i>
                                                                             @{
                                                                                 if (Model.Location.ClaimReport?.AgentLocationPicture != null)
                                                                                 {
-                                                                                    <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                                    <img title="location image" id="agentLocationPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.AgentLocationPicture))">
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    <img id="documentImage" alt="user-avatar"
-                                                                                         class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                                    <img title="location image" id="agentLocationPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                                 }
                                                                             }
                                                                             <br />
-                                                                            OCR Doc: <i class="fas fa-rupee-sign"></i>
+                                                                            OCR Doc: <i class="fas fa-pinn"></i>
                                                                             @{
-                                                                                if (Model.Location.ClaimReport?.AgentLocationPicture != null)
+                                                                                if (Model.Location.ClaimReport?.AgentOcrPicture != null)
                                                                                 {
-                                                                                    <img id="agentLocationPicture" class="report-Image" src="/img/no-image.png">
+                                                                                    <img id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.AgentOcrPicture))">
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    <img id="documentImage" alt="user-avatar"
-                                                                                         class="img-fluid form-Image" src="/img/no-photo.png">
+                                                                                    <img id="agentOcrPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                                 }
                                                                             }
                                                                         </div>
