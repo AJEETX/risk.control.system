@@ -286,10 +286,10 @@
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('provide a note on Policy !!!');
+                            $.alert('Provide Policy note!!!');
                             return false;
                         }
-                        $.alert('Your note is ' + name);
+                        $.alert('Policy note is ' + name);
                     }
                 },
                 cancel: function () {
@@ -326,10 +326,10 @@
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('provide notes');
+                            $.alert('Provide Customer note!!!');
                             return false;
                         }
-                        $.alert('Your note is ' + name);
+                        $.alert('Customer note is ' + name);
                     }
                 },
                 cancel: function () {
@@ -366,10 +366,10 @@
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('provide notes');
+                            $.alert('Provide Beneficiary note!!!');
                             return false;
                         }
-                        $.alert('Your note is ' + name);
+                        $.alert('Beneficiary note is ' + name);
                     }
                 },
                 cancel: function () {
