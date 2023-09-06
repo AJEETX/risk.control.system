@@ -189,9 +189,9 @@
                         self.setContentAppend('<br>Claim type: ' + response.claimType);
                         self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
                         self.setContentAppend('<br>Incidenct date: ' + response.dateOfIncident);
-                        self.setContentAppend('<br>Amount : ' + response.sumAssuredValue);
-                        self.setContentAppend('<br>Service : ' + response.investigationServiceType.name);
-                        self.setContentAppend('<br>Reason : ' + response.caseEnabler.name);
+                        self.setContentAppend('<br>Amount : <i class="fas fa-rupee-sign"></i>' + response.sumAssuredValue);
+                        self.setContentAppend('<br>Service : ' + response.investigationServiceType);
+                        self.setContentAppend('<br>Reason : ' + response.caseEnabler);
                         self.setContentAppend('<br>Cause : ' + response.causeOfLoss);
                     }
                 }, function () {

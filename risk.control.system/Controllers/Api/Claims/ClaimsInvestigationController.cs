@@ -929,7 +929,19 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(p => p.CaseEnabler)
                 .FirstOrDefaultAsync(p => p.PolicyDetailId == id);
 
-            return Ok(policy);
+            return Ok(
+                new 
+                {
+                    ContractNumber = policy.ContractNumber,
+                    ClaimType = policy.ClaimType.GetEnumDisplayName(),
+                    ContractIssueDate = policy.ContractIssueDate.ToString("dd-MMM-yyyy"),
+                    DateOfIncident = policy.DateOfIncident.ToString("dd-MMM-yyyy"),
+                    SumAssuredValue = policy.SumAssuredValue,
+                    InvestigationServiceType = policy.InvestigationServiceType.Name,
+                    CaseEnabler = policy.CaseEnabler.Name,
+                    CauseOfLoss = policy.CauseOfLoss
+                }
+                );
         }
 
         [HttpGet("GetCustomerDetail")]
