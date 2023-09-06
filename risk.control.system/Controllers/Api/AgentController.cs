@@ -1,10 +1,7 @@
 ﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,10 +9,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
-using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers.Api
 {

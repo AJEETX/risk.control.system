@@ -922,7 +922,12 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetPolicyDetail")]
         public async Task<IActionResult> GetPolicyDetail(string id)
         {
-            var policy = await _context.PolicyDetail.FirstOrDefaultAsync(p => p.PolicyDetailId == id);
+            var policy = await _context.PolicyDetail
+                .Include(p => p.LineOfBusiness)
+                .Include(p => p.InvestigationServiceType)
+                .Include(p => p.CostCentre)
+                .Include(p => p.CaseEnabler)
+                .FirstOrDefaultAsync(p => p.PolicyDetailId == id);
 
             return Ok(policy);
         }

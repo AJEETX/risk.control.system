@@ -150,7 +150,7 @@
                     self.setContent('QRData : ' + response.qrData);
                     self.setContentAppend('<br>Latitude/Longitude #: ' + response.latLong);
                     self.setContentAppend('<br>Location Image #:<img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br>Ocr Image #: <img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.OcrData + '" /> ');
+                    self.setContentAppend('<br>Ocr Image #: <img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.ocrData + '" /> ');
                     self.setTitle(response.title);
                 }).fail(function () {
                     self.setContent('Something went wrong.');
@@ -184,9 +184,15 @@
                     'dataType': 'json',
                     'success': function (response) {
                         console.log(response);
+                        self.setTitle('CLAIMS ');
                         self.setContent('Policy #: ' + response.contractNumber);
+                        self.setContentAppend('<br>Claim type: ' + response.claimType);
                         self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
-                        self.setTitle(response.causeOfLoss);
+                        self.setContentAppend('<br>Incidenct date: ' + response.dateOfIncident);
+                        self.setContentAppend('<br>Amount : ' + response.sumAssuredValue);
+                        self.setContentAppend('<br>Service : ' + response.investigationServiceType.name);
+                        self.setContentAppend('<br>Reason : ' + response.caseEnabler.name);
+                        self.setContentAppend('<br>Cause : ' + response.causeOfLoss);
                     }
                 }, function () {
                     //This function is for unhover.
@@ -198,8 +204,8 @@
     $('#customer-detail').click(function () {
         $.confirm({
             columnClass: 'medium',
-            title: "Policy detail",
-            icon: 'far fa-file-powerpoint',
+            title: "Customer detail",
+            icon: 'fa fa-user-plus',
             closeIcon: true,
             columnClass: 'medium',
             type: 'grey',
@@ -232,8 +238,8 @@
     $('#beneficiary-detail').click(function () {
         $.confirm({
             columnClass: 'medium',
-            title: "Policy detail",
-            icon: 'far fa-file-powerpoint',
+            title: "Beneficiary detail",
+            icon: 'fas fa-user-tie',
             closeIcon: true,
             columnClass: 'medium',
             type: 'grey',
@@ -265,6 +271,7 @@
     $('#policy-comments').click(function () {
         $.confirm({
             title: 'Policy Note!!!',
+            icon: 'far fa-file-powerpoint',
             content: '' +
                 '<form action="" class="formName">' +
                 '<div class="form-group">' +
@@ -304,6 +311,7 @@
     $('#customer-comments').click(function () {
         $.confirm({
             title: 'Customer Note!!!',
+            icon: 'fa fa-user-plus',
             content: '' +
                 '<form action="" class="formName">' +
                 '<div class="form-group">' +
@@ -343,6 +351,7 @@
     $('#beneficiary-comments').click(function () {
         $.confirm({
             title: 'Beneficiary Note!!!',
+            icon: 'fas fa-user-tie',
             content: '' +
                 '<form action="" class="formName">' +
                 '<div class="form-group">' +
