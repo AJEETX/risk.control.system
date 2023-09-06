@@ -930,7 +930,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .FirstOrDefaultAsync(p => p.PolicyDetailId == id);
 
             return Ok(
-                new 
+                new
                 {
                     ContractNumber = policy.ContractNumber,
                     ClaimType = policy.ClaimType.GetEnumDisplayName(),
@@ -947,19 +947,47 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetCustomerDetail")]
         public async Task<IActionResult> GetCustomerDetail(string id)
         {
-            var customer = await _context.CustomerDetail.FirstOrDefaultAsync(p => p.CustomerDetailId == id);
+            var customer = await _context.CustomerDetail
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .Include(c => c.District)
+                .Include(c => c.PinCode)
+                .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
 
-            return Ok(customer);
+            return Ok(
+                new
+                {
+                    CustomerName = customer.CustomerName,
+                    ContactNumber = customer.ContactNumber,
+                    Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
+                    Occupation = customer.CustomerOccupation.GetEnumDisplayName(),
+                    Income = customer.CustomerIncome,
+                    Education = customer.CustomerEducation.GetEnumDisplayName()
+                }
+                );
         }
 
         [HttpGet("GetBeneficiaryDetail")]
         public async Task<IActionResult> GetBeneficiaryDetail(long id, string claimId)
         {
             var beneficiary = await _context.CaseLocation
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .Include(c => c.District)
+                .Include(c => c.PinCode)
                 .Include(c => c.ClaimReport)
                 .FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
 
-            return Ok(beneficiary);
+            return Ok(new
+            {
+                BeneficiaryName = beneficiary.BeneficiaryName,
+                Income = beneficiary.BeneficiaryIncome.GetEnumDisplayName(),
+                BeneficiaryRelation = beneficiary.BeneficiaryRelation.Name,
+                Address = beneficiary.Addressline + "  " + beneficiary.District.Name + "  " + beneficiary.State.Name + "  " + beneficiary.Country.Name + "  " + beneficiary.PinCode.Code,
+                ContactNumber = beneficiary.BeneficiaryContactNumber
+            }
+            );
         }
 
         [HttpGet("GetInvestigationData")]

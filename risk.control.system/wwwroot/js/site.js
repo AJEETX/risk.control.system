@@ -184,7 +184,7 @@
                     'dataType': 'json',
                     'success': function (response) {
                         console.log(response);
-                        self.setTitle('CLAIMS ');
+                        self.setTitle('<i class="far fa-file-powerpoint"></i> Policy detail ');
                         self.setContent('Policy #: ' + response.contractNumber);
                         self.setContentAppend('<br>Claim type: ' + response.claimType);
                         self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
@@ -226,8 +226,12 @@
                     method: 'get'
                 }).done(function (response) {
                     self.setContent('Customer: ' + response.customerName);
+                    self.setContentAppend('<br>Occupation #: ' + response.occupation);
+                    self.setContentAppend('<br>Income #: ' + response.income);
+                    self.setContentAppend('<br>Education #: ' + response.education);
+                    self.setContentAppend('<br>Address #: ' + response.address);
                     self.setContentAppend('<br>Phone #: ' + response.contactNumber);
-                    self.setTitle(response.addressline);
+                    self.setTitle('Customer detail');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
@@ -260,8 +264,11 @@
                     method: 'get'
                 }).done(function (response) {
                     self.setContent('Beneficiary: ' + response.beneficiaryName);
-                    self.setContentAppend('<br>Phone #: ' + response.beneficiaryContactNumber);
-                    self.setTitle(response.beneficiaryIncome);
+                    self.setContentAppend('<br>Relation #: ' + response.beneficiaryRelation);
+                    self.setContentAppend('<br>Phone #: ' + response.contactNumber);
+                    self.setContentAppend('<br>Income #: ' + response.income);
+                    self.setContentAppend('<br>Address #: ' + response.address);
+                    self.setTitle(' Beneficiary detail');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });

@@ -50,15 +50,13 @@
         margin-right: -40px;
     }
 
-    .timeline-end::after {
-        border-radius: 0.25rem;
+    .timeline::after {
         background: #dee2e6;
-        bottom: 0;
+        top: 1.5rem;
         content: '';
-        left: 31px;
+        left: 2rem;
         margin: 0;
-        position: absolute;
-        top: 0;
+        position: relative;
         width: 4px;
     }
 </style>
@@ -103,9 +101,6 @@
 
                         string approved = "steps-green";
                         string approvedLine = "line-green";
-
-
-
 
                         if (Model.Log.Count > 0)
                         {
@@ -163,34 +158,24 @@
                                                 <div class="col-12 d-flex align-items-stretch flex-column">
                                                     <div class="bb-blog-content" itemprop="articleBody">
                                                     <div class="progresses">
-
-
                                                         @{
-
                                                             foreach (var log in Model.Log.OrderBy(o=>o.HopCount))
                                                             {
-                                                                <div class="timeline">
-                                                                        <div class="time-label"><span class="badge">@log.Created.ToString("dd-MMM-yyyy")</span></div>
-                                                                    <div>
-                                                                        <i class="fa fa-check bg-green"></i>
-                                                                        <div class="timeline-item">
-                                                                                <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
-                                                                        </div>
-                                                                    </div>
+                                                                    <div class="timeline">
                                                                         <div class="time-label"><span class="badge badge-light">@log.InvestigationCaseSubStatus.Name</span></div>
-
-                                                                    </div>
-                                                                    <div class="timeline-end">
+                                                                        <div class="time-label"><span class="badge">@log.Created.ToString("dd-MMM-yyyy")</span></div>
+                                                                        <div class="time-label"><span class="badge"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span></div>
+                                                                        <div>
+                                                                            <i class="fa fa-check bg-green"></i>
+                                                                        </div>
                                                                     </div>
                                                             }
                                                         }
                                                         </div>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                     <div class="card card-solid">
                                         <div class="card-body pb-0">
