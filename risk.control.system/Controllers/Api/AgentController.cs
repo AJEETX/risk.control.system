@@ -254,7 +254,6 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("post")]
         public async Task<IActionResult> Post(Data data)
         {
-            ClaimReport claimReport = null;
             var claimCase = _context.CaseLocation
                .Include(c => c.BeneficiaryRelation)
                .Include(c => c.ClaimReport)
@@ -268,28 +267,18 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest();
             }
-            if (claimCase.ClaimReport == null)
-            {
-                claimReport = new ClaimReport
-                {
-                    AgentEmail = data.Email,
-                };
-            }
-            else
-            {
-                claimReport = claimCase.ClaimReport;
-            }
+            claimCase.ClaimReport.AgentEmail = data.Email;
 
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
                 var image = Convert.FromBase64String(data.LocationImage);
                 var locationRealImage = ByteArrayToImage(image);
                 MemoryStream stream = new MemoryStream(image);
-                claimReport.AgentLocationPicture = image;
+                claimCase.ClaimReport.AgentLocationPicture = image;
                 var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                claimReport.AgentLocationPictureUrl = filePath;
+                claimCase.ClaimReport.AgentLocationPictureUrl = filePath;
                 CompressImage.Compressimage(stream, filePath);
-                claimReport.LocationLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
             }
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
@@ -297,51 +286,57 @@ namespace risk.control.system.Controllers.Api
                 var image = Convert.FromBase64String(data.OcrImage);
                 var OcrRealImage = ByteArrayToImage(image);
                 MemoryStream stream = new MemoryStream(image);
-                claimReport.AgentOcrPicture = image;
+                claimCase.ClaimReport.AgentOcrPicture = image;
                 var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
-                claimReport.AgentOcrUrl = filePath;
-                CompressImage.Compressimage(stream, claimReport.AgentOcrUrl);
-                claimReport.OcrLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.AgentOcrUrl = filePath;
+                CompressImage.Compressimage(stream, filePath);
+                claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
             }
 
             if (!string.IsNullOrWhiteSpace(data.LocationLongLat))
             {
-                claimReport.LocationLongLatTime = DateTime.UtcNow;
-                claimReport.LocationLongLat = data.LocationLongLat;
+                claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
             }
             if (!string.IsNullOrWhiteSpace(data.OcrData))
             {
-                claimReport.AgentOcrData = data.OcrData;
+                claimCase.ClaimReport.AgentOcrData = data.OcrData;
             }
 
             if (!string.IsNullOrWhiteSpace(data.OcrLongLat))
             {
-                claimReport.OcrLongLat = data.OcrLongLat;
-                claimReport.OcrLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.OcrLongLat = data.OcrLongLat;
+                claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
             }
-
-            claimCase.ClaimReport = claimReport;
 
             _context.CaseLocation.Update(claimCase);
 
-            await _context.SaveChangesAsync();
-            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.png");
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
             return Ok(new
             {
                 BeneficiaryId = claimCase.CaseLocationId,
-                LocationImage = !string.IsNullOrWhiteSpace(claimReport.AgentLocationPictureUrl) ?
-                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimReport.AgentLocationPictureUrl)) :
+                LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentLocationPictureUrl) ?
+                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentLocationPictureUrl)) :
                 Convert.ToBase64String(noDataimage),
-                LocationLongLat = claimReport.LocationLongLat,
-                LocationTime = claimReport.LocationLongLatTime,
-                OcrImage = !string.IsNullOrWhiteSpace(claimReport.AgentOcrUrl) ?
-                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimReport.AgentOcrUrl)) :
+                LocationLongLat = claimCase.ClaimReport.LocationLongLat,
+                LocationTime = claimCase.ClaimReport.LocationLongLatTime,
+                OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrUrl) ?
+                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentOcrUrl)) :
                 Convert.ToBase64String(noDataimage),
-                OcrLongLat = claimReport.OcrLongLat,
-                OcrTime = claimReport.OcrLongLatTime
+                OcrLongLat = claimCase.ClaimReport.OcrLongLat,
+                OcrTime = claimCase.ClaimReport.OcrLongLatTime
             });
         }
 

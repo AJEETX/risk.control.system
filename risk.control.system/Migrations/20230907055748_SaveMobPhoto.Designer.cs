@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230826031842_ReportUpdate")]
-    partial class ReportUpdate
+    [Migration("20230907055748_SaveMobPhoto")]
+    partial class SaveMobPhoto
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

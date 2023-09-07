@@ -83,7 +83,7 @@ namespace risk.control.system.Models
         public InvestigationCaseSubStatus? InvestigationCaseSubStatus { get; set; } = default!;
 
         public string? AssignedAgentUserEmail { get; set; }
-        public ClaimReport? ClaimReport { get; set; }
+        public ClaimReport? ClaimReport { get; set; } = new ClaimReport();
         public bool IsReviewCaseLocation { get; set; } = false;
     }
 }
