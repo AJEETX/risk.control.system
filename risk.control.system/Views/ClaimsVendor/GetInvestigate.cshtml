@@ -354,19 +354,19 @@
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img title="location image" id="agentLocationPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
+                                                                                <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                         <br />
-                                                                        OCR Doc: <i class="fas fa-pinn"></i>
+                                                                        OCR Doc: <i class="fas fa-pin"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
                                                                             {
-                                                                                <img id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
+                                                                                <img title="ocr image" id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img id="agentOcrPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
+                                                                                <img title="ocr image" id="agentOcrPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                     </div>

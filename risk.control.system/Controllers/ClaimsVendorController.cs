@@ -336,7 +336,6 @@ namespace risk.control.system.Controllers
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
-                .Include(c => c.ClaimReport)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
@@ -479,10 +478,20 @@ namespace risk.control.system.Controllers
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
+
+            var claimCase = _context.CaseLocation
+                .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.PinCode)
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.ClaimReport)
+                .Include(c => c.District)
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimsInvestigation.CaseLocations.FirstOrDefault(), ClaimsInvestigation = claimsInvestigation });
+            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
 
         [HttpPost]

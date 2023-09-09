@@ -599,16 +599,13 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimReport)
                 .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
-            var report = new ClaimReport
-            {
-                AgentEmail = userEmail,
-                AgentRemarksUpdated = DateTime.UtcNow,
-                AgentRemarks = remarks,
-                CaseLocationId = caseLocationId,
-            };
+            var claimReport = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
 
-            _context.ClaimReport.Add(report);
-            caseLocation.ClaimReport = report;
+            claimReport.AgentRemarks = remarks;
+            claimReport.AgentRemarksUpdated = DateTime.UtcNow;
+            claimReport.AgentEmail = userEmail;
+            _context.ClaimReport.Update(claimReport);
+
             caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId;
             caseLocation.Updated = DateTime.UtcNow;
