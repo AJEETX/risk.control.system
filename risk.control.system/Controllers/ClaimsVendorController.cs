@@ -517,26 +517,33 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
         {
-            if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+            try
             {
-                toastNotification.AddAlertToastMessage("No Supervisor remarks entered!!!. Please enter remarks.");
-                return RedirectToAction(nameof(GetInvestigateReport), new { selectedcase = claimId });
-            }
-            string userEmail = HttpContext?.User?.Identity.Name;
-            var reportUpdateStatus = SupervisorRemarkType.OK;
+                if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+                {
+                    toastNotification.AddAlertToastMessage("No Supervisor remarks entered!!!. Please enter remarks.");
+                    return RedirectToAction(nameof(GetInvestigateReport), new { selectedcase = claimId });
+                }
+                string userEmail = HttpContext?.User?.Identity.Name;
+                var reportUpdateStatus = SupervisorRemarkType.OK;
 
-            var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
+                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
-            if (success != null)
-            {
-                await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] investigation submitted to Company successfully !", success.PolicyDetail.ContractNumber));
+                if (success != null)
+                {
+                    await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
+                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] investigation submitted to Company successfully !", success.PolicyDetail.ContractNumber));
+                }
+                else
+                {
+                    toastNotification.AddSuccessToastMessage("Report sent to review successfully");
+                }
+                return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
             }
-            else
+            catch (Exception ex)
             {
-                toastNotification.AddSuccessToastMessage("Report sent to review successfully");
+                throw ex;
             }
-            return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
         [HttpPost]
