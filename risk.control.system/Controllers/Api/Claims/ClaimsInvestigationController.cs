@@ -1004,7 +1004,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var data = new
             {
                 Title = "Investigation Data",
-                QrData = beneficiary.ClaimReport?.QrData,
+                QrData = beneficiary.ClaimReport?.AgentOcrData,
                 LatLong = beneficiary.ClaimReport?.LocationLongLat,
                 Location = beneficiary.ClaimReport?.AgentLocationPicture != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentLocationPicture)) :
