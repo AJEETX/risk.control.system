@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230912025147_Err")]
-    partial class Err
+    [Migration("20230912095725_ErrorDebug")]
+    partial class ErrorDebug
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

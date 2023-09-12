@@ -84,7 +84,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=debug-err.db"));
+                    options.UseSqlite("Data Source=test.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
