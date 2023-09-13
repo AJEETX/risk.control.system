@@ -152,31 +152,7 @@
                                     <header class="bb-blog-header">
                                         <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Policy # : @Model.Claim.PolicyDetail.ContractNumber</h5>
                                     </header>
-                                    <div class="card card-solid">
-                                        <div class="card-body pb-0">
-                                            <div class="row">
-                                                <div class="col-12 d-flex align-items-stretch flex-column">
-                                                    <div class="bb-blog-content" itemprop="articleBody">
-                                                    <div class="progresses">
-                                                        @{
-                                                            foreach (var log in Model.Log.OrderBy(o=>o.HopCount))
-                                                            {
-                                                                    <div class="timeline">
-                                                                        <div class="time-label"><span class="badge badge-light">@log.InvestigationCaseSubStatus.Name</span></div>
-                                                                        <div class="time-label"><span class="badge">@log.Created.ToString("dd-MMM-yyyy")</span></div>
-                                                                        <div class="time-label"><span class="badge"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span></div>
-                                                                        <div>
-                                                                            <i class="fa fa-check bg-green"></i>
-                                                                        </div>
-                                                                    </div>
-                                                            }
-                                                        }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                   
                                     <div class="card card-solid">
                                         <div class="card-body pb-0">
                                             <div class="row">

@@ -139,6 +139,8 @@
 
     $('.investigation-Image').click(function () {
         $.confirm({
+            type: 'grey',
+            closeIcon: true,
             columnClass: 'medium',
             content: function () {
                 var self = this;
