@@ -982,6 +982,7 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(new
             {
                 BeneficiaryName = beneficiary.BeneficiaryName,
+                Dob = (int)beneficiary.BeneficiaryDateOfBirth.Subtract(DateTime.Now).TotalDays / 365,
                 Income = beneficiary.BeneficiaryIncome.GetEnumDisplayName(),
                 BeneficiaryRelation = beneficiary.BeneficiaryRelation.Name,
                 Address = beneficiary.Addressline + "  " + beneficiary.District.Name + "  " + beneficiary.State.Name + "  " + beneficiary.Country.Name + "  " + beneficiary.PinCode.Code,
