@@ -59,6 +59,9 @@
         position: relative;
         width: 4px;
     }
+    .timeline-reporting::before{
+
+    }
 </style>
 <section class="content pt-2">
     <div class="container-fluid">
@@ -101,7 +104,7 @@
 
                         string approved = "steps-green";
                         string approvedLine = "line-green";
-
+                        int timeTaken = 0;
                         if (Model.Log.Count > 0)
                         {
                             var statuses = Model.Log.Select(s => s.InvestigationCaseSubStatus.Name);
@@ -140,6 +143,7 @@
                                 created = "steps-grey";
                                 createdLine = "line-grey";
                             }
+                            timeTaken = @Model.Log.FirstOrDefault().Created.Subtract(Model.Log.LastOrDefault().Created).Days;
                         }
 
                         <div class="card-body">
@@ -511,7 +515,8 @@
 
                                     <div class="card card-solid">
                                         <div class="card-body pb-0">
-                                            <div class="row">
+                                            Time taken (days): @timeTaken 
+                                            <div id="timeline-reporting" class="row">
                                                 <div class="col-12 d-flex align-items-stretch flex-column">
                                                     <div class="bb-blog-content" itemprop="articleBody">
                                                         <div class="timeline">

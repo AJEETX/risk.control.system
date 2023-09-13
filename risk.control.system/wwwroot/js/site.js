@@ -151,9 +151,9 @@
                 }).done(function (response) {
                     self.setContent('OCR Data : ' + response.qrData);
                     self.setContentAppend('<br>Latitude/Longitude #: ' + response.latLong);
-                    self.setContentAppend('<br>Location Image #:<img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br>Ocr Image #: <img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.ocrData + '" /> ');
-                    self.setTitle(response.title);
+                    self.setContentAppend('<br>Location <i class="fas fa-pin"></i> :<img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
+                    self.setContentAppend('<br>Ocr <i class="fas fa-pin"></i> : <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
+                    self.setTitle('<i class="fas fa-mobile-alt"></i> ' + response.title);
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
@@ -165,7 +165,6 @@
         $.confirm({
             columnClass: 'medium',
             title: "Policy detail",
-            icon: 'far fa-file-powerpoint',
             closeIcon: true,
             columnClass: 'medium',
             type: 'grey',
@@ -190,7 +189,7 @@
                         self.setContent('Policy #: ' + response.contractNumber);
                         self.setContentAppend('<br>Claim type: ' + response.claimType);
                         self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
-                        self.setContentAppend('<br>Incidenct date: ' + response.dateOfIncident);
+                        self.setContentAppend('<br>Incident date: ' + response.dateOfIncident);
                         self.setContentAppend('<br>Amount : <i class="fas fa-rupee-sign"></i>' + response.sumAssuredValue);
                         self.setContentAppend('<br>Service : ' + response.investigationServiceType);
                         self.setContentAppend('<br>Reason : ' + response.caseEnabler);

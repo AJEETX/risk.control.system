@@ -131,6 +131,18 @@ table {
     border: .1px ridge #ccc;
 }
 
+#agentLocationPicture {
+    height: auto;
+    width: auto;
+    border: 1px solid #ddd;
+}
+
+investigation-actual-image {
+    height: auto;
+    width: auto;
+    border: 1px solid #ddd;
+}
+
 .timer-image {
     height: 1rem;
 }
