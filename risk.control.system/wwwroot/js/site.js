@@ -149,9 +149,9 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent('<br>Location <i class="fas fa-pin"></i> : <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br>Latitude/Longitude #: ' + response.latLong);
-                    self.setContentAppend('OCR Data : ' + response.qrData);
+                    self.setContent('Location <i class="fas fa-pin"></i> : <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
+                    self.setContentAppend('<br>Latitude/Longitude: ' + response.latLong);
+                    self.setContentAppend('<br>OCR Data : ' + response.qrData);
                     self.setContentAppend('<br>Ocr <i class="fas fa-pin"></i> : <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
                     self.setTitle('<i class="fas fa-mobile-alt"></i> ' + response.title);
                 }).fail(function () {

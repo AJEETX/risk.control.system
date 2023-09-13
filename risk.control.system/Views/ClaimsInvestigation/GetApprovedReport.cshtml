@@ -18,6 +18,13 @@
                         @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
                         var age = DateTime.Now.Subtract(Model.Claim.CustomerDetail.CustomerDateOfBirth).TotalDays;
                         var currentAgeinYrs = (int)age / 365;
+                        int beneficaryAge = 0;
+
+                        if (Model.Location.BeneficiaryDateOfBirth != null)
+                        {
+                            var bage = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
+                            beneficaryAge = (int)bage / 365;
+                        }
                         <div class="card-body">
                             <article>
                                 <input type="hidden" id="policyDetailId" value="@Model.Claim?.PolicyDetail.PolicyDetailId" />
@@ -181,6 +188,12 @@
                                                                         <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
                                                                     </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-user-clock"></i>
+                                                                            </span>
+                                                                            Age: @beneficaryAge
+                                                                        </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-rupee-sign"></i>

@@ -30,6 +30,13 @@
                             int currentAgeinYrs = 0;
                             bool customerExist = false;
                             bool beneficiaryExist = false;
+                            int beneficaryAge = 0;
+
+                            if (Model.CaseLocation.BeneficiaryDateOfBirth != null)
+                            {
+                                var bage = DateTime.Now.Subtract(Model.CaseLocation.BeneficiaryDateOfBirth).TotalDays;
+                                beneficaryAge = (int)bage / 365;
+                            }
                             if (Model.ClaimsInvestigation != null)
                             {
                                 address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
@@ -240,6 +247,12 @@
                                                                             <b>Relation: </b> @Model.CaseLocation?.BeneficiaryRelation.Name
                                                                         </p>
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="fas fa-user-clock"></i>
+                                                                                </span>
+                                                                                Age: @beneficaryAge
+                                                                            </li>
                                                                             <li class="small">
                                                                                 <span class="fa-li">
                                                                                     <i class="fas fa-rupee-sign"></i>
