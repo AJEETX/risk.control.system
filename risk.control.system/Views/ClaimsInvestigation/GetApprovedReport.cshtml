@@ -248,15 +248,14 @@
                                                                             var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "OCR DATA";
                                                                             var LongLat2 = @Model.Location?.ClaimReport?.LocationLongLat ?? "123.123/999.888";
                                                                         }
-                                                                        <b>OCR data:<i class="fas fa-paperclip"></i> </b> @QR1
+                                                                            <b>Location :<i class="fas fa-paperclip"></i> </b>  @LongLat2
                                                                     </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-money-bill-wave"></i>
                                                                             </span>
-                                                                            Long Lat: <i class="fas fa-pin"></i> @LongLat2
-
+                                                                                OCR Data: <i class="fas fa-pin"></i> @QR1
                                                                         </li>
                                                                     </ul>
                                                                 </div>
@@ -273,7 +272,7 @@
                                                                         }
                                                                     }
                                                                     <br />
-                                                                    OCR Doc: <i class="fas fa-pin"></i>
+                                                                    OCR Image: <i class="fas fa-pin"></i>
                                                                     @{
                                                                         if (Model.Location.ClaimReport?.AgentOcrPicture != null)
                                                                         {

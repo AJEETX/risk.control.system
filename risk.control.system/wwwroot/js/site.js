@@ -147,7 +147,7 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent('OCRData : ' + response.qrData);
+                    self.setContent('OCR Data : ' + response.qrData);
                     self.setContentAppend('<br>Latitude/Longitude #: ' + response.latLong);
                     self.setContentAppend('<br>Location Image #:<img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.location + '" /> ');
                     self.setContentAppend('<br>Ocr Image #: <img id="agentLocationPicture" class="img-fluid form-Image" src="' + response.ocrData + '" /> ');
