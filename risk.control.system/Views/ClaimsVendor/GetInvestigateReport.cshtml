@@ -1,7 +1,7 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 @{
-    ViewData["Title"] = @Applicationsettings.SERVICE;
+    ViewData["Title"] = "Claim: Report ";
 }
 <style>
     .supervisor-doc{
@@ -316,53 +316,54 @@
                                                     <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
                                                         <div class="card bg-light d-flex flex-fill">
                                                             <div class="card-header text-muted border-bottom-0">
-                                                                <i class="fas fa-mobile-alt"></i> Investigation data <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport.AgentRemarksUpdated</span>
+                                                                <i class="fas fa-mobile-alt"></i> Investigation data <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.AgentRemarksUpdated</span>
                                                             </div>
-                                                            
                                                             <div class="card-body pt-0">
                                                                 <div class="row">
                                                                     <div class="col-6">
-                                                                        <h2 class="lead"><b> @Model.CaseLocation.BeneficiaryName</b></h2>
                                                                         <p class="text-muted text-sm">
                                                                             @{
                                                                                 var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "OCR DATA";
                                                                                 var LongLat2 = @Model.CaseLocation?.ClaimReport?.LocationLongLat ?? "123.123/999.888";
                                                                             }
-                                                                            <b>Location :<i class="fas fa-paperclip"></i> </b>  @LongLat2
+                                                                            Location: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime
+                                                                            <br />
+                                                                            @{
+                                                                                if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                                {
+                                                                                    <img title="location image" id="agentLocationPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid investigation-Image" src="/img/no-photo.png">
+                                                                                }
+                                                                            }
+
                                                                         </p>
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="small">
                                                                                 <span class="fa-li">
                                                                                     <i class="fas fa-money-bill-wave"></i>
                                                                                 </span>
-                                                                                OCR Data: <i class="fas fa-pin"></i> @QR1
+                                                                                <b><i class="fas fa-paperclip"></i> </b>  @LongLat2
                                                                             </li>
                                                                         </ul>
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        Location: <i class="fas fa-pin"></i>
-                                                                        @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
-                                                                            {
-                                                                                <img title="location image" id="agentLocationPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <img title="location image" id="agentLocationPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
-                                                                            }
-                                                                        }
+                                                                        OCR: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime
                                                                         <br />
-                                                                        OCR Image: <i class="fas fa-pin"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
                                                                             {
-                                                                                <img title="ocr image" id="agentOcrPicture" alt="ocr image" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
+                                                                                <img title="ocr image" id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img title="ocr image" id="agentOcrPicture" alt="ocr image" class="img-fluid investigation-Image" src="/img/no-photo.png">
+                                                                                <img title="ocr image" id="agentOcrPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
+                                                                        <br />
+                                                                        <i class="fas fa-pin"></i> @QR1
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -441,7 +442,7 @@
                                                     <div class="col-12 d-flex align-items-stretch flex-column">
                                                         <div class="card bg-light d-flex flex-fill">
                                                             <div class="card-header text-muted border-bottom-0">
-                                                                <i class="fas fa-code"></i> Disclaimer
+                                                                <i class="fas fa-code"></i> Declaration
                                                             </div>
                                                             <div class="card-body pt-0 disclaimer-body">
                                                                 <div class="row report-disclaimer">
@@ -451,35 +452,31 @@
 
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <label>
-                                                                                <p>Our Disclaimer was last updated on [___DATE___]</p>
-                                                                                <p><strong>Interpretation and Definitions</strong></p>
-                                                                                <p><strong>Interpretation</strong></p>
-                                                                                <p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
-                                                                                <p><strong>Definitions</strong></p>
-                                                                                <p>For the purposes of this Disclaimer:</p>
-                                                                                <ul>
-                                                                                    <li><strong>"Company"</strong> (referred to as either "the Company", "We", "Us" or "Our" in this Disclaimer) refers to [___COMPANY_INFORMATION___]</li>
-                                                                                    <li><strong>"Service"</strong> refers to the Website.</li>
-                                                                                    <li><strong>"You"</strong> means the individual accessing the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</li>
-                                                                                    <li><strong>"Website"</strong> refers to [___WEBSITE_NAME___], accessible from [___WEBSITE_URL___]</li>
-                                                                                </ul>
-                                                                                <p><strong>Disclaimer</strong></p>
-                                                                                <p>The information contained on the Service is for general information purposes only.</p>
-                                                                                <p>The Company assumes no responsibility for errors or omissions in the contents of the Service.</p>
-                                                                                <p><strong>Fitness & Nutritional Information Disclaimer</strong></p>
-                                                                                <p>The Service can offer health, fitness and nutritional information including, without limitation, advice and recommendation, that is provided solely as general education and informational purposes.</p>
-                                                                                <p><strong>FTC Affiliate Disclaimer</strong></p>
-                                                                                <p>The disclosure that follows is intended to fully comply with the Federal Trade Commission's policy of the United States that requires the Company to be transparent about any and all affiliate relations the Company may have on the Service.</p>
-                                                                                <p>In no event shall the Company or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever arising out of or in connection with your access or use or inability to access or use the Service.</p>
-                                                                                <p><strong>"Use at Your Own Risk" Disclaimer</strong></p>
-                                                                                <p>All information in the Service is provided "as is", with no guarantee of completeness, accuracy, timeliness or of the results obtained from the use of this information, and without warranty of any kind, express or implied, including, but not limited to warranties of performance, merchantability and fitness for a particular purpose.</p>
-                                                                                <p>The Company will not be liable to You or anyone else for any decision made or action taken in reliance on the information given by the Service or for any consequential, special or similar damages, even if advised of the possibility of such damages.</p>
-                                                                                <p><strong>Contact Us</strong></p>
-                                                                                <p>If you have any questions about this Disclaimer, You can contact Us:</p>
-                                                                                <ul>
-                                                                                    <li>By visiting this page on our website: [___WEBSITE_CONTACT_PAGE_URL___]</li>
-                                                                                    <li>By sending us an email: [___WEBSITE_CONTACT_EMAIL___]</li>
-                                                                                </ul>
+
+                                                                                <h3 class="mb-0" style="margin-top: 0.2em!important;">Report Terms and Conditions</h3>
+                                                                                <p>Last updated <span style="color: #8351f9;">@DateTime.Now.AddYears(-1)</span></p>
+                                                                                <p><strong>AGREEMENT TO TERMS</strong></p>
+                                                                                <p>These Terms and Conditions constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and<span style="color: #8351f9;"> Holosync Technologies</span> (“we,” “us” or “our”), concerning your access to and use of the <span style="color: #8351f9;">icheckify.co.in</span> Report as well as any other media form, media channel, mobile Report or mobile application related, linked, or otherwise connected thereto (collectively, the “Application”).</p>
+                                                                                <p>You agree that by accessing the Application, you have read, understood, and agree to be bound by all of these Terms and Conditions. If you do not agree with all of these Terms and Conditions, then you are expressly prohibited from using the Application and you must discontinue use immediately.</p>
+                                                                                <p>Supplemental terms and conditions or documents that may be posted on the Application from time to time are hereby expressly incorporated herein by reference. We reserve the right, in our sole discretion, to make changes or modifications to these Terms and Conditions at any time and for any reason.</p>
+                                                                                <p>We will alert you about any changes by updating the “Last updated” date of these Terms and Conditions, and you waive any right to receive specific notice of each such change.</p>
+                                                                                <p>It is your responsibility to periodically review these Terms and Conditions to stay informed of updates. You will be subject to, and will be deemed to have been made aware of and to have accepted, the changes in any revised Terms and Conditions by your continued use of the Application after the date such revised Terms and Conditions are posted.</p>
+                                                                                <p>The information provided on the Application is not intended for distribution to or use by any person or entity in any jurisdiction or country where such distribution or use would be contrary to law or regulation or which would subject us to any report requirement within such jurisdiction or country.</p>
+                                                                                <p><strong>INTELLECTUAL PROPERTY RIGHTS</strong></p>
+                                                                                <p>Unless otherwise indicated, the Application is our proprietary property and all source code, databases, functionality, software, Report designs, audio, video, text, photographs, and graphics on the Application (collectively, the “Content”) and the trademarks, service marks, and logos contained therein (the “Marks”) are owned or controlled by us or licensed to us, and are protected by copyright and trademark laws and various other intellectual property rights and unfair competition laws of the United States, foreign jurisdictions, and international conventions.</p>
+                                                                                <p>The Content and the Marks are provided on the Application “AS IS” for your information and personal use only. Except as expressly provided in these Terms and Conditions, no part of the Application and no Content or Marks may be copied, reproduced, aggregated, republished, uploaded, posted, publicly displayed, encoded, translated, transmitted, distributed, sold, licensed, or otherwise exploited for any commercial purpose whatsoever, without our express prior written permission.</p>
+                                                                                <p>Provided that you are eligible to use the Application, you are granted a limited license to access and use the Application and to download or print a copy of any portion of the Content to which you have properly gained access solely for your personal, non-commercial use. We reserve all rights not expressly granted to you in and to the Application, the Content and the Marks.</p>
+                                                                                <p><strong>AGENCY REPRESENTATIONS</strong></p>
+                                                                                <p>By using the Application, you represent and warrant that:</p>
+                                                                                <p><span style="color: #8351f9;">[(1) all report information you submit will be true, accurate, current, and complete; (2) you will maintain the accuracy of such information and promptly update such report information as necessary;]</span></p>
+                                                                                <p>(3) you have the legal capacity and you agree to comply with these Terms and Conditions;</p>
+                                                                                <p><strong>CONTACT US</strong></p>
+                                                                                <p>In order to resolve a complaint regarding the Application or to receive further information regarding use of the Application, please contact us at:</p>
+                                                                                <p><span style="color: #8351f9;">Holosync Technologies</span></p>
+                                                                                <p><span style="color: #8351f9;">Bandra Kurla Complex, Mumbai – 400 051</span></p>
+                                                                                <p><span style="color: #8351f9;">+ 91 89579 56607</span></p>
+                                                                                <p><span style="color: #8351f9;">https://icheckify.co.in/</span></p>
+                                                                                <p><span style="color: #8351f9;">hi@icheckify.co.in</span></p>
                                                                                 <p></p>
                                                                             </label>
 

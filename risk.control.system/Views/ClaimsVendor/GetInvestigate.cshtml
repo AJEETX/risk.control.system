@@ -1,7 +1,7 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 @{
-    ViewData["Title"] = @Applicationsettings.SERVICE;
+    ViewData["Title"] = "Claim: Report ";
 }
 
 <section class="content pt-2">
@@ -327,38 +327,37 @@
                                                             <div class="card-body pt-0">
                                                                 <div class="row">
                                                                     <div class="col-6">
-                                                                        <h2 class="lead"><b> @Model.CaseLocation.BeneficiaryName</b></h2>
                                                                         <p class="text-muted text-sm">
                                                                             @{
                                                                                 var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "OCR DATA";
                                                                                 var LongLat2 = @Model.CaseLocation?.ClaimReport?.LocationLongLat ?? "123.123/999.888";
                                                                             }
-                                                                            <b>Location :<i class="fas fa-paperclip"></i> </b>  @LongLat2
+                                                                            Location: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime
+                                                                            <br />
+                                                                            @{
+                                                                                if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                                {
+                                                                                    <img title="location image" id="agentLocationPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid investigation-Image" src="/img/no-photo.png">
+                                                                                }
+                                                                            }
+                                                                            
                                                                         </p>
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="small">
                                                                                 <span class="fa-li">
                                                                                     <i class="fas fa-money-bill-wave"></i>
                                                                                 </span>
-                                                                                OCR Data: <i class="fas fa-pin"></i> @QR1
-
+                                                                                <b><i class="fas fa-paperclip"></i> </b>  @LongLat2
                                                                             </li>
                                                                         </ul>
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        Location: <i class="fas fa-pin"></i>
-                                                                        @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
-                                                                            {
-                                                                                <img title="location image" id="agentLocationPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid investigation-Image" src="/img/no-photo.png">
-                                                                            }
-                                                                        }
+                                                                        OCR: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime
                                                                         <br />
-                                                                        OCR Image: <i class="fas fa-pin"></i>
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
                                                                             {
@@ -369,6 +368,8 @@
                                                                                 <img title="ocr image" id="agentOcrPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                             }
                                                                         }
+                                                                        <br />
+                                                                        <i class="fas fa-pin"></i> @QR1
                                                                     </div>
                                                                 </div>
                                                             </div>
