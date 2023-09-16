@@ -15,6 +15,8 @@ using SmartBreadcrumbs.Nodes;
 
 using System.Security.Claims;
 
+using static System.Net.WebRequestMethods;
+
 namespace risk.control.system.Controllers
 {
     public class ClaimsVendorController : Controller
@@ -342,6 +344,7 @@ namespace risk.control.system.Controllers
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
                     );
+            //var url = $"https://maps.googleapis.com/maps/api/staticmap?center={lat},${lng}&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7Clabel:S%7C${lat},${lng}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
 
