@@ -272,6 +272,7 @@
                                                                         @{
                                                                             var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "OCR DATA";
                                                                             var LongLat2 = @Model.Location?.ClaimReport?.LocationLongLat ?? "123.123/999.888";
+                                                                                    var image = @ViewBag.LocationUrl;
                                                                         }
                                                                         <span class="badge badge-light"> Location</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.Location.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                         <br />
@@ -292,7 +293,8 @@
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-money-bill-wave"></i>
                                                                             </span>
-                                                                            <b><i class="fas fa-paperclip"></i> </b>  @LongLat2
+                                                                            <b><i class="fas fa-paperclip"></i> </b>  
+                                                                            <img class="locationImage" src=@image />
                                                                         </li>
                                                                     </ul>
                                                                 </div>

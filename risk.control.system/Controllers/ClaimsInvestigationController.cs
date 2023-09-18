@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
@@ -579,7 +580,20 @@ namespace risk.control.system.Controllers
                 .Include(c => c.Country)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
-                    );
+            );
+
+            if (claimCase.ClaimReport.LocationLongLat != null)
+            {
+                var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
+                var longitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat);
+                var latitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1);
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={longitude},{latitude}&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{longitude},{latitude}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                ViewBag.LocationUrl = url;
+            }
+            else
+            {
+                ViewBag.LocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=18.6648544,73.733224&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7Clabel:S%7C18.6648544,73.733224&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            }
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
 
@@ -647,6 +661,19 @@ namespace risk.control.system.Controllers
                 Log = caseLogs,
                 Location = location
             };
+
+            if (location.ClaimReport.LocationLongLat != null)
+            {
+                var longLat = location.ClaimReport.LocationLongLat.IndexOf("/");
+                var longitude = location.ClaimReport.LocationLongLat.Substring(0, longLat);
+                var latitude = location.ClaimReport.LocationLongLat.Substring(longLat + 1);
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={longitude},{latitude}&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{longitude},{latitude}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                ViewBag.LocationUrl = url;
+            }
+            else
+            {
+                ViewBag.LocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=18.6648544,73.733224&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7Clabel:S%7C18.6648544,73.733224&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            }
 
             return View(model);
         }
