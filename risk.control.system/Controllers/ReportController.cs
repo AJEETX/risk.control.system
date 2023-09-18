@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers
                 var longLat = location.ClaimReport.LocationLongLat.IndexOf("/");
                 var longitude = location.ClaimReport.LocationLongLat.Substring(0, longLat);
                 var latitude = location.ClaimReport.LocationLongLat.Substring(longLat + 1);
-                var longLatitude = longitude + "," + latitude;
+                var longLatitude = longitude.Trim() + "," + latitude.Trim();
                 var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{0}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s", longLatitude);
                 ViewBag.LocationUrl = url;
             }
