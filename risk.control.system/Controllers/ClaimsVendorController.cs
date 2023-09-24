@@ -350,7 +350,7 @@ namespace risk.control.system.Controllers
                 var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
                 var longitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat);
                 var latitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1);
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={longitude},{latitude}&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{longitude},{latitude}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{0}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s", claimCase.ClaimReport.LocationLongLat);
                 ViewBag.LocationUrl = url;
             }
             else
@@ -512,7 +512,7 @@ namespace risk.control.system.Controllers
                 var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
                 var longitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat);
                 var latitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1);
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={longitude},{latitude}&zoom=14&size=400x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{longitude},{latitude}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                var url = string.Format("https://maps.googleapis.com/maps/api/staticmap?center={0}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{0}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s", claimCase.ClaimReport.LocationLongLat);
                 ViewBag.LocationUrl = url;
             }
             else

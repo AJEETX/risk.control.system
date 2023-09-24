@@ -2,7 +2,13 @@
 
 @{
     ViewData["Title"] = Applicationsettings.CREATE;
+
     var email = Model.ClientCompany.Email;
+    var emailAtIndex = email.IndexOf("@");
+    if(emailAtIndex>0)
+    {
+        email = email.Substring(emailAtIndex + 1);    
+    }
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
 
