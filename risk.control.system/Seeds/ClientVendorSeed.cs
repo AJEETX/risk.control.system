@@ -14,10 +14,10 @@ namespace risk.control.system.Seeds
 
             var abcVendor = new Vendor
             {
-                Name = "Agency 1",
+                Name = Applicationsettings.AGENCY1NAME,
                 Addressline = "1, Main Road  ",
                 Branch = "MAHATTAN",
-                Code = "VA001",
+                Code = Applicationsettings.AGENCY1CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "WESTPAC",
@@ -28,7 +28,7 @@ namespace risk.control.system.Seeds
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "HEAD OFFICE ",
-                Email = "agency1.com",
+                Email = Applicationsettings.AGENCY1DOMAIN,
                 PhoneNumber = "8888004739",
                 DocumentUrl = "/img/agency.png"
             };
@@ -42,13 +42,13 @@ namespace risk.control.system.Seeds
             var TataAig = new ClientCompany
             {
                 ClientCompanyId = Guid.NewGuid().ToString(),
-                Name = "XYZ Insurance",
+                Name = Applicationsettings.COMPANYNAME,
                 Addressline = "100 GOOD STREET ",
                 Branch = "FOREST HILL CHASE",
-                Code = "TA001",
+                Code = Applicationsettings.COMPANYCODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
-                BankName = "WESTPAC",
+                BankName = "NAB",
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
                 CountryId = indiaCountry.Entity.CountryId,
@@ -56,7 +56,7 @@ namespace risk.control.system.Seeds
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "CORPORATE OFFICE ",
-                Email = "company.com",
+                Email = Applicationsettings.COMPANYDOMAIN,
                 DocumentUrl = "/img/company.png",
                 PhoneNumber = "9988004739",
                 EmpanelledVendors = new List<Vendor> { abcVendor }
@@ -66,10 +66,10 @@ namespace risk.control.system.Seeds
 
             var xyzVendor = new Vendor
             {
-                Name = "Agency 2",
-                Addressline = "1, Main Road  ",
+                Name = Applicationsettings.AGENCY2NAME,
+                Addressline = "10, Clear Road  ",
                 Branch = "KANPUR",
-                Code = "XY001",
+                Code = Applicationsettings.AGENCY2CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "SBI BANK",
@@ -80,7 +80,7 @@ namespace risk.control.system.Seeds
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "HEAD OFFICE ",
-                Email = "agency2.com",
+                Email = Applicationsettings.AGENCY2DOMAIN,
                 PhoneNumber = "4444404739",
                 DocumentUrl = "/img/2.png"
             };
@@ -134,10 +134,10 @@ namespace risk.control.system.Seeds
 
             var xyz1Vendor = new Vendor
             {
-                Name = "Agency 3",
+                Name = Applicationsettings.AGENCY3NAME,
                 Addressline = "1, Main Road  ",
                 Branch = "KANPUR",
-                Code = "XY100",
+                Code = Applicationsettings.AGENCY3CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "HDFC BANK",
@@ -148,7 +148,7 @@ namespace risk.control.system.Seeds
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "HEAD OFFICE ",
-                Email = "agency3.com",
+                Email = Applicationsettings.AGENCY3DOMAIN,
                 PhoneNumber = "7964404160",
                 DocumentUrl = "/img/agency1.png"
             };

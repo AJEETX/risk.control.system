@@ -43,7 +43,7 @@
     <a href="/" class="brand-link">
         <img src="@Applicationsettings.WEBSITE_SITE_MENU_LOGO" alt="icheckify logo" class="brand-image elevation-2" style="opacity: .8">
         <div>
-            <span class="brand-text font-weight-light">iCheck </span>
+            <span class="brand-text font-weight-light">&nbsp;</span>
         </div>
     </a>
     <!-- Sidebar -->
@@ -66,7 +66,7 @@
                     </div>
                 }
                 <a href="#" class="d-block">
-                    @UserManager.GetUserAsync(User).Result?.FirstName @UserManager.GetUserAsync(User).Result?.LastName
+                    @UserManager.GetUserAsync(User).Result?.FirstName
                     @if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                     {
                         roleCode = @Applicationsettings.PORTAL_ADMIN.CODE;

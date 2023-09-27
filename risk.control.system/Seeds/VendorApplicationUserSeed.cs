@@ -128,7 +128,7 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
-                Addressline = "99 Naaley ke paas",
+                Addressline = "99 Mandir ke paas",
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
                 StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,

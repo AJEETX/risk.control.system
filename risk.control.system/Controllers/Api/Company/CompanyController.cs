@@ -95,7 +95,6 @@ namespace risk.control.system.Controllers.Api.Company
                     State = u.State.Name,
                     Country = u.Country.Name
                 });
-            await Task.Delay(1000);
 
             return Ok(result.ToArray());
         }
@@ -111,8 +110,9 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var availableVendors = _context.Vendor
-                .Where(v => v.ClientCompanyId != companyUser.ClientCompanyId
-                && (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
+                .Where(v =>
+                v.ClientCompanyId != companyUser.ClientCompanyId &&
+                (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)

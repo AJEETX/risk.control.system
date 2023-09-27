@@ -67,28 +67,7 @@
                                 </div>
                                 <div class="col-sm-6">
                                    
-                                    <div class="form-group">
-                                        <label asp-for="AgreementDate" class="control-label"></label>
-                                        <input asp-for="AgreementDate" class="form-control" />
-                                        <span asp-validation-for="AgreementDate" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="ActivatedDate" class="control-label"></label>
-                                        <input asp-for="ActivatedDate" class="form-control" />
-                                        <span asp-validation-for="ActivatedDate" class="text-danger"></span>
-                                    </div>
-                                     <div class="form-group">
-                                        <label asp-for="Status" class="control-label"></label>
-                                        <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<CompanyStatus>()">
-                                            <option>--- SELECT STATUS ---</option>
-                                        </select>
-                                        <span asp-validation-for="Status" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label asp-for="Addressline" class="control-label"></label>
-                                        <input asp-for="Addressline" class="form-control" />
-                                        <span asp-validation-for="Addressline" class="text-danger"></span>
-                                    </div>
+                                    
                                     <div class="form-group">
                                         <label asp-for="CountryId" class="control-label"></label>
                                         <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
@@ -115,6 +94,29 @@
                                         <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
                                             <option>--- SELECT PINCODE ---</option>
                                         </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Addressline" class="control-label"></label>
+                                        <input asp-for="Addressline" class="form-control" />
+                                        <span asp-validation-for="Addressline" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label asp-for="AgreementDate" class="control-label"></label>
+                                        <input asp-for="AgreementDate" class="form-control" />
+                                        <span asp-validation-for="AgreementDate" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="ActivatedDate" class="control-label"></label>
+                                        <input asp-for="ActivatedDate" class="form-control" />
+                                        <span asp-validation-for="ActivatedDate" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="Status" class="control-label"></label>
+                                        <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<CompanyStatus>()">
+                                            <option>--- SELECT STATUS ---</option>
+                                        </select>
+                                        <span asp-validation-for="Status" class="text-danger"></span>
                                     </div>
                                      <div class="form-group">
                                         <label asp-for="DocumentImage" class="control-label"></label>

@@ -379,18 +379,8 @@ namespace risk.control.system.Controllers
 
                 if (company != null)
                 {
-                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
-                    .Include(v => v.Country)
-                    .Include(v => v.PinCode)
-                    .Include(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices)?.ToList();
+                    var empanelledVendors = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId))
+                    ?.ToList();
 
                     company.EmpanelledVendors.AddRange(empanelledVendors);
                     company.Updated = DateTime.UtcNow;
@@ -432,19 +422,9 @@ namespace risk.control.system.Controllers
 
                 if (company != null)
                 {
-                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
+                    var empanelledVendors = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId))
                     .Where(v => v.ClientCompanyId == companyUser.ClientCompanyId)
-                    .Include(v => v.Country)
-                    .Include(v => v.PinCode)
-                    .Include(v => v.State)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.District)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.LineOfBusiness)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.InvestigationServiceType)
-                    .Include(v => v.VendorInvestigationServiceTypes)
-                    .ThenInclude(v => v.PincodeServices);
+                    ;
                     foreach (var v in empanelledVendors)
                     {
                         company.EmpanelledVendors.Remove(v);

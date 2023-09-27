@@ -9,14 +9,14 @@
         //WEBSITE SETTINGS
 
         public const string WEBSITE_SITE_MENU_BRAND = "aby";
-        public const string WEBSITE_COMPANY_MENU_BRAND = "tata aig";
-        public const string WEBSITE_TITLE = "risk.control.unit";
+        public const string WEBSITE_COMPANY_MENU_BRAND = "sbi life";
+        public const string WEBSITE_TITLE = "iCheckify";
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
         public const string WEBSITE_SITE_DESIGNER = "its aby";
         public const string WEBSITE_SITE_DESIGNER_URL = "http://itsaby.com.au";
 
         //LOGIN
-        public const string WEBSITE_LOGIN = "Log in: risk.control.unit";
+        public const string WEBSITE_LOGIN = "Log in: iCheckify";
 
         public const string WEBSITE_SIGNIN = "Sign in";
 
@@ -147,12 +147,28 @@
         public const string CURRENT_DISTRICT = "ANANTAPUR";
         public const string CURRENT_STATE = "AD";
 
+        public const string COMPANYNAME = "sbi life";
+        public const string COMPANYCODE = "sli";
+        public const string COMPANYDOMAIN = "sbilife.com";
+
+        public const string AGENCY1NAME = "Good agency";
+        public const string AGENCY1CODE = "G0A";
+        public const string AGENCY1DOMAIN = "good_agency.com";
+
+        public const string AGENCY2NAME = "Great agency";
+        public const string AGENCY2CODE = "GRA";
+        public const string AGENCY2DOMAIN = "great_agency.com";
+
+        public const string AGENCY3NAME = "Best agency";
+        public const string AGENCY3CODE = "BEA";
+        public const string AGENCY3DOMAIN = "best_agency.com";
+
         public const string NO_IMAGE = "/img/no-image.png";
 
         public static class PORTAL_ADMIN
         {
             public const string DISPLAY_NAME = "ADMIN";
-            public const string CODE = "icheckify-admin";
+            public const string CODE = "admin";
             public const string USERNAME = "admin@icheckify.co.in";
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Ajeet";
@@ -164,7 +180,7 @@
         {
             public const string DISPLAY_NAME = "ADMIN";
             public const string CODE = "admin";
-            public const string USERNAME = "admin@company.com";
+            public const string USERNAME = "admin@" + COMPANYDOMAIN;
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Amit";
             public const string LAST_NAME = "Kumar";
@@ -175,7 +191,7 @@
         {
             public const string DISPLAY_NAME = "CREATOR";
             public const string CODE = "creator";
-            public const string USERNAME = "creator@company.com";
+            public const string USERNAME = "creator@" + COMPANYDOMAIN;
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Rashmi";
             public const string LAST_NAME = "Kumar";
@@ -186,7 +202,7 @@
         {
             public const string DISPLAY_NAME = "ASSIGNER";
             public const string CODE = "assigner";
-            public const string USERNAME = "assigner@company.com";
+            public const string USERNAME = "assigner@" + COMPANYDOMAIN;
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";
@@ -197,7 +213,7 @@
         {
             public const string DISPLAY_NAME = "ASSESSOR";
             public const string CODE = "assessor";
-            public const string USERNAME = "assessor@company.com";
+            public const string USERNAME = "assessor@" + COMPANYDOMAIN;
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";
