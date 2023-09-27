@@ -151,17 +151,17 @@
         public const string COMPANYCODE = "sli";
         public const string COMPANYDOMAIN = "sbilife.com";
 
-        public const string AGENCY1NAME = "Good agency";
-        public const string AGENCY1CODE = "G0A";
-        public const string AGENCY1DOMAIN = "good_agency.com";
+        public const string AGENCY1NAME = "Checker";
+        public const string AGENCY1CODE = "CHA";
+        public const string AGENCY1DOMAIN = "checker.com";
 
-        public const string AGENCY2NAME = "Great agency";
-        public const string AGENCY2CODE = "GRA";
-        public const string AGENCY2DOMAIN = "great_agency.com";
+        public const string AGENCY2NAME = "Verify";
+        public const string AGENCY2CODE = "VEA";
+        public const string AGENCY2DOMAIN = "verify.com";
 
-        public const string AGENCY3NAME = "Best agency";
-        public const string AGENCY3CODE = "BEA";
-        public const string AGENCY3DOMAIN = "best_agency.com";
+        public const string AGENCY3NAME = "Investigate";
+        public const string AGENCY3CODE = "INA";
+        public const string AGENCY3DOMAIN = "investigate.com";
 
         public const string NO_IMAGE = "/img/no-image.png";
 

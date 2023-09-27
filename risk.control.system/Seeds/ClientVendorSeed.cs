@@ -15,7 +15,7 @@ namespace risk.control.system.Seeds
             var abcVendor = new Vendor
             {
                 Name = Applicationsettings.AGENCY1NAME,
-                Addressline = "1, Main Road  ",
+                Addressline = "1, Nice Road  ",
                 Branch = "MAHATTAN",
                 Code = Applicationsettings.AGENCY1CODE,
                 ActivatedDate = DateTime.Now,
@@ -30,7 +30,7 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY1DOMAIN,
                 PhoneNumber = "8888004739",
-                DocumentUrl = "/img/agency.png"
+                DocumentUrl = "/img/checker.png"
             };
 
             var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
@@ -57,7 +57,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "CORPORATE OFFICE ",
                 Email = Applicationsettings.COMPANYDOMAIN,
-                DocumentUrl = "/img/company.png",
+                DocumentUrl = "/img/sbil.png",
                 PhoneNumber = "9988004739",
                 EmpanelledVendors = new List<Vendor> { abcVendor }
             };
@@ -82,7 +82,7 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY2DOMAIN,
                 PhoneNumber = "4444404739",
-                DocumentUrl = "/img/2.png"
+                DocumentUrl = "/img/verify.png"
             };
 
             var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);
@@ -150,7 +150,7 @@ namespace risk.control.system.Seeds
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY3DOMAIN,
                 PhoneNumber = "7964404160",
-                DocumentUrl = "/img/agency1.png"
+                DocumentUrl = "/img/investigate.png"
             };
 
             var xyz1VendorCompany = await context.Vendor.AddAsync(xyz1Vendor);
