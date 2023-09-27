@@ -571,7 +571,7 @@ namespace risk.control.system.Controllers
                 {
                     toastNotification.AddSuccessToastMessage("Report sent to review successfully");
                 }
-                return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                return RedirectToAction(nameof(ClaimsVendorController.Index));
             }
             catch (Exception ex)
             {
