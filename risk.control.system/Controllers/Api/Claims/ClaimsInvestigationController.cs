@@ -1021,11 +1021,17 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
+            var longLat = beneficiary.ClaimReport.LocationLongLat.IndexOf("/");
+            var longitude = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+            var latitude = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
+            var longLatString = longitude + "," + latitude;
+            var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+
             var data = new
             {
                 Title = "Investigation Data",
                 QrData = beneficiary.ClaimReport?.AgentOcrData,
-                LatLong = beneficiary.ClaimReport?.LocationLongLat,
+                LatLong = mapUrl,
                 Location = beneficiary.ClaimReport?.AgentLocationPicture != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentLocationPicture)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
