@@ -8,6 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\company\**" />
+    <Compile Remove="wwwroot\upload-pincodes\**" />
+    <Compile Remove="wwwroot\upload\**" />
+    <Content Remove="wwwroot\company\**" />
+    <Content Remove="wwwroot\upload-pincodes\**" />
+    <Content Remove="wwwroot\upload\**" />
+    <EmbeddedResource Remove="wwwroot\company\**" />
+    <EmbeddedResource Remove="wwwroot\upload-pincodes\**" />
+    <EmbeddedResource Remove="wwwroot\upload\**" />
+    <None Remove="wwwroot\company\**" />
+    <None Remove="wwwroot\upload-pincodes\**" />
+    <None Remove="wwwroot\upload\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\text.txt" />
   </ItemGroup>
 
@@ -170,10 +185,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\company\" />
-    <Folder Include="wwwroot\upload-pincodes\" />
     <Folder Include="wwwroot\document\" />
-    <Folder Include="wwwroot\upload\" />
   </ItemGroup>
 
   <ItemGroup>
