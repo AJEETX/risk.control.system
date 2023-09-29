@@ -186,7 +186,8 @@
                     'success': function (response) {
                         console.log(response);
                         self.setTitle('<i class="far fa-file-powerpoint"></i> Policy detail ');
-                        self.setContent('Policy #: ' + response.contractNumber);
+                        self.setContent('Policy Doc: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.document + '" /> ');
+                        self.setContentAppend('<br>Policy #: ' + response.contractNumber);
                         self.setContentAppend('<br>Claim type: ' + response.claimType);
                         self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
                         self.setContentAppend('<br>Incident date: ' + response.dateOfIncident);
@@ -226,7 +227,8 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent('Customer: ' + response.customerName);
+                    self.setContent('Photo: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.customer + '" /> ');
+                    self.setContentAppend('<br>Customer: ' + response.customerName);
                     self.setContentAppend('<br>Occupation #: ' + response.occupation);
                     self.setContentAppend('<br>Income #: ' + response.income);
                     self.setContentAppend('<br>Education #: ' + response.education);
@@ -264,7 +266,8 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent('Beneficiary: ' + response.beneficiaryName);
+                    self.setContent('Photo: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.beneficiary + '" /> ');
+                    self.setContentAppend('<br>Beneficiary: ' + response.beneficiaryName);
                     self.setContentAppend('<br>Relation #: ' + response.beneficiaryRelation);
                     self.setContentAppend('<br>Phone #: ' + response.contactNumber);
                     self.setContentAppend('<br>Income #: ' + response.income);

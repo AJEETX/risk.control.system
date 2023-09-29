@@ -929,19 +929,26 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(p => p.CaseEnabler)
                 .FirstOrDefaultAsync(p => p.PolicyDetailId == id);
 
-            return Ok(
-                new
-                {
-                    ContractNumber = policy.ContractNumber,
-                    ClaimType = policy.ClaimType.GetEnumDisplayName(),
-                    ContractIssueDate = policy.ContractIssueDate.ToString("dd-MMM-yyyy"),
-                    DateOfIncident = policy.DateOfIncident.ToString("dd-MMM-yyyy"),
-                    SumAssuredValue = policy.SumAssuredValue,
-                    InvestigationServiceType = policy.InvestigationServiceType.Name,
-                    CaseEnabler = policy.CaseEnabler.Name,
-                    CauseOfLoss = policy.CauseOfLoss
-                }
-                );
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+            var response = new
+            {
+                Document =
+                    policy.DocumentImage != null ?
+                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(policy.DocumentImage)) :
+                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                ContractNumber = policy.ContractNumber,
+                ClaimType = policy.ClaimType.GetEnumDisplayName(),
+                ContractIssueDate = policy.ContractIssueDate.ToString("dd-MMM-yyyy"),
+                DateOfIncident = policy.DateOfIncident.ToString("dd-MMM-yyyy"),
+                SumAssuredValue = policy.SumAssuredValue,
+                InvestigationServiceType = policy.InvestigationServiceType.Name,
+                CaseEnabler = policy.CaseEnabler.Name,
+                CauseOfLoss = policy.CauseOfLoss
+            };
+            return Ok(response);
         }
 
         [HttpGet("GetCustomerDetail")]
@@ -954,9 +961,15 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.PinCode)
                 .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
 
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
             return Ok(
                 new
                 {
+                    Customer = customer?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(customer.ProfilePicture)) :
+                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                     CustomerName = customer.CustomerName,
                     ContactNumber = customer.ContactNumber,
                     Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
@@ -979,8 +992,14 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Include(c => c.ClaimReport)
                 .FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
 
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
             return Ok(new
             {
+                Beneficiary = beneficiary?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ProfilePicture)) :
+                    string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 BeneficiaryName = beneficiary.BeneficiaryName,
                 Dob = (int)beneficiary.BeneficiaryDateOfBirth.Subtract(DateTime.Now).TotalDays / 365,
                 Income = beneficiary.BeneficiaryIncome.GetEnumDisplayName(),
