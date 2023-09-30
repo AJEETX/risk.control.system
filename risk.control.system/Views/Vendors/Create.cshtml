@@ -127,6 +127,16 @@
                                             <span asp-validation-for="IFSCCode" class="text-danger"></span>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Document:</span>
+                                        <div class="input-group mb-3">
+
+                                            <img id="documentImage" class="form-Image" src="/img/no-photo.png">
+
+                                            <input asp-for="DocumentImage" class="form-control" type="file" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-sm-6">
 
@@ -226,16 +236,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Document:</span>
-                                        <div class="input-group mb-3">
-                                            
-                                            <img id="documentImage" class="form-Image" src="/img/no-photo.png">
-
-                                            <input asp-for="DocumentImage" class="form-control" type="file" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
-
-                                        </div>
-                                    </div>
+                                    
 
                                     <div class="form-group">
                                         <span class="input-group-label"> Note:</span>

@@ -158,13 +158,15 @@
                                             <input type="text" asp-for="Addressline" class="form-control" required placeholder="Enter Address line"  maxlength="20"/>
                                         </div>
                                     </div>
-                                    <div class="form-group text-right">
-                                        <span class="checkbox">
-                                            <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
+                                    @if (ViewBag.Show)
+                                    {
+                                        <div class="form-group text-right">
+                                            <span class="checkbox">
+                                                <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
 
-                                        </span>
-                                    </div>
-
+                                            </span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                             <div class="row">

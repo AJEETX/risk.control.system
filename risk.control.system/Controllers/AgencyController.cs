@@ -243,6 +243,11 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("agency not found");
                 return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            ViewBag.Show = vendorApplicationUser.Email == vendorUser.Email ? false : true;
+
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
 
             if (vendor == null)

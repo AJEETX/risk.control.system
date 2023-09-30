@@ -236,6 +236,10 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("company not found");
                 return NotFound();
             }
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            ViewBag.Show = clientCompanyApplicationUser.Email == companyUser.Email ? false : true;
             var clientComapany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
 
             if (clientComapany == null)
