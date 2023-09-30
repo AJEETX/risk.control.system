@@ -564,13 +564,13 @@ namespace risk.control.system.Controllers
                 if (success != null)
                 {
                     await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] investigation submitted to Company successfully !", success.PolicyDetail.ContractNumber));
+                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] report submitted to Company successfully !", success.PolicyDetail.ContractNumber));
                 }
                 else
                 {
                     toastNotification.AddSuccessToastMessage("Report sent to review successfully");
                 }
-                return RedirectToAction(nameof(ClaimsVendorController.Index));
+                return RedirectToAction(nameof(ClaimsVendorController.ClaimReport));
             }
             catch (Exception ex)
             {
