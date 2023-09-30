@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'icheckify'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2896E2345CD44A3BABA06E101B10D513 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E2382D7A34F342F9BA2EFFC1279359F5 }}
           package: .
