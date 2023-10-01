@@ -1468,6 +1468,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CurrentClaimOwner")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("HopCount")
                         .HasColumnType("INTEGER");
 

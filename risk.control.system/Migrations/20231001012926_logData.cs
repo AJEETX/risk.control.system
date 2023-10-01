@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class sbi : Migration
+    public partial class logData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1229,6 +1229,7 @@ namespace risk.control.system.Migrations
                     messageIcon = table.Column<string>(type: "TEXT", nullable: true),
                     footerIcon = table.Column<string>(type: "TEXT", nullable: true),
                     footerMessage = table.Column<string>(type: "TEXT", nullable: true),
+                    CurrentClaimOwner = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)

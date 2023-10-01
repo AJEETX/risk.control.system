@@ -577,14 +577,14 @@
                                                                             <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
                                                                             @if (@firstOnly)
                                                                             {
-                                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name.</span></h3>
+                                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name : @log.InvestigationCaseSubStatus.Name.</span></h3>
                                                                             }
                                                                             else
                                                                             {
-                                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case: <span class="badge badge-success"> ....</span></h3>
+                                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case: <span class="badge badge-success"> @log.InvestigationCaseSubStatus.Name.</span></h3>
                                                                             }
                                                                             <div class="timeline-body">
-                                                                                The status has been updated to <span class="badge badge-info">@log.InvestigationCaseSubStatus.Name</span>
+                                                                                The case is moved to <span class="badge badge-info">@log.CurrentClaimOwner</span>
                                                                             </div>
 
                                                                         </div>

@@ -133,14 +133,14 @@ namespace risk.control.system.Services
             {
                 var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
-                var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
-                foreach (var assignedUser in assignerUsers)
+                foreach (var companyUser in companyUsers)
                 {
-                    var isTrue = await userManager.IsInRoleAsync(assignedUser, assignerRole?.Name);
-                    if (isTrue)
+                    var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
+                    if (isAssigner)
                     {
-                        userEmailsToSend.Add(assignedUser.Email);
+                        userEmailsToSend.Add(companyUser.Email);
                     }
                 }
             }

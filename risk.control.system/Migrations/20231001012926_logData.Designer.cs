@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230927071459_sbi")]
-    partial class sbi
+    [Migration("20231001012926_logData")]
+    partial class logData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1469,6 +1469,9 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurrentClaimOwner")
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("HopCount")

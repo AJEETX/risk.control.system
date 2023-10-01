@@ -25,5 +25,6 @@ namespace risk.control.system.Models
         public string? messageIcon { get; set; }
         public string? footerIcon { get; set; }
         public string? footerMessage { get; set; }
+        public string? CurrentClaimOwner { get; set; }
     }
 }
