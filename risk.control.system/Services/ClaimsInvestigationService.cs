@@ -66,9 +66,9 @@ namespace risk.control.system.Services
                     if (existingPolicy != null)
                     {
                         existingPolicy.Updated = DateTime.UtcNow;
-                        existingPolicy.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "(" + userEmail + ")";
+                        existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
-                        existingPolicy.CurrentClaimOwner = currentUser.FirstName + " " + currentUser.LastName;
+                        existingPolicy.CurrentClaimOwner = currentUser.Email;
                         existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
                         existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
                     }
@@ -98,7 +98,7 @@ namespace risk.control.system.Services
                             var log = new InvestigationTransaction
                             {
                                 ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                                CurrentClaimOwner = currentUser.FirstName + " " + currentUser.LastName,
+                                CurrentClaimOwner = currentUser.Email,
                                 Created = DateTime.UtcNow,
                                 HopCount = 0,
                                 Time2Update = 0,
@@ -436,7 +436,7 @@ namespace risk.control.system.Services
                     var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
                     if (isAssigner)
                     {
-                        currentOwner = companyUser.FirstName + " " + companyUser.LastName + "(" + companyUser.Email + ")";
+                        currentOwner = companyUser.Email;
                         break;
                     }
                 }
@@ -515,7 +515,7 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.Updated = DateTime.UtcNow;
                 claimsCaseToAllocateToVendor.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")";
                 claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
-                claimsCaseToAllocateToVendor.CurrentClaimOwner = supervisor.FirstName + " " + supervisor.LastName + "(" + supervisor.Email + ")";
+                claimsCaseToAllocateToVendor.CurrentClaimOwner = supervisor.Email;
                 claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId;
                 var existinCaseLocation = claimsCaseToAllocateToVendor.CaseLocations.FirstOrDefault(c => c.CaseLocationId == caseLocationId);
@@ -579,7 +579,7 @@ namespace risk.control.system.Services
                 claim.Updated = DateTime.UtcNow;
                 claim.UpdatedBy = supervisor.FirstName + " " + supervisor.LastName + " (" + supervisor.Email + ")";
                 claim.CurrentUserEmail = currentUser;
-                claim.CurrentClaimOwner = agentUser.FirstName + " " + agentUser.LastName + "(" + agentUser.Email + ")";
+                claim.CurrentClaimOwner = agentUser.Email;
                 claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
                 claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
 
@@ -621,7 +621,7 @@ namespace risk.control.system.Services
             claim.Updated = DateTime.UtcNow;
             claim.UpdatedBy = agent.FirstName + " " + agent.LastName + "(" + agent.Email + ")";
             claim.CurrentUserEmail = userEmail;
-            claim.CurrentClaimOwner = supervisor.FirstName + " " + supervisor.LastName + "(" + supervisor.Email + ")";
+            claim.CurrentClaimOwner = supervisor.Email;
             claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
             claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus
                 .FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId;
@@ -656,7 +656,7 @@ namespace risk.control.system.Services
             {
                 ClaimsInvestigationId = claimsInvestigationId,
                 HopCount = lastLogHop + 1,
-                CurrentClaimOwner = supervisor.FirstName + " " + supervisor.LastName + "(" + supervisor.Email + ")",
+                CurrentClaimOwner = supervisor.Email,
                 Created = DateTime.UtcNow,
                 Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
@@ -871,7 +871,7 @@ namespace risk.control.system.Services
             var isSupervisor = await userManager.IsInRoleAsync(agencyUser, supervisorRole?.Name);
             if (isSupervisor)
             {
-                supervisorUser = agencyUser.FirstName + " " + agencyUser.LastName + " (" + agencyUser.Email + ")";
+                supervisorUser = agencyUser.Email;
             }
 
             var companyUsers = _context.ClientCompanyApplicationUser.Where(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
@@ -881,7 +881,7 @@ namespace risk.control.system.Services
                 var isAssigner = await userManager.IsInRoleAsync(companyUser, assessorRole?.Name);
                 if (isAssigner)
                 {
-                    currentOwner = companyUser.FirstName + " " + companyUser.LastName + "(" + companyUser.Email + ")";
+                    currentOwner = companyUser.Email;
                     break;
                 }
             }

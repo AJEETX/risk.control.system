@@ -343,11 +343,12 @@
                                                                     <div class="col-6">
                                                                         <p class="text-muted text-sm">
                                                                             @{
-                                                                                var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "OCR DATA";
+                                                                                var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "PAN DATA";
                                                                                 var LongLat2 = @Model.CaseLocation?.ClaimReport?.LocationLongLat ?? "123.123/999.888";
                                                                                 var image = @ViewBag.LocationUrl;
+                                                                                var ocrImage = @ViewBag.OcrLocationUrl;
                                                                             }
-                                                                            <span class="badge badge-light"> Location</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                            <span class="badge badge-light"> Image:</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br />
                                                                             @{
                                                                                 if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
@@ -356,7 +357,7 @@
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid investigation-Image" src="/img/no-photo.png">
+                                                                                    <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid" src="/img/no-photo.png">
                                                                                 }
                                                                             }
 
@@ -373,7 +374,7 @@
                                                                         </ul>
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        <span class="badge badge-light"> OCR</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                        <span class="badge badge-light"> PAN</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                         <br />
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
@@ -382,11 +383,14 @@
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img title="ocr image" id="agentOcrPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
+                                                                                <img title="ocr image" id="agentOcrPicture" alt="user-avatar" class="img-fluid" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                         <br />
-                                                                        <i class="fas fa-pin"></i> @QR1
+                                                                        <i class="fas fa-pin"></i>
+                                                                        <img class="locationImage" src=@ocrImage />
+                                                                        <br />
+                                                                        @QR1
                                                                     </div>
                                                                 </div>
                                                             </div>
