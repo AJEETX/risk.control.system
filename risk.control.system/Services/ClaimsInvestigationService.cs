@@ -104,7 +104,7 @@ namespace risk.control.system.Services
                                 Time2Update = 0,
                                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
                                 InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
-                                UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "(" + userEmail + ")"
+                                UpdatedBy = userEmail
                             };
                             _context.InvestigationTransaction.Add(log);
                         }
@@ -474,7 +474,7 @@ namespace risk.control.system.Services
                         Created = DateTime.UtcNow,
                         InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                         InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId,
-                        UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")"
+                        UpdatedBy = currentUser.Email
                     };
                     _context.InvestigationTransaction.Add(log);
                 }
@@ -539,7 +539,7 @@ namespace risk.control.system.Services
                     Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
                     InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                     InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId,
-                    UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")"
+                    UpdatedBy = currentUser.Email
                 };
                 _context.InvestigationTransaction.Add(log);
 
@@ -577,7 +577,7 @@ namespace risk.control.system.Services
                 var agentUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == vendorAgentEmail);
 
                 claim.Updated = DateTime.UtcNow;
-                claim.UpdatedBy = supervisor.FirstName + " " + supervisor.LastName + " (" + supervisor.Email + ")";
+                claim.UpdatedBy = supervisor.Email;
                 claim.CurrentUserEmail = currentUser;
                 claim.CurrentClaimOwner = agentUser.Email;
                 claim.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
@@ -661,7 +661,7 @@ namespace risk.control.system.Services
                 Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR).InvestigationCaseSubStatusId,
-                UpdatedBy = agent.FirstName + " " + agent.LastName + "(" + agent.Email + ")"
+                UpdatedBy = agent.Email
             };
             _context.InvestigationTransaction.Add(log);
 
