@@ -347,7 +347,7 @@
                                                                                 var image = @ViewBag.LocationUrl;
                                                                                 var ocrImage = @ViewBag.OcrLocationUrl;
                                                                             }
-                                                                            <span class="badge badge-light"> Photo with Beneficiary:</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                            <span class="badge badge-light"> Photo with Beneficiary</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br />
                                                                             @{
                                                                                 if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
@@ -375,7 +375,7 @@
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img title="ocr image" id="agentOcrPicture" alt="user-avatar" class="img-fluid" src="/img/no-photo.png">
+                                                                                <img title="ocr image" id="agentOcrPicture" alt="pan-image" class="img-fluid" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                         <br />

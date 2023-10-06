@@ -152,8 +152,8 @@
                     self.setContent('Photo: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
                     self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
                     self.setContentAppend('<br>PAN: <i class="fas fa-pin"></i> : <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
-                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.OcrLatLong + '" /> ');
-                    self.setContentAppend('<br>PAN Data : ' + response.OcrData);
+                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
+                    self.setContentAppend('<br>PAN Data : ' + response.qrData);
                     self.setTitle('<i class="fas fa-mobile-alt"></i> ' + response.title);
                 }).fail(function () {
                     self.setContent('Something went wrong.');
