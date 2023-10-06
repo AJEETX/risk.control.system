@@ -400,7 +400,7 @@
                                                                         <div class="col-6">
                                                                             <p class="text-muted text-sm">
                                                                                 @{
-                                                                                    var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "OCR DATA";
+                                                                                    var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "PAN DATA";
                                                                                     var image = @ViewBag.LocationUrl;
                                                                                     string locationDateTime = null;
                                                                                     if (@Model.Location.ClaimReport?.LocationLongLatTime != null)
@@ -412,6 +412,8 @@
                                                                                     {
                                                                                         ocrDateTime = @Model.Location.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm");
                                                                                     }
+                                                                                    var ocrImage = @ViewBag.OcrLocationUrl;
+
                                                                                 }
                                                                                 <span class="badge badge-light"> Location</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @locationDateTime
                                                                                 <br />
@@ -427,18 +429,13 @@
                                                                                 }
 
                                                                             </p>
-                                                                            <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                                                <li class="small">
-                                                                                    <span class="fa-li">
-                                                                                        <i class="fas fa-money-bill-wave"></i>
-                                                                                    </span>
-                                                                                    <b><i class="fas fa-paperclip"></i> </b> 
-                                                                                    <img class="locationImage" src=@image />
-                                                                                </li>
-                                                                            </ul>
+                                                                            <p class="ml-4 mb-0 fa-ul text-muted">
+                                                                                <img class="locationImage" src=@image />
+                                                                            </p>
                                                                         </div>
                                                                         <div class="col-6 text-center">
-                                                                            <span class="badge badge-light"> OCR</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @ocrDateTime
+                                                                            <p class="text-muted text-sm">
+                                                                                <span class="badge badge-light"> PAN</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @ocrDateTime
                                                                             <br />
                                                                             @{
                                                                                 if (Model.Location.ClaimReport?.AgentOcrPicture != null)
@@ -450,8 +447,11 @@
                                                                                     <img title="ocr image" id="agentOcrPicture" alt="user-avatar" class="img-fluid investigation-Image" src="/img/no-photo.png">
                                                                                 }
                                                                             }
+                                                                            </p>
+                                                                            <i class="fas fa-pin"></i>
+                                                                            <img class="locationImage" src=@ocrImage />
                                                                             <br />
-                                                                            <i class="fas fa-pin"></i> @QR1
+                                                                            @QR1
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -565,8 +565,6 @@
                                                     <div class="bb-blog-content" itemprop="articleBody">
                                                         <div class="timeline">
                                                             @{
-                                                                var firstOnly = false;
-                                                                var lastOnly = true;
                                                                 foreach (var log in Model.Log)
                                                                 {
                                                                     <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
@@ -575,21 +573,13 @@
                                                                         <i class="nav-icon fas fa-envelope bg-blue"></i>
                                                                         <div class="timeline-item">
                                                                             <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
-                                                                            @if (@firstOnly)
-                                                                            {
-                                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name : @log.InvestigationCaseSubStatus.Name.</span></h3>
-                                                                            }
-                                                                            else
-                                                                            {
-                                                                                <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case: <span class="badge badge-success"> @log.InvestigationCaseSubStatus.Name.</span></h3>
-                                                                            }
+                                                                            <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name : @log.InvestigationCaseSubStatus.Name.</span></h3>
                                                                             <div class="timeline-body">
                                                                                 The case is moved to <span class="badge badge-info">@log.CurrentClaimOwner</span>
                                                                             </div>
 
                                                                         </div>
                                                                     </div>
-                                                                    firstOnly = true;
                                                                 }
                                                             }
 

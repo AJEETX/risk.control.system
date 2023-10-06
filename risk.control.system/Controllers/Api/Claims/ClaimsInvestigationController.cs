@@ -1037,7 +1037,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 OcrData = beneficiary.ClaimReport?.AgentOcrPicture != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentOcrPicture)) :
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage))
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
+                OcrLatLong = beneficiary.ClaimReport?.OcrLongLat
             };
 
             return Ok(data);
