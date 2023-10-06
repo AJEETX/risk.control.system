@@ -415,7 +415,7 @@
                                                                                     var ocrImage = @ViewBag.OcrLocationUrl;
 
                                                                                 }
-                                                                                <span class="badge badge-light"> Location</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @locationDateTime
+                                                                                <span class="badge badge-light"> Photo with Beneficiary</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @locationDateTime
                                                                                 <br />
                                                                                 @{
                                                                                     if (Model.Location.ClaimReport?.AgentLocationPicture != null)
@@ -435,7 +435,7 @@
                                                                         </div>
                                                                         <div class="col-6 text-center">
                                                                             <p class="text-muted text-sm">
-                                                                                <span class="badge badge-light"> PAN</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @ocrDateTime
+                                                                                <span class="badge badge-light"> PAN Card Image</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @ocrDateTime
                                                                             <br />
                                                                             @{
                                                                                 if (Model.Location.ClaimReport?.AgentOcrPicture != null)
