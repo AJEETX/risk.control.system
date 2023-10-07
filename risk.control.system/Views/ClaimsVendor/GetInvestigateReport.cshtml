@@ -401,10 +401,21 @@
                                                                     <div class="col-12">
 
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
-
                                                                             <li class="small">
                                                                                 <span class="fa-li">
-                                                                                    <i class="far fa-comment"></i>
+                                                                                    <i class="far fa-comment">Question1</i>
+                                                                                </span>
+                                                                                @Model.CaseLocation.ClaimReport?.Question1 <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment">Question2</i>
+                                                                                </span>
+                                                                                @Model.CaseLocation.ClaimReport?.Question2 <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment">Remarks</i>
                                                                                 </span>
                                                                                 @Model.CaseLocation.ClaimReport?.AgentRemarks <i class="far fa-comment"></i>
                                                                             </li>

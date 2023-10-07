@@ -660,6 +660,12 @@ namespace risk.control.system.Migrations
                     b.Property<string>("QrData")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Question1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question2")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SupervisorEmail")
                         .HasColumnType("TEXT");
 

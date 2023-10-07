@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class logData : Migration
+    public partial class dataImages : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1101,6 +1101,8 @@ namespace risk.control.system.Migrations
                     AgentEmail = table.Column<string>(type: "TEXT", nullable: true),
                     AgentRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     AgentRemarks = table.Column<string>(type: "TEXT", nullable: true),
+                    Question1 = table.Column<string>(type: "TEXT", nullable: true),
+                    Question2 = table.Column<string>(type: "TEXT", nullable: true),
                     AgentLocationPictureUrl = table.Column<string>(type: "TEXT", nullable: true),
                     AgentLocationPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     AgentOcrUrl = table.Column<string>(type: "TEXT", nullable: true),

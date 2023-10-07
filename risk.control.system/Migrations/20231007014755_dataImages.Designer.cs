@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231003055851_logData")]
-    partial class logData
+    [Migration("20231007014755_dataImages")]
+    partial class dataImages
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -661,6 +661,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("QrData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question2")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SupervisorEmail")
