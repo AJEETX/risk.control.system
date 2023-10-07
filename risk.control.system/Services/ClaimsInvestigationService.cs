@@ -29,7 +29,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> AssignToVendorAgent(string userEmail, string currentUser, string vendorId, string claimsInvestigationId);
 
-        Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string question1, string question2);
+        Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? question1, string? question2);
 
         Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks);
 
@@ -608,7 +608,7 @@ namespace risk.control.system.Services
             return claim;
         }
 
-        public async Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string question1, string question2)
+        public async Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? question1, string? question2)
         {
             var agent = _context.VendorApplicationUser.FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
 
