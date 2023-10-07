@@ -398,8 +398,8 @@ namespace risk.control.system.Controllers.Api
         public string Email { get; set; }
         public string ClaimId { get; set; }
         public long BeneficiaryId { get; set; }
-        public string Question1 { get; set; }
-        public string Question2 { get; set; }
+        public string? Question1 { get; set; }
+        public string? Question2 { get; set; }
         public string Remarks { get; set; }
     }
 
