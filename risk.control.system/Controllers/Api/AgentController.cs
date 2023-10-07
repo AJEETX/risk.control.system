@@ -309,6 +309,16 @@ namespace risk.control.system.Controllers.Api
                 claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
             }
 
+            if (!string.IsNullOrWhiteSpace(data.Question1))
+            {
+                claimCase.ClaimReport.Question1 = data.Question1;
+            }
+
+            if (!string.IsNullOrWhiteSpace(data.Question2))
+            {
+                claimCase.ClaimReport.Question2 = data.Question2;
+            }
+
             _context.CaseLocation.Update(claimCase);
 
             try
@@ -412,6 +422,8 @@ namespace risk.control.system.Controllers.Api
         public string? OcrImage { get; set; }
         public string? OcrLongLat { get; set; }
         public string? OcrData { get; set; }
+        public string? Question1 { get; set; }
+        public string? Question2 { get; set; }
         public string? Remarks { get; set; }
     }
 
