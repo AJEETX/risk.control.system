@@ -4,9 +4,9 @@
     ViewData["Title"] = "Claim: Report ";
 }
 <style>
-    .supervisor-doc{
+    .supervisor-doc {
         height: 2.4rem;
-        border:1px solid #ccc;
+        border: 1px solid #ccc;
     }
 </style>
 <section class="content pt-2">
@@ -79,7 +79,7 @@
                                 <article>
                                     <div class="bb-blog-inner">
                                         <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Policy # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber</h5>
+                                            <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Policy # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber</h5>
                                         </header>
                                         <div class="card card-solid">
                                             <div class="progress">
@@ -366,19 +366,20 @@
                                                                         </p>
                                                                     </div>
                                                                     <div class="col-6 text-center">
-                                                                        <span class="badge badge-light"> PAN Card Image</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
-                                                                        <br />
-                                                                        @{
-                                                                            if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
-                                                                            {
-                                                                                <img title="ocr image" id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
+                                                                        <p class="text-muted text-sm">
+                                                                            <span class="badge badge-light"> PAN Card Image</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                            <br />
+                                                                            @{
+                                                                                if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
+                                                                                {
+                                                                                    <img title="ocr image" id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <img title="ocr image" id="agentOcrPicture" alt="pan-image" class="img-fluid" src="/img/no-photo.png">
+                                                                                }
                                                                             }
-                                                                            else
-                                                                            {
-                                                                                <img title="ocr image" id="agentOcrPicture" alt="pan-image" class="img-fluid" src="/img/no-photo.png">
-                                                                            }
-                                                                        }
-                                                                        <br />
+                                                                        </p>
                                                                         <i class="fas fa-pin"></i>
                                                                         <img class="locationImage" src=@ocrImage />
                                                                         <p class="text-muted text-sm">
@@ -409,7 +410,7 @@
                                                                             </li>
                                                                         </ul>
                                                                     </div>
-                                                                    
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -453,7 +454,7 @@
                                                                             </div>
                                                                         </ul>
                                                                     </div>
-                                                                    
+
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -540,13 +541,13 @@
     </div>
 </section>
 @section Scripts    {
-       @{
-           await Html.RenderPartialAsync("_ValidationScriptsPartial");
-           }
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
     <script>
         $('#supervisorRemarks').focus();
-        
+
         $(document).ready(function () {
 
             $('#create-form').on('submit', function (e) {

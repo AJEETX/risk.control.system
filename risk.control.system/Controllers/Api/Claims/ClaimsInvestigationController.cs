@@ -1026,13 +1026,13 @@ namespace risk.control.system.Controllers.Api.Claims
             var longitude = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
             var latitude = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
             var longLatString = longitude + "," + latitude;
-            var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
 
             var ocrlongLat = beneficiary.ClaimReport.OcrLongLat.IndexOf("/");
-            var ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-            var ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+            var ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, ocrlongLat)?.Trim();
+            var ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(ocrlongLat + 1)?.Trim();
             var ocrLongLatString = ocrLongitude + "," + ocrLatitude;
-            var ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
 
             var data = new
             {

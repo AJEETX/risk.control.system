@@ -127,7 +127,8 @@ table {
 }
 
 .investigation-Image {
-    height: 2.4rem;
+    height: 150px;
+    width: 150px;
     border: .1px ridge #ccc;
 }
 
