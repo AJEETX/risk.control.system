@@ -346,7 +346,8 @@ namespace risk.control.system.Controllers.Api
                 Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentOcrUrl)) :
                 Convert.ToBase64String(noDataimage),
                 OcrLongLat = claimCase.ClaimReport.OcrLongLat,
-                OcrTime = claimCase.ClaimReport.OcrLongLatTime
+                OcrTime = claimCase.ClaimReport.OcrLongLatTime,
+                payload = data
             });
         }
 
