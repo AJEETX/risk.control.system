@@ -160,9 +160,9 @@
                 }).done(function (response) {
                     self.setContent('Photo with Beneficiary: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
                     self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
-                    self.setContentAppend('<br>PAN Card Image: <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
+                    self.setContentAppend('<br>OCR Photo: <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
                     self.setContentAppend('<br><img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
-                    self.setContentAppend('<br>PAN Card Data : ');
+                    self.setContentAppend('<br>OCR Data : ');
                     self.setContentAppend('<br>' + response.qrData);
                     self.setTitle('<i class="fas fa-mobile-alt"></i> ' + response.title);
                 }).fail(function () {

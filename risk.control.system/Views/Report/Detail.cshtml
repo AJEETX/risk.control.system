@@ -435,7 +435,7 @@
                                                                         </div>
                                                                         <div class="col-6 text-center">
                                                                             <p class="text-muted text-sm">
-                                                                                <span class="badge badge-light"> PAN Card Image</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @ocrDateTime
+                                                                                <span class="badge badge-light"> OCR Photo</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @ocrDateTime
                                                                             <br />
                                                                             @{
                                                                                 if (Model.Location.ClaimReport?.AgentOcrPicture != null)
@@ -448,12 +448,13 @@
                                                                                 }
                                                                             }
                                                                             </p>
-                                                                            <i class="fas fa-pin"></i>
-                                                                            <img class="locationImage" src=@ocrImage />
                                                                             <p class="text-muted text-sm">
-                                                                                <span class="badge badge-light"> PAN Card Data</span>
-                                                                                @QR1
-                                                                            </p>
+                                                                        <img class="locationImage" src=@ocrImage />
+                                                                        </p>
+                                                                        <p class="text-muted text-sm">
+                                                                            <span class="badge badge-light"> OCR Data</span>
+                                                                            @QR1
+                                                                        </p>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -476,14 +477,14 @@
                                                                                 </p>
                                                                                 <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                                     <li class="small">
-                                                                                        What is customer name?
+                                                                                        What is customer age?
                                                                                         <span class="fa-li">
                                                                                             <i class="far fa-comment"></i>
                                                                                         </span>
                                                                                         @Model.Location.ClaimReport?.Question1 <i class="far fa-comment"></i>
                                                                                     </li>
                                                                                     <li class="small">
-                                                                                        What is beneficiary name?
+                                                                                        What is beneficiary relation?
                                                                                         <span class="fa-li">
                                                                                             <i class="far fa-comment"></i>
                                                                                         </span>

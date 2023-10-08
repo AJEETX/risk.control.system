@@ -361,13 +361,13 @@
                                                                             }
 
                                                                         </p>
-                                                                        <p class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <p class="text-muted text-sm">
                                                                             <img class="locationImage" src=@image />
                                                                         </p>
                                                                     </div>
                                                                     <div class="col-6 text-center">
                                                                         <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"> PAN Card Image</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                            <span class="badge badge-light"> OCR Photo</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br />
                                                                             @{
                                                                                 if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
@@ -380,10 +380,11 @@
                                                                                 }
                                                                             }
                                                                         </p>
-                                                                        <i class="fas fa-pin"></i>
-                                                                        <img class="locationImage" src=@ocrImage />
                                                                         <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"> PAN Card Data</span>
+                                                                        <img class="locationImage" src=@ocrImage />
+                                                                        </p>
+                                                                        <p class="text-muted text-sm">
+                                                                            <span class="badge badge-light"> OCR Data</span>
                                                                             @QR1
                                                                         </p>
                                                                     </div>
@@ -402,14 +403,14 @@
 
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="small">
-                                                                            What is customer name?
+                                                                            What is customer age?
                                                                                 <span class="fa-li">
                                                                                     <i class="far fa-comment"></i>
                                                                                 </span>
                                                                                 @Model.CaseLocation.ClaimReport?.Question1 <i class="far fa-comment"></i>
                                                                             </li>
                                                                             <li class="small">
-                                                                                What is beneficiary name?
+                                                                                What is beneficiary relation?
                                                                                 <span class="fa-li">
                                                                                     <i class="far fa-comment"></i>
                                                                                 </span>
