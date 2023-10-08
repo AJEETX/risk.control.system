@@ -24,6 +24,9 @@ namespace risk.control.system.Models
         [Display(Name = "Agent Location Image")]
         public byte[]? AgentLocationPicture { get; set; }
 
+        [Display(Name = "Location Data")]
+        public string? LocationData { get; set; }
+
         [Display(Name = "Agent Location Image")]
         [NotMapped]
         public IFormFile? AgentLocationImage { get; set; }

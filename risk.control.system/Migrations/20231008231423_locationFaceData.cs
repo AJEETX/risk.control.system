@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class resetdb : Migration
+    public partial class locationFaceData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1105,6 +1105,7 @@ namespace risk.control.system.Migrations
                     Question2 = table.Column<string>(type: "TEXT", nullable: true),
                     AgentLocationPictureUrl = table.Column<string>(type: "TEXT", nullable: true),
                     AgentLocationPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    LocationData = table.Column<string>(type: "TEXT", nullable: true),
                     AgentOcrUrl = table.Column<string>(type: "TEXT", nullable: true),
                     AgentOcrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     AgentOcrData = table.Column<string>(type: "TEXT", nullable: true),

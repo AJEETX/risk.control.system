@@ -319,6 +319,11 @@ namespace risk.control.system.Controllers.Api
                 claimCase.ClaimReport.Question2 = data.Question2;
             }
 
+            if (!string.IsNullOrWhiteSpace(data.LocationData))
+            {
+                claimCase.ClaimReport.LocationData = data.LocationData;
+            }
+
             _context.CaseLocation.Update(claimCase);
 
             try
@@ -418,6 +423,7 @@ namespace risk.control.system.Controllers.Api
         public string Email { get; set; }
         public string ClaimId { get; set; }
         public string? LocationImage { get; set; }
+        public string? LocationData { get; set; }
         public string? LocationLongLat { get; set; }
         public string? OcrImage { get; set; }
         public string? OcrLongLat { get; set; }

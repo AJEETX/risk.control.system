@@ -339,6 +339,7 @@
                                                                                 var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "PAN DATA";
                                                                                 var image = @ViewBag.LocationUrl;
                                                                                 var ocrImage = @ViewBag.OcrLocationUrl;
+                                                                                var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Location DATA";
                                                                             }
                                                                             <span class="badge badge-light"> Beneficiary Photo</span>: <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br/>
@@ -355,8 +356,14 @@
                                                                             
                                                                         </p>
                                                                         <p class="text-muted text-sm">
-                                                                        <span class="badge badge-light"> Beneficiary Photo Location</span>
-                                                                            <img class="locationImage" src=@image />
+                                                                        <span class="badge badge-light"> Photo Location</span>
+                                                                            <br />
+                                                                            <img class="locationImage img-fluid " src=@image />
+                                                                        </p>
+                                                                         <p class="text-muted text-sm">
+                                                                            <span class="badge badge-light"> Location Data</span>
+                                                                            <br />
+                                                                            <label class="ocr-data img-fluid"> @locationData</label>
                                                                         </p>
                                                                     </div>
                                                                     <div class="col-6 text-center">
@@ -376,11 +383,13 @@
                                                                         </p>
                                                                         <p class="text-muted text-sm">
                                                                         <span class="badge badge-light"> OCR Location</span>
-                                                                        <img class="locationImage" src=@ocrImage />
+                                                                            <br />
+                                                                            <img class="img-fluid locationImage" src=@ocrImage />
                                                                         </p>
                                                                         <p class="text-muted text-sm">
                                                                             <span class="badge badge-light"> OCR Data</span>
-                                                                            <label class="ocr-data"> @QR1</label>
+                                                                            <br />
+                                                                            <label class="img-fluid ocr-data"> @QR1</label>
                                                                         </p>
                                                                     </div>
                                                                 </div>

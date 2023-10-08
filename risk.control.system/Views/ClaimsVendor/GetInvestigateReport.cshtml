@@ -344,6 +344,7 @@
                                                                         <p class="text-muted text-sm">
                                                                             @{
                                                                                 var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "PAN DATA";
+                                                                                var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Location DATA";
                                                                                 var image = @ViewBag.LocationUrl;
                                                                                 var ocrImage = @ViewBag.OcrLocationUrl;
                                                                             }
@@ -363,7 +364,13 @@
                                                                         </p>
                                                                         <p class="text-muted text-sm">
                                                                         <span class="badge badge-light"> Beneficiary Photo Location</span>
-                                                                            <img class="locationImage" src=@image />
+                                                                            <br />
+                                                                            <img class="locationImage img-fluid " src=@image />
+                                                                        </p>
+                                                                        <p class="text-muted text-sm">
+                                                                            <span class="badge badge-light"> Location Data</span>
+                                                                            <br />
+                                                                            <label class="ocr-data img-fluid "> @locationData</label>
                                                                         </p>
                                                                     </div>
                                                                     <div class="col-6 text-center">
@@ -383,11 +390,13 @@
                                                                         </p>
                                                                         <p class="text-muted text-sm">
                                                                         <span class="badge badge-light"> OCR Location</span>
-                                                                        <img class="locationImage" src=@ocrImage />
+                                                                            <br />
+                                                                            <img class="locationImage img-fluid " src=@ocrImage />
                                                                         </p>
                                                                         <p class="text-muted text-sm">
                                                                             <span class="badge badge-light"> OCR Data</span>
-                                                                            <label class="ocr-data"> @QR1</label>
+                                                                            <br />
+                                                                            <label class="ocr-data img-fluid "> @QR1</label>
                                                                         </p>
                                                                     </div>
                                                                 </div>

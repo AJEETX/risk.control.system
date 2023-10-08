@@ -645,6 +645,9 @@ namespace risk.control.system.Migrations
                     b.Property<long>("CaseLocationId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("LocationData")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("LocationLongLat")
                         .HasColumnType("TEXT");
 

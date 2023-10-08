@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231007211637_resetdb")]
-    partial class resetdb
+    [Migration("20231008231423_locationFaceData")]
+    partial class locationFaceData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -647,6 +647,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<long>("CaseLocationId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("LocationData")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LocationLongLat")
                         .HasColumnType("TEXT");
