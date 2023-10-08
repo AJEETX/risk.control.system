@@ -185,10 +185,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\document\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="wwwroot\text.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
