@@ -129,14 +129,28 @@ table {
 .investigation-Image {
     height: 150px;
     width: 150px;
-    border: 1px ridge #ccc;
+    border: 2px solid #ccc;
+    border-radius: 1rem;
+}
+
+.locationImage {
+    height: 150px;
+    width: 150px;
+    border: 2px solid #ccc;
+    border-radius: 1rem;
+}
+
+.ocr-data {
+    width: 150px;
+    border: 2px solid #ccc;
+    border-radius: 1rem;
 }
 
 .investigation-actual-image {
     height: auto;
     width: auto;
     border: 1px solid #ddd;
-    border-radius:3px;
+    border-radius: 3px;
 }
 
 .timer-image {
