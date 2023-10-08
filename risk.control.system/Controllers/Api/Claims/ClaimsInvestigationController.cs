@@ -1022,17 +1022,25 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
-            var longLat = beneficiary.ClaimReport.LocationLongLat.IndexOf("/");
-            var longitude = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
-            var latitude = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
-            var longLatString = longitude + "," + latitude;
-            var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.LocationLongLat ))
+            {
+                var longLat = beneficiary.ClaimReport.LocationLongLat.IndexOf("/");
+                var longitude = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                var latitude = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
+                var longLatString = longitude + "," + latitude;
+                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            }
 
-            var ocrlongLat = beneficiary.ClaimReport.OcrLongLat.IndexOf("/");
-            var ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, ocrlongLat)?.Trim();
-            var ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(ocrlongLat + 1)?.Trim();
-            var ocrLongLatString = ocrLongitude + "," + ocrLatitude;
-            var ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            string ocrUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.OcrLongLat))
+            {
+                var ocrlongLat = beneficiary.ClaimReport.OcrLongLat.IndexOf("/");
+                var ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, ocrlongLat)?.Trim();
+                var ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(ocrlongLat + 1)?.Trim();
+                var ocrLongLatString = ocrLongitude + "," + ocrLatitude;
+                ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            }
 
             var data = new
             {
