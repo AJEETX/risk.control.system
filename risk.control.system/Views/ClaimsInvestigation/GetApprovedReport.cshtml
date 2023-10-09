@@ -270,13 +270,13 @@
                                                                 <div class="col-6">
                                                                     <p class="text-muted text-sm">
                                                                         @{
-                                                                            var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "PAN DATA";
+                                                                            var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "OCR Scan Info";
                                                                             var image = @ViewBag.LocationUrl;
                                                                             var ocrImage = @ViewBag.OcrLocationUrl;
-                                                                                var locationData = @Model.Location?.ClaimReport?.LocationData ?? "Location DATA";
+                                                                            var locationData = @Model.Location?.ClaimReport?.LocationData ?? "Location DATA";
 
                                                                         }
-                                                                        <i class="fas fa-portrait"></i><span class="badge badge-light"><i class="fas fa-portrait"></i> Beneficiary Photo</span>:
+                                                                        <span class="badge badge-light"><i class="fas fa-portrait"></i> Beneficiary Photo</span>:
                                                                         <br />
                                                                         <i class="fas fa-clock"></i> @Model.Location.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                         <br />
@@ -296,7 +296,10 @@
                                                                         <span class="badge badge-light"><i class="fas fa-map-pin"></i> Photo Location</span>
                                                                         <br />
                                                                         <img class="locationImage img-fluid" src=@image />
-                                                                        </p>
+                                                                        <br />
+                                                                        <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> 12 Heathcote Drive Forest Hill VIC 3131</span>
+
+                                                                    </p>
                                                                          <p class="text-muted text-sm">
                                                                         <span class="badge badge-light"><i class="fas fa-info"></i> Photo Analytics</span>
                                                                             <br />
@@ -324,7 +327,10 @@
                                                                         <span class="badge badge-light"><i class="fas fa-map-pin"></i> OCR Location</span>
                                                                         <br />
                                                                         <img class="locationImage img-fluid" src=@ocrImage />
-                                                                        </p>
+                                                                        <br />
+                                                                        <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> 12 Heathcote Drive Forest Hill VIC 3131</span>
+
+                                                                    </p>
                                                                         <p class="text-muted text-sm">
                                                                         <span class="badge badge-light"><i class="fas fa-info"></i> OCR Scan Info</span>
                                                                             <br />

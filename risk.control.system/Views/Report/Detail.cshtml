@@ -400,7 +400,7 @@
                                                                         <div class="col-6">
                                                                             <p class="text-muted text-sm">
                                                                                 @{
-                                                                                    var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "PAN DATA";
+                                                                                    var QR1 = @Model.Location?.ClaimReport?.AgentOcrData ?? "OCR Scan Info";
                                                                                     var image = @ViewBag.LocationUrl;
                                                                                     string locationDateTime = null;
                                                                                     if (@Model.Location.ClaimReport?.LocationLongLatTime != null)
@@ -436,6 +436,9 @@
                                                                                 <span class="badge badge-light"><i class="fas fa-map-pin"></i> Photo Location</span>
                                                                                 <br />
                                                                                 <img class="locationImage img-fluid " src=@image />
+                                                                                <br />
+                                                                                <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> 12 Heathcote Drive Forest Hill VIC 3131</span>
+
                                                                             </p>
                                                                              <p class="text-muted text-sm">
                                                                                 <span class="badge badge-light"><i class="fas fa-info"></i> Photo Analytics</span>
@@ -462,8 +465,11 @@
                                                                             </p>
                                                                             <p class="text-muted text-sm">
                                                                                 <span class="badge badge-light"><i class="fas fa-map-pin"></i> OCR Location</span>
-                                                                            <br />
+                                                                            
+                                                                                <br />
                                                                                 <img class="locationImage img-fluid" src=@ocrImage />
+                                                                                <br />
+                                                                                <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> 12 Heathcote Drive Forest Hill VIC 3131</span>
                                                                             </p>
                                                                             <p class="text-muted text-sm">
                                                                                 <span class="badge badge-light"><i class="fas fa-info"></i> OCR Scan Info</span>
