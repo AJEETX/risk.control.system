@@ -348,7 +348,9 @@
                                                                                 var image = @ViewBag.LocationUrl;
                                                                                 var ocrImage = @ViewBag.OcrLocationUrl;
                                                                             }
-                                                                            <span class="badge badge-light"> Beneficiary Photo</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                            <span class="badge badge-light"> Beneficiary Photo</span>: <i class="fas fa-pin"></i>
+                                                                            <br />
+                                                                            <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br />
                                                                             @{
                                                                                 if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
@@ -363,7 +365,7 @@
 
                                                                         </p>
                                                                         <p class="text-muted text-sm">
-                                                                        <span class="badge badge-light"> Beneficiary Photo Location</span>
+                                                                        <span class="badge badge-light"> Photo Location</span>
                                                                             <br />
                                                                             <img class="locationImage img-fluid " src=@image />
                                                                         </p>
@@ -375,7 +377,10 @@
                                                                     </div>
                                                                     <div class="col-6 text-center">
                                                                         <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"> OCR Photo</span>: <i class="fas fa-pin"></i> <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                            <span class="badge badge-light"> OCR Photo</span>: <i class="fas fa-pin"></i>
+                                                                            <br />
+
+                                                                            <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br />
                                                                             @{
                                                                                 if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)

@@ -341,7 +341,9 @@
                                                                                 var ocrImage = @ViewBag.OcrLocationUrl;
                                                                                 var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Location DATA";
                                                                             }
-                                                                            <span class="badge badge-light"> Beneficiary Photo</span>: <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                            <span class="badge badge-light"> Beneficiary Photo</span>:
+                                                                            <br />
+                                                                            <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br/>
                                                                             @{
                                                                                 if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
@@ -368,7 +370,10 @@
                                                                     </div>
                                                                     <div class="col-6 text-center">
                                                                         <p class="text-muted text-sm">
-                                                                        <span class="badge badge-light"> OCR Photo</span>: <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
+                                                                        <span class="badge badge-light"> OCR Photo</span>:
+                                                                            <br />
+
+                                                                        <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br />
                                                                         @{
                                                                             if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
