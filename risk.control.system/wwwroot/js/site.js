@@ -160,11 +160,11 @@
                 }).done(function (response) {
                     self.setContent('Beneficiary Photo: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
                     self.setContentAppend('<br>Photo Location: <img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
-                    self.setContentAppend('<br>Location Data : ');
+                    self.setContentAppend('<br>Location Analytics : ');
                     self.setContentAppend('<br>' + response.locationData);
                     self.setContentAppend('<br>OCR Photo: <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
                     self.setContentAppend('<br>OCR Photo Location: <img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
-                    self.setContentAppend('<br>OCR Data : ');
+                    self.setContentAppend('<br>OCR Scan Data : ');
                     self.setContentAppend('<br>' + response.qrData);
                     self.setTitle('<i class="fas fa-mobile-alt"></i> ' + response.title);
                 }).fail(function () {

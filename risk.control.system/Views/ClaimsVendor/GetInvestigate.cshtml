@@ -341,7 +341,7 @@
                                                                                 var ocrImage = @ViewBag.OcrLocationUrl;
                                                                                 var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Location DATA";
                                                                             }
-                                                                            <span class="badge badge-light"> Beneficiary Photo</span>:
+                                                                            <span class="badge badge-light"><i class="fas fa-portrait"></i> Beneficiary Photo</span>:
                                                                             <br />
                                                                             <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br/>
@@ -358,19 +358,19 @@
                                                                             
                                                                         </p>
                                                                         <p class="text-muted text-sm">
-                                                                        <span class="badge badge-light"> Photo Location</span>
+                                                                            <span class="badge badge-light"><i class="fas fa-map-pin"></i> Photo Location</span>
                                                                             <br />
                                                                             <img class="locationImage img-fluid " src=@image />
                                                                         </p>
                                                                          <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"> Location Data</span>
+                                                                            <span class="badge badge-light"><i class="fas fa-info"></i> Photo Analytics</span>
                                                                             <br />
                                                                             <label class="ocr-data img-fluid"> @locationData</label>
                                                                         </p>
                                                                     </div>
                                                                     <div class="col-6 text-center">
                                                                         <p class="text-muted text-sm">
-                                                                        <span class="badge badge-light"> OCR Photo</span>:
+                                                                            <span class="badge badge-light"><i class="fas fa-film"></i> OCR Image</span>:
                                                                             <br />
 
                                                                         <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
@@ -387,12 +387,12 @@
                                                                         }
                                                                         </p>
                                                                         <p class="text-muted text-sm">
-                                                                        <span class="badge badge-light"> OCR Location</span>
+                                                                            <span class="badge badge-light"><i class="fas fa-map-pin"></i> OCR Location</span>
                                                                             <br />
                                                                             <img class="img-fluid locationImage" src=@ocrImage />
                                                                         </p>
                                                                         <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"> OCR Data</span>
+                                                                            <span class="badge badge-light"><i class="fas fa-info"></i> OCR Scan Info</span>
                                                                             <br />
                                                                             <label class="img-fluid ocr-data"> @QR1</label>
                                                                         </p>
