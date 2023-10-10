@@ -361,13 +361,13 @@ namespace risk.control.system.Controllers
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
 
-                RootObject rootObject = getAddress(Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+                RootObject rootObject = getAddress((latitude), (longitude));
 
                 ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
             }
             else
             {
-                RootObject rootObject = getAddress(-37.839542, 145.164834);
+                RootObject rootObject = getAddress("-37.839542", "145.164834");
                 ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
 
                 ViewBag.LocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
@@ -382,13 +382,13 @@ namespace risk.control.system.Controllers
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.OcrLocationUrl = url;
 
-                RootObject rootObject = getAddress(Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+                RootObject rootObject = getAddress((latitude), (longitude));
 
                 ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
             }
             else
             {
-                RootObject rootObject = getAddress(-37.839542, 145.164834);
+                RootObject rootObject = getAddress("-37.839542", "145.164834");
                 ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 ViewBag.OcrLocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
@@ -396,11 +396,11 @@ namespace risk.control.system.Controllers
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
 
-        public static RootObject getAddress(double lat, double lon)
+        public static RootObject getAddress(string lat, string lon)
         {
             WebClient webClient = new WebClient();
             webClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-            webClient.Headers.Add("Referer", "http://www.microsoft.com");
+            webClient.Headers.Add("Referer", "http://www.icheckify.co.in");
             var jsonData = webClient.DownloadData("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
             DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
             RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
@@ -561,13 +561,13 @@ namespace risk.control.system.Controllers
                 var longLatString = longitude + "," + latitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
-                RootObject rootObject = getAddress(Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+                RootObject rootObject = getAddress((latitude), (longitude));
 
                 ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
             }
             else
             {
-                RootObject rootObject = getAddress(-37.839542, 145.164834);
+                RootObject rootObject = getAddress("-37.839542", "145.164834");
                 ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 ViewBag.LocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
@@ -580,13 +580,13 @@ namespace risk.control.system.Controllers
                 var longLatString = longitude + "," + latitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.OcrLocationUrl = url;
-                RootObject rootObject = getAddress(Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+                RootObject rootObject = getAddress((latitude), (longitude));
 
                 ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
             }
             else
             {
-                RootObject rootObject = getAddress(-37.839542, 145.164834);
+                RootObject rootObject = getAddress("-37.839542", "145.164834");
                 ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 ViewBag.OcrLocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
