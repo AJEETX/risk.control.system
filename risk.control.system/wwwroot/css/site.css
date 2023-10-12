@@ -144,6 +144,8 @@ table {
     width: 150px;
     border: 2px solid #ccc;
     border-radius: 1rem;
+    height: 250px;
+    overflow-y: scroll;
 }
 
 .investigation-actual-image {

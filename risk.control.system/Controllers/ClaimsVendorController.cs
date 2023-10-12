@@ -563,7 +563,8 @@ namespace risk.control.system.Controllers
                 ViewBag.LocationUrl = url;
                 RootObject rootObject = getAddress((latitude), (longitude));
 
-                ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                ViewBag.LocationAddress = latitude;
+                ViewBag.LocationAddressLong = longitude;
             }
             else
             {
