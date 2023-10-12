@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers
                 ViewBag.LocationUrl = url;
                 RootObject rootObject = getAddress(latitude, longitude);
 
-                ViewBag.LocationAddress = rootObject;
+                ViewBag.LocationAddress = rootObject.display_name ?? "None";
                 ViewBag.LocationAddressLong = longitude ?? "LONG";
                 ViewBag.LocationAddressLat = latitude ?? "LAT";
             }
