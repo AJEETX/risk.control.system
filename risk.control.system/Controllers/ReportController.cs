@@ -14,10 +14,12 @@ namespace risk.control.system.Controllers
     public class ReportController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly HttpClient _httpClient;
 
         public ReportController(ApplicationDbContext context)
         {
             this._context = context;
+            _httpClient = new HttpClient();
         }
 
         [Breadcrumb(title: " Investigation Report", FromController = typeof(ClaimsInvestigationController))]
@@ -101,7 +103,7 @@ namespace risk.control.system.Controllers
                 ViewBag.LocationUrl = url;
                 RootObject rootObject = getAddress(latitude, longitude);
 
-                ViewBag.LocationAddress = rootObject.display_name ?? "None";
+                ViewBag.LocationAddress = rootObject.lat ?? "None";
                 ViewBag.LocationAddressLong = longitude ?? "LONG";
                 ViewBag.LocationAddressLat = latitude ?? "LAT";
             }
@@ -140,6 +142,14 @@ namespace risk.control.system.Controllers
             var jsonData = webClient.DownloadData("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
             DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
             RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
+            return rootObject;
+        }
+
+        public async Task<RootObject> GetAddress(string lat, string lon)
+        {
+            var jsonData = await _httpClient.GetStringAsync("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
+
+            var rootObject = Newtonsoft.Json.JsonConvert.DeserializeObject<RootObject>(jsonData);
             return rootObject;
         }
     }
