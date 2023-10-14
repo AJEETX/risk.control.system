@@ -669,6 +669,15 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Question2")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Question3")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question4")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question5")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SupervisorEmail")
                         .HasColumnType("TEXT");
 

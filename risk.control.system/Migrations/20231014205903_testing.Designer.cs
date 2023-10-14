@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231010070707_nextv1")]
-    partial class nextv1
+    [Migration("20231014205903_testing")]
+    partial class testing
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -670,6 +670,15 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Question2")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question3")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question4")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question5")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SupervisorEmail")

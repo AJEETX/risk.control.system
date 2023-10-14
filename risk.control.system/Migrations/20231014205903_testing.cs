@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class nextv1 : Migration
+    public partial class testing : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1103,6 +1103,9 @@ namespace risk.control.system.Migrations
                     AgentRemarks = table.Column<string>(type: "TEXT", nullable: true),
                     Question1 = table.Column<string>(type: "TEXT", nullable: true),
                     Question2 = table.Column<string>(type: "TEXT", nullable: true),
+                    Question3 = table.Column<string>(type: "TEXT", nullable: true),
+                    Question4 = table.Column<string>(type: "TEXT", nullable: true),
+                    Question5 = table.Column<string>(type: "TEXT", nullable: true),
                     AgentLocationPictureUrl = table.Column<string>(type: "TEXT", nullable: true),
                     AgentLocationPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
                     LocationData = table.Column<string>(type: "TEXT", nullable: true),
