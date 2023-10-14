@@ -1355,7 +1355,7 @@ namespace risk.control.system.Controllers
         {
             var random = new Random();
             string firstName = firstNames[random.Next(0, firstNames.Length)];
-            string lastName = firstNames[random.Next(0, firstNames.Length)];
+            string lastName = lastNames[random.Next(0, lastNames.Length)];
 
             return $"{firstName} {lastName}";
         }
