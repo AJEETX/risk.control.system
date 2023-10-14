@@ -73,7 +73,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" style="text-transform:uppercase" class="form-control" type="text" placeholder="Policy #" maxlength="20" value="" />
+                                                                        <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" style="text-transform:uppercase" class="form-control" type="text" placeholder="Policy #" maxlength="20" value="POLX1001" />
                                                                         <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -83,7 +83,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-rupee-sign"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control" type="text" placeholder="Insured Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" value="" min="1" maxlength="10" />
+                                                                        <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control" type="text" placeholder="Insured Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" value="900001" min="1" maxlength="10" />
                                                                         <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -124,9 +124,6 @@
                                                                         <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
-                                                                
-                                                               
-                                                                
 
                                                             </div>
                                                             <div class="col-sm-6">
@@ -151,7 +148,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="CauseOfLoss"><i class="nav-icon far fa-flag"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input required asp-for="PolicyDetail.CauseOfLoss" class="form-control" type="text" placeholder="Cause Of Incident" value="" maxlength="20" />
+                                                                        <input required asp-for="PolicyDetail.CauseOfLoss" class="form-control" type="text" placeholder="Cause Of Incident" maxlength="20" />
                                                                         <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -252,7 +249,7 @@
         $(document).ready(function () {
             $("#create-form").validate();
         });
-        $("#ContractNumber").focus();
+        $("#documentImage").focus();
 
         dateContractId.max = new Date().toISOString().split("T")[0];
         dateIncidentId.max = new Date().toISOString().split("T")[0];

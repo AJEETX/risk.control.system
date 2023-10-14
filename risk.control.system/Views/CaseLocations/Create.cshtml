@@ -94,7 +94,7 @@
                                                                             <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
                                                                         <input type="text" asp-for="BeneficiaryContactNumber" class="form-control" required maxlength="10" min="2222222222" max="9999999999"
-                                                                               value="" placeholder="Phone # (10 digit)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                                                                placeholder="Phone # (10 digit)" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                                                         <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
                                                                     </div>
                                                                 </div>

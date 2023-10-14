@@ -98,7 +98,27 @@ namespace risk.control.system.Controllers
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
-            var model = new CaseLocation { ClaimsInvestigation = claim };
+            var beneRelationId = _context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
+            var countryId = _context.Country.FirstOrDefault().CountryId;
+            var stateId = _context.State.FirstOrDefault().StateId;
+            var districtId = _context.District.Include(d => d.State).FirstOrDefault(d => d.StateId == stateId).DistrictId;
+            var pinCodeId = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.DistrictId == districtId).PinCodeId;
+            var random = new Random();
+
+            var model = new CaseLocation
+            {
+                ClaimsInvestigation = claim,
+                Addressline = random.Next(100, 999) + " GREAT ROAD",
+                BeneficiaryDateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
+                BeneficiaryIncome = Income.MEDIUUM_INCOME,
+                BeneficiaryName = ClaimsInvestigationController.GenerateName(),
+                BeneficiaryRelationId = beneRelationId,
+                CountryId = countryId,
+                StateId = stateId,
+                DistrictId = districtId,
+                PinCodeId = pinCodeId,
+                BeneficiaryContactNumber = random.NextInt64(5555555555, 9999999999),
+            };
 
             var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
             var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
@@ -108,6 +128,11 @@ namespace risk.control.system.Controllers
             var locationPage = new MvcBreadcrumbNode("Add", "CaseLocations", "Add Beneficiary") { Parent = incompleteClaim, RouteValues = new { id = id } };
 
             ViewData["BreadcrumbNode"] = locationPage;
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", model.DistrictId);
+            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", model.StateId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", model.PinCodeId);
+
             return View(model);
         }
 

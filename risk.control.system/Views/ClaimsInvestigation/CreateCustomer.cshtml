@@ -57,7 +57,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="CustomerName"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input required asp-for="CustomerDetail.CustomerName" class="form-control title-name" type="text" placeholder="Customer Name" value="" maxlength="20" />
+                                                                        <input required asp-for="CustomerDetail.CustomerName" class="form-control title-name" type="text" placeholder="Customer Name" maxlength="20" />
                                                                         <span asp-validation-for="CustomerDetail.CustomerName" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -103,7 +103,7 @@
                                                                             <span class="input-group-text" asp-for="ContactNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
 
-                                                                        <input type="text" asp-for="CustomerDetail.ContactNumber" class="form-control" required maxlength="10" value="" placeholder="Phone # (10 digit)"
+                                                                        <input type="text" asp-for="CustomerDetail.ContactNumber" class="form-control" required maxlength="10" placeholder="Phone # (10 digit)"
                                                                                min="2222222222" max="9999999999" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                                                         <span asp-validation-for="CustomerDetail.ContactNumber" class="text-danger field-validation-valid"></span>
 
@@ -211,7 +211,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input type="text" asp-for="CustomerDetail.Addressline" class="form-control title-name" type="text" required placeholder="Address" value="" maxlength="20" />
+                                                                        <input type="text" asp-for="CustomerDetail.Addressline" class="form-control title-name" type="text" required placeholder="Address" maxlength="20" />
                                                                         <span asp-validation-for="CustomerDetail.Addressline" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -223,7 +223,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" id="Description"><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input required asp-for="CustomerDetail.Description" class="form-control" type="text" placeholder="Note" value="" maxlength="20" />
+                                                                        <input required asp-for="CustomerDetail.Description" class="form-control" type="text" placeholder="Note" maxlength="20" />
                                                                         <span asp-validation-for="CustomerDetail.Description" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -299,7 +299,7 @@
         $(document).ready(function () {
             $("#create-form").validate();
         });
-        $("#CustomerDetail_CustomerName").focus();
+        $("#profileImage").focus();
 
         dateCustomerId.max = new Date().toISOString().split("T")[0];
     </script>

@@ -35,6 +35,9 @@ namespace risk.control.system.Controllers
             WriteIndented = true
         };
 
+        private static readonly string[] firstNames = { "John", "Paul", "Ringo", "George" };
+        private static readonly string[] lastNames = { "Lennon", "McCartney", "Starr", "Harrison" };
+
         private static string NO_DATA = " NO - DATA ";
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
@@ -1109,7 +1112,25 @@ namespace risk.control.system.Controllers
         {
             var userEmailToSend = string.Empty;
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
-            var model = new ClaimsInvestigation { PolicyDetail = new PolicyDetail { LineOfBusinessId = lineOfBusinessId } };
+
+            var random = new Random();
+            var model = new ClaimsInvestigation
+            {
+                PolicyDetail = new PolicyDetail
+                {
+                    LineOfBusinessId = lineOfBusinessId,
+                    CaseEnablerId = _context.CaseEnabler.FirstOrDefault().CaseEnablerId,
+                    CauseOfLoss = "LOST IN ACCIDENT",
+                    ClaimType = ClaimType.DEATH,
+                    ContractIssueDate = DateTime.UtcNow.AddDays(-10),
+                    CostCentreId = _context.CostCentre.FirstOrDefault().CostCentreId,
+                    DateOfIncident = DateTime.UtcNow.AddDays(-3),
+                    InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i => i.Code == "COMPREHENSIVE").InvestigationServiceTypeId,
+                    Comments = "SOMETHING FISHY",
+                    SumAssuredValue = random.Next(100000, 9999999),
+                    ContractNumber = "POLX" + random.Next(1000, 9999),
+                }
+            };
 
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
@@ -1140,7 +1161,7 @@ namespace risk.control.system.Controllers
             }
             ViewBag.ClientCompanyId = clientCompanyUser.ClientCompanyId;
 
-            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
+            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", model.PolicyDetail.InvestigationServiceTypeId);
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId), "InvestigationServiceTypeId", "Name", model.PolicyDetail.InvestigationServiceTypeId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
@@ -1285,7 +1306,34 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            var countryId = _context.Country.FirstOrDefault().CountryId;
+            var stateId = _context.State.FirstOrDefault().StateId;
+            var districtId = _context.District.Include(d => d.State).FirstOrDefault(d => d.StateId == stateId).DistrictId;
+            var pinCodeId = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.DistrictId == districtId).PinCodeId;
+            var random = new Random();
+            claimsInvestigation.CustomerDetail = new CustomerDetail
+            {
+                Addressline = random.Next(100, 999) + " GOOD STREET",
+                ContactNumber = random.NextInt64(5555555555, 9999999999),
+                CountryId = countryId,
+                CustomerDateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
+                CustomerEducation = Education.PROFESSIONAL,
+                CustomerIncome = Income.UPPER_INCOME,
+                CustomerName = GenerateName(),
+                CustomerOccupation = Occupation.SELF_EMPLOYED,
+                CustomerType = CustomerType.HNI,
+                Description = "DODGY PERSON",
+                StateId = stateId,
+                DistrictId = districtId,
+                PinCodeId = pinCodeId,
+                Gender = Gender.MALE,
+            };
+
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
+            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
+
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
             ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
@@ -1301,6 +1349,15 @@ namespace risk.control.system.Controllers
             var locationPage = new MvcBreadcrumbNode("CreateCustomer", "ClaimsInvestigation", "Add Customer") { Parent = incompleteClaim, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = locationPage;
             return View(claimsInvestigation);
+        }
+
+        public static string GenerateName()
+        {
+            var random = new Random();
+            string firstName = firstNames[random.Next(0, firstNames.Length)];
+            string lastName = firstNames[random.Next(0, firstNames.Length)];
+
+            return $"{firstName} {lastName}";
         }
 
         [HttpPost]
