@@ -325,95 +325,119 @@
                                                 <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
                                             </div>
                                             <div class="card-body pb-0">
+                                                @{
+                                                    var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "OCR Scan Info";
+                                                    var image = @ViewBag.LocationUrl;
+                                                    var ocrImage = @ViewBag.OcrLocationUrl;
+                                                    var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Image DATA";
+                                                }
                                                 <div class="row">
-                                                    <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
-                                                        <div class="card bg-light d-flex flex-fill">
-                                                            <div class="card-header text-muted border-bottom-0">
-                                                                @{
-                                                                    string agentRemarksUpdated = null;
-                                                                    if (@Model.CaseLocation.ClaimReport?.AgentRemarksUpdated != null)
-                                                                    {
-                                                                        agentRemarksUpdated = Model.CaseLocation.ClaimReport?.AgentRemarksUpdated.Value.ToString("dd-MMM-yy HH:mm");
-                                                                    }
-                                                                }
-                                                                <i class="fas fa-mobile-alt"></i> Investigation data <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @agentRemarksUpdated</span>
-                                                            </div>
-                                                            <div class="card-body pt-0">
-                                                                <div class="row">
-                                                                    <div class="col-6  text-center">
-                                                                        <p class="text-muted text-sm">
-                                                                            @{
-                                                                                var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "OCR Scan Info";
-                                                                                var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Image DATA";
-                                                                                var image = @ViewBag.LocationUrl;
-                                                                                var ocrImage = @ViewBag.OcrLocationUrl;
-                                                                            }
-                                                                            <span class="badge badge-light"><i class="fas fa-portrait"></i> Face Reader</span>: <i class="fas fa-pin"></i>
-                                                                            <br />
-                                                                            <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
-                                                                            <br />
-                                                                            @{
-                                                                                if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
-                                                                                {
-                                                                                    <img title="location image" id="agentLocationPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid" src="/img/no-photo.png">
-                                                                                }
-                                                                            }
+                                                    @{
+                                                        if (@Model.CaseLocation.ClaimReport?.LocationData != null)
+                                                        {
+                                                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                                <div class="card bg-light d-flex flex-fill">
+                                                                    <div class="card-header text-muted border-bottom-0">
 
-                                                                        </p>
-                                                                        <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"><i class="fas fa-map-pin"></i> Photo Location</span>
-                                                                           <br />
-                                                                            <img class="locationImage img-fluid " src=@image />
-                                                                            <br />
-                                                                            <label class="img-fluid ocr-data"> @ViewBag.LocationAddress</label>
-                                                                        </p>
-                                                                        <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"><i class="fas fa-info"></i> Photo Analytics</span>
-                                                                            <br />
-                                                                            <label class="ocr-data img-fluid "> @locationData</label>
-                                                                        </p>
+                                                                        <i class="fas fa-portrait"></i> Face Reader <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
-                                                                    <div class="col-6 text-center">
-                                                                        <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"><i class="fas fa-film"></i> OCR Image</span>: <i class="fas fa-pin"></i>
-                                                                            <br />
 
-                                                                            <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
-                                                                            <br />
-                                                                            @{
-                                                                                if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
-                                                                                {
-                                                                                    <img title="ocr image" id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
-                                                                                }
-                                                                                else
-                                                                                {
-                                                                                    <img title="ocr image" id="agentOcrPicture" alt="ocr-image" class="img-fluid" src="/img/no-photo.png">
-                                                                                }
-                                                                            }
-                                                                        </p>
-                                                                        <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"><i class="fas fa-map-pin"></i> OCR Location</span>
-                                                                            <br />
-                                                                            <img class="locationImage img-fluid " src=@ocrImage />
-                                                                            <br />
-                                                                            <label class="img-fluid ocr-data"> @ViewBag.OcrLocationAddress</label>
+                                                                    <div class="card-body pt-0">
+                                                                        <div class="row">
+                                                                            <div class="col-6">
+                                                                                <p class="text-muted text-sm">
+                                                                                    <span class="badge badge-light"><i class="fas fa-film"></i> Face Image</span>:
+                                                                                    <br />
+                                                                                    @{
+                                                                                        if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                                        {
+                                                                                            <img title="location image" id="agentLocationPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid  ocr-data" src="/img/no-photo.png">
+                                                                                        }
+                                                                                    }
+                                                                                </p>
+                                                                                <p class="text-muted text-sm">
 
-                                                                        </p>
-                                                                        <p class="text-muted text-sm">
-                                                                            <span class="badge badge-light"><i class="fas fa-info"></i> OCR Scan Info</span>
-                                                                            <br />
-                                                                            <label class="ocr-data img-fluid "> @QR1</label>
-                                                                        </p>
+                                                                                    <span class="badge badge-light"><i class="fas fa-info"></i> Photo Analysis</span>
+                                                                                    <br />
+                                                                                    <label class="ocr-data img-fluid"> @locationData</label>
+
+                                                                                </p>
+                                                                            </div>
+                                                                            <div class="col-6 text-center">
+                                                                                <p class="text-muted text-sm">
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location map</span>
+                                                                                    <br />
+                                                                                    <img class="img-fluid locationImage" src=@image />
+                                                                                </p>
+                                                                                <p class="text-muted text-sm">
+
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Location Address</span>
+                                                                                    <br />
+                                                                                    <label class="img-fluid ocr-data"> @ViewBag.LocationAddress</label>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                                                        }
+                                                        if (@Model.CaseLocation.ClaimReport?.AgentOcrData != null)
+                                                        {
+                                                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                                <div class="card bg-light d-flex flex-fill">
+                                                                    <div class="card-header text-muted border-bottom-0">
+
+                                                                        <i class="fas fa-mobile-alt"></i> OCR App <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                                    </div>
+                                                                    <div class="card-body pt-0">
+                                                                        <div class="row">
+                                                                            <div class="col-6">
+                                                                                <p class="text-muted text-sm">
+                                                                                    <span class="badge badge-light"><i class="fas fa-film"></i> OCR Image</span>:
+                                                                                    <br />
+                                                                                    @{
+                                                                                        if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
+                                                                                        {
+                                                                                            <img title="ocr image" id="agentOcrPicture" class="img-fluid investigation-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <img title="ocr image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src="/img/no-photo.png">
+                                                                                        }
+                                                                                    }
+                                                                                </p>
+                                                                                <p class="text-muted text-sm">
+
+                                                                                    <span class="badge badge-light"><i class="fas fa-info"></i> OCR Scan Info</span>
+                                                                                    <br />
+                                                                                    <label class="img-fluid ocr-data"> @QR1</label>
+                                                                                </p>
+                                                                            </div>
+                                                                            <div class="col-6 text-center">
+
+                                                                                <p class="text-muted text-sm">
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> OCR Location</span>
+                                                                                    <br />
+                                                                                    <img class="img-fluid locationImage" src=@ocrImage />
+                                                                                </p>
+                                                                                <p class="text-muted text-sm">
+
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location Address</span>
+                                                                                    <br />
+                                                                                    <label class="img-fluid ocr-data"> @ViewBag.OcrLocationAddress</label>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+                                                    <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
                                                         <div class="card bg-light d-flex flex-fill">
                                                             <div class="card-header text-muted border-bottom-0">
                                                                 <i class="fas fa-user-shield"></i> @Model.CaseLocation.ClaimReport.AgentEmail <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy HH:mm")</span>
