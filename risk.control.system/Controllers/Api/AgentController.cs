@@ -364,7 +364,7 @@ namespace risk.control.system.Controllers.Api
                 throw new ArgumentNullException("Argument(s) can't be null");
             }
 
-            await claimsInvestigationService.SubmitToVendorSupervisor(data.Email, data.BeneficiaryId, data.ClaimId, data.Remarks, data.Question1, data.Question2);
+            await claimsInvestigationService.SubmitToVendorSupervisor(data.Email, data.BeneficiaryId, data.ClaimId, data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
 
             await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
 
@@ -415,6 +415,8 @@ namespace risk.control.system.Controllers.Api
         public long BeneficiaryId { get; set; }
         public string? Question1 { get; set; }
         public string? Question2 { get; set; }
+        public string? Question3 { get; set; }
+        public string? Question4 { get; set; }
         public string Remarks { get; set; }
     }
 

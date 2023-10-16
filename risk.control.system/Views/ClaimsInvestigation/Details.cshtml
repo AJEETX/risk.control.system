@@ -536,11 +536,11 @@
                                                 <input type="hidden" id="testid" asp-for="Claim.ClaimsInvestigationId" />
                                                 <span class="fas fa-thumbtack input-fa"></span>
 
-                                                <input type="submit" value="Set as Assign" class="btn btn-danger" style="width:10rem" />
+                                                <input type="submit" value="Lock Details" class="btn btn-danger" style="width:10rem" />
                                             }
                                             else
                                             {
-                                                <input disabled type="submit" value="Set as Assign" class="btn btn-outline-danger" style="width:10rem" />
+                                                <input disabled type="submit" value="Lock Details" class="btn btn-outline-danger" style="width:10rem" />
 
                                             }
                                         }
@@ -569,14 +569,14 @@
                 if (askConfirmation) {
                     e.preventDefault();
                     $.confirm({
-                        title: "Confirm Set as <span class='fas fa-thumbtack'></span> <b> <u><i> Assign </i></u></b>",
+                        title: "Confirm <span class='fas fa-thumbtack'></span> <b> <u><i> Lock </i></u></b> Details",
                         content: "Are you sure?",
                         columnClass: 'medium',
                         closeIcon: true,
                         type: 'red',
                         buttons: {
                             confirm: {
-                                text: "Set as <span class='fas fa-thumbtack'></span> <u><i> Assign </i></u></b>",
+                                text: "<span class='fas fa-thumbtack'></span> <u><i> Lock </i></u></b> Details",
                                 btnClass: 'btn-danger',
                                 action: function () {
                                     askConfirmation = false;

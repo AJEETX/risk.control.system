@@ -339,9 +339,9 @@
                                                                                 var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "OCR Scan Info";
                                                                                 var image = @ViewBag.LocationUrl;
                                                                                 var ocrImage = @ViewBag.OcrLocationUrl;
-                                                                                var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Location DATA";
+                                                                                var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Image DATA";
                                                                             }
-                                                                            <span class="badge badge-light"><i class="fas fa-portrait"></i> Beneficiary Photo</span>:
+                                                                            <span class="badge badge-light"><i class="fas fa-portrait"></i> Face Reader</span>:
                                                                             <br />
                                                                             <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
                                                                             <br/>
@@ -418,12 +418,20 @@
 
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <li class="form-group">
-                                                                                What is customer age?
+                                                                                What is abc?
                                                                                 <input maxlength="100" name="question1" id="question1" asp-for="CaseLocation.ClaimReport.Question1" type="text" class="form-control" placeholder="Answer question1..." />
                                                                             </li>
                                                                             <li class="form-group">
-                                                                                What is beneficiary relation?
-                                                                                <input maxlength="100" name="question2" id="question3" asp-for="CaseLocation.ClaimReport.Question2" type="text" class="form-control" placeholder="Answer question2..." />
+                                                                                What is xyz?
+                                                                                <input maxlength="100" name="question2" id="question2" asp-for="CaseLocation.ClaimReport.Question2" type="text" class="form-control" placeholder="Answer question2..." />
+                                                                            </li>
+                                                                            <li class="form-group">
+                                                                                What is xxx?
+                                                                                <input maxlength="100" name="question3" id="question3" asp-for="CaseLocation.ClaimReport.Question3" type="text" class="form-control" placeholder="Answer question3..." />
+                                                                            </li>
+                                                                            <li class="form-group">
+                                                                                What is yyy?
+                                                                                <input maxlength="100" name="question4" id="question4" asp-for="CaseLocation.ClaimReport.Question4" type="text" class="form-control" placeholder="Answer question4..." />
                                                                             </li>
                                                                             <li class="form-group">
                                                                             Remarks

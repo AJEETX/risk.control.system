@@ -350,9 +350,9 @@
                                                                                 var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "OCR Scan Info";
                                                                                 var image = @ViewBag.LocationUrl;
                                                                                 var ocrImage = @ViewBag.OcrLocationUrl;
-                                                                                var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Location DATA";
+                                                                                var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Image DATA";
                                                                             }
-                                                                            <span class="badge badge-light"><i class="fas fa-portrait"></i> Beneficiary Photo</span>:
+                                                                            <span class="badge badge-light"><i class="fas fa-portrait"></i> Face Reader</span>:
                                                                             <br />
 
                                                                             <i class="fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy HH:mm")
@@ -446,6 +446,20 @@
                                                                                     <i class="far fa-comment"></i>
                                                                                 </span>
                                                                                 @Model.CaseLocation.ClaimReport?.Question2 <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                What is xxx?
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment"></i>
+                                                                                </span>
+                                                                                @Model.CaseLocation.ClaimReport?.Question3 <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                What is yyy?
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment"></i>
+                                                                                </span>
+                                                                                @Model.CaseLocation.ClaimReport?.Question4 <i class="far fa-comment"></i>
                                                                             </li>
                                                                             <li class="small">
                                                                                 Remarks?
