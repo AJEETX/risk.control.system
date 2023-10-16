@@ -143,10 +143,11 @@ table {
 .ocr-data {
     width: 150px;
     border: 2px solid #ccc;
-    height: 150px;
+    height: 200px;
     overflow-y: auto;
     padding: 5px;
     font-weight: 400 !important;
+    border-radius:5px;
 }
 
 .investigation-actual-image {
