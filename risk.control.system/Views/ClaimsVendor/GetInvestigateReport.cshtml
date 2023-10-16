@@ -333,7 +333,7 @@
                                                 }
                                                 <div class="row">
                                                     @{
-                                                        if (@Model.CaseLocation.ClaimReport?.LocationData != null)
+                                                        if (@Model.CaseLocation.ClaimReport?.LocationData != null && @Model.CaseLocation.ClaimReport?.LocationLongLatTime != null && image != null)
                                                         {
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
@@ -385,7 +385,7 @@
                                                                 </div>
                                                             </div>
                                                         }
-                                                        if (@Model.CaseLocation.ClaimReport?.AgentOcrData != null)
+                                                        if (@Model.CaseLocation.ClaimReport?.AgentOcrData != null && @Model.CaseLocation.ClaimReport?.OcrLongLatTime != null && ocrImage != null)
                                                         {
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
@@ -542,21 +542,13 @@
                                                             </div>
                                                             <div class="card-body pt-0 disclaimer-body">
                                                                 <div class="row report-disclaimer">
-
-
                                                                     <div class="col-12">
-
                                                                         <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                             <label>
-
                                                                                 <h4 class="mb-0" style="margin-top: 0.2em!important;">Report Terms and Conditions</h4>
                                                                                 <p>Last updated <span style="color: #8351f9;">@DateTime.Now.AddYears(-1)</span></p>
                                                                                 <p><strong>AGREEMENT TO TERMS</strong></p>
                                                                                 <p>These Terms and Conditions constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and<span style="color: #8351f9;"> Holosync Technologies</span> (“we,” “us” or “our”), concerning your access to and use of the <span style="color: #8351f9;">icheckify.co.in</span> Report as well as any other media form, media channel, mobile Report or mobile application related, linked, or otherwise connected thereto (collectively, the “Application”).</p>
-                                                                                <p>You agree that by accessing the Application, you have read, understood, and agree to be bound by all of these Terms and Conditions. If you do not agree with all of these Terms and Conditions, then you are expressly prohibited from using the Application and you must discontinue use immediately.</p>
-                                                                                <p>Supplemental terms and conditions or documents that may be posted on the Application from time to time are hereby expressly incorporated herein by reference. We reserve the right, in our sole discretion, to make changes or modifications to these Terms and Conditions at any time and for any reason.</p>
-                                                                                <p>We will alert you about any changes by updating the “Last updated” date of these Terms and Conditions, and you waive any right to receive specific notice of each such change.</p>
-                                                                                <p>It is your responsibility to periodically review these Terms and Conditions to stay informed of updates. You will be subject to, and will be deemed to have been made aware of and to have accepted, the changes in any revised Terms and Conditions by your continued use of the Application after the date such revised Terms and Conditions are posted.</p>
                                                                                 <p>The information provided on the Application is not intended for distribution to or use by any person or entity in any jurisdiction or country where such distribution or use would be contrary to law or regulation or which would subject us to any report requirement within such jurisdiction or country.</p>
                                                                                 <p><strong>INTELLECTUAL PROPERTY RIGHTS</strong></p>
                                                                                 <p>Unless otherwise indicated, the Application is our proprietary property and all source code, databases, functionality, software, Report designs, audio, video, text, photographs, and graphics on the Application (collectively, the “Content”) and the trademarks, service marks, and logos contained therein (the “Marks”) are owned or controlled by us or licensed to us, and are protected by copyright and trademark laws and various other intellectual property rights and unfair competition laws of the United States, foreign jurisdictions, and international conventions.</p>
@@ -581,12 +573,9 @@
                                                                                     <input type="checkbox" class="custom-control-input selected-case" id="selected-case" name="selected-case">
                                                                                     <label class="custom-control-label" for="selected-case"> I hereby consent to agree to the term and conditions.</label>
                                                                                 </div>
-
-
                                                                             </div>
                                                                         </ul>
                                                                     </div>
-
                                                                 </div>
                                                             </div>
                                                             <div class="card-footer">
@@ -620,8 +609,6 @@
     }
 
     <script>
-        $('#supervisorRemarks').focus();
-
         $(document).ready(function () {
 
             $('#create-form').on('submit', function (e) {
@@ -631,7 +618,7 @@
                     askConfirmation = false;
                     e.preventDefault();
                     $.alert({
-                        title: "Claim Assignment !!!",
+                        title: "Supervisor Comments !!!",
                         content: "Please enter comments?",
                         icon: 'fas fa-exclamation-triangle',
                         columnClass: 'medium',
