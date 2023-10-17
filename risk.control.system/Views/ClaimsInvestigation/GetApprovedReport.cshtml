@@ -361,33 +361,91 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                                    <div class="card bg-light d-flex flex-fill">
-                                                        <div class="card-header text-muted border-bottom-0">
-                                                            <i class="fas fa-user-edit"></i> Supervisor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
-                                                        </div>
-                                                        <div class="card-body pt-0">
-                                                            <div class="row">
-                                                                <div class="col-12">
-                                                                    <h4 class="lead"><b> @Model?.Location?.ClaimReport.SupervisorEmail</b></h4>
-                                                                    <p class="text-muted text-sm">
+                                                @if (!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.AgentRemarks))
+                                                {
+                                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="fas fa-user-shield"></i> @Model.Location.ClaimReport.AgentEmail <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-12">
 
-                                                                        <b>Supervisor comments: </b>
-                                                                    </p>
-                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                                        <li class="small">
-                                                                            <span class="fa-li">
-                                                                                <i class="far fa-comment"></i>
-                                                                            </span>
-                                                                            @Model.Location.ClaimReport?.SupervisorRemarks <i class="far fa-comment"></i>
-                                                                        </li>
-                                                                    </ul>
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                            <li class="small">
+                                                                                Ownership of residence ?
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment"></i>
+                                                                                </span>
+                                                                                @Model.Location.ClaimReport?.Question1 <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                Perceived financial status ?
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment"></i>
+                                                                                </span>
+                                                                                @Model.Location.ClaimReport?.Question2 <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                Name of neighbour met ?
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment"></i>
+                                                                                </span>
+                                                                                @Model.Location.ClaimReport?.Question3 <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                Date when met with neighbour ?
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment"></i>
+                                                                                </span>
+                                                                                @Model.Location.ClaimReport?.Question4 <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                Remarks?
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment"></i>
+                                                                                </span>
+                                                                                @Model.Location.ClaimReport?.AgentRemarks <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+
                                                                 </div>
-
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                }
+                                                @if (!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.SupervisorRemarks))
+                                                {
+                                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                        <div class="card bg-light d-flex flex-fill">
+                                                            <div class="card-header text-muted border-bottom-0">
+                                                                <i class="fas fa-user-edit"></i> Supervisor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                            </div>
+                                                            <div class="card-body pt-0">
+                                                                <div class="row">
+                                                                    <div class="col-12">
+                                                                        <h4 class="lead"><b> @Model?.Location?.ClaimReport.SupervisorEmail</b></h4>
+                                                                        <p class="text-muted text-sm">
+
+                                                                            <b>Supervisor comments: </b>
+                                                                        </p>
+                                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="far fa-comment"></i>
+                                                                                </span>
+                                                                                @Model.Location.ClaimReport?.SupervisorRemarks <i class="far fa-comment"></i>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
                                             </div>
                                             <div class="row">
                                                 <div class="col-12 d-flex align-items-stretch flex-column">
