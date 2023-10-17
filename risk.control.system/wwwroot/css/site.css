@@ -123,31 +123,31 @@ table {
 .form-Image {
     height: 2.4rem;
     width: 2.4rem;
-    border: .1px ridge #ccc;
+    border: 1px solid #ccc;
 }
 
 .investigation-Image {
     height: 150px;
     width: 150px;
-    border: 2px solid #ccc;
-    border-radius: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 .locationImage {
     height: 150px;
     width: 150px;
-    border: 2px solid #ccc;
-    border-radius: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 .ocr-data {
     width: 150px;
-    border: 2px solid #ccc;
-    height: 200px;
+    border: 1x solid #ccc;
+    height: 150px;
     overflow-y: auto;
     padding: 5px;
     font-weight: 400 !important;
-    border-radius:5px;
+    border-radius: 5px;
 }
 
 .investigation-actual-image {
