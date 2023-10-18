@@ -126,13 +126,19 @@ table {
     border: 1px solid #ccc;
 }
 
-.investigation-Image {
+.face-Image {
     height: 150px;
     width: 150px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
+.ocr-Image {
+    height: 150px;
+    width: 150px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 .locationImage {
     height: 150px;
     width: 150px;

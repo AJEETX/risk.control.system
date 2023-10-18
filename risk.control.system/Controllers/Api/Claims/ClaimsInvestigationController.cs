@@ -1023,22 +1023,28 @@ namespace risk.control.system.Controllers.Api.Claims
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
             string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
-            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.LocationLongLat ))
+            string imageAddress = string.Empty;
+            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.LocationLongLat))
             {
                 var longLat = beneficiary.ClaimReport.LocationLongLat.IndexOf("/");
-                var longitude = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
-                var latitude = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
-                var longLatString = longitude + "," + latitude;
+                var latitude = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                var longitude = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
+                var longLatString = latitude + "," + longitude;
+                RootObject rootObject = ReportController.getAddress((latitude), (longitude));
+                imageAddress = rootObject.display_name;
                 mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
 
             string ocrUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            string ocrAddress = string.Empty;
             if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.OcrLongLat))
             {
                 var ocrlongLat = beneficiary.ClaimReport.OcrLongLat.IndexOf("/");
-                var ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, ocrlongLat)?.Trim();
-                var ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(ocrlongLat + 1)?.Trim();
-                var ocrLongLatString = ocrLongitude + "," + ocrLatitude;
+                var ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, ocrlongLat)?.Trim();
+                var ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(ocrlongLat + 1)?.Trim();
+                var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
+                RootObject rootObject = ReportController.getAddress((ocrLatitude), (ocrLongitude));
+                ocrAddress = rootObject.display_name;
                 ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
 
@@ -1048,13 +1054,15 @@ namespace risk.control.system.Controllers.Api.Claims
                 QrData = beneficiary.ClaimReport?.AgentOcrData,
                 LocationData = beneficiary.ClaimReport?.LocationData ?? "Location Data",
                 LatLong = mapUrl,
+                ImageAddress = imageAddress,
                 Location = beneficiary.ClaimReport?.AgentLocationPicture != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentLocationPicture)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 OcrData = beneficiary.ClaimReport?.AgentOcrPicture != null ?
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentOcrPicture)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                OcrLatLong = ocrUrl
+                OcrLatLong = ocrUrl,
+                OcrAddress = ocrAddress
             };
 
             return Ok(data);

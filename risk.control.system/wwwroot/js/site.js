@@ -137,7 +137,7 @@
         });
     });
 
-    $('.investigation-Image').click(function () {
+    $('.face-Image').click(function () {
         $.confirm({
             type: 'grey',
             closeIcon: true,
@@ -158,15 +158,47 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent('Beneficiary Photo: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br>Photo Location: <img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
-                    self.setContentAppend('<br>Location Analytics : ');
+                    self.setContent(' Face image: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
+                    self.setContentAppend('<br>Photo Analysis : ');
                     self.setContentAppend('<br>' + response.locationData);
-                    self.setContentAppend('<br>OCR Photo: <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
-                    self.setContentAppend('<br>OCR Photo Location: <img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
+                    self.setContentAppend('<br>Location Map:');
+                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
+                    self.setContentAppend('<br>' + response.imageAddress);
+                    self.setTitle('<i class="fas fa-mobile-alt"></i> Face Reader');
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            }
+        })
+    })
+    $('.ocr-Image').click(function () {
+        $.confirm({
+            type: 'grey',
+            closeIcon: true,
+            columnClass: 'medium',
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    self.setContentAppend('<br>OCR Image: <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
                     self.setContentAppend('<br>OCR Scan Info : ');
                     self.setContentAppend('<br>' + response.qrData);
-                    self.setTitle('<i class="fas fa-mobile-alt"></i> ' + response.title);
+                    self.setContentAppend('<br>Location Map:');
+                    self.setContentAppend('<br><img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
+                    self.setContentAppend('<br>' + response.ocrAddress);
+                    self.setTitle('<i class="fas fa-mobile-alt"></i> OCR App');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
