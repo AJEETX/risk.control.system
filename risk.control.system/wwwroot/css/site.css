@@ -139,6 +139,7 @@ table {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 .locationImage {
     height: 150px;
     width: 150px;
@@ -148,7 +149,7 @@ table {
 
 .ocr-data {
     width: 150px;
-    border: 1x solid #ccc;
+    border: 1px solid #ccc;
     height: 150px;
     overflow-y: auto;
     padding: 5px;
