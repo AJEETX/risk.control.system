@@ -35,6 +35,29 @@ namespace risk.control.system.Seeds
 
             var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
 
+            var xyzVendor = new Vendor
+            {
+                Name = Applicationsettings.AGENCY2NAME,
+                Addressline = "10, Clear Road  ",
+                Branch = "BLACKBURN",
+                Code = Applicationsettings.AGENCY2CODE,
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "SBI BANK",
+                BankAccountNumber = "9876543",
+                IFSCCode = "IFSC999",
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                Description = "HEAD OFFICE ",
+                Email = Applicationsettings.AGENCY2DOMAIN,
+                PhoneNumber = "4444404739",
+                DocumentUrl = "/img/verify.png"
+            };
+
+            var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);
+
             //CREATE CLIENT COMPANY
             var currentPinCode = "515631";
             var currentDistrict = "ANANTAPUR";
@@ -59,33 +82,10 @@ namespace risk.control.system.Seeds
                 Email = Applicationsettings.COMPANYDOMAIN,
                 DocumentUrl = "/img/chl.png",
                 PhoneNumber = "9988004739",
-                EmpanelledVendors = new List<Vendor> { abcVendor }
+                EmpanelledVendors = new List<Vendor> { abcVendor, xyzVendor }
             };
 
             var tataAigCompany = await context.ClientCompany.AddAsync(TataAig);
-
-            var xyzVendor = new Vendor
-            {
-                Name = Applicationsettings.AGENCY2NAME,
-                Addressline = "10, Clear Road  ",
-                Branch = "KANPUR",
-                Code = Applicationsettings.AGENCY2CODE,
-                ActivatedDate = DateTime.Now,
-                AgreementDate = DateTime.Now,
-                BankName = "SBI BANK",
-                BankAccountNumber = "9876543",
-                IFSCCode = "IFSC999",
-                CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
-                Description = "HEAD OFFICE ",
-                Email = Applicationsettings.AGENCY2DOMAIN,
-                PhoneNumber = "4444404739",
-                DocumentUrl = "/img/verify.png"
-            };
-
-            var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);
 
             var abcSericesWithPinCodes = new List<VendorInvestigationServiceType>
             {
@@ -136,7 +136,7 @@ namespace risk.control.system.Seeds
             {
                 Name = Applicationsettings.AGENCY3NAME,
                 Addressline = "1, Main Road  ",
-                Branch = "KANPUR",
+                Branch = "CLAYTON",
                 Code = Applicationsettings.AGENCY3CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
