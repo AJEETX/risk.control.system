@@ -57,7 +57,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
                 Description = "CORPORATE OFFICE ",
                 Email = Applicationsettings.COMPANYDOMAIN,
-                DocumentUrl = "/img/sbil.png",
+                DocumentUrl = "/img/chl.png",
                 PhoneNumber = "9988004739",
                 EmpanelledVendors = new List<Vendor> { abcVendor }
             };

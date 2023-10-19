@@ -147,9 +147,9 @@
         public const string CURRENT_DISTRICT = "ANANTAPUR";
         public const string CURRENT_STATE = "AD";
 
-        public const string COMPANYNAME = "sbi life";
-        public const string COMPANYCODE = "sli";
-        public const string COMPANYDOMAIN = "sbilife.com";
+        public const string COMPANYNAME = "canara hsbc life";
+        public const string COMPANYCODE = "chl";
+        public const string COMPANYDOMAIN = "canarahsbclife.com";
 
         public const string AGENCY1NAME = "Checker";
         public const string AGENCY1CODE = "CHA";
