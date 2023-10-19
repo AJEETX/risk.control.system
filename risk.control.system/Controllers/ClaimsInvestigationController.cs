@@ -591,7 +591,7 @@ namespace risk.control.system.Controllers
             {
                 var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
                 var latitude = claimCase.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+                var longitude = claimCase.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
@@ -609,7 +609,7 @@ namespace risk.control.system.Controllers
             {
                 var longLat = claimCase.ClaimReport.OcrLongLat.IndexOf("/");
                 var latitude = claimCase.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+                var longitude = claimCase.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/","").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.OcrLocationUrl = url;
@@ -706,7 +706,7 @@ namespace risk.control.system.Controllers
             {
                 var longLat = location.ClaimReport.LocationLongLat.IndexOf("/");
                 var latitude = location.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "");
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
@@ -724,7 +724,7 @@ namespace risk.control.system.Controllers
             {
                 var longLat = location.ClaimReport.OcrLongLat.IndexOf("/");
                 var latitude = location.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "");
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.OcrLocationUrl = url;

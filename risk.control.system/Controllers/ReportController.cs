@@ -8,6 +8,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Models;
 using System.Net;
 using System.Runtime.Serialization.Json;
+using System.Text.RegularExpressions;
 
 namespace risk.control.system.Controllers
 {
@@ -15,6 +16,7 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly HttpClient _httpClient;
+        private Regex longLatRegex = new Regex("(?<lat>[-|+| ]\\d+.\\d+)\\s* \\/\\s*(?<lon>\\d+.\\d+)");
 
         public ReportController(ApplicationDbContext context)
         {
@@ -97,7 +99,8 @@ namespace risk.control.system.Controllers
             {
                 var longLat = location.ClaimReport.LocationLongLat.IndexOf("/");
                 var latitude = location.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
@@ -115,7 +118,7 @@ namespace risk.control.system.Controllers
             {
                 var longLat = location.ClaimReport.OcrLongLat.IndexOf("/");
                 var latitude = location.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.OcrLocationUrl = url;
