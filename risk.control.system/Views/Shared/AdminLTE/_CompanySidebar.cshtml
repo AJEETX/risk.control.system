@@ -202,6 +202,16 @@
                 @{
                     if (User.IsInRole(AppRoles.Creator.ToString()))
                     {
+                       
+
+                        <li class="nav-item">
+                            <a style="pointer-events: none"  is-active-page asp-controller="ClaimsInvestigation" asp-action="UploadClaims" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","UploadClaims")">
+                                <i class="nav-icon fa fa-upload"></i>
+                                <p>
+                                    <span class="badge badge-secondary"> UPLOAD NEW</span> <span class="badge badge-light"> (coming)</span>
+                                </p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="CreateClaim" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","CreateClaim")
                                     @Url.MakeActiveClass("ClaimsInvestigation","CreatePolicy") ">
@@ -308,6 +318,14 @@
                         <i class="fa fa-toggle-on nav-icon"></i>
                         <p>
                              <span class="badge badge-primary">ACTIVE</span>
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a style="pointer-events: none" is-active-page asp-controller="File" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("File","")">
+                        <i class="nav-icon fa fa-upload"></i>
+                        <p>
+                            <span class="badge badge-secondary"> UPLOAD LOG</span> <span class="badge badge-light"> (coming)</span>
                         </p>
                     </a>
                 </li>
@@ -538,23 +556,23 @@
                             </a>
                         </li>
 
-                        //<li class="nav-item">
-                        //    <a is-active-page asp-controller="File" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("File","")">
-                        //        <i class="nav-icon fa fa-upload"></i>
-                        //        <p>
-                        //            @Applicationsettings.MULTIPLE_UPLOAD
-                        //        </p>
-                        //    </a>
-                        //</li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="File" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("File","")">
+                                <i class="nav-icon fa fa-upload"></i>
+                                <p>
+                                    @Applicationsettings.MULTIPLE_UPLOAD
+                                </p>
+                            </a>
+                        </li>
 
-                        //<li class="nav-item">
-                        //    <a is-active-page asp-controller="Uploads" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Uploads","")">
-                        //        <i class="nav-icon fa fa-upload"></i>
-                        //        <p>
-                        //            @Applicationsettings.PINCODE_UPLOAD
-                        //        </p>
-                        //    </a>
-                        //</li>
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="Uploads" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Uploads","")">
+                                <i class="nav-icon fa fa-upload"></i>
+                                <p>
+                                    @Applicationsettings.PINCODE_UPLOAD
+                                </p>
+                            </a>
+                        </li>
                     }
                 }
             </ul>

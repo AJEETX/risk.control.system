@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,15 +10,19 @@ namespace risk.control.system.Controllers
     public class UploadsController : Controller
     {
         private readonly IWebHostEnvironment webHostEnvironment;
+        private static string NO_DATA = " NO - DATA ";
+        private static Regex regex = new Regex("\\\"(.*?)\\\"");
 
         public UploadsController(IWebHostEnvironment webHostEnvironment)
         {
             this.webHostEnvironment = webHostEnvironment;
         }
+
         public async Task<IActionResult> Index()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Index(IFormFile postedFile)
         {
@@ -57,9 +62,11 @@ namespace risk.control.system.Controllers
                             {
                                 dt.Rows.Add();
                                 int i = 0;
-                                foreach (string cell in row.Split(','))
+                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                                var rowData = output.Split(',').ToList();
+                                foreach (string cell in rowData)
                                 {
-                                    dt.Rows[dt.Rows.Count - 1][i] = cell.Trim();
+                                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
                                     i++;
                                 }
                             }

@@ -35,8 +35,8 @@ namespace risk.control.system.Controllers
             WriteIndented = true
         };
 
-        private static readonly string[] firstNames = { "John", "Paul", "Ringo", "George" };
-        private static readonly string[] lastNames = { "Lennon", "McCartney", "Starr", "Harrison" };
+        private static readonly string[] firstNames = { "John", "Paul", "Ringo", "George", "Laura", "Stephaney" };
+        private static readonly string[] lastNames = { "Lennon", "McCartney", "Starr", "Harrison", "Blanc" };
 
         private static string NO_DATA = " NO - DATA ";
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
@@ -63,6 +63,70 @@ namespace risk.control.system.Controllers
             this.webHostEnvironment = webHostEnvironment;
             this.roleManager = roleManager;
             this.toastNotification = toastNotification;
+        }
+
+        [Breadcrumb(" Upload New")]
+        public IActionResult UploadClaims()
+        {
+            DataTable dt = new DataTable();
+
+            return View(dt);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadClaims(IFormFile postedFile)
+        {
+            if (postedFile != null)
+            {
+                string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                string fileName = Path.GetFileName(postedFile.FileName);
+                string filePath = Path.Combine(path, fileName);
+                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                {
+                    postedFile.CopyTo(stream);
+                }
+
+                string csvData = await System.IO.File.ReadAllTextAsync(filePath);
+                DataTable dt = new DataTable();
+                bool firstRow = true;
+                foreach (string row in csvData.Split('\n'))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        if (!string.IsNullOrEmpty(row))
+                        {
+                            if (firstRow)
+                            {
+                                foreach (string cell in row.Split(','))
+                                {
+                                    dt.Columns.Add(cell.Trim());
+                                }
+                                firstRow = false;
+                            }
+                            else
+                            {
+                                dt.Rows.Add();
+                                int i = 0;
+                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                                var rowData = output.Split(',').ToList();
+                                foreach (string cell in rowData)
+                                {
+                                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
+                                    i++;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return View(dt);
+            }
+            return Problem();
         }
 
         [Breadcrumb(" Add New")]
@@ -590,8 +654,8 @@ namespace risk.control.system.Controllers
             if (claimCase.ClaimReport.LocationLongLat != null)
             {
                 var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var latitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
@@ -609,7 +673,7 @@ namespace risk.control.system.Controllers
             {
                 var longLat = claimCase.ClaimReport.OcrLongLat.IndexOf("/");
                 var latitude = claimCase.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/","").Trim();
+                var longitude = claimCase.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.OcrLocationUrl = url;
@@ -705,8 +769,8 @@ namespace risk.control.system.Controllers
             if (location.ClaimReport.LocationLongLat != null)
             {
                 var longLat = location.ClaimReport.LocationLongLat.IndexOf("/");
-                var latitude = location.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "");
+                var latitude = location.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                var longitude = location.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "");
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;

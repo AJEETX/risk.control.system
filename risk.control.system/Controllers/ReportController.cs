@@ -98,8 +98,8 @@ namespace risk.control.system.Controllers
             if (location.ClaimReport.LocationLongLat != null)
             {
                 var longLat = location.ClaimReport.LocationLongLat.IndexOf("/");
-                var latitude = location.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
-                var longitude = location.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var latitude = location.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                var longitude = location.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
 
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";

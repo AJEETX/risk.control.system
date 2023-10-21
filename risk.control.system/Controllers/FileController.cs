@@ -14,12 +14,14 @@ namespace risk.control.system.Controllers
         {
             this.context = context;
         }
+
         public async Task<IActionResult> Index()
         {
             var fileuploadViewModel = await LoadAllFiles();
             ViewBag.Message = TempData["Message"];
             return View(fileuploadViewModel);
         }
+
         [HttpPost]
         public async Task<IActionResult> UploadToFileSystem(List<IFormFile> files, string description)
         {
@@ -54,6 +56,7 @@ namespace risk.control.system.Controllers
             TempData["Message"] = "File successfully uploaded to File System.";
             return RedirectToAction("Index");
         }
+
         [HttpPost]
         public async Task<IActionResult> UploadToDatabase(List<IFormFile> files, string description)
         {
@@ -92,7 +95,6 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> DownloadFileFromDatabase(int id)
         {
-
             var file = await context.FilesOnDatabase.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (file == null) return null;
             return File(file.Data, file.FileType, file.Name + file.Extension);
@@ -100,7 +102,6 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> DownloadSampleFileFromFileSystem()
         {
-
             var file = await context.FilesOnFileSystem.FirstOrDefaultAsync();
             if (file == null) return null;
             var memory = new MemoryStream();
@@ -111,9 +112,9 @@ namespace risk.control.system.Controllers
             memory.Position = 0;
             return File(memory, file.FileType, file.Name + file.Extension);
         }
+
         public async Task<IActionResult> DownloadFileFromFileSystem(int id)
         {
-
             var file = await context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (file == null) return null;
             var memory = new MemoryStream();
@@ -124,9 +125,9 @@ namespace risk.control.system.Controllers
             memory.Position = 0;
             return File(memory, file.FileType, file.Name + file.Extension);
         }
+
         public async Task<IActionResult> DeleteFileFromFileSystem(int id)
         {
-
             var file = await context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (file == null) return null;
             if (System.IO.File.Exists(file.FilePath))
@@ -138,9 +139,9 @@ namespace risk.control.system.Controllers
             TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
             return RedirectToAction("Index");
         }
+
         public async Task<IActionResult> DeleteFileFromDatabase(int id)
         {
-
             var file = await context.FilesOnDatabase.Where(x => x.Id == id).FirstOrDefaultAsync();
             context.FilesOnDatabase.Remove(file);
             context.SaveChanges();

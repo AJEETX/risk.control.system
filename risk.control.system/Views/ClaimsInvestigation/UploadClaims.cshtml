@@ -1,0 +1,71 @@
+﻿@using System.Data;
+@model DataTable
+
+@{
+    ViewData["Title"] = Applicationsettings.UPLOAD;
+}
+
+<section class="content pt-2">
+    <div class="container-fluid">
+
+        <form asp-action="UploadClaims" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-upload"></i> Upload New</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <input type="file" name="postedFile" required />
+                                        <input type="text" autocomplete="off" placeholder="Enter File Description" name="description" required />
+                                        <button type="submit" class="btn btn-danger" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title">Uploaded Claims</h3>
+                        </div>
+                        <div class="card-body">
+                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                <thead>
+                                    <tr>
+                                        @foreach (DataColumn dc in Model?.Columns)
+                                        {
+                                            <th>@dc.ColumnName</th>
+                                        }
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (DataRow dr in Model?.Rows)
+                                    {
+                                        <tr>
+                                            @foreach (DataColumn dc in Model.Columns)
+                                            {
+                                                <td>@dr[dc.ColumnName]</td>
+                                            }
+                                            <td>X</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                        
+                                </table>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
