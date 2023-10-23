@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231023071532_bulk")]
+    [Migration("20231023074307_bulk")]
     partial class bulk
     {
         /// <inheritdoc />
