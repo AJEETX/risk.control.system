@@ -84,7 +84,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=hsl-demo.db"));
+                    options.UseSqlite("Data Source=bulk-demo.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -145,12 +145,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Home/Error");
+//    app.UseHsts();
+//}
+//app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
 app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);

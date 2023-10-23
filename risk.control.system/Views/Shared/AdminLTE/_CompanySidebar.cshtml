@@ -205,10 +205,10 @@
                        
 
                         <li class="nav-item">
-                            <a style="pointer-events: none"  is-active-page asp-controller="ClaimsInvestigation" asp-action="UploadClaims" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","UploadClaims")">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="UploadClaims" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","UploadClaims")">
                                 <i class="nav-icon fa fa-upload"></i>
                                 <p>
-                                    <span class="badge badge-secondary"> UPLOAD NEW</span> <span class="badge badge-light"> (coming)</span>
+                                    <span class="badge badge-secondary"> UPLOAD</span> <span class="badge badge-light"> (new)</span>
                                 </p>
                             </a>
                         </li>
@@ -322,10 +322,10 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a style="pointer-events: none" is-active-page asp-controller="File" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("File","")">
-                        <i class="nav-icon fa fa-upload"></i>
+                    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="UploadNewLogs" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","UploadNewLogs")">
+                        <i class="nav-icon fas fa-archive"></i>
                         <p>
-                            <span class="badge badge-secondary"> UPLOAD LOG</span> <span class="badge badge-light"> (coming)</span>
+                            <span class="badge badge-secondary"> UPLOAD LOG</span> <span class="badge badge-light">new</span>
                         </p>
                     </a>
                 </li>

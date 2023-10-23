@@ -16,6 +16,9 @@ using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
 using System.Data;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Security.Claims;
@@ -74,7 +77,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadClaims(IFormFile postedFile)
+        public async Task<IActionResult> UploadClaims(IFormFile postedFile, string description)
         {
             if (postedFile != null)
             {
@@ -83,15 +86,32 @@ namespace risk.control.system.Controllers
                 {
                     Directory.CreateDirectory(path);
                 }
-
+                string docPath = Path.Combine(webHostEnvironment.WebRootPath, "document");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
                 string fileName = Path.GetFileName(postedFile.FileName);
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(postedFile.FileName);
                 string filePath = Path.Combine(path, fileName);
+
                 using (FileStream stream = new FileStream(filePath, FileMode.Create))
                 {
                     postedFile.CopyTo(stream);
                 }
 
-                string csvData = await System.IO.File.ReadAllTextAsync(filePath);
+                using var archive = ZipFile.OpenRead(filePath);
+
+                ZipFile.ExtractToDirectory(filePath, docPath, true);
+
+                string zipFilePath = Path.Combine(docPath, fileNameWithoutExtension);
+                var dirNames = Directory.EnumerateDirectories(zipFilePath);
+                var fileNames = Directory.EnumerateFiles(zipFilePath);
+
+                string csvData = await System.IO.File.ReadAllTextAsync(fileNames.First());
+
+                var userEmail = HttpContext.User.Identity.Name;
+
                 DataTable dt = new DataTable();
                 bool firstRow = true;
                 foreach (string row in csvData.Split('\n'))
@@ -123,10 +143,206 @@ namespace risk.control.system.Controllers
                         }
                     }
                 }
-
+                await SaveUpload(postedFile, filePath, description, userEmail);
+                ViewBag.FilePath = filePath;
                 return View(dt);
             }
             return Problem();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveUploadedClaims(IFormFile postedFile, string filePath)
+        {
+            string docPath = Path.Combine(webHostEnvironment.WebRootPath, "document");
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+
+            string zipFilePath = Path.Combine(docPath, fileNameWithoutExtension);
+            var dirNames = Directory.EnumerateDirectories(zipFilePath).ToList();
+            var fileNames = Directory.EnumerateFiles(zipFilePath);
+
+            string csvData = await System.IO.File.ReadAllTextAsync(fileNames.First());
+
+            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
+            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
+
+            var userEmail = HttpContext.User.Identity.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var uploadedClaims = new List<UploadedClaim>();
+            DataTable dt = new DataTable();
+            bool firstRow = true;
+            foreach (string row in csvData.Split('\n'))
+            {
+                if (!string.IsNullOrEmpty(row))
+                {
+                    if (!string.IsNullOrEmpty(row))
+                    {
+                        if (firstRow)
+                        {
+                            foreach (string cell in row.Split(','))
+                            {
+                                dt.Columns.Add(cell.Trim());
+                            }
+                            firstRow = false;
+                        }
+                        else
+                        {
+                            dt.Rows.Add();
+                            int i = 0;
+                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                            var rowData = output.Split(',').ToList();
+                            foreach (string cell in rowData)
+                            {
+                                dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
+                                i++;
+                            }
+                            var claim = new ClaimsInvestigation { };
+                            claim.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
+                            claim.InvestigationCaseStatus = status;
+                            claim.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
+                            claim.InvestigationCaseSubStatus = subStatus;
+                            claim.Updated = DateTime.UtcNow;
+                            claim.UpdatedBy = userEmail;
+                            claim.CurrentUserEmail = userEmail;
+                            claim.CurrentClaimOwner = userEmail;
+
+                            var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
+                            var directoryName = dirNames.FirstOrDefault(d => d.EndsWith(rowData[0].Trim()));
+                            DirectoryInfo dir = new DirectoryInfo($"{directoryName}");
+                            FileInfo[] imageFiles = dir.GetFiles("*.jpg");
+
+                            var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg")?.FullName;
+
+                            var image = System.IO.File.ReadAllBytes(policyImagePath);
+
+                            claim.PolicyDetail = new PolicyDetail
+                            {
+                                ContractNumber = rowData[0].Trim(),
+                                SumAssuredValue = Convert.ToDecimal(rowData[1].Trim()),
+                                ContractIssueDate = DateTime.Parse(rowData[2].Trim()),
+                                ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3].Trim()),
+                                InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
+                                DateOfIncident = DateTime.Parse(rowData[5].Trim()),
+                                CauseOfLoss = rowData[6].Trim(),
+                                CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
+                                CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
+                                LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
+                                ClientCompanyId = companyUser?.ClientCompanyId,
+                                DocumentImage = image
+                            };
+
+                            var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
+
+                            var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
+
+                            var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+
+                            var country = _context.Country.FirstOrDefault(c => c.Code.ToLower() == "IND".ToLower());
+
+                            var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg")?.FullName;
+
+                            var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+
+                            claim.CustomerDetail = new CustomerDetail
+                            {
+                                CustomerName = rowData[10].Trim(),
+                                CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11].Trim()),
+                                Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12].Trim()),
+                                CustomerDateOfBirth = DateTime.Parse(rowData[13].Trim()),
+                                ContactNumber = Convert.ToInt64(rowData[14].Trim()),
+                                CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15].Trim()),
+                                CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16].Trim()),
+                                CustomerIncome = (Income)Enum.Parse(typeof(Income), rowData[17].Trim()),
+                                Addressline = rowData[18].Trim(),
+                                CountryId = country.CountryId,
+                                PinCodeId = pinCode.PinCodeId,
+                                StateId = state.StateId,
+                                DistrictId = district.DistrictId,
+                                Description = rowData[20].Trim(),
+                                ProfilePicture = customerImage
+                            };
+
+                            var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[27].Trim());
+
+                            var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
+
+                            var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
+                            var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[22].Trim().ToLower());
+
+                            var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg")?.FullName;
+
+                            var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
+
+                            var beneficairy = new CaseLocation
+                            {
+                                BeneficiaryName = rowData[21].Trim(),
+                                BeneficiaryRelationId = relation.BeneficiaryRelationId,
+                                BeneficiaryDateOfBirth = DateTime.Parse(rowData[23].Trim()),
+                                BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[24].Trim()),
+                                BeneficiaryContactNumber = Convert.ToInt64(rowData[25].Trim()),
+                                Addressline = rowData[26].Trim(),
+                                PinCodeId = benePinCode.PinCodeId,
+                                DistrictId = beneDistrict.DistrictId,
+                                StateId = beneState.StateId,
+                                CountryId = country.CountryId,
+                                InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
+                                ProfilePicture = beneficairyImage
+                            };
+
+                            var uploadedClaim = new UploadedClaim
+                            {
+                                Claim = claim,
+                                Beneficairy = beneficairy
+                            };
+                            uploadedClaims.Add(uploadedClaim);
+
+                            var addedClaim = _context.ClaimsInvestigation.Add(claim);
+
+                            beneficairy.ClaimsInvestigationId = addedClaim.Entity.ClaimsInvestigationId;
+
+                            _context.CaseLocation.Add(beneficairy);
+
+                            var log = new InvestigationTransaction
+                            {
+                                ClaimsInvestigationId = addedClaim.Entity.ClaimsInvestigationId,
+                                CurrentClaimOwner = userEmail,
+                                Created = DateTime.UtcNow,
+                                HopCount = 0,
+                                Time2Update = 0,
+                                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                                UpdatedBy = userEmail
+                            };
+                            _context.InvestigationTransaction.Add(log);
+                        }
+                    }
+                }
+            }
+            var fName = Path.GetFileName(filePath);
+            var lst = _context.FilesOnFileSystem.ToList();
+            var fileData = _context.FilesOnFileSystem.FirstOrDefault(f => f.Name == Path.GetFileName(filePath));
+            var rows = _context.SaveChanges();
+            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i>Uploaded Claims saved as Draft"));
+
+            return RedirectToAction("Draft");
+        }
+
+        private async Task SaveUpload(IFormFile file, string filePath, string description, string uploadedBy)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+            var extension = Path.GetExtension(file.FileName);
+            var fileModel = new FileOnFileSystemModel
+            {
+                CreatedOn = DateTime.UtcNow,
+                FileType = file.ContentType,
+                Extension = extension,
+                Name = fileName,
+                Description = description,
+                FilePath = filePath,
+                UploadedBy = uploadedBy
+            };
+            _context.FilesOnFileSystem.Add(fileModel);
+            _context.SaveChanges();
         }
 
         [Breadcrumb(" Add New")]
@@ -1189,7 +1405,7 @@ namespace risk.control.system.Controllers
                     ContractIssueDate = DateTime.UtcNow.AddDays(-10),
                     CostCentreId = _context.CostCentre.FirstOrDefault().CostCentreId,
                     DateOfIncident = DateTime.UtcNow.AddDays(-3),
-                    InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i => i.Code == "COMPREHENSIVE").InvestigationServiceTypeId,
+                    InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i => i.Code == "COMP").InvestigationServiceTypeId,
                     Comments = "SOMETHING FISHY",
                     SumAssuredValue = random.Next(100000, 9999999),
                     ContractNumber = "POLX" + random.Next(1000, 9999),
@@ -1995,58 +2211,46 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        public async Task<IActionResult> Uploads()
+        [Breadcrumb(" Upload Log")]
+        public async Task<IActionResult> UploadNewLogs()
         {
-            return View();
+            var fileuploadViewModel = await LoadAllFiles();
+            ViewBag.Message = TempData["Message"];
+            return View(fileuploadViewModel);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Uploads(IFormFile postedFile)
+        public async Task<IActionResult> DownloadLog(int id)
         {
-            if (postedFile != null)
+            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (file == null) return null;
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(file.FilePath, FileMode.Open))
             {
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-
-                string fileName = Path.GetFileName(postedFile.FileName);
-                string filePath = Path.Combine(path, fileName);
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                {
-                    postedFile.CopyTo(stream);
-                }
-
-                string csvData = await System.IO.File.ReadAllTextAsync(filePath);
-                bool firstRow = true;
-                var claims = new List<ClaimsInvestigation>();
-                foreach (string row in csvData.Split('\n'))
-                {
-                    if (!string.IsNullOrEmpty(row))
-                    {
-                        if (!string.IsNullOrEmpty(row))
-                        {
-                            if (firstRow)
-                            {
-                                firstRow = false;
-                            }
-                            else
-                            {
-                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                                var rowData = output.Split(',').ToList();
-                                var claim = new ClaimsInvestigation
-                                {
-                                };
-                                claims.Add(claim);
-                            }
-                        }
-                    }
-                }
-
-                return View(claims);
+                await stream.CopyToAsync(memory);
             }
-            return Problem();
+            memory.Position = 0;
+            return File(memory, file.FileType, file.Name + file.Extension);
+        }
+
+        public async Task<IActionResult> DeleteLog(int id)
+        {
+            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (file == null) return null;
+            if (System.IO.File.Exists(file.FilePath))
+            {
+                System.IO.File.Delete(file.FilePath);
+            }
+            _context.FilesOnFileSystem.Remove(file);
+            _context.SaveChanges();
+            TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
+            return RedirectToAction("UploadNewLogs");
+        }
+
+        private async Task<FileUploadViewModel> LoadAllFiles()
+        {
+            var viewModel = new FileUploadViewModel();
+            viewModel.FilesOnFileSystem = await _context.FilesOnFileSystem.ToListAsync();
+            return viewModel;
         }
 
         private bool ClaimsInvestigationExists(string id)

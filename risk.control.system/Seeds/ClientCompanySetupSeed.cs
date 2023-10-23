@@ -80,14 +80,14 @@ namespace risk.control.system.Seeds
             var doubtCaseEnabler = new CaseEnabler
             {
                 Name = "DOUBTFUL BACKGROUND DETAILS",
-                Code = "DOUBTFUL BACKGROUND DETAILS",
+                Code = "DBD",
             };
             var doubtCaseEnablerEntity = await context.CaseEnabler.AddAsync(doubtCaseEnabler);
 
             var highAmountCaseEnabler = new CaseEnabler
             {
                 Name = "VERY HIGH INSURANCE PREMIUM",
-                Code = "VERY HIGH INSURANCE PREMIUM",
+                Code = "VHIP",
             };
             var highAmountCaseEnablerEntity = await context.CaseEnabler.AddAsync(highAmountCaseEnabler);
 

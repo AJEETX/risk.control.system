@@ -9,19 +9,25 @@
     <div class="container-fluid">
 
         <form asp-action="UploadClaims" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="filePath" value="@ViewBag.FilePath" />
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fa fa-upload"></i> Upload New</h3>
+                            <h3 class="card-title"><i class="fa fa-upload"></i> Upload</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <input type="file" name="postedFile" required />
-                                        <input type="text" autocomplete="off" placeholder="Enter File Description" name="description" required />
-                                        <button type="submit" class="btn btn-danger" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                        <span class="input-group-label"> Upload Claims:</span>
+                                        <div class="input-group mb-3">
+                                            <img class="form-Image" id="documentImage" src="/img/no-policy.jpg">
+                                            <input accept=".zip" type="file" class="form-control" name="postedFile" />
+                                            <input type="text" autocomplete="off" placeholder="Enter File Description" name="description" value="sample upload" required />
+                                            <button type="submit" class="btn btn-info" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload</button>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -59,11 +65,16 @@
                                         </tr>
                                     }
                                     </tbody>
-                        
                                 </table>
-                            
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <button id="manage-vendors" class="btn btn-success" asp-action="SaveUploadedClaims">
+                        <i class="fas fa-hand-pointer" aria-hidden="true"></i> Save as Draft
+                    </button>
                 </div>
             </div>
         </form>

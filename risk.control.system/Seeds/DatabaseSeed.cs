@@ -72,7 +72,7 @@ namespace risk.control.system.Seeds
             var claimComprehensive = new InvestigationServiceType
             {
                 Name = "COMPREHENSIVE",
-                Code = "COMPREHENSIVE",
+                Code = "COMP",
                 MasterData = true,
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
             };
@@ -81,7 +81,7 @@ namespace risk.control.system.Seeds
             var claimNonComprehensive = new InvestigationServiceType
             {
                 Name = "NON-COMPREHENSIVE",
-                Code = "NON-COMPREHENSIVE",
+                Code = "NON-COMP",
                 MasterData = true,
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
             };
@@ -91,7 +91,7 @@ namespace risk.control.system.Seeds
             var claimDocumentCollection = new InvestigationServiceType
             {
                 Name = "DOCUMENT-COLLECTION",
-                Code = "DOCUMENT-COLLECTION",
+                Code = "DOC",
                 MasterData = true,
                 LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
             };
@@ -111,7 +111,7 @@ namespace risk.control.system.Seeds
             var underWritingPreVerification = new InvestigationServiceType
             {
                 Name = "PRE-ONBOARDING-VERIFICATION",
-                Code = "PRE-ONBOARDING-VERIFICATION",
+                Code = "PRE-OV",
                 MasterData = true,
                 LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
             };
@@ -121,7 +121,7 @@ namespace risk.control.system.Seeds
             var underWritingPostVerification = new InvestigationServiceType
             {
                 Name = "POST-ONBOARDING-VERIFICATION",
-                Code = "POST-ONBOARDING-VERIFICATION",
+                Code = "POST-OV",
                 MasterData = true,
                 LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
             };

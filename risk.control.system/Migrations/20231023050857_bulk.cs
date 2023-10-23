@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class hsbc : Migration
+    public partial class bulk : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -131,7 +131,8 @@ namespace risk.control.system.Migrations
                     Extension = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     UploadedBy = table.Column<string>(type: "TEXT", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Saved = table.Column<bool>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -150,7 +151,8 @@ namespace risk.control.system.Migrations
                     Extension = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     UploadedBy = table.Column<string>(type: "TEXT", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Saved = table.Column<bool>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {

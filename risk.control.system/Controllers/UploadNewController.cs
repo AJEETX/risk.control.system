@@ -6,11 +6,11 @@ using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Controllers
 {
-    public class FileController : Controller
+    public class UploadNewController : Controller
     {
         private readonly ApplicationDbContext context;
 
-        public FileController(ApplicationDbContext context)
+        public UploadNewController(ApplicationDbContext context)
         {
             this.context = context;
         }
@@ -137,7 +137,7 @@ namespace risk.control.system.Controllers
             context.FilesOnFileSystem.Remove(file);
             context.SaveChanges();
             TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
-            return RedirectToAction("Index", "UploadNew");
+            return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> DeleteFileFromDatabase(int id)

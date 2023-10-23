@@ -193,7 +193,7 @@ namespace risk.control.system.Models
         [Display(Name = "HNI")]
         HNI,
 
-        [Display(Name = "Non-NHI")]
+        [Display(Name = "Non-HNI")]
         NONHNI,
     }
 }

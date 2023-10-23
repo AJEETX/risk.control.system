@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231019210327_hsbc")]
-    partial class hsbc
+    [Migration("20231023050857_bulk")]
+    partial class bulk
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2307,6 +2307,9 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool?>("Saved")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("UploadedBy")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -2344,6 +2347,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Saved")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("UploadedBy")
                         .IsRequired()
