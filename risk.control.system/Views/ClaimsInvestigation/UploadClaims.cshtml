@@ -57,7 +57,14 @@
                                         <tr>
                                             @foreach (DataColumn dc in Model.Columns)
                                             {
-                                                <td>@dr[dc.ColumnName]</td>
+                                                if (dc.ColumnName == "PDocument" || dc.ColumnName == "CPhoto" || dc.ColumnName == "BPhoto")
+                                                {
+                                                    <td> <img id="documentImage" class="form-Image" src="data:image/*;base64,@dr[dc.ColumnName]"></td>
+                                                }
+                                                else
+                                                {
+                                                    <td>@dr[dc.ColumnName]</td>
+                                                }
                                             }
                                             <td>X</td>
                                         </tr>

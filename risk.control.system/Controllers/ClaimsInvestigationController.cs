@@ -135,17 +135,17 @@ namespace risk.control.system.Controllers
                             }
                             else
                             {
-                                dt.Rows.Add();
-                                int i = 0;
-                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                                var rowData = output.Split(',').ToList();
-                                foreach (string cell in rowData)
-                                {
-                                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
-                                    i++;
-                                }
                                 try
                                 {
+                                    dt.Rows.Add();
+                                    int i = 0;
+                                    var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                                    var rowData = output.Split(',').ToList();
+                                    foreach (string cell in rowData)
+                                    {
+                                        dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
+                                        i++;
+                                    }
                                     var claim = new ClaimsInvestigation { };
                                     claim.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
                                     claim.InvestigationCaseStatus = status;
@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers
                                     var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg" || i.Name.ToLower() == "policy.jpeg")?.FullName;
 
                                     var image = System.IO.File.ReadAllBytes(policyImagePath);
-
+                                    dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
                                     claim.PolicyDetail = new PolicyDetail
                                     {
                                         ContractNumber = rowData[0].Trim(),
@@ -192,6 +192,7 @@ namespace risk.control.system.Controllers
                                     var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
 
                                     var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+                                    dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
                                     claim.CustomerDetail = new CustomerDetail
                                     {
@@ -212,25 +213,26 @@ namespace risk.control.system.Controllers
                                         ProfilePicture = customerImage
                                     };
 
-                                    var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[27].Trim());
+                                    var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
 
                                     var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
 
                                     var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
-                                    var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[22].Trim().ToLower());
+                                    var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
                                     var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg" || i.Name.ToLower() == "beneficiary.jpeg")?.FullName;
 
                                     var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
+                                    dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
 
                                     var beneficairy = new CaseLocation
                                     {
-                                        BeneficiaryName = rowData[21].Trim(),
+                                        BeneficiaryName = rowData[22].Trim(),
                                         BeneficiaryRelationId = relation.BeneficiaryRelationId,
-                                        BeneficiaryDateOfBirth = DateTime.Parse(rowData[23].Trim()),
-                                        BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[24].Trim()),
-                                        BeneficiaryContactNumber = Convert.ToInt64(rowData[25].Trim()),
-                                        Addressline = rowData[26].Trim(),
+                                        BeneficiaryDateOfBirth = DateTime.Parse(rowData[24].Trim()),
+                                        BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25].Trim()),
+                                        BeneficiaryContactNumber = Convert.ToInt64(rowData[26].Trim()),
+                                        Addressline = rowData[27].Trim(),
                                         PinCodeId = benePinCode.PinCodeId,
                                         DistrictId = beneDistrict.DistrictId,
                                         StateId = beneState.StateId,
