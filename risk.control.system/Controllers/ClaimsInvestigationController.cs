@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers
                     }
                 }
                 await SaveUpload(postedFile, filePath, description, userEmail);
-                ViewBag.FilePath = filePath;
+                ViewBag.FilePath = fileNameWithoutExtension;
                 return View(dt);
             }
             return Problem();
@@ -154,7 +154,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> SaveUploadedClaims(string filePath)
         {
             string docPath = Path.Combine(webHostEnvironment.WebRootPath, "document");
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(filePath);
+            string fileNameWithoutExtension = filePath;
 
             string zipFilePath = Path.Combine(docPath, fileNameWithoutExtension);
             var dirNames = Directory.EnumerateDirectories(zipFilePath).ToList();
@@ -318,9 +318,7 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
-            var fName = Path.GetFileName(filePath);
-            var lst = _context.FilesOnFileSystem.ToList();
-            var fileData = _context.FilesOnFileSystem.FirstOrDefault(f => f.Name == Path.GetFileName(filePath));
+
             var rows = _context.SaveChanges();
             toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i>Uploaded Claims saved as Draft"));
 
