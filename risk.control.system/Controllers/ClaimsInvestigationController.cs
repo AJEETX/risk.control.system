@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveUploadedClaims(string filePath)
+        public async Task<IActionResult> SaveUploadedClaims(IFormFile postedFile, string description, string filePath)
         {
             string docPath = Path.Combine(webHostEnvironment.WebRootPath, "document");
             string fileNameWithoutExtension = filePath;

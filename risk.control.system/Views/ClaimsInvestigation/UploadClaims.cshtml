@@ -8,8 +8,7 @@
 <section class="content pt-2">
     <div class="container-fluid">
 
-        <form method="post" enctype="multipart/form-data">
-            <input type="hidden" name="filePath" value="@ViewBag.FilePath" />
+        <form id="upload-claims" method="post" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -70,6 +69,10 @@
                     </div>
                 </div>
             </div>
+        </form>
+        <form id="save-claims" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="filePath" value="@ViewBag.FilePath" />
+
             <div class="row">
                 <div class="col-md-12">
                     <button id="manage-vendors" class="btn btn-success" asp-action="SaveUploadedClaims">
