@@ -260,6 +260,7 @@ namespace risk.control.system.Controllers
                                 }
                                 catch (Exception ex)
                                 {
+                                    Console.WriteLine(ex.StackTrace);
                                     throw ex;
                                 }
                             }
