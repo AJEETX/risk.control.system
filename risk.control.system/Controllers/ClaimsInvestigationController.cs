@@ -87,9 +87,9 @@ namespace risk.control.system.Controllers
                     Directory.CreateDirectory(path);
                 }
                 string docPath = Path.Combine(webHostEnvironment.WebRootPath, "document");
-                if (!Directory.Exists(path))
+                if (!Directory.Exists(docPath))
                 {
-                    Directory.CreateDirectory(path);
+                    Directory.CreateDirectory(docPath);
                 }
                 string fileName = Path.GetFileName(postedFile.FileName);
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(postedFile.FileName);
