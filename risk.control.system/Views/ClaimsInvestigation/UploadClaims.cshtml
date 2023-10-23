@@ -24,8 +24,7 @@
                                             <img class="form-Image" id="documentImage" src="/img/no-policy.jpg">
                                             <input accept=".zip" type="file" class="form-control" name="postedFile" />
                                             <input type="text" autocomplete="off" placeholder="Enter File Description" name="description" value="sample upload" required />
-                                            <button name="upload" type="submit" class="btn btn-info" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload</button>
-
+                                            <button type="submit" class="btn btn-info" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload</button>
                                         </div>
                                     </div>
                                 </div>
@@ -70,15 +69,15 @@
                 </div>
             </div>
         </form>
-        <form id="save-claims" method="get">
+        @*<form id="save-claims" method="post">
             <input type="hidden" name="filePath" value="@ViewBag.FilePath" />
             <div class="row">
                 <div class="col-md-12">
-                    <button name="save" class="btn btn-success" asp-action="SaveUploadedClaims">
+                    <button class="btn btn-success" asp-action="SaveUploadedClaims">
                         <i class="fas fa-hand-pointer" aria-hidden="true"></i> Save as Draft
                     </button>
                 </div>
             </div>
-        </form>
+        </form>*@
     </div>
 </section>
