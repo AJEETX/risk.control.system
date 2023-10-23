@@ -150,7 +150,6 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [HttpPost]
         public async Task<IActionResult> SaveUploadedClaims(string filePath)
         {
             string docPath = Path.Combine(webHostEnvironment.WebRootPath, "document");
@@ -209,12 +208,12 @@ namespace risk.control.system.Controllers
 
                                 var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
                                 var directoryName = dirNames.FirstOrDefault(d => d.EndsWith(rowData[0].Trim()));
-                                DirectoryInfo dir = new DirectoryInfo($"{directoryName}");
-                                FileInfo[] imageFiles = dir.GetFiles("*.jpg").Union(dir.GetFiles("*.jpeg")).ToArray();
+                                //DirectoryInfo dir = new DirectoryInfo($"{directoryName}");
+                                //FileInfo[] imageFiles = dir.GetFiles("*.jpg").Union(dir.GetFiles("*.jpeg")).ToArray();
 
-                                var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg" || i.Name.ToLower() == "policy.jpeg")?.FullName;
+                                //var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg" || i.Name.ToLower() == "policy.jpeg")?.FullName;
 
-                                var image = System.IO.File.ReadAllBytes(policyImagePath);
+                                //var image = System.IO.File.ReadAllBytes(policyImagePath);
 
                                 claim.PolicyDetail = new PolicyDetail
                                 {
@@ -229,7 +228,7 @@ namespace risk.control.system.Controllers
                                     CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                                     LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
                                     ClientCompanyId = companyUser?.ClientCompanyId,
-                                    DocumentImage = image
+                                    //DocumentImage = image
                                 };
 
                                 var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
@@ -240,9 +239,9 @@ namespace risk.control.system.Controllers
 
                                 var country = _context.Country.FirstOrDefault(c => c.Code.ToLower() == "IND".ToLower());
 
-                                var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
+                                //var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
 
-                                var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+                                //var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
 
                                 claim.CustomerDetail = new CustomerDetail
                                 {
@@ -260,7 +259,7 @@ namespace risk.control.system.Controllers
                                     StateId = state.StateId,
                                     DistrictId = district.DistrictId,
                                     Description = rowData[20].Trim(),
-                                    ProfilePicture = customerImage
+                                    //ProfilePicture = customerImage
                                 };
 
                                 var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[27].Trim());
@@ -270,9 +269,9 @@ namespace risk.control.system.Controllers
                                 var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
                                 var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[22].Trim().ToLower());
 
-                                var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg" || i.Name.ToLower() == "beneficiary.jpeg")?.FullName;
+                                //var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg" || i.Name.ToLower() == "beneficiary.jpeg")?.FullName;
 
-                                var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
+                                //var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
 
                                 var beneficairy = new CaseLocation
                                 {
@@ -287,7 +286,7 @@ namespace risk.control.system.Controllers
                                     StateId = beneState.StateId,
                                     CountryId = country.CountryId,
                                     InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                    ProfilePicture = beneficairyImage
+                                    //ProfilePicture = beneficairyImage
                                 };
 
                                 var addedClaim = _context.ClaimsInvestigation.Add(claim);
