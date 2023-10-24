@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -74,6 +75,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Upload New")]
+        [AllowAnonymous]
         public IActionResult UploadClaims()
         {
             DataTable dt = new DataTable();
@@ -121,7 +123,6 @@ namespace risk.control.system.Controllers
                 var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                var data = new List<string>();
 
                 DataTable dt = new DataTable();
                 bool firstRow = true;
@@ -146,7 +147,6 @@ namespace risk.control.system.Controllers
                                     dt.Rows.Add();
                                     int i = 0;
                                     var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                                    data.Add(output);
                                     var rowData = output.Split(',').ToList();
                                     foreach (string cell in rowData)
                                     {
@@ -174,13 +174,13 @@ namespace risk.control.system.Controllers
                                     dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
                                     claim.PolicyDetail = new PolicyDetail
                                     {
-                                        ContractNumber = rowData[0].Trim(),
-                                        SumAssuredValue = Convert.ToDecimal(rowData[1].Trim()),
-                                        ContractIssueDate = DateTime.Parse(rowData[2].Trim()),
-                                        ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3].Trim()),
+                                        ContractNumber = rowData[0]?.Trim(),
+                                        SumAssuredValue = Convert.ToDecimal(rowData[1]?.Trim()),
+                                        ContractIssueDate = DateTime.Parse(rowData[2]?.Trim()),
+                                        ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
                                         InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
-                                        DateOfIncident = DateTime.Parse(rowData[5].Trim()),
-                                        CauseOfLoss = rowData[6].Trim(),
+                                        DateOfIncident = DateTime.Parse(rowData[5]?.Trim()),
+                                        CauseOfLoss = rowData[6]?.Trim(),
                                         CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
                                         CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                                         LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
@@ -203,20 +203,20 @@ namespace risk.control.system.Controllers
 
                                     claim.CustomerDetail = new CustomerDetail
                                     {
-                                        CustomerName = rowData[10].Trim(),
-                                        CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11].Trim()),
-                                        Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12].Trim()),
-                                        CustomerDateOfBirth = DateTime.Parse(rowData[13].Trim()),
-                                        ContactNumber = Convert.ToInt64(rowData[14].Trim()),
-                                        CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15].Trim()),
-                                        CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16].Trim()),
-                                        CustomerIncome = (Income)Enum.Parse(typeof(Income), rowData[17].Trim()),
-                                        Addressline = rowData[18].Trim(),
+                                        CustomerName = rowData[10]?.Trim(),
+                                        CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
+                                        Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
+                                        CustomerDateOfBirth = DateTime.Parse(rowData[13]?.Trim()),
+                                        ContactNumber = Convert.ToInt64(rowData[14]?.Trim()),
+                                        CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
+                                        CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
+                                        CustomerIncome = (Income)Enum.Parse(typeof(Income), rowData[17]?.Trim()),
+                                        Addressline = rowData[18]?.Trim(),
                                         CountryId = country.CountryId,
                                         PinCodeId = pinCode.PinCodeId,
                                         StateId = state.StateId,
                                         DistrictId = district.DistrictId,
-                                        Description = rowData[20].Trim(),
+                                        Description = rowData[20]?.Trim(),
                                         ProfilePicture = customerImage
                                     };
 
@@ -234,12 +234,12 @@ namespace risk.control.system.Controllers
 
                                     var beneficairy = new CaseLocation
                                     {
-                                        BeneficiaryName = rowData[22].Trim(),
+                                        BeneficiaryName = rowData[22]?.Trim(),
                                         BeneficiaryRelationId = relation.BeneficiaryRelationId,
-                                        BeneficiaryDateOfBirth = DateTime.Parse(rowData[24].Trim()),
-                                        BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25].Trim()),
-                                        BeneficiaryContactNumber = Convert.ToInt64(rowData[26].Trim()),
-                                        Addressline = rowData[27].Trim(),
+                                        BeneficiaryDateOfBirth = DateTime.Parse(rowData[24]?.Trim()),
+                                        BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25]?.Trim()),
+                                        BeneficiaryContactNumber = Convert.ToInt64(rowData[26]?.Trim()),
+                                        Addressline = rowData[27]?.Trim(),
                                         PinCodeId = benePinCode.PinCodeId,
                                         DistrictId = beneDistrict.DistrictId,
                                         StateId = beneState.StateId,
@@ -278,10 +278,18 @@ namespace risk.control.system.Controllers
                 }
 
                 await SaveUpload(postedFile, filePath, description, userEmail);
-                var rows = _context.SaveChanges();
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i>Uploaded Claims saved as Draft"));
+                try
+                {
+                    var rows = _context.SaveChanges();
+                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i>Uploaded Claims saved as Draft"));
 
-                return RedirectToAction("Draft");
+                    return RedirectToAction("Draft");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    throw ex;
+                }
             }
             return Problem();
         }

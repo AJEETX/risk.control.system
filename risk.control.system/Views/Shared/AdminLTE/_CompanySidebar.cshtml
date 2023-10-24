@@ -205,23 +205,6 @@
                        
 
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="UploadClaims" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","UploadClaims")">
-                                <i class="nav-icon fa fa-upload"></i>
-                                <p>
-                                    <span class="badge badge-secondary"> UPLOAD</span> <span class="badge badge-danger"> (new)</span>
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="CreateClaim" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","CreateClaim")
-                                    @Url.MakeActiveClass("ClaimsInvestigation","CreatePolicy") ">
-                                <i class="fas fa-pen-alt nav-icon"></i>
-                                <p>
-                                    <span class="badge badge-success">ADD NEW </span> 
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft")
                                         @Url.MakeActiveClass("ClaimsInvestigation","Details") @Url.MakeActiveClass("ClaimsInvestigation","Delete") 
                                         @Url.MakeActiveClass("CaseLocations","Create") @Url.MakeActiveClass("CaseLocations","Edit")
@@ -229,9 +212,19 @@
                                                 @Url.MakeActiveClass("ClaimsInvestigation","EditPolicy")
                                                 @Url.MakeActiveClass("ClaimsInvestigation","CreateCustomer") @Url.MakeActiveClass("ClaimsInvestigation","EditCustomer")
                                                         @Url.MakeActiveClass("CaseLocation","Create") @Url.MakeActiveClass("CaseLocation","Edit")">
-                                <i class="far fa-clone nav-icon"></i>
+                                <i class="fa fa-upload nav-icon"></i>
                                 <p>
-                                    <span class="badge badge-warning">DRAFT</span>
+                                    <span class="badge badge-warning">UPLOAD</span>
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="CreateClaim" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","CreateClaim")
+                                        @Url.MakeActiveClass("ClaimsInvestigation","CreatePolicy") ">
+                                <i class="fas fa-pen-alt nav-icon"></i>
+                                <p>
+                                    <span class="badge badge-success">ADD NEW </span>
                                 </p>
                             </a>
                         </li>
@@ -325,7 +318,7 @@
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="UploadNewLogs" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","UploadNewLogs")">
                         <i class="nav-icon fas fa-archive"></i>
                         <p>
-                            <span class="badge badge-secondary"> UPLOAD LOG</span> <span class="badge badge-danger">new</span>
+                            <span class="badge badge-secondary"> UPLOADS</span>
                         </p>
                     </a>
                 </li>

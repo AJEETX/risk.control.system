@@ -216,22 +216,36 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, CaseLocation caseLocation)
+        public async Task<IActionResult> Edit(long id, CaseLocation ecaseLocation)
         {
-            if (id != caseLocation.CaseLocationId)
+            if (id != ecaseLocation.CaseLocationId)
             {
                 return NotFound();
             }
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            if (caseLocation is not null)
+            if (ecaseLocation is not null)
             {
                 try
                 {
                     {
+                        var caseLocation = _context.CaseLocation.FirstOrDefault(c => c.CaseLocationId == ecaseLocation.CaseLocationId);
                         caseLocation.Updated = DateTime.UtcNow;
                         caseLocation.InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId;
                         caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
+                        caseLocation.Addressline = ecaseLocation.Addressline;
+                        caseLocation.BeneficiaryContactNumber = ecaseLocation.BeneficiaryContactNumber;
+                        caseLocation.BeneficiaryDateOfBirth = ecaseLocation.BeneficiaryDateOfBirth;
+                        caseLocation.BeneficiaryIncome = ecaseLocation.BeneficiaryIncome;
+                        caseLocation.BeneficiaryName = ecaseLocation.BeneficiaryName;
+                        caseLocation.BeneficiaryRelation = ecaseLocation.BeneficiaryRelation;
+                        caseLocation.BeneficiaryRelationId = ecaseLocation.BeneficiaryRelationId;
+                        caseLocation.ClaimsInvestigationId = ecaseLocation.ClaimsInvestigationId;
+                        caseLocation.CountryId = ecaseLocation.CountryId;
+                        caseLocation.DistrictId = ecaseLocation.DistrictId;
+                        caseLocation.PinCodeId = ecaseLocation.PinCodeId;
+                        caseLocation.StateId = ecaseLocation.StateId;
+
                         IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
                         if (customerDocument is not null)
                         {
@@ -259,7 +273,7 @@ namespace risk.control.system.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CaseLocationExists(caseLocation.CaseLocationId))
+                    if (!CaseLocationExists(ecaseLocation.CaseLocationId))
                     {
                         return NotFound();
                     }
@@ -269,11 +283,11 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", caseLocation.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", caseLocation.StateId);
-            return View(caseLocation);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", ecaseLocation.DistrictId);
+            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", ecaseLocation.BeneficiaryRelationId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", ecaseLocation.PinCodeId);
+            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", ecaseLocation.StateId);
+            return View(ecaseLocation);
         }
 
         // GET: CaseLocations/Delete/5
