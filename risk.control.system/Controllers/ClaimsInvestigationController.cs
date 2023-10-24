@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CsvHelper;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+
+using Newtonsoft.Json;
 
 using NToastNotify;
 
@@ -16,6 +20,7 @@ using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -86,7 +91,7 @@ namespace risk.control.system.Controllers
                 {
                     Directory.CreateDirectory(path);
                 }
-                string docPath = Path.Combine(webHostEnvironment.WebRootPath, "img");
+                string docPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
                 if (!Directory.Exists(docPath))
                 {
                     Directory.CreateDirectory(docPath);
@@ -116,6 +121,7 @@ namespace risk.control.system.Controllers
                 var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
 
                 var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var data = new List<string>();
 
                 DataTable dt = new DataTable();
                 bool firstRow = true;
@@ -140,6 +146,7 @@ namespace risk.control.system.Controllers
                                     dt.Rows.Add();
                                     int i = 0;
                                     var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                                    data.Add(output);
                                     var rowData = output.Split(',').ToList();
                                     foreach (string cell in rowData)
                                     {
@@ -163,7 +170,7 @@ namespace risk.control.system.Controllers
 
                                     var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg" || i.Name.ToLower() == "policy.jpeg")?.FullName;
 
-                                    var image = System.IO.File.ReadAllBytes(policyImagePath);
+                                    var image = System.IO.File.ReadAllBytes(policyImagePath ?? "/img/no-policy.jpg");
                                     dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
                                     claim.PolicyDetail = new PolicyDetail
                                     {
@@ -191,7 +198,7 @@ namespace risk.control.system.Controllers
 
                                     var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
 
-                                    var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+                                    var customerImage = System.IO.File.ReadAllBytes(customerImagePath ?? "/img/user.png");
                                     dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
                                     claim.CustomerDetail = new CustomerDetail
@@ -222,7 +229,7 @@ namespace risk.control.system.Controllers
 
                                     var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg" || i.Name.ToLower() == "beneficiary.jpeg")?.FullName;
 
-                                    var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
+                                    var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath ?? "/img/no-policy.jpg");
                                     dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
 
                                     var beneficairy = new CaseLocation
@@ -282,7 +289,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveUploadedClaims(DataTable td, string filePath)
         {
-            string docPath = Path.Combine(webHostEnvironment.WebRootPath, "img");
+            string docPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
             string fileNameWithoutExtension = filePath;
 
             string zipFilePath = Path.Combine(docPath, fileNameWithoutExtension);
