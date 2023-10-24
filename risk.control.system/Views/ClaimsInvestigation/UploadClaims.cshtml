@@ -34,6 +34,9 @@
                     </div>
                 </div>
             </div>
+        </form>
+        <form id="save-claims" method="post">
+            <input type="hidden" name="filePath" value="@ViewBag.FilePath" />
             <div class="row">
                 <div class="col-md-12">
                     <div class="card card-secondary">
@@ -75,9 +78,6 @@
                     </div>
                 </div>
             </div>
-        </form>
-        @*<form id="save-claims" method="post">
-            <input type="hidden" name="filePath" value="@ViewBag.FilePath" />
             <div class="row">
                 <div class="col-md-12">
                     <button class="btn btn-success" asp-action="SaveUploadedClaims">
@@ -85,6 +85,6 @@
                     </button>
                 </div>
             </div>
-        </form>*@
+        </form>
     </div>
 </section>

@@ -4,6 +4,33 @@
 }
 <section class="content pt-2">
     <div class="container-fluid">
+        <form id="upload-claims" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-secondary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa fa-upload"></i> Upload</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Upload Claims:</span>
+                                        <div class="input-group mb-3">
+                                            <img class="form-Image" id="documentImage" src="/img/no-policy.jpg">
+                                            <input accept=".zip" type="file" class="form-control" name="postedFile" />
+                                            <input type="text" autocomplete="off" placeholder="Enter File Description" name="description" value="sample upload" required />
+                                            <button type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
         <div class="row ">
             <div class="col-md-12">
                 <div class="card card-secondary">

@@ -158,13 +158,13 @@ namespace risk.control.system.Controllers
 
                                     var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
                                     var directoryName = dirNames.FirstOrDefault(d => d.EndsWith(rowData[0].Trim()));
-                                    //DirectoryInfo dir = new DirectoryInfo($"{directoryName}");
-                                    //FileInfo[] imageFiles = dir.GetFiles("*.jpg").Union(dir.GetFiles("*.jpeg")).ToArray();
+                                    DirectoryInfo dir = new DirectoryInfo($"{directoryName}");
+                                    FileInfo[] imageFiles = dir.GetFiles("*.jpg").Union(dir.GetFiles("*.jpeg")).ToArray();
 
-                                    //var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg" || i.Name.ToLower() == "policy.jpeg")?.FullName;
+                                    var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg" || i.Name.ToLower() == "policy.jpeg")?.FullName;
 
-                                    //var image = System.IO.File.ReadAllBytes(policyImagePath);
-                                    //dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
+                                    var image = System.IO.File.ReadAllBytes(policyImagePath);
+                                    dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
                                     claim.PolicyDetail = new PolicyDetail
                                     {
                                         ContractNumber = rowData[0].Trim(),
@@ -178,7 +178,7 @@ namespace risk.control.system.Controllers
                                         CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                                         LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
                                         ClientCompanyId = companyUser?.ClientCompanyId,
-                                        //DocumentImage = image
+                                        DocumentImage = image
                                     };
 
                                     var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
@@ -189,10 +189,10 @@ namespace risk.control.system.Controllers
 
                                     var country = _context.Country.FirstOrDefault(c => c.Code.ToLower() == "IND".ToLower());
 
-                                    //var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
+                                    var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
 
-                                    //var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
-                                    //dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
+                                    var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+                                    dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
                                     claim.CustomerDetail = new CustomerDetail
                                     {
@@ -210,7 +210,7 @@ namespace risk.control.system.Controllers
                                         StateId = state.StateId,
                                         DistrictId = district.DistrictId,
                                         Description = rowData[20].Trim(),
-                                        //ProfilePicture = customerImage
+                                        ProfilePicture = customerImage
                                     };
 
                                     var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
@@ -220,10 +220,10 @@ namespace risk.control.system.Controllers
                                     var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
                                     var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
-                                    //var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg" || i.Name.ToLower() == "beneficiary.jpeg")?.FullName;
+                                    var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg" || i.Name.ToLower() == "beneficiary.jpeg")?.FullName;
 
-                                    //var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
-                                    //dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
+                                    var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
+                                    dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
 
                                     var beneficairy = new CaseLocation
                                     {
@@ -238,7 +238,7 @@ namespace risk.control.system.Controllers
                                         StateId = beneState.StateId,
                                         CountryId = country.CountryId,
                                         InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                        //ProfilePicture = beneficairyImage
+                                        ProfilePicture = beneficairyImage
                                     };
 
                                     var addedClaim = _context.ClaimsInvestigation.Add(claim);
@@ -270,16 +270,17 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                var rows = _context.SaveChanges();
                 await SaveUpload(postedFile, filePath, description, userEmail);
-                ViewBag.FilePath = fileNameWithoutExtension;
-                return View(dt);
+                var rows = _context.SaveChanges();
+                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i>Uploaded Claims saved as Draft"));
+
+                return RedirectToAction("Draft");
             }
             return Problem();
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveUploadedClaims(string filePath)
+        public async Task<IActionResult> SaveUploadedClaims(DataTable td, string filePath)
         {
             string docPath = Path.Combine(webHostEnvironment.WebRootPath, "img");
             string fileNameWithoutExtension = filePath;
@@ -314,17 +315,17 @@ namespace risk.control.system.Controllers
                         }
                         else
                         {
-                            dt.Rows.Add();
-                            int i = 0;
-                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                            var rowData = output.Split(',').ToList();
-                            foreach (string cell in rowData)
-                            {
-                                dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
-                                i++;
-                            }
                             try
                             {
+                                dt.Rows.Add();
+                                int i = 0;
+                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                                var rowData = output.Split(',').ToList();
+                                foreach (string cell in rowData)
+                                {
+                                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
+                                    i++;
+                                }
                                 var claim = new ClaimsInvestigation { };
                                 claim.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
                                 claim.InvestigationCaseStatus = status;
@@ -343,7 +344,7 @@ namespace risk.control.system.Controllers
                                 var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg" || i.Name.ToLower() == "policy.jpeg")?.FullName;
 
                                 var image = System.IO.File.ReadAllBytes(policyImagePath);
-
+                                dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
                                 claim.PolicyDetail = new PolicyDetail
                                 {
                                     ContractNumber = rowData[0].Trim(),
@@ -371,6 +372,7 @@ namespace risk.control.system.Controllers
                                 var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
 
                                 var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+                                dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
                                 claim.CustomerDetail = new CustomerDetail
                                 {
@@ -391,25 +393,26 @@ namespace risk.control.system.Controllers
                                     ProfilePicture = customerImage
                                 };
 
-                                var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[27].Trim());
+                                var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
 
                                 var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
 
                                 var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
-                                var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[22].Trim().ToLower());
+                                var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
                                 var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg" || i.Name.ToLower() == "beneficiary.jpeg")?.FullName;
 
                                 var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
+                                dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
 
                                 var beneficairy = new CaseLocation
                                 {
-                                    BeneficiaryName = rowData[21].Trim(),
+                                    BeneficiaryName = rowData[22].Trim(),
                                     BeneficiaryRelationId = relation.BeneficiaryRelationId,
-                                    BeneficiaryDateOfBirth = DateTime.Parse(rowData[23].Trim()),
-                                    BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[24].Trim()),
-                                    BeneficiaryContactNumber = Convert.ToInt64(rowData[25].Trim()),
-                                    Addressline = rowData[26].Trim(),
+                                    BeneficiaryDateOfBirth = DateTime.Parse(rowData[24].Trim()),
+                                    BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25].Trim()),
+                                    BeneficiaryContactNumber = Convert.ToInt64(rowData[26].Trim()),
+                                    Addressline = rowData[27].Trim(),
                                     PinCodeId = benePinCode.PinCodeId,
                                     DistrictId = beneDistrict.DistrictId,
                                     StateId = beneState.StateId,
