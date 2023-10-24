@@ -270,7 +270,7 @@ namespace risk.control.system.Controllers
                     }
                 }
 
-                var rows = _context.SaveChanges();
+                //var rows = _context.SaveChanges();
                 await SaveUpload(postedFile, filePath, description, userEmail);
                 ViewBag.FilePath = fileNameWithoutExtension;
                 return View(dt);
