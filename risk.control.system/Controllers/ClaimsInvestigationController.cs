@@ -172,8 +172,8 @@ namespace risk.control.system.Controllers
 
                                     //var policyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("policy.jpg"));
 
-                                    var image = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg"));
-                                    dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
+                                    //var image = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg"));
+                                    //dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
                                     claim.PolicyDetail = new PolicyDetail
                                     {
                                         ContractNumber = rowData[0]?.Trim(),
@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
                                         CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                                         LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
                                         ClientCompanyId = companyUser?.ClientCompanyId,
-                                        DocumentImage = image
+                                        //DocumentImage = image
                                     };
 
                                     var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
@@ -200,9 +200,9 @@ namespace risk.control.system.Controllers
 
                                     //var customerImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("customer.jpg"));
 
-                                    var customerImage = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png"));
+                                    //var customerImage = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png"));
 
-                                    dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
+                                    //dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
                                     claim.CustomerDetail = new CustomerDetail
                                     {
@@ -220,7 +220,7 @@ namespace risk.control.system.Controllers
                                         StateId = state.StateId,
                                         DistrictId = district.DistrictId,
                                         Description = rowData[20]?.Trim(),
-                                        ProfilePicture = customerImage
+                                        //ProfilePicture = customerImage
                                     };
 
                                     var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
@@ -232,8 +232,8 @@ namespace risk.control.system.Controllers
 
                                     //var beneficairyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("beneficiary.jpg"));
 
-                                    var beneficairyImage = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png"));
-                                    dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
+                                    //var beneficairyImage = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png"));
+                                    //dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
 
                                     var beneficairy = new CaseLocation
                                     {
@@ -248,7 +248,7 @@ namespace risk.control.system.Controllers
                                         StateId = beneState.StateId,
                                         CountryId = country.CountryId,
                                         InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                        ProfilePicture = beneficairyImage
+                                        //ProfilePicture = beneficairyImage
                                     };
 
                                     var addedClaim = _context.ClaimsInvestigation.Add(claim);
