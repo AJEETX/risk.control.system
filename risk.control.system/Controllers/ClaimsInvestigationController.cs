@@ -283,7 +283,7 @@ namespace risk.control.system.Controllers
                 await SaveUpload(postedFile, filePath, description, userEmail);
                 try
                 {
-                    var rows = _context.SaveChanges();
+                    //var rows = _context.SaveChanges();
                     toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Uploaded Claims saved as Draft"));
 
                     return RedirectToAction("Draft");
