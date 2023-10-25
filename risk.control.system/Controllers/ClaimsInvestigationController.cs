@@ -168,7 +168,7 @@ namespace risk.control.system.Controllers
 
                                     var dname = directoryName.Substring(directoryName.LastIndexOf('\\') + 1);
 
-                                    var folders = Directory.GetFiles(Path.Combine(docPath, fileNameWithoutExtension, dname));
+                                    var folders = Directory.GetFiles(Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, dname));
 
                                     var policyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("policy.jpg"));
 
