@@ -165,10 +165,12 @@ namespace risk.control.system.Controllers
 
                                     var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
                                     var directoryName = dirNames.FirstOrDefault(d => d.EndsWith(rowData[0].Trim()));
-                                    DirectoryInfo dir = new DirectoryInfo($"{directoryName}");
-                                    FileInfo[] imageFiles = dir.GetFiles("*.jpg").Union(dir.GetFiles("*.jpeg")).ToArray();
 
-                                    var policyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "policy.jpg" || i.Name.ToLower() == "policy.jpeg")?.FullName;
+                                    var dname = directoryName.Substring(directoryName.LastIndexOf('\\') + 1);
+
+                                    var folders = Directory.GetFiles(Path.Combine(docPath, fileNameWithoutExtension, dname));
+
+                                    var policyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("policy.jpg"));
 
                                     var image = System.IO.File.ReadAllBytes(policyImagePath ?? "/img/no-policy.jpg");
                                     dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
@@ -196,7 +198,7 @@ namespace risk.control.system.Controllers
 
                                     var country = _context.Country.FirstOrDefault(c => c.Code.ToLower() == "IND".ToLower());
 
-                                    var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
+                                    var customerImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("customer.jpg"));
 
                                     var customerImage = System.IO.File.ReadAllBytes(customerImagePath ?? "/img/user.png");
                                     dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
@@ -227,7 +229,7 @@ namespace risk.control.system.Controllers
                                     var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
                                     var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
-                                    var beneficairyImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "beneficiary.jpg" || i.Name.ToLower() == "beneficiary.jpeg")?.FullName;
+                                    var beneficairyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("beneficiary.jpg"));
 
                                     var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath ?? "/img/no-policy.jpg");
                                     dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
@@ -281,7 +283,7 @@ namespace risk.control.system.Controllers
                 try
                 {
                     var rows = _context.SaveChanges();
-                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i>Uploaded Claims saved as Draft"));
+                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Uploaded Claims saved as Draft"));
 
                     return RedirectToAction("Draft");
                 }
