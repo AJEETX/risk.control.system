@@ -164,15 +164,15 @@ namespace risk.control.system.Controllers
                                     claim.CurrentClaimOwner = userEmail;
 
                                     var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
-                                    var directoryName = dirNames.FirstOrDefault(d => d.EndsWith(rowData[0].Trim()));
+                                    //var directoryName = dirNames.FirstOrDefault(d => d.EndsWith(rowData[0].Trim()));
 
-                                    var dname = directoryName.Substring(directoryName.LastIndexOf('\\') + 1);
+                                    //var dname = directoryName.Substring(directoryName.LastIndexOf('\\') + 1);
 
-                                    var folders = Directory.GetFiles(Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, dname));
+                                    //var folders = Directory.GetFiles(Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, dname));
 
-                                    var policyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("policy.jpg"));
+                                    //var policyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("policy.jpg"));
 
-                                    var image = System.IO.File.ReadAllBytes(policyImagePath ?? "/img/no-policy.jpg");
+                                    var image = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg"));
                                     dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
                                     claim.PolicyDetail = new PolicyDetail
                                     {
@@ -198,9 +198,10 @@ namespace risk.control.system.Controllers
 
                                     var country = _context.Country.FirstOrDefault(c => c.Code.ToLower() == "IND".ToLower());
 
-                                    var customerImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("customer.jpg"));
+                                    //var customerImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("customer.jpg"));
 
-                                    var customerImage = System.IO.File.ReadAllBytes(customerImagePath ?? "/img/user.png");
+                                    var customerImage = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png"));
+
                                     dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
                                     claim.CustomerDetail = new CustomerDetail
@@ -229,9 +230,9 @@ namespace risk.control.system.Controllers
                                     var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
                                     var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
-                                    var beneficairyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("beneficiary.jpg"));
+                                    //var beneficairyImagePath = folders.FirstOrDefault(i => i.ToLower().EndsWith("beneficiary.jpg"));
 
-                                    var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath ?? "/img/no-policy.jpg");
+                                    var beneficairyImage = System.IO.File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png"));
                                     dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
 
                                     var beneficairy = new CaseLocation
