@@ -1,7 +1,14 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace risk.control.system.Models.ViewModel
 {
     public class UploadClaim
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
         public string Policy { get; set; }
         public string Amount { get; set; }
         public string IssueDate { get; set; }

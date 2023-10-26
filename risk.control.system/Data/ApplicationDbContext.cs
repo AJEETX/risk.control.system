@@ -16,6 +16,7 @@ namespace risk.control.system.Data
             base.OnModelCreating(builder);
         }
 
+        public virtual DbSet<UploadClaim> UploadClaim { get; set; }
         public virtual DbSet<ClaimNote> ClaimNote { get; set; }
         public virtual DbSet<ClaimMessage> ClaimMessage { get; set; }
         public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }

@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231024073736_bulk")]
+    [Migration("20231026080434_bulk")]
     partial class bulk
     {
         /// <inheritdoc />
@@ -2358,6 +2358,134 @@ namespace risk.control.system.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FilesOnFileSystem");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ViewModel.UploadClaim", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Amount")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BPhoto")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BPincode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BeneficiaryContact")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BeneficiaryDob")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BeneficiaryIncome")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BeneficiaryName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CPhoto")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CauseOfLoss")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClaimType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CustomerDob")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CustomerType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DateOfIncident")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Dept")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Education")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Income")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IssueDate")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Occupation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PDocument")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Pincode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Policy")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Relation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ServiceType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UploadClaim");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClientCompanyApplicationUser", b =>

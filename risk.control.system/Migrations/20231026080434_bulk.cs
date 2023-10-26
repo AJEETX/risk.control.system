@@ -210,6 +210,48 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UploadClaim",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Policy = table.Column<string>(type: "TEXT", nullable: false),
+                    Amount = table.Column<string>(type: "TEXT", nullable: false),
+                    IssueDate = table.Column<string>(type: "TEXT", nullable: false),
+                    ClaimType = table.Column<string>(type: "TEXT", nullable: false),
+                    ServiceType = table.Column<string>(type: "TEXT", nullable: false),
+                    DateOfIncident = table.Column<string>(type: "TEXT", nullable: false),
+                    CauseOfLoss = table.Column<string>(type: "TEXT", nullable: false),
+                    Reason = table.Column<string>(type: "TEXT", nullable: false),
+                    Dept = table.Column<string>(type: "TEXT", nullable: false),
+                    PDocument = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    CustomerType = table.Column<string>(type: "TEXT", nullable: false),
+                    Gender = table.Column<string>(type: "TEXT", nullable: false),
+                    CustomerDob = table.Column<string>(type: "TEXT", nullable: false),
+                    Contact = table.Column<string>(type: "TEXT", nullable: false),
+                    Education = table.Column<string>(type: "TEXT", nullable: false),
+                    Occupation = table.Column<string>(type: "TEXT", nullable: false),
+                    Income = table.Column<string>(type: "TEXT", nullable: false),
+                    CAddress = table.Column<string>(type: "TEXT", nullable: false),
+                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
+                    Comment = table.Column<string>(type: "TEXT", nullable: false),
+                    CPhoto = table.Column<string>(type: "TEXT", nullable: true),
+                    BeneficiaryName = table.Column<string>(type: "TEXT", nullable: false),
+                    Relation = table.Column<string>(type: "TEXT", nullable: false),
+                    BeneficiaryDob = table.Column<string>(type: "TEXT", nullable: false),
+                    BeneficiaryIncome = table.Column<string>(type: "TEXT", nullable: false),
+                    BeneficiaryContact = table.Column<string>(type: "TEXT", nullable: false),
+                    BAddress = table.Column<string>(type: "TEXT", nullable: false),
+                    BPincode = table.Column<string>(type: "TEXT", nullable: false),
+                    BPhoto = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UploadClaim", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "State",
                 columns: table => new
                 {
@@ -2119,6 +2161,9 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "TrashMessage");
+
+            migrationBuilder.DropTable(
+                name: "UploadClaim");
 
             migrationBuilder.DropTable(
                 name: "VerificationLocation");
