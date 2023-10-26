@@ -341,13 +341,13 @@ namespace risk.control.system.Controllers
 
                 claim.PolicyDetail = new PolicyDetail
                 {
-                    ContractNumber = "P001",
-                    SumAssuredValue = 999999,
+                    ContractNumber = uclaim.Policy,
+                    SumAssuredValue = Convert.ToDecimal(uclaim.Amount),
                     ContractIssueDate = DateTime.UtcNow.AddDays(-10),
-                    ClaimType = (ClaimType.DEATH),
+                    ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), uclaim.ClaimType),
                     InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
                     DateOfIncident = DateTime.UtcNow.AddDays(-5),
-                    CauseOfLoss = "LALA LOST ",
+                    CauseOfLoss = uclaim.CauseOfLoss,
                     CaseEnablerId = _context.CaseEnabler.FirstOrDefault().CaseEnablerId,
                     CostCentreId = _context.CostCentre.FirstOrDefault().CostCentreId,
                     LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
