@@ -139,6 +139,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                         Policy = a.PolicyDetail?.LineOfBusiness.Name,
                         Status = a.InvestigationCaseStatus.Name,
+                        Ready2Assign = a.IsReady2Assign,
                         ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
                         Location = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :

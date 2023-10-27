@@ -8,11 +8,12 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task<(Vendor abcVendor, Vendor xyzVendor, Vendor xyz1Vendor, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, InvestigationServiceType investigationServiceType, LineOfBusiness lineOfBusiness)
+        public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
+            InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness)
         {
             //CREATE VENDOR COMPANY
 
-            var abcVendor = new Vendor
+            var checker = new Vendor
             {
                 Name = Applicationsettings.AGENCY1NAME,
                 Addressline = "1, Nice Road  ",
@@ -33,9 +34,9 @@ namespace risk.control.system.Seeds
                 DocumentUrl = "/img/checker.png"
             };
 
-            var abcVendorCompany = await context.Vendor.AddAsync(abcVendor);
+            var checkerAgency = await context.Vendor.AddAsync(checker);
 
-            var xyzVendor = new Vendor
+            var verify = new Vendor
             {
                 Name = Applicationsettings.AGENCY2NAME,
                 Addressline = "10, Clear Road  ",
@@ -56,83 +57,9 @@ namespace risk.control.system.Seeds
                 DocumentUrl = "/img/verify.png"
             };
 
-            var xyzVendorCompany = await context.Vendor.AddAsync(xyzVendor);
+            var verifyAgency = await context.Vendor.AddAsync(verify);
 
-            //CREATE CLIENT COMPANY
-            var currentPinCode = "515631";
-            var currentDistrict = "ANANTAPUR";
-            var currentState = "AD";
-            var TataAig = new ClientCompany
-            {
-                ClientCompanyId = Guid.NewGuid().ToString(),
-                Name = Applicationsettings.COMPANYNAME,
-                Addressline = "100 GOOD STREET ",
-                Branch = "FOREST HILL CHASE",
-                Code = Applicationsettings.COMPANYCODE,
-                ActivatedDate = DateTime.Now,
-                AgreementDate = DateTime.Now,
-                BankName = "NAB",
-                BankAccountNumber = "1234567",
-                IFSCCode = "IFSC100",
-                CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
-                Description = "CORPORATE OFFICE ",
-                Email = Applicationsettings.COMPANYDOMAIN,
-                DocumentUrl = "/img/chl.png",
-                PhoneNumber = "9988004739",
-                EmpanelledVendors = new List<Vendor> { abcVendor, xyzVendor }
-            };
-
-            var tataAigCompany = await context.ClientCompany.AddAsync(TataAig);
-
-            var abcSericesWithPinCodes = new List<VendorInvestigationServiceType>
-            {
-                new VendorInvestigationServiceType{
-                    VendorId = abcVendorCompany.Entity.VendorId,
-                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
-                    Price = 199,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    CountryId = indiaCountry.Entity.CountryId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
-                        }
-                    }
-                }
-            };
-
-            var listOfSericesWithPinCodes = new List<VendorInvestigationServiceType>
-            {
-                new VendorInvestigationServiceType{
-                    VendorId = xyzVendorCompany.Entity.VendorId,
-                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
-                    Price = 299,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
-                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                    CountryId = indiaCountry.Entity.CountryId,
-                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    PincodeServices = new List<ServicedPinCode>
-                    {
-                        new ServicedPinCode
-                        {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
-                        }
-                    }
-                }
-            };
-
-            abcVendor.VendorInvestigationServiceTypes = abcSericesWithPinCodes;
-            xyzVendor.VendorInvestigationServiceTypes = listOfSericesWithPinCodes;
-
-            var xyz1Vendor = new Vendor
+            var investigate = new Vendor
             {
                 Name = Applicationsettings.AGENCY3NAME,
                 Addressline = "1, Main Road  ",
@@ -153,10 +80,174 @@ namespace risk.control.system.Seeds
                 DocumentUrl = "/img/investigate.png"
             };
 
-            var xyz1VendorCompany = await context.Vendor.AddAsync(xyz1Vendor);
+            var investigateAgency = await context.Vendor.AddAsync(investigate);
+
+            //CREATE CLIENT COMPANY
+            var currentPinCode = "515631";
+            var currentDistrict = "ANANTAPUR";
+            var currentState = "AD";
+            var insurance = new ClientCompany
+            {
+                ClientCompanyId = Guid.NewGuid().ToString(),
+                Name = Applicationsettings.COMPANYNAME,
+                Addressline = "100 GOOD STREET ",
+                Branch = "FOREST HILL CHASE",
+                Code = Applicationsettings.COMPANYCODE,
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "NAB",
+                BankAccountNumber = "1234567",
+                IFSCCode = "IFSC100",
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
+                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                Description = "CORPORATE OFFICE ",
+                Email = Applicationsettings.COMPANYDOMAIN,
+                DocumentUrl = "/img/chl.png",
+                PhoneNumber = "9988004739",
+                EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            };
+
+            var insuranceCompany = await context.ClientCompany.AddAsync(insurance);
+
+            var abcSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            {
+                new VendorInvestigationServiceType{
+                    VendorId = checkerAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
+                    Price = 199,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    CountryId = indiaCountry.Entity.CountryId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                },
+                new VendorInvestigationServiceType{
+                    VendorId = checkerAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = docServiceType.InvestigationServiceTypeId,
+                    Price = 99,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    CountryId = indiaCountry.Entity.CountryId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                }
+            };
+
+            var xyzSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            {
+                new VendorInvestigationServiceType{
+                    VendorId = verifyAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
+                    Price = 399,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    CountryId = indiaCountry.Entity.CountryId,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                },
+                new VendorInvestigationServiceType{
+                    VendorId = verifyAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = discreetServiceType.InvestigationServiceTypeId,
+                    Price = 299,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    CountryId = indiaCountry.Entity.CountryId,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                }
+            };
+
+            var xyz1SericesWithPinCodes = new List<VendorInvestigationServiceType>
+            {
+                new VendorInvestigationServiceType{
+                    VendorId = investigateAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = docServiceType.InvestigationServiceTypeId,
+                    Price = 199,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    CountryId = indiaCountry.Entity.CountryId,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                },
+                new VendorInvestigationServiceType{
+                    VendorId = investigateAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = discreetServiceType.InvestigationServiceTypeId,
+                    Price = 299,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    CountryId = indiaCountry.Entity.CountryId,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                },
+                new VendorInvestigationServiceType{
+                    VendorId = investigateAgency.Entity.VendorId,
+                    InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
+                    Price = 599,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
+                    CountryId = indiaCountry.Entity.CountryId,
+                    LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
+                    PincodeServices = new List<ServicedPinCode>
+                    {
+                        new ServicedPinCode
+                        {
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                        }
+                    }
+                }
+            };
+
+            checker.VendorInvestigationServiceTypes = abcSericesWithPinCodes;
+            verify.VendorInvestigationServiceTypes = xyzSericesWithPinCodes;
+            investigate.VendorInvestigationServiceTypes = xyz1SericesWithPinCodes;
 
             await context.SaveChangesAsync(null, false);
-            return (abcVendor, xyzVendor, xyz1Vendor, tataAigCompany.Entity.ClientCompanyId);
+            return (checker, verify, investigate, insuranceCompany.Entity.ClientCompanyId);
         }
     }
 }

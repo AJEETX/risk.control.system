@@ -8,6 +8,8 @@ using risk.control.system.Models.ViewModel;
 
 using System.Data;
 
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
 namespace risk.control.system.Services
 {
     public interface IClaimsInvestigationService
@@ -594,6 +596,8 @@ namespace risk.control.system.Services
                 claimsCaseToAllocateToVendor.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")";
                 claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;
                 claimsCaseToAllocateToVendor.CurrentClaimOwner = supervisor.Email;
+                claimsCaseToAllocateToVendor.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
                 claimsCaseToAllocateToVendor.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId;
                 var existinCaseLocation = claimsCaseToAllocateToVendor.CaseLocations.FirstOrDefault(c => c.CaseLocationId == caseLocationId);

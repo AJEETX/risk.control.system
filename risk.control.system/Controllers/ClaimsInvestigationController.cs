@@ -694,7 +694,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClaimsInvestigation
 
-        [Breadcrumb(" Upload", FromAction = "Index")]
+        [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Draft()
         {
             return View();
@@ -980,7 +980,7 @@ namespace risk.control.system.Controllers
 
             toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] submitted to Agency {1} !", policy.PolicyDetail.ContractNumber, vendor.Name));
 
-            return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+            return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
         }
 
         [Breadcrumb(" Case-locations")]
@@ -1365,7 +1365,7 @@ namespace risk.control.system.Controllers
             if (claims == null || claims.Count == 0)
             {
                 toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be assigned.");
-                return RedirectToAction(nameof(Assign));
+                return RedirectToAction(nameof(Draft));
             }
 
             //IF AUTO ALLOCATION TRUE
@@ -1660,11 +1660,12 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == model.Claim.ClaimsInvestigationId);
             claimsInvestigation.IsReady2Assign = true;
             _context.ClaimsInvestigation.Update(claimsInvestigation);
+
             await _context.SaveChangesAsync();
 
-            toastNotification.AddSuccessToastMessage("<i class='far fa-file-powerpoint'></i> Claim set as <i>Assigned</i> successfully!");
+            toastNotification.AddSuccessToastMessage("<i class='far fa-file-powerpoint'></i> Claim details completed successfully!");
 
-            return RedirectToAction(nameof(Assign));
+            return RedirectToAction(nameof(Draft));
         }
 
         [Breadcrumb(title: " Detail", FromAction = "Active")]

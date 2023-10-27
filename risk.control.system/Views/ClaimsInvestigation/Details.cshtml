@@ -529,21 +529,8 @@
                                 <div class="col-md-12 text-right">
 
                                     <form id="create-form" method="post" asp-action="CaseReadyToAssign" asp-route--testid="@Model.Claim.ClaimsInvestigationId">
-                                        <a asp-action="Draft" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
-                                        @{
-                                            if (Model.Claim.CaseLocations != null && Model.Claim.CaseLocations.Count > 0)
-                                            {
-                                                <input type="hidden" id="testid" asp-for="Claim.ClaimsInvestigationId" />
-                                                <span class="fas fa-thumbtack input-fa"></span>
-
-                                                <input type="submit" value="Lock Details" class="btn btn-danger" style="width:10rem" />
-                                            }
-                                            else
-                                            {
-                                                <input disabled type="submit" value="Lock Details" class="btn btn-outline-danger" style="width:10rem" />
-
-                                            }
-                                        }
+                                        <a asp-action="Draft" class="btn btn-default"> Go to Assign <i class="fas fa-arrow-right"></i></a> &nbsp;&nbsp;&nbsp;
+                                        <a asp-action="Active" class="btn btn-default"> Go to Active <i class="fas fa-arrow-right"></i></a> &nbsp;&nbsp;&nbsp;
                                     </form>
                                 </div>
                             </div>

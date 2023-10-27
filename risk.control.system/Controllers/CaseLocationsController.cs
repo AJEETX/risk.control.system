@@ -166,6 +166,14 @@ namespace risk.control.system.Controllers
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
                 toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} added successfully !", caseLocation.BeneficiaryName));
+
+                var claimsInvestigation = await _context.ClaimsInvestigation
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == caseLocation.ClaimsInvestigationId);
+                claimsInvestigation.IsReady2Assign = true;
+                _context.ClaimsInvestigation.Update(claimsInvestigation);
+                await _context.SaveChangesAsync();
+
+
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
