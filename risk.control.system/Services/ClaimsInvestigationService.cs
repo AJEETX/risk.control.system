@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 using System.Data;
 
@@ -34,6 +35,8 @@ namespace risk.control.system.Services
         Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks);
 
         Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType);
+
+        Task<List<VendorCaseModel>> GetAgencyLoad(List<Vendor> existingVendors);
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -47,6 +50,81 @@ namespace risk.control.system.Services
             this._context = context;
             this.roleManager = roleManager;
             this.userManager = userManager;
+        }
+
+        public async Task<List<VendorCaseModel>> GetAgencyLoad(List<Vendor> existingVendors)
+        {
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+            var submitted2SuperStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var claimsCases = _context.ClaimsInvestigation
+                .Include(c => c.Vendors)
+                .Include(c => c.CaseLocations.Where(c =>
+                !string.IsNullOrWhiteSpace(c.VendorId) &&
+                (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                    c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                    c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
+                ));
+
+            var vendorCaseCount = new Dictionary<string, int>();
+
+            int countOfCases = 0;
+            foreach (var claimsCase in claimsCases)
+            {
+                if (claimsCase.CaseLocations.Count > 0)
+                {
+                    foreach (var CaseLocation in claimsCase.CaseLocations)
+                    {
+                        if (!string.IsNullOrEmpty(CaseLocation.VendorId))
+                        {
+                            if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
+                                    CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                                    CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
+                                    )
+                            {
+                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId, out countOfCases))
+                                {
+                                    vendorCaseCount.Add(CaseLocation.VendorId, 1);
+                                }
+                                else
+                                {
+                                    int currentCount = vendorCaseCount[CaseLocation.VendorId];
+                                    ++currentCount;
+                                    vendorCaseCount[CaseLocation.VendorId] = currentCount;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            List<VendorCaseModel> vendorWithCaseCounts = new();
+
+            foreach (var existingVendor in existingVendors)
+            {
+                var vendorCase = vendorCaseCount.FirstOrDefault(v => v.Key == existingVendor.VendorId);
+                if (vendorCase.Key == existingVendor.VendorId)
+                {
+                    vendorWithCaseCounts.Add(new VendorCaseModel
+                    {
+                        CaseCount = vendorCase.Value,
+                        Vendor = existingVendor,
+                    });
+                }
+                else
+                {
+                    vendorWithCaseCounts.Add(new VendorCaseModel
+                    {
+                        CaseCount = 0,
+                        Vendor = existingVendor,
+                    });
+                }
+            }
+            return vendorWithCaseCounts;
         }
 
         public async Task<ClaimsInvestigation> CreatePolicy(string userEmail, ClaimsInvestigation claimsInvestigation, IFormFile? claimDocument, IFormFile? customerDocument, bool create = true)

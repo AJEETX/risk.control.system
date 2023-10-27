@@ -789,6 +789,9 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("AgreementDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("Auto")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("BankAccountNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");

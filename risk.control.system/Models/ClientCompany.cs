@@ -73,11 +73,18 @@ namespace risk.control.system.Models
 
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
         public List<ClaimsInvestigation> ClaimsInvestigations { get; set; } = new();
+        public bool Auto { get; set; } = false;
     }
 
     public enum CompanyStatus
     {
         ACTIVE,
         INACTIVE,
+    }
+
+    public enum Allocation
+    {
+        MANUAL,
+        AUTO
     }
 }

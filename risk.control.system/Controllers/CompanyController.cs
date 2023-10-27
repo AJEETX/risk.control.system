@@ -130,7 +130,38 @@ namespace risk.control.system.Controllers
                             clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
                         }
                     }
+                    
+                    var assignerRole = roleManager.Roles.FirstOrDefault(r =>
+                            r.Name.Contains(AppRoles.Assigner.ToString()));
+                    var creatorRole = roleManager.Roles.FirstOrDefault(r =>
+                            r.Name.Contains(AppRoles.Creator.ToString()));
 
+                    var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == companyUser.ClientCompanyId);
+
+                    string currentOwner = string.Empty;
+                    foreach (var companyUse in companyUsers)
+                    {
+                        var isCreator = await userManager.IsInRoleAsync(companyUse, creatorRole?.Name);
+                        if (isCreator)
+                        {
+                            currentOwner = companyUse.Email;
+                            break;
+                        }
+                    }
+                    ClientCompanyApplicationUser user = await userManager.FindByEmailAsync(currentOwner);
+
+                    if (clientCompany.Auto)
+                    {
+                        var result = await userManager.AddToRoleAsync(user, assignerRole.Name);
+                        var currentUser = await userManager.FindByEmailAsync(userEmail);
+                        await signInManager.RefreshSignInAsync(currentUser);
+                    }
+                    else
+                    {
+                        var result = await userManager.RemoveFromRoleAsync(user, assignerRole.Name);
+                        var currentUser = await userManager.FindByEmailAsync(userEmail);
+                        await signInManager.RefreshSignInAsync(currentUser);
+                    }
                     clientCompany.Updated = DateTime.UtcNow;
                     clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(clientCompany);

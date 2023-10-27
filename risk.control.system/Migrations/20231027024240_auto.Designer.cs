@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231026080434_bulk")]
-    partial class bulk
+    [Migration("20231027024240_auto")]
+    partial class auto
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -791,6 +791,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<DateTime?>("AgreementDate")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Auto")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("BankAccountNumber")
                         .IsRequired()

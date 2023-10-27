@@ -228,14 +228,14 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assign" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assign") @Url.MakeActiveClass("ClaimsInvestigation","AssignDetail") ">
-                                <i class="fas fa-thumbtack nav-icon"></i>
-                                <p>
-                                    <span class="badge badge-danger">ASSIGN</span>
-                                </p>
-                            </a>
-                        </li>
+                        //<li class="nav-item">
+                        //    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assign" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assign") @Url.MakeActiveClass("ClaimsInvestigation","AssignDetail") ">
+                        //        <i class="fas fa-thumbtack nav-icon"></i>
+                        //        <p>
+                        //            <span class="badge badge-danger">ASSIGN</span>
+                        //        </p>
+                        //    </a>
+                        //</li>
                     }
                     if (User.IsInRole(AppRoles.Assigner.ToString()))
                     {

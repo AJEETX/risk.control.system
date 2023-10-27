@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class bulk : Migration
+    public partial class auto : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -443,6 +443,7 @@ namespace risk.control.system.Migrations
                     Status = table.Column<int>(type: "INTEGER", nullable: true),
                     DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    Auto = table.Column<bool>(type: "INTEGER", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
