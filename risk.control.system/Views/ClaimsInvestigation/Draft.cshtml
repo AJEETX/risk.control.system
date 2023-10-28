@@ -9,23 +9,33 @@
                 <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fa fa-upload"></i> Upload</h3>
+                            <h3 class="card-title"><i class="fas fa-thumbtack"></i> Assign</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <span class="input-group-label"> Upload Claims:</span>
+                                        <span class="input-group-label">File Upload Claims:</span>
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="documentImage" src="/img/no-policy.jpg">
                                             <input accept=".zip" type="file" class="form-control" name="postedFile" />
-                                            <input type="text" autocomplete="off" placeholder="Enter File Description" name="description" value="sample upload" required />
-                                            <button type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                            <button type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload File</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> FTP Download Claims:</span>
+                                        <div class="input-group mb-3">
+                                            <img class="form-Image" id="ftpImage" src="/img/no-policy.jpg">
+                                            <input class="form-control" value="ftp server: 000webhost.com" disabled />
+                                            <button type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="FtpDownload"><i class="nav-icon fa fa-download"></i> Download FTP</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -35,7 +45,7 @@
             <div class="col-md-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-thumbtack"></i> Assign</h3>
+                        <h3 class="card-title"><i class="far fa-paper-plane"></i> Claim Assignment</h3>
                     </div>
                     <div class="card-body">
                         <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">

@@ -2,8 +2,6 @@
 using System.Security.Claims;
 using System.Text;
 
-using Azure.Communication.Sms;
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -112,7 +110,6 @@ namespace risk.control.system.Controllers
         public IActionResult Forgot(string useremail, long mobile)
         {
             string connectionString = "";
-            SmsClient smsClient = new SmsClient(connectionString);
             return Ok();
         }
 
