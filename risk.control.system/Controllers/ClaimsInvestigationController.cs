@@ -104,8 +104,7 @@ namespace risk.control.system.Controllers
                 var files = GetFtpData();
                 var zipFiles = files.Where(f => f.EndsWith(".zip"));
                 var userEmail = HttpContext.User.Identity.Name;
-                string username = "holosync";
-                string password = "C0##ect10n";
+
                 WebClient client = new WebClient();
                 client.Credentials = new NetworkCredential(_login, _password);
 
@@ -316,6 +315,18 @@ namespace risk.control.system.Controllers
                 }
 
                 var rows = _context.SaveChanges();
+
+                foreach (var zipFile in zipFiles)
+                {
+                    string fileName = zipFile;
+
+                    FtpWebRequest requestFileDelete = (FtpWebRequest)WebRequest.Create($"{_ftpPath}" + fileName);
+                    requestFileDelete.Credentials = new NetworkCredential(_login, _password);
+                    requestFileDelete.Method = WebRequestMethods.Ftp.DeleteFile;
+
+                    FtpWebResponse responseFileDelete = (FtpWebResponse)requestFileDelete.GetResponse();
+                }
+
                 toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Uploaded Claims ready"));
 
                 return RedirectToAction("Draft");
