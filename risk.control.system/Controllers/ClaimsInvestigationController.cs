@@ -304,10 +304,10 @@ namespace risk.control.system.Controllers
                     var fileModel = new FileOnFileSystemModel
                     {
                         CreatedOn = DateTime.UtcNow,
-                        FileType = "xxx\\compressed",
+                        FileType = "application/x-zip-compressed",
                         Extension = "zip",
                         Name = fileName,
-                        Description = "Ftp Upload",
+                        Description = "Ftp Download",
                         FilePath = filePath,
                         UploadedBy = userEmail
                     };
@@ -327,7 +327,7 @@ namespace risk.control.system.Controllers
                     FtpWebResponse responseFileDelete = (FtpWebResponse)requestFileDelete.GetResponse();
                 }
 
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Uploaded Claims ready"));
+                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Downloaded Claims ready"));
 
                 return RedirectToAction("Draft");
             }
@@ -1804,18 +1804,24 @@ namespace risk.control.system.Controllers
                         }
                     }
                 }
-
-                toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) allocated successfully !");
+                if (claims.Count == autoAllocatedClaims.Count)
+                {
+                    toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
+                }
 
                 if (claims.Count > autoAllocatedClaims.Count)
                 {
+                    toastNotification.AddWarningToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
+
                     var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
 
                     await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
                     await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
-                    toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {notAutoAllocated.Count}/{claims.Count} claim(s) assigned successfully !");
+                    toastNotification.AddWarningToastMessage($"<i class='far fa-file-powerpoint'></i> {notAutoAllocated.Count}/{claims.Count} claim(s) assigned successfully !");
+
+                    return RedirectToAction(nameof(Assigner));
                 }
             }
             else
