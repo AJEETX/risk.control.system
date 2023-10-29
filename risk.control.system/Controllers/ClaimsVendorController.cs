@@ -770,6 +770,16 @@ namespace risk.control.system.Controllers
                 Location = location
             };
 
+            var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
+
+            var curl = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            ViewBag.CustomerLocationUrl = curl;
+
+            var beneficiarylatLong = location.PinCode.Latitude + "," + location.PinCode.Longitude;
+            var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            ViewBag.BeneficiaryLocationUrl = bUrl;
+
+
             return View(model);
         }
 

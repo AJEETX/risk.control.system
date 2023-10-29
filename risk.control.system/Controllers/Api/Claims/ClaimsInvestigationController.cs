@@ -134,8 +134,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
-                        Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
+                        Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : "/img/no-policy.jpg",
                         Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : "/img/user.png",
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -154,12 +153,28 @@ namespace risk.control.system.Controllers.Api.Claims
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
                                       "/img/user.png",
                         BeneficiaryName = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
                     })?
                     .ToList();
 
             return Ok(response);
+        }
+
+        private string GetPincode(ClaimType? claimType, CustomerDetail cdetail, CaseLocation location)
+        {
+            if (claimType == ClaimType.HEALTH)
+            {
+                if (cdetail is null)
+                    return "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>";
+                return cdetail.PinCode.Code;
+            }
+            else
+            {
+                if (location is null)
+                    return "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>";
+                return location.PinCode.Code;
+            }
         }
 
         [HttpGet("GetActiveMap")]
@@ -193,7 +208,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Where(c => !c.Deleted);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var clientCompany = _context.ClientCompanyApplicationUser.Include(c => c.PinCode).FirstOrDefault(c => c.Email == userEmail.Value);
             if (clientCompany == null)
             {
             }
@@ -202,7 +217,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == clientCompany.ClientCompanyId);
             }
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INPROGRESS)).ToList();
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -224,7 +239,11 @@ namespace risk.control.system.Controllers.Api.Claims
             if (userRole.Value.Contains(AppRoles.Creator.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.PortalAdmin.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+                applicationDbContext = applicationDbContext
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CaseLocations)
+                    .Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
                 claimsSubmitted = await applicationDbContext.ToListAsync();
             }
             else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
@@ -268,9 +287,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new
                    {
                        Id = a.ClaimsInvestigationId,
-                       Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                       a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
-                       a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                       Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        Description = a.PolicyDetail.CauseOfLoss,
                        Price = a.PolicyDetail.SumAssuredValue,
                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -293,6 +310,22 @@ namespace risk.control.system.Controllers.Api.Claims
                 lat = clientCompany.PinCode.Latitude,
                 lng = clientCompany.PinCode.Longitude
             });
+        }
+
+        private string GetAddress(ClaimType? claimType, CustomerDetail a, CaseLocation location)
+        {
+            if (claimType == ClaimType.HEALTH)
+            {
+                if (a is null)
+                    return string.Empty;
+                return a.Addressline + " " + a.District?.Code + " " + a.State?.Code;
+            }
+            else
+            {
+                if (location is null)
+                    return string.Empty;
+                return location.Addressline + " " + location.District.Code + " " + location.State.Code;
+            }
         }
 
         [HttpGet("GetAssign")]
@@ -374,9 +407,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                         Policy = a.PolicyDetail?.LineOfBusiness?.Name,
                         Status = a.InvestigationCaseStatus.Name,
-                        Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
-
+                        Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         ServiceType = a.PolicyDetail?.ClaimType?.GetEnumDisplayName(),
                         Location = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
@@ -484,9 +515,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code + " " + a.CustomerDetail.PinCode.Code :
-                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code + " " + a.CaseLocations.FirstOrDefault().PinCode.Code,
+                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -684,8 +713,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
-                        Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
+                        Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                         Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -779,9 +807,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
-                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -906,8 +932,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 SelectedToAssign = false,
-                Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
+                Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -1030,9 +1055,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
-                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -1127,8 +1150,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 SelectedToAssign = false,
-                Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
+                Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -1221,9 +1243,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
-                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -1476,8 +1496,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 SelectedToAssign = false,
-                Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
+                Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                 Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -1539,9 +1558,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
-                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
