@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -86,6 +87,12 @@ namespace risk.control.system.Seeds
             var currentPinCode = "515631";
             var currentDistrict = "ANANTAPUR";
             var currentState = "AD";
+            var biharPincode = "853204";
+
+            var companyPinCode = context.PinCode.Include(p=>p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE);
+            var companyDistrict = context.District.Include(d=>d.State).FirstOrDefault(s => s.DistrictId == companyPinCode.District.DistrictId);
+            var companyStateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!;
+
             var insurance = new ClientCompany
             {
                 ClientCompanyId = Guid.NewGuid().ToString(),
@@ -99,9 +106,9 @@ namespace risk.control.system.Seeds
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = companyDistrict.DistrictId,
+                StateId = companyStateId,
+                PinCodeId = companyPinCode.PinCodeId,
                 Description = "CORPORATE OFFICE ",
                 Email = Applicationsettings.COMPANYDOMAIN,
                 DocumentUrl = "/img/chl.png",

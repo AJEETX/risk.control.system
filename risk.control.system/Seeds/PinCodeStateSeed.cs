@@ -39,6 +39,8 @@ namespace risk.control.system.Seeds
                         {
                             Name = pinCode.Name,
                             Code = pinCode.Code,
+                            Longitude = pinCode.Longitude,
+                            Latitude = pinCode.Latitude,
                             DistrictId = districtAdded.Entity.DistrictId,
                             StateId = stateAdded.Entity.StateId,
                             CountryId = country.CountryId,
@@ -76,6 +78,8 @@ namespace risk.control.system.Seeds
                                 District = rowData[7] ?? NO_DATA,
                                 StateName = rowData[8] ?? NO_DATA,
                                 StateCode = rowData[9] ?? NO_DATA,
+                                Latitude = rowData[10] ?? NO_DATA,
+                                Longitude = rowData[11] ?? NO_DATA,
                             };
                             var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
                             if (isDupicate is null )

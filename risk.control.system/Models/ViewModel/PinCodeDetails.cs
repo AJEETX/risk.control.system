@@ -6,6 +6,7 @@ namespace risk.control.system.Models.ViewModel
     {
         public DataTable DataTable { get; set; }
     }
+
     public class PinCodeState
     {
         public string Name { get; set; }
@@ -13,5 +14,7 @@ namespace risk.control.system.Models.ViewModel
         public string District { get; set; }
         public string StateName { get; set; }
         public string StateCode { get; set; }
+        public string? Latitude { get; set; }
+        public string? Longitude { get; set; }
     }
 }

@@ -160,8 +160,141 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
+        [HttpGet("GetActiveMap")]
+        public async Task<IActionResult> GetActiveMap()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            if (clientCompany == null)
+            {
+            }
+            else
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == clientCompany.ClientCompanyId);
+            }
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
+            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+
+            var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+
+            if (userRole.Value.Contains(AppRoles.Creator.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.PortalAdmin.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+                claimsSubmitted = await applicationDbContext.ToListAsync();
+            }
+            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a =>
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == reAssigned2AssignerStatus.InvestigationCaseSubStatusId
+                || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
+                claimsSubmitted = await applicationDbContext.ToListAsync();
+            }
+            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+            }
+            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a =>
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
+                a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
+                a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
+                );
+                claimsSubmitted = await applicationDbContext.ToListAsync();
+            }
+            var response = claimsSubmitted
+                   .Select(a => new
+                   {
+                       Id = a.ClaimsInvestigationId,
+                       Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                       a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
+                       a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                       Description = a.PolicyDetail.CauseOfLoss,
+                       Price = a.PolicyDetail.SumAssuredValue,
+                       Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
+                       Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
+                       Bath = a.CustomerDetail.ContactNumber,
+                       Size = a.CustomerDetail.Description,
+                       Position = new
+                       {
+                           Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                          decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                           Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                           decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                       }
+                   })?
+                   .ToList();
+
+            return Ok(new
+            {
+                response = response,
+                lat = clientCompany.PinCode.Latitude,
+                lng = clientCompany.PinCode.Longitude
+            });
+        }
+
         [HttpGet("GetAssign")]
-        public async Task<IActionResult> GetAssign()
+        public IActionResult GetAssign()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -252,12 +385,128 @@ namespace risk.control.system.Controllers.Api.Claims
                         BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        a.CustomerDetail.Addressline + a.CustomerDetail.District.Name + a.CustomerDetail.State.Name :
+                        a.CaseLocations.FirstOrDefault().Addressline + a.CaseLocations.FirstOrDefault().District.Name + a.CaseLocations.FirstOrDefault().State.Name,
+                        Description = a.PolicyDetail.CauseOfLoss,
+                        Price = a.PolicyDetail.SumAssuredValue,
+                        Type = a.PolicyDetail.ClaimType?.GetEnumDisplayName(),
+                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
+                        Bath = a.CustomerDetail.ContactNumber,
+                        Size = a.CustomerDetail.Description,
+                        Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Latitude : a.CaseLocations.FirstOrDefault().PinCode.Latitude,
+                        Long = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Longitude : a.CaseLocations.FirstOrDefault().PinCode.Longitude
                     })?
                     .ToList();
 
                 return Ok(response);
             }
             return Ok(null);
+        }
+
+        [HttpGet("GetAssignMap")]
+        public IActionResult GetAssignMap()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
+
+                var claimsAssigned = new List<ClaimsInvestigation>();
+                foreach (var item in applicationDbContext)
+                {
+                    if (item.IsReady2Assign)
+                    {
+                        item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                        && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
+                        if (item.CaseLocations.Any())
+                        {
+                            claimsAssigned.Add(item);
+                        }
+                    }
+                }
+                var response = claimsAssigned
+                    .Select(a => new
+                    {
+                        Id = a.ClaimsInvestigationId,
+                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code + " " + a.CustomerDetail.PinCode.Code :
+                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code + " " + a.CaseLocations.FirstOrDefault().PinCode.Code,
+                        Description = a.PolicyDetail.CauseOfLoss,
+                        Price = a.PolicyDetail.SumAssuredValue,
+                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
+                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
+                        Bath = a.CustomerDetail.ContactNumber,
+                        Size = a.CustomerDetail.Description,
+                        Position = new
+                        {
+                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                        }
+                    })?
+                    .ToList();
+                var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+                return Ok(new
+                {
+                    response = response,
+                    lat = company.PinCode.Latitude,
+                    lng = company.PinCode.Longitude
+                });
+            }
+            return Problem();
         }
 
         [HttpGet("GetIncomplete")]
@@ -361,7 +610,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetAssigner")]
-        public async Task<IActionResult> GetAssigner()
+        public IActionResult GetAssigner()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
@@ -454,8 +703,105 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
+        [HttpGet("GetAssignerMap")]
+        public IActionResult GetAssignerMap()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+
+            // SHOWING DIFFERRENT PAGES AS PER ROLES
+            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
+
+            var claimsAssigned = new List<ClaimsInvestigation>();
+
+            foreach (var item in applicationDbContext)
+            {
+                item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                if (item.CaseLocations.Any())
+                {
+                    claimsAssigned.Add(item);
+                }
+            }
+            var response = claimsAssigned
+                    .Select(a => new
+                    {
+                        Id = a.ClaimsInvestigationId,
+                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
+                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                        Description = a.PolicyDetail.CauseOfLoss,
+                        Price = a.PolicyDetail.SumAssuredValue,
+                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
+                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
+                        Bath = a.CustomerDetail.ContactNumber,
+                        Size = a.CustomerDetail.Description,
+                        Position = new
+                        {
+                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                        }
+                    })?
+                    .ToList();
+            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            return Ok(new
+            {
+                response = response,
+                lat = company.PinCode.Latitude,
+                lng = company.PinCode.Longitude
+            });
+        }
+
         [HttpGet("GetAssessor")]
-        public async Task<IActionResult> GetAssessor()
+        public IActionResult GetAssessor()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
@@ -577,8 +923,134 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
+        [HttpGet("GetAssessorMap")]
+        public IActionResult GetAssessorMap()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
+
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+
+            var claimsAssigned = new List<ClaimsInvestigation>();
+            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+            }
+            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                        && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+            }
+            else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+            }
+
+            var response = claimsAssigned
+                    .Select(a => new
+                    {
+                        Id = a.ClaimsInvestigationId,
+                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
+                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                        Description = a.PolicyDetail.CauseOfLoss,
+                        Price = a.PolicyDetail.SumAssuredValue,
+                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
+                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
+                        Bath = a.CustomerDetail.ContactNumber,
+                        Size = a.CustomerDetail.Description,
+                        Position = new
+                        {
+                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                        }
+                    })?
+                    .ToList();
+            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            return Ok(new
+            {
+                response = response,
+                lat = company.PinCode.Latitude,
+                lng = company.PinCode.Longitude
+            });
+        }
+
         [HttpGet("GetApproved")]
-        public async Task<IActionResult> GetApproved()
+        public IActionResult GetApproved()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
@@ -670,8 +1142,104 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
+        [HttpGet("GetApprovedMap")]
+        public IActionResult GetApprovedMap()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted);
+            var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+
+            if (companyUser == null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            else if (companyUser != null && vendorUser == null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId);
+            }
+            var claimsSubmitted = new List<ClaimsInvestigation>();
+
+            if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
+            {
+                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsSubmitted.Add(item);
+                    }
+                }
+            }
+            var response = claimsSubmitted
+                    .Select(a => new
+                    {
+                        Id = a.ClaimsInvestigationId,
+                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
+                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                        Description = a.PolicyDetail.CauseOfLoss,
+                        Price = a.PolicyDetail.SumAssuredValue,
+                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
+                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
+                        Bath = a.CustomerDetail.ContactNumber,
+                        Size = a.CustomerDetail.Description,
+                        Position = new
+                        {
+                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                        }
+                    })?
+                    .ToList();
+            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            return Ok(new
+            {
+                response = response,
+                lat = company.PinCode.Latitude,
+                lng = company.PinCode.Longitude
+            });
+        }
+
         [HttpGet("GetReview")]
-        public async Task<IActionResult> GetReview()
+        public IActionResult GetReview()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -919,6 +1487,75 @@ namespace risk.control.system.Controllers.Api.Claims
             ?.ToList();
 
             return Ok(response);
+        }
+
+        [HttpGet("GetReportMap")]
+        public async Task<IActionResult> GetReportMap()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+                .Where(c => !c.Deleted &&
+                c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
+                c.CaseLocations.All(c => c.ClaimReport != null));
+            var claimsSubmitted = await applicationDbContext.ToListAsync();
+
+            var response = claimsSubmitted
+                    .Select(a => new
+                    {
+                        Id = a.ClaimsInvestigationId,
+                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                        a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code :
+                        a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code,
+                        Description = a.PolicyDetail.CauseOfLoss,
+                        Price = a.PolicyDetail.SumAssuredValue,
+                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
+                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
+                        Bath = a.CustomerDetail.ContactNumber,
+                        Size = a.CustomerDetail.Description,
+                        Position = new
+                        {
+                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                           decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                        }
+                    })?
+                    .ToList();
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            return Ok(new
+            {
+                response = response,
+                lat = company.PinCode.Latitude,
+                lng = company.PinCode.Longitude
+            });
         }
 
         [HttpGet("GetPolicyDetail")]

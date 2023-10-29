@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class bulkseed : Migration
+    public partial class mapp : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -391,6 +391,8 @@ namespace risk.control.system.Migrations
                     PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", nullable: false),
+                    Latitude = table.Column<string>(type: "TEXT", nullable: true),
+                    Longitude = table.Column<string>(type: "TEXT", nullable: true),
                     DistrictId = table.Column<string>(type: "TEXT", nullable: true),
                     StateId = table.Column<string>(type: "TEXT", nullable: true),
                     CountryId = table.Column<string>(type: "TEXT", nullable: false),
