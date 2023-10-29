@@ -99,6 +99,8 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
+                       Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                        Company = a.PolicyDetail.ClientCompany.Name,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
@@ -313,6 +315,8 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        Company = a.PolicyDetail.ClientCompany.Name,
+                       Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                        SelectedToAssign = false,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
@@ -513,6 +517,8 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
+                       Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                        Company = a.PolicyDetail.ClientCompany.Name,
                        Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                        Customer = a.CustomerDetail.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",

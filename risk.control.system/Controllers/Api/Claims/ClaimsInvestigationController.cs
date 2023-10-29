@@ -134,6 +134,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
+                        Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                         Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : "/img/no-policy.jpg",
                         Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : "/img/user.png",
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -372,6 +374,9 @@ namespace risk.control.system.Controllers.Api.Claims
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                         Policy = a.PolicyDetail?.LineOfBusiness?.Name,
                         Status = a.InvestigationCaseStatus.Name,
+                        Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
+
                         ServiceType = a.PolicyDetail?.ClaimType?.GetEnumDisplayName(),
                         Location = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
@@ -679,6 +684,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
+                        Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                         Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                         Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -899,6 +906,8 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 SelectedToAssign = false,
+                Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -1118,6 +1127,8 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 SelectedToAssign = false,
+                Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -1465,6 +1476,8 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 SelectedToAssign = false,
+                Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                 Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                 Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
