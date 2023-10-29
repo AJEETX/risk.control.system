@@ -143,7 +143,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Ready2Assign = a.IsReady2Assign,
                         ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
                         Location = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>") :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                         Created = a.Created.ToString("dd-MM-yyyy"),
                         timePending = DateTime.Now.Subtract(a.Created).Days == 0 ? "< 1" : DateTime.Now.Subtract(a.Created).Days.ToString(),
@@ -166,13 +166,13 @@ namespace risk.control.system.Controllers.Api.Claims
             if (claimType == ClaimType.HEALTH)
             {
                 if (cdetail is null)
-                    return "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>";
+                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
                 return cdetail.PinCode.Code;
             }
             else
             {
                 if (location is null)
-                    return "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>";
+                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
                 return location.PinCode.Code;
             }
         }
