@@ -601,28 +601,28 @@
             content.classList.add("property");
             content.innerHTML = `
                                 <div class="icon">
-                                    <i aria-hidden="true" class="fa fa-icon fa-${property.type}" title="${property.type}"></i>
+                                   <i aria-hidden="true" class="fa fa-icon fa-${property.type}" title="${property.type}"></i></a>
                                     <span class="fa-sr-only">${property.type}</span>
                                 </div>
                                 <div class="details">
                                     <div class="price">$ ${property.price}</div>
-                                    <div class="address">${property.address}</div>
+                                            <div class="address"><i aria-hidden="true" class="fas fa-home" title="bedroom"></i> ${property.address}</div>
                                     <div class="features">
-                                    <div>
-                                                <i aria-hidden="true" class="fas fa-rupee-sign" title="bedroom"></i>
-                                        <span class="fa-sr-only">bedroom</span>
-                                        <span>${property.bed}</span>
-                                    </div>
-                                    <div>
-                                                <i aria-hidden="true" class="fas fa-phone-square-alt" title="bathroom"></i>
-                                        <span class="fa-sr-only">bathroom</span>
-                                        <span>${property.bath}</span>
-                                    </div>
-                                    <div>
-                                        <i aria-hidden="true" class="fa fa-ruler fa-lg size" title="size"></i>
-                                        <span class="fa-sr-only">size</span>
-                                        <span>${property.size} <sup>2</sup></span>
-                                    </div>
+                                        <div>
+                                            <i aria-hidden="true" class="fas fa-rupee-sign" title="bedroom"></i>
+                                            <span class="fa-sr-only">bedroom</span>
+                                            <span>${property.bed}</span>
+                                        </div>
+                                        <div>
+                                            <i aria-hidden="true" class="fas fa-phone-square-alt" title="bathroom"></i>
+                                            <span class="fa-sr-only">bathroom</span>
+                                            <span>${property.bath}</span>
+                                        </div>
+                                        <div>
+                                            <i aria-hidden="true" class="fa fa-ruler fa-lg size" title="size"></i>
+                                            <span class="fa-sr-only">size</span>
+                                            <span>${property.size} <sup>2</sup></span>
+                                        </div>
                                     </div>
                                 </div>
                                 `;
