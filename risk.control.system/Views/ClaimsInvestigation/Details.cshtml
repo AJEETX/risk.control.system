@@ -303,15 +303,15 @@
                                                                             <p class="text-muted text-sm">
                                                                                 @if (Model?.Claim?.CustomerDetail?.ProfilePicture is not null)
                                                                                 {
-                                                                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim?.CustomerDetail?.ProfilePicture))">
+                                                                                    <img id="profileImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim?.CustomerDetail?.ProfilePicture))">
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    <img id="profileImage" class="form-Image" src="/img/user.png">
+                                                                                    <img id="profileImage" class="img-fluid block-data" src="/img/user.png">
                                                                                 }
                                                                             </p>
                                                                             <p class="text-muted text-sm">
-                                                                                <img id="profileImage" class="img-fluid locationImage" src="@customerLocationMap">
+                                                                                <img id="profileImageMap" class="img-fluid block-data" src="@customerLocationMap">
                                                                             </p>
                                                                             
                                                                         </div>
@@ -435,15 +435,15 @@
                                                                             <p class="text-muted text-sm">
                                                                                 @if (Model?.Location?.ProfilePicture is not null)
                                                                                 {
-                                                                                    <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
+                                                                                    <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    <img id="profileImage" class="form-Image" src="/img/user.png">
+                                                                                    <img id="bImage" class="img-fluid block-data" src="/img/user.png">
                                                                                 }
                                                                             </p>
                                                                             <p class="text-muted text-sm">
-                                                                                <img id="profileImage" class="img-fluid locationImage" src="@beneficiaryLocationMap">
+                                                                                <img id="bImageMap" class="img-fluid block-data" src="@beneficiaryLocationMap">
                                                                             </p>
                                                                         </div>
                                                                     </div>
