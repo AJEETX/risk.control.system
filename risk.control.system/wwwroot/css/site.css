@@ -133,6 +133,22 @@ table {
     border-radius: 5px;
 }
 
+#profileImageMap {
+    cursor: pointer;
+}
+
+#bImageMap {
+    cursor: pointer;
+}
+
+#agentLocationPicture {
+    cursor: pointer;
+}
+
+#agentOcrPicture {
+    cursor: pointer;
+}
+
 .ocr-Image {
     height: 150px;
     width: 150px;
@@ -166,6 +182,7 @@ table {
     font-weight: 400 !important;
     border-radius: 5px;
 }
+
 .investigation-actual-image {
     height: auto;
     width: auto;
