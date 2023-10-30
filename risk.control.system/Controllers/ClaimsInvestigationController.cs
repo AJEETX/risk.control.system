@@ -39,6 +39,7 @@ using Renci.SshNet.Sftp;
 using static risk.control.system.Helpers.Permissions;
 using System.Text;
 using System.Net.Http;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -1504,7 +1505,23 @@ namespace risk.control.system.Controllers
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
                 RootObject rootObject = getAddress((latitude), (longitude));
-                ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
+                }
+                else
+                {
+                    registeredLatitude = Convert.ToDouble(claimCase.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimCase.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, 222, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                var address = rootObject.display_name;
+                address = address + $" \n\r The location is {distance} meter away from expected address";
+                ViewBag.LocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {
@@ -1521,8 +1538,18 @@ namespace risk.control.system.Controllers
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.OcrLocationUrl = url;
                 RootObject rootObject = getAddress((latitude), (longitude));
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, 222, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
-                ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                var address = rootObject.display_name;
+                address = address + $" \n\r The location is {distance} meter away from expected address";
+                ViewBag.OcrLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {
@@ -1628,8 +1655,18 @@ namespace risk.control.system.Controllers
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
                 RootObject rootObject = getAddress((latitude), (longitude));
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, 222, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
-                ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                var address = rootObject.display_name;
+                address = address + $" \n\r The location is {distance} meter away from expected address";
+                ViewBag.LocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {
@@ -1647,7 +1684,23 @@ namespace risk.control.system.Controllers
                 ViewBag.OcrLocationUrl = url;
                 RootObject rootObject = getAddress((latitude), (longitude));
 
-                ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
+                }
+                else
+                {
+                    registeredLatitude = Convert.ToDouble(value: location.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(location.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, 222, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                var address = rootObject.display_name;
+                address = address + $" \n\r The location is {distance} meter away from expected address";
+                ViewBag.OcrLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {

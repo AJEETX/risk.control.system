@@ -9,6 +9,7 @@ using risk.control.system.Models;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text.RegularExpressions;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
@@ -106,7 +107,23 @@ namespace risk.control.system.Controllers
                 ViewBag.LocationUrl = url;
                 RootObject rootObject = getAddress(latitude, longitude);
 
-                ViewBag.LocationAddress = rootObject.display_name ?? "None";
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
+                }
+                else
+                {
+                    registeredLatitude = Convert.ToDouble(location.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(location.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, 222, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                var address = rootObject.display_name;
+                address = address + $" \n\r The location is {distance} meter away from expected address";
+                ViewBag.LocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {
@@ -124,7 +141,18 @@ namespace risk.control.system.Controllers
                 ViewBag.OcrLocationUrl = url;
                 RootObject rootObject = getAddress(latitude, longitude);
 
-                ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, 222, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                var address = rootObject.display_name;
+                address = address + $" \n\r The location is {distance} meter away from expected address";
+                ViewBag.OcrLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {
