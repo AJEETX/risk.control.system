@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231029003431_mapp")]
+    [Migration("20231030024124_mapp")]
     partial class mapp
     {
         /// <inheritdoc />
