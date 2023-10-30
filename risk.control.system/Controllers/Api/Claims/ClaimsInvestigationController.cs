@@ -9,6 +9,9 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+
+using static risk.control.system.Helpers.Permissions;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -20,6 +23,7 @@ namespace risk.control.system.Controllers.Api.Claims
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private static HttpClient httpClient = new HttpClient();
 
         public ClaimsInvestigationController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -1733,6 +1737,76 @@ namespace risk.control.system.Controllers.Api.Claims
                 OcrAddress = ocrAddress
             };
 
+            return Ok(data);
+        }
+
+        [HttpGet("GetCustomerMap")]
+        public async Task<IActionResult> GetCustomerMap(string id)
+        {
+            var customer = await _context.CustomerDetail
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .Include(c => c.District)
+                .Include(c => c.PinCode)
+                .FirstOrDefaultAsync(p => p.CustomerDetailId == id);
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-image.png");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+            var latitude = customer.PinCode.Latitude;
+            var longitude = customer.PinCode.Longitude.Trim();
+            var latLongString = latitude + "," + longitude;
+            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+            var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
+
+            var longLatString = latitude + "," + longitude;
+            RootObject rootObject = ReportController.getAddress((latitude), (longitude));
+            var imageAddress = rootObject.display_name;
+            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var data = new
+            {
+                profileMap = customerMapUrl,
+                weatherData = weatherCustomData,
+                address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name
+            };
+            return Ok(data);
+        }
+
+        [HttpGet("GetBeneficiaryMap")]
+        public async Task<IActionResult> GetBeneficiaryMap(long id, string claimId)
+        {
+            var beneficiary = await _context.CaseLocation
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.Country)
+                .Include(c => c.State)
+                .Include(c => c.District)
+                .Include(c => c.PinCode)
+            .Include(c => c.ClaimReport)
+                .FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-image.png");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+            var latitude = beneficiary.PinCode.Latitude;
+            var longitude = beneficiary.PinCode.Longitude.Trim();
+            var latLongString = latitude + "," + longitude;
+            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+            var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
+
+            var longLatString = latitude + "," + longitude;
+            RootObject rootObject = ReportController.getAddress((latitude), (longitude));
+            var imageAddress = rootObject.display_name;
+            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var data = new
+            {
+                profileMap = customerMapUrl,
+                weatherData = weatherCustomData,
+                address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name
+            };
             return Ok(data);
         }
     }

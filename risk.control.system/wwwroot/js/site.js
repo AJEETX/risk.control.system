@@ -171,6 +171,78 @@
             }
         })
     })
+
+    $('#profileImageMap').click(function () {
+        $.confirm({
+            type: 'grey',
+            closeIcon: true,
+            columnClass: 'medium',
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetCustomerMap?id=' + $('#customerDetailId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    self.setContent('Location Map:');
+                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
+                    self.setContentAppend('<br>Address');
+                    self.setContentAppend('<br>' + response.address);
+                    self.setContentAppend('<br> Location detail');
+                    self.setContentAppend('<br>' + response.weatherData);
+                    self.setTitle('<i class="fas fa-mobile-alt"></i> Customer Address Detail');
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            }
+        })
+    })
+
+
+    $('#bImageMap').click(function () {
+        $.confirm({
+            type: 'grey',
+            closeIcon: true,
+            columnClass: 'medium',
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetBeneficiaryMap?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    self.setContent('Location Map:');
+                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
+                    self.setContentAppend('<br>Address');
+                    self.setContentAppend('<br>' + response.address);
+                    self.setContentAppend('<br> Location detail');
+                    self.setContentAppend('<br>' + response.weatherData);
+                    self.setTitle('<i class="fas fa-mobile-alt"></i> Customer Address Detail');
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            }
+        })
+    })
+
     $('.ocr-Image').click(function () {
         $.confirm({
             type: 'grey',
