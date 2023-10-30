@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +10,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api
@@ -22,6 +24,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private static HttpClient httpClient = new();
 
         public AgentController(ApplicationDbContext context, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment)
         {
@@ -40,7 +43,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("agent")]
-        public async Task<IActionResult> Index(string email = "agent@agency1.com")
+        public async Task<IActionResult> Index(string email = "agent@verify.com")
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -297,6 +300,15 @@ namespace risk.control.system.Controllers.Api
             {
                 claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
                 claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
+
+                var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
+                var latitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var latLongString = latitude + "," + longitude;
+                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
+                claimCase.ClaimReport.LocationData = weatherCustomData;
             }
             if (!string.IsNullOrWhiteSpace(data.OcrData))
             {

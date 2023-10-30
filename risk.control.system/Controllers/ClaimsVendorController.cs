@@ -33,7 +33,6 @@ namespace risk.control.system.Controllers
         private readonly IMailboxService mailboxService;
         private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext _context;
-
         private static HttpClient httpClient = new();
 
         public ClaimsVendorController(
@@ -377,9 +376,15 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                RootObject rootObject = getAddress("-37.839542", "145.164834");
-                ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                var latitude = "-37.839542";
+                var longitude = "145.164834";
+                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
 
+                RootObject rootObject = getAddress(latitude, longitude);
+                ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \nElevation(sea level):{weatherData.elevation} metres";
+                claimCase.ClaimReport.LocationData = weatherCustomData;
                 ViewBag.LocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
 
@@ -398,7 +403,10 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                RootObject rootObject = getAddress("-37.839542", "145.164834");
+                var latitude = "-37.839542";
+                var longitude = "145.164834";
+
+                RootObject rootObject = getAddress(latitude, longitude);
                 ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 ViewBag.OcrLocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
@@ -581,7 +589,6 @@ namespace risk.control.system.Controllers
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
                 RootObject rootObject = getAddress((latitude), (longitude));
-
                 ViewBag.LocationAddress = rootObject.display_name ?? "None";
             }
             else
@@ -609,7 +616,6 @@ namespace risk.control.system.Controllers
                 ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 ViewBag.OcrLocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
-
 
             var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
 
@@ -778,7 +784,6 @@ namespace risk.control.system.Controllers
             var beneficiarylatLong = location.PinCode.Latitude + "," + location.PinCode.Longitude;
             var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             ViewBag.BeneficiaryLocationUrl = bUrl;
-
 
             return View(model);
         }

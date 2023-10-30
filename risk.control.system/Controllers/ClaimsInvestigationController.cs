@@ -38,6 +38,7 @@ using Renci.SshNet.Sftp;
 
 using static risk.control.system.Helpers.Permissions;
 using System.Text;
+using System.Net.Http;
 
 namespace risk.control.system.Controllers
 {
@@ -61,6 +62,7 @@ namespace risk.control.system.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
+        private static HttpClient httpClient = new();
 
         public ClaimsInvestigationController(ApplicationDbContext context,
             IClaimsInvestigationService claimsInvestigationService,
@@ -1502,7 +1504,6 @@ namespace risk.control.system.Controllers
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
                 RootObject rootObject = getAddress((latitude), (longitude));
-
                 ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
             }
             else
