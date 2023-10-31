@@ -991,7 +991,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Allocate", FromAction = "Index")]
+        [Breadcrumb(" Allocate(manual)", FromAction = "Index")]
         public IActionResult Assigner()
         {
             return View();

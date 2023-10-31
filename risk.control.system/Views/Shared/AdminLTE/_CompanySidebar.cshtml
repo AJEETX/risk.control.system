@@ -202,8 +202,6 @@
                 @{
                     if (User.IsInRole(AppRoles.Creator.ToString()))
                     {
-                       
-
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft") ">
                                 <i class="fas fa-thumbtack nav-icon"></i>
