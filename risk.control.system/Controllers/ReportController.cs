@@ -122,7 +122,10 @@ namespace risk.control.system.Controllers
                 var distance = DistanceFinder.GetDistance(registeredLatitude, 222, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
                 var address = rootObject.display_name;
-                address = address + $" \n\r The location is {distance} meter away from expected address";
+                if (distance > 0)
+                {
+                    address = address + $" \n\r The location is {distance} km away from expected address";
+                }
                 ViewBag.LocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
@@ -151,7 +154,10 @@ namespace risk.control.system.Controllers
                 var distance = DistanceFinder.GetDistance(registeredLatitude, 222, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
                 var address = rootObject.display_name;
-                address = address + $" \n\r The location is {distance} meter away from expected address";
+                if (distance > 0)
+                {
+                    address = address + $" \n\r The location is {distance} km away from expected address";
+                }
                 ViewBag.OcrLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
