@@ -139,7 +139,7 @@
 
     $('.face-Image').click(function () {
         $.confirm({
-            type: 'grey',
+            type: 'green',
             closeIcon: true,
             columnClass: 'medium',
             buttons: {
@@ -158,13 +158,14 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent(' Face image: <img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br>Photo Analysis : ');
-                    self.setContentAppend('<br>' + response.locationData);
-                    self.setContentAppend('<br>Location Map:');
-                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
-                    self.setContentAppend('<br>' + response.imageAddress);
                     self.setTitle('<i class="fas fa-mobile-alt"></i> Face Reader');
+                    self.setContent('<b>Face image</b>:');
+                    self.setContent('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
+                    self.setContentAppend('<br><b>Photo Analysis</b> : ');
+                    self.setContentAppend('<br><i>' + response.locationData + '</i>');
+                    self.setContentAppend('<br><b>Location Map</b>:');
+                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
+                    self.setContentAppend('<br>' + response.imageAddress + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
@@ -174,7 +175,7 @@
 
     $('#profileImageMap').click(function () {
         $.confirm({
-            type: 'grey',
+            type: 'green',
             closeIcon: true,
             columnClass: 'medium',
             buttons: {
@@ -193,13 +194,13 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent('Location Map:');
+                    self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
+                    self.setContent('<b>Location Map</b>:');
                     self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
-                    self.setContentAppend('<br>Address');
-                    self.setContentAppend('<br>' + response.address);
-                    self.setContentAppend('<br> Location detail');
-                    self.setContentAppend('<br>' + response.weatherData);
-                    self.setTitle('<i class="fas fa-mobile-alt"></i> Customer Address Detail');
+                    self.setContentAppend('<br><b>Address</b>:');
+                    self.setContentAppend('<br><i>' + response.address + '</i>');
+                    self.setContentAppend('<br> <b>Location detail</b> :');
+                    self.setContentAppend('<br><i>' + response.weatherData + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
@@ -209,7 +210,7 @@
 
     $('#bImageMap').click(function () {
         $.confirm({
-            type: 'grey',
+            type: 'green',
             closeIcon: true,
             columnClass: 'medium',
             buttons: {
@@ -228,13 +229,13 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent('Location Map:');
+                    self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Beneficiary Address Location</b>');
+                    self.setContent('<b>Location Map</b>:');
                     self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
-                    self.setContentAppend('<br>Address');
-                    self.setContentAppend('<br>' + response.address);
-                    self.setContentAppend('<br> Location detail');
-                    self.setContentAppend('<br>' + response.weatherData);
-                    self.setTitle('<i class="fas fa-mobile-alt"></i> Customer Address Detail');
+                    self.setContentAppend('<br><b>Address</b>:');
+                    self.setContentAppend('<br><i>' + response.address+ '</i>');
+                    self.setContentAppend('<br> <b>Location detail</b> :');
+                    self.setContentAppend('<br><i>' + response.weatherData + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
@@ -244,7 +245,7 @@
 
     $('.ocr-Image').click(function () {
         $.confirm({
-            type: 'grey',
+            type: 'green',
             closeIcon: true,
             columnClass: 'medium',
             buttons: {
@@ -263,13 +264,14 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContentAppend('<br>OCR Image: <img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
-                    self.setContentAppend('<br>OCR Scan Info : ');
-                    self.setContentAppend('<br>' + response.qrData);
-                    self.setContentAppend('<br>Location Map:');
-                    self.setContentAppend('<br><img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
-                    self.setContentAppend('<br>' + response.ocrAddress);
                     self.setTitle('<i class="fas fa-mobile-alt"></i> OCR App');
+                    self.setContentAppend('<b>OCR Image</b>:');
+                    self.setContentAppend('<br><img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
+                    self.setContentAppend('<br><b>OCR Scan Info</b> : ');
+                    self.setContentAppend('<br><i>' +  response.qrData + '</i>');
+                    self.setContentAppend('<br><b>Location Map<</b>:');
+                    self.setContentAppend('<br><img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
+                    self.setContentAppend('<br><i>' + response.ocrAddress +'</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
@@ -341,14 +343,6 @@
                         self.setContentAppend('</div>');
                         self.setContentAppend('</div>');
                         self.setContentAppend('</article>');
-                        //self.setContentAppend('<br>Policy #: ' + response.contractNumber);
-                        //self.setContentAppend('<br>Claim type: ' + response.claimType);
-                        //self.setContentAppend('<br>Issue date: ' + response.contractIssueDate);
-                        //self.setContentAppend('<br>Incident date: ' + response.dateOfIncident);
-                        //self.setContentAppend('<br>Amount : <i class="fas fa-rupee-sign"></i>' + response.sumAssuredValue);
-                        //self.setContentAppend('<br>Service : ' + response.investigationServiceType);
-                        //self.setContentAppend('<br>Reason : ' + response.caseEnabler);
-                        //self.setContentAppend('<br>Cause : ' + response.causeOfLoss);
                     }
                 }, function () {
                     //This function is for unhover.
@@ -430,7 +424,7 @@
                     self.setContentAppend('<br><b>Phone</b>: ' + response.contactNumber);
                     self.setContentAppend('<br><b>Income</b>: ' + response.income);
                     self.setContentAppend('<br><b>Address</b>: ' + response.address);
-                    self.setContentAppend('<img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.beneficiary + '" /> ');
+                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.beneficiary + '" /> ');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
