@@ -1674,7 +1674,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 SumAssuredValue = policy.SumAssuredValue,
                 InvestigationServiceType = policy.InvestigationServiceType.Name,
                 CaseEnabler = policy.CaseEnabler.Name,
-                CauseOfLoss = policy.CauseOfLoss
+                CauseOfLoss = policy.CauseOfLoss,
+                CostCentre = policy.CostCentre.Name,
             };
             return Ok(response);
         }
@@ -1702,8 +1703,9 @@ namespace risk.control.system.Controllers.Api.Claims
                     ContactNumber = customer.ContactNumber,
                     Address = customer.Addressline + "  " + customer.District.Name + "  " + customer.State.Name + "  " + customer.Country.Name + "  " + customer.PinCode.Code,
                     Occupation = customer.CustomerOccupation.GetEnumDisplayName(),
-                    Income = customer.CustomerIncome,
-                    Education = customer.CustomerEducation.GetEnumDisplayName()
+                    Income = customer.CustomerIncome.GetEnumDisplayName(),
+                    Education = customer.CustomerEducation.GetEnumDisplayName(),
+                    DateOfBirth = customer.CustomerDateOfBirth
                 }
                 );
         }
