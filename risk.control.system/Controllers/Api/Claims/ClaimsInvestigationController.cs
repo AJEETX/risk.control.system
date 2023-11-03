@@ -1972,5 +1972,74 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             return Ok();
         }
+
+        [HttpGet("GetOcrDetail")]
+        public async Task<IActionResult> GetOcrDetail(string claimid)
+        {
+            var claim = _context.ClaimsInvestigation
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(l => l.ClaimReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
+
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
+
+                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.OcrLongLat is not null)
+                {
+                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.OcrLongLat.IndexOf("/");
+                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new { center, dakota, frick });
+                }
+            }
+            else
+            {
+                var center = new { Lat = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Latitude), Lng = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Longitude) };
+                var dakota = new { Lat = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Latitude), Lng = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Longitude) };
+
+                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.OcrLongLat is not null)
+                {
+                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.OcrLongLat.IndexOf("/");
+                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.OcrLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.OcrLongLat.Substring(longLat + 1)?.Trim();
+
+                    var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
+                    return Ok(new { center, dakota, frick });
+                }
+            }
+            return Ok();
+        }
     }
 }

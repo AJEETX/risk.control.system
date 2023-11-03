@@ -30,7 +30,7 @@ function initReportMap() {
     };
     if (response) {
         var data = JSON.parse(response);
-        if (data.center && data.dakota && data.frick) {
+        if (data && data.center && data.dakota && data.frick) {
             center = data.center;
             dakota = data.dakota;
             frick = data.frick
@@ -38,7 +38,36 @@ function initReportMap() {
     }
 
     initFaceMap(center, dakota, frick);
-    initOcrMap();
+
+    var ocrResponse = $.ajax({
+        type: "GET",
+        url: "/api/ClaimsInvestigation/GetOcrDetail?claimId=" + claimId,
+        async: false
+    }).responseText;
+
+    var ocenter = {
+        lat: 40.774102,
+        lng: -73.971734
+    };
+    var odakota = {
+        lat: 40.7767644,
+        lng: -73.9761399
+    };
+    var ofrick = {
+        lat: 40.771209,
+        lng: -73.9673991
+    };
+
+    if (ocrResponse) {
+        var odata = JSON.parse(ocrResponse);
+        if (odata && odata.center && odata.dakota && odata.frick) {
+            ocenter = odata.center;
+            odakota = odata.dakota;
+            ofrick = odata.frick
+        }
+    }
+
+    initOcrMap(ocenter, odakota, ofrick);
 }
 
 function initFaceMap(center, dakota, frick) {
@@ -99,12 +128,7 @@ function initFaceMap(center, dakota, frick) {
             }
         });
 }
-function initOcrMap() {
-    // The map, centered on Central Park
-    const center = {
-        lat: 40.774102,
-        lng: -73.971734
-    };
+function initOcrMap(center, dakota, frick) {
     const options = {
         zoom: 17,
         scaleControl: true,
@@ -113,15 +137,7 @@ function initOcrMap() {
     map = new google.maps.Map(
         document.getElementById('ocr-map'),
         options);
-    // Locations of landmarks
-    const dakota = {
-        lat: 40.7767644,
-        lng: -73.9761399
-    };
-    const frick = {
-        lat: 40.771209, lng:
-            -73.9673991
-    };
+
     // The markers for The Dakota and The Frick Collection
     var mk1 = new
         google.maps.Marker({
