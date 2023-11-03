@@ -149,6 +149,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
                         Policy = a.PolicyDetail?.LineOfBusiness.Name,
                         Status = a.InvestigationCaseStatus.Name,
+                        SubStatus = a.InvestigationCaseSubStatus.Name,
                         Ready2Assign = a.IsReady2Assign,
                         ServiceType = a.PolicyDetail?.ClaimType.GetEnumDisplayName(),
                         Location = a.CaseLocations.Count == 0 ?
@@ -308,12 +309,13 @@ namespace risk.control.system.Controllers.Api.Claims
                        }
                    })?
                    .ToList();
+            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
 
             return Ok(new
             {
                 response = response,
-                lat = decimal.Parse(clientCompany.PinCode.Latitude),
-                lng = decimal.Parse(clientCompany.PinCode.Longitude)
+                lat = decimal.Parse(company.PinCode.Latitude),
+                lng = decimal.Parse(company.PinCode.Longitude)
             });
         }
 

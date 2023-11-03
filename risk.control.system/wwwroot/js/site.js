@@ -233,7 +233,7 @@
                     self.setContent('<b>Location Map</b>:');
                     self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
                     self.setContentAppend('<br><b>Address</b>:');
-                    self.setContentAppend('<br><i>' + response.address+ '</i>');
+                    self.setContentAppend('<br><i>' + response.address + '</i>');
                     self.setContentAppend('<br> <b>Location detail</b> :');
                     self.setContentAppend('<br><i>' + response.weatherData + '</i>');
                 }).fail(function () {
@@ -268,10 +268,10 @@
                     self.setContentAppend('<b>OCR Image</b>:');
                     self.setContentAppend('<br><img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
                     self.setContentAppend('<br><b>OCR Scan Info</b> : ');
-                    self.setContentAppend('<br><i>' +  response.qrData + '</i>');
+                    self.setContentAppend('<br><i>' + response.qrData + '</i>');
                     self.setContentAppend('<br><b>Location Map<</b>:');
                     self.setContentAppend('<br><img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
-                    self.setContentAppend('<br><i>' + response.ocrAddress +'</i>');
+                    self.setContentAppend('<br><i>' + response.ocrAddress + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
@@ -375,8 +375,9 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setContent('<header>');
-                    self.setContentAppend('<h5 class="bb-blog-title" itemprop="name">Customer Name: ' + response.customerName);
+                    self.setContent('<hr>');
+                    self.setContentAppend('<header>');
+                    self.setContentAppend('<b>Customer Name</b>: ' + response.customerName);
                     self.setContentAppend('</header>');
                     self.setContentAppend('<br><b>Date of birth</b> : ' + response.dateOfBirth);
                     self.setContentAppend('<br><b>Occupation</b> : ' + response.occupation);
@@ -418,7 +419,8 @@
                     method: 'get'
                 }).done(function (response) {
                     self.setContent('<header>');
-                    self.setContentAppend('<h5 class="bb-blog-title" itemprop="name">Customer Name: ' + response.beneficiaryName);
+                    self.setContentAppend('<hr>');
+                    self.setContentAppend('<b>Beneficiary Name</b>: ' + response.beneficiaryName);
                     self.setContentAppend('</header>');
                     self.setContentAppend('<br><b>Relation</b> : ' + response.beneficiaryRelation);
                     self.setContentAppend('<br><b>Phone</b>: ' + response.contactNumber);

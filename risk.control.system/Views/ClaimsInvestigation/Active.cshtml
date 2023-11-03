@@ -336,7 +336,7 @@
                         "bSortable": false,
                         "mRender": function (data, type, row) {
                             var buttons = "";
-                            if (row.ready2Assign) {
+                            if (row.ready2Assign && row.subStatus != 'CREATED') {
                                 buttons += '<a href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                             }
                             else{
