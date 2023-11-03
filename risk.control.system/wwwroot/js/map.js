@@ -185,7 +185,7 @@ function initOcrMap(center, dakota, frick) {
     directionsService.route(route,
         function (response, status) { // anonymous function to capture directions
             if (status !== 'OK') {
-                window.alert('Directions request failed due to ' + status);
+                console.log('Directions request failed due to ' + status);
                 return;
             } else {
                 directionsRenderer.setDirections(response); // Add route to the map
