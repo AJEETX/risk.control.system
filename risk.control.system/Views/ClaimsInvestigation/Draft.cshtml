@@ -222,11 +222,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <span class="input-group-label">File Upload Claims:</span>
+                                        <span class="input-group-label">File Uploads:</span>
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="documentImage" src="/img/no-policy.jpg">
                                             <input accept=".zip" type="file" class="form-control" name="postedFile" id="postedFile" />
-                                            <button id="UploadButton" disabled type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload File</button>
+                                            <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload File</button>
                                         </div>
                                     </div>
                                 </div>
@@ -234,11 +234,12 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <span class="input-group-label"> FTP Download Claims:</span>
+                                        <span class="input-group-label"> FTP Uploads / Downloads:</span>
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="ftpImage" src="/img/no-policy.jpg">
-                                            <input class="form-control" value="ftp server: 000webhost.com" disabled />
-                                            <button type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="FtpDownload"><i class="nav-icon fa fa-download"></i> Download FTP</button>
+                                            <input accept=".zip" type="file" class="form-control" name="postedFtp" id="postedFtp" />
+                                            <button id="UploadFtpButton" disabled type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="FtpUpload"><i class="nav-icon fa fa-upload"></i> Upload FTP</button>&nbsp;
+                                            <button id="DownloadFtpButton" type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="FtpDownload"><i class="nav-icon fa fa-download"></i> Download FTP</button>
                                         </div>
                                     </div>
                                 </div>
@@ -327,8 +328,8 @@
 
             $('#postedFile').on("change", function () {
                 var val = $(this).val(),
-                    btn = $('#UploadButton');
-                val ? btn.removeAttr("disabled") : btn.attr("disabled");
+                    fbtn = $('#UploadFileButton');
+                val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
             });
 
             $('#view-type a').on('click', function () {
@@ -558,6 +559,8 @@
             const { Map } = await google.maps.importLibrary("maps");
             const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
             const { LatLng } = await google.maps.importLibrary("core");
+            var bounds = new google.maps.LatLngBounds();
+
             var response = $.ajax({
                 type: "GET",
                 url: "/api/ClaimsInvestigation/GetAssignMap",
@@ -570,7 +573,7 @@
                 center,
                 mapId: "4504f8b37365c3d0",
             });
-
+            var markers = [];
             for (const property of data.response) {
                 const AdvancedMarkerElement = new google.maps.marker.AdvancedMarkerElement({
                     map,
@@ -582,7 +585,13 @@
                 AdvancedMarkerElement.addListener("click", () => {
                     toggleHighlight(AdvancedMarkerElement, property);
                 });
+                markers.push(AdvancedMarkerElement);
             }
+            for (var i = 0; i < markers.length; i++) {
+                bounds.extend(markers[i]);
+            }
+
+            map.fitBounds(bounds);
         }
 
         function toggleHighlight(markerView, property) {

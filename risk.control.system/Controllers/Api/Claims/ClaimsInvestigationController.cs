@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Net;
 
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ using risk.control.system.Models.ViewModel;
 using static risk.control.system.Helpers.Permissions;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
@@ -21,6 +23,9 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiController]
     public class ClaimsInvestigationController : ControllerBase
     {
+        private String _ftpPath = "ftp://files.000webhost.com/public_html/";
+        private String _login = "holosync";
+        private String _password = "C0##ect10n";
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new HttpClient();
@@ -315,9 +320,41 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(new
             {
                 response = response,
-                lat = clientCompany.PinCode.Latitude,
-                lng = clientCompany.PinCode.Longitude
+                lat = decimal.Parse(clientCompany.PinCode.Latitude),
+                lng = decimal.Parse(clientCompany.PinCode.Longitude)
             });
+        }
+
+        [HttpGet("GetFtpData")]
+        public List<string> GetFtpData()
+        {
+            var request = System.Net.WebRequest.Create(_ftpPath);
+            request.Method = System.Net.WebRequestMethods.Ftp.ListDirectory;
+            request.Credentials = new System.Net.NetworkCredential(_login, _password);
+
+            var files = new List<string>();
+
+            using (var response = request.GetResponse())
+            {
+                using (var stream = response.GetResponseStream())
+                {
+                    using (var reader = new StreamReader(stream, true))
+                    {
+                        while (!reader.EndOfStream)
+                        {
+                            var file = reader.ReadLine();
+                            //Make sure you only get the filename and not the whole path.
+                            file = file.Substring(file.LastIndexOf('/') + 1);
+                            //The root folder will also be added, this can of course be ignored.
+                            if (!file.StartsWith("."))
+                                files.Add(file);
+                        }
+                    }
+                }
+            }
+            var zipFiles = files.Where(f => f.EndsWith(".zip"));
+
+            return zipFiles?.ToList();
         }
 
         private string GetAddress(ClaimType? claimType, CustomerDetail a, CaseLocation location)
@@ -553,8 +590,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 return Ok(new
                 {
                     response = response,
-                    lat = company.PinCode.Latitude,
-                    lng = company.PinCode.Longitude
+                    lat = decimal.Parse(company.PinCode.Latitude),
+                    lng = decimal.Parse(company.PinCode.Longitude)
                 });
             }
             return Problem();
@@ -855,8 +892,8 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(new
             {
                 response = response,
-                lat = company.PinCode.Latitude,
-                lng = company.PinCode.Longitude
+                lat = decimal.Parse(company.PinCode.Latitude),
+                lng = decimal.Parse(company.PinCode.Longitude)
             });
         }
 
@@ -1111,8 +1148,8 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(new
             {
                 response = response,
-                lat = company.PinCode.Latitude,
-                lng = company.PinCode.Longitude
+                lat = decimal.Parse(company.PinCode.Latitude),
+                lng = decimal.Parse(company.PinCode.Longitude)
             });
         }
 
@@ -1307,8 +1344,8 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(new
             {
                 response = response,
-                lat = company.PinCode.Latitude,
-                lng = company.PinCode.Longitude
+                lat = decimal.Parse(company.PinCode.Latitude),
+                lng = decimal.Parse(company.PinCode.Longitude)
             });
         }
 
@@ -1642,8 +1679,8 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(new
             {
                 response = response,
-                lat = company.PinCode.Latitude,
-                lng = company.PinCode.Longitude
+                lat = decimal.Parse(company.PinCode.Latitude),
+                lng = decimal.Parse(company.PinCode.Longitude)
             });
         }
 

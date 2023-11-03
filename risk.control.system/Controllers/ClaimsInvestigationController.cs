@@ -380,13 +380,36 @@ namespace risk.control.system.Controllers
             return files;
         }
 
-        [Breadcrumb(" Upload New")]
-        [AllowAnonymous]
-        public IActionResult UploadClaims()
+        [HttpPost]
+        public IActionResult FtpUpload(IFormFile postedFtp)
         {
-            DataTable dt = new DataTable();
+            if (postedFtp != null)
+            {
+                string folder = Path.Combine(webHostEnvironment.WebRootPath, "document");
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
 
-            return View(dt);
+                string fileName = Path.GetFileName(postedFtp.FileName);
+                string filePath = Path.Combine(folder, fileName);
+                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                {
+                    postedFtp.CopyTo(stream);
+                }
+                var wc = new WebClient
+                {
+                    Credentials = new NetworkCredential(_login, _password),
+                };
+                var response = wc.UploadFile(_ftpPath + fileName, filePath);
+
+                var data = Encoding.UTF8.GetString(response);
+
+                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Uploaded Claims."));
+
+                return RedirectToAction("Draft");
+            }
+            return Problem();
         }
 
         [HttpPost]
