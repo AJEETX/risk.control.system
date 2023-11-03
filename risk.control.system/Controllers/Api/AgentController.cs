@@ -289,21 +289,36 @@ namespace risk.control.system.Controllers.Api
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
-                var json = new { image = data.LocationImage };
+                var json = new { image = data.OcrImage };
 
                 var response = await httpClient.PostAsJsonAsync("http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com", JsonConvert.SerializeObject(json));
 
-                if (response != null)
+                var maskedImage = await response.Content.ReadAsStringAsync();
+
+                if (!string.IsNullOrWhiteSpace(maskedImage))
                 {
-                    var maskedImage = await response.Content.ReadAsStringAsync();
-                    var image = Convert.FromBase64String(maskedImage);
-                    var OcrRealImage = ByteArrayToImage(image);
-                    MemoryStream stream = new MemoryStream(image);
-                    claimCase.ClaimReport.AgentOcrPicture = image;
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
-                    claimCase.ClaimReport.AgentOcrUrl = filePath;
-                    CompressImage.Compressimage(stream, filePath);
-                    claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                    try
+                    {
+                        var image = Convert.FromBase64String(maskedImage);
+                        var OcrRealImage = ByteArrayToImage(image);
+                        MemoryStream stream = new MemoryStream(image);
+                        claimCase.ClaimReport.AgentOcrPicture = image;
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
+                        claimCase.ClaimReport.AgentOcrUrl = filePath;
+                        CompressImage.Compressimage(stream, filePath);
+                        claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                    }
+                    catch (Exception)
+                    {
+                        var image = Convert.FromBase64String(data.OcrImage);
+                        var OcrRealImage = ByteArrayToImage(image);
+                        MemoryStream stream = new MemoryStream(image);
+                        claimCase.ClaimReport.AgentOcrPicture = image;
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
+                        claimCase.ClaimReport.AgentOcrUrl = filePath;
+                        CompressImage.Compressimage(stream, filePath);
+                        claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                    }
                 }
                 else
                 {
