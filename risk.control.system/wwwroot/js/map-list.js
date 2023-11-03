@@ -39,16 +39,16 @@ async function initMap(url) {
     google.maps.event.addListenerOnce(map, 'bounds_changed', function (event) {
         this.setZoom(map.getZoom() - 1);
 
-        if (this.getZoom() > 15) {
-            this.setZoom(15);
+        if (this.getZoom() > 10) {
+            this.setZoom(10);
         }
     });
 
     map.fitBounds(bounds);
     map.setCenter(bounds.getCenter());
     map.setZoom(map.getZoom() - 1);
-    if (map.getZoom() > 15) {
-        map.setZoom(15);
+    if (map.getZoom() > 10) {
+        map.setZoom(10);
     }
 }
 
