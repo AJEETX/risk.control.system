@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers
                             clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
                         }
                     }
-                    
+
                     var assignerRole = roleManager.Roles.FirstOrDefault(r =>
                             r.Name.Contains(AppRoles.Assigner.ToString()));
                     var creatorRole = roleManager.Roles.FirstOrDefault(r =>
@@ -624,7 +624,7 @@ namespace risk.control.system.Controllers
             await signInManager.RefreshSignInAsync(currentUser);
 
             toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
-            return RedirectToAction(nameof(CompanyController.EditUser), "Company", new { userid = userId });
+            return RedirectToAction(nameof(CompanyController.User));
         }
 
         private bool VendorApplicationUserExists(long id)

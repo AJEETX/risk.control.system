@@ -200,10 +200,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 .ThenInclude(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
@@ -221,7 +217,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Where(c => !c.Deleted);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var clientCompany = _context.ClientCompanyApplicationUser.Include(c => c.PinCode).FirstOrDefault(c => c.Email == userEmail.Value);
+            var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
             if (clientCompany == null)
             {
             }
@@ -230,7 +226,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == clientCompany.ClientCompanyId);
             }
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INPROGRESS)).ToList();
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
             var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -252,11 +248,7 @@ namespace risk.control.system.Controllers.Api.Claims
             if (userRole.Value.Contains(AppRoles.Creator.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.PortalAdmin.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.PolicyDetail)
-                    .Include(c => c.CaseLocations)
-                    .Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
                 claimsSubmitted = await applicationDbContext.ToListAsync();
             }
             else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
