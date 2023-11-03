@@ -28,11 +28,13 @@ function initReportMap() {
         lat: 40.771209,
         lng: -73.9673991
     };
-    if (response && data.center && data.dakota && data.frick) {
-        const data = JSON.parse(response);
-        center = data.center;
-        dakota = data.dakota;
-        frick = data.frick
+    if (response) {
+        var data = JSON.parse(response);
+        if (data.center && data.dakota && data.frick) {
+            center = data.center;
+            dakota = data.dakota;
+            frick = data.frick
+        }
     }
 
     initFaceMap(center, dakota, frick);
