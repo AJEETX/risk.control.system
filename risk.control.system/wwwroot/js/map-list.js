@@ -11,12 +11,11 @@ async function initMap(url) {
 
     // Request needed libraries.
     const { Map } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const { LatLng } = await google.maps.importLibrary("core");
     var bounds = new google.maps.LatLngBounds();
 
     const center = new LatLng(data.lat, data.lng);
-    const map = new Map(document.getElementById("map"), { mapTypeId: google.maps.MapTypeId.ROADMAP, mapId: "4504f8b37365c3d0" });
+    const map = new Map(document.getElementById("map"), { scaleControl: true, mapTypeId: google.maps.MapTypeId.ROADMAP, mapId: "4504f8b37365c3d0" });
 
     map.setCenter(center);
 

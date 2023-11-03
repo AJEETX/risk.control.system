@@ -7,7 +7,7 @@ function haversine_distance(mk1, mk2) {
     var difflon = (mk2.position.lng() - mk1.position.lng()) * (Math.PI / 180); // Radian difference (longitudes)
 
     var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat / 2) * Math.sin(difflat / 2) + Math.cos(rlat1) * Math.cos(rlat2) * Math.sin(difflon / 2) * Math.sin(difflon / 2)));
-    return d;
+    return d * 1.609;
 }
 function initReportMap() {
     var claimId = document.getElementById('claimId').value;
@@ -72,9 +72,10 @@ function initReportMap() {
 
 function initFaceMap(center, dakota, frick) {
     const options = {
-        zoom: 17,
         scaleControl: true,
-        center: center
+        center: center,
+        mapId: "4504f8b37365c3d0",
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
     };
     map = new google.maps.Map(
         document.getElementById('face-map'),
@@ -93,12 +94,16 @@ function initFaceMap(center, dakota, frick) {
             map: map
         });
 
+    var bounds = new google.maps.LatLngBounds();
+    bounds.extend(dakota);
+    bounds.extend(frick);
+
     // Draw a line showing the straight distance between the markers
     var line = new google.maps.Polyline({ path: [dakota, frick], map: map });
 
     // Calculate and display the distance between markers
     var distance = haversine_distance(mk1, mk2);
-    document.getElementById('face-msg').innerHTML = "Distance between markers: " + distance.toFixed(2) + " mi.";
+    document.getElementById('face-msg').innerHTML = "Distance between markers: " + distance.toFixed(2) + " km.";
     let directionsService = new google.maps.DirectionsService();
     let directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map); // Existing map object displays directions
@@ -127,12 +132,19 @@ function initFaceMap(center, dakota, frick) {
                 }
             }
         });
+    map.fitBounds(bounds);
+    map.setCenter(bounds.getCenter());
+    map.setZoom(map.getZoom() - 1);
+    if (map.getZoom() > 18) {
+        map.setZoom(18);
+    }
 }
 function initOcrMap(center, dakota, frick) {
     const options = {
-        zoom: 17,
         scaleControl: true,
-        center: center
+        center: center,
+        mapId: "4504f8b37365c3d0",
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
     };
     map = new google.maps.Map(
         document.getElementById('ocr-map'),
@@ -150,12 +162,16 @@ function initOcrMap(center, dakota, frick) {
             map: map
         });
 
+    var bounds = new google.maps.LatLngBounds();
+    bounds.extend(dakota);
+    bounds.extend(frick);
+
     // Draw a line showing the straight distance between the markers
     var line = new google.maps.Polyline({ path: [dakota, frick], map: map });
 
     // Calculate and display the distance between markers
     var distance = haversine_distance(mk1, mk2);
-    document.getElementById('ocr-msg').innerHTML = "Distance between markers: " + distance.toFixed(2) + " mi.";
+    document.getElementById('ocr-msg').innerHTML = "Distance between markers: " + distance.toFixed(2) + " km.";
     let directionsService = new google.maps.DirectionsService();
     let directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map); // Existing map object displays directions
@@ -184,4 +200,10 @@ function initOcrMap(center, dakota, frick) {
                 }
             }
         });
+    map.fitBounds(bounds);
+    map.setCenter(bounds.getCenter());
+    map.setZoom(map.getZoom() - 1);
+    if (map.getZoom() > 18) {
+        map.setZoom(18);
+    }
 }
