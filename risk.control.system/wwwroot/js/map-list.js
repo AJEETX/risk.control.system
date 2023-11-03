@@ -11,6 +11,7 @@ async function initMap(url) {
 
     // Request needed libraries.
     const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     const { LatLng } = await google.maps.importLibrary("core");
     var bounds = new google.maps.LatLngBounds();
 
