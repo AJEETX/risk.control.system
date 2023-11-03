@@ -295,7 +295,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        Description = a.PolicyDetail.CauseOfLoss,
                        Price = a.PolicyDetail.SumAssuredValue,
-                       Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "HEALTH" : "DEATH",
+                       Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                        Bath = a.CustomerDetail.ContactNumber,
                        Size = a.CustomerDetail.Description,
