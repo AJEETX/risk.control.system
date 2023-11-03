@@ -162,6 +162,7 @@ table {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 #face-map {
     height: 300px;
     width: auto;
@@ -171,6 +172,7 @@ table {
     height: 300px;
     width: auto;
 }
+
 .ocr-data {
     width: 150px;
     border: 1px solid #ccc;
@@ -178,6 +180,8 @@ table {
     overflow-y: auto;
     padding: 5px;
     font-weight: 400 !important;
+    font-size: small;
+    background: white;
     border-radius: 5px;
 }
 
