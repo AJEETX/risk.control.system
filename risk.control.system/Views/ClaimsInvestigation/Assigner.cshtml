@@ -416,34 +416,55 @@
 
 
             async function initMap() {
-                // Request needed libraries.
-                const { Map } = await google.maps.importLibrary("maps");
-                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-                const { LatLng } = await google.maps.importLibrary("core");
+
                 var response = $.ajax({
                     type: "GET",
                     url: "/api/ClaimsInvestigation/GetAssignerMap",
                     async: false
                 }).responseText;
                 const data = JSON.parse(response);
+
+                // Request needed libraries.
+                const { Map } = await google.maps.importLibrary("maps");
+                const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+                const { LatLng } = await google.maps.importLibrary("core");
+                var bounds = new google.maps.LatLngBounds();
+
+
                 const center = new LatLng(data.lat, data.lng);
-                const map = new Map(document.getElementById("map"), {
-                    zoom: 7,
-                    center,
-                    mapId: "4504f8b37365c3d0",
-                });
+                const map = new Map(document.getElementById("map"), { mapTypeId: google.maps.MapTypeId.ROADMAP, mapId: "4504f8b37365c3d0" });
+
+                map.setCenter(center);
 
                 for (const property of data.response) {
+                    var latLng = new google.maps.LatLng(property.position.lat, property.position.lng);
+
                     const AdvancedMarkerElement = new google.maps.marker.AdvancedMarkerElement({
                         map,
                         content: buildContent(property),
-                        position: property.position,
+                        position: latLng,
                         title: property.description,
                     });
 
                     AdvancedMarkerElement.addListener("click", () => {
                         toggleHighlight(AdvancedMarkerElement, property);
                     });
+                    bounds.extend(latLng);
+                }
+
+                google.maps.event.addListenerOnce(map, 'bounds_changed', function (event) {
+                    this.setZoom(map.getZoom() - 1);
+
+                    if (this.getZoom() > 15) {
+                        this.setZoom(15);
+                    }
+                });
+
+                map.fitBounds(bounds);
+                map.setCenter(bounds.getCenter());
+                map.setZoom(map.getZoom() - 1);
+                if (map.getZoom() > 15) {
+                    map.setZoom(15);
                 }
             }
 
