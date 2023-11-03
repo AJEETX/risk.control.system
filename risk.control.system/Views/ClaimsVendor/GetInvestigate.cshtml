@@ -317,6 +317,7 @@
                                         </div>
                                     </div> <!-- class bb-blog-inner -->
                                 </article>
+                                
                                 <article>
                                     <div class="bb-blog-inner">
                                         <header class="bb-blog-header">
@@ -349,7 +350,12 @@
 
                                                                     <i class="fas fa-portrait"></i> Face Reader <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                 </div>
-
+                                                                <div class="card-footer">
+                                                                    <div id="face-map">
+                                                                    </div>
+                                                                    <div id="face-msg">
+                                                                    </div>
+                                                                </div>
                                                                 <div class="card-body pt-0">
                                                                     <div class="row">
                                                                         <div class="col-6">
@@ -390,6 +396,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                
                                                             </div>
                                                         </div>
                                                         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -397,6 +404,12 @@
                                                                 <div class="card-header text-muted border-bottom-0">
 
                                                                     <i class="fas fa-mobile-alt"></i> OCR App <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                                </div>
+                                                                <div class="card-footer">
+                                                                    <div id="ocr-map">
+                                                                    </div>
+                                                                    <div id="ocr-msg">
+                                                                    </div>
                                                                 </div>
                                                                 <div class="card-body pt-0">
                                                                     <div class="row">
@@ -535,12 +548,18 @@
                         </div>
                     </div>
                 }
+                
             }
 
         </form>
     </div>
+
 </section>
 @section Scripts    {
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E&callback=initReportMap">
+    </script>
+    <script src="~/js/map.js"></script>
+
     <script>
         $(document).ready(function () {
 

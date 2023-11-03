@@ -162,7 +162,15 @@ table {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+#face-map {
+    height: 300px;
+    width: auto;
+}
 
+#ocr-map {
+    height: 300px;
+    width: auto;
+}
 .ocr-data {
     width: 150px;
     border: 1px solid #ccc;
@@ -185,9 +193,9 @@ table {
 
 .investigation-actual-image {
     height: auto;
-    width: auto;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+    width: 100%;
+    border: 2px solid #ddd;
+    border-radius: 5px;
 }
 
 .timer-image {

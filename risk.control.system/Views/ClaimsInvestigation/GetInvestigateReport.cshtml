@@ -362,7 +362,12 @@
 
                                                                         <i class="fas fa-portrait"></i> Face Reader <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
-
+                                                                    <div class="card-footer">
+                                                                        <div id="face-map">
+                                                                        </div>
+                                                                        <div id="face-msg">
+                                                                        </div>
+                                                                    </div>
                                                                     <div class="card-body pt-0">
                                                                         <div class="row">
                                                                             <div class="col-6">
@@ -515,6 +520,12 @@
                                                             <div class="card-header text-muted border-bottom-0">
                                                                 <i class="fas fa-user-edit"></i> Supervisor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                             </div>
+                                                            <div class="card-footer">
+                                                                <div id="face-map">
+                                                                </div>
+                                                                <div id="face-msg">
+                                                                </div>
+                                                            </div>
                                                             <div class="card-body pt-0">
                                                                 <div class="row">
                                                                     <div class="col-12">
@@ -577,6 +588,10 @@
 </section>
 
 @section Scripts    {
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E&callback=initReportMap">
+    </script>
+    <script src="~/js/map.js"></script>
+
     <script>
         $(document).ready(function () {
 
