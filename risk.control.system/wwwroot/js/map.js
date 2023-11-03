@@ -10,40 +10,46 @@ function haversine_distance(mk1, mk2) {
     return d;
 }
 function initReportMap() {
-    //var claimId = document.getElementById('claimId').value;
-    //var response = $.ajax({
-    //    type: "GET",
-    //    url: "/api/ClaimsInvestigation/GetFaceMap?claimId=" + claimId,
-    //    async: false
-    //}).responseText;
-    //const data = JSON.parse(response);
-
-    initFaceMap();
-    initOcrMap();
-}
-
-function initFaceMap() {
-    // The map, centered on Central Park
-    const center = {
+    var claimId = document.getElementById('claimId').value;
+    var response = $.ajax({
+        type: "GET",
+        url: "/api/ClaimsInvestigation/GetFaceDetail?claimId=" + claimId,
+        async: false
+    }).responseText;
+    var center = {
         lat: 40.774102,
         lng: -73.971734
     };
+    var dakota = {
+        lat: 40.7767644,
+        lng: -73.9761399
+    };
+    var frick = {
+        lat: 40.771209,
+        lng: -73.9673991
+    };
+    if (response && data.center && data.dakota && data.frick) {
+        const data = JSON.parse(response);
+        center = data.center;
+        dakota = data.dakota;
+        frick = data.frick
+    }
+
+    initFaceMap(center, dakota, frick);
+    initOcrMap();
+}
+
+function initFaceMap(center, dakota, frick) {
     const options = {
         zoom: 17,
-        scaleControl: true, center: center
+        scaleControl: true,
+        center: center
     };
     map = new google.maps.Map(
         document.getElementById('face-map'),
         options);
     // Locations of landmarks
-    const dakota = {
-        lat: 40.7767644,
-        lng: -73.9761399
-    };
-    const frick = {
-        lat: 40.771209, lng:
-            -73.9673991
-    };
+
     // The markers for The Dakota and The Frick Collection
     var mk1 = new
         google.maps.Marker({
@@ -99,7 +105,8 @@ function initOcrMap() {
     };
     const options = {
         zoom: 17,
-        scaleControl: true, center: center
+        scaleControl: true,
+        center: center
     };
     map = new google.maps.Map(
         document.getElementById('ocr-map'),
