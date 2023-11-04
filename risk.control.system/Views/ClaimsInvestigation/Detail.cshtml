@@ -18,6 +18,7 @@
                         string address = string.Empty;
                         string baddress = string.Empty;
                         int currentAgeinYrs = 0;
+                        int currentBAgeinYrs = 0;
                         bool customerExist = false;
                         bool beneficiaryExist = false;
                         if (Model.Claim != null && Model.Claim.CustomerDetail != null)
@@ -31,6 +32,13 @@
                                 var age = DateTime.Now.Subtract(Model.Claim.CustomerDetail.CustomerDateOfBirth).TotalDays;
                                 currentAgeinYrs = (int)age / 365;
                             }
+
+                            if (Model.Location.BeneficiaryDateOfBirth != null)
+                            {
+                                var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
+                                currentBAgeinYrs = (int)age / 365;
+                            }
+
                         }
                         if (!string.IsNullOrWhiteSpace(Model.Claim.PolicyDetail?.ContractNumber))
                         {
@@ -110,6 +118,12 @@
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
+                                                                                <i class="fas fa-bolt"></i>
+                                                                            </span>
+                                                                            Cause: @Model.Claim?.PolicyDetail.CauseOfLoss
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
                                                                                 <i class="fas fa-tools"></i>
                                                                             </span>
                                                                             Service: @Model.Claim?.PolicyDetail.InvestigationServiceType.Name
@@ -131,6 +145,12 @@
                                                                                 <i class="far fa-clock"></i>
                                                                             </span>
                                                                             Issue Date: @Model.Claim?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="far fa-clock"></i>
+                                                                            </span>
+                                                                            Incidence Date: @Model.Claim?.PolicyDetail.DateOfIncident.ToString("dd-MMM-yyyy")
                                                                         </li>
                                                                     </ul>
                                                                 </div>
@@ -154,14 +174,20 @@
                                                             </div>
                                                         </div>
                                                         <div class="card-footer">
-                                                            <div class="text-right">
-                                                                <button id="policy-comments" class="btn btn-sm bg-teal">
-                                                                    <i class="fas fa-comments"></i>
-                                                                </button>
-                                                                <button id="policy-detail" class="btn btn-sm btn-danger">
-                                                                    <i class="far fa-file-powerpoint"></i> ...
-                                                                </button>
+
+                                                            <div class="row">
+                                                                <div class="col-6 text-left">
+                                                                    <button id="policy-comments" class="btn btn-sm bg-teal">
+                                                                        <i class="fas fa-comments"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="col-6 text-right">
+                                                                    <button id="policy-detail" class="btn btn-sm btn-danger">
+                                                                        <i class="far fa-file-powerpoint"></i> ...
+                                                                    </button>
+                                                                </div>
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                     
@@ -187,7 +213,13 @@
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
-                                                                                <i class="fas fa-rupee-sign"></i>
+                                                                                <i class="fas fa-restroom"></i>
+                                                                            </span>
+                                                                            Gender: @Model.Claim?.CustomerDetail?.Gender
+                                                                        </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-user-alt"></i>
                                                                             </span>
                                                                             Age: @currentAgeinYrs
                                                                         </li>
@@ -224,14 +256,19 @@
                                                             </div>
                                                         </div>
                                                         <div class="card-footer">
-                                                            <div class="text-right">
-                                                                <button id="customer-comments" class="btn btn-sm bg-teal">
-                                                                    <i class="fas fa-comments"></i>
-                                                                </button>
-                                                                <button id="customer-detail" class="btn btn-sm btn-warning">
-                                                                    <i class="fa fa-user-plus"></i> ...
-                                                                </button>
+                                                            <div class="row">
+                                                                    <div class="col-6 text-left">
+                                                                        <button id="customer-comments" class="btn btn-sm bg-teal">
+                                                                            <i class="fas fa-comments"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="col-6 text-right">
+                                                                        <button id="customer-detail" class="btn btn-sm btn-warning">
+                                                                            <i class="fa fa-user-plus"></i> ...
+                                                                        </button>
+                                                                    </div>
                                                             </div>
+                                                           
                                                         </div>
                                                     </div>
                                                 </div>
@@ -255,6 +292,13 @@
                                                                             </span>
                                                                             Income: @Model.Location?.BeneficiaryIncome
                                                                         </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-user-alt"></i>
+                                                                            </span>
+                                                                            Age: @currentBAgeinYrs
+                                                                        </li>
+                                                                       
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-lg fa-building"></i>
@@ -287,15 +331,21 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        
                                                         <div class="card-footer">
-                                                            <div class="text-right">
-                                                                <button id="beneficiary-comments" class="btn btn-sm bg-teal">
-                                                                    <i class="fas fa-comments"></i>
-                                                                </button>
-                                                                <button id="beneficiary-detail" class="btn btn-sm btn-success">
-                                                                    <i class="fas fa-user-tie"></i> ...
-                                                                </button>
+                                                            <div class="row">
+                                                                <div class="col-6 text-left">
+                                                                    <button id="beneficiary-comments" class="btn btn-sm bg-teal">
+                                                                        <i class="fas fa-comments"></i>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="col-6 text-right">
+                                                                    <button id="beneficiary-detail" class="btn btn-sm btn-success">
+                                                                        <i class="fas fa-user-tie"></i> ...
+                                                                    </button>
+                                                                </div>
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
