@@ -13,7 +13,10 @@
         --shop-color: #7B1FA2;
         --warehouse-color: #558B2F;
     }
-
+    .download-file{
+        border:1px solid #ccc;
+        padding:5px;
+    }
     /*
      * Optional: Makes the sample page fill the window.
      */
@@ -220,6 +223,21 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                <div class="col-md-12">
+                                    <span class="download-file badge badge-light">
+                                        <a href="~/document/single.zip">
+                                            <i class="nav-icon fa fa-download"></i> sample file (1 claim)
+                                        </a>
+                                    </span>
+                                    <span class="download-file badge badge-light">
+                                        <a href="~/document/multi-pincode.zip">
+                                            <i class="nav-icon fa fa-download"></i> sample file (6 claims)
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <span class="input-group-label">File Uploads:</span>
@@ -233,7 +251,7 @@
                             
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <span class="input-group-label"> FTP Uploads / Downloads:</span>
+                                        <span class="input-group-label"> FTP Uploads / Downloads: </span>
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="ftpImage" src="/img/no-policy.jpg">
                                             <input accept=".zip" type="file" class="form-control" name="postedFtp" id="postedFtp" />
