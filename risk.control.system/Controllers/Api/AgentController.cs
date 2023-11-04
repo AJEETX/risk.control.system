@@ -1,7 +1,12 @@
 ﻿using System.Drawing;
+using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.RegularExpressions;
+
+using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +33,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
+        private static string urlAddress = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
 
         public AgentController(ApplicationDbContext context, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment)
         {
@@ -38,10 +44,14 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpGet("test")]
-        public IActionResult Test()
+        [HttpPost("test")]
+        public async Task<IActionResult> Test(object? image)
         {
-            return Ok("This is a test endpoint");
+            var response = await httpClient.PostAsJsonAsync(urlAddress, image);
+            response.Headers.Add("Accept", "application/xml");
+            var maskedImage = await response.Content.ReadAsStringAsync();
+
+            return Ok(maskedImage);
         }
 
         [AllowAnonymous]
@@ -291,7 +301,7 @@ namespace risk.control.system.Controllers.Api
             {
                 var json = new { image = data.OcrImage };
 
-                var response = await httpClient.PostAsJsonAsync("http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com", JsonConvert.SerializeObject(json));
+                var response = await httpClient.PostAsJsonAsync(urlAddress, JsonConvert.SerializeObject(json));
 
                 var maskedImage = await response.Content.ReadAsStringAsync();
 
