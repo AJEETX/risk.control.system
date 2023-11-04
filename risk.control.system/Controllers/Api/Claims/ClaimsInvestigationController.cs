@@ -95,10 +95,16 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            if (userRole.Value.Contains(AppRoles.Creator.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.PortalAdmin.ToString()))
+            if (userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
+                claimsSubmitted = await applicationDbContext.ToListAsync();
+            }
+            if (userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
+            {
+                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatus.Name != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
                 claimsSubmitted = await applicationDbContext.ToListAsync();
             }
             else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
@@ -1602,6 +1608,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
+               .Include(c => c.Vendor)
                 .Where(c => !c.Deleted &&
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
                 c.CaseLocations.All(c => c.ClaimReport != null));
@@ -1631,6 +1638,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
+                Agency = a.Vendor?.Name
             })
             ?.ToList();
 

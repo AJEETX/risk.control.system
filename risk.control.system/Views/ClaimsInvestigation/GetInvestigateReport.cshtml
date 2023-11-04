@@ -28,6 +28,7 @@
                             string address = string.Empty;
                             string baddress = string.Empty;
                             int currentAgeinYrs = 0;
+                            int currentBAgeinYrs = 0;
                             bool customerExist = false;
                             bool beneficiaryExist = false;
                             int beneficaryAge = 0;
@@ -47,6 +48,11 @@
                                 {
                                     var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
                                     currentAgeinYrs = (int)age / 365;
+                                }
+                                if (Model.CaseLocation?.BeneficiaryDateOfBirth != null)
+                                {
+                                    var age = DateTime.Now.Subtract(Model.CaseLocation.BeneficiaryDateOfBirth).TotalDays;
+                                    currentBAgeinYrs = (int)age / 365;
                                 }
                             }
                             if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail.ContractNumber))
@@ -167,14 +173,20 @@
                                                                 </div>
                                                             </div>
                                                             <div class="card-footer">
-                                                                <div class="text-right">
-                                                                    <a id="policy-comments" class="btn btn-sm bg-teal">
-                                                                        <i class="fas fa-comments"></i>
-                                                                    </a>
-                                                                    <a id="policy-detail" class="btn btn-sm btn-danger">
-                                                                        <i class="far fa-file-powerpoint"></i> ...
-                                                                    </a>
+
+                                                                <div class="row">
+                                                                    <div class="col-6 text-left">
+                                                                        <button id="policy-comments" class="btn btn-sm bg-teal">
+                                                                            <i class="fas fa-comments"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="col-6 text-right">
+                                                                        <button id="policy-detail" class="btn btn-sm btn-danger">
+                                                                            <i class="far fa-file-powerpoint"></i> ...
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -196,6 +208,12 @@
                                                                                     <i class="fas fa-rupee-sign"></i>
                                                                                 </span>
                                                                                 Income: @Model.ClaimsInvestigation.CustomerDetail.CustomerIncome
+                                                                            </li>
+                                                                            <li class="small">
+                                                                                <span class="fa-li">
+                                                                                    <i class="fas fa-restroom"></i>
+                                                                                </span>
+                                                                                Gender: @Model.ClaimsInvestigation?.CustomerDetail?.Gender
                                                                             </li>
                                                                             <li class="small">
                                                                                 <span class="fa-li">
@@ -237,14 +255,19 @@
                                                                 </div>
                                                             </div>
                                                             <div class="card-footer">
-                                                                <div class="text-right">
-                                                                    <a id="customer-comments" class="btn btn-sm bg-teal">
-                                                                        <i class="fas fa-comments"></i>
-                                                                    </a>
-                                                                    <a id="customer-detail" class="btn btn-sm btn-warning">
-                                                                        <i class="fa fa-user-plus"></i> ...
-                                                                    </a>
+                                                                <div class="row">
+                                                                    <div class="col-6 text-left">
+                                                                        <button id="customer-comments" class="btn btn-sm bg-teal">
+                                                                            <i class="fas fa-comments"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="col-6 text-right">
+                                                                        <button id="customer-detail" class="btn btn-sm btn-warning">
+                                                                            <i class="fa fa-user-plus"></i> ...
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -306,14 +329,19 @@
                                                                 </div>
                                                             </div>
                                                             <div class="card-footer">
-                                                                <div class="text-right">
-                                                                    <a id="beneficiary-comments" class="btn btn-sm bg-teal">
-                                                                        <i class="fas fa-comments"></i>
-                                                                    </a>
-                                                                    <a id="beneficiary-detail" class="btn btn-sm btn-success">
-                                                                        <i class="fas fa-user-tie"></i> ...
-                                                                    </a>
+                                                                <div class="row">
+                                                                    <div class="col-6 text-left">
+                                                                        <button id="beneficiary-comments" class="btn btn-sm bg-teal">
+                                                                            <i class="fas fa-comments"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="col-6 text-right">
+                                                                        <button id="beneficiary-detail" class="btn btn-sm btn-success">
+                                                                            <i class="fas fa-user-tie"></i> ...
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     </div>

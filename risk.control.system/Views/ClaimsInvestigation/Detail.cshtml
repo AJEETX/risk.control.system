@@ -33,7 +33,7 @@
                                 currentAgeinYrs = (int)age / 365;
                             }
 
-                            if (Model.Location.BeneficiaryDateOfBirth != null)
+                            if (Model.Location?.BeneficiaryDateOfBirth != null)
                             {
                                 var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
                                 currentBAgeinYrs = (int)age / 365;
