@@ -302,10 +302,8 @@ namespace risk.control.system.Controllers.Api.Claims
                        Size = a.CustomerDetail.Description,
                        Position = new
                        {
-                           Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                          decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
-                           Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                           decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                           Lat = GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                           Lng = GetLng(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        }
                    })?
                    .ToList();
@@ -349,6 +347,38 @@ namespace risk.control.system.Controllers.Api.Claims
             var zipFiles = files.Where(f => f.EndsWith(".zip"));
 
             return zipFiles?.ToList();
+        }
+
+        private decimal? GetLat(ClaimType? claimType, CustomerDetail a, CaseLocation location)
+        {
+            if (claimType == ClaimType.HEALTH)
+            {
+                if (a is null)
+                    return null;
+                return decimal.Parse(a.PinCode.Latitude);
+            }
+            else
+            {
+                if (location is null)
+                    return null;
+                return decimal.Parse(location.PinCode.Latitude);
+            }
+        }
+
+        private decimal? GetLng(ClaimType? claimType, CustomerDetail a, CaseLocation location)
+        {
+            if (claimType == ClaimType.HEALTH)
+            {
+                if (a is null)
+                    return null;
+                return decimal.Parse(a.PinCode.Longitude);
+            }
+            else
+            {
+                if (location is null)
+                    return null;
+                return decimal.Parse(location.PinCode.Longitude);
+            }
         }
 
         private string GetAddress(ClaimType? claimType, CustomerDetail a, CaseLocation location)
