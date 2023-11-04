@@ -15,19 +15,19 @@ namespace risk.control.system.Migrations
                 name: "AgentReport",
                 columns: table => new
                 {
-                    AgentReportId = table.Column<string>(type: "TEXT", nullable: false),
-                    AgentEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    AgentRemarks = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentLocationPictureUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentLocationPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    AgentOcrUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentOcrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    AgentOcrData = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentQrUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentQrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    QrData = table.Column<string>(type: "TEXT", nullable: true),
-                    LongLat = table.Column<string>(type: "TEXT", nullable: true)
+                    AgentReportId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AgentEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentRemarksUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AgentRemarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentLocationPictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentLocationPicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AgentOcrUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentOcrPicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AgentOcrData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentQrUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentQrPicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    QrData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LongLat = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -38,16 +38,16 @@ namespace risk.control.system.Migrations
                 name: "AuditLogs",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: true),
-                    Type = table.Column<string>(type: "TEXT", nullable: false),
-                    TableName = table.Column<string>(type: "TEXT", nullable: true),
-                    DateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    OldValues = table.Column<string>(type: "TEXT", nullable: true),
-                    NewValues = table.Column<string>(type: "TEXT", nullable: true),
-                    AffectedColumns = table.Column<string>(type: "TEXT", nullable: true),
-                    PrimaryKey = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TableName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OldValues = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NewValues = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AffectedColumns = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PrimaryKey = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -58,13 +58,13 @@ namespace risk.control.system.Migrations
                 name: "BeneficiaryRelation",
                 columns: table => new
                 {
-                    BeneficiaryRelationId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    BeneficiaryRelationId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -75,12 +75,12 @@ namespace risk.control.system.Migrations
                 name: "CaseEnabler",
                 columns: table => new
                 {
-                    CaseEnablerId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    CaseEnablerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -91,12 +91,12 @@ namespace risk.control.system.Migrations
                 name: "CostCentre",
                 columns: table => new
                 {
-                    CostCentreId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    CostCentreId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -107,12 +107,12 @@ namespace risk.control.system.Migrations
                 name: "Country",
                 columns: table => new
                 {
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -123,16 +123,16 @@ namespace risk.control.system.Migrations
                 name: "FilesOnDatabase",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Data = table.Column<byte[]>(type: "BLOB", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    FileType = table.Column<string>(type: "TEXT", nullable: false),
-                    Extension = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    UploadedBy = table.Column<string>(type: "TEXT", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Saved = table.Column<bool>(type: "INTEGER", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Data = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UploadedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Saved = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -143,16 +143,16 @@ namespace risk.control.system.Migrations
                 name: "FilesOnFileSystem",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    FilePath = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    FileType = table.Column<string>(type: "TEXT", nullable: false),
-                    Extension = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    UploadedBy = table.Column<string>(type: "TEXT", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Saved = table.Column<bool>(type: "INTEGER", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UploadedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Saved = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -163,12 +163,12 @@ namespace risk.control.system.Migrations
                 name: "InvestigationCaseOutcome",
                 columns: table => new
                 {
-                    InvestigationCaseOutcomeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    InvestigationCaseOutcomeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -179,13 +179,13 @@ namespace risk.control.system.Migrations
                 name: "InvestigationCaseStatus",
                 columns: table => new
                 {
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    MasterData = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    InvestigationCaseStatusId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MasterData = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -196,13 +196,13 @@ namespace risk.control.system.Migrations
                 name: "LineOfBusiness",
                 columns: table => new
                 {
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    MasterData = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    LineOfBusinessId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MasterData = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -213,38 +213,38 @@ namespace risk.control.system.Migrations
                 name: "UploadClaim",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Policy = table.Column<string>(type: "TEXT", nullable: false),
-                    Amount = table.Column<string>(type: "TEXT", nullable: false),
-                    IssueDate = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: false),
-                    ServiceType = table.Column<string>(type: "TEXT", nullable: false),
-                    DateOfIncident = table.Column<string>(type: "TEXT", nullable: false),
-                    CauseOfLoss = table.Column<string>(type: "TEXT", nullable: false),
-                    Reason = table.Column<string>(type: "TEXT", nullable: false),
-                    Dept = table.Column<string>(type: "TEXT", nullable: false),
-                    PDocument = table.Column<string>(type: "TEXT", nullable: true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerType = table.Column<string>(type: "TEXT", nullable: false),
-                    Gender = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerDob = table.Column<string>(type: "TEXT", nullable: false),
-                    Contact = table.Column<string>(type: "TEXT", nullable: false),
-                    Education = table.Column<string>(type: "TEXT", nullable: false),
-                    Occupation = table.Column<string>(type: "TEXT", nullable: false),
-                    Income = table.Column<string>(type: "TEXT", nullable: false),
-                    CAddress = table.Column<string>(type: "TEXT", nullable: false),
-                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
-                    Comment = table.Column<string>(type: "TEXT", nullable: false),
-                    CPhoto = table.Column<string>(type: "TEXT", nullable: true),
-                    BeneficiaryName = table.Column<string>(type: "TEXT", nullable: false),
-                    Relation = table.Column<string>(type: "TEXT", nullable: false),
-                    BeneficiaryDob = table.Column<string>(type: "TEXT", nullable: false),
-                    BeneficiaryIncome = table.Column<string>(type: "TEXT", nullable: false),
-                    BeneficiaryContact = table.Column<string>(type: "TEXT", nullable: false),
-                    BAddress = table.Column<string>(type: "TEXT", nullable: false),
-                    BPincode = table.Column<string>(type: "TEXT", nullable: false),
-                    BPhoto = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Policy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IssueDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ServiceType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateOfIncident = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CauseOfLoss = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Dept = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PDocument = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerDob = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Contact = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Education = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Occupation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Income = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Pincode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CPhoto = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BeneficiaryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Relation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BeneficiaryDob = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BeneficiaryIncome = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BeneficiaryContact = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BPincode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BPhoto = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -255,13 +255,13 @@ namespace risk.control.system.Migrations
                 name: "State",
                 columns: table => new
                 {
-                    StateId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -278,14 +278,14 @@ namespace risk.control.system.Migrations
                 name: "InvestigationCaseSubStatus",
                 columns: table => new
                 {
-                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    MasterData = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    InvestigationCaseSubStatusId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InvestigationCaseStatusId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    MasterData = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -301,14 +301,14 @@ namespace risk.control.system.Migrations
                 name: "InvestigationServiceType",
                 columns: table => new
                 {
-                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
-                    MasterData = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    InvestigationServiceTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MasterData = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -325,14 +325,14 @@ namespace risk.control.system.Migrations
                 name: "District",
                 columns: table => new
                 {
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -354,15 +354,15 @@ namespace risk.control.system.Migrations
                 name: "InvestigationCase",
                 columns: table => new
                 {
-                    InvestigationId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    InvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    InvestigationServiceTypeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    InvestigationCaseStatusId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -388,17 +388,17 @@ namespace risk.control.system.Migrations
                 name: "PinCode",
                 columns: table => new
                 {
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Latitude = table.Column<string>(type: "TEXT", nullable: true),
-                    Longitude = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    PinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Latitude = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Longitude = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -425,30 +425,30 @@ namespace risk.control.system.Migrations
                 name: "ClientCompany",
                 columns: table => new
                 {
-                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Branch = table.Column<string>(type: "TEXT", nullable: false),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    BankName = table.Column<string>(type: "TEXT", nullable: false),
-                    BankAccountNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    IFSCCode = table.Column<string>(type: "TEXT", nullable: false),
-                    AgreementDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ActivatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Status = table.Column<int>(type: "INTEGER", nullable: true),
-                    DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    Auto = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    ClientCompanyId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Branch = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Addressline = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IFSCCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AgreementDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ActivatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    DocumentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Auto = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -479,23 +479,23 @@ namespace risk.control.system.Migrations
                 name: "CustomerDetail",
                 columns: table => new
                 {
-                    CustomerDetailId = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerName = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerDateOfBirth = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Gender = table.Column<int>(type: "INTEGER", nullable: true),
-                    ContactNumber = table.Column<long>(type: "INTEGER", nullable: false),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: false),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: false),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerType = table.Column<int>(type: "INTEGER", nullable: false),
-                    CustomerIncome = table.Column<int>(type: "INTEGER", nullable: false),
-                    CustomerOccupation = table.Column<int>(type: "INTEGER", nullable: false),
-                    CustomerEducation = table.Column<int>(type: "INTEGER", nullable: false),
-                    ProfilePictureUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    ProfilePicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    Description = table.Column<string>(type: "TEXT", nullable: true)
+                    CustomerDetailId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerDateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Gender = table.Column<int>(type: "int", nullable: true),
+                    ContactNumber = table.Column<long>(type: "bigint", nullable: false),
+                    Addressline = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CustomerType = table.Column<int>(type: "int", nullable: false),
+                    CustomerIncome = table.Column<int>(type: "int", nullable: false),
+                    CustomerOccupation = table.Column<int>(type: "int", nullable: false),
+                    CustomerEducation = table.Column<int>(type: "int", nullable: false),
+                    ProfilePictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProfilePicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -504,46 +504,42 @@ namespace risk.control.system.Migrations
                         name: "FK_CustomerDetail_Country_CountryId",
                         column: x => x.CountryId,
                         principalTable: "Country",
-                        principalColumn: "CountryId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CountryId");
                     table.ForeignKey(
                         name: "FK_CustomerDetail_District_DistrictId",
                         column: x => x.DistrictId,
                         principalTable: "District",
-                        principalColumn: "DistrictId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
                         name: "FK_CustomerDetail_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
                         principalTable: "PinCode",
-                        principalColumn: "PinCodeId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "PinCodeId");
                     table.ForeignKey(
                         name: "FK_CustomerDetail_State_StateId",
                         column: x => x.StateId,
                         principalTable: "State",
-                        principalColumn: "StateId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "StateId");
                 });
 
             migrationBuilder.CreateTable(
                 name: "PolicyDetail",
                 columns: table => new
                 {
-                    PolicyDetailId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    ContractNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    ContractIssueDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ClaimType = table.Column<int>(type: "INTEGER", nullable: false),
-                    DateOfIncident = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    CauseOfLoss = table.Column<string>(type: "TEXT", nullable: false),
+                    PolicyDetailId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClientCompanyId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    InvestigationServiceTypeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ContractNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ContractIssueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ClaimType = table.Column<int>(type: "int", nullable: true),
+                    DateOfIncident = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CauseOfLoss = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SumAssuredValue = table.Column<decimal>(type: "decimal(15,2)", nullable: false),
-                    CostCentreId = table.Column<string>(type: "TEXT", nullable: false),
-                    CaseEnablerId = table.Column<string>(type: "TEXT", nullable: false),
-                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    Comments = table.Column<string>(type: "TEXT", nullable: true)
+                    CostCentreId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CaseEnablerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DocumentImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -552,8 +548,7 @@ namespace risk.control.system.Migrations
                         name: "FK_PolicyDetail_CaseEnabler_CaseEnablerId",
                         column: x => x.CaseEnablerId,
                         principalTable: "CaseEnabler",
-                        principalColumn: "CaseEnablerId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CaseEnablerId");
                     table.ForeignKey(
                         name: "FK_PolicyDetail_ClientCompany_ClientCompanyId",
                         column: x => x.ClientCompanyId,
@@ -570,25 +565,23 @@ namespace risk.control.system.Migrations
                         name: "FK_PolicyDetail_InvestigationServiceType_InvestigationServiceTypeId",
                         column: x => x.InvestigationServiceTypeId,
                         principalTable: "InvestigationServiceType",
-                        principalColumn: "InvestigationServiceTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "InvestigationServiceTypeId");
                     table.ForeignKey(
                         name: "FK_PolicyDetail_LineOfBusiness_LineOfBusinessId",
                         column: x => x.LineOfBusinessId,
                         principalTable: "LineOfBusiness",
-                        principalColumn: "LineOfBusinessId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "LineOfBusinessId");
                 });
 
             migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RoleId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<long>(type: "bigint", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -599,13 +592,13 @@ namespace risk.control.system.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Code = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    ApplicationUserId = table.Column<long>(type: "bigint", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -616,11 +609,11 @@ namespace risk.control.system.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -631,10 +624,10 @@ namespace risk.control.system.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false)
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -645,8 +638,8 @@ namespace risk.control.system.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    RoleId = table.Column<long>(type: "INTEGER", nullable: false)
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    RoleId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -663,45 +656,45 @@ namespace risk.control.system.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ProfilePictureUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    IsSuperAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsClientAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsVendorAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
-                    ProfilePicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
-                    Password = table.Column<string>(type: "TEXT", nullable: false),
-                    Active = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Deleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", nullable: false),
-                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
-                    Comments = table.Column<string>(type: "TEXT", nullable: true),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
-                    VendorApplicationUser_Comments = table.Column<string>(type: "TEXT", nullable: true),
-                    UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProfilePictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsSuperAdmin = table.Column<bool>(type: "bit", nullable: false),
+                    IsClientAdmin = table.Column<bool>(type: "bit", nullable: false),
+                    IsVendorAdmin = table.Column<bool>(type: "bit", nullable: false),
+                    ProfilePicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Addressline = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientCompanyId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    VendorApplicationUser_Comments = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -715,8 +708,7 @@ namespace risk.control.system.Migrations
                         name: "FK_AspNetUsers_Country_CountryId",
                         column: x => x.CountryId,
                         principalTable: "Country",
-                        principalColumn: "CountryId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CountryId");
                     table.ForeignKey(
                         name: "FK_AspNetUsers_District_DistrictId",
                         column: x => x.DistrictId,
@@ -738,10 +730,10 @@ namespace risk.control.system.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Value = table.Column<string>(type: "TEXT", nullable: true)
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -758,13 +750,13 @@ namespace risk.control.system.Migrations
                 name: "Mailbox",
                 columns: table => new
                 {
-                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    ApplicationUserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    MailboxId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApplicationUserId = table.Column<long>(type: "bigint", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -781,29 +773,29 @@ namespace risk.control.system.Migrations
                 name: "DeletedMessage",
                 columns: table => new
                 {
-                    DeletedMessageId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    Subject = table.Column<string>(type: "TEXT", nullable: false),
-                    RawMessage = table.Column<string>(type: "TEXT", nullable: true),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    AttachmentName = table.Column<string>(type: "TEXT", nullable: true),
-                    FileType = table.Column<string>(type: "TEXT", nullable: true),
-                    Extension = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    DeletedMessageId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RawMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Read = table.Column<bool>(type: "bit", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AttachmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDraft = table.Column<bool>(type: "bit", nullable: true),
+                    Trashed = table.Column<bool>(type: "bit", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "bit", nullable: true),
+                    MessageStatus = table.Column<int>(type: "int", nullable: false),
+                    MailboxId = table.Column<long>(type: "bigint", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -820,28 +812,28 @@ namespace risk.control.system.Migrations
                 name: "DraftMessage",
                 columns: table => new
                 {
-                    DraftMessageId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    Subject = table.Column<string>(type: "TEXT", nullable: false),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    AttachmentName = table.Column<string>(type: "TEXT", nullable: true),
-                    FileType = table.Column<string>(type: "TEXT", nullable: true),
-                    Extension = table.Column<string>(type: "TEXT", nullable: true),
-                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    DraftMessageId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Read = table.Column<bool>(type: "bit", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AttachmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    IsDraft = table.Column<bool>(type: "bit", nullable: true),
+                    Trashed = table.Column<bool>(type: "bit", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "bit", nullable: true),
+                    MessageStatus = table.Column<int>(type: "int", nullable: false),
+                    MailboxId = table.Column<long>(type: "bigint", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -858,29 +850,29 @@ namespace risk.control.system.Migrations
                 name: "InboxMessage",
                 columns: table => new
                 {
-                    InboxMessageId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    Subject = table.Column<string>(type: "TEXT", nullable: false),
-                    RawMessage = table.Column<string>(type: "TEXT", nullable: true),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    AttachmentName = table.Column<string>(type: "TEXT", nullable: true),
-                    FileType = table.Column<string>(type: "TEXT", nullable: true),
-                    Extension = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    InboxMessageId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RawMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Read = table.Column<bool>(type: "bit", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AttachmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDraft = table.Column<bool>(type: "bit", nullable: true),
+                    Trashed = table.Column<bool>(type: "bit", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "bit", nullable: true),
+                    MessageStatus = table.Column<int>(type: "int", nullable: false),
+                    MailboxId = table.Column<long>(type: "bigint", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -897,29 +889,29 @@ namespace risk.control.system.Migrations
                 name: "OutboxMessage",
                 columns: table => new
                 {
-                    OutboxMessageId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    Subject = table.Column<string>(type: "TEXT", nullable: false),
-                    RawMessage = table.Column<string>(type: "TEXT", nullable: true),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    AttachmentName = table.Column<string>(type: "TEXT", nullable: true),
-                    FileType = table.Column<string>(type: "TEXT", nullable: true),
-                    Extension = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    OutboxMessageId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RawMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Read = table.Column<bool>(type: "bit", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AttachmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDraft = table.Column<bool>(type: "bit", nullable: true),
+                    Trashed = table.Column<bool>(type: "bit", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "bit", nullable: true),
+                    MessageStatus = table.Column<int>(type: "int", nullable: false),
+                    MailboxId = table.Column<long>(type: "bigint", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -936,29 +928,29 @@ namespace risk.control.system.Migrations
                 name: "SentMessage",
                 columns: table => new
                 {
-                    SentMessageId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    Subject = table.Column<string>(type: "TEXT", nullable: false),
-                    RawMessage = table.Column<string>(type: "TEXT", nullable: true),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    AttachmentName = table.Column<string>(type: "TEXT", nullable: true),
-                    FileType = table.Column<string>(type: "TEXT", nullable: true),
-                    Extension = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    SentMessageId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RawMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Read = table.Column<bool>(type: "bit", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AttachmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDraft = table.Column<bool>(type: "bit", nullable: true),
+                    Trashed = table.Column<bool>(type: "bit", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "bit", nullable: true),
+                    MessageStatus = table.Column<int>(type: "int", nullable: false),
+                    MailboxId = table.Column<long>(type: "bigint", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -975,29 +967,29 @@ namespace risk.control.system.Migrations
                 name: "TrashMessage",
                 columns: table => new
                 {
-                    TrashMessageId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    SenderEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    ReceipientEmail = table.Column<string>(type: "TEXT", nullable: false),
-                    Subject = table.Column<string>(type: "TEXT", nullable: false),
-                    RawMessage = table.Column<string>(type: "TEXT", nullable: true),
-                    Message = table.Column<string>(type: "TEXT", nullable: false),
-                    Read = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Priority = table.Column<int>(type: "INTEGER", nullable: false),
-                    SendDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ReceiveDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Attachment = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    AttachmentName = table.Column<string>(type: "TEXT", nullable: true),
-                    FileType = table.Column<string>(type: "TEXT", nullable: true),
-                    Extension = table.Column<string>(type: "TEXT", nullable: true),
-                    IsDraft = table.Column<bool>(type: "INTEGER", nullable: true),
-                    Trashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DeleteTrashed = table.Column<bool>(type: "INTEGER", nullable: true),
-                    MessageStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    MailboxId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    TrashMessageId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ReceipientEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RawMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Read = table.Column<bool>(type: "bit", nullable: false),
+                    Priority = table.Column<int>(type: "int", nullable: false),
+                    SendDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReceiveDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Attachment = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AttachmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Extension = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDraft = table.Column<bool>(type: "bit", nullable: true),
+                    Trashed = table.Column<bool>(type: "bit", nullable: true),
+                    DeleteTrashed = table.Column<bool>(type: "bit", nullable: true),
+                    MessageStatus = table.Column<int>(type: "int", nullable: false),
+                    MailboxId = table.Column<long>(type: "bigint", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1014,29 +1006,29 @@ namespace risk.control.system.Migrations
                 name: "CaseLocation",
                 columns: table => new
                 {
-                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    BeneficiaryName = table.Column<string>(type: "TEXT", nullable: false),
-                    BeneficiaryRelationId = table.Column<long>(type: "INTEGER", nullable: false),
-                    BeneficiaryContactNumber = table.Column<long>(type: "INTEGER", nullable: false),
-                    BeneficiaryIncome = table.Column<int>(type: "INTEGER", nullable: true),
-                    ProfilePictureUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    ProfilePicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    BeneficiaryDateOfBirth = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: false),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: false),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: false),
-                    Addressline2 = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    AssignedAgentUserEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    IsReviewCaseLocation = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    CaseLocationId = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BeneficiaryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BeneficiaryRelationId = table.Column<long>(type: "bigint", nullable: false),
+                    BeneficiaryContactNumber = table.Column<long>(type: "bigint", nullable: false),
+                    BeneficiaryIncome = table.Column<int>(type: "int", nullable: true),
+                    ProfilePictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProfilePicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    BeneficiaryDateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Addressline = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Addressline2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    InvestigationCaseSubStatusId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AssignedAgentUserEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsReviewCaseLocation = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1051,14 +1043,12 @@ namespace risk.control.system.Migrations
                         name: "FK_CaseLocation_Country_CountryId",
                         column: x => x.CountryId,
                         principalTable: "Country",
-                        principalColumn: "CountryId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "CountryId");
                     table.ForeignKey(
                         name: "FK_CaseLocation_District_DistrictId",
                         column: x => x.DistrictId,
                         principalTable: "District",
-                        principalColumn: "DistrictId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
                         name: "FK_CaseLocation_InvestigationCaseSubStatus_InvestigationCaseSubStatusId",
                         column: x => x.InvestigationCaseSubStatusId,
@@ -1068,27 +1058,25 @@ namespace risk.control.system.Migrations
                         name: "FK_CaseLocation_PinCode_PinCodeId",
                         column: x => x.PinCodeId,
                         principalTable: "PinCode",
-                        principalColumn: "PinCodeId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "PinCodeId");
                     table.ForeignKey(
                         name: "FK_CaseLocation_State_StateId",
                         column: x => x.StateId,
                         principalTable: "State",
-                        principalColumn: "StateId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "StateId");
                 });
 
             migrationBuilder.CreateTable(
                 name: "VerifyPinCode",
                 columns: table => new
                 {
-                    VerifyPinCodeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
-                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    VerifyPinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Pincode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CaseLocationId = table.Column<long>(type: "bigint", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1105,11 +1093,11 @@ namespace risk.control.system.Migrations
                 name: "ClaimMessage",
                 columns: table => new
                 {
-                    ClaimMessageId = table.Column<string>(type: "TEXT", nullable: false),
-                    SenderEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    RecepicientEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    Message = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true)
+                    ClaimMessageId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SenderEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RecepicientEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1120,14 +1108,14 @@ namespace risk.control.system.Migrations
                 name: "ClaimNote",
                 columns: table => new
                 {
-                    ClaimNoteId = table.Column<string>(type: "TEXT", nullable: false),
-                    Sender = table.Column<string>(type: "TEXT", nullable: false),
-                    Comment = table.Column<string>(type: "TEXT", nullable: false),
-                    ParentClaimNoteClaimNoteId = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    ClaimNoteId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Sender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParentClaimNoteClaimNoteId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1143,40 +1131,40 @@ namespace risk.control.system.Migrations
                 name: "ClaimReport",
                 columns: table => new
                 {
-                    ClaimReportId = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    AgentRemarks = table.Column<string>(type: "TEXT", nullable: true),
-                    Question1 = table.Column<string>(type: "TEXT", nullable: true),
-                    Question2 = table.Column<string>(type: "TEXT", nullable: true),
-                    Question3 = table.Column<string>(type: "TEXT", nullable: true),
-                    Question4 = table.Column<string>(type: "TEXT", nullable: true),
-                    Question5 = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentLocationPictureUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentLocationPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    LocationData = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentOcrUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentOcrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    AgentOcrData = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentQrUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentQrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    QrData = table.Column<string>(type: "TEXT", nullable: true),
-                    LocationLongLat = table.Column<string>(type: "TEXT", nullable: true),
-                    LocationLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    OcrLongLat = table.Column<string>(type: "TEXT", nullable: true),
-                    OcrLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    AgentReportId = table.Column<string>(type: "TEXT", nullable: true),
-                    SupervisorPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    SupervisorRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    SupervisorEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    SupervisorRemarks = table.Column<string>(type: "TEXT", nullable: true),
-                    SupervisorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
-                    AssessorRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    AssessorEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    AssessorRemarks = table.Column<string>(type: "TEXT", nullable: true),
-                    AssessorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
-                    CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false)
+                    ClaimReportId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AgentEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentRemarksUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AgentRemarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Question1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Question2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Question3 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Question4 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Question5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentLocationPictureUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentLocationPicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    LocationData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentOcrUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentOcrPicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    AgentOcrData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentQrUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AgentQrPicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    QrData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LocationLongLat = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LocationLongLatTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    OcrLongLat = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OcrLongLatTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AgentReportId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    SupervisorPicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    SupervisorRemarksUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SupervisorEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SupervisorRemarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SupervisorRemarkType = table.Column<int>(type: "int", nullable: true),
+                    AssessorRemarksUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AssessorEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AssessorRemarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AssessorRemarkType = table.Column<int>(type: "int", nullable: true),
+                    CaseLocationId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1198,21 +1186,21 @@ namespace risk.control.system.Migrations
                 name: "ClaimsInvestigation",
                 columns: table => new
                 {
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
-                    PolicyDetailId = table.Column<string>(type: "TEXT", nullable: true),
-                    CustomerDetailId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    CurrentUserEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    CurrentClaimOwner = table.Column<string>(type: "TEXT", nullable: true),
-                    IsReviewCase = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsReady2Assign = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Deleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    ClaimsInvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PolicyDetailId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CustomerDetailId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    InvestigationCaseStatusId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    InvestigationCaseSubStatusId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CurrentUserEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CurrentClaimOwner = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsReviewCase = table.Column<bool>(type: "bit", nullable: false),
+                    IsReady2Assign = table.Column<bool>(type: "bit", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    ClientCompanyId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1248,11 +1236,11 @@ namespace risk.control.system.Migrations
                 name: "FileAttachment",
                 columns: table => new
                 {
-                    FileAttachmentId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    AttachedDocument = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    ContactMessageId = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true)
+                    FileAttachmentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AttachedDocument = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ContactMessageId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimsInvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1268,24 +1256,24 @@ namespace risk.control.system.Migrations
                 name: "InvestigationTransaction",
                 columns: table => new
                 {
-                    InvestigationTransactionId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationCaseStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
-                    Time2Update = table.Column<int>(type: "INTEGER", nullable: true),
-                    HopCount = table.Column<int>(type: "INTEGER", nullable: true),
-                    Sender = table.Column<string>(type: "TEXT", nullable: true),
-                    Receiver = table.Column<string>(type: "TEXT", nullable: true),
-                    Message = table.Column<string>(type: "TEXT", nullable: true),
-                    headerIcon = table.Column<string>(type: "TEXT", nullable: true),
-                    headerMessage = table.Column<string>(type: "TEXT", nullable: true),
-                    messageIcon = table.Column<string>(type: "TEXT", nullable: true),
-                    footerIcon = table.Column<string>(type: "TEXT", nullable: true),
-                    footerMessage = table.Column<string>(type: "TEXT", nullable: true),
-                    CurrentClaimOwner = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    InvestigationTransactionId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimsInvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    InvestigationCaseStatusId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    InvestigationCaseSubStatusId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Time2Update = table.Column<int>(type: "int", nullable: true),
+                    HopCount = table.Column<int>(type: "int", nullable: true),
+                    Sender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Receiver = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    headerIcon = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    headerMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    messageIcon = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    footerIcon = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    footerMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CurrentClaimOwner = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1311,36 +1299,36 @@ namespace risk.control.system.Migrations
                 name: "Vendor",
                 columns: table => new
                 {
-                    VendorId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Code = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Branch = table.Column<string>(type: "TEXT", nullable: false),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: false),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
-                    BankName = table.Column<string>(type: "TEXT", nullable: false),
-                    BankAccountNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    IFSCCode = table.Column<string>(type: "TEXT", nullable: false),
-                    City = table.Column<string>(type: "TEXT", nullable: false),
-                    AgreementDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ActivatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DeListedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    Status = table.Column<int>(type: "INTEGER", nullable: true),
-                    DomainName = table.Column<int>(type: "INTEGER", nullable: true),
-                    DelistReason = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
-                    Deleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Branch = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Addressline = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    PinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BankAccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IFSCCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AgreementDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ActivatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeListedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: true),
+                    DomainName = table.Column<int>(type: "int", nullable: true),
+                    DelistReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    ClientCompanyId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    ClaimsInvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1381,13 +1369,13 @@ namespace risk.control.system.Migrations
                 name: "VerificationLocation",
                 columns: table => new
                 {
-                    VerificationLocationId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
-                    Addressline = table.Column<string>(type: "TEXT", nullable: true),
-                    PinCodeId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: false),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true)
+                    VerificationLocationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimsInvestigationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Addressline = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1425,18 +1413,18 @@ namespace risk.control.system.Migrations
                 name: "VendorInvestigationServiceType",
                 columns: table => new
                 {
-                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    LineOfBusinessId = table.Column<string>(type: "TEXT", nullable: true),
-                    CountryId = table.Column<string>(type: "TEXT", nullable: true),
-                    StateId = table.Column<string>(type: "TEXT", nullable: true),
-                    DistrictId = table.Column<string>(type: "TEXT", nullable: true),
+                    VendorInvestigationServiceTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    InvestigationServiceTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LineOfBusinessId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CountryId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StateId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DistrictId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    VendorId = table.Column<string>(type: "TEXT", nullable: false),
-                    Deleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    VendorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Deleted = table.Column<bool>(type: "bit", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1479,13 +1467,13 @@ namespace risk.control.system.Migrations
                 name: "ServicedPinCode",
                 columns: table => new
                 {
-                    ServicedPinCodeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Pincode = table.Column<string>(type: "TEXT", nullable: false),
-                    VendorInvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    ServicedPinCodeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Pincode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VendorInvestigationServiceTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1512,7 +1500,8 @@ namespace risk.control.system.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -1568,7 +1557,8 @@ namespace risk.control.system.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CaseLocation_BeneficiaryRelationId",

@@ -11,21 +11,19 @@ namespace risk.control.system.Models
 
         [Required]
         [Display(Name = "Company name")]
-        public string ClientCompanyId { get; set; }
+        public string? ClientCompanyId { get; set; }
 
         [Display(Name = "Company name")]
         public ClientCompany? ClientCompany { get; set; }
 
-        [Required]
         [Display(Name = "Line of Business")]
-        public string LineOfBusinessId { get; set; } = default!;
+        public string? LineOfBusinessId { get; set; } = default!;
 
         [Display(Name = "Line of Business")]
         public LineOfBusiness? LineOfBusiness { get; set; } = default!;
 
-        [Required]
         [Display(Name = "Investigation type")]
-        public string InvestigationServiceTypeId { get; set; } = default!;
+        public string? InvestigationServiceTypeId { get; set; } = default!;
 
         [Display(Name = "Investigation type")]
         public InvestigationServiceType? InvestigationServiceType { get; set; } = default!;
@@ -38,7 +36,6 @@ namespace risk.control.system.Models
         [DataType(DataType.Date)]
         public DateTime ContractIssueDate { get; set; } = DateTime.UtcNow;
 
-        [Required]
         [Display(Name = "Claim type")]
         public ClaimType? ClaimType { get; set; }
 
@@ -63,8 +60,7 @@ namespace risk.control.system.Models
         [Display(Name = "Budget centre")]
         public CostCentre? CostCentre { get; set; }
 
-        [Required]
-        public string CaseEnablerId { get; set; }
+        public string? CaseEnablerId { get; set; }
 
         [Display(Name = "Reason To Verify")]
         public CaseEnabler? CaseEnabler { get; set; }

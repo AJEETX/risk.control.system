@@ -39,12 +39,11 @@ namespace risk.control.system.Models
         [Display(Name = "State name")]
         public State? State { get; set; } = default!;
 
-        [Required]
         [Display(Name = "Country name")]
-        public string CountryId { get; set; } = default!;
+        public string? CountryId { get; set; } = default!;
 
         [Display(Name = "Country name")]
-        public Country Country { get; set; } = default!;
+        public Country? Country { get; set; } = default!;
 
         [Display(Name = "District")]
         public string? DistrictId { get; set; } = default!;

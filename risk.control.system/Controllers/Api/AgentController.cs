@@ -45,10 +45,31 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("test")]
-        public async Task<IActionResult> Test(object? image)
+        public async Task<IActionResult> Test(DocImage image)
         {
-            var response = await httpClient.PostAsJsonAsync(urlAddress, image);
-            response.Headers.Add("Accept", "application/xml");
+            if (image == null)
+            {
+                return BadRequest();
+            }
+
+            var json = JsonConvert.SerializeObject(image);
+
+            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, urlAddress);
+            msg.Content = new StringContent(image.Image, Encoding.UTF8, "application/json");
+
+            var response = await httpClient.SendAsync(msg);
+
+            var maskedImage = await response.Content.ReadAsStringAsync();
+
+            return Ok(maskedImage);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("test2")]
+        public async Task<IActionResult> Test2()
+        {
+            var response = await httpClient.GetAsync(urlAddress);
+
             var maskedImage = await response.Content.ReadAsStringAsync();
 
             return Ok(maskedImage);
@@ -462,6 +483,11 @@ namespace risk.control.system.Controllers.Api
             Image returnImage = Image.FromStream(ms);
             return returnImage;
         }
+    }
+
+    public class DocImage
+    {
+        public string Image { get; set; }
     }
 
     public class SubmitData

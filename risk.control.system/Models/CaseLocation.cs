@@ -41,25 +41,25 @@ namespace risk.control.system.Models
         public DateTime BeneficiaryDateOfBirth { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Country name")]
-        public string CountryId { get; set; } = default!;
+        public string? CountryId { get; set; } = default!;
 
-        public Country Country { get; set; } = default!;
+        public Country? Country { get; set; } = default!;
 
         [Display(Name = "State")]
-        public string StateId { get; set; } = default!;
+        public string? StateId { get; set; } = default!;
 
-        public State State { get; set; } = default!;
+        public State? State { get; set; } = default!;
 
         [Display(Name = "District")]
-        public string DistrictId { get; set; } = default!;
+        public string? DistrictId { get; set; } = default!;
 
-        public District District { get; set; } = default!;
-
-        [Display(Name = "PinCode")]
-        public string PinCodeId { get; set; } = default!;
+        public District? District { get; set; } = default!;
 
         [Display(Name = "PinCode")]
-        public PinCode PinCode { get; set; } = default!;
+        public string? PinCodeId { get; set; } = default!;
+
+        [Display(Name = "PinCode")]
+        public PinCode? PinCode { get; set; } = default!;
 
         [Display(Name = "Address")]
         public string Addressline { get; set; }

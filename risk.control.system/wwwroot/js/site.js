@@ -436,10 +436,13 @@
     $('#policy-comments').click(function () {
         $.confirm({
             title: 'Policy Note!!!',
+            closeIcon: true,
+            type: 'green',
             icon: 'far fa-file-powerpoint',
             content: '' +
                 '<form action="" class="formName">' +
                 '<div class="form-group">' +
+                '<hr>' +
                 '<label>Enter note on Policy</label>' +
                 '<input type="text" placeholder="Enter note" class="name form-control" required />' +
                 '</div>' +
@@ -447,7 +450,7 @@
             buttons: {
                 formSubmit: {
                     text: 'Add Note',
-                    btnClass: 'btn-blue',
+                    btnClass: 'btn-green',
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
@@ -476,10 +479,13 @@
     $('#customer-comments').click(function () {
         $.confirm({
             title: 'Customer Note!!!',
+            closeIcon: true,
+            type: 'green',
             icon: 'fa fa-user-plus',
             content: '' +
                 '<form action="" class="formName">' +
                 '<div class="form-group">' +
+                '<hr>' +
                 '<label>Enter note on Customer</label>' +
                 '<input type="text" placeholder="Enter note" class="name form-control" required />' +
                 '</div>' +
@@ -487,7 +493,7 @@
             buttons: {
                 formSubmit: {
                     text: 'Add Note',
-                    btnClass: 'btn-blue',
+                    btnClass: 'btn-green',
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
@@ -517,9 +523,12 @@
         $.confirm({
             title: 'Beneficiary Note!!!',
             icon: 'fas fa-user-tie',
+            closeIcon: true,
+            type: 'green',
             content: '' +
                 '<form action="" class="formName">' +
                 '<div class="form-group">' +
+                '<hr>' +
                 '<label>Enter note about Beneficiary</label>' +
                 '<input type="text" placeholder="Enter note" class="name form-control" required />' +
                 '</div>' +
@@ -527,7 +536,7 @@
             buttons: {
                 formSubmit: {
                     text: 'Add Note',
-                    btnClass: 'btn-blue',
+                    btnClass: 'btn-green',
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {

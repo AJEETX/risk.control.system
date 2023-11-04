@@ -29,30 +29,26 @@ namespace risk.control.system.Models
         [Display(Name = "Address line")]
         public string Addressline { get; set; }
 
-        [Required]
         [Display(Name = "PinCode name")]
-        public string PinCodeId { get; set; } = default!;
+        public string? PinCodeId { get; set; } = default!;
 
         [Display(Name = "PinCode name")]
         public PinCode? PinCode { get; set; } = default!;
 
         [Display(Name = "State name")]
-        [Required]
-        public string StateId { get; set; } = default!;
+        public string? StateId { get; set; } = default!;
 
         [Display(Name = "State name")]
         public State? State { get; set; } = default!;
 
-        [Required]
         [Display(Name = "Country name")]
-        public string CountryId { get; set; } = default!;
+        public string? CountryId { get; set; } = default!;
 
         [Display(Name = "Country name")]
         public Country? Country { get; set; } = default!;
 
-        [Required]
         [Display(Name = "District")]
-        public string DistrictId { get; set; } = default!;
+        public string? DistrictId { get; set; } = default!;
 
         [Display(Name = "District")]
         public District? District { get; set; } = default!;
