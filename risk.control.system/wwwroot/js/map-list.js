@@ -2,6 +2,7 @@
     ({ key: "AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E", v: "beta" });
 
 async function initMap(url) {
+
     var response = $.ajax({
         type: "GET",
         url: url,
@@ -16,34 +17,30 @@ async function initMap(url) {
     var bounds = new google.maps.LatLngBounds();
 
     const center = new LatLng(data.lat, data.lng);
-    const map = new Map(document.getElementById("map"), { scaleControl: true, mapTypeId: google.maps.MapTypeId.ROADMAP, mapId: "4504f8b37365c3d0" });
+    const options = {
+        scaleControl: true,
+        center: center,
+        mapId: "4504f8b37365c3d0",
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+    };
 
-    map.setCenter(center);
+    const map = new google.maps.Map(
+        document.getElementById('map'),
+        options);
 
     for (const property of data.response) {
-        var latLng = new google.maps.LatLng(property.position.lat, property.position.lng);
-
         const AdvancedMarkerElement = new google.maps.marker.AdvancedMarkerElement({
             map,
             content: buildContent(property),
-            position: latLng,
+            position: property.position,
             title: property.description,
         });
 
         AdvancedMarkerElement.addListener("click", () => {
             toggleHighlight(AdvancedMarkerElement, property);
         });
-        bounds.extend(latLng);
+        bounds.extend(property.position);
     }
-
-    google.maps.event.addListenerOnce(map, 'bounds_changed', function (event) {
-        this.setZoom(map.getZoom() - 1);
-
-        if (this.getZoom() > 18) {
-            this.setZoom(18);
-        }
-    });
-
     map.fitBounds(bounds);
     map.setCenter(bounds.getCenter());
     map.setZoom(map.getZoom() - 1);

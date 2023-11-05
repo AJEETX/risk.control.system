@@ -145,6 +145,24 @@ table {
     cursor: pointer;
 }
 
+#maps {
+    height: 600px;
+    margin: 0;
+    padding: 0;
+    display: none;
+}
+
+/*
+         * Always set the map height explicitly to define the size of the div element
+         * that contains the map.
+         */
+#pop-face-map {
+    width: auto;
+    height: 500px;
+    position: relative;
+    overflow: hidden;
+}
+
 #agentOcrPicture {
     cursor: pointer;
 }

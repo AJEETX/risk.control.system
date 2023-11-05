@@ -1895,7 +1895,8 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 profileMap = customerMapUrl,
                 weatherData = weatherCustomData,
-                address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name
+                address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name,
+                position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
             };
             return Ok(data);
         }

@@ -1,4 +1,12 @@
-﻿$(document).ready(function () {
+﻿(g => { var h, a, k, p = "API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
+    ({ key: "AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E", v: "beta" });
+
+let map;
+var showCustomerMap = false;
+var showBeneficiaryMap = false;
+
+
+$(document).ready(function () {
     $('#datatable thead th').css('background-color', '#e9ecef')
     var datatable = $('#datatable').dataTable({
         processing: true,
@@ -167,14 +175,16 @@
                     self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
                     self.setContentAppend('<br><b>Location Address</b>:');
                     self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
+                    
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
             }
         })
     })
-
     $('#profileImageMap').click(function () {
+
+        var data;
         $.confirm({
             type: 'green',
             closeIcon: true,
@@ -195,21 +205,31 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
+                    data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
                     self.setContent('<b>Location Map</b>:');
-                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
+                    self.setContentAppend('<br><div id="maps"></div>')
+                    self.setContentAppend('<br><div id="pop-face-map"></div>')
+                    self.setContentAppend('</div>')
                     self.setContentAppend('<br><b>Address</b>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
                     self.setContentAppend('<br> <b>Location detail</b> :');
                     self.setContentAppend('<br><i>' + response.weatherData + '</i>');
+                    showCustomerMap = true;
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
+            },
+            onContentReady: function () {
+                if (showCustomerMap) {
+                    showCustomerMap = false;
+                    initPopMap(data.position, data.address);
+                }
             }
         })
-    })
-
+    });
     $('#bImageMap').click(function () {
+        var data;
         $.confirm({
             type: 'green',
             closeIcon: true,
@@ -230,16 +250,26 @@
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
+                    data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Beneficiary Address Location</b>');
                     self.setContent('<b>Location Map</b>:');
-                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.profileMap + '" /> ');
+                    self.setContentAppend('<br><div id="maps"></div>')
+                    self.setContentAppend('<br><div id="pop-face-map"></div>')
+                    self.setContentAppend('</div>')
                     self.setContentAppend('<br><b>Address</b>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
                     self.setContentAppend('<br> <b>Location detail</b> :');
                     self.setContentAppend('<br><i>' + response.weatherData + '</i>');
+                    showBeneficiaryMap = true;
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
+            },
+            onContentReady: function () {
+                if (showBeneficiaryMap) {
+                    showBeneficiaryMap = false;
+                    initPopMap(data.position, data.address);
+                }
             }
         })
     })
@@ -272,6 +302,7 @@
                     self.setContentAppend('<br><i>' + response.qrData + '</i>');
                     self.setContentAppend('<br><b>Location Map<</b>:');
                     self.setContentAppend('<br><img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
+                    self.setContentAppend('<br><b>Location Address<</b>:');
                     self.setContentAppend('<br><i>' + response.ocrAddress + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
@@ -580,6 +611,28 @@ function checkIfAnyChecked(elements) {
     });
     return hasAnyCheckboxChecked;
 }
+
+async function initPopMap(_position, title) {
+    const { Map } = await google.maps.importLibrary("maps");
+    // The location of Uluru
+    var position = { lat: -25.344, lng: 131.031 };
+    if (_position) {
+        position = _position;
+    }
+    var element = document.getElementById("pop-face-map");
+    // The map, centered at Uluru
+    map = new Map(element, {
+        scaleControl: true,
+        zoom: 14,
+        center: position,
+        mapId: "4504f8b37365c3d0",
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+    });
+
+    var marker = new google.maps.Marker({ position: position, map: map, title: title })
+}
+
+
 function loadState(obj, showDefaultOption = true) {
     var value = obj.value;
     $.post("/MasterData/GetStatesByCountryId", { countryId: value }, function (data) {
