@@ -179,6 +179,7 @@ table {
     width: 150px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 .olocationImage {
@@ -186,6 +187,7 @@ table {
     width: 150px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 #face-map {
