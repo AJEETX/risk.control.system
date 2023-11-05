@@ -341,6 +341,12 @@ namespace risk.control.system.Controllers.Api
                         CompressImage.Compressimage(stream, filePath);
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
                         claimCase.ClaimReport.AgentOcrData = " Doc type: " + maskedImageDetail.DocType;
+
+                        if (!string.IsNullOrWhiteSpace(data.OcrData))
+                        {
+                            claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ".\n " +
+                                "" + data.OcrData.Replace(maskedImageDetail.DocumentId, "xxxxxxxxxx");
+                        }
                     }
                     catch (Exception)
                     {
@@ -372,7 +378,7 @@ namespace risk.control.system.Controllers.Api
                 claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
                 claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
             }
-            if (!string.IsNullOrWhiteSpace(data.OcrData))
+            if (string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrData) && !string.IsNullOrWhiteSpace(data.OcrData))
             {
                 claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ".\n " +
                     "" + data.OcrData;
