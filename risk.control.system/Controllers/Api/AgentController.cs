@@ -44,24 +44,53 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpPost("test")]
-        public async Task<IActionResult> Test(DocImage image)
+        [HttpGet("GetImage")]
+        public IActionResult GetImage(string claimId, string type)
         {
-            if (image == null)
+            var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+            try
+            {
+                var caseLocation = _context.CaseLocation
+                    .Include(l => l.ClaimsInvestigation)
+                    .Include(l => l.ClaimReport)
+                    .FirstOrDefault(c => c.ClaimsInvestigation.ClaimsInvestigationId == claimId);
+
+                if (caseLocation != null)
+                {
+                    if (type.ToLower() == "face")
+                    {
+                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.AgentLocationPicture));
+                        return Ok(new { Image = image });
+                    }
+
+                    if (type.ToLower() == "ocr")
+                    {
+                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.AgentOcrPicture));
+                        return Ok(new { Image = image });
+                    }
+                }
+            }
+            catch (Exception)
             {
                 return BadRequest();
             }
 
-            var json = JsonConvert.SerializeObject(image);
-
-            HttpRequestMessage msg = new HttpRequestMessage(HttpMethod.Post, urlAddress);
-            msg.Content = new StringContent(image.Image, Encoding.UTF8, "application/json");
-
-            var response = await httpClient.SendAsync(msg);
-
-            var maskedImage = await response.Content.ReadAsStringAsync();
-
-            return Ok(maskedImage);
+            return Ok();
         }
 
         [AllowAnonymous]
