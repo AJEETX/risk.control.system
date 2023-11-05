@@ -65,14 +65,16 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpGet("test2")]
-        public async Task<IActionResult> Test2()
+        [HttpPost("test2")]
+        public async Task<IActionResult> Test2(DocImage image)
         {
-            var response = await httpClient.GetAsync(urlAddress);
+            var response = await httpClient.PostAsJsonAsync(urlAddress, image);
 
             var maskedImage = await response.Content.ReadAsStringAsync();
 
-            return Ok(maskedImage);
+            var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
+
+            return Ok(maskedImageDetail);
         }
 
         [AllowAnonymous]
@@ -320,9 +322,8 @@ namespace risk.control.system.Controllers.Api
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
-                var json = new { image = data.OcrImage };
-
-                var response = await httpClient.PostAsJsonAsync(urlAddress, JsonConvert.SerializeObject(json));
+                var inputImage = new DocImage { Image = data.OcrImage };
+                var response = await httpClient.PostAsJsonAsync(urlAddress, inputImage);
 
                 var maskedImage = await response.Content.ReadAsStringAsync();
 
@@ -330,7 +331,8 @@ namespace risk.control.system.Controllers.Api
                 {
                     try
                     {
-                        var image = Convert.FromBase64String(maskedImage);
+                        var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
+                        var image = Convert.FromBase64String(maskedImageDetail.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
                         claimCase.ClaimReport.AgentOcrPicture = image;
@@ -338,6 +340,7 @@ namespace risk.control.system.Controllers.Api
                         claimCase.ClaimReport.AgentOcrUrl = filePath;
                         CompressImage.Compressimage(stream, filePath);
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.AgentOcrData = maskedImageDetail.DocType;
                     }
                     catch (Exception)
                     {
@@ -369,7 +372,7 @@ namespace risk.control.system.Controllers.Api
                 claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
                 claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
             }
-            if (!string.IsNullOrWhiteSpace(data.OcrData))
+            if (string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrData) && !string.IsNullOrWhiteSpace(data.OcrData))
             {
                 claimCase.ClaimReport.AgentOcrData = data.OcrData;
             }
@@ -483,6 +486,13 @@ namespace risk.control.system.Controllers.Api
             Image returnImage = Image.FromStream(ms);
             return returnImage;
         }
+    }
+
+    public class FaceImageDetail
+    {
+        public string DocType { get; set; }
+        public string DocumentId { get; set; }
+        public string MaskedImage { get; set; }
     }
 
     public class DocImage
