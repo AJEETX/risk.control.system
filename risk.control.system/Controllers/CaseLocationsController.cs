@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+using Newtonsoft.Json;
+
 using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -22,6 +25,7 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IToastNotification toastNotification;
+        private HttpClient client = new HttpClient();
 
         public CaseLocationsController(ApplicationDbContext context, IToastNotification toastNotification)
         {
@@ -170,9 +174,33 @@ namespace risk.control.system.Controllers
                 var claimsInvestigation = await _context.ClaimsInvestigation
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == caseLocation.ClaimsInvestigationId);
                 claimsInvestigation.IsReady2Assign = true;
+
+                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pincode.Code}"),
+                    Headers =
+                            {
+                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                            },
+                };
+                using (var response = await client.SendAsync(request))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var body = await response.Content.ReadAsStringAsync();
+
+                    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+
+                    caseLocation.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                    caseLocation.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                    Console.WriteLine(body);
+                }
+
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
-
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
@@ -273,6 +301,29 @@ namespace risk.control.system.Controllers
                                 caseLocation.ProfilePicture = existingLocation.ProfilePicture;
                             }
                         }
+
+                        var request = new HttpRequestMessage
+                        {
+                            Method = HttpMethod.Get,
+                            RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{caseLocation.PinCode.Code}"),
+                            Headers =
+                            {
+                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                            },
+                        };
+                        using (var response = await client.SendAsync(request))
+                        {
+                            response.EnsureSuccessStatusCode();
+                            var body = await response.Content.ReadAsStringAsync();
+
+                            var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+
+                            caseLocation.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                            caseLocation.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                            Console.WriteLine(body);
+                        }
+
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
                         toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} edited successfully !", caseLocation.BeneficiaryName));

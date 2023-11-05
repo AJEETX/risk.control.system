@@ -207,6 +207,10 @@ namespace risk.control.system.Controllers.Api.Claims
                 .ThenInclude(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.Country)
                 .Include(c => c.CustomerDetail)
@@ -303,9 +307,9 @@ namespace risk.control.system.Controllers.Api.Claims
                        Description = a.PolicyDetail.CauseOfLoss,
                        Price = a.PolicyDetail.SumAssuredValue,
                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
-                       Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
-                       Bath = a.CustomerDetail.ContactNumber,
-                       Size = a.CustomerDetail.Description,
+                       Bed = a.CustomerDetail?.CustomerIncome.GetEnumDisplayName(),
+                       Bath = a.CustomerDetail?.ContactNumber,
+                       Size = a.CustomerDetail?.Description,
                        Position = new
                        {
                            Lat = GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),

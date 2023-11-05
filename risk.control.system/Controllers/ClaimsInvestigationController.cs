@@ -542,6 +542,17 @@ namespace risk.control.system.Controllers
 
                                     dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
+                                    var request = new HttpRequestMessage
+                                    {
+                                        Method = HttpMethod.Get,
+                                        RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pinCode.Code}"),
+                                        Headers =
+                                            {
+                                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                                            },
+                                    };
+
                                     claim.CustomerDetail = new CustomerDetail
                                     {
                                         CustomerName = rowData[10]?.Trim(),
@@ -560,7 +571,17 @@ namespace risk.control.system.Controllers
                                         Description = rowData[20]?.Trim(),
                                         ProfilePicture = customerImage
                                     };
+                                    using (var response = await httpClient.SendAsync(request))
+                                    {
+                                        response.EnsureSuccessStatusCode();
+                                        var body = await response.Content.ReadAsStringAsync();
 
+                                        var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+                                        claim.CustomerDetail.PinCode = pinCode;
+                                        claim.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                                        claim.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                                        Console.WriteLine(body);
+                                    }
                                     var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
 
                                     var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
@@ -592,6 +613,28 @@ namespace risk.control.system.Controllers
                                     var addedClaim = _context.ClaimsInvestigation.Add(claim);
 
                                     beneficairy.ClaimsInvestigationId = addedClaim.Entity.ClaimsInvestigationId;
+
+                                    var brequest = new HttpRequestMessage
+                                    {
+                                        Method = HttpMethod.Get,
+                                        RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{benePinCode.Code}"),
+                                        Headers =
+                                            {
+                                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                                            },
+                                    };
+                                    using (var response = await httpClient.SendAsync(brequest))
+                                    {
+                                        response.EnsureSuccessStatusCode();
+                                        var body = await response.Content.ReadAsStringAsync();
+
+                                        var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+                                        beneficairy.PinCode = benePinCode;
+                                        beneficairy.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                                        beneficairy.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                                        Console.WriteLine(body);
+                                    }
 
                                     _context.CaseLocation.Add(beneficairy);
 

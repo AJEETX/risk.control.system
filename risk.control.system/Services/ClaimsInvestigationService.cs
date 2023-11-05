@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+using Newtonsoft.Json;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -46,6 +48,7 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
+        private HttpClient client = new HttpClient();
 
         public ClaimsInvestigationService(ApplicationDbContext context, RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
         {
@@ -305,27 +308,27 @@ namespace risk.control.system.Services
                             existingPolicy.CustomerDetail.ProfilePicture = dataStream.ToArray();
                         }
 
-                        //var lastLog = _context.InvestigationTransaction
-                        //    .Where(i =>
-                        //        i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                        //        .OrderByDescending(o => o.Created)?.FirstOrDefault();
-                        //var lastLogHop = _context.InvestigationTransaction
-                        //    .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                        //    .AsNoTracking().Max(s => s.HopCount);
+                        var request = new HttpRequestMessage
+                        {
+                            Method = HttpMethod.Get,
+                            RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{existingPolicy.CustomerDetail.PinCode.Code}"),
+                            Headers =
+                            {
+                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                            },
+                        };
+                        using (var response = await client.SendAsync(request))
+                        {
+                            response.EnsureSuccessStatusCode();
+                            var body = await response.Content.ReadAsStringAsync();
 
-                        //var log = new InvestigationTransaction
-                        //{
-                        //    HopCount = lastLogHop + 1,
-                        //    Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
-                        //    ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                        //    Created = DateTime.UtcNow,
+                            var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
 
-                        //    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                        //    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
-                        //    UpdatedBy = userEmail
-                        //};
-
-                        //_context.InvestigationTransaction.Add(log);
+                            existingPolicy.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                            existingPolicy.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                            Console.WriteLine(body);
+                        }
                         _context.ClaimsInvestigation.Update(existingPolicy);
 
                         await _context.SaveChangesAsync();
@@ -347,7 +350,10 @@ namespace risk.control.system.Services
             {
                 try
                 {
-                    var existingPolicy = await _context.ClaimsInvestigation.Include(c => c.CustomerDetail).AsNoTracking()
+                    var existingPolicy = await _context.ClaimsInvestigation
+                        .Include(c => c.CustomerDetail)
+                        .ThenInclude(c => c.PinCode)
+                        .AsNoTracking()
                             .FirstOrDefaultAsync(c => c.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId);
                     if (existingPolicy != null)
                     {
@@ -390,27 +396,29 @@ namespace risk.control.system.Services
                         var addedClaim = _context.CustomerDetail.Update(claimsInvestigation.CustomerDetail);
                         existingPolicy.CustomerDetail = addedClaim.Entity;
                     }
-                    //var lastLog = _context.InvestigationTransaction
-                    //    .Where(i =>
-                    //        i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                    //        .OrderByDescending(o => o.Created)?.FirstOrDefault();
-                    //var lastLogHop = _context.InvestigationTransaction
-                    //    .Where(i => i.ClaimsInvestigationId == claimsInvestigation.ClaimsInvestigationId)
-                    //    .AsNoTracking().Max(s => s.HopCount);
+                    var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
 
-                    //var log = new InvestigationTransaction
-                    //{
-                    //    HopCount = lastLogHop + 1,
-                    //    Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
-                    //    ClaimsInvestigationId = claimsInvestigation.ClaimsInvestigationId,
-                    //    Created = DateTime.UtcNow,
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pincode.Code}"),
+                        Headers =
+                            {
+                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                            },
+                    };
+                    using (var response = await client.SendAsync(request))
+                    {
+                        response.EnsureSuccessStatusCode();
+                        var body = await response.Content.ReadAsStringAsync();
 
-                    //    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                    //    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
-                    //    UpdatedBy = userEmail
-                    //};
+                        var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
 
-                    //_context.InvestigationTransaction.Add(log);
+                        existingPolicy.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                        existingPolicy.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                        Console.WriteLine(body);
+                    }
                     _context.ClaimsInvestigation.Update(existingPolicy);
 
                     await _context.SaveChangesAsync();
