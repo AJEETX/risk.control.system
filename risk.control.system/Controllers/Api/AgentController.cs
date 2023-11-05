@@ -340,7 +340,7 @@ namespace risk.control.system.Controllers.Api
                         claimCase.ClaimReport.AgentOcrUrl = filePath;
                         CompressImage.Compressimage(stream, filePath);
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
-                        claimCase.ClaimReport.AgentOcrData = maskedImageDetail.DocType;
+                        claimCase.ClaimReport.AgentOcrData = " Doc type: " + maskedImageDetail.DocType;
                     }
                     catch (Exception)
                     {
@@ -372,9 +372,10 @@ namespace risk.control.system.Controllers.Api
                 claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
                 claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
             }
-            if (string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrData) && !string.IsNullOrWhiteSpace(data.OcrData))
+            if (!string.IsNullOrWhiteSpace(data.OcrData))
             {
-                claimCase.ClaimReport.AgentOcrData = data.OcrData;
+                claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ".\n " +
+                    "" + data.OcrData;
             }
 
             if (!string.IsNullOrWhiteSpace(data.OcrLongLat))
@@ -400,7 +401,9 @@ namespace risk.control.system.Controllers.Api
             var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
             var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                $"\r\n" +
                 $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                $"\r\n" +
                 $"\r\nElevation(sea level):{weatherData.elevation} metres";
             claimCase.ClaimReport.LocationData = weatherCustomData;
 
