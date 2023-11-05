@@ -1,10 +1,12 @@
 ﻿(g => { var h, a, k, p = "API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
     ({ key: "AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E", v: "beta" });
 
-let map;
+let mapz;
 var showCustomerMap = false;
 var showBeneficiaryMap = false;
-
+var showFaceMap = false;
+var showLocationMap = false;
+var showOcrMap = false;
 
 $(document).ready(function () {
     $('#datatable thead th').css('background-color', '#e9ecef')
@@ -146,6 +148,7 @@ $(document).ready(function () {
     });
 
     $('.face-Image').click(function () {
+        var data;
         $.confirm({
             type: 'green',
             closeIcon: true,
@@ -166,24 +169,112 @@ $(document).ready(function () {
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
+                    data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> Face Reader');
                     self.setContent('<b>Face image</b>:');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
                     self.setContentAppend('<br><b>Location Info</b> : ');
                     self.setContentAppend('<br><i>' + response.locationData + '</i>');
-                    self.setContentAppend('<br><b>Location Map</b>:');
-                    self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
-                    self.setContentAppend('<br><b>Location Address</b>:');
-                    self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
-                    
+                    showFaceMap = true;
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
+            },
+            onContentReady: function () {
+                if (showFaceMap) {
+                    showFaceMap = false;
+                    initPopMap(data.position, data.address);
+                }
             }
         })
     })
-    $('#profileImageMap').click(function () {
 
+    $('.locationImage').click(function () {
+        var data;
+        $.confirm({
+            type: 'green',
+            closeIcon: true,
+            columnClass: 'medium',
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    data = response;
+                    self.setTitle('<i class="fas fa-map-marker-alt"></i> <b>Location Map</b>:');
+                    self.setContent('<b>Location Address</b>:');
+                    self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
+                    self.setContentAppend('<br><div id="maps"></div>')
+                    self.setContentAppend('<br><div id="pop-face-map"></div>')
+                    self.setContentAppend('</div>')
+                    showLocationMap = true;
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            },
+            onContentReady: function () {
+                if (showLocationMap) {
+                    showLocationMap = false;
+                    initPopMap(data.facePosition, data.imageAddress);
+                }
+            }
+        })
+    })
+    $('.olocationImage').click(function () {
+        var data;
+        $.confirm({
+            type: 'green',
+            closeIcon: true,
+            columnClass: 'medium',
+            buttons: {
+                confirm: {
+                    text: "Ok",
+                    btnClass: 'btn-secondary',
+                    action: function () {
+                        askConfirmation = false;
+                    }
+                }
+            },
+            content: function () {
+                var self = this;
+                return $.ajax({
+                    url: '/api/ClaimsInvestigation/GetInvestigationData?id=' + $('#beneficiaryId').val() + '&claimId=' + $('#claimId').val(),
+                    dataType: 'json',
+                    method: 'get'
+                }).done(function (response) {
+                    data = response;
+                    self.setTitle('<i class="fas fa-map-marker-alt"></i> <b>Location Map</b>:');
+                    self.setContent('<b>Location Address</b>:');
+                    self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
+                    self.setContentAppend('<br><div id="maps"></div>')
+                    self.setContentAppend('<br><div id="pop-face-map"></div>')
+                    self.setContentAppend('</div>')
+                    showOcrMap = true;
+                }).fail(function () {
+                    self.setContent('Something went wrong.');
+                });
+            },
+            onContentReady: function () {
+                if (showOcrMap) {
+                    showOcrMap = false;
+                    initPopMap(data.ocrPosition, data.ocrAddress);
+                }
+            }
+        })
+    })
+
+    $('#profileImageMap').click(function () {
         var data;
         $.confirm({
             type: 'green',
@@ -228,6 +319,7 @@ $(document).ready(function () {
             }
         })
     });
+
     $('#bImageMap').click(function () {
         var data;
         $.confirm({
@@ -621,7 +713,7 @@ async function initPopMap(_position, title) {
     }
     var element = document.getElementById("pop-face-map");
     // The map, centered at Uluru
-    map = new Map(element, {
+    mapz = new Map(element, {
         scaleControl: true,
         zoom: 14,
         center: position,
@@ -629,9 +721,8 @@ async function initPopMap(_position, title) {
         mapTypeId: google.maps.MapTypeId.ROADMAP,
     });
 
-    var marker = new google.maps.Marker({ position: position, map: map, title: title })
+    var marker = new google.maps.Marker({ position: position, map: mapz, title: title })
 }
-
 
 function loadState(obj, showDefaultOption = true) {
     var value = obj.value;

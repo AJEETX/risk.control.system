@@ -301,11 +301,11 @@
                                                                         @{
                                                                             if (Model.Location.ClaimReport?.AgentLocationPicture != null)
                                                                             {
-                                                                                <img title="location image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.AgentLocationPicture))">
+                                                                                <img title="face image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.AgentLocationPicture))">
                                                                             }
                                                                             else
                                                                             {
-                                                                                <img title="location image" id="agentLocationPicture" alt="location image" class="img-fluid  ocr-data" src="/img/no-photo.png">
+                                                                                <img title="face image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src="/img/no-photo.png">
                                                                             }
                                                                         }
                                                                     </p>
@@ -375,7 +375,7 @@
                                                                     <p class="text-muted text-sm">
                                                                         <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location Map</span>
                                                                         <br />
-                                                                        <img class="img-fluid locationImage" src=@ocrImage />
+                                                                        <img class="img-fluid olocationImage" src=@ocrImage />
                                                                     </p>
                                                                     <p class="text-muted text-sm">
 

@@ -1822,24 +1822,26 @@ namespace risk.control.system.Controllers.Api.Claims
 
             string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             string imageAddress = string.Empty;
+            string faceLat = string.Empty, faceLng = string.Empty;
             if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.LocationLongLat))
             {
                 var longLat = beneficiary.ClaimReport.LocationLongLat.IndexOf("/");
-                var latitude = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
-                var longitude = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
-                var longLatString = latitude + "," + longitude;
-                RootObject rootObject = ReportController.getAddress((latitude), (longitude));
+                faceLat = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                faceLng = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
+                var longLatString = faceLat + "," + faceLng;
+                RootObject rootObject = ReportController.getAddress((faceLat), (faceLng));
                 imageAddress = rootObject.display_name;
                 mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
 
             string ocrUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             string ocrAddress = string.Empty;
+            string ocrLatitude = string.Empty, ocrLongitude = string.Empty;
             if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.OcrLongLat))
             {
                 var ocrlongLat = beneficiary.ClaimReport.OcrLongLat.IndexOf("/");
-                var ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, ocrlongLat)?.Trim();
-                var ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(ocrlongLat + 1)?.Trim();
+                ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, ocrlongLat)?.Trim();
+                ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(ocrlongLat + 1)?.Trim();
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
                 RootObject rootObject = ReportController.getAddress((ocrLatitude), (ocrLongitude));
                 ocrAddress = rootObject.display_name;
@@ -1860,7 +1862,9 @@ namespace risk.control.system.Controllers.Api.Claims
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.AgentOcrPicture)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 OcrLatLong = ocrUrl,
-                OcrAddress = ocrAddress
+                OcrAddress = ocrAddress,
+                FacePosition = new { Lat = decimal.Parse(faceLat), Lng = decimal.Parse(faceLng) },
+                OcrPosition = new { Lat = decimal.Parse(ocrLatitude), Lng = decimal.Parse(ocrLongitude) }
             };
 
             return Ok(data);
@@ -1932,7 +1936,8 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 profileMap = customerMapUrl,
                 weatherData = weatherCustomData,
-                address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name
+                address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name,
+                position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
             };
             return Ok(data);
         }
