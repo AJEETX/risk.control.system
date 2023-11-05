@@ -160,12 +160,13 @@
                 }).done(function (response) {
                     self.setTitle('<i class="fas fa-mobile-alt"></i> Face Reader');
                     self.setContent('<b>Face image</b>:');
-                    self.setContent('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br><b>Photo Analysis</b> : ');
+                    self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
+                    self.setContentAppend('<br><b>Location Info</b> : ');
                     self.setContentAppend('<br><i>' + response.locationData + '</i>');
                     self.setContentAppend('<br><b>Location Map</b>:');
                     self.setContentAppend('<br><img id="agentLocation" class="img-fluid investigation-actual-image" src="' + response.latLong + '" /> ');
-                    self.setContentAppend('<br>' + response.imageAddress + '</i>');
+                    self.setContentAppend('<br><b>Location Address</b>:');
+                    self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });
