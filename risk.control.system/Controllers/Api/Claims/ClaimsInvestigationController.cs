@@ -152,7 +152,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : "/img/no-policy.jpg",
                         Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : "/img/user.png",
-                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
+                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
                         Policy = a.PolicyDetail?.LineOfBusiness.Name,
                         Status = a.InvestigationCaseStatus.Name,
                         SubStatus = a.InvestigationCaseSubStatus.Name,
@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers.Api.Claims
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
                                       "/img/user.png",
                         BeneficiaryName = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>" :
+                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
                     })?
                     .ToList();
@@ -299,6 +299,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 );
                 claimsSubmitted = await applicationDbContext.ToListAsync();
             }
+            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
+
             var response = claimsSubmitted
                    .Select(a => new
                    {
@@ -312,12 +314,11 @@ namespace risk.control.system.Controllers.Api.Claims
                        Size = a.CustomerDetail?.Description,
                        Position = new
                        {
-                           Lat = GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
-                           Lng = GetLng(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                           Lat = GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()) ?? decimal.Parse(company.PinCode.Latitude),
+                           Lng = GetLng(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()) ?? decimal.Parse(company.PinCode.Longitude),
                        }
                    })?
                    .ToList();
-            var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
 
             return Ok(new
             {
