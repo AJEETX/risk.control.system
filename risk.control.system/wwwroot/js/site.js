@@ -392,10 +392,6 @@ $(document).ready(function () {
                     self.setContentAppend('<br><img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
                     self.setContentAppend('<br><b>OCR Scan Info</b> : ');
                     self.setContentAppend('<br><i>' + response.qrData + '</i>');
-                    self.setContentAppend('<br><b>Location Map<</b>:');
-                    self.setContentAppend('<br><img id="ocrLocation" class="img-fluid investigation-actual-image" src="' + response.ocrLatLong + '" /> ');
-                    self.setContentAppend('<br><b>Location Address<</b>:');
-                    self.setContentAppend('<br><i>' + response.ocrAddress + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
                 });

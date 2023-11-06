@@ -358,6 +358,7 @@ namespace risk.control.system.Controllers.Api
                     registeredImage = claimCase.ProfilePicture;
                 }
 
+                string ImageData = string.Empty;
                 try
                 {
                     if (registeredImage != null)
@@ -366,16 +367,19 @@ namespace risk.control.system.Controllers.Api
 
                         var response = await httpClient.PostAsJsonAsync(FaceUrl, new { source = base64Image, dest = data.LocationImage });
 
-                        var ImageData = await response.Content.ReadAsStringAsync();
+                        ImageData = await response.Content.ReadAsStringAsync();
 
-                        var faceImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(ImageData);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var faceImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(ImageData);
 
-                        claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                            claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    claimCase.ClaimReport.LocationPictureConfidence = "failed ";
+                    claimCase.ClaimReport.LocationPictureConfidence = "failed " + ImageData;
                 }
 
                 var image = Convert.FromBase64String(data.LocationImage);
