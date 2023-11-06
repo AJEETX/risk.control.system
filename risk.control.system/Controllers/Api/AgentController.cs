@@ -375,7 +375,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 catch (Exception ex)
                 {
-                    claimCase.ClaimReport.LocationPictureConfidence = "failed " + ex.Message;
+                    claimCase.ClaimReport.LocationPictureConfidence = "failed ";
                 }
 
                 var image = Convert.FromBase64String(data.LocationImage);
@@ -401,42 +401,42 @@ namespace risk.control.system.Controllers.Api
                     try
                     {
                         var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
-                        //var request = new HttpRequestMessage
-                        //{
-                        //    Method = HttpMethod.Get,
-                        //    RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
-                        //    Headers =
-                        //    {
-                        //        { "x-rapid-api", "rapid-api-database" },
-                        //        { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
-                        //        { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
-                        //    },
-                        //};
-                        //using (var panResponse = await httpClient.SendAsync(request))
-                        //{
-                        //    panResponse.EnsureSuccessStatusCode();
-                        //    var body = await panResponse.Content.ReadAsStringAsync();
-                        //    try
-                        //    {
-                        //        var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
+                        var request = new HttpRequestMessage
+                        {
+                            Method = HttpMethod.Get,
+                            RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
+                            Headers =
+                            {
+                                { "x-rapid-api", "rapid-api-database" },
+                                { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
+                                { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                            },
+                        };
+                        using (var panResponse = await httpClient.SendAsync(request))
+                        {
+                            panResponse.EnsureSuccessStatusCode();
+                            var body = await panResponse.Content.ReadAsStringAsync();
+                            try
+                            {
+                                var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
 
-                        //        if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                        //        {
-                        //            if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name))
-                        //                claimCase.ClaimReport.PanValid = true;
-                        //        }
+                                if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                                {
+                                    if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name))
+                                        claimCase.ClaimReport.PanValid = true;
+                                }
 
-                        //        claimCase.ClaimReport.PanValid = true;
-                        //    }
-                        //    catch (Exception ex)
-                        //    {
-                        //        var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
-                        //        if (panInvalidData != null && panInvalidData.status == 500)
-                        //        {
-                        //            Console.WriteLine(panInvalidData.status);
-                        //        }
-                        //    }
-                        //}
+                                claimCase.ClaimReport.PanValid = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
+                                if (panInvalidData != null && panInvalidData.status == 500)
+                                {
+                                    Console.WriteLine(panInvalidData.status);
+                                }
+                            }
+                        }
 
                         var image = Convert.FromBase64String(maskedImageDetail.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
