@@ -30,6 +30,8 @@ namespace risk.control.system.Models
         [Display(Name = "Location Data")]
         public string? LocationData { get; set; }
 
+        public string? LocationPictureConfidence { get; set; } = string.Empty;
+
         [Display(Name = "Agent Location Image")]
         [NotMapped]
         public IFormFile? AgentLocationImage { get; set; }
@@ -43,6 +45,9 @@ namespace risk.control.system.Models
         [Display(Name = "Agent Ocr Image")]
         [NotMapped]
         public IFormFile? AgentOcrImage { get; set; }
+
+        public bool? PanValid { get; set; } = false;
+        public string? ImageType { get; set; }
 
         [Display(Name = "Agent Ocr Data")]
         public string? AgentOcrData { get; set; }
@@ -98,5 +103,12 @@ namespace risk.control.system.Models
     {
         OK,
         REVIEW,
+    }
+
+    public enum OcrImageType
+    {
+        PAN,
+        ADHAAR,
+        DL
     }
 }

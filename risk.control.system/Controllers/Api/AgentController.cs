@@ -34,7 +34,10 @@ namespace risk.control.system.Controllers.Api
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
         private static string urlAddress = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
+        private static string FaceUrl = "http://icheck-webse-konc2x2nmowe-196777346.ap-southeast-2.elb.amazonaws.com/faceMatch";
+        private static string PanUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verifyPan/";
 
+        //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
@@ -75,13 +78,13 @@ namespace risk.control.system.Controllers.Api
                     if (type.ToLower() == "face")
                     {
                         var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.AgentLocationPicture));
-                        return Ok(new { Image = image });
+                        return Ok(new { Image = image, Valid = caseLocation.ClaimReport.LocationPictureConfidence ?? "00.00" });
                     }
 
                     if (type.ToLower() == "ocr")
                     {
                         var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.AgentOcrPicture));
-                        return Ok(new { Image = image });
+                        return Ok(new { Image = image, Valid = caseLocation.ClaimReport.PanValid.ToString() });
                     }
                 }
             }
@@ -337,8 +340,35 @@ namespace risk.control.system.Controllers.Api
             }
             claimCase.ClaimReport.AgentEmail = data.Email;
 
+            var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
+                byte[] registeredImage = null!;
+
+                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredImage = claim.CustomerDetail.ProfilePicture;
+                }
+                if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+                {
+                    registeredImage = claimCase.ProfilePicture;
+                }
+
+                if (registeredImage != null)
+                {
+                    var base64Image = Convert.ToBase64String(registeredImage);
+                    var response = await httpClient.PostAsJsonAsync(FaceUrl, new { source = base64Image, dest = data.LocationImage });
+
+                    var ImageData = await response.Content.ReadAsStringAsync();
+
+                    var faceImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(ImageData);
+
+                    claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                }
+
                 var image = Convert.FromBase64String(data.LocationImage);
                 var locationRealImage = ByteArrayToImage(image);
                 MemoryStream stream = new MemoryStream(image);
@@ -352,6 +382,7 @@ namespace risk.control.system.Controllers.Api
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
                 var inputImage = new DocImage { Image = data.OcrImage };
+
                 var response = await httpClient.PostAsJsonAsync(urlAddress, inputImage);
 
                 var maskedImage = await response.Content.ReadAsStringAsync();
@@ -361,6 +392,44 @@ namespace risk.control.system.Controllers.Api
                     try
                     {
                         var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
+
+                        var request = new HttpRequestMessage
+                        {
+                            Method = HttpMethod.Get,
+                            RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
+                            Headers =
+                            {
+                                { "x-rapid-api", "rapid-api-database" },
+                                { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
+                                { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                            },
+                        };
+                        using (var panResponse = await httpClient.SendAsync(request))
+                        {
+                            panResponse.EnsureSuccessStatusCode();
+                            var body = await panResponse.Content.ReadAsStringAsync();
+                            try
+                            {
+                                var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
+
+                                if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                                {
+                                    if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name))
+                                        claimCase.ClaimReport.PanValid = true;
+                                }
+
+                                claimCase.ClaimReport.PanValid = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
+                                if (panInvalidData != null && panInvalidData.status == 500)
+                                {
+                                    Console.WriteLine(panInvalidData.status);
+                                }
+                            }
+                        }
+
                         var image = Convert.FromBase64String(maskedImageDetail.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
@@ -369,6 +438,7 @@ namespace risk.control.system.Controllers.Api
                         claimCase.ClaimReport.AgentOcrUrl = filePath;
                         CompressImage.Compressimage(stream, filePath);
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.ImageType = maskedImageDetail.DocType;
                         claimCase.ClaimReport.AgentOcrData = " Doc type: " + maskedImageDetail.DocType;
 
                         if (!string.IsNullOrWhiteSpace(data.OcrData))
@@ -469,7 +539,9 @@ namespace risk.control.system.Controllers.Api
                 Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentOcrUrl)) :
                 Convert.ToBase64String(noDataimage),
                 OcrLongLat = claimCase.ClaimReport.OcrLongLat,
-                OcrTime = claimCase.ClaimReport.OcrLongLatTime
+                OcrTime = claimCase.ClaimReport.OcrLongLatTime,
+                FacePercent = claimCase.ClaimReport.LocationPictureConfidence,
+                PanValid = claimCase.ClaimReport.PanValid
             });
         }
 
@@ -524,6 +596,29 @@ namespace risk.control.system.Controllers.Api
             Image returnImage = Image.FromStream(ms);
             return returnImage;
         }
+    }
+
+    public class PanInValidationResponse
+    {
+        public string error { get; set; }
+        public string message { get; set; }
+        public int status { get; set; }
+    }
+
+    public class PanValidationResponse
+    {
+        public string @entity { get; set; }
+        public string pan { get; set; }
+        public string first_name { get; set; }
+        public string middle_name { get; set; }
+        public string last_name { get; set; }
+    }
+
+    public class FaceMatchDetail
+    {
+        public decimal FaceLeftCoordinate { get; set; }
+        public decimal FaceTopCcordinate { get; set; }
+        public string Confidence { get; set; }
     }
 
     public class FaceImageDetail

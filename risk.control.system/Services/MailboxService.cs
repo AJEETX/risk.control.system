@@ -1,9 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Net.Http.Headers;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
+using Newtonsoft.Json;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
@@ -32,6 +37,7 @@ namespace risk.control.system.Services
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
+        private static HttpClient client = new HttpClient();
 
         public MailboxService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<ClientCompanyApplicationUser> userManager, UserManager<VendorApplicationUser> userVendorManager)
         {
@@ -54,14 +60,14 @@ namespace risk.control.system.Services
 
             var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == vendorId);
 
-            List<string> userEmailsToSend = new();
+            List<VendorApplicationUser> userEmailsToSend = new();
 
             foreach (var assignedUser in vendorUsers)
             {
                 var isTrue = await userVendorManager.IsInRoleAsync(assignedUser, supervisorRole?.Name);
                 if (isTrue)
                 {
-                    userEmailsToSend.Add(assignedUser.Email);
+                    userEmailsToSend.Add(assignedUser);
                 }
             }
 
@@ -79,7 +85,7 @@ namespace risk.control.system.Services
 
             foreach (var userEmailToSend in userEmailsToSend)
             {
-                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend);
+                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend.Email);
                 var contactMessage = new InboxMessage
                 {
                     //ReceipientEmail = userEmailToSend,
@@ -107,6 +113,10 @@ namespace risk.control.system.Services
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
+
+                //SEND SMS
+                //await SmsService.Send();
+                //SMS ::END
             }
 
             try
