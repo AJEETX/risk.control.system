@@ -344,6 +344,7 @@ namespace risk.control.system.Controllers.Api
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
                 byte[] registeredImage = null!;
@@ -357,16 +358,23 @@ namespace risk.control.system.Controllers.Api
                     registeredImage = claimCase.ProfilePicture;
                 }
 
-                if (registeredImage != null)
+                try
                 {
-                    var base64Image = Convert.ToBase64String(registeredImage);
-                    var response = await httpClient.PostAsJsonAsync(FaceUrl, new { source = base64Image, dest = data.LocationImage });
+                    if (registeredImage != null)
+                    {
+                        var base64Image = Convert.ToBase64String(registeredImage);
 
-                    var ImageData = await response.Content.ReadAsStringAsync();
+                        var response = await httpClient.PostAsJsonAsync(FaceUrl, new { source = base64Image, dest = data.LocationImage });
 
-                    var faceImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(ImageData);
+                        var ImageData = await response.Content.ReadAsStringAsync();
 
-                    claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                        var faceImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(ImageData);
+
+                        claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                    }
+                }
+                catch (Exception)
+                {
                 }
 
                 var image = Convert.FromBase64String(data.LocationImage);
@@ -387,48 +395,48 @@ namespace risk.control.system.Controllers.Api
 
                 var maskedImage = await response.Content.ReadAsStringAsync();
 
+                var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
+
                 if (!string.IsNullOrWhiteSpace(maskedImage))
                 {
                     try
                     {
-                        var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
+                        //var request = new HttpRequestMessage
+                        //{
+                        //    Method = HttpMethod.Get,
+                        //    RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
+                        //    Headers =
+                        //    {
+                        //        { "x-rapid-api", "rapid-api-database" },
+                        //        { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
+                        //        { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                        //    },
+                        //};
+                        //using (var panResponse = await httpClient.SendAsync(request))
+                        //{
+                        //    panResponse.EnsureSuccessStatusCode();
+                        //    var body = await panResponse.Content.ReadAsStringAsync();
+                        //    try
+                        //    {
+                        //        var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
 
-                        var request = new HttpRequestMessage
-                        {
-                            Method = HttpMethod.Get,
-                            RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
-                            Headers =
-                            {
-                                { "x-rapid-api", "rapid-api-database" },
-                                { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
-                                { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
-                            },
-                        };
-                        using (var panResponse = await httpClient.SendAsync(request))
-                        {
-                            panResponse.EnsureSuccessStatusCode();
-                            var body = await panResponse.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
+                        //        if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        //        {
+                        //            if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name))
+                        //                claimCase.ClaimReport.PanValid = true;
+                        //        }
 
-                                if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                                {
-                                    if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name))
-                                        claimCase.ClaimReport.PanValid = true;
-                                }
-
-                                claimCase.ClaimReport.PanValid = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
-                                if (panInvalidData != null && panInvalidData.status == 500)
-                                {
-                                    Console.WriteLine(panInvalidData.status);
-                                }
-                            }
-                        }
+                        //        claimCase.ClaimReport.PanValid = true;
+                        //    }
+                        //    catch (Exception ex)
+                        //    {
+                        //        var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
+                        //        if (panInvalidData != null && panInvalidData.status == 500)
+                        //        {
+                        //            Console.WriteLine(panInvalidData.status);
+                        //        }
+                        //    }
+                        //}
 
                         var image = Convert.FromBase64String(maskedImageDetail.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
@@ -449,7 +457,7 @@ namespace risk.control.system.Controllers.Api
                     }
                     catch (Exception)
                     {
-                        var image = Convert.FromBase64String(data.OcrImage);
+                        var image = Convert.FromBase64String(maskedImageDetail.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
                         claimCase.ClaimReport.AgentOcrPicture = image;
@@ -457,6 +465,14 @@ namespace risk.control.system.Controllers.Api
                         claimCase.ClaimReport.AgentOcrUrl = filePath;
                         CompressImage.Compressimage(stream, filePath);
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.ImageType = maskedImageDetail.DocType;
+                        claimCase.ClaimReport.AgentOcrData = " Doc type: " + maskedImageDetail.DocType;
+
+                        if (!string.IsNullOrWhiteSpace(data.OcrData))
+                        {
+                            claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ".\n " +
+                                "" + data.OcrData.Replace(maskedImageDetail.DocumentId, "xxxxxxxxxx");
+                        }
                     }
                 }
                 else
