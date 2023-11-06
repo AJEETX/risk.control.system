@@ -373,8 +373,9 @@ namespace risk.control.system.Controllers.Api
                         claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    claimCase.ClaimReport.LocationPictureConfidence = "failed " + ex.Message;
                 }
 
                 var image = Convert.FromBase64String(data.LocationImage);
