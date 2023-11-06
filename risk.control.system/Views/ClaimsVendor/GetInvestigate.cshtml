@@ -396,7 +396,9 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                
+                                                                <div class="card-footer text-center">
+                                                                    <span class="badge badge-light">Match :<i class="fa fa-user"></i> @Model.CaseLocation.ClaimReport.LocationPictureConfidence</span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -451,6 +453,9 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <div class="card-footer text-center">
+                                                                    <span class="badge badge-light">Valid :<i class="fa fa-user"></i> @Model.CaseLocation.ClaimReport.PanValid</span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     }
@@ -464,7 +469,8 @@
                                                                 <i class="far fa-comment"></i> Questionnaire template
                                                             </div>
                                                             <div class="card-header text-muted border-bottom-0">
-                                                                <span class="badge badge-light">Agent: <i class="fas fa-user-shield"></i> @Model.CaseLocation.ClaimReport.AgentEmail </span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i>@questionTime </span>
+                                                               <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.CaseLocation.ClaimReport.AgentEmail </span>
+                                                                <span style="float:right;"><i class="nav-icon fas fa-clock"></i>@questionTime </span>
                                                             </div>
                                                             <div class="card-body pt-0">
                                                                 <div class="row">
