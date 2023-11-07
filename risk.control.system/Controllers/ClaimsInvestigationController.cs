@@ -1808,6 +1808,10 @@ namespace risk.control.system.Controllers
         {
             string userEmail = HttpContext?.User?.Identity.Name;
 
+            if (string.IsNullOrWhiteSpace(assessorRemarks))
+            {
+                assessorRemarks = "review";
+            }
             var reportUpdateStatus = AssessorRemarkType.REVIEW;
 
             var claim = await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);

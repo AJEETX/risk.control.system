@@ -330,6 +330,10 @@ namespace risk.control.system.Controllers
             var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             ViewBag.BeneficiaryLocationUrl = bUrl;
 
+            location.ClaimReport = null;
+
+            _context.SaveChanges();
+
             return View(model);
         }
 
