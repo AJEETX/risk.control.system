@@ -160,7 +160,7 @@
                                                                         <p class="text-muted text-sm">
                                                                             @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
                                                                             {
-                                                                                <img id="documentImage" class="img-fluid locationImage" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
+                                                                                <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
                                                                             }
                                                                             else
                                                                             {
@@ -382,7 +382,7 @@
                                                 }
                                                 <div class="row">
                                                     @{
-                                                        if (@Model.CaseLocation.ClaimReport?.LocationData != null)
+                                                        if (@Model.CaseLocation.ClaimReport?.LocationData != null && @Model.CaseLocation.ClaimReport?.LocationLongLatTime != null && image != null)
                                                         {
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
@@ -390,13 +390,7 @@
 
                                                                         <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
-                                                                    <div class="card-footer">
-                                                                        <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:
-                                                                        <div id="face-map">
-                                                                        </div>
-                                                                        <div id="face-msg">
-                                                                        </div>
-                                                                    </div>
+
                                                                     <div class="card-body pt-0">
                                                                         <div class="row">
                                                                             <div class="col-6">
@@ -416,7 +410,7 @@
                                                                                 </p>
                                                                                 <p class="text-muted text-sm">
 
-                                                                                    <span class="badge badge-light"><i class="fas fa-info"></i> Image Analysis</span>
+                                                                                    <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                                                                                     <br />
                                                                                     <label class="ocr-data img-fluid"> @locationData</label>
 
@@ -424,17 +418,24 @@
                                                                             </div>
                                                                             <div class="col-6 text-center">
                                                                                 <p class="text-muted text-sm">
-                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location map</span>
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                                                                                     <br />
                                                                                     <img class="img-fluid locationImage" src=@image />
                                                                                 </p>
                                                                                 <p class="text-muted text-sm">
 
-                                                                                    <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Location Address</span>
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                                                                                     <br />
                                                                                     <label class="img-fluid ocr-data"> @ViewBag.LocationAddress</label>
                                                                                 </p>
                                                                             </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="card-footer">
+                                                                        <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
+                                                                        <div id="face-map">
+                                                                        </div>
+                                                                        <div id="face-msg">
                                                                         </div>
                                                                     </div>
                                                                     <div class="card-footer text-center">
@@ -443,21 +444,15 @@
                                                                 </div>
                                                             </div>
                                                         }
-                                                        if (@Model.CaseLocation.ClaimReport?.AgentOcrData != null)
+                                                        if (@Model.CaseLocation.ClaimReport?.AgentOcrData != null && @Model.CaseLocation.ClaimReport?.OcrLongLatTime != null && ocrImage != null)
                                                         {
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
                                                                     <div class="card-header text-muted border-bottom-0">
 
-                                                                        <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                                        <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span><span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
-                                                                    <div class="card-footer">
-                                                                        <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:
-                                                                        <div id="ocr-map">
-                                                                        </div>
-                                                                        <div id="ocr-msg">
-                                                                        </div>
-                                                                    </div>
+
                                                                     <div class="card-body pt-0">
                                                                         <div class="row">
                                                                             <div class="col-6">
@@ -485,17 +480,24 @@
                                                                             <div class="col-6 text-center">
 
                                                                                 <p class="text-muted text-sm">
-                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location Map</span>
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                                                                                     <br />
                                                                                     <img class="img-fluid olocationImage" src=@ocrImage />
                                                                                 </p>
                                                                                 <p class="text-muted text-sm">
 
-                                                                                    <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Location Address</span>
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                                                                                     <br />
                                                                                     <label class="img-fluid ocr-data"> @ViewBag.OcrLocationAddress</label>
                                                                                 </p>
                                                                             </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="card-footer">
+                                                                        <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
+                                                                        <div id="ocr-map">
+                                                                        </div>
+                                                                        <div id="ocr-msg">
                                                                         </div>
                                                                     </div>
                                                                     <div class="card-footer text-center">
