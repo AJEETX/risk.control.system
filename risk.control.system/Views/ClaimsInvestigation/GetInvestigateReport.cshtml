@@ -388,9 +388,10 @@
                                                                 <div class="card bg-light d-flex flex-fill">
                                                                     <div class="card-header text-muted border-bottom-0">
 
-                                                                        <i class="fas fa-portrait"></i> Face Reader <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                                        <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
                                                                     <div class="card-footer">
+                                                                        <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:
                                                                         <div id="face-map">
                                                                         </div>
                                                                         <div id="face-msg">
@@ -400,22 +401,22 @@
                                                                         <div class="row">
                                                                             <div class="col-6">
                                                                                 <p class="text-muted text-sm">
-                                                                                    <span class="badge badge-light"><i class="fas fa-film"></i> Face Image</span>:
+                                                                                    <span class="badge badge-light"><i class="fas fa-film"></i> Digital Image</span>:
                                                                                     <br />
                                                                                     @{
                                                                                         if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
                                                                                         {
-                                                                                            <img title="face image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
+                                                                                            <img title="location image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
                                                                                         }
                                                                                         else
                                                                                         {
-                                                                                            <img title="face image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src="/img/no-photo.png">
+                                                                                            <img title="location image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src="/img/no-photo.png">
                                                                                         }
                                                                                     }
                                                                                 </p>
                                                                                 <p class="text-muted text-sm">
 
-                                                                                    <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
+                                                                                    <span class="badge badge-light"><i class="fas fa-info"></i> Image Analysis</span>
                                                                                     <br />
                                                                                     <label class="ocr-data img-fluid"> @locationData</label>
 
@@ -423,7 +424,7 @@
                                                                             </div>
                                                                             <div class="col-6 text-center">
                                                                                 <p class="text-muted text-sm">
-                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location Map</span>
+                                                                                    <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location map</span>
                                                                                     <br />
                                                                                     <img class="img-fluid locationImage" src=@image />
                                                                                 </p>
@@ -448,9 +449,10 @@
                                                                 <div class="card bg-light d-flex flex-fill">
                                                                     <div class="card-header text-muted border-bottom-0">
 
-                                                                        <i class="fas fa-mobile-alt"></i> OCR App <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                                        <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
                                                                     <div class="card-footer">
+                                                                        <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:
                                                                         <div id="ocr-map">
                                                                         </div>
                                                                         <div id="ocr-msg">
@@ -460,7 +462,7 @@
                                                                         <div class="row">
                                                                             <div class="col-6">
                                                                                 <p class="text-muted text-sm">
-                                                                                    <span class="badge badge-light"><i class="fas fa-film"></i> OCR Image</span>:
+                                                                                    <span class="badge badge-light"><i class="fas fa-film"></i> Document Image</span>:
                                                                                     <br />
                                                                                     @{
                                                                                         if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
@@ -475,7 +477,7 @@
                                                                                 </p>
                                                                                 <p class="text-muted text-sm">
 
-                                                                                    <span class="badge badge-light"><i class="fas fa-info"></i> OCR Scan Info</span>
+                                                                                    <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                                                                                     <br />
                                                                                     <label class="img-fluid ocr-data"> @QR1</label>
                                                                                 </p>

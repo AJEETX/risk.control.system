@@ -302,10 +302,13 @@ namespace risk.control.system.Controllers
                             }
                         }
 
+                        var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+
+
                         var request = new HttpRequestMessage
                         {
                             Method = HttpMethod.Get,
-                            RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{caseLocation.PinCode.Code}"),
+                            RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pinCode.Code}"),
                             Headers =
                             {
                                 { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },

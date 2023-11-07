@@ -307,11 +307,12 @@ namespace risk.control.system.Services
                             await existingPolicy.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
                             existingPolicy.CustomerDetail.ProfilePicture = dataStream.ToArray();
                         }
+                        var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
 
                         var request = new HttpRequestMessage
                         {
                             Method = HttpMethod.Get,
-                            RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{existingPolicy.CustomerDetail.PinCode.Code}"),
+                            RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pinCode.Code}"),
                             Headers =
                             {
                                 { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },

@@ -284,9 +284,10 @@
                                                     <div class="card bg-light d-flex flex-fill">
                                                         <div class="card-header text-muted border-bottom-0">
 
-                                                            <i class="fas fa-portrait"></i> Face Reader <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                            <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                         </div>
                                                         <div class="card-footer">
+                                                            <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:
                                                             <div id="face-map">
                                                             </div>
                                                             <div id="face-msg">
@@ -341,9 +342,10 @@
                                                     <div class="card bg-light d-flex flex-fill">
                                                         <div class="card-header text-muted border-bottom-0">
 
-                                                            <i class="fas fa-mobile-alt"></i> OCR App <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                            <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                         </div>
                                                         <div class="card-footer">
+                                                            <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:
                                                             <div id="ocr-map">
                                                             </div>
                                                             <div id="ocr-msg">
