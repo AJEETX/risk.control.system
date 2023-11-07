@@ -127,8 +127,8 @@ table {
 }
 
 .face-Image {
-    height: 150px;
-    width: 150px;
+    height: 200px;
+    width: 200px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -168,8 +168,8 @@ table {
 }
 
 .ocr-Image {
-    height: 150px;
-    width: 150px;
+    height: 200px;
+    width: 2000px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -182,16 +182,16 @@ table {
 }
 
 .locationImage {
-    height: 150px;
-    width: 150px;
+    height: 200px;
+    width: 2000px;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .olocationImage {
-    height: 150px;
-    width: 150px;
+    height: 200px;
+    width: 200px;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
@@ -208,9 +208,9 @@ table {
 }
 
 .ocr-data {
-    width: 150px;
+    width: 200px;
     border: 1px solid #ccc;
-    height: 150px;
+    height: 100px;
     overflow-y: auto;
     padding: 5px;
     font-weight: 400 !important;

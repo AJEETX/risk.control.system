@@ -444,8 +444,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -469,7 +469,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 applicationDbContext = applicationDbContext
                     .Include(c => c.CaseLocations)
                     .ThenInclude(c => c.PinCode)
-                    .Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId));
+                    .Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => (c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                    ) || a.IsReviewCase);
 
                 var claimsAssigned = new List<ClaimsInvestigation>();
                 foreach (var item in applicationDbContext)
@@ -477,7 +478,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     if (item.IsReady2Assign)
                     {
                         item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
-                        && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
+                        && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId || item.IsReviewCase)?.ToList();
                         if (item.CaseLocations.Any())
                         {
                             claimsAssigned.Add(item);

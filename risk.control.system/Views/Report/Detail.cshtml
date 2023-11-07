@@ -432,7 +432,6 @@
                                                             var image = @ViewBag.LocationUrl;
                                                             var ocrImage = @ViewBag.OcrLocationUrl;
                                                             var locationData = @Model.Location?.ClaimReport?.LocationData ?? "Image DATA";
-                                                        }
                                                         if (@Model.Location.ClaimReport?.LocationData != null && @Model.Location.ClaimReport?.LocationLongLatTime != null && image != null)
                                                         {
                                                         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -557,7 +556,8 @@
                                                             </div>
                                                         </div>
                                                         }
-                                                        @if(!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.AgentRemarks))
+                                                        }
+                                                        @if (!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.AgentRemarks))
                                                         {
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">

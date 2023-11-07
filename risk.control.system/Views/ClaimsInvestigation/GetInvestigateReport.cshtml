@@ -620,10 +620,10 @@
                                     <a asp-controller="ClaimsInvestigation" class="btn btn-default" asp-action="Assessor">
                                         <i class="fas fa-arrow-left" aria-hidden="true"></i> Back &nbsp;&nbsp;&nbsp;
                                     </a>
-                                    <a asp-controller="ClaimsInvestigation" asp-action="ReProcessCaseReport" asp-route-claimId="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                    <button type="submit" asp-controller="ClaimsInvestigation" asp-action="ReProcessCaseReport" class="btn btn-danger">
                                         <i class="fas fa-sync" aria-hidden="true"></i> Re- Allocate
-                                    </a>
-                                    <button asp-action="ProcessCaseReport" id="approve-case" type="submit" class="btn btn-danger">
+                                    </button>
+                                    <button asp-action="ProcessCaseReport" id="approve-case" type="submit" class="btn btn-success">
                                         <i class="fas fa-glasses" aria-hidden="true"></i> ASSESS REPORT
                                     </button>
                                 </div>
@@ -654,7 +654,7 @@
                     askConfirmation = false;
                     e.preventDefault();
                     $.alert({
-                        title: "Claim Assignment !!!",
+                        title: "Claim Assessment !!!",
                         content: "Please enter comments?",
                         icon: 'fas fa-exclamation-triangle',
                         columnClass: 'medium',
