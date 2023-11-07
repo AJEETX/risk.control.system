@@ -668,7 +668,10 @@
                                                                     <a asp-controller="ClaimsVendor" class="btn btn-default" asp-action="ClaimReport">
                                                                         <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
                                                                     </a>
-                                                                    <button disabled id="allocate-case" type="submit" asp-action="ProcessReport" class="btn btn-danger">
+                                                                    <a asp-controller="ClaimsVendor" asp-action="ReSelectVendorAgent" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                                                        <i class="fas fa-sync" aria-hidden="true"></i> Re- Allocate
+                                                                    </a>
+                                                                    <button disabled id="allocate-case" type="submit" asp-action="ProcessReport" class="btn btn-success">
                                                                         <i class="far fa-file-alt" aria-hidden="true"></i> SUBMIT
                                                                     </button>
                                                                 </div>

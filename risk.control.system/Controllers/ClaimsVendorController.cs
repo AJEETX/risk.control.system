@@ -219,6 +219,118 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [Breadcrumb("ReAllocate")]
+        public async Task<IActionResult> ReSelectVendorAgent(string selectedcase)
+        {
+            if (string.IsNullOrWhiteSpace(selectedcase))
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var claimsCaseToAllocateToVendorAgent = _context.ClaimsInvestigation
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.ClientCompany)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.CaseEnabler)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.CostCentre)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.InvestigationCaseSubStatus)
+              .Include(c => c.CaseLocations)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.Country)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.District)
+              .Include(c => c.InvestigationCaseStatus)
+              .Include(c => c.InvestigationCaseSubStatus)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.InvestigationServiceType)
+              .Include(c => c.PolicyDetail)
+              .ThenInclude(c => c.LineOfBusiness)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.PinCode)
+              .Include(c => c.CustomerDetail)
+              .ThenInclude(c => c.State)
+                .Include(c => c.Vendors)
+                .FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
+
+            var claimsCaseLocation = _context.CaseLocation
+                .Include(c => c.ClaimsInvestigation)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.Vendor)
+                .Include(c => c.PinCode)
+                .Include(c => c.BeneficiaryRelation)
+                .Include(c => c.District)
+                .Include(c => c.State)
+                .Include(c => c.Country)
+                .FirstOrDefault(c => c.CaseLocationId == claimsCaseToAllocateToVendorAgent.CaseLocations.FirstOrDefault().CaseLocationId &&
+                c.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseStatusId);
+
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+
+            var vendorUsers = _context.VendorApplicationUser
+                .Include(u => u.District)
+                .Include(u => u.State)
+                .Include(u => u.Country)
+                .Include(u => u.PinCode)
+                .Where(u => u.VendorId == claimsCaseLocation.VendorId && u.Active);
+
+            List<VendorUserClaim> agents = new List<VendorUserClaim>();
+            var result = dashboardService.CalculateAgentCaseStatus(userEmail);
+
+            foreach (var vendorUser in vendorUsers)
+            {
+                var isTrue = await userManager.IsInRoleAsync(vendorUser, agentRole?.Name);
+                if (isTrue)
+                {
+                    int claimCount = 0;
+                    if (result.TryGetValue(vendorUser.Email, out claimCount))
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = vendorUser,
+                            CurrentCaseCount = claimCount,
+                        };
+                        agents.Add(agentData);
+                    }
+                    else
+                    {
+                        var agentData = new VendorUserClaim
+                        {
+                            AgencyUser = vendorUser,
+                            CurrentCaseCount = 0,
+                        };
+                        agents.Add(agentData);
+                    }
+                }
+            }
+
+            var model = new ClaimsInvestigationVendorAgentModel
+            {
+                CaseLocation = claimsCaseLocation,
+                ClaimsInvestigation = claimsCaseToAllocateToVendorAgent,
+                VendorUserClaims = agents
+            };
+
+            var customerLatLong = claimsCaseToAllocateToVendorAgent.CustomerDetail.PinCode.Latitude + "," + claimsCaseToAllocateToVendorAgent.CustomerDetail.PinCode.Longitude;
+
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            ViewBag.CustomerLocationUrl = url;
+
+            var beneficiarylatLong = claimsCaseLocation.PinCode.Latitude + "," + claimsCaseLocation.PinCode.Longitude;
+            var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            ViewBag.BeneficiaryLocationUrl = bUrl;
+
+            return View(model);
+        }
+
         [Breadcrumb("Agency Workload")]
         public async Task<IActionResult> AgentLoad()
         {
