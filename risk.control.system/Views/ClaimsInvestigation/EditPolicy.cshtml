@@ -191,13 +191,13 @@
                                                                     <div class="input-group mb-3">
                                                                         @if (Model?.PolicyDetail.DocumentImage is not null)
                                                                         {
-                                                                            <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.PolicyDetail.DocumentImage))">
+                                                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.PolicyDetail.DocumentImage))">
                                                                         }
                                                                         else
                                                                         {
-                                                                            <img id="documentImage" class="form-Image" src="/img/no-policy.jpg">
+                                                                            <img id="profileImage" class="form-Image" src="/img/no-policy.jpg">
                                                                         }
-                                                                        <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                                        <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
                                                                     </div>
                                                                 </div>
 

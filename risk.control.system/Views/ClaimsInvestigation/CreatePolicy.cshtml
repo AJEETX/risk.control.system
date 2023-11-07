@@ -182,8 +182,8 @@
                                                                     <span class="input-group-label"> Policy Document:</span>
                                                                     <div class="input-group mb-3">
                                                                         
-                                                                        <img class="form-Image" id="documentImage" src="/img/no-document.png">
-                                                                        <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control" id="documentImage" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                                        <img class="form-Image" id="policyImage" src="/img/no-document.png">
+                                                                        <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control" id="documentImageInput" onchange="document.getElementById('policyImage').src = window.URL.createObjectURL(this.files[0])" />
                                                                     </div>
                                                                 </div>
                                                             </div>

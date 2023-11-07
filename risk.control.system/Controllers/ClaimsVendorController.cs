@@ -261,6 +261,8 @@ namespace risk.control.system.Controllers
                 .Include(c => c.Vendors)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == selectedcase);
 
+            var location = claimsCaseToAllocateToVendorAgent.CaseLocations.FirstOrDefault();
+
             var claimsCaseLocation = _context.CaseLocation
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.InvestigationCaseSubStatus)
@@ -270,8 +272,8 @@ namespace risk.control.system.Controllers
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
-                .FirstOrDefault(c => c.CaseLocationId == claimsCaseToAllocateToVendorAgent.CaseLocations.FirstOrDefault().CaseLocationId &&
-                c.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseStatusId);
+                .FirstOrDefault(c => c.CaseLocationId == location.CaseLocationId &&
+                c.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId);
 
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
