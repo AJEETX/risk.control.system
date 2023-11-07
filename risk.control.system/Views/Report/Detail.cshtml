@@ -451,11 +451,11 @@
                                                                                 @{
                                                                                     if (Model.Location.ClaimReport?.AgentLocationPicture != null)
                                                                                     {
-                                                                                        <img title="location image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.AgentLocationPicture))">
+                                                                                        <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.AgentLocationPicture))">
                                                                                     }
                                                                                     else
                                                                                     {
-                                                                                        <img title="location image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src="/img/no-photo.png">
+                                                                                        <img title="digital image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src="/img/no-photo.png">
                                                                                     }
                                                                                 }
                                                                             </p>
@@ -513,11 +513,11 @@
                                                                                 @{
                                                                                     if (Model.Location.ClaimReport?.AgentOcrPicture != null)
                                                                                     {
-                                                                                        <img title="ocr image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.AgentOcrPicture))">
+                                                                                        <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.AgentOcrPicture))">
                                                                                     }
                                                                                     else
                                                                                     {
-                                                                                        <img title="ocr image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src="/img/no-photo.png">
+                                                                                        <img title="document image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src="/img/no-photo.png">
                                                                                     }
                                                                                 }
                                                                             </p>
