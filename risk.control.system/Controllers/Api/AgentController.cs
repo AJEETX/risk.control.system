@@ -396,18 +396,22 @@ namespace risk.control.system.Controllers.Api
                 .Include(c => c.CustomerDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
-            //FACE IMAGE PROCESSING
+            #region FACE IMAGE PROCESSING
+
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
                 byte[] registeredImage = null!;
+                this.logger.LogInformation("DIGITAL ID : FACE image {LocationImage} ", data.LocationImage);
 
                 if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
                 {
                     registeredImage = claim.CustomerDetail.ProfilePicture;
+                    this.logger.LogInformation("DIGITAL ID : HEALTH image {registeredImage} ", registeredImage);
                 }
                 if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
                 {
                     registeredImage = claimCase.ProfilePicture;
+                    this.logger.LogInformation("DIGITAL ID : DEATH image {registeredImage} ", registeredImage);
                 }
 
                 string ImageData = string.Empty;
@@ -417,6 +421,7 @@ namespace risk.control.system.Controllers.Api
                     {
                         var base64Image = Convert.ToBase64String(registeredImage);
 
+                        this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
                         var response = await httpClient.PostAsJsonAsync(FacematchUrl, new MatchImage { Source = base64Image, Dest = data.LocationImage });
 
                         ImageData = await response.Content.ReadAsStringAsync();
@@ -447,62 +452,68 @@ namespace risk.control.system.Controllers.Api
                 claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
                 this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
             }
+
+            #endregion FACE IMAGE PROCESSING
+
             if (!string.IsNullOrWhiteSpace(data.LocationLongLat))
             {
                 claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
                 claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
             }
 
-            //FACE IMAGE PROCESSING
+            #region PAN IMAGE PROCESSING
+
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
                 var inputImage = new MaskImage { Image = data.OcrImage };
+                this.logger.LogInformation("DOCUMENT ID : PAN image {ocrImage} ", data.OcrImage);
 
                 var response = await httpClient.PostAsJsonAsync(PanMaskUrl, inputImage);
 
                 var maskedImage = await response.Content.ReadAsStringAsync();
 
+                this.logger.LogInformation("DOCUMENT ID : PAN maskedImage image {maskedImage} ", maskedImage);
                 if (!string.IsNullOrWhiteSpace(maskedImage))
                 {
                     try
                     {
                         var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
-                        var request = new HttpRequestMessage
-                        {
-                            Method = HttpMethod.Get,
-                            RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
-                            Headers =
-                            {
-                                { "x-rapid-api", "rapid-api-database" },
-                                { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
-                                { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
-                            },
-                        };
-                        using (var panResponse = await httpClient.SendAsync(request))
-                        {
-                            panResponse.EnsureSuccessStatusCode();
-                            var body = await panResponse.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
+                        //var request = new HttpRequestMessage
+                        //{
+                        //    Method = HttpMethod.Get,
+                        //    RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
+                        //    Headers =
+                        //    {
+                        //        { "x-rapid-api", "rapid-api-database" },
+                        //        { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
+                        //        { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                        //    },
+                        //};
+                        //using (var panResponse = await httpClient.SendAsync(request))
+                        //{
+                        //    panResponse.EnsureSuccessStatusCode();
+                        //    var body = await panResponse.Content.ReadAsStringAsync();
+                        //    try
+                        //    {
+                        //        var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
 
-                                if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                                {
-                                    if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name))
-                                        claimCase.ClaimReport.PanValid = true;
-                                }
+                        //        if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        //        {
+                        //            if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name))
+                        //                claimCase.ClaimReport.PanValid = true;
+                        //        }
 
-                                claimCase.ClaimReport.PanValid = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
-                                if (panInvalidData != null && panInvalidData.status == 500)
-                                {
-                                    Console.WriteLine(panInvalidData.status);
-                                }
-                            }
-                        }
+                        //        claimCase.ClaimReport.PanValid = true;
+                        //    }
+                        //    catch (Exception ex)
+                        //    {
+                        //        var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
+                        //        if (panInvalidData != null && panInvalidData.status == 500)
+                        //        {
+                        //            Console.WriteLine(panInvalidData.status);
+                        //        }
+                        //    }
+                        //}
 
                         var image = Convert.FromBase64String(maskedImageDetail.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
@@ -535,6 +546,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 else
                 {
+                    this.logger.LogInformation("DOCUMENT ID : PAN unmaskedImage image {maskedImage} ", data.OcrImage);
                     var image = Convert.FromBase64String(data.OcrImage);
                     var OcrRealImage = ByteArrayToImage(image);
                     MemoryStream stream = new MemoryStream(image);
@@ -544,8 +556,9 @@ namespace risk.control.system.Controllers.Api
                     CompressImage.Compressimage(stream, filePath);
                     claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
                 }
-                this.logger.LogInformation("PAN masked image {maskedImage} ", maskedImage);
             }
+
+            #endregion PAN IMAGE PROCESSING
 
             if (string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrData) && !string.IsNullOrWhiteSpace(data.OcrData))
             {
