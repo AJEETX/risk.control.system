@@ -21,6 +21,8 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static System.Net.Mime.MediaTypeNames;
+
 namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
@@ -66,13 +68,19 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("match")]
         public async Task<IActionResult> Match(MatchImage image)
         {
+            var maskedImageDetail = await GetFaceMatch(image);
+
+            return Ok(maskedImageDetail);
+        }
+
+        private async Task<FaceMatchDetail> GetFaceMatch(MatchImage image)
+        {
             var response = await httpClient.PostAsJsonAsync(FacematchUrl, image);
 
             var maskedImage = await response.Content.ReadAsStringAsync();
 
             var maskedImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(maskedImage);
-
-            return Ok(maskedImageDetail);
+            return maskedImageDetail;
         }
 
         [AllowAnonymous]
@@ -400,7 +408,7 @@ namespace risk.control.system.Controllers.Api
 
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
-                byte[] registeredImage = null!;
+                byte[]? registeredImage = null;
                 this.logger.LogInformation("DIGITAL ID : FACE image {LocationImage} ", data.LocationImage);
 
                 if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -419,19 +427,32 @@ namespace risk.control.system.Controllers.Api
                 {
                     if (registeredImage != null)
                     {
+                        var image = Convert.FromBase64String(data.LocationImage);
+                        var locationRealImage = ByteArrayToImage(image);
+                        MemoryStream stream = new MemoryStream(image);
+                        claimCase.ClaimReport.AgentLocationPicture = image;
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                        claimCase.ClaimReport.AgentLocationPictureUrl = filePath;
+                        CompressImage.Compressimage(stream, filePath);
+
+                        var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                        var saveImageBase64String = Convert.ToBase64String(savedImage);
+
+                        claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
+                        this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
+                        
+                        
                         var base64Image = Convert.ToBase64String(registeredImage);
 
                         this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
-                        var response = await httpClient.PostAsJsonAsync(FacematchUrl, new MatchImage { Source = base64Image, Dest = data.LocationImage });
+                        var faceImageDetail = await GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String });
 
-                        ImageData = await response.Content.ReadAsStringAsync();
-
-                        if (response.IsSuccessStatusCode)
-                        {
-                            var faceImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(ImageData);
-
-                            claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
-                        }
+                        claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                    }
+                    else
+                    {
+                        claimCase.ClaimReport.LocationPictureConfidence = "no face image";
                     }
                 }
                 catch (Exception ex)
@@ -442,15 +463,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     claimCase.ClaimReport.LocationPictureConfidence = "no image";
                 }
-                var image = Convert.FromBase64String(data.LocationImage);
-                var locationRealImage = ByteArrayToImage(image);
-                MemoryStream stream = new MemoryStream(image);
-                claimCase.ClaimReport.AgentLocationPicture = image;
-                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                claimCase.ClaimReport.AgentLocationPictureUrl = filePath;
-                CompressImage.Compressimage(stream, filePath);
-                claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
-                this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
+                
             }
 
             #endregion FACE IMAGE PROCESSING
@@ -673,10 +686,10 @@ namespace risk.control.system.Controllers.Api
             return Ok(response);
         }
 
-        public Image? ByteArrayToImage(byte[] data)
+        public System.Drawing.Image? ByteArrayToImage(byte[] data)
         {
             MemoryStream ms = new MemoryStream(data);
-            Image returnImage = Image.FromStream(ms);
+            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
             return returnImage;
         }
     }
