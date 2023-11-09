@@ -594,8 +594,8 @@ namespace risk.control.system.Controllers.Api
                         MemoryStream stream = new MemoryStream(image);
                         claimCase.ClaimReport.AgentOcrPicture = image;
                         var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
-                        claimCase.ClaimReport.AgentOcrUrl = filePath;
                         CompressImage.Compressimage(stream, filePath);
+                        claimCase.ClaimReport.AgentOcrUrl = filePath;
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
                         claimCase.ClaimReport.ImageType = maskedImage.DocType;
                         claimCase.ClaimReport.AgentOcrData = " Doc type: " + maskedImage.DocType;
@@ -626,8 +626,8 @@ namespace risk.control.system.Controllers.Api
                     MemoryStream stream = new MemoryStream(image);
                     claimCase.ClaimReport.AgentOcrPicture = image;
                     var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
-                    claimCase.ClaimReport.AgentOcrUrl = filePath;
                     CompressImage.Compressimage(stream, filePath);
+                    claimCase.ClaimReport.AgentOcrUrl = filePath;
                     claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
                 }
             }
