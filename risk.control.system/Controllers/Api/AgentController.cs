@@ -38,6 +38,7 @@ namespace risk.control.system.Controllers.Api
         private static string PanMaskUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
         private static string FacematchUrl = "http://icheck-webse-konc2x2nmowe-196777346.ap-southeast-2.elb.amazonaws.com/faceMatch";
         private static string PanUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verifyPan/";
+        private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan";
 
         private ILogger<AgentController> logger;
 
@@ -492,42 +493,98 @@ namespace risk.control.system.Controllers.Api
                     try
                     {
                         var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
-                        //var request = new HttpRequestMessage
+                        //test PAN FNLPM8635N
+
+                        if (maskedImageDetail != null && maskedImageDetail.DocumentId.ToUpper() == "ABCDE1234F")
+                        {
+                            maskedImageDetail.DocumentId = "FNLPM8635N";
+                        }
+                        //PAN VERIFICATION
+
+                        #region//PLAN 1 : PAN VERIFICATION
+
+                        var request = new HttpRequestMessage
+                        {
+                            Method = HttpMethod.Get,
+                            RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
+                            Headers =
+                            {
+                                { "x-rapid-api", "rapid-api-database" },
+                                { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
+                                { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                            },
+                        };
+                        using (var panResponse = await httpClient.SendAsync(request))
+                        {
+                            panResponse.EnsureSuccessStatusCode();
+                            var body = await panResponse.Content.ReadAsStringAsync();
+                            try
+                            {
+                                var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
+
+                                if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                                {
+                                    if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name.ToLower()) || claim.CustomerDetail.CustomerName.ToLower().Contains(panData.last_name.ToLower()))
+                                        claimCase.ClaimReport.PanValid = true;
+                                }
+
+                                if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+                                {
+                                    if (claimCase.BeneficiaryName.ToLower().Contains(panData.first_name.ToLower()) || claimCase.BeneficiaryName.ToLower().Contains(panData.last_name.ToLower()))
+                                        claimCase.ClaimReport.PanValid = true;
+                                }
+                                if (panData != null && !string.IsNullOrEmpty(panData.pan))
+                                    claimCase.ClaimReport.PanValid = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
+                                if (panInvalidData != null && panInvalidData.status == 500)
+                                {
+                                    Console.WriteLine(panInvalidData.status);
+                                }
+                            }
+                        }
+                        #endregion PAN IMAGE PROCESSING
+
+                        //#region//PLAN 2 : PAN VERIFICATION
+
+                        //var requestPayload = new PanVerifyRequest
                         //{
-                        //    Method = HttpMethod.Get,
-                        //    RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
+                        //    task_id = "74f4c926-250c-43ca-9c53-453e87ceacd1",
+                        //    group_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
+                        //    data = new PanNumber
+                        //    {
+                        //        id_number = maskedImageDetail.DocumentId
+                        //    }
+                        //};
+
+                        //var request2 = new HttpRequestMessage
+                        //{
+                        //    Method = HttpMethod.Post,
+                        //    RequestUri = new Uri(PanIdfyUrl),
                         //    Headers =
                         //    {
-                        //        { "x-rapid-api", "rapid-api-database" },
-                        //        { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
-                        //        { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                        //        { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                        //        { "X-RapidAPI-Host", "idfy-verification-suite.p.rapidapi.com" },
                         //    },
+                        //    Content = new StringContent(JsonConvert.SerializeObject(requestPayload)) { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } },
                         //};
-                        //using (var panResponse = await httpClient.SendAsync(request))
+
+                        //using (var response2 = await httpClient.SendAsync(request2))
                         //{
-                        //    panResponse.EnsureSuccessStatusCode();
-                        //    var body = await panResponse.Content.ReadAsStringAsync();
-                        //    try
+                        //    response2.EnsureSuccessStatusCode();
+                        //    var body = await response2.Content.ReadAsStringAsync();
+                        //    var verifiedPanResponse = JsonConvert.DeserializeObject<PanVerifyResponse>(body);
+
+                        //    if (verifiedPanResponse != null && verifiedPanResponse.status == "completed")
                         //    {
-                        //        var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
-
-                        //        if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                        //        {
-                        //            if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name))
-                        //                claimCase.ClaimReport.PanValid = true;
-                        //        }
-
                         //        claimCase.ClaimReport.PanValid = true;
                         //    }
-                        //    catch (Exception ex)
-                        //    {
-                        //        var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
-                        //        if (panInvalidData != null && panInvalidData.status == 500)
-                        //        {
-                        //            Console.WriteLine(panInvalidData.status);
-                        //        }
-                        //    }
                         //}
+                        //#endregion
+
+                        //END PANS
 
                         var image = Convert.FromBase64String(maskedImageDetail.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
@@ -693,6 +750,32 @@ namespace risk.control.system.Controllers.Api
             System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
             return returnImage;
         }
+    }
+
+    public class PanVerifyResponse
+    {
+        public string Action { get; set; }
+        public string completed_at { get; set; }
+        public string created_at { get; set; }
+        public string group_id { get; set; }
+        public string request_id { get; set; }
+        public string result { get; set; }
+        public string status { get; set; }
+        public string task_id { get; set; }
+        public string type { get; set; }
+        public string error { get; set; }
+    }
+
+    public class PanVerifyRequest
+    {
+        public string task_id { get; set; }
+        public string group_id { get; set; }
+        public PanNumber data { get; set; }
+    }
+
+    public class PanNumber
+    {
+        public string id_number { get; set; }
     }
 
     public class PanInValidationResponse
