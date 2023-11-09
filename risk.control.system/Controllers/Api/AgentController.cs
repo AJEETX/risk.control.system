@@ -549,12 +549,14 @@ namespace risk.control.system.Controllers.Api
                             maskedImage.DocumentId = "FNLPM8635N";
                         }
                         //END:: TEMP
-
-                        var body = await VerifyPan(maskedImage.DocumentId);
-
-                        if (body != null && body.status == "completed" && body.result?.source_output?.status == "id_found")
+                        if (maskedImage.DocType.ToLower() == "PAN")
                         {
-                            claimCase.ClaimReport.PanValid = true;
+                            var body = await VerifyPan(maskedImage.DocumentId);
+
+                            if (body != null && body.status == "completed" && body.result?.source_output?.status == "id_found")
+                            {
+                                claimCase.ClaimReport.PanValid = true;
+                            }
                         }
 
                         #endregion PAN IMAGE PROCESSING
