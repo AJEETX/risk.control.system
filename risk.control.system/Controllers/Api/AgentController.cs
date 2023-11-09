@@ -22,7 +22,6 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -541,11 +540,6 @@ namespace risk.control.system.Controllers.Api
                     try
                     {
                         //test PAN FNLPM8635N
-
-                        if (maskedImage != null && maskedImage.DocumentId.ToUpper() == "ABCDE1234F")
-                        {
-                            maskedImage.DocumentId = "FNLPM8635N";
-                        }
                         //PAN VERIFICATION
                         #region//PLAN 2 : PAN VERIFICATION
 
@@ -564,17 +558,17 @@ namespace risk.control.system.Controllers.Api
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
                         claimCase.ClaimReport.AgentOcrPicture = image;
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{maskedImage.DocType}{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
                         CompressImage.Compressimage(stream, filePath);
                         claimCase.ClaimReport.AgentOcrUrl = filePath;
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
                         claimCase.ClaimReport.ImageType = maskedImage.DocType;
-                        claimCase.ClaimReport.AgentOcrData = maskedImage.DocType + ": " + maskedImage.DocumentId;
+                        claimCase.ClaimReport.AgentOcrData = maskedImage.DocType + " data: ";
 
-                        if (!string.IsNullOrWhiteSpace(data.OcrData))
+                        if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
                         {
-                            claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ".\n " +
-                                "" + data.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
+                            claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ". \r\n " +
+                                "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                         }
                     }
                     catch (Exception)
@@ -583,7 +577,7 @@ namespace risk.control.system.Controllers.Api
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
                         claimCase.ClaimReport.AgentOcrPicture = image;
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{maskedImage.DocType}{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
                         claimCase.ClaimReport.AgentOcrUrl = filePath;
                         CompressImage.Compressimage(stream, filePath);
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
@@ -596,7 +590,7 @@ namespace risk.control.system.Controllers.Api
                     var OcrRealImage = ByteArrayToImage(image);
                     MemoryStream stream = new MemoryStream(image);
                     claimCase.ClaimReport.AgentOcrPicture = image;
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{maskedImage.DocType}{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
                     CompressImage.Compressimage(stream, filePath);
                     claimCase.ClaimReport.AgentOcrUrl = filePath;
                     claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
@@ -798,6 +792,7 @@ namespace risk.control.system.Controllers.Api
         public string DocType { get; set; }
         public string DocumentId { get; set; }
         public string MaskedImage { get; set; }
+        public string? OcrData { get; set; }
     }
 
     public class MatchImage

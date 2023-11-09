@@ -170,10 +170,10 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-mobile-alt"></i> Face Reader');
-                    self.setContent('<b>Face image</b>:');
+                    self.setTitle('<i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span>');
+                    self.setContent('<span class="badge badge-light"><i class="far fa-image"></i> Digital Image</span>');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.location + '" /> ');
-                    self.setContentAppend('<br><b>Location Info</b> : ');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> ');
                     self.setContentAppend('<br><i>' + response.locationData + '</i>');
                     showFaceMap = true;
                 }).fail(function () {
@@ -213,7 +213,7 @@ $(document).ready(function () {
                 }).done(function (response) {
                     data = response;
                     self.setTitle('<i class="fas fa-map-marker-alt"></i> <b>Location Map</b>:');
-                    self.setContent('<b>Location Address</b>:');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location Address</span>:');
                     self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
@@ -231,6 +231,7 @@ $(document).ready(function () {
             }
         })
     })
+
     $('.olocationImage').click(function () {
         var data;
         $.confirm({
@@ -255,7 +256,7 @@ $(document).ready(function () {
                 }).done(function (response) {
                     data = response;
                     self.setTitle('<i class="fas fa-map-marker-alt"></i> <b>Location Map</b>:');
-                    self.setContent('<b>Location Address</b>:');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location Address</span>:');
                     self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
@@ -298,13 +299,13 @@ $(document).ready(function () {
                 }).done(function (response) {
                     data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
-                    self.setContent('<b>Location Map</b>:');
+                    self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Address visited</span></b>:');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
                     self.setContentAppend('</div>')
-                    self.setContentAppend('<br><b>Address</b>:');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
-                    self.setContentAppend('<br> <b>Location detail</b> :');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> :');
                     self.setContentAppend('<br><i>' + response.weatherData + '</i>');
                     showCustomerMap = true;
                 }).fail(function () {
@@ -344,13 +345,13 @@ $(document).ready(function () {
                 }).done(function (response) {
                     data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Beneficiary Address Location</b>');
-                    self.setContent('<b>Location Map</b>:');
+                    self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Address visited</span></b>:');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
                     self.setContentAppend('</div>')
-                    self.setContentAppend('<br><b>Address</b>:');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address</span>:');
                     self.setContentAppend('<br><i>' + response.address + '</i>');
-                    self.setContentAppend('<br> <b>Location detail</b> :');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span> :');
                     self.setContentAppend('<br><i>' + response.weatherData + '</i>');
                     showBeneficiaryMap = true;
                 }).fail(function () {
@@ -387,10 +388,10 @@ $(document).ready(function () {
                     dataType: 'json',
                     method: 'get'
                 }).done(function (response) {
-                    self.setTitle('<i class="fas fa-mobile-alt"></i> OCR App');
-                    self.setContentAppend('<b>OCR Image</b>:');
+                    self.setTitle('<i class="fas fa-portrait"></i> Document <span class="badge badge-light">checkify</span>');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-film"></i> Document Image</span>');
                     self.setContentAppend('<br><img id="agentOcrPicture" class="img-fluid investigation-actual-image" src="' + response.ocrData + '" /> ');
-                    self.setContentAppend('<br><b>OCR Scan Info</b> : ');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span> ');
                     self.setContentAppend('<br><i>' + response.qrData + '</i>');
                 }).fail(function () {
                     self.setContent('Something went wrong.');
@@ -553,6 +554,7 @@ $(document).ready(function () {
             }
         })
     })
+
     $('#policy-comments').click(function () {
         $.confirm({
             title: 'Policy Note!!!',
