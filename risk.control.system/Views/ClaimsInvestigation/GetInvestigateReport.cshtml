@@ -390,7 +390,17 @@
 
                                                                         <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
-
+                                                                    <div class="card-footer text-center">
+                                                                        <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
+                                                                        @if (string.IsNullOrWhiteSpace(@Model.CaseLocation.ClaimReport.LocationPictureConfidence))
+                                                                        {
+                                                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                                                        }
+                                                                    </div>
                                                                     <div class="card-body pt-0">
                                                                         <div class="row">
                                                                             <div class="col-6">
@@ -438,9 +448,7 @@
                                                                         <div id="face-msg">
                                                                         </div>
                                                                     </div>
-                                                                    <div class="card-footer text-center">
-                                                                        <span class="badge badge-light">Match :<i class="fa fa-user"></i> @Model.CaseLocation.ClaimReport.LocationPictureConfidence</span>
-                                                                    </div>
+                                                                    
                                                                 </div>
                                                             </div>
                                                         }
@@ -452,7 +460,17 @@
 
                                                                         <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span><span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
-
+                                                                    <div class="card-footer text-center">
+                                                                        <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
+                                                                        @if (@Model.CaseLocation.ClaimReport.PanValid.HasValue && @Model.CaseLocation.ClaimReport.PanValid.Value)
+                                                                        {
+                                                                            <i style='color:green;' class='fas fa-check-circle'></i>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                                                                        }
+                                                                    </div>
                                                                     <div class="card-body pt-0">
                                                                         <div class="row">
                                                                             <div class="col-6">
@@ -500,9 +518,7 @@
                                                                         <div id="ocr-msg">
                                                                         </div>
                                                                     </div>
-                                                                    <div class="card-footer text-center">
-                                                                        <span class="badge badge-light">Valid :<i class="fa fa-user"></i> @Model.CaseLocation.ClaimReport.PanValid</span>
-                                                                    </div>
+                                                                   
                                                                 </div>
                                                             </div>
                                                         }
