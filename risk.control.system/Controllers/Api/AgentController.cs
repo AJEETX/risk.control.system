@@ -56,13 +56,19 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("mask")]
         public async Task<IActionResult> Mask(MaskImage image)
         {
+            var maskedImageDetail = await GetMaskedImage(image);
+
+            return Ok(maskedImageDetail);
+        }
+
+        private async Task<FaceImageDetail> GetMaskedImage(MaskImage image)
+        {
             var response = await httpClient.PostAsJsonAsync(PanMaskUrl, image);
 
             var maskedImage = await response.Content.ReadAsStringAsync();
 
             var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
-
-            return Ok(maskedImageDetail);
+            return maskedImageDetail;
         }
 
         [AllowAnonymous]
@@ -483,68 +489,65 @@ namespace risk.control.system.Controllers.Api
                 var inputImage = new MaskImage { Image = data.OcrImage };
                 this.logger.LogInformation("DOCUMENT ID : PAN image {ocrImage} ", data.OcrImage);
 
-                var response = await httpClient.PostAsJsonAsync(PanMaskUrl, inputImage);
-
-                var maskedImage = await response.Content.ReadAsStringAsync();
+                var maskedImage = await GetMaskedImage(inputImage);
 
                 this.logger.LogInformation("DOCUMENT ID : PAN maskedImage image {maskedImage} ", maskedImage);
-                if (!string.IsNullOrWhiteSpace(maskedImage))
+                if (maskedImage != null)
                 {
                     try
                     {
-                        var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
                         //test PAN FNLPM8635N
 
-                        if (maskedImageDetail != null && maskedImageDetail.DocumentId.ToUpper() == "ABCDE1234F")
+                        if (maskedImage != null && maskedImage.DocumentId.ToUpper() == "ABCDE1234F")
                         {
-                            maskedImageDetail.DocumentId = "FNLPM8635N";
+                            maskedImage.DocumentId = "FNLPM8635N";
                         }
                         //PAN VERIFICATION
 
                         #region//PLAN 1 : PAN VERIFICATION
 
-                        var request = new HttpRequestMessage
-                        {
-                            Method = HttpMethod.Get,
-                            RequestUri = new Uri(PanUrl + maskedImageDetail.DocumentId),
-                            Headers =
-                            {
-                                { "x-rapid-api", "rapid-api-database" },
-                                { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
-                                { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
-                            },
-                        };
-                        using (var panResponse = await httpClient.SendAsync(request))
-                        {
-                            panResponse.EnsureSuccessStatusCode();
-                            var body = await panResponse.Content.ReadAsStringAsync();
-                            try
-                            {
-                                var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
+                        //var request = new HttpRequestMessage
+                        //{
+                        //    Method = HttpMethod.Get,
+                        //    RequestUri = new Uri(PanUrl + maskedImage.DocumentId),
+                        //    Headers =
+                        //    {
+                        //        { "x-rapid-api", "rapid-api-database" },
+                        //        { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
+                        //        { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
+                        //    },
+                        //};
+                        //using (var panResponse = await httpClient.SendAsync(request))
+                        //{
+                        //    panResponse.EnsureSuccessStatusCode();
+                        //    var body = await panResponse.Content.ReadAsStringAsync();
+                        //    try
+                        //    {
+                        //        var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
 
-                                if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                                {
-                                    if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name.ToLower()) || claim.CustomerDetail.CustomerName.ToLower().Contains(panData.last_name.ToLower()))
-                                        claimCase.ClaimReport.PanValid = true;
-                                }
+                        //        if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                        //        {
+                        //            if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name.ToLower()) || claim.CustomerDetail.CustomerName.ToLower().Contains(panData.last_name.ToLower()))
+                        //                claimCase.ClaimReport.PanValid = true;
+                        //        }
 
-                                if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.DEATH)
-                                {
-                                    if (claimCase.BeneficiaryName.ToLower().Contains(panData.first_name.ToLower()) || claimCase.BeneficiaryName.ToLower().Contains(panData.last_name.ToLower()))
-                                        claimCase.ClaimReport.PanValid = true;
-                                }
-                                if (panData != null && !string.IsNullOrEmpty(panData.pan))
-                                    claimCase.ClaimReport.PanValid = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
-                                if (panInvalidData != null && panInvalidData.status == 500)
-                                {
-                                    Console.WriteLine(panInvalidData.status);
-                                }
-                            }
-                        }
+                        //        if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+                        //        {
+                        //            if (claimCase.BeneficiaryName.ToLower().Contains(panData.first_name.ToLower()) || claimCase.BeneficiaryName.ToLower().Contains(panData.last_name.ToLower()))
+                        //                claimCase.ClaimReport.PanValid = true;
+                        //        }
+                        //        if (panData != null && !string.IsNullOrEmpty(panData.pan))
+                        //            claimCase.ClaimReport.PanValid = true;
+                        //    }
+                        //    catch (Exception ex)
+                        //    {
+                        //        var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
+                        //        if (panInvalidData != null && panInvalidData.status == 500)
+                        //        {
+                        //            Console.WriteLine(panInvalidData.status);
+                        //        }
+                        //    }
+                        //}
                         #endregion PAN IMAGE PROCESSING
 
                         //#region//PLAN 2 : PAN VERIFICATION
@@ -586,7 +589,7 @@ namespace risk.control.system.Controllers.Api
 
                         //END PANS
 
-                        var image = Convert.FromBase64String(maskedImageDetail.MaskedImage);
+                        var image = Convert.FromBase64String(maskedImage.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
                         claimCase.ClaimReport.AgentOcrPicture = image;
@@ -594,18 +597,18 @@ namespace risk.control.system.Controllers.Api
                         claimCase.ClaimReport.AgentOcrUrl = filePath;
                         CompressImage.Compressimage(stream, filePath);
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
-                        claimCase.ClaimReport.ImageType = maskedImageDetail.DocType;
-                        claimCase.ClaimReport.AgentOcrData = " Doc type: " + maskedImageDetail.DocType;
+                        claimCase.ClaimReport.ImageType = maskedImage.DocType;
+                        claimCase.ClaimReport.AgentOcrData = " Doc type: " + maskedImage.DocType;
 
                         if (!string.IsNullOrWhiteSpace(data.OcrData))
                         {
                             claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ".\n " +
-                                "" + data.OcrData.Replace(maskedImageDetail.DocumentId, "xxxxxxxxxx");
+                                "" + data.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                         }
                     }
                     catch (Exception)
                     {
-                        var image = Convert.FromBase64String(data.OcrImage);
+                        var image = Convert.FromBase64String(maskedImage.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
                         claimCase.ClaimReport.AgentOcrPicture = image;
@@ -617,7 +620,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 else
                 {
-                    this.logger.LogInformation("DOCUMENT ID : PAN unmaskedImage image {maskedImage} ", data.OcrImage);
+                    this.logger.LogInformation("DOCUMENT ID : PAN maskedImage image {maskedImage} ", maskedImage);
                     var image = Convert.FromBase64String(data.OcrImage);
                     var OcrRealImage = ByteArrayToImage(image);
                     MemoryStream stream = new MemoryStream(image);
