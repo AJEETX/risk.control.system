@@ -103,7 +103,7 @@ function initFaceMap(center, dakota, frick) {
 
     // Calculate and display the distance between markers
     var distance = haversine_distance(mk1, mk2);
-    document.getElementById('face-msg').innerHTML = "Distance between markers: " + distance.toFixed(2) + " km.";
+    document.getElementById('face-msg').innerHTML = "Distance between expected vs visited location: " + distance.toFixed(2) + " km.";
     let directionsService = new google.maps.DirectionsService();
     let directionsRenderer = new google.maps.DirectionsRenderer();
     directionsRenderer.setMap(map); // Existing map object displays directions
