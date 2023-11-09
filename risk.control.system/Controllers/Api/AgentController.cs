@@ -551,7 +551,7 @@ namespace risk.control.system.Controllers.Api
 
                         var body = await VerifyPan(maskedImage.DocumentId);
 
-                        if (body != null && body.result.source_output.status == "id_found")
+                        if (body != null && body.status == "completed" && body.result?.source_output?.status == "id_found")
                         {
                             claimCase.ClaimReport.PanValid = true;
                         }
