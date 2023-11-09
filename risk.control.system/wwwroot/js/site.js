@@ -299,7 +299,7 @@ $(document).ready(function () {
                 }).done(function (response) {
                     data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Customer Address Location</b>');
-                    self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Address visited</span></b>:');
+                    self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
                     self.setContentAppend('</div>')
@@ -345,7 +345,7 @@ $(document).ready(function () {
                 }).done(function (response) {
                     data = response;
                     self.setTitle('<i class="fas fa-mobile-alt"></i> <b>Beneficiary Address Location</b>');
-                    self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Address visited</span></b>:');
+                    self.setContent('<b><span class="badge badge-light"><i class="fas fa-map-pin"></i> Map Location</span></b>:');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
                     self.setContentAppend('</div>')

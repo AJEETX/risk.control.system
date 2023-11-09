@@ -543,6 +543,13 @@ namespace risk.control.system.Controllers.Api
                         //PAN VERIFICATION
                         #region//PLAN 2 : PAN VERIFICATION
 
+                        //TEMP
+                        if (!maskedImage.DocumentId.StartsWith("ABCDE1234F"))
+                        {
+                            maskedImage.DocumentId = "FNLPM8635N";
+                        }
+                        //END:: TEMP
+
                         var body = await VerifyPan(maskedImage.DocumentId);
 
                         if (body != null && body.status == "completed" && body.result?.source_output?.status == "id_found")
