@@ -341,6 +341,11 @@
                                                     var image = @ViewBag.LocationUrl;
                                                     var ocrImage = @ViewBag.OcrLocationUrl;
                                                     var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Image DATA";
+                                                    var faceMatch = "<i style='color:green;' class='fas fa-check-circle'></i>";
+                                                    if (string.IsNullOrWhiteSpace(@Model.CaseLocation.ClaimReport.LocationPictureConfidence))
+                                                    {
+                                                        faceMatch = "<i class='fa fa-times' aria-hidden='true'></i>";
+                                                    }
                                                 }
                                                 <div class="row">
                                                     @{
@@ -352,7 +357,9 @@
 
                                                                         <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
-
+                                                                    <div class="card-footer text-center">
+                                                                        <span class="badge badge-light">Match : <i class="fa fa-user"></i> </span> @faceMatch
+                                                                    </div>
                                                                     <div class="card-body pt-0">
                                                                         <div class="row">
                                                                             <div class="col-6">
@@ -400,21 +407,26 @@
                                                                         <div id="face-msg">
                                                                         </div>
                                                                     </div>
-                                                                    <div class="card-footer text-center">
-                                                                        <span class="badge badge-light">Match :<i class="fa fa-user"></i> @Model.CaseLocation.ClaimReport.LocationPictureConfidence</span>
-                                                                    </div>
+                                                                    
                                                                 </div>
                                                             </div>
                                                         }
                                                         if (@Model.CaseLocation.ClaimReport?.AgentOcrData != null && @Model.CaseLocation.ClaimReport?.OcrLongLatTime != null && ocrImage != null)
                                                         {
+                                                            var panValid = "<i class='fa fa-times' aria-hidden='true'></i>";
+                                                            if (@Model.CaseLocation.ClaimReport.PanValid.HasValue && @Model.CaseLocation.ClaimReport.PanValid.Value)
+                                                            {
+                                                                panValid = "<i style='color:green;' class='fas fa-check-circle'></i>";
+                                                            }
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
                                                                     <div class="card-header text-muted border-bottom-0">
 
                                                                         <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span><span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
-
+                                                                    <div class="card-footer text-center">
+                                                                        <span class="badge badge-light">Valid :<i class="fa fa-user"></i> </span> @panValid
+                                                                    </div>
                                                                     <div class="card-body pt-0">
                                                                         <div class="row">
                                                                             <div class="col-6">
@@ -462,9 +474,7 @@
                                                                         <div id="ocr-msg">
                                                                         </div>
                                                                     </div>
-                                                                    <div class="card-footer text-center">
-                                                                        <span class="badge badge-light">Valid :<i class="fa fa-user"></i> @Model.CaseLocation.ClaimReport.PanValid</span>
-                                                                    </div>
+                                                                    
                                                                 </div>
                                                             </div>
                                                         }

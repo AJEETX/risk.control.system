@@ -80,6 +80,7 @@ namespace risk.control.system.Controllers.Api
             var maskedImage = await response.Content.ReadAsStringAsync();
 
             var maskedImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(maskedImage);
+
             return maskedImageDetail;
         }
 
@@ -441,13 +442,14 @@ namespace risk.control.system.Controllers.Api
 
                         claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
                         this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
-                        
-                        
+
                         var base64Image = Convert.ToBase64String(registeredImage);
 
                         this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
                         var faceImageDetail = await GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String });
-
+                        if (faceImageDetail != null && faceImageDetail.Confidence == null)
+                        {
+                        }
                         claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
                     }
                     else
@@ -463,7 +465,6 @@ namespace risk.control.system.Controllers.Api
                 {
                     claimCase.ClaimReport.LocationPictureConfidence = "no image";
                 }
-                
             }
 
             #endregion FACE IMAGE PROCESSING

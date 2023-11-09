@@ -169,7 +169,7 @@ table {
 
 .ocr-Image {
     height: 200px;
-    width: 2000px;
+    width: 200px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -183,7 +183,7 @@ table {
 
 .locationImage {
     height: 200px;
-    width: 2000px;
+    width: 200px;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
