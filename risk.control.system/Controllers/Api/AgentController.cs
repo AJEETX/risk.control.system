@@ -22,6 +22,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -68,6 +69,7 @@ namespace risk.control.system.Controllers.Api
             var maskedImage = await response.Content.ReadAsStringAsync();
 
             var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
+
             return maskedImageDetail;
         }
 
@@ -124,6 +126,48 @@ namespace risk.control.system.Controllers.Api
                 }
             }
             return BadRequest();
+        }
+
+        [AllowAnonymous]
+        [HttpGet("pan2")]
+        public async Task<IActionResult> Pan2(string pan = "FNLPM8635N")
+        {
+            var verifiedPanResponse = await VerifyPan(pan);
+
+            return Ok(verifiedPanResponse);
+        }
+
+        private async Task<PanVerifyResponse> VerifyPan(string pan)
+        {
+            var requestPayload = new PanVerifyRequest
+            {
+                task_id = "74f4c926-250c-43ca-9c53-453e87ceacd1",
+                group_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
+                data = new PanNumber
+                {
+                    id_number = pan
+                }
+            };
+
+            var request2 = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(PanIdfyUrl),
+                Headers =
+                {
+                    { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                    { "X-RapidAPI-Host", "idfy-verification-suite.p.rapidapi.com" },
+                },
+                Content = new StringContent(JsonConvert.SerializeObject(requestPayload)) { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } },
+            };
+
+            using (var response2 = await httpClient.SendAsync(request2))
+            {
+                //response2.EnsureSuccessStatusCode();
+                var body = await response2.Content.ReadAsStringAsync();
+                var verifiedPanResponse = JsonConvert.DeserializeObject<PanVerifyResponse>(body);
+                return verifiedPanResponse;
+            }
         }
 
         [AllowAnonymous]
@@ -503,89 +547,16 @@ namespace risk.control.system.Controllers.Api
                             maskedImage.DocumentId = "FNLPM8635N";
                         }
                         //PAN VERIFICATION
+                        #region//PLAN 2 : PAN VERIFICATION
 
-                        #region//PLAN 1 : PAN VERIFICATION
+                        var body = await VerifyPan(maskedImage.DocumentId);
 
-                        //var request = new HttpRequestMessage
-                        //{
-                        //    Method = HttpMethod.Get,
-                        //    RequestUri = new Uri(PanUrl + maskedImage.DocumentId),
-                        //    Headers =
-                        //    {
-                        //        { "x-rapid-api", "rapid-api-database" },
-                        //        { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
-                        //        { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
-                        //    },
-                        //};
-                        //using (var panResponse = await httpClient.SendAsync(request))
-                        //{
-                        //    panResponse.EnsureSuccessStatusCode();
-                        //    var body = await panResponse.Content.ReadAsStringAsync();
-                        //    try
-                        //    {
-                        //        var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
+                        if (body != null && body.result.source_output.status == "id_found")
+                        {
+                            claimCase.ClaimReport.PanValid = true;
+                        }
 
-                        //        if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                        //        {
-                        //            if (claim.CustomerDetail.CustomerName.ToLower().Contains(panData.first_name.ToLower()) || claim.CustomerDetail.CustomerName.ToLower().Contains(panData.last_name.ToLower()))
-                        //                claimCase.ClaimReport.PanValid = true;
-                        //        }
-
-                        //        if (panData != null && claim.PolicyDetail.ClaimType == ClaimType.DEATH)
-                        //        {
-                        //            if (claimCase.BeneficiaryName.ToLower().Contains(panData.first_name.ToLower()) || claimCase.BeneficiaryName.ToLower().Contains(panData.last_name.ToLower()))
-                        //                claimCase.ClaimReport.PanValid = true;
-                        //        }
-                        //        if (panData != null && !string.IsNullOrEmpty(panData.pan))
-                        //            claimCase.ClaimReport.PanValid = true;
-                        //    }
-                        //    catch (Exception ex)
-                        //    {
-                        //        var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
-                        //        if (panInvalidData != null && panInvalidData.status == 500)
-                        //        {
-                        //            Console.WriteLine(panInvalidData.status);
-                        //        }
-                        //    }
-                        //}
                         #endregion PAN IMAGE PROCESSING
-
-                        //#region//PLAN 2 : PAN VERIFICATION
-
-                        //var requestPayload = new PanVerifyRequest
-                        //{
-                        //    task_id = "74f4c926-250c-43ca-9c53-453e87ceacd1",
-                        //    group_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
-                        //    data = new PanNumber
-                        //    {
-                        //        id_number = maskedImageDetail.DocumentId
-                        //    }
-                        //};
-
-                        //var request2 = new HttpRequestMessage
-                        //{
-                        //    Method = HttpMethod.Post,
-                        //    RequestUri = new Uri(PanIdfyUrl),
-                        //    Headers =
-                        //    {
-                        //        { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                        //        { "X-RapidAPI-Host", "idfy-verification-suite.p.rapidapi.com" },
-                        //    },
-                        //    Content = new StringContent(JsonConvert.SerializeObject(requestPayload)) { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } },
-                        //};
-
-                        //using (var response2 = await httpClient.SendAsync(request2))
-                        //{
-                        //    response2.EnsureSuccessStatusCode();
-                        //    var body = await response2.Content.ReadAsStringAsync();
-                        //    var verifiedPanResponse = JsonConvert.DeserializeObject<PanVerifyResponse>(body);
-
-                        //    if (verifiedPanResponse != null && verifiedPanResponse.status == "completed")
-                        //    {
-                        //        claimCase.ClaimReport.PanValid = true;
-                        //    }
-                        //}
-                        //#endregion
 
                         //END PANS
 
@@ -598,7 +569,7 @@ namespace risk.control.system.Controllers.Api
                         claimCase.ClaimReport.AgentOcrUrl = filePath;
                         claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
                         claimCase.ClaimReport.ImageType = maskedImage.DocType;
-                        claimCase.ClaimReport.AgentOcrData = " Doc type: " + maskedImage.DocType;
+                        claimCase.ClaimReport.AgentOcrData = maskedImage.DocType + ": " + maskedImage.DocumentId;
 
                         if (!string.IsNullOrWhiteSpace(data.OcrData))
                         {
@@ -762,11 +733,29 @@ namespace risk.control.system.Controllers.Api
         public string created_at { get; set; }
         public string group_id { get; set; }
         public string request_id { get; set; }
-        public string result { get; set; }
+        public Result? result { get; set; }
         public string status { get; set; }
-        public string task_id { get; set; }
-        public string type { get; set; }
-        public string error { get; set; }
+        public string? task_id { get; set; }
+        public string? type { get; set; }
+        public string? error { get; set; }
+    }
+
+    public class Result
+    {
+        public SourceOutput source_output { get; set; }
+    }
+
+    public class SourceOutput
+    {
+        public bool? aadhaar_seeding_status { get; set; }
+        public string first_name { get; set; }
+        public object gender { get; set; }
+        public string id_number { get; set; }
+        public string last_name { get; set; }
+        public string? middle_name { get; set; }
+        public string? name_on_card { get; set; }
+        public string? source { get; set; }
+        public string status { get; set; }
     }
 
     public class PanVerifyRequest
