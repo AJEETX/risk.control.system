@@ -212,9 +212,10 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-map-marker-alt"></i> <b>Location Map</b>:');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location Address</span>:');
+                    self.setTitle('<i class="fas fa-portrait"></i> Document <span class="badge badge-light">checkify</span>');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
                     self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
                     self.setContentAppend('</div>')
@@ -255,9 +256,10 @@ $(document).ready(function () {
                     method: 'get'
                 }).done(function (response) {
                     data = response;
-                    self.setTitle('<i class="fas fa-map-marker-alt"></i> <b>Location Map</b>:');
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location Address</span>:');
+                    self.setTitle('<i class="fas fa-portrait"></i> Document <span class="badge badge-light">checkify</span>');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
                     self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
+                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
                     self.setContentAppend('</div>')
