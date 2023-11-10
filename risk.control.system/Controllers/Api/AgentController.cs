@@ -39,6 +39,8 @@ namespace risk.control.system.Controllers.Api
         private static string FacematchUrl = "/faceMatch";
         private static string PanUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verifyPan/";
         private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan";
+        private static string RapidAPIKey = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
+        private static string RapidAPIHost = "idfy-verification-suite.p.rapidapi.com";
 
         private ILogger<AgentController> logger;
 
@@ -131,12 +133,12 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("pan2")]
         public async Task<IActionResult> Pan2(string pan = "FNLPM8635N")
         {
-            var verifiedPanResponse = await VerifyPan(pan, PanIdfyUrl);
+            var verifiedPanResponse = await VerifyPan(pan, PanIdfyUrl, RapidAPIKey);
 
             return Ok(verifiedPanResponse);
         }
 
-        private async Task<PanVerifyResponse> VerifyPan(string pan, string panUrl)
+        private async Task<PanVerifyResponse> VerifyPan(string pan, string panUrl, string rapidAPIKey)
         {
             var requestPayload = new PanVerifyRequest
             {
@@ -154,8 +156,8 @@ namespace risk.control.system.Controllers.Api
                 RequestUri = new Uri(panUrl),
                 Headers =
                 {
-                    { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                    { "X-RapidAPI-Host", "idfy-verification-suite.p.rapidapi.com" },
+                    { "X-RapidAPI-Key", rapidAPIKey },
+                    { "X-RapidAPI-Host", RapidAPIHost },
                 },
                 Content = new StringContent(JsonConvert.SerializeObject(requestPayload)) { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } },
             };
@@ -549,7 +551,7 @@ namespace risk.control.system.Controllers.Api
                         {
                             if (company != null && company.VerifyOcr)
                             {
-                                var body = await VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl);
+                                var body = await VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey);
 
                                 if (body != null && body.status == "completed" && body.result?.source_output?.status == "id_found")
                                 {

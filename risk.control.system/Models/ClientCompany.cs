@@ -77,6 +77,7 @@ namespace risk.control.system.Models
         public bool VerifyOcr { get; set; } = false;
         public string ApiBaseUrl { get; set; } = "http://icheck-webse-konc2x2nmowe-196777346.ap-southeast-2.elb.amazonaws.com/";
         public string PanIdfyUrl { get; set; } = "https://idfy-verification-suite.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan";
+        public string RapidAPIKey { get; set; } = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
     }
 
     public enum CompanyStatus

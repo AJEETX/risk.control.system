@@ -15,8 +15,6 @@
                             <h3 class="card-title"><i class="fas fa-building"></i> Edit @Applicationsettings.CLIENT_COMPANY Profile</h3>
                         </div>
                         <div class="card-body">
-                        </div>
-                        <div class="card-body">
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -235,11 +233,41 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Comments"><i class="fas fa-edit"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Description" class="form-control" placeholder="Note"  maxlength="20"/>
+                                            <input type="text" asp-for="Description" class="form-control" placeholder="Note"  maxlength="30"/>
                                             <span asp-validation-for="Description" class="text-danger"></span>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Api Url:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="ApiBaseUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="ApiBaseUrl" class="form-control" placeholder="api url" />
+                                            <span asp-validation-for="ApiBaseUrl" class="text-danger"></span>
+                                        </div>
+                                    </div>
 
+                                     <div class="form-group">
+                                        <span class="input-group-label"> PanUrl:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="PanIdfyUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="PanIdfyUrl" class="form-control" placeholder="pan verify url"/>
+                                            <span asp-validation-for="PanIdfyUrl" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> RapidAPIKey:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="RapidAPIKey"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="RapidAPIKey" class="form-control" placeholder="pan verify url"/>
+                                            <span asp-validation-for="RapidAPIKey" class="text-danger"></span>
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <span class="input-group-label"> Allocation:</span>
                                         <div class="input-group mb-3">
@@ -247,7 +275,7 @@
                                                 <span class="input-group-text" id="auto-allocation"><i class="fas fa-file-export"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
                                             <span class="checkbox">
-                                                <input asp-for="Auto" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> AUTO " data-off="<i class='fa fa-pause'></i> MANUAL" data-onstyle="info" data-offstyle="secondary">
+                                                <input asp-for="Auto" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> AUTO " data-off="<i class='fa fa-pause'></i> MANUAL" data-onstyle="success" data-offstyle="secondary">
 
                                             </span>
                                         </div>
@@ -260,32 +288,12 @@
                                                 <span class="input-group-text" id="ocr-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
                                             <span class="checkbox">
-                                                <input asp-for="VerifyOcr" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> YES " data-off="<i class='fa fa-pause'></i> NO" data-onstyle="info" data-offstyle="secondary">
+                                                <input asp-for="VerifyOcr" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> YES " data-off="<i class='fa fa-pause'></i> NO" data-onstyle="danger" data-offstyle="secondary">
 
                                             </span>
                                         </div>
                                     </div>
-                                     <div class="form-group">
-                                        <span class="input-group-label"> Api Url:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="ApiBaseUrl"><i class="fas fa-edit"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" asp-for="ApiBaseUrl" class="form-control" placeholder="Note"  maxlength="20"/>
-                                            <span asp-validation-for="ApiBaseUrl" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                     <div class="form-group">
-                                        <span class="input-group-label"> PanUrl:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Comments"><i class="fas fa-edit"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" asp-for="PanIdfyUrl" class="form-control" placeholder="Note"  maxlength="20"/>
-                                            <span asp-validation-for="PanIdfyUrl" class="text-danger"></span>
-                                        </div>
-                                    </div>
+                                     
 
                                     <div class="form-group text-right">
                                         <a asp-action="Index" class="btn btn-secondary">

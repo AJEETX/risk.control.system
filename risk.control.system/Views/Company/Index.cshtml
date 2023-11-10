@@ -116,7 +116,30 @@
                                     </dd>
                                 </dl>
                             </div>
+                            <div class="col-md-12">
+                                <dl class="row">
+                                      <dt class="col-sm-5">
+                                        Api Url
+                                    </dt>
+                                    <dd class="col-sm-12">
+                                      <a href="#">@Html.DisplayFor(model => model.ApiBaseUrl)</a>  
+                                    </dd>
+                                     <dt class="col-sm-5">
+                                        Pan Url
+                                    </dt>
+                                    <dd class="col-sm-12">
+                                      <a href="#">  @Html.DisplayFor(model => model.PanIdfyUrl)</a>  
+                                    </dd>
+                                     <dt class="col-sm-5">
+                                        RapidApi Key
+                                    </dt>
+                                    <dd class="col-sm-12">
+                                      <a href="#">  @Html.DisplayFor(model => model.RapidAPIKey)</a>  
+                                    </dd>
+                                </dl>
+                            </div>
                         </div>
+                        
                         <div class="row">
                             <div class="col-md-12 text-right">
                                 <a asp-controller="Company" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Company @Applicationsettings.PROFILE</a>

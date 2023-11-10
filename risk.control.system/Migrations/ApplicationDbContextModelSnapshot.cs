@@ -858,6 +858,10 @@ namespace risk.control.system.Migrations
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("RapidAPIKey")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
 

@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231110004217_config")]
-    partial class config
+    [Migration("20231110014031_configKey")]
+    partial class configKey
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -859,6 +859,10 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PinCodeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RapidAPIKey")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StateId")
