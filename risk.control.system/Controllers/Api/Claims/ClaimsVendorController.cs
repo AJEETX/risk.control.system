@@ -141,8 +141,12 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.CostCentre)
                .Include(c => c.CaseLocations)
                .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.Country)
                .Include(c => c.CustomerDetail)
@@ -204,9 +208,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new MapResponse
                    {
                        Id = a.ClaimsInvestigationId,
-                       Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                         a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code + " " + a.CustomerDetail.PinCode.Code :
-                         a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code + " " + a.CaseLocations.FirstOrDefault().PinCode.Code,
+                       Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        Description = a.PolicyDetail.CauseOfLoss,
                        Price = a.PolicyDetail.SumAssuredValue,
                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -368,8 +370,12 @@ namespace risk.control.system.Controllers.Api.Claims
               .ThenInclude(c => c.CostCentre)
               .Include(c => c.CaseLocations)
               .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
               .Include(c => c.CustomerDetail)
@@ -436,9 +442,7 @@ namespace risk.control.system.Controllers.Api.Claims
                      .Select(a => new MapResponse
                      {
                          Id = a.ClaimsInvestigationId,
-                         Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                         a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code + " " + a.CustomerDetail.PinCode.Code :
-                         a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code + " " + a.CaseLocations.FirstOrDefault().PinCode.Code,
+                         Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                          Description = a.PolicyDetail.CauseOfLoss,
                          Price = a.PolicyDetail.SumAssuredValue,
                          Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -582,8 +586,12 @@ namespace risk.control.system.Controllers.Api.Claims
               .ThenInclude(c => c.CostCentre)
               .Include(c => c.CaseLocations)
               .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                 .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.Country)
               .Include(c => c.CustomerDetail)
