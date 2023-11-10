@@ -5,6 +5,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 using System.Security.Claims;
 
@@ -200,7 +201,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
                 var response = claimsAllocated
-                   .Select(a => new
+                   .Select(a => new MapResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
@@ -212,7 +213,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                        Bath = a.CustomerDetail.ContactNumber,
                        Size = a.CustomerDetail.Description,
-                       Position = new
+                       Position = new Position
                        {
                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                             decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
@@ -222,6 +223,19 @@ namespace risk.control.system.Controllers.Api.Claims
                    })?
                    .ToList();
 
+                foreach (var item in response)
+                {
+                    var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                    if (isExist)
+                    {
+                        var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
+                        item.Position = new Position
+                        {
+                            Lat = lat,
+                            Lng = lng,
+                        };
+                    }
+                }
                 var vendor = _context.Vendor.Include(c => c.PinCode).FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
 
                 return Ok(new
@@ -419,7 +433,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
             var response = claims
-                     .Select(a => new
+                     .Select(a => new MapResponse
                      {
                          Id = a.ClaimsInvestigationId,
                          Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
@@ -431,7 +445,7 @@ namespace risk.control.system.Controllers.Api.Claims
                          Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                          Bath = a.CustomerDetail.ContactNumber,
                          Size = a.CustomerDetail.Description,
-                         Position = new
+                         Position = new Position
                          {
                              Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                             decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
@@ -441,7 +455,19 @@ namespace risk.control.system.Controllers.Api.Claims
                      })?
                      .ToList();
             var vendor = _context.Vendor.Include(c => c.PinCode).FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-
+            foreach (var item in response)
+            {
+                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                if (isExist)
+                {
+                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
+                    item.Position = new Position
+                    {
+                        Lat = lat,
+                        Lng = lng,
+                    };
+                }
+            }
             return Ok(new
             {
                 response = response,
@@ -607,19 +633,17 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
             var response = claimsSubmitted
-                   .Select(a => new
+                   .Select(a => new MapResponse
                    {
                        Id = a.ClaimsInvestigationId,
-                       Address = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                         a.CustomerDetail.Addressline + " " + a.CustomerDetail.District.Code + " " + a.CustomerDetail.State.Code + " " + a.CustomerDetail.PinCode.Code :
-                         a.CaseLocations.FirstOrDefault().Addressline + " " + a.CaseLocations.FirstOrDefault().District.Code + " " + a.CaseLocations.FirstOrDefault().State.Code + " " + a.CaseLocations.FirstOrDefault().PinCode.Code,
+                       Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        Description = a.PolicyDetail.CauseOfLoss,
                        Price = a.PolicyDetail.SumAssuredValue,
                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                        Bath = a.CustomerDetail.ContactNumber,
                        Size = a.CustomerDetail.Description,
-                       Position = new
+                       Position = new Position
                        {
                            Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                             decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
@@ -629,7 +653,19 @@ namespace risk.control.system.Controllers.Api.Claims
                    })?
                      .ToList();
             var vendor = _context.Vendor.Include(c => c.PinCode).FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
-
+            foreach (var item in response)
+            {
+                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                if (isExist)
+                {
+                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
+                    item.Position = new Position
+                    {
+                        Lat = lat,
+                        Lng = lng,
+                    };
+                }
+            }
             return Ok(new
             {
                 response = response,

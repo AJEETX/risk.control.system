@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+using MimeKit.Encodings;
+
 using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -23,12 +26,14 @@ namespace risk.control.system.Controllers
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
+        private readonly IHttpClientService httpClientService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
 
         public CompanyController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
+            IHttpClientService httpClientService,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
@@ -37,6 +42,7 @@ namespace risk.control.system.Controllers
             this._context = context;
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.httpClientService = httpClientService;
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
@@ -162,6 +168,12 @@ namespace risk.control.system.Controllers
                         var currentUser = await userManager.FindByEmailAsync(userEmail);
                         await signInManager.RefreshSignInAsync(currentUser);
                     }
+
+                    var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == clientCompany.PinCodeId);
+
+                    var pinCodeData = await httpClientService.GetPinCodeLatLng(pinCode.Code);
+                    pinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                    pinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
                     clientCompany.Updated = DateTime.UtcNow;
                     clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(clientCompany);

@@ -59,6 +59,7 @@ builder.Services.AddScoped<IMailboxService, MailboxService>();
 
 builder.Services.AddScoped<IInboxMailService, InboxMailService>();
 builder.Services.AddScoped<ISentMailService, SentMailService>();
+builder.Services.AddScoped<IHttpClientService, HttpClientService>();
 builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();

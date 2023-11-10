@@ -307,7 +307,7 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new MapResponse
                    {
                        Id = a.ClaimsInvestigationId,
-                       Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                       Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        Description = a.PolicyDetail.CauseOfLoss,
                        Price = a.PolicyDetail.SumAssuredValue,
                        Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -327,7 +327,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
                 if (isExist)
                 {
-                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
                     item.Position = new Position
                     {
                         Lat = lat,
@@ -341,29 +341,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 lat = decimal.Parse(company.PinCode.Latitude),
                 lng = decimal.Parse(company.PinCode.Longitude)
             });
-        }
-
-        private static Random random = new Random();
-
-        private (decimal, decimal) GetLatLng(decimal lat, decimal lng)
-        {
-            //Earth’s radius
-            var R = 6378137.0;
-
-            //offsets in meters (random values between 3 and 5)
-            var DistanceNorth = random.Next(30, 50);
-            var DistanceEast = random.Next(30, 50);
-
-            //Coordinate offsets in radians
-            var dLat = DistanceNorth / R;
-            var dLon = DistanceEast / (R * Math.Cos(Math.PI * (double.Parse(lat.ToString("###.#######"))) / 180));
-
-            //New coordinates
-            var tmpLat = dLat * 180 / Math.PI;
-            var NewLat = lat + decimal.Parse(tmpLat.ToString("###.#######"));
-            var tmpLng = dLon * 180 / Math.PI;
-            var NewLng = lng + decimal.Parse(tmpLng.ToString("###.#######"));
-            return (NewLat, NewLng);
         }
 
         [HttpGet("GetFtpData")]
@@ -427,22 +404,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 if (location is null)
                     return null;
                 return decimal.Parse(location.PinCode.Longitude);
-            }
-        }
-
-        private string GetAddress(ClaimType? claimType, CustomerDetail a, CaseLocation location)
-        {
-            if (claimType == ClaimType.HEALTH)
-            {
-                if (a is null)
-                    return string.Empty;
-                return a.Addressline + " " + a.District?.Code + " " + a.State?.Code;
-            }
-            else
-            {
-                if (location is null)
-                    return string.Empty;
-                return location.Addressline + " " + location.District.Code + " " + location.State.Code;
             }
         }
 
@@ -547,7 +508,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations.FirstOrDefault()),
+                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType?.GetEnumDisplayName(),
@@ -644,7 +605,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -667,7 +628,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
                     if (isExist)
                     {
-                        var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                        var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
                         item.Position = new Position
                         {
                             Lat = lat,
@@ -960,7 +921,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -984,7 +945,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
                 if (isExist)
                 {
-                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
                     item.Position = new Position
                     {
                         Lat = lat,
@@ -1230,7 +1191,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -1253,7 +1214,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
                 if (isExist)
                 {
-                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
                     item.Position = new Position
                     {
                         Lat = lat,
@@ -1445,7 +1406,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -1468,7 +1429,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
                 if (isExist)
                 {
-                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
                     item.Position = new Position
                     {
                         Lat = lat,
@@ -1791,7 +1752,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
-                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Description = a.PolicyDetail.CauseOfLoss,
                         Price = a.PolicyDetail.SumAssuredValue,
                         Type = a.PolicyDetail.ClaimType == ClaimType.HEALTH ? "home" : "building",
@@ -1818,7 +1779,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
                 if (isExist)
                 {
-                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    var (lat, lng) = LocationDetail.GetLatLng(item.Position.Lat, item.Position.Lng);
                     item.Position = new Position
                     {
                         Lat = lat,
