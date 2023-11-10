@@ -16,6 +16,8 @@ using static risk.control.system.Helpers.Permissions;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Collections.Generic;
+using Highsoft.Web.Mvc.Charts;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
@@ -302,7 +304,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
 
             var response = claimsSubmitted
-                   .Select(a => new
+                   .Select(a => new MapResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
@@ -312,7 +314,7 @@ namespace risk.control.system.Controllers.Api.Claims
                        Bed = a.CustomerDetail?.CustomerIncome.GetEnumDisplayName(),
                        Bath = a.CustomerDetail?.ContactNumber,
                        Size = a.CustomerDetail?.Description,
-                       Position = new
+                       Position = new Position
                        {
                            Lat = GetLat(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()) ?? decimal.Parse(company.PinCode.Latitude),
                            Lng = GetLng(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()) ?? decimal.Parse(company.PinCode.Longitude),
@@ -320,12 +322,48 @@ namespace risk.control.system.Controllers.Api.Claims
                    })?
                    .ToList();
 
+            foreach (var item in response)
+            {
+                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                if (isExist)
+                {
+                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    item.Position = new Position
+                    {
+                        Lat = lat,
+                        Lng = lng,
+                    };
+                }
+            }
             return Ok(new
             {
                 response = response,
                 lat = decimal.Parse(company.PinCode.Latitude),
                 lng = decimal.Parse(company.PinCode.Longitude)
             });
+        }
+
+        private static Random random = new Random();
+
+        private (decimal, decimal) GetLatLng(decimal lat, decimal lng)
+        {
+            //Earth’s radius
+            var R = 6378137.0;
+
+            //offsets in meters (random values between 3 and 5)
+            var DistanceNorth = random.Next(30, 50);
+            var DistanceEast = random.Next(30, 50);
+
+            //Coordinate offsets in radians
+            var dLat = DistanceNorth / R;
+            var dLon = DistanceEast / (R * Math.Cos(Math.PI * (double.Parse(lat.ToString("###.#######"))) / 180));
+
+            //New coordinates
+            var tmpLat = dLat * 180 / Math.PI;
+            var NewLat = lat + decimal.Parse(tmpLat.ToString("###.#######"));
+            var tmpLng = dLon * 180 / Math.PI;
+            var NewLng = lng + decimal.Parse(tmpLng.ToString("###.#######"));
+            return (NewLat, NewLng);
         }
 
         [HttpGet("GetFtpData")]
@@ -603,7 +641,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
                 var response = claimsAssigned
-                    .Select(a => new
+                    .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
                         Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
@@ -613,7 +651,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                         Bath = a.CustomerDetail.ContactNumber,
                         Size = a.CustomerDetail.Description,
-                        Position = new
+                        Position = new Position
                         {
                             Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                            decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
@@ -623,6 +661,20 @@ namespace risk.control.system.Controllers.Api.Claims
                     })?
                     .ToList();
                 var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+                foreach (var item in response)
+                {
+                    var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                    if (isExist)
+                    {
+                        var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                        item.Position = new Position
+                        {
+                            Lat = lat,
+                            Lng = lng,
+                        };
+                    }
+                }
 
                 return Ok(new
                 {
@@ -905,7 +957,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
             var response = claimsAssigned
-                    .Select(a => new
+                    .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
                         Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
@@ -915,7 +967,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                         Bath = a.CustomerDetail.ContactNumber,
                         Size = a.CustomerDetail.Description,
-                        Position = new
+                        Position = new Position
                         {
                             Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                            decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
@@ -924,8 +976,22 @@ namespace risk.control.system.Controllers.Api.Claims
                         }
                     })?
                     .ToList();
+
             var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
+            foreach (var item in response)
+            {
+                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                if (isExist)
+                {
+                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    item.Position = new Position
+                    {
+                        Lat = lat,
+                        Lng = lng,
+                    };
+                }
+            }
             return Ok(new
             {
                 response = response,
@@ -1161,7 +1227,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
             var response = claimsAssigned
-                    .Select(a => new
+                    .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
                         Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
@@ -1171,7 +1237,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                         Bath = a.CustomerDetail.ContactNumber,
                         Size = a.CustomerDetail.Description,
-                        Position = new
+                        Position = new Position
                         {
                             Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                            decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
@@ -1182,6 +1248,19 @@ namespace risk.control.system.Controllers.Api.Claims
                     .ToList();
             var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
+            foreach (var item in response)
+            {
+                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                if (isExist)
+                {
+                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    item.Position = new Position
+                    {
+                        Lat = lat,
+                        Lng = lng,
+                    };
+                }
+            }
             return Ok(new
             {
                 response = response,
@@ -1363,7 +1442,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
             var response = claimsSubmitted
-                    .Select(a => new
+                    .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
                         Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
@@ -1373,7 +1452,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                         Bath = a.CustomerDetail.ContactNumber,
                         Size = a.CustomerDetail.Description,
-                        Position = new
+                        Position = new Position
                         {
                             Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                            decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
@@ -1384,6 +1463,19 @@ namespace risk.control.system.Controllers.Api.Claims
                     .ToList();
             var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
+            foreach (var item in response)
+            {
+                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                if (isExist)
+                {
+                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    item.Position = new Position
+                    {
+                        Lat = lat,
+                        Lng = lng,
+                    };
+                }
+            }
             return Ok(new
             {
                 response = response,
@@ -1696,7 +1788,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var claimsSubmitted = await applicationDbContext.ToListAsync();
 
             var response = claimsSubmitted
-                    .Select(a => new
+                    .Select(a => new MapResponse
                     {
                         Id = a.ClaimsInvestigationId,
                         Address = GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
@@ -1706,7 +1798,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
                         Bath = a.CustomerDetail.ContactNumber,
                         Size = a.CustomerDetail.Description,
-                        Position = new
+                        Position = new Position
                         {
                             Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                            decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
@@ -1721,6 +1813,19 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
+            foreach (var item in response)
+            {
+                var isExist = response.Any(r => r.Position.Lng == item.Position.Lng && r.Position.Lat == item.Position.Lat && item.Id != r.Id);
+                if (isExist)
+                {
+                    var (lat, lng) = GetLatLng(item.Position.Lat, item.Position.Lng);
+                    item.Position = new Position
+                    {
+                        Lat = lat,
+                        Lng = lng,
+                    };
+                }
+            }
             return Ok(new
             {
                 response = response,
