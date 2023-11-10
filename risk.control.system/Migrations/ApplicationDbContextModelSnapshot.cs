@@ -793,6 +793,10 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("AgreementDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ApiBaseUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Auto")
                         .HasColumnType("INTEGER");
 
@@ -843,6 +847,10 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PanIdfyUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -861,6 +869,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("VerifyOcr")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ClientCompanyId");
 

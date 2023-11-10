@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class face_match_pan : Migration
+    public partial class config : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -446,6 +446,9 @@ namespace risk.control.system.Migrations
                     DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
                     Auto = table.Column<bool>(type: "INTEGER", nullable: false),
+                    VerifyOcr = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ApiBaseUrl = table.Column<string>(type: "TEXT", nullable: false),
+                    PanIdfyUrl = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)

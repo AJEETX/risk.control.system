@@ -52,28 +52,29 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Branch)
                                     </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Addressline)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Addressline)
-                                    </dd>
-                                </dl>
-                            </div>
-                            <div class="col-md-6">
-                                <dl class="row">
+                                    
                                     <dt class="col-sm-5">
                                         Document
                                     </dt>
                                     <dd class="col-sm-5">
                                         @if (Model?.DocumentUrl is not null)
                                         {
-                                            <img id="documentImage" class="form-Image" src="@Model?.DocumentUrl">
+                                            <img id="ProfileImage" class="form-Image" src="@Model?.DocumentUrl">
                                         }
                                         else
                                         {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                         }
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.Addressline)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.Addressline)
                                     </dd>
                                     <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.District)
@@ -106,6 +107,12 @@
                                     </dt>
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Auto)
+                                    </dd>
+                                     <dt class="col-sm-5">
+                                        Verify Pan
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.VerifyOcr)
                                     </dd>
                                 </dl>
                             </div>

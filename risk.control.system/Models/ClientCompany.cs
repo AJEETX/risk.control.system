@@ -74,6 +74,9 @@ namespace risk.control.system.Models
         public List<Vendor>? EmpanelledVendors { get; set; } = new();
         public List<ClaimsInvestigation> ClaimsInvestigations { get; set; } = new();
         public bool Auto { get; set; } = false;
+        public bool VerifyOcr { get; set; } = false;
+        public string ApiBaseUrl { get; set; } = "http://icheck-webse-konc2x2nmowe-196777346.ap-southeast-2.elb.amazonaws.com/";
+        public string PanIdfyUrl { get; set; } = "https://idfy-verification-suite.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan";
     }
 
     public enum CompanyStatus

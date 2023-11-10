@@ -35,8 +35,8 @@ namespace risk.control.system.Controllers.Api
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
-        private static string PanMaskUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
-        private static string FacematchUrl = "http://icheck-webse-konc2x2nmowe-196777346.ap-southeast-2.elb.amazonaws.com/faceMatch";
+        private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
+        private static string FacematchUrl = "/faceMatch";
         private static string PanUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verifyPan/";
         private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan";
 
@@ -56,14 +56,14 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("mask")]
         public async Task<IActionResult> Mask(MaskImage image)
         {
-            var maskedImageDetail = await GetMaskedImage(image);
+            var maskedImageDetail = await GetMaskedImage(image, BaseUrl);
 
             return Ok(maskedImageDetail);
         }
 
-        private async Task<FaceImageDetail> GetMaskedImage(MaskImage image)
+        private async Task<FaceImageDetail> GetMaskedImage(MaskImage image, string baseUrl)
         {
-            var response = await httpClient.PostAsJsonAsync(PanMaskUrl, image);
+            var response = await httpClient.PostAsJsonAsync(baseUrl, image);
 
             var maskedImage = await response.Content.ReadAsStringAsync();
 
@@ -76,14 +76,14 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("match")]
         public async Task<IActionResult> Match(MatchImage image)
         {
-            var maskedImageDetail = await GetFaceMatch(image);
+            var maskedImageDetail = await GetFaceMatch(image, BaseUrl);
 
             return Ok(maskedImageDetail);
         }
 
-        private async Task<FaceMatchDetail> GetFaceMatch(MatchImage image)
+        private async Task<FaceMatchDetail> GetFaceMatch(MatchImage image, string baseUrl)
         {
-            var response = await httpClient.PostAsJsonAsync(FacematchUrl, image);
+            var response = await httpClient.PostAsJsonAsync(baseUrl + "/faceMatch", image);
 
             var maskedImage = await response.Content.ReadAsStringAsync();
 
@@ -131,12 +131,12 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("pan2")]
         public async Task<IActionResult> Pan2(string pan = "FNLPM8635N")
         {
-            var verifiedPanResponse = await VerifyPan(pan);
+            var verifiedPanResponse = await VerifyPan(pan, PanIdfyUrl);
 
             return Ok(verifiedPanResponse);
         }
 
-        private async Task<PanVerifyResponse> VerifyPan(string pan)
+        private async Task<PanVerifyResponse> VerifyPan(string pan, string panUrl)
         {
             var requestPayload = new PanVerifyRequest
             {
@@ -151,7 +151,7 @@ namespace risk.control.system.Controllers.Api
             var request2 = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(PanIdfyUrl),
+                RequestUri = new Uri(panUrl),
                 Headers =
                 {
                     { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
@@ -455,6 +455,8 @@ namespace risk.control.system.Controllers.Api
                 .Include(c => c.CustomerDetail)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+
             #region FACE IMAGE PROCESSING
 
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
@@ -496,7 +498,7 @@ namespace risk.control.system.Controllers.Api
                         var base64Image = Convert.ToBase64String(registeredImage);
 
                         this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
-                        var faceImageDetail = await GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String });
+                        var faceImageDetail = await GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
                         if (faceImageDetail != null && faceImageDetail.Confidence == null)
                         {
                         }
@@ -532,28 +534,29 @@ namespace risk.control.system.Controllers.Api
                 var inputImage = new MaskImage { Image = data.OcrImage };
                 this.logger.LogInformation("DOCUMENT ID : PAN image {ocrImage} ", data.OcrImage);
 
-                var maskedImage = await GetMaskedImage(inputImage);
+                var maskedImage = await GetMaskedImage(inputImage, company.ApiBaseUrl);
 
                 this.logger.LogInformation("DOCUMENT ID : PAN maskedImage image {maskedImage} ", maskedImage);
                 if (maskedImage != null)
                 {
                     try
                     {
-                        //test PAN FNLPM8635N
+                        //test PAN FNLPM8635N, BYSPP5796F
                         //PAN VERIFICATION
                         #region//PLAN 2 : PAN VERIFICATION
 
-                        //TEMP
-                        if (!maskedImage.DocumentId.StartsWith("ABCDE1234F"))
+                        if (maskedImage.DocType.ToUpper() == "PAN")
                         {
-                            maskedImage.DocumentId = "FNLPM8635N";
-                        }
-                        //END:: TEMP
-                        if (maskedImage.DocType.ToLower() == "PAN")
-                        {
-                            var body = await VerifyPan(maskedImage.DocumentId);
+                            if (company != null && company.VerifyOcr)
+                            {
+                                var body = await VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl);
 
-                            if (body != null && body.status == "completed" && body.result?.source_output?.status == "id_found")
+                                if (body != null && body.status == "completed" && body.result?.source_output?.status == "id_found")
+                                {
+                                    claimCase.ClaimReport.PanValid = true;
+                                }
+                            }
+                            else
                             {
                                 claimCase.ClaimReport.PanValid = true;
                             }

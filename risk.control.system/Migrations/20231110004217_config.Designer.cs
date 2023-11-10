@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231106063852_face_match_pan")]
-    partial class face_match_pan
+    [Migration("20231110004217_config")]
+    partial class config
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -796,6 +796,10 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime?>("AgreementDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ApiBaseUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Auto")
                         .HasColumnType("INTEGER");
 
@@ -846,6 +850,10 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PanIdfyUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -864,6 +872,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("VerifyOcr")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ClientCompanyId");
 
