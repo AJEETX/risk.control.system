@@ -565,7 +565,7 @@ namespace risk.control.system.Controllers.Api
 
                                     if (body != null && body?.status == "completed" && body?.result != null && body.result?.source_output != null && body.result?.source_output?.status == "id_found")
                                     {
-                                        claimCase.ClaimReport.PanValid = true;
+                                        claimCase.ClaimReport.PanValid = false;
                                     }
                                     else
                                     {
@@ -579,7 +579,7 @@ namespace risk.control.system.Controllers.Api
                             }
                             else
                             {
-                                claimCase.ClaimReport.PanValid = true;
+                                claimCase.ClaimReport.PanValid = false;
                             }
                         }
 
