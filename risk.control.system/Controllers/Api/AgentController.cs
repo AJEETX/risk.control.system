@@ -138,7 +138,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(verifiedPanResponse);
         }
 
-        private async Task<PanVerifyResponse> VerifyPan(string pan, string panUrl, string rapidAPIKey)
+        private async Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey)
         {
             var requestPayload = new PanVerifyRequest
             {
@@ -164,11 +164,14 @@ namespace risk.control.system.Controllers.Api
 
             using (var response2 = await httpClient.SendAsync(request2))
             {
-                //response2.EnsureSuccessStatusCode();
-                var body = await response2.Content.ReadAsStringAsync();
-                var verifiedPanResponse = JsonConvert.DeserializeObject<PanVerifyResponse>(body);
-                return verifiedPanResponse;
+                if (response2.StatusCode == HttpStatusCode.OK)
+                {
+                    var body = await response2.Content.ReadAsStringAsync();
+                    var verifiedPanResponse = JsonConvert.DeserializeObject<PanVerifyResponse>(body);
+                    return verifiedPanResponse;
+                }
             }
+            return null!;
         }
 
         [AllowAnonymous]
@@ -500,11 +503,16 @@ namespace risk.control.system.Controllers.Api
                         var base64Image = Convert.ToBase64String(registeredImage);
 
                         this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
-                        var faceImageDetail = await GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
-                        if (faceImageDetail != null && faceImageDetail.Confidence == null)
+                        try
                         {
+                            var faceImageDetail = await GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
+
+                            claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
                         }
-                        claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                        catch (Exception)
+                        {
+                            claimCase.ClaimReport.LocationPictureConfidence = string.Empty;
+                        }
                     }
                     else
                     {
@@ -545,17 +553,28 @@ namespace risk.control.system.Controllers.Api
                     {
                         //test PAN FNLPM8635N, BYSPP5796F
                         //PAN VERIFICATION
-                        #region//PLAN 2 : PAN VERIFICATION
+                        #region// PAN VERIFICATION
 
                         if (maskedImage.DocType.ToUpper() == "PAN")
                         {
-                            if (company != null && company.VerifyOcr)
+                            if (company.VerifyOcr)
                             {
-                                var body = await VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey);
-
-                                if (body != null && body.status == "completed" && body.result?.source_output?.status == "id_found")
+                                try
                                 {
-                                    claimCase.ClaimReport.PanValid = true;
+                                    var body = await VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey);
+
+                                    if (body != null && body?.status == "completed" && body?.result != null && body.result?.source_output != null && body.result?.source_output?.status == "id_found")
+                                    {
+                                        claimCase.ClaimReport.PanValid = true;
+                                    }
+                                    else
+                                    {
+                                        claimCase.ClaimReport.PanValid = false;
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    claimCase.ClaimReport.PanValid = false;
                                 }
                             }
                             else
