@@ -35,7 +35,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
-        private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
+        private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com/";
         private static string FacematchUrl = "/faceMatch";
         private static string PanUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verifyPan/";
         private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan";
@@ -65,13 +65,17 @@ namespace risk.control.system.Controllers.Api
 
         private async Task<FaceImageDetail> GetMaskedImage(MaskImage image, string baseUrl)
         {
-            var response = await httpClient.PostAsJsonAsync(baseUrl + "/ocr", image);
+            var response = await httpClient.PostAsJsonAsync(baseUrl + "ocr", image);
 
-            var maskedImage = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                var maskedImage = await response.Content.ReadAsStringAsync();
 
-            var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
+                var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
 
-            return maskedImageDetail;
+                return maskedImageDetail;
+            }
+            return null;
         }
 
         [AllowAnonymous]
@@ -565,7 +569,7 @@ namespace risk.control.system.Controllers.Api
 
                                     if (body != null && body?.status == "completed" && body?.result != null && body.result?.source_output != null && body.result?.source_output?.status == "id_found")
                                     {
-                                        claimCase.ClaimReport.PanValid = false;
+                                        claimCase.ClaimReport.PanValid = true;
                                     }
                                     else
                                     {
@@ -579,7 +583,7 @@ namespace risk.control.system.Controllers.Api
                             }
                             else
                             {
-                                claimCase.ClaimReport.PanValid = false;
+                                claimCase.ClaimReport.PanValid = true;
                             }
                         }
 
@@ -623,7 +627,7 @@ namespace risk.control.system.Controllers.Api
                     var OcrRealImage = ByteArrayToImage(image);
                     MemoryStream stream = new MemoryStream(image);
                     claimCase.ClaimReport.AgentOcrPicture = image;
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{maskedImage.DocType}{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
                     CompressImage.Compressimage(stream, filePath);
                     claimCase.ClaimReport.AgentOcrUrl = filePath;
                     claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
@@ -688,7 +692,7 @@ namespace risk.control.system.Controllers.Api
                 LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentLocationPictureUrl) ?
                 Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentLocationPictureUrl)) :
                 Convert.ToBase64String(noDataimage),
-                LocationLongLat = claimCase.ClaimReport.LocationLongLat,
+                LocationLongLat = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.LocationLongLat),
                 LocationTime = claimCase.ClaimReport.LocationLongLatTime,
                 OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrUrl) ?
                 Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentOcrUrl)) :
