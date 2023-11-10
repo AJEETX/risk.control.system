@@ -65,7 +65,7 @@ namespace risk.control.system.Controllers.Api
 
         private async Task<FaceImageDetail> GetMaskedImage(MaskImage image, string baseUrl)
         {
-            var response = await httpClient.PostAsJsonAsync(baseUrl, image);
+            var response = await httpClient.PostAsJsonAsync(baseUrl + "/ocr", image);
 
             var maskedImage = await response.Content.ReadAsStringAsync();
 
