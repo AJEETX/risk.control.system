@@ -35,10 +35,8 @@ namespace risk.control.system.Controllers.Api
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
-        private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com/";
-        private static string FacematchUrl = "/faceMatch";
-        private static string PanUrl = "https://pan-card-verification-at-lowest-price.p.rapidapi.com/verifyPan/";
-        private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan";
+        private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
+        private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com";
         private static string RapidAPIKey = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         private static string RapidAPIHost = "idfy-verification-suite.p.rapidapi.com";
 
@@ -65,7 +63,7 @@ namespace risk.control.system.Controllers.Api
 
         private async Task<FaceImageDetail> GetMaskedImage(MaskImage image, string baseUrl)
         {
-            var response = await httpClient.PostAsJsonAsync(baseUrl + "ocr", image);
+            var response = await httpClient.PostAsJsonAsync(baseUrl + "/ocr", image);
 
             if (response.IsSuccessStatusCode)
             {
@@ -100,42 +98,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpGet("pan")]
-        public async Task<IActionResult> Pan(string pan)
-        {
-            //test PAN FNLPM8635N
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(PanUrl + pan),
-                Headers =
-                    {
-                        { "x-rapid-api", "rapid-api-database" },
-                        { "X-RapidAPI-Key", "47cd2be148msh455c39da6e1d554p1733e0jsn8bd7464ed610" },
-                        { "X-RapidAPI-Host", "pan-card-verification-at-lowest-price.p.rapidapi.com" },
-                    },
-            };
-            using var panResponse = await httpClient.SendAsync(request);
-            panResponse.EnsureSuccessStatusCode();
-            var body = await panResponse.Content.ReadAsStringAsync();
-            try
-            {
-                var panData = JsonConvert.DeserializeObject<PanValidationResponse>(body);
-                return Ok(panData);
-            }
-            catch (Exception ex)
-            {
-                var panInvalidData = JsonConvert.DeserializeObject<PanInValidationResponse>(body);
-                if (panInvalidData != null && panInvalidData.status == 500)
-                {
-                    Console.WriteLine(panInvalidData.status);
-                }
-            }
-            return BadRequest();
-        }
-
-        [AllowAnonymous]
-        [HttpGet("pan2")]
-        public async Task<IActionResult> Pan2(string pan = "FNLPM8635N")
+        public async Task<IActionResult> Pan(string pan = "FNLPM8635N")
         {
             var verifiedPanResponse = await VerifyPan(pan, PanIdfyUrl, RapidAPIKey);
 
@@ -157,7 +120,7 @@ namespace risk.control.system.Controllers.Api
             var request2 = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(panUrl),
+                RequestUri = new Uri(panUrl + "/v3/tasks/sync/verify_with_source/ind_pan"),
                 Headers =
                 {
                     { "X-RapidAPI-Key", rapidAPIKey },
@@ -555,9 +518,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     try
                     {
-                        //test PAN FNLPM8635N, BYSPP5796F
-                        //PAN VERIFICATION
-                        #region// PAN VERIFICATION
+                        #region// PAN VERIFICATION ::: //test PAN FNLPM8635N, BYSPP5796F
 
                         if (maskedImage.DocType.ToUpper() == "PAN")
                         {
@@ -567,7 +528,10 @@ namespace risk.control.system.Controllers.Api
                                 {
                                     var body = await VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey);
 
-                                    if (body != null && body?.status == "completed" && body?.result != null && body.result?.source_output != null && body.result?.source_output?.status == "id_found")
+                                    if (body != null && body?.status == "completed" &&
+                                        body?.result != null &&
+                                        body.result?.source_output != null
+                                        && body.result?.source_output?.status == "id_found")
                                     {
                                         claimCase.ClaimReport.PanValid = true;
                                     }
@@ -588,8 +552,6 @@ namespace risk.control.system.Controllers.Api
                         }
 
                         #endregion PAN IMAGE PROCESSING
-
-                        //END PANS
 
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
