@@ -858,7 +858,15 @@ namespace risk.control.system.Migrations
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("RapidAPIGroupId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("RapidAPIKey")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RapidAPITaskId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

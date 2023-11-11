@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231110112234_config")]
+    [Migration("20231111000256_config")]
     partial class config
     {
         /// <inheritdoc />
@@ -861,7 +861,15 @@ namespace risk.control.system.Migrations
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("RapidAPIGroupId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("RapidAPIKey")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RapidAPITaskId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

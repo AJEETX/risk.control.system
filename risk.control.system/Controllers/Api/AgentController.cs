@@ -31,6 +31,7 @@ namespace risk.control.system.Controllers.Api
     {
         private Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
         private readonly ApplicationDbContext _context;
+        private readonly IHttpClientService httpClientService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -39,13 +40,16 @@ namespace risk.control.system.Controllers.Api
         private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com";
         private static string RapidAPIKey = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         private static string RapidAPIHost = "idfy-verification-suite.p.rapidapi.com";
+        private static string PanTask_id = "74f4c926-250c-43ca-9c53-453e87ceacd1";
+        private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
 
         private ILogger<AgentController> logger;
 
         //test PAN FNLPM8635N
-        public AgentController(ApplicationDbContext context, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment, ILogger<AgentController> logger)
+        public AgentController(ApplicationDbContext context, IHttpClientService httpClientService, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment, ILogger<AgentController> logger)
         {
             this._context = context;
+            this.httpClientService = httpClientService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
@@ -56,89 +60,27 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("mask")]
         public async Task<IActionResult> Mask(MaskImage image)
         {
-            var maskedImageDetail = await GetMaskedImage(image, BaseUrl);
+            var maskedImageDetail = await httpClientService.GetMaskedImage(image, BaseUrl);
 
             return Ok(maskedImageDetail);
-        }
-
-        private async Task<FaceImageDetail> GetMaskedImage(MaskImage image, string baseUrl)
-        {
-            var response = await httpClient.PostAsJsonAsync(baseUrl + "/ocr", image);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var maskedImage = await response.Content.ReadAsStringAsync();
-
-                var maskedImageDetail = JsonConvert.DeserializeObject<FaceImageDetail>(maskedImage);
-
-                return maskedImageDetail;
-            }
-            return null;
         }
 
         [AllowAnonymous]
         [HttpPost("match")]
         public async Task<IActionResult> Match(MatchImage image)
         {
-            var maskedImageDetail = await GetFaceMatch(image, BaseUrl);
+            var maskedImageDetail = await httpClientService.GetFaceMatch(image, BaseUrl);
 
             return Ok(maskedImageDetail);
-        }
-
-        private async Task<FaceMatchDetail> GetFaceMatch(MatchImage image, string baseUrl)
-        {
-            var response = await httpClient.PostAsJsonAsync(baseUrl + "/faceMatch", image);
-
-            var maskedImage = await response.Content.ReadAsStringAsync();
-
-            var maskedImageDetail = JsonConvert.DeserializeObject<FaceMatchDetail>(maskedImage);
-
-            return maskedImageDetail;
         }
 
         [AllowAnonymous]
         [HttpGet("pan")]
         public async Task<IActionResult> Pan(string pan = "FNLPM8635N")
         {
-            var verifiedPanResponse = await VerifyPan(pan, PanIdfyUrl, RapidAPIKey);
+            var verifiedPanResponse = await httpClientService.VerifyPan(pan, PanIdfyUrl, RapidAPIKey, PanTask_id, PanGroup_id);
 
             return Ok(verifiedPanResponse);
-        }
-
-        private async Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey)
-        {
-            var requestPayload = new PanVerifyRequest
-            {
-                task_id = "74f4c926-250c-43ca-9c53-453e87ceacd1",
-                group_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
-                data = new PanNumber
-                {
-                    id_number = pan
-                }
-            };
-
-            var request2 = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(panUrl + "/v3/tasks/sync/verify_with_source/ind_pan"),
-                Headers =
-                {
-                    { "X-RapidAPI-Key", rapidAPIKey },
-                    { "X-RapidAPI-Host", RapidAPIHost },
-                },
-                Content = new StringContent(JsonConvert.SerializeObject(requestPayload)) { Headers = { ContentType = new MediaTypeHeaderValue("application/json") } },
-            };
-
-            using (var response2 = await httpClient.SendAsync(request2))
-            {
-                if (response2.StatusCode == HttpStatusCode.OK)
-                {
-                    var body = await response2.Content.ReadAsStringAsync();
-                    var verifiedPanResponse = JsonConvert.DeserializeObject<PanVerifyResponse>(body);
-                    return verifiedPanResponse;
-                }
-            }
-            return null!;
         }
 
         [AllowAnonymous]
@@ -431,6 +373,7 @@ namespace risk.control.system.Controllers.Api
 
             #region FACE IMAGE PROCESSING
 
+            //var (claimWithDigitalId, ClaimCaseWithDitialId) = await ProcessDigitalId(data, claim, claimCase);
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
                 byte[]? registeredImage = null;
@@ -472,7 +415,7 @@ namespace risk.control.system.Controllers.Api
                         this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
                         try
                         {
-                            var faceImageDetail = await GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
+                            var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
 
                             claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
                         }
@@ -511,7 +454,7 @@ namespace risk.control.system.Controllers.Api
                 var inputImage = new MaskImage { Image = data.OcrImage };
                 this.logger.LogInformation("DOCUMENT ID : PAN image {ocrImage} ", data.OcrImage);
 
-                var maskedImage = await GetMaskedImage(inputImage, company.ApiBaseUrl);
+                var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
 
                 this.logger.LogInformation("DOCUMENT ID : PAN maskedImage image {maskedImage} ", maskedImage);
                 if (maskedImage != null)
@@ -526,7 +469,7 @@ namespace risk.control.system.Controllers.Api
                             {
                                 try
                                 {
-                                    var body = await VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey);
+                                    var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
 
                                     if (body != null && body?.status == "completed" &&
                                         body?.result != null &&
@@ -716,6 +659,76 @@ namespace risk.control.system.Controllers.Api
             MemoryStream ms = new MemoryStream(data);
             System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
             return returnImage;
+        }
+
+        private async Task<(ClaimsInvestigation claim, CaseLocation claimCase)> ProcessDigitalId(Data data, ClaimsInvestigation claim, CaseLocation claimCase)
+        {
+            if (!string.IsNullOrWhiteSpace(data.LocationImage))
+            {
+                byte[]? registeredImage = null;
+                this.logger.LogInformation("DIGITAL ID : FACE image {LocationImage} ", data.LocationImage);
+
+                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredImage = claim.CustomerDetail.ProfilePicture;
+                    this.logger.LogInformation("DIGITAL ID : HEALTH image {registeredImage} ", registeredImage);
+                }
+                if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+                {
+                    registeredImage = claimCase.ProfilePicture;
+                    this.logger.LogInformation("DIGITAL ID : DEATH image {registeredImage} ", registeredImage);
+                }
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+
+                string ImageData = string.Empty;
+                try
+                {
+                    if (registeredImage != null)
+                    {
+                        var image = Convert.FromBase64String(data.LocationImage);
+                        var locationRealImage = ByteArrayToImage(image);
+                        MemoryStream stream = new MemoryStream(image);
+                        claimCase.ClaimReport.AgentLocationPicture = image;
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                        claimCase.ClaimReport.AgentLocationPictureUrl = filePath;
+                        CompressImage.Compressimage(stream, filePath);
+
+                        var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                        var saveImageBase64String = Convert.ToBase64String(savedImage);
+
+                        claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
+                        this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
+
+                        var base64Image = Convert.ToBase64String(registeredImage);
+
+                        this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
+                        try
+                        {
+                            var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
+
+                            claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                        }
+                        catch (Exception)
+                        {
+                            claimCase.ClaimReport.LocationPictureConfidence = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        claimCase.ClaimReport.LocationPictureConfidence = "no face image";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    claimCase.ClaimReport.LocationPictureConfidence = "err " + ImageData;
+                }
+                if (registeredImage == null)
+                {
+                    claimCase.ClaimReport.LocationPictureConfidence = "no image";
+                }
+            }
+            return (claim, claimCase);
         }
     }
 

@@ -450,6 +450,8 @@ namespace risk.control.system.Migrations
                     ApiBaseUrl = table.Column<string>(type: "TEXT", nullable: false),
                     PanIdfyUrl = table.Column<string>(type: "TEXT", nullable: false),
                     RapidAPIKey = table.Column<string>(type: "TEXT", nullable: false),
+                    RapidAPITaskId = table.Column<string>(type: "TEXT", nullable: false),
+                    RapidAPIGroupId = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
