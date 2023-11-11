@@ -213,11 +213,11 @@ $(document).ready(function () {
                 }).done(function (response) {
                     data = response;
                     self.setTitle('<i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span>');
-                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
+                    self.setContent('<br><span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
                     self.setContentAppend('</div>')
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
+                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
                     self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
                     showLocationMap = true;
                 }).fail(function () {
@@ -257,11 +257,11 @@ $(document).ready(function () {
                 }).done(function (response) {
                     data = response;
                     self.setTitle('<i class="fas fa-portrait"></i> Document <span class="badge badge-light">checkify</span>');
-                    self.setContentAppend('<br><span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
+                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>:');
                     self.setContentAppend('<br><div id="maps"></div>')
                     self.setContentAppend('<br><div id="pop-face-map"></div>')
                     self.setContentAppend('</div>')
-                    self.setContent('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
+                    self.setContentAppend('<span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>:');
                     self.setContentAppend('<br><i>' + response.imageAddress + '</i>');
                     showOcrMap = true;
                 }).fail(function () {
