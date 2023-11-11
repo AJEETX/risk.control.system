@@ -1,17 +1,34 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
+using MimeKit.Encodings;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
+        private static string currentPinCode = "515631";
+        private static string currentDistrict = "ANANTAPUR";
+        private static string currentState = "AD";
+        private static string biharPincode = "853204";
+
         public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
-            InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness)
+            InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpClientService httpClientService)
         {
+            var companyPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE);
+            var companyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == companyPinCode.District.DistrictId);
+            var companyStateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!;
+
+            var pinCodeData = await httpClientService.GetPinCodeLatLng(companyPinCode.Code);
+
+            companyPinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+            companyPinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+
             //CREATE VENDOR COMPANY
 
             var checker = new Vendor
@@ -26,9 +43,9 @@ namespace risk.control.system.Seeds
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = companyDistrict.DistrictId,
+                StateId = companyStateId,
+                PinCodeId = companyPinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY1DOMAIN,
                 PhoneNumber = "8888004739",
@@ -49,9 +66,9 @@ namespace risk.control.system.Seeds
                 BankAccountNumber = "9876543",
                 IFSCCode = "IFSC999",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = companyDistrict.DistrictId,
+                StateId = companyStateId,
+                PinCodeId = companyPinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY2DOMAIN,
                 PhoneNumber = "4444404739",
@@ -72,9 +89,9 @@ namespace risk.control.system.Seeds
                 BankAccountNumber = "9876543",
                 IFSCCode = "IFSC999",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = companyDistrict.DistrictId,
+                StateId = companyStateId,
+                PinCodeId = companyPinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY3DOMAIN,
                 PhoneNumber = "7964404160",
@@ -83,15 +100,7 @@ namespace risk.control.system.Seeds
 
             var investigateAgency = await context.Vendor.AddAsync(investigate);
 
-            //CREATE CLIENT COMPANY
-            var currentPinCode = "515631";
-            var currentDistrict = "ANANTAPUR";
-            var currentState = "AD";
-            var biharPincode = "853204";
-
-            var companyPinCode = context.PinCode.Include(p=>p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE);
-            var companyDistrict = context.District.Include(d=>d.State).FirstOrDefault(s => s.DistrictId == companyPinCode.District.DistrictId);
-            var companyStateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!;
+            //CREATE COMPANY
 
             var insurance = new ClientCompany
             {

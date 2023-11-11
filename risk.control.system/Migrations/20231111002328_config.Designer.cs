@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231111000256_config")]
+    [Migration("20231111002328_config")]
     partial class config
     {
         /// <inheritdoc />

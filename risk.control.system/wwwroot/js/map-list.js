@@ -28,25 +28,33 @@ async function initMap(url) {
         document.getElementById('map'),
         options);
 
-    for (const property of data.response) {
-        const AdvancedMarkerElement = new google.maps.marker.AdvancedMarkerElement({
-            map,
-            content: buildContent(property),
-            position: property.position,
-            title: property.description,
-        });
+    if (data.response.length > 0) {
+        for (const property of data.response) {
+            const AdvancedMarkerElement = new google.maps.marker.AdvancedMarkerElement({
+                map,
+                content: buildContent(property),
+                position: property.position,
+                title: property.description,
+            });
 
-        AdvancedMarkerElement.addListener("click", () => {
-            toggleHighlight(AdvancedMarkerElement, property);
-        });
-        bounds.extend(property.position);
+            AdvancedMarkerElement.addListener("click", () => {
+                toggleHighlight(AdvancedMarkerElement, property);
+            });
+            bounds.extend(property.position);
+        }
+        map.setZoom(map.getZoom() - 1);
+        if (map.getZoom() > 18) {
+            map.setZoom(18);
+        }
+    } else {
+        bounds.extend(center);
+        map.setZoom(8);
     }
+    
+
     map.fitBounds(bounds);
     map.setCenter(bounds.getCenter());
-    map.setZoom(map.getZoom() - 1);
-    if (map.getZoom() > 18) {
-        map.setZoom(18);
-    }
+    
 }
 
 function toggleHighlight(markerView, property) {

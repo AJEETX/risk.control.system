@@ -23,12 +23,7 @@ namespace risk.control.system.Services
     public class HttpClientService : IHttpClientService
     {
         private HttpClient httpClient = new HttpClient();
-        private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
-        private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com";
-        private static string RapidAPIKey = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
         private static string RapidAPIHost = "idfy-verification-suite.p.rapidapi.com";
-        private static string PanTask_id = "74f4c926-250c-43ca-9c53-453e87ceacd1";
-        private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
         private static string PinCodeBaseUrl = "https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode";
 
         public async Task<List<PincodeApiData>> GetPinCodeLatLng(string pinCode)

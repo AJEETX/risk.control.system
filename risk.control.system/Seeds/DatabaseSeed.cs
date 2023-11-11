@@ -3,6 +3,7 @@
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Services;
 
 namespace risk.control.system.Seeds
 {
@@ -13,6 +14,7 @@ namespace risk.control.system.Seeds
             using var scope = app.Services.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var httpClientService = scope.ServiceProvider.GetRequiredService<IHttpClientService>();
             var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
             var clientUserManager = scope.ServiceProvider.GetRequiredService<UserManager<ClientCompanyApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
@@ -281,7 +283,8 @@ namespace risk.control.system.Seeds
             #region CLIENT/ VENDOR COMPANY
 
             var (checker, verify, investigate, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry,
-                claimComprehensiveService.Entity, claimDiscreetService.Entity, claimDocumentCollectionService.Entity, claimCaseType.Entity);
+                claimComprehensiveService.Entity, claimDiscreetService.Entity,
+                claimDocumentCollectionService.Entity, claimCaseType.Entity, httpClientService);
 
             #endregion CLIENT/ VENDOR COMPANY
 
