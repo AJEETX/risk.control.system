@@ -242,6 +242,96 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpGet("agent-map")]
+        public async Task<IActionResult> IndexMap(string email = "agent@verify.com")
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Vendor)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State);
+
+            var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email);
+
+            if (vendorUser != null)
+            {
+                applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
+                var claimsAssigned = new List<ClaimsInvestigation>();
+
+                foreach (var item in applicationDbContext)
+                {
+                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
+                        && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
+                        && c.AssignedAgentUserEmail == email)?.ToList();
+                    if (item.CaseLocations.Any())
+                    {
+                        claimsAssigned.Add(item);
+                    }
+                }
+                var filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-policy.jpg");
+
+                var noDocumentimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                filePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
+                var noCustomerimage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                var claim2Agent = claimsAssigned
+                    .Select(c =>
+                new
+                {
+                    Id = c.ClaimsInvestigationId,
+                    Coordinate = new
+                    {
+                        Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                            decimal.Parse(c.CustomerDetail.PinCode.Latitude) : decimal.Parse(c.CaseLocations.FirstOrDefault().PinCode.Latitude),
+                        Lng = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
+                             decimal.Parse(c.CustomerDetail.PinCode.Longitude) : decimal.Parse(c.CaseLocations.FirstOrDefault().PinCode.Longitude)
+                    },
+                    Address = LocationDetail.GetAddress(c.PolicyDetail.ClaimType, c.CustomerDetail, c.CaseLocations?.FirstOrDefault()),
+                    PolicyNumber = c.PolicyDetail.ContractNumber,
+                });
+                return Ok(claim2Agent);
+            }
+            return Unauthorized();
+        }
+
+        [AllowAnonymous]
         [HttpGet("get")]
         public async Task<IActionResult> Get(string claimId)
         {

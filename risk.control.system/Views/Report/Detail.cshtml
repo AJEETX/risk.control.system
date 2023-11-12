@@ -575,18 +575,22 @@
                                                         }
                                                         @if (!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.AgentRemarks))
                                                         {
-                                                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                                            var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+
+                                                            <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
                                                                     <div class="card-header text-muted border-bottom-0">
-                                                                        <i class="far fa-comment"></i> Questionnaire template <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                                        <i class="far fa-comment"></i> Questionnaire <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i>@questionTime </span>
                                                                     </div>
                                                                     <div class="card-footer text-muted border-bottom-0">
                                                                         <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
                                                                     </div>
-                                                                    <div class="card-body pt-0">
+                                                                    <div class="card-body">
                                                                         <div class="row">
                                                                             <div class="col-12">
-                                                                                
+                                                                                <p class="text-muted text-sm">
+                                                                                    <span class="badge badge-light"><i class="fas fa-film"></i> Questions</span>:
+                                                                                </p>
                                                                                 <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                                     <li class="small">
                                                                                         Ownership of residence ?
@@ -595,7 +599,9 @@
                                                                                         </span>
                                                                                         @Model.Location.ClaimReport?.Question1 <i class="far fa-comment"></i>
                                                                                     </li>
-                                                                                    <br />
+                                                                                </ul>
+                                                                            
+                                                                                <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                                     <li class="small">
                                                                                         Perceived financial status ?
                                                                                         <span class="fa-li">
@@ -603,7 +609,8 @@
                                                                                         </span>
                                                                                         @Model.Location.ClaimReport?.Question2 <i class="far fa-comment"></i>
                                                                                     </li>
-                                                                                    <br />
+                                                                                </ul>
+                                                                                <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                                     <li class="small">
                                                                                         Name of neighbour met ?
                                                                                         <span class="fa-li">
@@ -611,7 +618,8 @@
                                                                                         </span>
                                                                                         @Model.Location.ClaimReport?.Question3 <i class="far fa-comment"></i>
                                                                                     </li>
-                                                                                    <br />
+                                                                                </ul>
+                                                                                <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                                     <li class="small">
                                                                                         Date when met with neighbour ?
                                                                                         <span class="fa-li">
@@ -619,7 +627,8 @@
                                                                                         </span>
                                                                                         @Model.Location.ClaimReport?.Question4 <i class="far fa-comment"></i>
                                                                                     </li>
-                                                                                    <br />
+                                                                                </ul>
+                                                                                <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                                     <li class="small">
                                                                                         Remarks?
                                                                                         <span class="fa-li">
@@ -629,7 +638,6 @@
                                                                                     </li>
                                                                                 </ul>
                                                                             </div>
-
                                                                         </div>
                                                                     </div>
                                                                 </div>
