@@ -315,7 +315,7 @@ namespace risk.control.system.Controllers.Api
                     .Select(c =>
                 new
                 {
-                    Id = c.ClaimsInvestigationId,
+                    ClaimId = c.ClaimsInvestigationId,
                     Coordinate = new
                     {
                         Lat = c.PolicyDetail.ClaimType == ClaimType.HEALTH ?
