@@ -310,10 +310,10 @@ namespace risk.control.system.Services
                             existingPolicy.CustomerDetail.ProfilePicture = dataStream.ToArray();
                         }
                         var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
-                        var pinCodeData = await httpClientService.GetPinCodeLatLng(pinCode.Code);
+                        //var pinCodeData = await httpClientService.GetPinCodeLatLng(pinCode.Code);
 
-                        existingPolicy.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                        existingPolicy.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                        //existingPolicy.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                        //existingPolicy.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
                         _context.ClaimsInvestigation.Update(existingPolicy);
 
                         await _context.SaveChangesAsync();
@@ -383,27 +383,30 @@ namespace risk.control.system.Services
                     }
                     var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
 
-                    var request = new HttpRequestMessage
-                    {
-                        Method = HttpMethod.Get,
-                        RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pincode.Code}"),
-                        Headers =
-                            {
-                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                            },
-                    };
-                    using (var response = await client.SendAsync(request))
-                    {
-                        response.EnsureSuccessStatusCode();
-                        var body = await response.Content.ReadAsStringAsync();
+                    existingPolicy.CustomerDetail.PinCode.Latitude = pincode.Latitude;
+                    existingPolicy.CustomerDetail.PinCode.Longitude = pincode.Longitude;
 
-                        var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+                    //var request = new HttpRequestMessage
+                    //{
+                    //    Method = HttpMethod.Get,
+                    //    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pincode.Code}"),
+                    //    Headers =
+                    //        {
+                    //            { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                    //            { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                    //        },
+                    //};
+                    //using (var response = await client.SendAsync(request))
+                    //{
+                    //    response.EnsureSuccessStatusCode();
+                    //    var body = await response.Content.ReadAsStringAsync();
 
-                        existingPolicy.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                        existingPolicy.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
-                        Console.WriteLine(body);
-                    }
+                    //    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+
+                    //    existingPolicy.CustomerDetail.PinCode.Latitude = pincode.Latitude;
+                    //    existingPolicy.CustomerDetail.PinCode.Longitude = pincode.Longitude;
+                    //    Console.WriteLine(body);
+                    //}
                     _context.ClaimsInvestigation.Update(existingPolicy);
 
                     await _context.SaveChangesAsync();

@@ -11,12 +11,15 @@ namespace risk.control.system.Seeds
 {
     public static class PinCodeStateSeed
     {
-        private static string stateWisePincodeFilePath = @"pincode.csv";
+        private static string stateWisePincodeFilePath = @"au_postcodes.csv";
+
+        //private static string stateWisePincodeFilePath = @"pincode.csv";
         private static string NO_DATA = " NO - DATA ";
+
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
+
         public static async Task SeedPincode(ApplicationDbContext context, Country country)
         {
-
             var pincodes = await CsvRead();
 
             // add the states with pincodes
@@ -31,7 +34,7 @@ namespace risk.control.system.Seeds
                 var pinCodeList = new List<PinCode> { };
                 foreach (var district in districts)
                 {
-                    var districtDetail = new District {  Code = district.Key, Name = district.Key, StateId = stateAdded.Entity.StateId, CountryId = country.CountryId };
+                    var districtDetail = new District { Code = district.Key, Name = district.Key, StateId = stateAdded.Entity.StateId, CountryId = country.CountryId };
                     var districtAdded = await context.District.AddAsync(districtDetail);
                     foreach (var pinCode in district)
                     {
@@ -51,6 +54,7 @@ namespace risk.control.system.Seeds
                 await context.PinCode.AddRangeAsync(pinCodeList);
             }
         }
+
         private static async Task<List<PinCodeState>> CsvRead()
         {
             var pincodes = new List<PinCodeState>();
@@ -73,16 +77,16 @@ namespace risk.control.system.Seeds
                             var rowData = output.Split(',').ToList();
                             var pincodeState = new PinCodeState
                             {
-                                Name = rowData[3] ?? NO_DATA,
-                                Code = rowData[4] ?? NO_DATA,
-                                District = rowData[7] ?? NO_DATA,
-                                StateName = rowData[8] ?? NO_DATA,
-                                StateCode = rowData[9] ?? NO_DATA,
-                                Latitude = rowData[10] ?? NO_DATA,
-                                Longitude = rowData[11] ?? NO_DATA,
+                                Code = rowData[0] ?? NO_DATA,
+                                Name = rowData[1] ?? NO_DATA,
+                                District = rowData[1] ?? NO_DATA,
+                                StateName = rowData[2] ?? NO_DATA,
+                                StateCode = rowData[3] ?? NO_DATA,
+                                Latitude = rowData[4] ?? NO_DATA,
+                                Longitude = rowData[5] ?? NO_DATA,
                             };
                             var isDupicate = pincodes.FirstOrDefault(p => p.Code == pincodeState.Code);
-                            if (isDupicate is null )
+                            if (isDupicate is null)
                             {
                                 pincodes.Add(pincodeState);
                             }
@@ -90,7 +94,8 @@ namespace risk.control.system.Seeds
                     }
                 }
             }
-            return pincodes.Distinct()?.ToList();
+            var smallerPincodes = pincodes.Where(p => p.StateCode == "VIC" || p.StateCode == "NSW")?.ToList();
+            return smallerPincodes.Distinct()?.ToList();
         }
     }
 }

@@ -143,9 +143,9 @@
         public const string UPLOAD_DATABASE = "UPLOAD DB";
         public const string AUDIT_LOGS = "AUDIT LOGS";
 
-        public const string CURRENT_PINCODE = "515631";
-        public const string CURRENT_DISTRICT = "ANANTAPUR";
-        public const string CURRENT_STATE = "AD";
+        public const string CURRENT_PINCODE = "3131";
+        public const string CURRENT_DISTRICT = "Forest Hill";
+        public const string CURRENT_STATE = "VIC";
 
         public const string COMPANYNAME = "canara hsbc life";
         public const string COMPANYCODE = "chl";

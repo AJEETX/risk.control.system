@@ -38,8 +38,8 @@ namespace risk.control.system.Seeds
 
             var india = new Country
             {
-                Name = "INDIA",
-                Code = "IND",
+                Name = "AUSTRALIA",
+                Code = "AU",
             };
             var indiaCountry = await context.Country.AddAsync(india);
 

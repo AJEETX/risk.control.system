@@ -177,27 +177,29 @@ namespace risk.control.system.Controllers
 
                 var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
 
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pincode.Code}"),
-                    Headers =
-                            {
-                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                            },
-                };
-                using (var response = await client.SendAsync(request))
-                {
-                    response.EnsureSuccessStatusCode();
-                    var body = await response.Content.ReadAsStringAsync();
+                caseLocation.PinCode.Latitude = pincode.Latitude;
+                caseLocation.PinCode.Longitude = pincode.Longitude;
+                //var request = new HttpRequestMessage
+                //{
+                //    Method = HttpMethod.Get,
+                //    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pincode.Code}"),
+                //    Headers =
+                //            {
+                //                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                //                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                //            },
+                //};
+                //using (var response = await client.SendAsync(request))
+                //{
+                //    response.EnsureSuccessStatusCode();
+                //    var body = await response.Content.ReadAsStringAsync();
 
-                    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+                //    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
 
-                    caseLocation.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                    caseLocation.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
-                    Console.WriteLine(body);
-                }
+                //    caseLocation.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                //    caseLocation.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                //    Console.WriteLine(body);
+                //}
 
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
@@ -303,29 +305,30 @@ namespace risk.control.system.Controllers
                         }
 
                         var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+                        caseLocation.PinCode.Latitude = pinCode.Latitude;
+                        caseLocation.PinCode.Longitude = pinCode.Longitude;
 
+                        //var request = new HttpRequestMessage
+                        //{
+                        //    Method = HttpMethod.Get,
+                        //    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pinCode.Code}"),
+                        //    Headers =
+                        //    {
+                        //        { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                        //        { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                        //    },
+                        //};
+                        //using (var response = await client.SendAsync(request))
+                        //{
+                        //    response.EnsureSuccessStatusCode();
+                        //    var body = await response.Content.ReadAsStringAsync();
 
-                        var request = new HttpRequestMessage
-                        {
-                            Method = HttpMethod.Get,
-                            RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pinCode.Code}"),
-                            Headers =
-                            {
-                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                            },
-                        };
-                        using (var response = await client.SendAsync(request))
-                        {
-                            response.EnsureSuccessStatusCode();
-                            var body = await response.Content.ReadAsStringAsync();
+                        //    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
 
-                            var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
-
-                            caseLocation.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                            caseLocation.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
-                            Console.WriteLine(body);
-                        }
+                        //    caseLocation.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                        //    caseLocation.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                        //    Console.WriteLine(body);
+                        //}
 
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();

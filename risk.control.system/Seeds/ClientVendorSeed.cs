@@ -12,11 +12,6 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        private static string currentPinCode = "515631";
-        private static string currentDistrict = "ANANTAPUR";
-        private static string currentState = "AD";
-        private static string biharPincode = "853204";
-
         public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
             InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpClientService httpClientService)
         {
@@ -24,10 +19,10 @@ namespace risk.control.system.Seeds
             var companyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == companyPinCode.District.DistrictId);
             var companyStateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!;
 
-            var pinCodeData = await httpClientService.GetPinCodeLatLng(companyPinCode.Code);
+            //var pinCodeData = await httpClientService.GetPinCodeLatLng(companyPinCode.Code);
 
-            companyPinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-            companyPinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+            //companyPinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+            //companyPinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
 
             //CREATE VENDOR COMPANY
 
@@ -133,7 +128,7 @@ namespace risk.control.system.Seeds
                     VendorId = checkerAgency.Entity.VendorId,
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
                     Price = 199,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     CountryId = indiaCountry.Entity.CountryId,
@@ -141,8 +136,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
                     }
                 },
@@ -150,7 +145,7 @@ namespace risk.control.system.Seeds
                     VendorId = checkerAgency.Entity.VendorId,
                     InvestigationServiceTypeId = docServiceType.InvestigationServiceTypeId,
                     Price = 99,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     CountryId = indiaCountry.Entity.CountryId,
@@ -158,8 +153,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
                     }
                 }
@@ -171,7 +166,7 @@ namespace risk.control.system.Seeds
                     VendorId = verifyAgency.Entity.VendorId,
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
                     Price = 399,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     CountryId = indiaCountry.Entity.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
@@ -179,8 +174,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
                     }
                 },
@@ -188,7 +183,7 @@ namespace risk.control.system.Seeds
                     VendorId = verifyAgency.Entity.VendorId,
                     InvestigationServiceTypeId = discreetServiceType.InvestigationServiceTypeId,
                     Price = 299,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     CountryId = indiaCountry.Entity.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
@@ -196,8 +191,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
                     }
                 }
@@ -209,7 +204,7 @@ namespace risk.control.system.Seeds
                     VendorId = investigateAgency.Entity.VendorId,
                     InvestigationServiceTypeId = docServiceType.InvestigationServiceTypeId,
                     Price = 199,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     CountryId = indiaCountry.Entity.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
@@ -217,8 +212,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
                     }
                 },
@@ -226,7 +221,7 @@ namespace risk.control.system.Seeds
                     VendorId = investigateAgency.Entity.VendorId,
                     InvestigationServiceTypeId = discreetServiceType.InvestigationServiceTypeId,
                     Price = 299,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     CountryId = indiaCountry.Entity.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
@@ -234,8 +229,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
                     }
                 },
@@ -243,7 +238,7 @@ namespace risk.control.system.Seeds
                     VendorId = investigateAgency.Entity.VendorId,
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
                     Price = 599,
-                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(currentState))?.StateId ?? default!,
+                    StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(Applicationsettings.CURRENT_STATE))?.StateId ?? default!,
                     DistrictId = context.District.FirstOrDefault(s => s.Name == Applicationsettings.CURRENT_DISTRICT)?.DistrictId ?? default!,
                     CountryId = indiaCountry.Entity.CountryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
@@ -251,8 +246,8 @@ namespace risk.control.system.Seeds
                     {
                         new ServicedPinCode
                         {
-                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Code ?? default !,
-                            Name = context.PinCode.FirstOrDefault(s => s.Code == currentPinCode)?.Name ?? default !
+                            Pincode = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Code ?? default !,
+                            Name = context.PinCode.FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE)?.Name ?? default !
                         }
                     }
                 }

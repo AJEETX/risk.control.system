@@ -217,7 +217,7 @@ namespace risk.control.system.Controllers
 
                                         var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
-                                        var country = _context.Country.FirstOrDefault(c => c.Code.ToLower() == "IND".ToLower());
+                                        var country = _context.Country.FirstOrDefault();
 
                                         var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, rowData[0].Trim(), "CUSTOMER.jpg");
 
@@ -534,7 +534,7 @@ namespace risk.control.system.Controllers
 
                                     var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
-                                    var country = _context.Country.FirstOrDefault(c => c.Code.ToLower() == "IND".ToLower());
+                                    var country = _context.Country.FirstOrDefault();
 
                                     var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, rowData[0].Trim(), "CUSTOMER.jpg");
 
@@ -542,16 +542,16 @@ namespace risk.control.system.Controllers
 
                                     dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
-                                    var request = new HttpRequestMessage
-                                    {
-                                        Method = HttpMethod.Get,
-                                        RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pinCode.Code}"),
-                                        Headers =
-                                            {
-                                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                                            },
-                                    };
+                                    //var request = new HttpRequestMessage
+                                    //{
+                                    //    Method = HttpMethod.Get,
+                                    //    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pinCode.Code}"),
+                                    //    Headers =
+                                    //        {
+                                    //            { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                                    //            { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                                    //        },
+                                    //};
 
                                     claim.CustomerDetail = new CustomerDetail
                                     {
@@ -571,17 +571,20 @@ namespace risk.control.system.Controllers
                                         Description = rowData[20]?.Trim(),
                                         ProfilePicture = customerImage
                                     };
-                                    using (var response = await httpClient.SendAsync(request))
-                                    {
-                                        response.EnsureSuccessStatusCode();
-                                        var body = await response.Content.ReadAsStringAsync();
+                                    claim.CustomerDetail.PinCode = pinCode;
+                                    claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
+                                    claim.CustomerDetail.PinCode.Longitude = pinCode.Longitude;
+                                    //using (var response = await httpClient.SendAsync(request))
+                                    //{
+                                    //    response.EnsureSuccessStatusCode();
+                                    //    var body = await response.Content.ReadAsStringAsync();
 
-                                        var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
-                                        claim.CustomerDetail.PinCode = pinCode;
-                                        claim.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                                        claim.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
-                                        Console.WriteLine(body);
-                                    }
+                                    //    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+                                    //    claim.CustomerDetail.PinCode = pinCode;
+                                    //    claim.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                                    //    claim.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                                    //    Console.WriteLine(body);
+                                    //}
                                     var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
 
                                     var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
@@ -614,27 +617,31 @@ namespace risk.control.system.Controllers
 
                                     beneficairy.ClaimsInvestigationId = addedClaim.Entity.ClaimsInvestigationId;
 
-                                    var brequest = new HttpRequestMessage
-                                    {
-                                        Method = HttpMethod.Get,
-                                        RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{benePinCode.Code}"),
-                                        Headers =
-                                            {
-                                                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                                                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                                            },
-                                    };
-                                    using (var response = await httpClient.SendAsync(brequest))
-                                    {
-                                        response.EnsureSuccessStatusCode();
-                                        var body = await response.Content.ReadAsStringAsync();
+                                    beneficairy.PinCode = benePinCode;
+                                    beneficairy.PinCode.Latitude = benePinCode.Latitude;
+                                    beneficairy.PinCode.Longitude = benePinCode.Longitude;
 
-                                        var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
-                                        beneficairy.PinCode = benePinCode;
-                                        beneficairy.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                                        beneficairy.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
-                                        Console.WriteLine(body);
-                                    }
+                                    //var brequest = new HttpRequestMessage
+                                    //{
+                                    //    Method = HttpMethod.Get,
+                                    //    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{benePinCode.Code}"),
+                                    //    Headers =
+                                    //        {
+                                    //            { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
+                                    //            { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
+                                    //        },
+                                    //};
+                                    //using (var response = await httpClient.SendAsync(brequest))
+                                    //{
+                                    //    response.EnsureSuccessStatusCode();
+                                    //    var body = await response.Content.ReadAsStringAsync();
+
+                                    //    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
+                                    //    beneficairy.PinCode = benePinCode;
+                                    //    beneficairy.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
+                                    //    beneficairy.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
+                                    //    Console.WriteLine(body);
+                                    //}
 
                                     _context.CaseLocation.Add(beneficairy);
 
@@ -798,7 +805,7 @@ namespace risk.control.system.Controllers
 
                                 var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
-                                var country = _context.Country.FirstOrDefault(c => c.Code.ToLower() == "IND".ToLower());
+                                var country = _context.Country.FirstOrDefault();
 
                                 var customerImagePath = imageFiles.FirstOrDefault(i => i.Name.ToLower() == "customer.jpg" || i.Name.ToLower() == "customer.jpeg")?.FullName;
 
@@ -1027,6 +1034,7 @@ namespace risk.control.system.Controllers
                 .Where(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.PolicyDetail.ClientCompanyId)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
+                .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.District)
@@ -1856,7 +1864,10 @@ namespace risk.control.system.Controllers
 
                 if (claims.Count > autoAllocatedClaims.Count)
                 {
-                    toastNotification.AddWarningToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
+                    if (autoAllocatedClaims.Count > 0)
+                    {
+                        toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
+                    }
 
                     var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
 
