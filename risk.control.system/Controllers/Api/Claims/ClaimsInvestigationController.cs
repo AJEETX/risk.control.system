@@ -1978,7 +1978,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 profileMap = customerMapUrl,
                 weatherData = weatherCustomData,
-                address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name,
+                address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name + " " + customer.Country.Name + " " + customer.PinCode.Name,
                 position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
             };
             return Ok(data);
@@ -2015,7 +2015,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 profileMap = customerMapUrl,
                 weatherData = weatherCustomData,
-                address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name,
+                address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Name,
                 position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
             };
             return Ok(data);
