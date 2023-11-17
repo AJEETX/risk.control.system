@@ -15,6 +15,7 @@ namespace risk.control.system.Controllers.Api
         {
             this.context = context;
         }
+
         [HttpPost, ActionName("GetStatesByCountryId")]
         public async Task<IActionResult> GetStatesByCountryId(string countryId)
         {
@@ -23,7 +24,7 @@ namespace risk.control.system.Controllers.Api
             if (!string.IsNullOrEmpty(countryId))
             {
                 cId = countryId;
-                states = await context.State.Where(s => s.CountryId.Equals(cId)).ToListAsync();
+                states = await context.State.Where(s => s.CountryId.Equals(cId)).OrderBy(s => s.Code).ToListAsync();
             }
             return Ok(states);
         }
@@ -36,7 +37,7 @@ namespace risk.control.system.Controllers.Api
             if (!string.IsNullOrEmpty(stateId))
             {
                 sId = stateId;
-                districts = await context.District.Where(s => s.State.StateId.Equals(sId)).ToListAsync();
+                districts = await context.District.Where(s => s.State.StateId.Equals(sId)).OrderBy(s => s.Code).ToListAsync();
             }
             return Ok(districts);
         }
@@ -49,10 +50,11 @@ namespace risk.control.system.Controllers.Api
             if (!string.IsNullOrEmpty(districtId))
             {
                 sId = districtId;
-                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
+                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).OrderBy(s => s.Code).ToListAsync();
             }
             return Ok(pincodes);
         }
+
         [HttpPost, ActionName("GetPincodesByDistrictIdWithoutPreviousSelected")]
         public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelected(string districtId, string caseId)
         {
@@ -63,7 +65,7 @@ namespace risk.control.system.Controllers.Api
             if (!string.IsNullOrEmpty(districtId))
             {
                 sId = districtId;
-                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();
+                pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).OrderBy(s => s.Code).ToListAsync();
 
                 //var existingCaseLocations = context.CaseLocation
                 //    .Include(c => c.PincodeServices)
@@ -98,7 +100,7 @@ namespace risk.control.system.Controllers.Api
 
                 var vendor = context.Vendor
                     .Include(c => c.VendorInvestigationServiceTypes)
-                    .ThenInclude(v=>v.Country)
+                    .ThenInclude(v => v.Country)
                     .Include(c => c.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.State)
                     .Include(c => c.VendorInvestigationServiceTypes)
@@ -117,7 +119,7 @@ namespace risk.control.system.Controllers.Api
 
                     foreach (var existingVendorService in existingVendorServices)
                     {
-                        if(existingVendorService.LineOfBusinessId == lobId && existingVendorService.InvestigationServiceTypeId == serviceId)
+                        if (existingVendorService.LineOfBusinessId == lobId && existingVendorService.InvestigationServiceTypeId == serviceId)
                         {
                             foreach (var pincodeService in existingVendorService.PincodeServices)
                             {
@@ -128,7 +130,7 @@ namespace risk.control.system.Controllers.Api
 
                     var existingPicodes = existingServicedPincodes.Select(e => e.Pincode).ToList();
                     var remaingPincodesString = pinCodeString.Except(existingPicodes).ToList();
-                    remaingPincodes = pincodes.Where(p => remaingPincodesString.Contains(p.Code)).ToList();
+                    remaingPincodes = pincodes.Where(p => remaingPincodesString.Contains(p.Code)).OrderBy(s => s.Code).ToList();
                     return Ok(remaingPincodes);
                 }
             }
@@ -146,7 +148,7 @@ namespace risk.control.system.Controllers.Api
                    || true
                 ).ToListAsync();
             }
-            return Ok(applicationUsers?.Select(a => a.Email).ToList());
+            return Ok(applicationUsers?.Select(a => a.Email).OrderBy(s => s).ToList());
         }
     }
 }

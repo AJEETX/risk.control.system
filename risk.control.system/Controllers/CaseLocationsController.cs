@@ -133,9 +133,9 @@ namespace risk.control.system.Controllers
 
             ViewData["BreadcrumbNode"] = locationPage;
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", model.DistrictId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", model.StateId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", model.PinCodeId);
+            ViewData["DistrictId"] = new SelectList(_context.District.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
+            ViewData["StateId"] = new SelectList(_context.State.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode.OrderBy(s => s.Code), "PinCodeId", "Code", model.PinCodeId);
 
             return View(model);
         }
@@ -203,11 +203,12 @@ namespace risk.control.system.Controllers
 
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
+                toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} added successfully !", caseLocation.BeneficiaryName));
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", caseLocation.PinCodeId);
@@ -234,11 +235,11 @@ namespace risk.control.system.Controllers
                 .Include(v => v.District)
                 .First(v => v.CaseLocationId == id);
 
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", caseLocation.StateId);
+            ViewData["DistrictId"] = new SelectList(_context.District.OrderBy(s => s.Code), "DistrictId", "Name", caseLocation.DistrictId);
+            ViewData["StateId"] = new SelectList(_context.State.OrderBy(s => s.Code), "StateId", "Name", caseLocation.StateId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", caseLocation.PinCodeId);
+            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode.OrderBy(s => s.Code), "PinCodeId", "Code", caseLocation.PinCodeId);
 
             var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
             var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
