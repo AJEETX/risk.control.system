@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", model.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", model.StateId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", model.PinCodeId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", model.PinCodeId);
 
             return View(model);
         }
@@ -210,6 +210,7 @@ namespace risk.control.system.Controllers
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", caseLocation.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "StateId", caseLocation.StateId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", caseLocation.PinCodeId);
             return View(caseLocation);
         }
 
@@ -237,7 +238,7 @@ namespace risk.control.system.Controllers
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", caseLocation.StateId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", caseLocation.PinCodeId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", caseLocation.PinCodeId);
 
             var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
             var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };

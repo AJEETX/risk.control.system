@@ -76,7 +76,7 @@ namespace risk.control.system.Seeds
             {
                 Name = Applicationsettings.AGENCY3NAME,
                 Addressline = "1, Main Road  ",
-                Branch = "CLAYTON",
+                Branch = "CLAYTON ROAD",
                 Code = Applicationsettings.AGENCY3CODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
@@ -115,7 +115,7 @@ namespace risk.control.system.Seeds
                 PinCodeId = companyPinCode.PinCodeId,
                 Description = "CORPORATE OFFICE ",
                 Email = Applicationsettings.COMPANYDOMAIN,
-                DocumentUrl = "/img/chl.png",
+                DocumentUrl = Applicationsettings.COMPANYLOGO,
                 PhoneNumber = "9988004739",
                 EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
             };

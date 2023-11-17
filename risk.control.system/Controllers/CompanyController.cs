@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", clientCompany.CountryId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", clientCompany.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", clientCompany.PinCodeId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", clientCompany.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", clientCompany.StateId);
             return View(clientCompany);
         }

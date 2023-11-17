@@ -1923,6 +1923,12 @@ namespace risk.control.system.Controllers
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.Vendor)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.BeneficiaryRelation)
@@ -1961,14 +1967,14 @@ namespace risk.control.system.Controllers
             {
                 var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
 
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.CustomerLocationUrl = url;
             }
 
             if (location is not null)
             {
                 var beneficiarylatLong = location.PinCode.Latitude + "," + location.PinCode.Longitude;
-                var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.BeneficiaryLocationUrl = bUrl;
             }
 
@@ -2076,6 +2082,12 @@ namespace risk.control.system.Controllers
                 .ThenInclude(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.PinCode)
+               .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.Vendor)
                 .Include(c => c.CaseLocations)
@@ -2112,11 +2124,11 @@ namespace risk.control.system.Controllers
             };
             var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
 
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             ViewBag.CustomerLocationUrl = url;
 
             var beneficiarylatLong = location.PinCode.Latitude + "," + location.PinCode.Longitude;
-            var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             ViewBag.BeneficiaryLocationUrl = bUrl;
 
             return View(model);
@@ -2465,7 +2477,7 @@ namespace risk.control.system.Controllers
 
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", claimsInvestigation.CustomerDetail.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
 
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
@@ -2567,7 +2579,7 @@ namespace risk.control.system.Controllers
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
+            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", claimsInvestigation.CustomerDetail.PinCodeId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
 
             var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");

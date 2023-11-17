@@ -1910,7 +1910,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var longLatString = faceLat + "," + faceLng;
                 RootObject rootObject = ReportController.getAddress((faceLat), (faceLng));
                 imageAddress = rootObject.display_name;
-                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
 
             string ocrUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
@@ -1924,7 +1924,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
                 RootObject rootObject = ReportController.getAddress((ocrLatitude), (ocrLongitude));
                 ocrAddress = rootObject.display_name;
-                ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
 
             var data = new
@@ -1973,12 +1973,12 @@ namespace risk.control.system.Controllers.Api.Claims
             var longLatString = latitude + "," + longitude;
             RootObject rootObject = ReportController.getAddress((latitude), (longitude));
             var imageAddress = rootObject.display_name;
-            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             var data = new
             {
                 profileMap = customerMapUrl,
                 weatherData = weatherCustomData,
-                address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name + " " + customer.Country.Name + " " + customer.PinCode.Name,
+                address = customer.Addressline + " " + customer.District.Name + " " + customer.State.Name + " " + customer.Country.Name + " " + customer.PinCode.Code,
                 position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
             };
             return Ok(data);
@@ -2010,12 +2010,12 @@ namespace risk.control.system.Controllers.Api.Claims
             var longLatString = latitude + "," + longitude;
             RootObject rootObject = ReportController.getAddress((latitude), (longitude));
             var imageAddress = rootObject.display_name;
-            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=14&size=400x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             var data = new
             {
                 profileMap = customerMapUrl,
                 weatherData = weatherCustomData,
-                address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Name,
+                address = beneficiary.Addressline + " " + beneficiary.District.Name + " " + beneficiary.State.Name + " " + beneficiary.Country.Name + " " + beneficiary.PinCode.Code,
                 position = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) }
             };
             return Ok(data);
