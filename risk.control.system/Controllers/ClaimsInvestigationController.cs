@@ -2240,6 +2240,14 @@ namespace risk.control.system.Controllers
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
 
             var random = new Random();
+            var cNumber = random.Next(3333, 9999);
+            var contractNumber = "POLX" + cNumber;
+
+            var existingContractNumber = _context.PolicyDetail.Any(p => p.ContractNumber == contractNumber);
+            if (existingContractNumber)
+            {
+                cNumber = cNumber + random.Next(3333, 9999);
+            }
             var model = new ClaimsInvestigation
             {
                 PolicyDetail = new PolicyDetail
@@ -2254,7 +2262,7 @@ namespace risk.control.system.Controllers
                     InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i => i.Code == "COMP").InvestigationServiceTypeId,
                     Comments = "SOMETHING FISHY",
                     SumAssuredValue = random.Next(100000, 9999999),
-                    ContractNumber = "POLX" + random.Next(1000, 9999),
+                    ContractNumber = "POLX" + cNumber,
                 }
             };
 

@@ -2,7 +2,6 @@
     ({ key: "AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E", v: "beta" });
 
 async function initMap(url) {
-
     var response = $.ajax({
         type: "GET",
         url: url,
@@ -43,18 +42,16 @@ async function initMap(url) {
             bounds.extend(property.position);
         }
         map.setZoom(map.getZoom() - 1);
-        if (map.getZoom() > 18) {
-            map.setZoom(18);
+        if (map.getZoom() > 15) {
+            map.setZoom(15);
         }
     } else {
         bounds.extend(center);
         map.setZoom(8);
     }
-    
 
     map.fitBounds(bounds);
     map.setCenter(bounds.getCenter());
-    
 }
 
 function toggleHighlight(markerView, property) {
