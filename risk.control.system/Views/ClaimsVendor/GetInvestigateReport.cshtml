@@ -381,7 +381,7 @@
                                                                                         }
                                                                                         else
                                                                                         {
-                                                                                            <img title="digital image" id="agentLocationPicture" alt="face image" class="img-fluid  ocr-data" src="/img/no-photo.png">
+                                                                                            <img title="digital image" id="agentLocationPicture" alt="face image" class="img-fluid  no-Image" src="/img/no-photo.png">
                                                                                         }
                                                                                     }
                                                                                 </p>
@@ -419,7 +419,7 @@
                                                                 </div>
                                                             </div>
                                                         }
-                                                        if ( @Model.CaseLocation.ClaimReport?.OcrLongLatTime != null && ocrImage != null)
+                                                        if (@Model.CaseLocation.ClaimReport?.AgentOcrData != null && @Model.CaseLocation.ClaimReport?.OcrLongLatTime != null && ocrImage != null)
                                                         {
                                                            
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -452,7 +452,7 @@
                                                                                         }
                                                                                         else
                                                                                         {
-                                                                                            <img title="document image" id="agentOcrPicture" alt="ocr-image" class="img-fluid ocr-data" src="/img/no-photo.png">
+                                                                                            <img title="document image" id="agentOcrPicture" alt="ocr-image" class="img-fluid no-Image" src="/img/no-photo.png">
                                                                                         }
                                                                                     }
                                                                                 </p>
