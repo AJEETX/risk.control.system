@@ -576,7 +576,19 @@
                                                         @if (!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.AgentRemarks))
                                                         {
                                                             var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-
+                                                            var status_fin = "LOW";
+                                                            if (Model.Location?.ClaimReport?.Question2 == ".5")
+                                                            {
+                                                                status_fin = "Medium";
+                                                            }
+                                                            else if (Model.Location?.ClaimReport?.Question2 == "1")
+                                                            {
+                                                                status_fin = "High";
+                                                            }
+                                                            else
+                                                            {
+                                                                status_fin = Model.Location?.ClaimReport?.Question2;
+                                                            }
                                                             <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
                                                                     <div class="card-header text-muted border-bottom-0">
@@ -607,7 +619,7 @@
                                                                                         <span class="fa-li">
                                                                                             <i class="far fa-comment"></i>
                                                                                         </span>
-                                                                                        @Model.Location.ClaimReport?.Question2 <i class="far fa-comment"></i>
+                                                                                        @status_fin <i class="far fa-comment"></i>
                                                                                     </li>
                                                                                 </ul>
                                                                                 <ul class="ml-4 mb-0 fa-ul text-muted">

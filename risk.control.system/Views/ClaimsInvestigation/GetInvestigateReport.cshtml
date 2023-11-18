@@ -525,6 +525,19 @@
                                                     }
                                                     @{
                                                         var questionTime = @Model.CaseLocation.ClaimReport.AgentRemarksUpdated != null ? @Model.CaseLocation.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                                                        var status_fin = "LOW";
+                                                        if (Model.CaseLocation?.ClaimReport?.Question2 == ".5")
+                                                        {
+                                                            status_fin = "Medium";
+                                                        }
+                                                        else if (Model.CaseLocation?.ClaimReport?.Question2 == "1")
+                                                        {
+                                                            status_fin = "High";
+                                                        }
+                                                        else
+                                                        {
+                                                            status_fin = Model.CaseLocation?.ClaimReport?.Question2;
+                                                        }
                                                     }
                                                     <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
                                                         <div class="card bg-light d-flex flex-fill">
@@ -552,7 +565,7 @@
                                                                                 <span class="fa-li">
                                                                                     <i class="far fa-comment"></i>
                                                                                 </span>
-                                                                                @Model.CaseLocation.ClaimReport?.Question2 <i class="far fa-comment"></i>
+                                                                                @status_fin <i class="far fa-comment"></i>
                                                                             </li>
                                                                             <br />
                                                                             <li class="small">
