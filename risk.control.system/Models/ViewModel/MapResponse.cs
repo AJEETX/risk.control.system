@@ -12,6 +12,7 @@ namespace risk.control.system.Models.ViewModel
         public string Bed { get; set; }
         public long? Bath { get; set; }
         public string Size { get; set; }
+        public string? Url { get; set; }
 
         public Position Position
         {

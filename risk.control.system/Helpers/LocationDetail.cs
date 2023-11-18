@@ -28,19 +28,20 @@ namespace risk.control.system.Helpers
             var NewLng = lng + decimal.Parse(tmpLng.ToString("###.#######"));
             return (NewLat, NewLng);
         }
+
         public static string GetAddress(ClaimType? claimType, CustomerDetail a, CaseLocation location)
         {
             if (claimType == ClaimType.HEALTH)
             {
                 if (a is null)
                     return string.Empty;
-                return a.Addressline + " " + a.District?.Code + " " + a.State?.Code;
+                return a.Addressline + " " + a.District?.Name + " " + a.State?.Name + " " + a.Country?.Name + " " + a.PinCode?.Code;
             }
             else
             {
                 if (location is null)
                     return string.Empty;
-                return location.Addressline + " " + location.District.Code + " " + location.State.Code;
+                return location.Addressline + " " + location.District.Name + " " + location.State.Name + " " + location.Country.Name + " " + location.PinCode.Code;
             }
         }
     }

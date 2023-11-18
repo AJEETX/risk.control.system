@@ -1,6 +1,5 @@
-﻿(g => { var h, a, k, p = "API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
-    ({ key: "AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E", v: "beta" });
-var data;
+﻿var data;
+var current_data;
 function initMap(url) {
     var response = $.ajax({
         type: "GET",
@@ -17,12 +16,19 @@ function initMap(url) {
 }
 
 async function success(position) {
-    const { Map } = await google.maps.importLibrary("maps");
+    var apiKey = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
+    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     var bounds = new google.maps.LatLngBounds();
     var lat = position.coords.latitude;
     var long = position.coords.longitude;
-    var city = position.coords.locality;
+    var locresponse = $.ajax({
+        type: "GET",
+        url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${apiKey}`,
+        async: false
+    }).responseText;
+    current_data = JSON.parse(locresponse);
+
     var LatLng = new google.maps.LatLng(lat, long);
     var mapOptions = {
         center: LatLng,
@@ -34,28 +40,29 @@ async function success(position) {
     var map = new google.maps.Map(document.getElementById("map"), mapOptions);
     var marker = new google.maps.Marker({
         position: LatLng,
-        title: "Your location: Latitude: " + lat + +", Longitude: " + long
+        title: "You are here: " + current_data.results[0].formatted_address
     });
 
     marker.setMap(map);
     var getInfoWindow = new google.maps.InfoWindow({
-        content: "<b>Your Current Location</b><br/> Latitude:" +
-            lat + "<br /> Longitude:" + long + ""
+        content: "<b>Your Current Location</b><br/> " +
+            current_data.results[0].formatted_address + ""
     });
     getInfoWindow.open(map, marker);
+    const infoWindow = new InfoWindow();
 
     if (data.response.length > 0) {
         bounds.extend(LatLng);
         for (const property of data.response) {
-            const AdvancedMarkerElement = new google.maps.marker.AdvancedMarkerElement({
+            const marker = new google.maps.marker.AdvancedMarkerElement({
                 map,
                 content: buildContent(property),
                 position: property.position,
                 title: property.description,
             });
 
-            AdvancedMarkerElement.addListener("click", () => {
-                toggleHighlight(AdvancedMarkerElement, property);
+            marker.addListener("gmp-click", ({ domEvent, latLng }) => {
+                toggleHighlight(marker, property, domEvent, infoWindow);
             });
             bounds.extend(property.position);
         }
@@ -72,14 +79,18 @@ async function success(position) {
     map.fitBounds(bounds);
     map.setCenter(bounds.getCenter());
 }
-function toggleHighlight(markerView, property) {
-    if (markerView.content.classList.contains("highlight")) {
-        markerView.content.classList.remove("highlight");
-        markerView.zIndex = null;
+function toggleHighlight(marker, property, domEvent, infoWindow) {
+    if (marker.content.classList.contains("highlight")) {
+        marker.content.classList.remove("highlight");
+        window.location.href = property.url;
+        marker.zIndex = null;
     } else {
-        markerView.content.classList.add("highlight");
-        markerView.zIndex = 1;
+        marker.content.classList.add("highlight");
+        marker.zIndex = 1;
     }
+    //infoWindow.close();
+    //infoWindow.setContent(buildContent(property));
+    //infoWindow.open(marker.map, marker);
 }
 
 function buildContent(property) {
@@ -88,8 +99,8 @@ function buildContent(property) {
     content.classList.add("property");
     content.innerHTML = `
                                         <div class="icon">
-                                            <i aria-hidden="true" class="fa fa-icon fa-${property.type}" title="${property.type}"></i>
-                                            <span class="fa-sr-only">${property.type}</span>
+                                            <i aria-hidden="true" class="fa fa-icon fa-${property.type}" title="${property.address}"></i>
+                                            <span class="fa-sr-only">${property.address}</span>
                                         </div>
                                         <div class="details">
                                             <div class="price">$ ${property.price}</div>

@@ -221,7 +221,8 @@ namespace risk.control.system.Controllers.Api.Claims
                             decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                              decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
-                       }
+                       },
+                       Url = "/ClaimsVendor/Detail?Id=" + a.ClaimsInvestigationId
                    })?
                    .ToList();
 
@@ -455,7 +456,8 @@ namespace risk.control.system.Controllers.Api.Claims
                             decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
                              Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                              decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
-                         }
+                         },
+                         Url = "/ClaimsVendor/Detail?Id=" + a.ClaimsInvestigationId
                      })?
                      .ToList();
             var vendor = _context.Vendor.Include(c => c.PinCode).FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
@@ -657,7 +659,8 @@ namespace risk.control.system.Controllers.Api.Claims
                             decimal.Parse(a.CustomerDetail.PinCode.Latitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Latitude),
                            Lng = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                              decimal.Parse(a.CustomerDetail.PinCode.Longitude) : decimal.Parse(a.CaseLocations.FirstOrDefault().PinCode.Longitude)
-                       }
+                       },
+                       Url = "/ClaimsVendor/Detail?Id=" + a.ClaimsInvestigationId
                    })?
                      .ToList();
             var vendor = _context.Vendor.Include(c => c.PinCode).FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
