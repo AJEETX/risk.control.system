@@ -651,19 +651,22 @@ namespace risk.control.system.Controllers.Api
             {
                 claimCase.ClaimReport.Question2 = data.Question2;
             }
+            if(!string.IsNullOrWhiteSpace(claimCase.ClaimReport.LocationLongLat))
+            {
+                var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
+                var latitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var latLongString = latitude + "," + longitude;
+                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                    $"\r\n" +
+                    $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                    $"\r\n" +
+                    $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                claimCase.ClaimReport.LocationData = weatherCustomData;
+            }
 
-            var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
-            var latitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
-            var longitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-            var latLongString = latitude + "," + longitude;
-            var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-            var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-            string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                $"\r\n" +
-                $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                $"\r\n" +
-                $"\r\nElevation(sea level):{weatherData.elevation} metres";
-            claimCase.ClaimReport.LocationData = weatherCustomData;
 
             _context.CaseLocation.Update(claimCase);
 

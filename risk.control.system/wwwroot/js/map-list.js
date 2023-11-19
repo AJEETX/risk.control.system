@@ -82,7 +82,7 @@ async function success(position) {
 function toggleHighlight(marker, property, domEvent, infoWindow) {
     if (marker.content.classList.contains("highlight")) {
         marker.content.classList.remove("highlight");
-        window.location.href = property.url;
+        //window.location.href = property.url;
         marker.zIndex = null;
     } else {
         marker.content.classList.add("highlight");
@@ -104,7 +104,7 @@ function buildContent(property) {
                                         </div>
                                         <div class="details">
                                             <div class="price">$ ${property.price}</div>
-                                            <div class="address"><i aria-hidden="true" class="fas fa-home" title="bedroom"></i> ${property.address}</div>
+                                            <div class="address"><i aria-hidden="true" class="fas fa-home" title="bedroom"></i> <a href="${property.url}"> ${property.address}</a></div>
                                             <div class="features">
                                             <div>
                                                         <i aria-hidden="true" class="fas fa-rupee-sign" title="bedroom"></i>
