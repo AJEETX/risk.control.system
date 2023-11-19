@@ -78,10 +78,12 @@ body {
     position: fixed;
     z-index: 10000;
     color: red;
-    transform: rotate(-40deg);
+    transform: rotate(-45deg);
     opacity: 0.1;
+    height: 60px;
 }
 .watermark {
+    height: 60px;
 }
 .footer {
     position: absolute;
