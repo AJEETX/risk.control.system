@@ -17,7 +17,11 @@
     #watermark {
         position: fixed;
         z-index: 10000;
-        font-size: 40px;
+        bottom:400px;
+        left:150px;
+        font-size: 30px;
+        font-weight:bold;
+        font-style:italic;
         color: red;
         transform: rotate(-40deg);
         opacity: 0.2;
@@ -60,7 +64,7 @@
                 <div class="login-form">
                     <img src="/img/iCheckifyLogo.png" height="40px" />
                     <div id="watermark">
-                        -- DEMO --
+                       - DEMO -
                     </div>
                     <form style="padding-top:3rem;" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
                         <div class="input-boxes">
