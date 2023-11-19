@@ -76,15 +76,13 @@ body {
 
 #watermark {
     position: fixed;
-    bottom: 500px;
-    left: 900px;
     z-index: 10000;
-    font-size: 60px;
     color: red;
     transform: rotate(-40deg);
     opacity: 0.1;
 }
-
+.watermark {
+}
 .footer {
     position: absolute;
     bottom: 0;
