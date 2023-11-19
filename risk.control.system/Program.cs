@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OpenApi.Models;
 
 using NToastNotify;
 
@@ -143,8 +144,30 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 //        .RequireAuthenticatedUser()
 //        .Build();
 //});
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "iCheckify API",
+        Description = "iCheckify API ",
+        TermsOfService = new Uri("https://icheckify.co.in"),
+        Contact = new OpenApiContact
+        {
+            Name = "iCheckify Team",
+            Email = "hi@icheckify.co.in",
+            Url = new Uri("https://icheckify.co.in"),
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Use under OpenApiLicense",
+            Url = new Uri("https://icheckify.co.in"),
+        }
+    });
+});
 
 var app = builder.Build();
+app.UseSwagger();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -161,6 +184,10 @@ app.UseHttpLogging();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+});
 //app.UseCookiePolicy(
 //    new CookiePolicyOptions
 //    {

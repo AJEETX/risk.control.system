@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl == "dashboard";
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
