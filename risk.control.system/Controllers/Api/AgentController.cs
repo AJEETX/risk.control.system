@@ -746,7 +746,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(response);
         }
 
-        public System.Drawing.Image? ByteArrayToImage(byte[] data)
+        private System.Drawing.Image? ByteArrayToImage(byte[] data)
         {
             MemoryStream ms = new MemoryStream(data);
             System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);

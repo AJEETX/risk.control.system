@@ -479,12 +479,12 @@
                                                                         </p>
                                                                     </div>
                                                                     @{
-                                                                        var status_fin = "LOW";
-                                                                        if (Model.Location?.ClaimReport?.Question2 == ".5")
+                                                                        var status_fin = "Low";
+                                                                        if (Model.Location?.ClaimReport?.Question2 == ".5" || Model.Location?.ClaimReport?.Question2 == "0.5")
                                                                         {
                                                                             status_fin = "Medium";
                                                                         }
-                                                                        else if (Model.Location?.ClaimReport?.Question2 == "1")
+                                                                        else if (Model.Location?.ClaimReport?.Question2 == "1" || Model.Location?.ClaimReport?.Question2 == "1.0")
                                                                         {
                                                                             status_fin = "High";
                                                                         }
