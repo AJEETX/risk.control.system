@@ -149,7 +149,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "iCheckify API",
+        Title = "iCheckify Utility",
         Description = "iCheckify API ",
         TermsOfService = new Uri("https://icheckify.co.in"),
         Contact = new OpenApiContact
