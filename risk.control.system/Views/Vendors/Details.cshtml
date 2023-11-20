@@ -93,11 +93,11 @@
                                     <dd class="col-sm-8">
                                         @if (Model?.DocumentUrl is not null)
                                         {
-                                            <img id="documentImage" class="form-Image" src="@Model?.DocumentUrl">
+                                            <img id="profileImage" class="form-Image" src="@Model?.DocumentUrl">
                                         }
                                         else
                                         {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                         }
                                     </dd>
                                     <dt class="col-sm-3">
@@ -173,18 +173,12 @@
         }
 
         async function success(position) {
+            const image =
+                "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
             const { Map, InfoWindow } = await google.maps.importLibrary("maps");
             // The location of Uluru
             var element = document.getElementById("pop-face-map");
             var bounds = new google.maps.LatLngBounds();
-            var lat = position.coords.latitude;
-            var long = position.coords.longitude;
-            var locresponse = $.ajax({
-                type: "GET",
-                url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${apiKey}`,
-                async: false
-            }).responseText;
-            current_data = JSON.parse(locresponse);
 
             // The map, centered at branch
             var map = new Map(element, {
@@ -194,18 +188,41 @@
                 mapId: "4504f8b37365c3d0",
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
             });
+            var b_lat = parseFloat($('#Latitude').val());
+            var b_lng = parseFloat($('#Longitude').val());
+            var b_response = $.ajax({
+                type: "GET",
+                url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${b_lat},${b_lng}&sensor=false&key=${apiKey}`,
+                async: false
+            }).responseText;
 
-            var b_LatLng = new google.maps.LatLng(parseFloat($('#Latitude').val()), parseFloat($('#Longitude').val()));
+            var b_current_data = JSON.parse(b_response);
+
+            var b_LatLng = new google.maps.LatLng(b_lat, b_lng);
             var b_marker = new google.maps.Marker({
                 position: b_LatLng,
-                title: 'Branch Location'
+                title: "Branch Location: " + b_current_data.results[0].formatted_address
             });
             b_marker.setMap(map);
+            var b_getInfoWindow = new google.maps.InfoWindow({
+                content: "<b>Branch Location</b><br/> " +
+                    b_current_data.results[0].formatted_address + ""
+            });
+            b_getInfoWindow.open(map, b_marker);
 
+            var lat = position.coords.latitude;
+            var long = position.coords.longitude;
+            var locresponse = $.ajax({
+                type: "GET",
+                url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${apiKey}`,
+                async: false
+            }).responseText;
+            var current_data = JSON.parse(locresponse);
 
             var LatLng = new google.maps.LatLng(lat, long);
             var marker = new google.maps.Marker({
                 position: LatLng,
+                icon: image,
                 title: "You are here: " + current_data.results[0].formatted_address
             });
 
@@ -215,6 +232,7 @@
                     current_data.results[0].formatted_address + ""
             });
             getInfoWindow.open(map, marker);
+
             bounds.extend(LatLng);
             bounds.extend(b_LatLng);
 

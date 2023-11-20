@@ -7,7 +7,8 @@ var showBeneficiaryMap = false;
 var showFaceMap = false;
 var showLocationMap = false;
 var showOcrMap = false;
-
+const image =
+    "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
 $(document).ready(function () {
     $('#datatable thead th').css('background-color', '#e9ecef')
     var datatable = $('#datatable').dataTable({
