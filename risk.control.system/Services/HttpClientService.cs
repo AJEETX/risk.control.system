@@ -2,6 +2,8 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 
+using Azure;
+
 using Newtonsoft.Json;
 
 using risk.control.system.Controllers.Api;
@@ -106,6 +108,12 @@ namespace risk.control.system.Services
             {
                 var body = await response2.Content.ReadAsStringAsync();
                 var verifiedPanResponse = JsonConvert.DeserializeObject<PanVerifyResponse>(body);
+                HttpHeaders headers = response2.Headers;
+                IEnumerable<string> values;
+                if (headers.TryGetValues("x-ratelimit-requests-remaining", out values))
+                {
+                    verifiedPanResponse.count_remain = values.First();
+                }
                 return verifiedPanResponse;
             }
             return null!;

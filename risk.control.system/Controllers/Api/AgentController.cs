@@ -38,7 +38,7 @@ namespace risk.control.system.Controllers.Api
         private static HttpClient httpClient = new();
         private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
         private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com";
-        private static string RapidAPIKey = "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a";
+        private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
         private static string PanTask_id = "74f4c926-250c-43ca-9c53-453e87ceacd1";
         private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
 
@@ -559,6 +559,7 @@ namespace risk.control.system.Controllers.Api
                                 try
                                 {
                                     var body = await httpClientService.VerifyPan(maskedImage.DocumentId, company.PanIdfyUrl, company.RapidAPIKey, company.RapidAPITaskId, company.RapidAPIGroupId);
+                                    company.RapidAPIPanRemainCount = body.count_remain;
 
                                     if (body != null && body?.status == "completed" &&
                                         body?.result != null &&
@@ -651,7 +652,7 @@ namespace risk.control.system.Controllers.Api
             {
                 claimCase.ClaimReport.Question2 = data.Question2;
             }
-            if(!string.IsNullOrWhiteSpace(claimCase.ClaimReport.LocationLongLat))
+            if (!string.IsNullOrWhiteSpace(claimCase.ClaimReport.LocationLongLat))
             {
                 var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
                 var latitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
@@ -666,7 +667,6 @@ namespace risk.control.system.Controllers.Api
                     $"\r\nElevation(sea level):{weatherData.elevation} metres";
                 claimCase.ClaimReport.LocationData = weatherCustomData;
             }
-
 
             _context.CaseLocation.Update(claimCase);
 
@@ -836,6 +836,7 @@ namespace risk.control.system.Controllers.Api
         public string? task_id { get; set; }
         public string? type { get; set; }
         public string? error { get; set; }
+        public string? count_remain { get; set; }
     }
 
     public class Result
