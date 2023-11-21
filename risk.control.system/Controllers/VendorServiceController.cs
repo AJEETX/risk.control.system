@@ -158,6 +158,7 @@ namespace risk.control.system.Controllers
 
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
+
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
             ViewData["DistrictId"] = new SelectList(_context.District.Where(d => d.State.StateId == vendorInvestigationServiceType.StateId), "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);

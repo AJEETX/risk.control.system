@@ -15,8 +15,6 @@
                             <h3 class="card-title"><i class="fas fa-user-plus"></i> Edit  User </h3>
                         </div>
                         <div class="card-body">
-                        </div>
-                        <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -153,15 +151,20 @@
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
-                                    @if (ViewBag.Show)
-                                    {
-                                        <div class="form-group text-right">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Status:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <div class="input-group-prepend">
+                                            </div>
                                             <span class="checkbox">
-                                                <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
+                                                <input asp-for="Active" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
 
                                             </span>
                                         </div>
-                                    }
+                                    </div>
                                 </div>
                             </div>
                             <div class="row">

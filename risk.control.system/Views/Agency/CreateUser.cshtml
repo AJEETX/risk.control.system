@@ -120,7 +120,7 @@
                                         <span class="input-group-label"> Note:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i> </span>
+                                                <span class="input-group-text" id="Comments"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style-none"></i></span>
                                             </div>
                                             <input type="text" asp-for="Comments" class="form-control" placeholder="Notes (optional)" value="" maxlength="20" />
                                         </div>
@@ -193,11 +193,19 @@
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
-                                    <div class="form-group text-right">
-                                        <span class="checkbox">
-                                            <input asp-for="Active" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Status:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="Addressline"><i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <div class="input-group-prepend">
+                                            </div>
+                                            <span class="checkbox">
+                                                <input asp-for="Active" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
 
-                                        </span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

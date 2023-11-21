@@ -235,11 +235,17 @@ namespace risk.control.system.Controllers
                 .Include(v => v.District)
                 .First(v => v.CaseLocationId == id);
 
-            ViewData["DistrictId"] = new SelectList(_context.District.OrderBy(s => s.Code), "DistrictId", "Name", caseLocation.DistrictId);
-            ViewData["StateId"] = new SelectList(_context.State.OrderBy(s => s.Code), "StateId", "Name", caseLocation.StateId);
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", caseLocation.CountryId);
+            var country = _context.Country.Where(c => c.CountryId == caseLocation.CountryId);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == caseLocation.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == caseLocation.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == caseLocation.DistrictId).OrderBy(d => d.Name);
+
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", caseLocation.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", caseLocation.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", caseLocation.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", caseLocation.PinCodeId);
+
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode.OrderBy(s => s.Code), "PinCodeId", "Code", caseLocation.PinCodeId);
 
             var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
             var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };

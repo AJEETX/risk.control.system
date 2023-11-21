@@ -188,10 +188,16 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             vendorApplicationUser.Vendor = vendor;
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", vendor.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name");
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", vendor.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendor.StateId);
+
+            var country = _context.Country.Where(c => c.CountryId == vendor.CountryId);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
+
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendor.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendor.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
 
             var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendor.VendorId } };

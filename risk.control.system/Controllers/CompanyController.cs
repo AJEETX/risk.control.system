@@ -91,10 +91,15 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", clientCompany.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", clientCompany.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Code", clientCompany.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", clientCompany.StateId);
+            var country = _context.Country.Where(c => c.CountryId == clientCompany.CountryId);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
+
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompany.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompany.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompany.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
             return View(clientCompany);
         }
 
@@ -283,18 +288,24 @@ namespace risk.control.system.Controllers
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             ViewBag.Show = clientCompanyApplicationUser.Email == companyUser.Email ? false : true;
-            var clientComapany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
+            var clientCompany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
 
-            if (clientComapany == null)
+            if (clientCompany == null)
             {
                 toastNotification.AddErrorToastMessage("company not found");
                 return NotFound();
             }
-            clientCompanyApplicationUser.ClientCompany = clientComapany;
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", clientComapany.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name");
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", clientComapany.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", clientComapany.StateId);
+            clientCompanyApplicationUser.ClientCompany = clientCompany;
+
+            var country = _context.Country.Where(c => c.CountryId == clientCompany.CountryId);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
+
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompany.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompany.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompany.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
 
             var companyPage = new MvcBreadcrumbNode("Index", "Company", "Company");
             var usersPage = new MvcBreadcrumbNode("User", "Company", "Users") { Parent = companyPage };
