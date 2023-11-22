@@ -480,7 +480,11 @@
                                                                     </div>
                                                                     @{
                                                                         var status_fin = "Low";
-                                                                        if (Model.Location?.ClaimReport?.Question2 == ".5" || Model.Location?.ClaimReport?.Question2 == "0.5")
+                                                                        if (Model.Location?.ClaimReport?.Question2 == "0" || Model.Location?.ClaimReport?.Question2 == "0.0")
+                                                                        {
+                                                                            status_fin = "Low";
+                                                                        }
+                                                                        else if (Model.Location?.ClaimReport?.Question2 == ".5" || Model.Location?.ClaimReport?.Question2 == "0.5")
                                                                         {
                                                                             status_fin = "Medium";
                                                                         }

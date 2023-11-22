@@ -548,7 +548,11 @@
                                                                     </div>
                                                                     @{
                                                                         var status_fin = "Low";
-                                                                        if (Model.CaseLocation?.ClaimReport?.Question2 == ".5" || Model.CaseLocation?.ClaimReport?.Question2 == "0.5")
+                                                                        if (Model.CaseLocation?.ClaimReport?.Question2 == "0" || Model.CaseLocation?.ClaimReport?.Question2 == "0.0")
+                                                                        {
+                                                                            status_fin = "Low";
+                                                                        }
+                                                                        else if (Model.CaseLocation?.ClaimReport?.Question2 == ".5" || Model.CaseLocation?.ClaimReport?.Question2 == "0.5")
                                                                         {
                                                                             status_fin = "Medium";
                                                                         }
