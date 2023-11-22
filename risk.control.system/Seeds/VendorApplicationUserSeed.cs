@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 using risk.control.system.AppConstant;
@@ -19,6 +20,11 @@ namespace risk.control.system.Seeds
             {
                 Name = adminEmailwithSuffix
             };
+
+            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
+            var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
+            var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+
             var vendorAdmin = new VendorApplicationUser()
             {
                 Mailbox = vaMailBox,
@@ -36,9 +42,9 @@ namespace risk.control.system.Seeds
                 PhoneNumber = "9876543210",
                 VendorId = vendor.VendorId,
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = AGENCY_ADMIN.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
@@ -86,9 +92,9 @@ namespace risk.control.system.Seeds
                 Addressline = "123 Pakki Gali",
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
@@ -130,9 +136,9 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = false,
                 Addressline = "99 Mandir ke paas",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = AGENT.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))

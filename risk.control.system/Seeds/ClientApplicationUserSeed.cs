@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 using risk.control.system.AppConstant;
@@ -18,6 +19,10 @@ namespace risk.control.system.Seeds
             {
                 Name = ADMIN.EMAIL
             };
+            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
+            var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
+            var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+
             var clientAdmin = new ClientCompanyApplicationUser()
             {
                 Mailbox = caMailBox,
@@ -35,9 +40,9 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = false,
                 ClientCompanyId = clientCompanyId,
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = ADMIN.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientAdmin.Id))
@@ -86,9 +91,9 @@ namespace risk.control.system.Seeds
                 PhoneNumber = "9976543210",
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = CREATOR.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
@@ -125,9 +130,9 @@ namespace risk.control.system.Seeds
                 PhoneNumber = "9810543210",
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = ASSIGNER.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientAssigner.Id))
@@ -164,9 +169,9 @@ namespace risk.control.system.Seeds
                 Addressline = "453 Patna Road",
                 PhoneNumber = "9820043210",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = ASSESSOR.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientAssessor.Id))

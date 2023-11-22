@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
@@ -18,6 +20,10 @@ namespace risk.control.system.Seeds
             {
                 Name = PORTAL_ADMIN.EMAIL
             };
+            var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
+            var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
+            var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+
             //Seed portal admin
             var portalAdmin = new ApplicationUser()
             {
@@ -32,11 +38,11 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = true,
                 IsVendorAdmin = true,
                 PhoneNumberConfirmed = true,
-                PhoneNumber ="9876543210",
+                PhoneNumber = "9876543210",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = context.District.FirstOrDefault(s => s.Name == CURRENT_DISTRICT)?.DistrictId ?? default!,
-                StateId = context.State.FirstOrDefault(s => s.Code.StartsWith(CURRENT_STATE))?.StateId ?? default!,
-                PinCodeId = context.PinCode.FirstOrDefault(s => s.Code == CURRENT_PINCODE)?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = PORTAL_ADMIN.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != portalAdmin.Id))

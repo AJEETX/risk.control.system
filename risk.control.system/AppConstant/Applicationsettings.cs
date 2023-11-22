@@ -144,8 +144,10 @@
         public const string AUDIT_LOGS = "AUDIT LOGS";
 
         public const string CURRENT_PINCODE = "3131";
-        public const string CURRENT_DISTRICT = "Forest Hill";
-        public const string CURRENT_STATE = "VIC";
+        public const string CURRENT_PINCODE2 = "3130";
+        public const string CURRENT_PINCODE3 = "3133";
+        //public const string CURRENT_DISTRICT = "Forest Hill";
+        //public const string CURRENT_STATE = "VIC";
 
         public const string COMPANYNAME = "canara hsbc life";
         public const string COMPANYCODE = "chl";
