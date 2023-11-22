@@ -147,15 +147,15 @@
         public const string CURRENT_DISTRICT = "Forest Hill";
         public const string CURRENT_STATE = "VIC";
 
-        //public const string COMPANYNAME = "canara hsbc life";
-        //public const string COMPANYCODE = "chl";
-        //public const string COMPANYDOMAIN = "canarahsbclife.com";
-        //public const string COMPANYLOGO = "/img/chl.png";
+        public const string COMPANYNAME = "canara hsbc life";
+        public const string COMPANYCODE = "chl";
+        public const string COMPANYDOMAIN = "canarahsbclife.com";
+        public const string COMPANYLOGO = "/img/chl.png";
 
-        public const string COMPANYNAME = "hdfc life";
-        public const string COMPANYCODE = "hdl";
-        public const string COMPANYDOMAIN = "hdfclife.com";
-        public const string COMPANYLOGO = "/img/hdfc.jpg";
+        //public const string COMPANYNAME = "hdfc life";
+        //public const string COMPANYCODE = "hdl";
+        //public const string COMPANYDOMAIN = "hdfclife.com";
+        //public const string COMPANYLOGO = "/img/hdfc.jpg";
 
         public const string AGENCY1NAME = "Checker";
         public const string AGENCY1CODE = "CHA";
