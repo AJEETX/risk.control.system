@@ -146,6 +146,9 @@
         public const string CURRENT_PINCODE = "3131";
         public const string CURRENT_PINCODE2 = "3130";
         public const string CURRENT_PINCODE3 = "3133";
+        public const string CURRENT_PINCODE4 = "3150";
+        public const string CURRENT_PINCODE5 = "3125";
+        public const string CURRENT_PINCODE6 = "3124";
         //public const string CURRENT_DISTRICT = "Forest Hill";
         //public const string CURRENT_STATE = "VIC";
 

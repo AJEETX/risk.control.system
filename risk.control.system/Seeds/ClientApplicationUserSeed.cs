@@ -74,6 +74,9 @@ namespace risk.control.system.Seeds
             {
                 Name = CREATOR.EMAIL
             };
+            var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
+            var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
+            var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
             var clientCreator = new ClientCompanyApplicationUser()
             {
                 Mailbox = ccMailBox,
@@ -91,9 +94,9 @@ namespace risk.control.system.Seeds
                 PhoneNumber = "9976543210",
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
-                PinCodeId = pinCode?.PinCodeId ?? default!,
+                DistrictId = investigateDistrict?.DistrictId ?? default!,
+                StateId = investigateState?.StateId ?? default!,
+                PinCodeId = investigatePinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = CREATOR.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))

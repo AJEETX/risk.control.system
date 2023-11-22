@@ -75,6 +75,10 @@ namespace risk.control.system.Seeds
             {
                 Name = supervisorEmailwithSuffix
             };
+            var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
+            var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
+            var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+
             var vendorSupervisor = new VendorApplicationUser()
             {
                 Mailbox = vsMailBox,
@@ -92,9 +96,9 @@ namespace risk.control.system.Seeds
                 Addressline = "123 Pakki Gali",
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
-                PinCodeId = pinCode?.PinCodeId ?? default!,
+                DistrictId = investigateDistrict?.DistrictId ?? default!,
+                StateId = investigateState?.StateId ?? default!,
+                PinCodeId = investigatePinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
@@ -119,6 +123,10 @@ namespace risk.control.system.Seeds
             {
                 Name = agentEmailwithSuffix
             };
+
+            var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+            var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
+            var checkerState = context.State.FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
             var vendorAgent = new VendorApplicationUser()
             {
                 Mailbox = faMailBox,
@@ -136,9 +144,9 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = false,
                 Addressline = "99 Mandir ke paas",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
-                PinCodeId = pinCode?.PinCodeId ?? default!,
+                DistrictId = checkerDistrict?.DistrictId ?? default!,
+                StateId = checkerState?.StateId ?? default!,
+                PinCodeId = checkerPinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = AGENT.PROFILE_IMAGE
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))

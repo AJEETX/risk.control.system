@@ -26,6 +26,11 @@ namespace risk.control.system.Seeds
 
             //CREATE VENDOR COMPANY
 
+
+            var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+            var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
+            var checkerState = context.State.FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
+
             var checker = new Vendor
             {
                 Name = Applicationsettings.AGENCY1NAME,
@@ -38,9 +43,9 @@ namespace risk.control.system.Seeds
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = companyDistrict.DistrictId,
-                StateId = companyStateId,
-                PinCodeId = companyPinCode.PinCodeId,
+                DistrictId = checkerDistrict.DistrictId,
+                StateId = checkerState.StateId,
+                PinCodeId = checkerPinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY1DOMAIN,
                 PhoneNumber = "8888004739",
@@ -49,6 +54,10 @@ namespace risk.control.system.Seeds
 
             var checkerAgency = await context.Vendor.AddAsync(checker);
 
+            var verifyPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE3);
+            var verifyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == verifyPinCode.District.DistrictId);
+            var verifyState = context.State.FirstOrDefault(s => s.StateId == verifyDistrict.State.StateId);
+            
             var verify = new Vendor
             {
                 Name = Applicationsettings.AGENCY2NAME,
@@ -72,6 +81,12 @@ namespace risk.control.system.Seeds
 
             var verifyAgency = await context.Vendor.AddAsync(verify);
 
+
+            var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
+            var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
+            var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+
+
             var investigate = new Vendor
             {
                 Name = Applicationsettings.AGENCY3NAME,
@@ -84,9 +99,9 @@ namespace risk.control.system.Seeds
                 BankAccountNumber = "9876543",
                 IFSCCode = "IFSC999",
                 CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = companyDistrict.DistrictId,
-                StateId = companyStateId,
-                PinCodeId = companyPinCode.PinCodeId,
+                DistrictId = investigateDistrict.DistrictId,
+                StateId = investigateState.StateId,
+                PinCodeId = investigatePinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY3DOMAIN,
                 PhoneNumber = "7964404160",
@@ -101,7 +116,7 @@ namespace risk.control.system.Seeds
             {
                 ClientCompanyId = Guid.NewGuid().ToString(),
                 Name = Applicationsettings.COMPANYNAME,
-                Addressline = "100 GOOD STREET ",
+                Addressline = "34 Lasiandra Avenue ",
                 Branch = "FOREST HILL CHASE",
                 Code = Applicationsettings.COMPANYCODE,
                 ActivatedDate = DateTime.Now,
