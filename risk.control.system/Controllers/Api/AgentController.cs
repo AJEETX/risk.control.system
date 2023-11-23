@@ -435,8 +435,8 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [RequestSizeLimit(100_000_000)]
-        [HttpPost("post")]
-        public async Task<IActionResult> Post(Data data)
+        [HttpPost("face")]
+        public async Task<IActionResult> Face(Data data)
         {
             var claimCase = _context.CaseLocation
                .Include(c => c.BeneficiaryRelation)
@@ -535,6 +535,82 @@ namespace risk.control.system.Controllers.Api
                 claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
                 claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
             }
+
+            if (!string.IsNullOrWhiteSpace(claimCase.ClaimReport.LocationLongLat))
+            {
+                var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
+                var latitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var latLongString = latitude + "," + longitude;
+                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
+                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
+                    $"\r\n" +
+                    $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
+                    $"\r\n" +
+                    $"\r\nElevation(sea level):{weatherData.elevation} metres";
+                claimCase.ClaimReport.LocationData = weatherCustomData;
+            }
+
+            _context.CaseLocation.Update(claimCase);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception exception)
+            {
+                throw exception;
+            }
+
+            var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
+
+            var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
+
+            return Ok(new
+            {
+                BeneficiaryId = claimCase.CaseLocationId,
+                LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentLocationPictureUrl) ?
+                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentLocationPictureUrl)) :
+                Convert.ToBase64String(noDataimage),
+                LocationLongLat = claimCase.ClaimReport.LocationLongLat,
+                LocationTime = claimCase.ClaimReport.LocationLongLatTime,
+                OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrUrl) ?
+                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentOcrUrl)) :
+                Convert.ToBase64String(noDataimage),
+                OcrLongLat = claimCase.ClaimReport.OcrLongLat,
+                OcrTime = claimCase.ClaimReport.OcrLongLatTime,
+                FacePercent = claimCase.ClaimReport.LocationPictureConfidence,
+                PanValid = claimCase.ClaimReport.PanValid
+            });
+        }
+
+        [AllowAnonymous]
+        [RequestSizeLimit(100_000_000)]
+        [HttpPost("document")]
+        public async Task<IActionResult> Document(Data data)
+        {
+            var claimCase = _context.CaseLocation
+               .Include(c => c.BeneficiaryRelation)
+               .Include(c => c.ClaimReport)
+               .Include(c => c.PinCode)
+               .Include(c => c.District)
+               .Include(c => c.State)
+               .Include(c => c.Country)
+               .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+
+            if (claimCase == null)
+            {
+                return BadRequest();
+            }
+            claimCase.ClaimReport.AgentEmail = data.Email;
+
+            var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
 
             #region PAN IMAGE PROCESSING
 
@@ -643,31 +719,6 @@ namespace risk.control.system.Controllers.Api
                 claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
             }
 
-            if (!string.IsNullOrWhiteSpace(data.Question1))
-            {
-                claimCase.ClaimReport.Question1 = data.Question1;
-            }
-
-            if (!string.IsNullOrWhiteSpace(data.Question2))
-            {
-                claimCase.ClaimReport.Question2 = data.Question2;
-            }
-            if (!string.IsNullOrWhiteSpace(claimCase.ClaimReport.LocationLongLat))
-            {
-                var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-                var latLongString = latitude + "," + longitude;
-                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}." +
-                    $"\r\n" +
-                    $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
-                    $"\r\n" +
-                    $"\r\nElevation(sea level):{weatherData.elevation} metres";
-                claimCase.ClaimReport.LocationData = weatherCustomData;
-            }
-
             _context.CaseLocation.Update(claimCase);
 
             try
@@ -689,7 +740,7 @@ namespace risk.control.system.Controllers.Api
                 LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentLocationPictureUrl) ?
                 Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentLocationPictureUrl)) :
                 Convert.ToBase64String(noDataimage),
-                LocationLongLat = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.LocationLongLat),
+                LocationLongLat = claimCase.ClaimReport.LocationLongLat,
                 LocationTime = claimCase.ClaimReport.LocationLongLatTime,
                 OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrUrl) ?
                 Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentOcrUrl)) :
