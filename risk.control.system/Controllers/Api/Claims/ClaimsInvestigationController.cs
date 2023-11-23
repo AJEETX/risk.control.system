@@ -1683,7 +1683,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Where(c => !c.Deleted &&
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
                 c.CaseLocations.All(c => c.ClaimReport != null));
-            var claimsSubmitted = await applicationDbContext.ToListAsync();
+            var user = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
+
+            var claimsSubmitted = await applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId).ToListAsync();
 
             var response = claimsSubmitted
             .Select(a => new
@@ -1751,7 +1755,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Where(c => !c.Deleted &&
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
                 c.CaseLocations.All(c => c.ClaimReport != null));
-            var claimsSubmitted = await applicationDbContext.ToListAsync();
+            var user = HttpContext.User.Identity.Name;
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
+
+            var claimsSubmitted = await applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId).ToListAsync();
 
             var response = claimsSubmitted
                     .Select(a => new MapResponse
@@ -1774,9 +1782,6 @@ namespace risk.control.system.Controllers.Api.Claims
                         Url = (a.CaseLocations?.FirstOrDefault() != null && a.CaseLocations?.FirstOrDefault().InvestigationCaseSubStatus.Code != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR) ? "/ClaimsInvestigation/Detail?Id=" + a.ClaimsInvestigationId : "/ClaimsInvestigation/Details?Id=" + a.ClaimsInvestigationId
                     })?
                     .ToList();
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var company = _context.ClientCompany.Include(c => c.PinCode).FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 

@@ -47,13 +47,13 @@
                                     <tr>
 
                                         <td>
-                                            @if (item?.DocumentImage is not null)
+                                            @if (item?.DocumentUrl is not null)
                                             {
-                                                <img id="documentImage" class="table-row-image" src="data:image/*;base64,@(Convert.ToBase64String(item?.DocumentImage))">
+                                                <img id="profileImage" class="table-row-image" src="@item?.DocumentUrl">
                                             }
                                             else
                                             {
-                                                <img id="documentImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
+                                                <img id="profileImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
                                             }
                                         </td>
                                         <td>
