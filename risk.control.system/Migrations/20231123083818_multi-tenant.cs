@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class seed_can : Migration
+    public partial class multitenant : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -1333,7 +1333,6 @@ namespace risk.control.system.Migrations
                     DelistReason = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
                     Deleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -1348,11 +1347,6 @@ namespace risk.control.system.Migrations
                         column: x => x.ClaimsInvestigationId,
                         principalTable: "ClaimsInvestigation",
                         principalColumn: "ClaimsInvestigationId");
-                    table.ForeignKey(
-                        name: "FK_Vendor_ClientCompany_ClientCompanyId",
-                        column: x => x.ClientCompanyId,
-                        principalTable: "ClientCompany",
-                        principalColumn: "ClientCompanyId");
                     table.ForeignKey(
                         name: "FK_Vendor_Country_CountryId",
                         column: x => x.CountryId,
@@ -1417,6 +1411,30 @@ namespace risk.control.system.Migrations
                         column: x => x.StateId,
                         principalTable: "State",
                         principalColumn: "StateId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClientCompanyVendor",
+                columns: table => new
+                {
+                    ClientsClientCompanyId = table.Column<string>(type: "TEXT", nullable: false),
+                    EmpanelledVendorsVendorId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientCompanyVendor", x => new { x.ClientsClientCompanyId, x.EmpanelledVendorsVendorId });
+                    table.ForeignKey(
+                        name: "FK_ClientCompanyVendor_ClientCompany_ClientsClientCompanyId",
+                        column: x => x.ClientsClientCompanyId,
+                        principalTable: "ClientCompany",
+                        principalColumn: "ClientCompanyId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClientCompanyVendor_Vendor_EmpanelledVendorsVendorId",
+                        column: x => x.EmpanelledVendorsVendorId,
+                        principalTable: "Vendor",
+                        principalColumn: "VendorId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1690,6 +1708,11 @@ namespace risk.control.system.Migrations
                 column: "StateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ClientCompanyVendor_EmpanelledVendorsVendorId",
+                table: "ClientCompanyVendor",
+                column: "EmpanelledVendorsVendorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CustomerDetail_CountryId",
                 table: "CustomerDetail",
                 column: "CountryId");
@@ -1854,11 +1877,6 @@ namespace risk.control.system.Migrations
                 name: "IX_Vendor_ClaimsInvestigationId",
                 table: "Vendor",
                 column: "ClaimsInvestigationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Vendor_ClientCompanyId",
-                table: "Vendor",
-                column: "ClientCompanyId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Vendor_CountryId",
@@ -2042,10 +2060,6 @@ namespace risk.control.system.Migrations
                 table: "PolicyDetail");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Vendor_ClientCompany_ClientCompanyId",
-                table: "Vendor");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_CustomerDetail_Country_CountryId",
                 table: "CustomerDetail");
 
@@ -2123,6 +2137,9 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClaimReport");
+
+            migrationBuilder.DropTable(
+                name: "ClientCompanyVendor");
 
             migrationBuilder.DropTable(
                 name: "DeletedMessage");

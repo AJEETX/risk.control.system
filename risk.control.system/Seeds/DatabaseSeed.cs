@@ -18,6 +18,7 @@ namespace risk.control.system.Seeds
             var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
             var clientUserManager = scope.ServiceProvider.GetRequiredService<UserManager<ClientCompanyApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+            context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             //check for users
@@ -282,7 +283,7 @@ namespace risk.control.system.Seeds
 
             #region CLIENT/ VENDOR COMPANY
 
-            var (checker, verify, investigate, clientCompanyId) = await ClientVendorSeed.Seed(context, indiaCountry,
+            var (checker, verify, investigate, canaraId, hdfcId) = await ClientVendorSeed.Seed(context, indiaCountry,
                 claimComprehensiveService.Entity, claimDiscreetService.Entity,
                 claimDocumentCollectionService.Entity, claimCaseType.Entity, httpClientService);
 
@@ -292,7 +293,9 @@ namespace risk.control.system.Seeds
 
             await PortalAdminSeed.Seed(context, indiaCountry, userManager, roleManager);
 
-            await ClientApplicationUserSeed.Seed(context, indiaCountry, clientUserManager, clientCompanyId);
+            await ClientApplicationUserSeed.Seed(context, indiaCountry, clientUserManager, canaraId);
+
+            await ClientApplicationUserSeed.Seed(context, indiaCountry, clientUserManager, hdfcId);
 
             await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, checker);
 

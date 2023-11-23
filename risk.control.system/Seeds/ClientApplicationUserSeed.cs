@@ -15,9 +15,12 @@ namespace risk.control.system.Seeds
         public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<ClientCompanyApplicationUser> userManager, string clientCompanyId)
         {
             //Seed client admin
+            var company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyId);
+
+            string adminEmailwithSuffix = Applicationsettings.ADMIN.CODE + "@" + company.Email;
             var caMailBox = new Mailbox
             {
-                Name = ADMIN.EMAIL
+                Name = adminEmailwithSuffix
             };
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
@@ -26,8 +29,8 @@ namespace risk.control.system.Seeds
             var clientAdmin = new ClientCompanyApplicationUser()
             {
                 Mailbox = caMailBox,
-                UserName = ADMIN.USERNAME,
-                Email = ADMIN.EMAIL,
+                UserName = adminEmailwithSuffix,
+                Email = adminEmailwithSuffix,
                 FirstName = ADMIN.FIRST_NAME,
                 LastName = ADMIN.LAST_NAME,
                 EmailConfirmed = true,
@@ -70,9 +73,10 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client creator
+            string creatorEmailwithSuffix = Applicationsettings.CREATOR.CODE + "@" + company.Email;
             var ccMailBox = new Mailbox
             {
-                Name = CREATOR.EMAIL
+                Name = creatorEmailwithSuffix
             };
             var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
@@ -80,8 +84,8 @@ namespace risk.control.system.Seeds
             var clientCreator = new ClientCompanyApplicationUser()
             {
                 Mailbox = ccMailBox,
-                UserName = CREATOR.USERNAME,
-                Email = CREATOR.EMAIL,
+                UserName = creatorEmailwithSuffix,
+                Email = creatorEmailwithSuffix,
                 FirstName = CREATOR.FIRST_NAME,
                 LastName = CREATOR.LAST_NAME,
                 EmailConfirmed = true,
@@ -112,15 +116,16 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client assigner
+            string assignerEmailwithSuffix = Applicationsettings.ASSIGNER.CODE + "@" + company.Email;
             var asMailBox = new Mailbox
             {
-                Name = ASSIGNER.EMAIL
+                Name = assignerEmailwithSuffix
             };
             var clientAssigner = new ClientCompanyApplicationUser()
             {
                 Mailbox = asMailBox,
-                UserName = ASSIGNER.USERNAME,
-                Email = ASSIGNER.EMAIL,
+                UserName = assignerEmailwithSuffix,
+                Email = assignerEmailwithSuffix,
                 FirstName = ASSIGNER.FIRST_NAME,
                 LastName = ASSIGNER.LAST_NAME,
                 EmailConfirmed = true,
@@ -151,15 +156,16 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client assessor
+            string assessorEmailwithSuffix = Applicationsettings.ASSESSOR.CODE + "@" + company.Email;
             var ssMailBox = new Mailbox
             {
-                Name = ASSESSOR.EMAIL
+                Name = assessorEmailwithSuffix
             };
             var clientAssessor = new ClientCompanyApplicationUser()
             {
                 Mailbox = ssMailBox,
-                UserName = ASSESSOR.USERNAME,
-                Email = ASSESSOR.EMAIL,
+                UserName = assessorEmailwithSuffix,
+                Email = assessorEmailwithSuffix,
                 FirstName = ASSESSOR.FIRST_NAME,
                 LastName = ASSESSOR.LAST_NAME,
                 EmailConfirmed = true,

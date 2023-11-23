@@ -17,6 +17,21 @@ namespace risk.control.system.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
 
+            modelBuilder.Entity("ClientCompanyVendor", b =>
+                {
+                    b.Property<string>("ClientsClientCompanyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EmpanelledVendorsVendorId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ClientsClientCompanyId", "EmpanelledVendorsVendorId");
+
+                    b.HasIndex("EmpanelledVendorsVendorId");
+
+                    b.ToTable("ClientCompanyVendor");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
                 {
                     b.Property<int>("Id")
@@ -2089,9 +2104,6 @@ namespace risk.control.system.Migrations
                     b.Property<string>("ClaimsInvestigationId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ClientCompanyId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -2161,8 +2173,6 @@ namespace risk.control.system.Migrations
                     b.HasKey("VendorId");
 
                     b.HasIndex("ClaimsInvestigationId");
-
-                    b.HasIndex("ClientCompanyId");
 
                     b.HasIndex("CountryId");
 
@@ -2551,6 +2561,21 @@ namespace risk.control.system.Migrations
                         });
 
                     b.HasDiscriminator().HasValue("VendorApplicationUser");
+                });
+
+            modelBuilder.Entity("ClientCompanyVendor", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ClientCompany", null)
+                        .WithMany()
+                        .HasForeignKey("ClientsClientCompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.Vendor", null)
+                        .WithMany()
+                        .HasForeignKey("EmpanelledVendorsVendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
@@ -3082,10 +3107,6 @@ namespace risk.control.system.Migrations
                         .WithMany("Vendors")
                         .HasForeignKey("ClaimsInvestigationId");
 
-                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
-                        .WithMany("EmpanelledVendors")
-                        .HasForeignKey("ClientCompanyId");
-
                     b.HasOne("risk.control.system.Models.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId");
@@ -3101,8 +3122,6 @@ namespace risk.control.system.Migrations
                     b.HasOne("risk.control.system.Models.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId");
-
-                    b.Navigation("ClientCompany");
 
                     b.Navigation("Country");
 
@@ -3250,8 +3269,6 @@ namespace risk.control.system.Migrations
                     b.Navigation("ClaimsInvestigations");
 
                     b.Navigation("CompanyApplicationUser");
-
-                    b.Navigation("EmpanelledVendors");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.InvestigationCaseStatus", b =>

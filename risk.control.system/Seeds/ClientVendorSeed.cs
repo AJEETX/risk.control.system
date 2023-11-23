@@ -12,7 +12,7 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string clientCompanyId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
+        public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string canaraId, string hdfcId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
             InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpClientService httpClientService)
         {
             var companyPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE);
@@ -25,7 +25,6 @@ namespace risk.control.system.Seeds
             //companyPinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
 
             //CREATE VENDOR COMPANY
-
 
             var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
             var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
@@ -57,7 +56,7 @@ namespace risk.control.system.Seeds
             var verifyPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE3);
             var verifyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == verifyPinCode.District.DistrictId);
             var verifyState = context.State.FirstOrDefault(s => s.StateId == verifyDistrict.State.StateId);
-            
+
             var verify = new Vendor
             {
                 Name = Applicationsettings.AGENCY2NAME,
@@ -81,11 +80,9 @@ namespace risk.control.system.Seeds
 
             var verifyAgency = await context.Vendor.AddAsync(verify);
 
-
             var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
             var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
-
 
             var investigate = new Vendor
             {
@@ -110,15 +107,15 @@ namespace risk.control.system.Seeds
 
             var investigateAgency = await context.Vendor.AddAsync(investigate);
 
-            //CREATE COMPANY
+            //CREATE COMPANY1
 
-            var insurance = new ClientCompany
+            var canara = new ClientCompany
             {
                 ClientCompanyId = Guid.NewGuid().ToString(),
-                Name = Applicationsettings.COMPANYNAME,
+                Name = Applicationsettings.CANARA,
                 Addressline = "34 Lasiandra Avenue ",
                 Branch = "FOREST HILL CHASE",
-                Code = Applicationsettings.COMPANYCODE,
+                Code = Applicationsettings.CANARACODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "NAB",
@@ -129,15 +126,42 @@ namespace risk.control.system.Seeds
                 StateId = companyStateId,
                 PinCodeId = companyPinCode.PinCodeId,
                 Description = "CORPORATE OFFICE ",
-                Email = Applicationsettings.COMPANYDOMAIN,
-                DocumentUrl = Applicationsettings.COMPANYLOGO,
+                Email = Applicationsettings.CANARADOMAIN,
+                DocumentUrl = Applicationsettings.CANARALOGO,
                 PhoneNumber = "9988004739",
                 EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
             };
 
-            var insuranceCompany = await context.ClientCompany.AddAsync(insurance);
+            var canaraCompany = await context.ClientCompany.AddAsync(canara);
 
-            var abcSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            //CREATE COMPANY2
+
+            var hdfc = new ClientCompany
+            {
+                ClientCompanyId = Guid.NewGuid().ToString(),
+                Name = Applicationsettings.HDFC,
+                Addressline = "34 Lasiandra Avenue ",
+                Branch = "FOREST HILL CHASE",
+                Code = Applicationsettings.HDFCCODE,
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "NAB",
+                BankAccountNumber = "1234567",
+                IFSCCode = "IFSC100",
+                CountryId = indiaCountry.Entity.CountryId,
+                DistrictId = companyDistrict.DistrictId,
+                StateId = companyStateId,
+                PinCodeId = companyPinCode.PinCodeId,
+                Description = "CORPORATE OFFICE ",
+                Email = Applicationsettings.HDFCDOMAIN,
+                DocumentUrl = Applicationsettings.HDFCLOGO,
+                PhoneNumber = "9988004739",
+                EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            };
+
+            var hdfcCompany = await context.ClientCompany.AddAsync(hdfc);
+
+            var checkerServices = new List<VendorInvestigationServiceType>
             {
                 new VendorInvestigationServiceType{
                     VendorId = checkerAgency.Entity.VendorId,
@@ -175,7 +199,7 @@ namespace risk.control.system.Seeds
                 }
             };
 
-            var xyzSericesWithPinCodes = new List<VendorInvestigationServiceType>
+            var verifyServices = new List<VendorInvestigationServiceType>
             {
                 new VendorInvestigationServiceType{
                     VendorId = verifyAgency.Entity.VendorId,
@@ -213,7 +237,7 @@ namespace risk.control.system.Seeds
                 }
             };
 
-            var xyz1SericesWithPinCodes = new List<VendorInvestigationServiceType>
+            var investigateServices = new List<VendorInvestigationServiceType>
             {
                 new VendorInvestigationServiceType{
                     VendorId = investigateAgency.Entity.VendorId,
@@ -268,12 +292,20 @@ namespace risk.control.system.Seeds
                 }
             };
 
-            checker.VendorInvestigationServiceTypes = abcSericesWithPinCodes;
-            verify.VendorInvestigationServiceTypes = xyzSericesWithPinCodes;
-            investigate.VendorInvestigationServiceTypes = xyz1SericesWithPinCodes;
+            checker.VendorInvestigationServiceTypes = checkerServices;
+            verify.VendorInvestigationServiceTypes = verifyServices;
+            investigate.VendorInvestigationServiceTypes = investigateServices;
+
+            checker.Clients.Add(canaraCompany.Entity);
+            verify.Clients.Add(canaraCompany.Entity);
+            investigate.Clients.Add(canaraCompany.Entity);
+
+            checker.Clients.Add(hdfcCompany.Entity);
+            verify.Clients.Add(hdfcCompany.Entity);
+            investigate.Clients.Add(hdfcCompany.Entity);
 
             await context.SaveChangesAsync(null, false);
-            return (checker, verify, investigate, insuranceCompany.Entity.ClientCompanyId);
+            return (checker, verify, investigate, canaraCompany.Entity.ClientCompanyId, hdfcCompany.Entity.ClientCompanyId);
         }
     }
 }

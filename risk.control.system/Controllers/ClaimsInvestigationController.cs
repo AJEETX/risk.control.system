@@ -1031,7 +1031,7 @@ namespace risk.control.system.Controllers
                 );
 
             var existingVendors = await _context.Vendor
-                .Where(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.PolicyDetail.ClientCompanyId)
+                .Where(c => c.Clients.Any(c => c.ClientCompanyId == claimCase.ClaimsInvestigation.PolicyDetail.ClientCompanyId))
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)

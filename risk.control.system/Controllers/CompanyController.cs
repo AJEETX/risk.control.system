@@ -481,11 +481,13 @@ namespace risk.control.system.Controllers
                 if (company != null)
                 {
                     var empanelledVendors = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId))
-                    .Where(v => v.ClientCompanyId == companyUser.ClientCompanyId)
+                    .Where(v => v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId))
                     ;
                     foreach (var v in empanelledVendors)
                     {
                         company.EmpanelledVendors.Remove(v);
+                        v.Clients.Add(company);
+                        _context.Vendor.Update(v);
                     }
                     _context.ClientCompany.Update(company);
                     company.Updated = DateTime.UtcNow;

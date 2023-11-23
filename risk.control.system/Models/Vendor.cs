@@ -91,11 +91,7 @@ namespace risk.control.system.Models
         [Display(Name = "Vendor Users")]
         public List<VendorApplicationUser>? VendorApplicationUser { get; set; }
 
-        [Display(Name = "Company")]
-        public string? ClientCompanyId { get; set; }
-
-        [Display(Name = "Company")]
-        public ClientCompany? ClientCompany { get; set; }
+        public List<ClientCompany>? Clients { get; set; } = new List<ClientCompany>();
 
         [Display(Name = "Empanel")]
         [NotMapped]

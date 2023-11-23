@@ -152,15 +152,15 @@
         //public const string CURRENT_DISTRICT = "Forest Hill";
         //public const string CURRENT_STATE = "VIC";
 
-        public const string COMPANYNAME = "canara hsbc life";
-        public const string COMPANYCODE = "chl";
-        public const string COMPANYDOMAIN = "canarahsbclife.com";
-        public const string COMPANYLOGO = "/img/chl.png";
+        public const string CANARA = "canara hsbc life";
+        public const string CANARACODE = "chl";
+        public const string CANARADOMAIN = "canarahsbclife.com";
+        public const string CANARALOGO = "/img/chl.png";
 
-        //public const string COMPANYNAME = "hdfc life";
-        //public const string COMPANYCODE = "hdl";
-        //public const string COMPANYDOMAIN = "hdfclife.com";
-        //public const string COMPANYLOGO = "/img/hdfc.jpg";
+        public const string HDFC = "hdfc life";
+        public const string HDFCCODE = "hdl";
+        public const string HDFCDOMAIN = "hdfclife.com";
+        public const string HDFCLOGO = "/img/hdfc.jpg";
 
         public const string AGENCY1NAME = "Checker";
         public const string AGENCY1CODE = "CHA";
@@ -191,7 +191,7 @@
         {
             public const string DISPLAY_NAME = "ADMIN";
             public const string CODE = "admin";
-            public const string USERNAME = "admin@" + COMPANYDOMAIN;
+            public const string USERNAME = "admin@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Amit";
             public const string LAST_NAME = "Kumar";
@@ -202,7 +202,7 @@
         {
             public const string DISPLAY_NAME = "CREATOR";
             public const string CODE = "creator";
-            public const string USERNAME = "creator@" + COMPANYDOMAIN;
+            public const string USERNAME = "creator@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Rashmi";
             public const string LAST_NAME = "Kumar";
@@ -213,7 +213,7 @@
         {
             public const string DISPLAY_NAME = "ASSIGNER";
             public const string CODE = "assigner";
-            public const string USERNAME = "assigner@" + COMPANYDOMAIN;
+            public const string USERNAME = "assigner@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";
@@ -224,7 +224,7 @@
         {
             public const string DISPLAY_NAME = "ASSESSOR";
             public const string CODE = "assessor";
-            public const string USERNAME = "assessor@" + COMPANYDOMAIN;
+            public const string USERNAME = "assessor@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
             public const string FIRST_NAME = CODE;
             public const string LAST_NAME = "Kumar";

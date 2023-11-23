@@ -111,7 +111,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             var availableVendors = _context.Vendor
                 .Where(v =>
-                v.ClientCompanyId != companyUser.ClientCompanyId &&
+                !v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId) &&
                 (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)

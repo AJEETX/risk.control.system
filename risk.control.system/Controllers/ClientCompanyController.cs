@@ -298,7 +298,7 @@ namespace risk.control.system.Controllers
             ViewBag.CurrentFilter = searchString;
 
             var applicationDbContext = _context.Vendor
-                .Where(v => v.ClientCompanyId == id)
+                .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
@@ -378,15 +378,15 @@ namespace risk.control.system.Controllers
 
             ViewBag.CurrentFilter = searchString;
 
-            var vendorUsers = _context.VendorApplicationUser.Include(u => u.Vendor).Where(u => u.Vendor.ClientCompanyId == id).ToList();
-            List<string> userVendorids = new List<string>();
-            if (vendorUsers is not null && vendorUsers.Count > 0)
-            {
-                userVendorids = vendorUsers.Select(u => u.VendorId).ToList();
-            }
+            //var vendorUsers = _context.VendorApplicationUser.Include(u => u.Vendor).Where(u => u.Vendor.ClientCompanyId == id).ToList();
+            //List<string> userVendorids = new List<string>();
+            //if (vendorUsers is not null && vendorUsers.Count > 0)
+            //{
+            //    userVendorids = vendorUsers.Select(u => u.VendorId).ToList();
+            //}
 
             var applicationDbContext = _context.Vendor
-                .Where(v => v.ClientCompanyId != id
+                .Where(v => !v.Clients.Any(c => c.ClientCompanyId == id)
                 //&& userVendorids.Contains(v.VendorId)
                 && (v.VendorInvestigationServiceTypes != null) && v.VendorInvestigationServiceTypes.Count > 0)
                 .Include(v => v.Country)
@@ -470,7 +470,14 @@ namespace risk.control.system.Controllers
                     .ThenInclude(v => v.InvestigationServiceType)
                     .Include(v => v.VendorInvestigationServiceTypes)
                     .ThenInclude(v => v.PincodeServices);
+
                     company.EmpanelledVendors.AddRange(empanelledVendors);
+
+                    foreach (var empanelledVendor in empanelledVendors)
+                    {
+                        empanelledVendor.Clients.Add(company);
+                        _context.Vendor.Update(empanelledVendor);
+                    }
                     company.Updated = DateTime.UtcNow;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
@@ -500,7 +507,7 @@ namespace risk.control.system.Controllers
                 if (company != null)
                 {
                     var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
-                    .Where(v => v.ClientCompanyId == id)
+                    .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
@@ -515,6 +522,8 @@ namespace risk.control.system.Controllers
                     foreach (var v in empanelledVendors)
                     {
                         company.EmpanelledVendors.Remove(v);
+                        v.Clients.Remove(company);
+                        _context.Vendor.Update(v);
                     }
                     _context.ClientCompany.Update(company);
                     company.Updated = DateTime.UtcNow;
