@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231123083818_multi-tenant")]
+    [Migration("20231123220048_multi-tenant")]
     partial class multitenant
     {
         /// <inheritdoc />
