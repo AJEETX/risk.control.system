@@ -437,10 +437,15 @@ namespace risk.control.system.Controllers
 
                 if (company != null)
                 {
-                    var empanelledVendors = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId))
+                    var empanelledVendors = _context.Vendor.Include(v=>v.Clients).AsNoTracking().Where(v => vendors.Contains(v.VendorId))
                     ?.ToList();
 
                     company.EmpanelledVendors.AddRange(empanelledVendors);
+
+                    foreach (var item in empanelledVendors)
+                    {
+                        item.Clients.Add(company);
+                    }
                     company.Updated = DateTime.UtcNow;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
@@ -476,22 +481,23 @@ namespace risk.control.system.Controllers
 
                 var company = _context.ClientCompany
                     .Include(c => c.CompanyApplicationUser)
+                    .Include(c => c.EmpanelledVendors)
                     .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
                 if (company != null)
                 {
-                    var empanelledVendors = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId))
-                    .Where(v => v.Clients.Any(c => c.ClientCompanyId == companyUser.ClientCompanyId))
-                    ;
-                    foreach (var v in empanelledVendors)
+                    var empanelledVendors2Depanel = _context.Vendor.Include(v => v.Clients).AsNoTracking().Where(v => vendors.Contains(v.VendorId));
+                    foreach (var empanelledVendor2Depanel in empanelledVendors2Depanel)
                     {
-                        company.EmpanelledVendors.Remove(v);
-                        v.Clients.Add(company);
-                        _context.Vendor.Update(v);
+                        var empanelled = company.EmpanelledVendors.FirstOrDefault(v => v.VendorId == empanelledVendor2Depanel.VendorId);
+                        company.EmpanelledVendors.Remove(empanelled);
+                        var clientCompany = empanelledVendor2Depanel.Clients.FirstOrDefault(c => c.ClientCompanyId == company.ClientCompanyId);
+
+                        empanelledVendor2Depanel.Clients.Remove(clientCompany);
                     }
-                    _context.ClientCompany.Update(company);
                     company.Updated = DateTime.UtcNow;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
                     toastNotification.AddSuccessToastMessage("Agency(s) depanel sucessful!");
                     try

@@ -54,7 +54,7 @@
                                 <div class="row">
                                     <div class="col-md-12">
 
-                                        <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-success">
+                                        <button id="manage-vendors" type="submit" class="btn btn-success">
                                         <i class="fas fa-handshake"></i> Empanel Agency(s)
                                         </button>
                                     </div>
@@ -173,6 +173,27 @@
                         }
                     }
                 });
+
+                var checkboxes = $("input[type='checkbox'].vendors");
+                var anyChecked = checkIfAnyChecked(checkboxes);
+
+                if (!anyChecked) {
+                    e.preventDefault();
+                    $.alert({
+                        title: "Agency Empanelment !!!",
+                        content: "Please select agency to empanel?",
+                        icon: 'fas fa-exclamation-triangle',
+                        columnClass: 'medium',
+                        type: 'green',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "SELECT",
+                                btnClass: 'btn-success'
+                            }
+                        }
+                    });
+                }
             });
         });
     </script>

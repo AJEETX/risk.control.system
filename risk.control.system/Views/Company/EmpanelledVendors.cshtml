@@ -54,7 +54,7 @@
                             <div class="row">
                                 <div class="col-md-12">
 
-                                    <button disabled="disabled" id="manage-vendors" type="submit" class="btn btn-danger">
+                                    <button id="manage-vendors" type="submit" class="btn btn-danger">
                                         <i class="fas fa-hand-pointer" aria-hidden="true"></i> Depanel Agency(s)
                                     </button>
                                 </div>
@@ -98,7 +98,7 @@
                         "sDefaultContent": "",
                         "bSortable": false,
                         "mRender": function (data, type, row) {
-                            var img = '<input class="vendors" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
+                            var img = '<input class="vendors vcheckbox" name="vendors" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
                             return img;
                         }
                     },
@@ -124,6 +124,14 @@
                 ],
                 error: function (xhr, status, error) { alert('err ' + error) }
             });
+
+            $('#customerTable input[type="checkbox"].vendors').on('click', function () {
+                var checkboxes = $("input[type='checkbox'].vendors");
+                var anyChecked = checkIfAnyChecked(checkboxes);
+                var allChecked = checkIfAllChecked(checkboxes);
+                $('#checkall').prop('checked', allChecked);
+                $('#manage-vendors').prop('disabled', !anyChecked)
+            });
             // Handle click on "Select all" control
             $('#checkall').on('click', function () {
                 // Get all rows with search applied
@@ -131,13 +139,7 @@
                 // Check/uncheck checkboxes for all rows in the table
                 $('input[type="checkbox"]', rows).prop('checked', this.checked);
             });
-            $('input.vendors').on('click', function () {
-                var checkboxes = $("input[type='checkbox'].vendors");
-                var anyChecked = checkIfAnyChecked(checkboxes);
-                var allChecked = checkIfAllChecked(checkboxes);
-                $('#checkall').prop('checked', allChecked);
-                $('#manage-vendors').prop('disabled', !anyChecked)
-            });
+
 
             // Handle click on checkbox to set state of "Select all" control
             $('#customerTable tbody').on('change', 'input[type="checkbox"]', function () {
@@ -173,7 +175,44 @@
                         }
                     }
                 });
+
+                var checkboxes = $("input[type='checkbox'].vendors");
+                var anyChecked = checkIfAnyChecked(checkboxes);
+
+                if (!anyChecked) {
+                    e.preventDefault();
+                    $.alert({
+                        title: "Agency Depanelment !!!",
+                        content: "Please select agency to depanel?",
+                        icon: 'fas fa-exclamation-triangle',
+                        columnClass: 'medium',
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "SELECT",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    });
+                }
             });
         });
+        function checkIfAllChecked(elements) {
+            var totalElmentCount = elements.length;
+            var totalCheckedElements = elements.filter(":checked").length;
+            return (totalElmentCount == totalCheckedElements)
+        }
+
+        function checkIfAnyChecked(elements) {
+            var hasAnyCheckboxChecked = false;
+
+            $.each(elements, function (index, element) {
+                if (element.checked === true) {
+                    hasAnyCheckboxChecked = true;
+                }
+            });
+            return hasAnyCheckboxChecked;
+        }
     </script>
     }
