@@ -192,9 +192,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="pincode.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="au_postcodes.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

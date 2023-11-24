@@ -56,6 +56,7 @@ builder.Services.Configure<FormOptions>(x =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
 builder.Services.AddScoped<IICheckifyService, ICheckifyService>();
+builder.Services.AddScoped<IFtpService, FtpService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IMailboxService, MailboxService>();
 
@@ -87,7 +88,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=multi-tenant.db"));
+                    options.UseSqlite("Data Source=good2go.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
