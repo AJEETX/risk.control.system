@@ -21,9 +21,9 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task Upload(string userEmail, string filePath, string docPath, string fileNameWithoutExtension);
+        Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension);
 
-        Task Download(string userEmail);
+        Task DownloadFtp(string userEmail);
     }
 
     public class FtpService : IFtpService
@@ -65,11 +65,7 @@ namespace risk.control.system.Services
             this.toastNotification = toastNotification;
         }
 
-        private String _ftpPath = "ftp://files.000webhost.com/public_html/";
-        private String _login = "holosync";
-        private String _password = "C0##ect10n";
-
-        public async Task Download(string userEmail)
+        public async Task DownloadFtp(string userEmail)
         {
             string path = Path.Combine(webHostEnvironment.WebRootPath, "download-file");
             if (!Directory.Exists(path))
@@ -84,7 +80,7 @@ namespace risk.control.system.Services
             var files = GetFtpData();
             var zipFiles = files.Where(f => f.EndsWith(".zip"));
             WebClient client = new WebClient();
-            client.Credentials = new NetworkCredential(_login, _password);
+            client.Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA);
 
             foreach (var zipFile in zipFiles)
             {
@@ -92,7 +88,7 @@ namespace risk.control.system.Services
                 string fileNameWithoutExtension = fileName.Substring(0, fileName.Length - 4);
                 string filePath = Path.Combine(path, fileName);
 
-                string ftpPath = $"ftp://files.000webhost.com/public_html/{zipFile}";
+                string ftpPath = $"{Applicationsettings.FTP_SITE}/{zipFile}";
 
                 client.DownloadFile(ftpPath, filePath);
 
@@ -103,7 +99,7 @@ namespace risk.control.system.Services
                 ZipFile.ExtractToDirectory(filePath, zipFilePath, true);
 
                 var dirNames = Directory.EnumerateDirectories(zipFilePath);
-                var fileNames = Directory.EnumerateFiles(zipFilePath);
+                var fileNames = Directory.EnumerateFiles(dirNames.FirstOrDefault());
 
                 string csvData = await System.IO.File.ReadAllTextAsync(fileNames.First());
 
@@ -295,8 +291,8 @@ namespace risk.control.system.Services
             {
                 string fileName = zipFile;
 
-                FtpWebRequest requestFileDelete = (FtpWebRequest)WebRequest.Create($"{_ftpPath}" + fileName);
-                requestFileDelete.Credentials = new NetworkCredential(_login, _password);
+                FtpWebRequest requestFileDelete = (FtpWebRequest)WebRequest.Create($"{Applicationsettings.FTP_SITE}" + fileName);
+                requestFileDelete.Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA);
                 requestFileDelete.Method = WebRequestMethods.Ftp.DeleteFile;
 
                 FtpWebResponse responseFileDelete = (FtpWebResponse)requestFileDelete.GetResponse();
@@ -305,9 +301,9 @@ namespace risk.control.system.Services
 
         private List<string> GetFtpData()
         {
-            var request = WebRequest.Create(_ftpPath);
+            var request = WebRequest.Create(Applicationsettings.FTP_SITE);
             request.Method = WebRequestMethods.Ftp.ListDirectory;
-            request.Credentials = new NetworkCredential(_login, _password);
+            request.Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA);
 
             var files = new List<string>();
 
@@ -344,7 +340,7 @@ namespace risk.control.system.Services
             return data;
         }
 
-        public async Task Upload(string userEmail, string filePath, string docPath, string fileNameWithoutExtension)
+        public async Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension)
         {
             using var archive = ZipFile.OpenRead(filePath);
 
@@ -353,7 +349,7 @@ namespace risk.control.system.Services
             ZipFile.ExtractToDirectory(filePath, zipFilePath, true);
 
             var dirNames = Directory.EnumerateDirectories(zipFilePath);
-            var fileNames = Directory.EnumerateFiles(zipFilePath);
+            var fileNames = Directory.EnumerateFiles(dirNames.FirstOrDefault());
 
             string csvData = await System.IO.File.ReadAllTextAsync(fileNames.First());
 

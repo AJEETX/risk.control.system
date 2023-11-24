@@ -227,7 +227,7 @@
                                                 @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete")
                                                     @Url.MakeActiveClass("ClaimsInvestigation","EditPolicy")
                                                     @Url.MakeActiveClass("ClaimsInvestigation","CreateCustomer") @Url.MakeActiveClass("ClaimsInvestigation","EditCustomer")
-                                                            @Url.MakeActiveClass("CaseLocation","Create") @Url.MakeActiveClass("CaseLocation","Edit")">
+                                                                        @Url.MakeActiveClass("CaseLocation","Create") @Url.MakeActiveClass("CaseLocation","Edit") @Url.MakeActiveClass("Uploads","Uploads")">
                                 <i class="fas fa-pen-alt nav-icon"></i>
                                 <p>
                                     <span class="badge badge-success">ADD NEW </span>
@@ -324,7 +324,7 @@
                     if (User.IsInRole(AppRoles.CompanyAdmin.ToString()) || User.IsInRole(AppRoles.Creator.ToString()))
                     {
                         <li class="nav-item">
-                            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="UploadNewLogs" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","UploadNewLogs")">
+                            <a is-active-page asp-controller="Uploads" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("Uploads","Uploads")">
                                 <i class="nav-icon fas fa-archive"></i>
                                 <p>
                                     <span class="badge badge-secondary"> UPLOADS</span>

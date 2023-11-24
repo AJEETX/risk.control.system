@@ -46,8 +46,8 @@
                                                 <td>@file.CreatedOn</td>
                                                 <td>@file.UploadedBy</td>
                                                 <td>
-                                                    <a type="button" class="btn  btn-xs btn-primary" asp-controller="ClaimsInvestigation" asp-action="DownloadLog" asp-route-id="@file.Id"><i class="nav-icon fa fa-download"></i> @Applicationsettings.DOWNLOAD</a>
-                                                    <a type="button" class="btn  btn-xs btn-danger" asp-controller="ClaimsInvestigation" asp-action="DeleteLog" asp-route-id="@file.Id"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
+                                                    <a type="button" class="btn  btn-xs btn-primary" asp-action="DownloadLog" asp-route-id="@file.Id"><i class="nav-icon fa fa-download"></i> @Applicationsettings.DOWNLOAD</a>
+                                                    <a type="button" class="btn  btn-xs btn-danger" asp-action="DeleteLog" asp-route-id="@file.Id"><i class="fas fa-trash"></i> @Applicationsettings.DELETE</a>
                                                 </td>
                                             </tr>
                                         }

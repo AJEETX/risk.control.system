@@ -70,12 +70,6 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        private string _ftpPath = "ftp://files.000webhost.com/public_html/";
-        private String RemoteFileName = "text.txt";
-        private String LocalDestinationFilename = "sample.txt";
-        private String _login = "holosync";
-        private String _password = "C0##ect10n";
-
         [HttpPost]
         [Breadcrumb(" FTP")]
         public async Task<IActionResult> FtpDownload()
@@ -84,7 +78,7 @@ namespace risk.control.system.Controllers
             {
                 var userEmail = HttpContext.User.Identity.Name;
 
-                await ftpService.Download(userEmail);
+                await ftpService.DownloadFtp(userEmail);
 
                 toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Downloaded Claims ready"));
 
@@ -116,9 +110,9 @@ namespace risk.control.system.Controllers
                 }
                 var wc = new WebClient
                 {
-                    Credentials = new NetworkCredential(_login, _password),
+                    Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
                 };
-                var response = wc.UploadFile(_ftpPath + fileName, filePath);
+                var response = wc.UploadFile(Applicationsettings.FTP_SITE + fileName, filePath);
 
                 var data = Encoding.UTF8.GetString(response);
 
@@ -158,7 +152,7 @@ namespace risk.control.system.Controllers
                 }
                 var userEmail = HttpContext.User.Identity.Name;
 
-                await ftpService.Upload(userEmail, filePath, docPath, fileNameWithoutExtension);
+                await ftpService.UploadFile(userEmail, filePath, docPath, fileNameWithoutExtension);
 
                 //await SaveTheClaims(dataObject);
                 await SaveUpload(postedFile, filePath, "File upload", userEmail);
@@ -1364,7 +1358,6 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: " Add New")]
         public async Task<IActionResult> CreatePolicy()
         {
-            var userEmailToSend = string.Empty;
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
 
             var random = new Random();
@@ -1398,29 +1391,8 @@ namespace risk.control.system.Controllers
 
             var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
 
-            if (clientCompanyUser == null)
-            {
-                model.HasClientCompany = false;
-                userEmailToSend = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin).Email;
-            }
-            else
-            {
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+            model.PolicyDetail.ClientCompanyId = clientCompanyUser.ClientCompanyId;
 
-                var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
-
-                foreach (var assignedUser in assignerUsers)
-                {
-                    var isTrue = await userManager.IsInRoleAsync(assignedUser, assignerRole.Name);
-                    if (isTrue)
-                    {
-                        userEmailToSend = assignedUser.Email;
-                        break;
-                    }
-                }
-
-                model.PolicyDetail.ClientCompanyId = clientCompanyUser.ClientCompanyId;
-            }
             ViewBag.ClientCompanyId = clientCompanyUser.ClientCompanyId;
 
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", model.PolicyDetail.InvestigationServiceTypeId);
@@ -1439,17 +1411,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreatePolicy(ClaimsInvestigation claimsInvestigation)
         {
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
-
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
-            claimsInvestigation.InvestigationCaseStatus = status;
-            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
-            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
             claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
             IFormFile documentFile = null;
@@ -1516,17 +1481,10 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
         {
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
-
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
-            claimsInvestigation.InvestigationCaseStatus = status;
-            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
-            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
             claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
             IFormFile documentFile = null;
@@ -1720,17 +1678,10 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
-
             var userEmail = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
-            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
-            claimsInvestigation.InvestigationCaseStatus = status;
-            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
-            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
             claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
 
             IFormFile documentFile = null;
@@ -1758,217 +1709,6 @@ namespace risk.control.system.Controllers
             toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-check'></i> Customer {0} edited successfully !", claimsInvestigation.CustomerDetail.CustomerName));
 
             return RedirectToAction(nameof(Details), new { id = claim.ClaimsInvestigationId });
-        }
-
-        // GET: ClaimsInvestigation/Create
-        [Breadcrumb(title: " Create Claim")]
-        public async Task<IActionResult> Create()
-        {
-            var userEmailToSend = string.Empty;
-            var model = new ClaimsInvestigation { PolicyDetail = new PolicyDetail { LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId } };
-
-            var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
-            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-
-            if (clientCompanyUser == null)
-            {
-                model.HasClientCompany = false;
-                userEmailToSend = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin).Email;
-            }
-            else
-            {
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
-
-                var assignerUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
-
-                foreach (var assignedUser in assignerUsers)
-                {
-                    var isTrue = await userManager.IsInRoleAsync(assignedUser, assignerRole.Name);
-                    if (isTrue)
-                    {
-                        userEmailToSend = assignedUser.Email;
-                        break;
-                    }
-                }
-
-                model.PolicyDetail.ClientCompanyId = clientCompanyUser.ClientCompanyId;
-            }
-            ViewBag.ClientCompanyId = clientCompanyUser.ClientCompanyId;
-
-            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name");
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i => i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId), "InvestigationServiceTypeId", "Name", model.PolicyDetail.InvestigationServiceTypeId);
-            ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
-            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name");
-            ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name");
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-            return View(model);
-        }
-
-        // POST: ClaimsInvestigation/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClaimsInvestigation claimsInvestigation)
-        {
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
-
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
-            claimsInvestigation.InvestigationCaseStatus = status;
-            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
-            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
-            claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
-
-            if (status == null || !ModelState.IsValid)
-            {
-                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
-                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
-                ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
-                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
-                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
-                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
-                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
-                ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
-                ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
-                toastNotification.AddErrorToastMessage("Error!!!");
-                return View(claimsInvestigation);
-            }
-            IFormFile documentFile = null;
-            IFormFile profileFile = null;
-            var files = Request.Form?.Files;
-
-            if (files != null && files.Count > 0)
-            {
-                var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail.Document?.Name);
-                if (file != null)
-                {
-                    documentFile = file;
-                }
-                file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail.ProfileImage?.Name);
-                if (file != null)
-                {
-                    profileFile = file;
-                }
-            }
-
-            var claimId = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
-
-            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
-
-            toastNotification.AddSuccessToastMessage("<i class=\"fas fa-newspaper\"></i> Claim created successfully!");
-
-            return RedirectToAction(nameof(Details), new { id = claimId });
-        }
-
-        // GET: ClaimsInvestigation/Edit/5
-        [Breadcrumb(title: " Edit Claim", FromAction = "Draft")]
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null || _context.ClaimsInvestigation == null)
-            {
-                return NotFound();
-            }
-
-            var claimsInvestigation = await _context.ClaimsInvestigation.Include(c => c.PolicyDetail).FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
-
-            if (claimsInvestigation == null)
-            {
-                return NotFound();
-            }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
-            ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
-            ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
-            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
-
-            return View(claimsInvestigation);
-        }
-
-        // POST: ClaimsInvestigation/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
-        {
-            var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
-            var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
-
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            claimsInvestigation.InvestigationCaseStatusId = status.InvestigationCaseStatusId;
-            claimsInvestigation.InvestigationCaseStatus = status;
-            claimsInvestigation.InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId;
-            claimsInvestigation.InvestigationCaseSubStatus = subStatus;
-            claimsInvestigation.PolicyDetail.ClientCompanyId = companyUser?.ClientCompanyId;
-
-            if (claimsInvestigationId != claimsInvestigation.ClaimsInvestigationId || !ModelState.IsValid)
-            {
-                ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", claimsInvestigation.PolicyDetail.ClientCompanyId);
-                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
-                ViewData["CaseEnablerId"] = new SelectList(_context.CaseEnabler, "CaseEnablerId", "Name", claimsInvestigation.PolicyDetail.CaseEnablerId);
-                ViewData["CostCentreId"] = new SelectList(_context.CostCentre, "CostCentreId", "Name", claimsInvestigation.PolicyDetail.CostCentreId);
-                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
-                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
-                ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
-                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
-                ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", claimsInvestigation.CustomerDetail.PinCodeId);
-                ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
-                toastNotification.AddErrorToastMessage("Error!!!");
-
-                return View(claimsInvestigation);
-            }
-            try
-            {
-                IFormFile documentFile = null;
-                IFormFile profileFile = null;
-                var files = Request.Form?.Files;
-
-                if (files != null && files.Count > 0)
-                {
-                    var file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.PolicyDetail.Document?.FileName && f.Name == claimsInvestigation.PolicyDetail.Document?.Name);
-                    if (file != null)
-                    {
-                        documentFile = file;
-                    }
-                    file = files.FirstOrDefault(f => f.FileName == claimsInvestigation.CustomerDetail.ProfileImage?.FileName && f.Name == claimsInvestigation.CustomerDetail.ProfileImage?.Name);
-                    if (file != null)
-                    {
-                        profileFile = file;
-                    }
-                }
-
-                await claimsInvestigationService.Create(userEmail, claimsInvestigation, documentFile, profileFile, false);
-                toastNotification.AddSuccessToastMessage("claim case edited successfully!");
-            }
-            catch (Exception)
-            {
-                if (!ClaimsInvestigationExists(claimsInvestigation.ClaimsInvestigationId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Draft));
         }
 
         // GET: ClaimsInvestigation/Edit/5
@@ -2199,59 +1939,6 @@ namespace risk.control.system.Controllers
             ViewBag.Selectedcase = selectedcase;
 
             return View(vendor);
-        }
-
-        [Breadcrumb(" Upload Log")]
-        public async Task<IActionResult> UploadNewLogs()
-        {
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var fileuploadViewModel = await LoadAllFiles(userEmail);
-            ViewBag.Message = TempData["Message"];
-            return View(fileuploadViewModel);
-        }
-
-        public async Task<IActionResult> DownloadLog(int id)
-        {
-            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (file == null) return null;
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(file.FilePath, FileMode.Open))
-            {
-                await stream.CopyToAsync(memory);
-            }
-            memory.Position = 0;
-            return File(memory, file.FileType, file.Name + file.Extension);
-        }
-
-        public async Task<IActionResult> DeleteLog(int id)
-        {
-            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
-            if (file == null) return null;
-            if (System.IO.File.Exists(file.FilePath))
-            {
-                System.IO.File.Delete(file.FilePath);
-            }
-            _context.FilesOnFileSystem.Remove(file);
-            _context.SaveChanges();
-            TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
-            return RedirectToAction("UploadNewLogs");
-        }
-
-        private async Task<FileUploadViewModel> LoadAllFiles(string userEmail)
-        {
-            var viewModel = new FileUploadViewModel();
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
-
-            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-
-            viewModel.FilesOnFileSystem = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).ToListAsync();
-            return viewModel;
-        }
-
-        private bool ClaimsInvestigationExists(string id)
-        {
-            return (_context.ClaimsInvestigation?.Any(e => e.ClaimsInvestigationId == id)).GetValueOrDefault();
         }
     }
 }
