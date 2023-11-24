@@ -12,14 +12,14 @@ namespace risk.control.system.Controllers.Api
     {
         [AllowAnonymous]
         [HttpPost("sms")]
-        public async Task<IActionResult> SendSingleSMS(string mobile = "+61432854196", string message = "Testing fom Azy")
+        public async Task<IActionResult> SendSingleSMS(string mobile = "61432854196", string message = "Testing fom Azy")
         {
             string device = "0";
             long? timestamp = null;
             bool isMMS = false;
             string? attachments = null;
             bool priority = false;
-            var response = SendSms.SendSingleMessage(mobile, message, device, timestamp, isMMS, attachments, priority);
+            var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
             return Ok(response);
         }
     }
