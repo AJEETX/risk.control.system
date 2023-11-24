@@ -2,25 +2,79 @@
 using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
+
+using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
     public class UploadsController : Controller
     {
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly ApplicationDbContext _context;
         private static string NO_DATA = " NO - DATA ";
         private static Regex regex = new Regex("\\\"(.*?)\\\"");
 
-        public UploadsController(IWebHostEnvironment webHostEnvironment)
+        public UploadsController(IWebHostEnvironment webHostEnvironment, ApplicationDbContext context)
         {
             this.webHostEnvironment = webHostEnvironment;
+            this._context = context;
         }
 
         public async Task<IActionResult> Index()
         {
             return View();
+        }
+
+        [Breadcrumb(" Upload Log", FromController = typeof(ClaimsInvestigationController))]
+        public async Task<IActionResult> Uploads()
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+
+            var fileuploadViewModel = await LoadAllFiles(userEmail);
+            ViewBag.Message = TempData["Message"];
+            return View(fileuploadViewModel);
+        }
+
+        public async Task<IActionResult> DownloadLog(int id)
+        {
+            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (file == null) return null;
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(file.FilePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+            return File(memory, file.FileType, file.Name + file.Extension);
+        }
+
+        public async Task<IActionResult> DeleteLog(int id)
+        {
+            var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
+            if (file == null) return null;
+            if (System.IO.File.Exists(file.FilePath))
+            {
+                System.IO.File.Delete(file.FilePath);
+            }
+            _context.FilesOnFileSystem.Remove(file);
+            _context.SaveChanges();
+            TempData["Message"] = $"Removed {file.Name + file.Extension} successfully from File System.";
+            return RedirectToAction("Uploads");
+        }
+
+        private async Task<FileUploadViewModel> LoadAllFiles(string userEmail)
+        {
+            var viewModel = new FileUploadViewModel();
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            viewModel.FilesOnFileSystem = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).ToListAsync();
+            return viewModel;
         }
 
         [HttpPost]

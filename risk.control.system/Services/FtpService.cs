@@ -21,9 +21,9 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task Upload(string userEmail, string filePath, string docPath, string fileNameWithoutExtension);
+        Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension);
 
-        Task Download(string userEmail);
+        Task DownloadFtp(string userEmail);
     }
 
     public class FtpService : IFtpService
@@ -65,18 +65,14 @@ namespace risk.control.system.Services
             this.toastNotification = toastNotification;
         }
 
-        private String _ftpPath = "ftp://files.000webhost.com/public_html/";
-        private String _login = "holosync";
-        private String _password = "C0##ect10n";
-
-        public async Task Download(string userEmail)
+        public async Task DownloadFtp(string userEmail)
         {
-            string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
+            string path = Path.Combine(webHostEnvironment.WebRootPath, "download-file");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            string docPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
+            string docPath = Path.Combine(webHostEnvironment.WebRootPath, "download-case");
             if (!Directory.Exists(docPath))
             {
                 Directory.CreateDirectory(docPath);
@@ -84,7 +80,7 @@ namespace risk.control.system.Services
             var files = GetFtpData();
             var zipFiles = files.Where(f => f.EndsWith(".zip"));
             WebClient client = new WebClient();
-            client.Credentials = new NetworkCredential(_login, _password);
+            client.Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA);
 
             foreach (var zipFile in zipFiles)
             {
@@ -92,17 +88,18 @@ namespace risk.control.system.Services
                 string fileNameWithoutExtension = fileName.Substring(0, fileName.Length - 4);
                 string filePath = Path.Combine(path, fileName);
 
-                string ftpPath = $"ftp://files.000webhost.com/public_html/{zipFile}";
+                string ftpPath = $"{Applicationsettings.FTP_SITE}/{zipFile}";
 
-                client.DownloadFile(
-                    ftpPath, filePath);
+                client.DownloadFile(ftpPath, filePath);
+
                 using var archive = ZipFile.OpenRead(filePath);
 
-                ZipFile.ExtractToDirectory(filePath, docPath, true);
-
                 string zipFilePath = Path.Combine(docPath, fileNameWithoutExtension);
+
+                ZipFile.ExtractToDirectory(filePath, zipFilePath, true);
+
                 var dirNames = Directory.EnumerateDirectories(zipFilePath);
-                var fileNames = Directory.EnumerateFiles(zipFilePath);
+                var fileNames = Directory.EnumerateFiles(dirNames.FirstOrDefault());
 
                 string csvData = await System.IO.File.ReadAllTextAsync(fileNames.First());
 
@@ -160,7 +157,7 @@ namespace risk.control.system.Services
 
                                     var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
 
-                                    var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, rowData[0].Trim(), "POLICY.jpg");
+                                    var policyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "POLICY.jpg");
 
                                     var image = System.IO.File.ReadAllBytes(policyImagePath);
                                     dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
@@ -188,7 +185,7 @@ namespace risk.control.system.Services
 
                                     var country = _context.Country.FirstOrDefault();
 
-                                    var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, rowData[0].Trim(), "CUSTOMER.jpg");
+                                    var customerImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "CUSTOMER.jpg");
 
                                     var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
 
@@ -220,7 +217,7 @@ namespace risk.control.system.Services
                                     var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
                                     var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
-                                    var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, rowData[0].Trim(), "BENEFICIARY.jpg");
+                                    var beneficairyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "BENEFICIARY.jpg");
 
                                     var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
                                     dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
@@ -294,8 +291,8 @@ namespace risk.control.system.Services
             {
                 string fileName = zipFile;
 
-                FtpWebRequest requestFileDelete = (FtpWebRequest)WebRequest.Create($"{_ftpPath}" + fileName);
-                requestFileDelete.Credentials = new NetworkCredential(_login, _password);
+                FtpWebRequest requestFileDelete = (FtpWebRequest)WebRequest.Create($"{Applicationsettings.FTP_SITE}" + fileName);
+                requestFileDelete.Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA);
                 requestFileDelete.Method = WebRequestMethods.Ftp.DeleteFile;
 
                 FtpWebResponse responseFileDelete = (FtpWebResponse)requestFileDelete.GetResponse();
@@ -304,9 +301,9 @@ namespace risk.control.system.Services
 
         private List<string> GetFtpData()
         {
-            var request = WebRequest.Create(_ftpPath);
+            var request = WebRequest.Create(Applicationsettings.FTP_SITE);
             request.Method = WebRequestMethods.Ftp.ListDirectory;
-            request.Credentials = new NetworkCredential(_login, _password);
+            request.Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA);
 
             var files = new List<string>();
 
@@ -343,15 +340,16 @@ namespace risk.control.system.Services
             return data;
         }
 
-        public async Task Upload(string userEmail, string filePath, string docPath, string fileNameWithoutExtension)
+        public async Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension)
         {
             using var archive = ZipFile.OpenRead(filePath);
 
-            ZipFile.ExtractToDirectory(filePath, docPath, true);
-
             string zipFilePath = Path.Combine(docPath, fileNameWithoutExtension);
+
+            ZipFile.ExtractToDirectory(filePath, zipFilePath, true);
+
             var dirNames = Directory.EnumerateDirectories(zipFilePath);
-            var fileNames = Directory.EnumerateFiles(zipFilePath);
+            var fileNames = Directory.EnumerateFiles(dirNames.FirstOrDefault());
 
             string csvData = await System.IO.File.ReadAllTextAsync(fileNames.First());
 
@@ -409,7 +407,7 @@ namespace risk.control.system.Services
 
                                 var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
 
-                                var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, rowData[0].Trim(), "POLICY.jpg");
+                                var policyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "POLICY.jpg");
 
                                 var image = System.IO.File.ReadAllBytes(policyImagePath);
                                 dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
@@ -437,7 +435,7 @@ namespace risk.control.system.Services
 
                                 var country = _context.Country.FirstOrDefault();
 
-                                var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, rowData[0].Trim(), "CUSTOMER.jpg");
+                                var customerImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "CUSTOMER.jpg");
 
                                 var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
 
@@ -472,7 +470,7 @@ namespace risk.control.system.Services
                                 var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
                                 var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
-                                var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, rowData[0].Trim(), "BENEFICIARY.jpg");
+                                var beneficairyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "BENEFICIARY.jpg");
 
                                 var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
                                 dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";

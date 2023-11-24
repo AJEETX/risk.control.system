@@ -14,6 +14,9 @@
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
         public const string WEBSITE_SITE_DESIGNER = "its aby";
         public const string WEBSITE_SITE_DESIGNER_URL = "http://itsaby.com.au";
+        public static readonly string FTP_SITE = "ftp://files.000webhost.com/public_html/";
+        public static readonly string FTP_SITE_LOG = "holosync";
+        public static readonly string FTP_SITE_DATA = "C0##ect10n";
 
         //LOGIN
         public const string WEBSITE_LOGIN = "Log in: iCheckify";
