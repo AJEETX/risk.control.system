@@ -138,7 +138,7 @@ namespace risk.control.system.Controllers
         {
             if (postedFile != null)
             {
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
+                string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);

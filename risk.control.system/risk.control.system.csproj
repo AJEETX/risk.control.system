@@ -173,17 +173,10 @@
     <None Update="Templates\WelcomeTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\upload-case\*" />
+    <Folder Include="wwwroot\upload-case" />
+    <Folder Include="wwwroot\upload-case\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="wwwroot\upload-case\*" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="wwwroot\img\*" />
-  </ItemGroup>
-
 </Project>
