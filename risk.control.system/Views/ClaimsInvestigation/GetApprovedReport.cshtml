@@ -478,25 +478,7 @@
                                                                             </ul>
                                                                         </p>
                                                                     </div>
-                                                                    @{
-                                                                        var status_fin = "Low";
-                                                                        if (Model.Location?.ClaimReport?.Question2 == "0" || Model.Location?.ClaimReport?.Question2 == "0.0")
-                                                                        {
-                                                                            status_fin = "Low";
-                                                                        }
-                                                                        else if (Model.Location?.ClaimReport?.Question2 == ".5" || Model.Location?.ClaimReport?.Question2 == "0.5")
-                                                                        {
-                                                                            status_fin = "Medium";
-                                                                        }
-                                                                        else if (Model.Location?.ClaimReport?.Question2 == "1" || Model.Location?.ClaimReport?.Question2 == "1.0")
-                                                                        {
-                                                                            status_fin = "High";
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            status_fin = Model.Location?.ClaimReport?.Question2;
-                                                                        }
-                                                                    }
+                                                                   
                                                                     <div class="col-6">
                                                                         <p class="text-muted text-sm">
                                                                             <span class="badge badge-light"><i class="fas fa-film"></i> Answers</span>:
@@ -514,7 +496,7 @@
                                                                                     <span class="fa-li">
                                                                                         <i class="far fa-comment"></i>
                                                                                     </span>
-                                                                                    @status_fin
+                                                                                    @Model.Location.ClaimReport?.Question2
                                                                                 </li>
                                                                                 <br />
                                                                                 <li class="small">

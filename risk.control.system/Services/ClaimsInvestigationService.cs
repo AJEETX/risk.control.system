@@ -711,7 +711,26 @@ namespace risk.control.system.Services
             var claimReport = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
 
             claimReport.Question1 = question1;
-            claimReport.Question2 = question2;
+
+            var status_fin = "Low";
+            if (claimReport?.Question2 == "0" || claimReport?.Question2 == "0.0")
+            {
+                status_fin = "Low";
+            }
+            else if (claimReport?.Question2 == ".5" || claimReport?.Question2 == "0.5")
+            {
+                status_fin = "Medium";
+            }
+            else if (claimReport?.Question2 == "1" || claimReport?.Question2 == "1.0")
+            {
+                status_fin = "High";
+            }
+            else
+            {
+                status_fin = claimReport?.Question2;
+            }
+
+            claimReport.Question2 = status_fin;
             claimReport.Question3 = question3;
             claimReport.Question4 = question4;
             claimReport.AgentRemarks = remarks;

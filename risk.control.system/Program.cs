@@ -55,6 +55,7 @@ builder.Services.Configure<FormOptions>(x =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
+builder.Services.AddScoped<IICheckifyService, ICheckifyService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IMailboxService, MailboxService>();
 
