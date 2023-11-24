@@ -8,25 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\company\**" />
-    <Compile Remove="wwwroot\upload-pincodes\**" />
-    <Compile Remove="wwwroot\upload\**" />
-    <Content Remove="wwwroot\company\**" />
-    <Content Remove="wwwroot\upload-pincodes\**" />
-    <Content Remove="wwwroot\upload\**" />
-    <EmbeddedResource Remove="wwwroot\company\**" />
-    <EmbeddedResource Remove="wwwroot\upload-pincodes\**" />
-    <EmbeddedResource Remove="wwwroot\upload\**" />
-    <None Remove="wwwroot\company\**" />
-    <None Remove="wwwroot\upload-pincodes\**" />
-    <None Remove="wwwroot\upload\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="wwwroot\text.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.1.0.2" />
     <PackageReference Include="MailKit" Version="4.2.0" />
@@ -186,25 +167,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\text.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="au_postcodes.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Templates\WelcomeTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="text.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\upload-case\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\img\*.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\img\*.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\img\*.jpeg" />
   </ItemGroup>
 
 </Project>

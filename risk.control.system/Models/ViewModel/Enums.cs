@@ -8,9 +8,9 @@ namespace risk.control.system.Models.ViewModel
         com,
 
         [Display(Name = ".co.in")]
-        coin,
+        co_in,
 
         [Display(Name = ".in")]
-        _in
+        _in_
     }
 }

@@ -128,11 +128,11 @@ namespace risk.control.system.Controllers
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
-                        vendor.Document = vendorDocument;
 
                         using var dataStream = new MemoryStream();
-                        await vendor.Document.CopyToAsync(dataStream);
+                        vendorDocument.CopyTo(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
+                        vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
                         vendor.DocumentUrl = "/img/" + newFileName;
                     }
                     else
@@ -188,6 +188,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix)
         {
+            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
                 string newFileName = Guid.NewGuid().ToString();
@@ -197,7 +198,6 @@ namespace risk.control.system.Controllers
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
-            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
@@ -264,15 +264,15 @@ namespace risk.control.system.Controllers
             }
             vendorApplicationUser.Vendor = vendor;
 
-            var country = _context.Country.Where(c => c.CountryId == vendor.CountryId);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
+            var country = _context.Country.Where(c => c.CountryId == vendorUser.CountryId);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorUser.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorUser.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorUser.DistrictId).OrderBy(d => d.Name);
 
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendor.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendor.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorUser.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorUser.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorUser.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorUser.PinCodeId);
 
             return View(vendorApplicationUser);
         }
@@ -596,6 +596,7 @@ namespace risk.control.system.Controllers
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
+            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
             ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
             return View(vendorInvestigationServiceType);
         }

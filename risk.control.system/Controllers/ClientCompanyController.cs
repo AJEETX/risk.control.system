@@ -56,8 +56,9 @@ namespace risk.control.system.Controllers
 
                     clientCompany.Document = companyDocument;
                     using var dataStream = new MemoryStream();
-                    await clientCompany.Document.CopyToAsync(dataStream);
+                    companyDocument.CopyTo(dataStream);
                     clientCompany.DocumentImage = dataStream.ToArray();
+                    companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                     clientCompany.DocumentUrl = "/img/" + newFileName;
                 }
                 clientCompany.Email = clientCompany.Email.Trim().ToLower();
@@ -191,10 +192,10 @@ namespace risk.control.system.Controllers
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
 
-                        clientCompany.Document = companyDocument;
                         using var dataStream = new MemoryStream();
-                        await clientCompany.Document.CopyToAsync(dataStream);
+                        companyDocument.CopyTo(dataStream);
                         clientCompany.DocumentImage = dataStream.ToArray();
+                        companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                         clientCompany.DocumentUrl = "/img/" + newFileName;
                     }
                     else
