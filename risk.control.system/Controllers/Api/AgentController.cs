@@ -23,6 +23,8 @@ using risk.control.system.Services;
 
 using static System.Net.Mime.MediaTypeNames;
 
+using risk.control.system.Models.ViewModel;
+
 namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
@@ -36,11 +38,6 @@ namespace risk.control.system.Controllers.Api
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
-        private static string BaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
-        private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com";
-        private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
-        private static string PanTask_id = "74f4c926-250c-43ca-9c53-453e87ceacd1";
-        private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
 
         private ILogger<AgentController> logger;
 
@@ -53,33 +50,6 @@ namespace risk.control.system.Controllers.Api
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
             this.logger = logger;
-        }
-
-        [AllowAnonymous]
-        [HttpPost("mask")]
-        public async Task<IActionResult> Mask(MaskImage image)
-        {
-            var maskedImageDetail = await httpClientService.GetMaskedImage(image, BaseUrl);
-
-            return Ok(maskedImageDetail);
-        }
-
-        [AllowAnonymous]
-        [HttpPost("match")]
-        public async Task<IActionResult> Match(MatchImage image)
-        {
-            var maskedImageDetail = await httpClientService.GetFaceMatch(image, BaseUrl);
-
-            return Ok(maskedImageDetail);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("pan")]
-        public async Task<IActionResult> Pan(string pan = "FNLPM8635N")
-        {
-            var verifiedPanResponse = await httpClientService.VerifyPan(pan, PanIdfyUrl, RapidAPIKey, PanTask_id, PanGroup_id);
-
-            return Ok(verifiedPanResponse);
         }
 
         [AllowAnonymous]
@@ -435,8 +405,8 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [RequestSizeLimit(100_000_000)]
-        [HttpPost("face")]
-        public async Task<IActionResult> Face(Data data)
+        [HttpPost("faceid")]
+        public async Task<IActionResult> FaceId(PostData data)
         {
             var claimCase = _context.CaseLocation
                .Include(c => c.BeneficiaryRelation)
@@ -587,8 +557,8 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [RequestSizeLimit(100_000_000)]
-        [HttpPost("document")]
-        public async Task<IActionResult> Document(Data data)
+        [HttpPost("documentid")]
+        public async Task<IActionResult> DocumentId(PostData data)
         {
             var claimCase = _context.CaseLocation
                .Include(c => c.BeneficiaryRelation)
@@ -768,241 +738,11 @@ namespace risk.control.system.Controllers.Api
             return Ok(new { data });
         }
 
-        [AllowAnonymous]
-        [HttpGet("Vendors")]
-        public async Task<IActionResult> Vendors()
-        {
-            var applicationDbContext = await _context.Vendor
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes).ToListAsync();
-
-            var data = applicationDbContext.Select(a => new VendorData
-            {
-                Image = a.DocumentImage,
-                Name = a.Name,
-                Code = a.Code,
-                PhoneNumber = a.PhoneNumber,
-                Email = a.Email,
-                Addressline = a.Addressline,
-                State = a.State.Name,
-                Created = a.Created.ToString("dd/MM/yyyy")
-            });
-
-            var response = new VendorDataDataTable
-            {
-                data = data.ToList()
-            };
-            return Ok(response);
-        }
-
         private System.Drawing.Image? ByteArrayToImage(byte[] data)
         {
             MemoryStream ms = new MemoryStream(data);
             System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
             return returnImage;
         }
-
-        private async Task<(ClaimsInvestigation claim, CaseLocation claimCase)> ProcessDigitalId(Data data, ClaimsInvestigation claim, CaseLocation claimCase)
-        {
-            if (!string.IsNullOrWhiteSpace(data.LocationImage))
-            {
-                byte[]? registeredImage = null;
-                this.logger.LogInformation("DIGITAL ID : FACE image {LocationImage} ", data.LocationImage);
-
-                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredImage = claim.CustomerDetail.ProfilePicture;
-                    this.logger.LogInformation("DIGITAL ID : HEALTH image {registeredImage} ", registeredImage);
-                }
-                if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
-                {
-                    registeredImage = claimCase.ProfilePicture;
-                    this.logger.LogInformation("DIGITAL ID : DEATH image {registeredImage} ", registeredImage);
-                }
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
-
-                string ImageData = string.Empty;
-                try
-                {
-                    if (registeredImage != null)
-                    {
-                        var image = Convert.FromBase64String(data.LocationImage);
-                        var locationRealImage = ByteArrayToImage(image);
-                        MemoryStream stream = new MemoryStream(image);
-                        claimCase.ClaimReport.AgentLocationPicture = image;
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                        claimCase.ClaimReport.AgentLocationPictureUrl = filePath;
-                        CompressImage.Compressimage(stream, filePath);
-
-                        var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
-
-                        var saveImageBase64String = Convert.ToBase64String(savedImage);
-
-                        claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
-                        this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
-
-                        var base64Image = Convert.ToBase64String(registeredImage);
-
-                        this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
-                        try
-                        {
-                            var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
-
-                            claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
-                        }
-                        catch (Exception)
-                        {
-                            claimCase.ClaimReport.LocationPictureConfidence = string.Empty;
-                        }
-                    }
-                    else
-                    {
-                        claimCase.ClaimReport.LocationPictureConfidence = "no face image";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    claimCase.ClaimReport.LocationPictureConfidence = "err " + ImageData;
-                }
-                if (registeredImage == null)
-                {
-                    claimCase.ClaimReport.LocationPictureConfidence = "no image";
-                }
-            }
-            return (claim, claimCase);
-        }
-    }
-
-    public class PanVerifyResponse
-    {
-        public string Action { get; set; }
-        public string completed_at { get; set; }
-        public string created_at { get; set; }
-        public string group_id { get; set; }
-        public string request_id { get; set; }
-        public Result? result { get; set; }
-        public string status { get; set; }
-        public string? task_id { get; set; }
-        public string? type { get; set; }
-        public string? error { get; set; }
-        public string? count_remain { get; set; }
-    }
-
-    public class Result
-    {
-        public SourceOutput source_output { get; set; }
-    }
-
-    public class SourceOutput
-    {
-        public bool? aadhaar_seeding_status { get; set; }
-        public string first_name { get; set; }
-        public object gender { get; set; }
-        public string id_number { get; set; }
-        public string last_name { get; set; }
-        public string? middle_name { get; set; }
-        public string? name_on_card { get; set; }
-        public string? source { get; set; }
-        public string status { get; set; }
-    }
-
-    public class PanVerifyRequest
-    {
-        public string task_id { get; set; }
-        public string group_id { get; set; }
-        public PanNumber data { get; set; }
-    }
-
-    public class PanNumber
-    {
-        public string id_number { get; set; }
-    }
-
-    public class PanInValidationResponse
-    {
-        public string error { get; set; }
-        public string message { get; set; }
-        public int status { get; set; }
-    }
-
-    public class PanValidationResponse
-    {
-        public string @entity { get; set; }
-        public string pan { get; set; }
-        public string first_name { get; set; }
-        public string middle_name { get; set; }
-        public string last_name { get; set; }
-    }
-
-    public class FaceMatchDetail
-    {
-        public decimal FaceLeftCoordinate { get; set; }
-        public decimal FaceTopCcordinate { get; set; }
-        public string Confidence { get; set; }
-    }
-
-    public class FaceImageDetail
-    {
-        public string DocType { get; set; }
-        public string DocumentId { get; set; }
-        public string MaskedImage { get; set; }
-        public string? OcrData { get; set; }
-    }
-
-    public class MatchImage
-    {
-        public string Source { get; set; }
-        public string Dest { get; set; }
-    }
-
-    public class MaskImage
-    {
-        public string Image { get; set; }
-    }
-
-    public class SubmitData
-    {
-        public string Email { get; set; }
-        public string ClaimId { get; set; }
-        public long BeneficiaryId { get; set; }
-        public string? Question1 { get; set; }
-        public string? Question2 { get; set; }
-        public string? Question3 { get; set; }
-        public string? Question4 { get; set; }
-        public string Remarks { get; set; }
-    }
-
-    public class Data
-    {
-        public string Email { get; set; }
-        public string ClaimId { get; set; }
-        public string? LocationImage { get; set; }
-        public string? LocationData { get; set; }
-        public string? LocationLongLat { get; set; }
-        public string? OcrImage { get; set; }
-        public string? OcrLongLat { get; set; }
-        public string? OcrData { get; set; }
-        public string? Question1 { get; set; }
-        public string? Question2 { get; set; }
-        public string? Remarks { get; set; }
-    }
-
-    public class VendorData
-    {
-        public byte[]? Image { get; set; }
-        public string Name { get; set; }
-        public string Code { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
-        public string Addressline { get; set; }
-        public string State { get; set; }
-        public string Created { get; set; }
-    }
-
-    public class VendorDataDataTable
-    {
-        public List<VendorData> data { get; set; }
     }
 }

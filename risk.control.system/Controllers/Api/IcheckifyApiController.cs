@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api
