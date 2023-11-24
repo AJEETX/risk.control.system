@@ -41,6 +41,8 @@ namespace risk.control.system.Services
         Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType);
 
         Task<List<VendorCaseModel>> GetAgencyLoad(List<Vendor> existingVendors);
+
+        Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail);
     }
 
     public class ClaimsInvestigationService : IClaimsInvestigationService
@@ -48,15 +50,143 @@ namespace risk.control.system.Services
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly IMailboxService mailboxService;
         private readonly UserManager<ApplicationUser> userManager;
         private HttpClient client = new HttpClient();
 
-        public ClaimsInvestigationService(ApplicationDbContext context, IHttpClientService httpClientService, RoleManager<ApplicationRole> roleManager, UserManager<ApplicationUser> userManager)
+        public ClaimsInvestigationService(ApplicationDbContext context, IHttpClientService httpClientService, RoleManager<ApplicationRole> roleManager,
+            IMailboxService mailboxService,
+            UserManager<ApplicationUser> userManager)
         {
             this._context = context;
             this.httpClientService = httpClientService;
             this.roleManager = roleManager;
+            this.mailboxService = mailboxService;
             this.userManager = userManager;
+        }
+
+        public async Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail)
+        {
+            var autoAllocatedClaims = new List<string>();
+            foreach (var claim in claims)
+            {
+                string pinCode2Verify = string.Empty;
+                //1. GET THE PINCODE FOR EACH CLAIM
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Include(c => c.CustomerDetail)
+                    .ThenInclude(c => c.PinCode)
+                    .First(c => c.ClaimsInvestigationId == claim);
+                var beneficiary = _context.CaseLocation.Include(b => b.PinCode).FirstOrDefault(b => b.ClaimsInvestigationId == claim);
+
+                if (claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH)
+                {
+                    pinCode2Verify = claimsInvestigation.CustomerDetail?.PinCode?.Code;
+                }
+                else
+                {
+                    pinCode2Verify = beneficiary.PinCode?.Code;
+                }
+
+                var vendorsInPincode = new List<Vendor>();
+
+                //2. GET THE VENDORID FOR EACH CLAIM BASED ON PINCODE
+                foreach (var empanelledVendor in company.EmpanelledVendors)
+                {
+                    foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
+                    {
+                        if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
+                                serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
+                        {
+                            foreach (var pincodeService in serviceType.PincodeServices)
+                            {
+                                if (pincodeService.Pincode == pinCode2Verify)
+                                {
+                                    vendorsInPincode.Add(empanelledVendor);
+                                    continue;
+                                }
+                            }
+                        }
+                        var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
+                        if (added)
+                        {
+                            continue;
+                        }
+                    }
+                }
+
+                if (vendorsInPincode.Count == 0)
+                {
+                    foreach (var empanelledVendor in company.EmpanelledVendors)
+                    {
+                        foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
+                        {
+                            if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
+                                    serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
+                            {
+                                foreach (var pincodeService in serviceType.PincodeServices)
+                                {
+                                    if (pincodeService.Pincode.Contains(pinCode2Verify.Substring(0, pinCode2Verify.Length - 2)))
+                                    {
+                                        vendorsInPincode.Add(empanelledVendor);
+                                        continue;
+                                    }
+                                }
+                            }
+                            var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
+                            if (added)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                if (vendorsInPincode.Count == 0)
+                {
+                    foreach (var empanelledVendor in company.EmpanelledVendors)
+                    {
+                        foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
+                        {
+                            if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
+                                    serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
+                            {
+                                var pincode = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.Code == pinCode2Verify);
+                                if (serviceType.District.DistrictId == pincode.District.DistrictId)
+                                {
+                                    vendorsInPincode.Add(empanelledVendor);
+                                    continue;
+                                }
+                            }
+                            var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
+                            if (added)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                }
+
+                var distinctVendors = vendorsInPincode.Distinct()?.ToList();
+
+                //3. CALL SERVICE WITH VENDORID
+                if (vendorsInPincode is not null && vendorsInPincode.Count > 0)
+                {
+                    var vendorsWithCaseLoad = (await GetAgencyLoad(distinctVendors)).OrderBy(o => o.CaseCount)?.ToList();
+
+                    if (vendorsWithCaseLoad is not null && vendorsWithCaseLoad.Count > 0)
+                    {
+                        var selectedVendor = vendorsWithCaseLoad.FirstOrDefault();
+
+                        var policy = await AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.CaseLocationId);
+
+                        autoAllocatedClaims.Add(claim);
+
+                        await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.CaseLocationId);
+                    }
+                }
+            }
+            return autoAllocatedClaims;
         }
 
         public async Task<List<VendorCaseModel>> GetAgencyLoad(List<Vendor> existingVendors)

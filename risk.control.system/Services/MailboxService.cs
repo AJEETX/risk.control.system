@@ -83,6 +83,10 @@ namespace risk.control.system.Services
             string MailText = str.ReadToEnd();
             str.Close();
 
+            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+
             foreach (var userEmailToSend in userEmailsToSend)
             {
                 var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend.Email);
@@ -115,7 +119,10 @@ namespace risk.control.system.Services
                 _context.Mailbox.Update(recepientMailbox);
 
                 //SEND SMS
-                //await SmsService.Send();
+                if (company.SendSMS)
+                {
+                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, "Claim(s) allocated: Policy #" + policy + " ");
+                }
                 //SMS ::END
             }
 

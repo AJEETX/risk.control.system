@@ -38,7 +38,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = true,
                 IsVendorAdmin = true,
                 PhoneNumberConfirmed = true,
-                PhoneNumber = "9876543210",
+                PhoneNumber = Applicationsettings.MOBILE,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,

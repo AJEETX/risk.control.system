@@ -1,13 +1,6 @@
-﻿using CsvHelper;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
-using Newtonsoft.Json;
 
 using NToastNotify;
 
@@ -15,31 +8,14 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-using risk.control.system.Services;
-
-using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 using System.Data;
-using System.Globalization;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Runtime.Serialization.Json;
-using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Renci.SshNet;
-using Renci.SshNet.Common;
-using Renci.SshNet.Sftp;
-
-using static risk.control.system.Helpers.Permissions;
-using System.Text;
-using System.Net.Http;
-using risk.control.system.Helpers;
 
 namespace risk.control.system.Services
 {
@@ -90,8 +66,6 @@ namespace risk.control.system.Services
         }
 
         private String _ftpPath = "ftp://files.000webhost.com/public_html/";
-        private String RemoteFileName = "text.txt";
-        private String LocalDestinationFilename = "sample.txt";
         private String _login = "holosync";
         private String _password = "C0##ect10n";
 

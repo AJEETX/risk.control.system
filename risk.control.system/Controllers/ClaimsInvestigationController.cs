@@ -1,13 +1,9 @@
 ﻿using CsvHelper;
-
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-
-using Newtonsoft.Json;
 
 using NToastNotify;
 
@@ -21,24 +17,13 @@ using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
 
 using System.Data;
-using System.Globalization;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Renci.SshNet;
-using Renci.SshNet.Common;
-using Renci.SshNet.Sftp;
-
-using static risk.control.system.Helpers.Permissions;
 using System.Text;
-using System.Net.Http;
 using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
@@ -85,7 +70,7 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        private String _ftpPath = "ftp://files.000webhost.com/public_html/";
+        private string _ftpPath = "ftp://files.000webhost.com/public_html/";
         private String RemoteFileName = "text.txt";
         private String LocalDestinationFilename = "sample.txt";
         private String _login = "holosync";
@@ -113,7 +98,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public IActionResult FtpUpload(IFormFile postedFtp)
+        public async Task<IActionResult> FtpUpload(IFormFile postedFtp)
         {
             if (postedFtp != null)
             {
@@ -136,6 +121,10 @@ namespace risk.control.system.Controllers
                 var response = wc.UploadFile(_ftpPath + fileName, filePath);
 
                 var data = Encoding.UTF8.GetString(response);
+
+                var userEmail = HttpContext.User.Identity.Name;
+
+                await SaveUpload(postedFtp, filePath, "Ftp upload", userEmail);
 
                 toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Uploaded Claims."));
 
@@ -1035,125 +1024,8 @@ namespace risk.control.system.Controllers
 
             if (company is not null && company.Auto)
             {
-                var autoAllocatedClaims = new List<string>();
-                foreach (var claim in claims)
-                {
-                    string pinCode2Verify = string.Empty;
-                    //1. GET THE PINCODE FOR EACH CLAIM
-                    var claimsInvestigation = _context.ClaimsInvestigation
-                        .Include(c => c.PolicyDetail)
-                        .Include(c => c.CustomerDetail)
-                        .ThenInclude(c => c.PinCode)
-                        .First(c => c.ClaimsInvestigationId == claim);
-                    var beneficiary = _context.CaseLocation.Include(b => b.PinCode).FirstOrDefault(b => b.ClaimsInvestigationId == claim);
+                var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, userEmail);
 
-                    if (claimsInvestigation.PolicyDetail?.ClaimType == ClaimType.HEALTH)
-                    {
-                        pinCode2Verify = claimsInvestigation.CustomerDetail?.PinCode?.Code;
-                    }
-                    else
-                    {
-                        pinCode2Verify = beneficiary.PinCode?.Code;
-                    }
-
-                    var vendorsInPincode = new List<Vendor>();
-
-                    //2. GET THE VENDORID FOR EACH CLAIM BASED ON PINCODE
-                    foreach (var empanelledVendor in company.EmpanelledVendors)
-                    {
-                        foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
-                        {
-                            if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                                    serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
-                            {
-                                foreach (var pincodeService in serviceType.PincodeServices)
-                                {
-                                    if (pincodeService.Pincode == pinCode2Verify)
-                                    {
-                                        vendorsInPincode.Add(empanelledVendor);
-                                        continue;
-                                    }
-                                }
-                            }
-                            var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
-                            if (added)
-                            {
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (vendorsInPincode.Count == 0)
-                    {
-                        foreach (var empanelledVendor in company.EmpanelledVendors)
-                        {
-                            foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
-                            {
-                                if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                                        serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
-                                {
-                                    foreach (var pincodeService in serviceType.PincodeServices)
-                                    {
-                                        if (pincodeService.Pincode.Contains(pinCode2Verify.Substring(0, pinCode2Verify.Length - 2)))
-                                        {
-                                            vendorsInPincode.Add(empanelledVendor);
-                                            continue;
-                                        }
-                                    }
-                                }
-                                var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
-                                if (added)
-                                {
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-
-                    if (vendorsInPincode.Count == 0)
-                    {
-                        foreach (var empanelledVendor in company.EmpanelledVendors)
-                        {
-                            foreach (var serviceType in empanelledVendor.VendorInvestigationServiceTypes)
-                            {
-                                if (serviceType.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId &&
-                                        serviceType.LineOfBusinessId == claimsInvestigation.PolicyDetail.LineOfBusinessId)
-                                {
-                                    var pincode = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.Code == pinCode2Verify);
-                                    if (serviceType.District.DistrictId == pincode.District.DistrictId)
-                                    {
-                                        vendorsInPincode.Add(empanelledVendor);
-                                        continue;
-                                    }
-                                }
-                                var added = vendorsInPincode.Any(v => v.VendorId == empanelledVendor.VendorId);
-                                if (added)
-                                {
-                                    continue;
-                                }
-                            }
-                        }
-                    }
-
-                    var distinctVendors = vendorsInPincode.Distinct()?.ToList();
-
-                    //3. CALL SERVICE WITH VENDORID
-                    if (vendorsInPincode is not null && vendorsInPincode.Count > 0)
-                    {
-                        var vendorsWithCaseLoad = (await claimsInvestigationService.GetAgencyLoad(distinctVendors)).OrderBy(o => o.CaseCount)?.ToList();
-
-                        if (vendorsWithCaseLoad is not null && vendorsWithCaseLoad.Count > 0)
-                        {
-                            var selectedVendor = vendorsWithCaseLoad.FirstOrDefault();
-
-                            var policy = await claimsInvestigationService.AllocateToVendor(userEmail, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.CaseLocationId);
-
-                            autoAllocatedClaims.Add(claim);
-
-                            await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimsInvestigation.ClaimsInvestigationId, selectedVendor.Vendor.VendorId, beneficiary.CaseLocationId);
-                        }
-                    }
-                }
                 if (claims.Count == autoAllocatedClaims.Count)
                 {
                     toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");

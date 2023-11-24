@@ -42,5 +42,12 @@ namespace risk.control.system.Services
                 Console.WriteLine(body);
             }
         }
+
+        public static Dictionary<string, object> SendSingleMessage(string mobile = "61432854196", string message = "Testing fom Azy", string? device = "0", long? timestamp = null, bool isMMS = false, string? attachments = null, bool priority = false)
+        {
+            // Send a message using the primary device.
+            var result = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
+            return result;
+        }
     }
 }

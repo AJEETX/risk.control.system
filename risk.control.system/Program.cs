@@ -84,11 +84,11 @@ builder.Services.AddControllersWithViews()
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//                    options.UseSqlite("Data Source=good2go.db"));
+//         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlite("Data Source=mobile-sms.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {

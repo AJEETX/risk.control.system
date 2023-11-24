@@ -81,6 +81,7 @@ namespace risk.control.system.Models
         public string RapidAPITaskId { get; set; } = "74f4c926-250c-43ca-9c53-453e87ceacd1";
         public string RapidAPIGroupId { get; set; } = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
         public string? RapidAPIPanRemainCount { get; set; } = "50";
+        public bool SendSMS { get; set; } = false;
     }
 
     public enum CompanyStatus

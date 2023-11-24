@@ -185,7 +185,7 @@
                                         </div>
                                     </div>
 *@
-<div class="form-group">
+                                    <div class="form-group">
                                         <span class="input-group-label"> Bank Account #: </span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -314,6 +314,19 @@
                                         </div>
                                     </div>
                                      
+                                    <div class="form-group">
+                                        <span class="input-group-label">Send SMS:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="send-sms"><i class="fas fa-portrait"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <span class="checkbox">
+                                                <input asp-for="SendSMS" type="checkbox" checked data-toggle="toggle" data-on="<i class='fas fa-check'></i>  " data-off="<i class='fa fa-times'></i> " data-onstyle="success" data-offstyle="secondary">
+
+                                            </span>
+                                        </div>
+                                    </div>
+
 
                                     <div class="form-group text-right">
                                         <a asp-action="Index" class="btn btn-secondary">

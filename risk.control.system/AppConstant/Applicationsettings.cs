@@ -5,11 +5,11 @@
         public const string Password = "R1$kcontrol!";
         public const string TestPassword = "R1$kcontrol";
         public const string PERMISSION = "Permission";
-
+        public static readonly string MOBILE = "61432854196";
         //WEBSITE SETTINGS
 
         public const string WEBSITE_SITE_MENU_BRAND = "aby";
-        public const string WEBSITE_COMPANY_MENU_BRAND = "sbi life";
+        public const string WEBSITE_COMPANY_MENU_BRAND = "iCheckify";
         public const string WEBSITE_TITLE = "iCheckify";
         public const string WEBSITE_SITE_MENU_LOGO = "/img/logo.png";
         public const string WEBSITE_SITE_DESIGNER = "its aby";
