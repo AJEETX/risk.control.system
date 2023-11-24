@@ -177,19 +177,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\upload-case\*.zip" />
+    <Folder Include="wwwroot\upload-case\*" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\upload-case\*" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="wwwroot\img\*.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="wwwroot\img\*.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="wwwroot\img\*.jpeg" />
+    <Folder Include="wwwroot\img\*" />
   </ItemGroup>
 
 </Project>
