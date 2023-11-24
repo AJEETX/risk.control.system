@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers
                     IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                     if (companyDocument is not null)
                     {
-                        string newFileName = Guid.NewGuid().ToString();
+                        string newFileName = clientCompany.Email;
                         string fileExtension = Path.GetExtension(companyDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -217,17 +217,22 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(ClientCompanyApplicationUser user, string emailSuffix)
         {
+            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                string newFileName = Guid.NewGuid().ToString();
+                string newFileName = userFullEmail;
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+
+                using var dataStream = new MemoryStream();
+                user.ProfileImage.CopyTo(dataStream);
+                user.ProfilePicture = dataStream.ToArray();
+
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
 
-            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
@@ -335,12 +340,15 @@ namespace risk.control.system.Controllers
                     var user = await userManager.FindByIdAsync(id);
                     if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
-                        string newFileName = Guid.NewGuid().ToString();
+                        string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                         applicationUser.ProfilePictureUrl = "/img/" + newFileName;
+                        using var dataStream = new MemoryStream();
+                        applicationUser.ProfileImage.CopyTo(dataStream);
+                        applicationUser.ProfilePicture = dataStream.ToArray();
                     }
 
                     if (user != null)
@@ -385,7 +393,7 @@ namespace risk.control.system.Controllers
                             else
                             {
                                 var createdUser = await userManager.FindByEmailAsync(user.Email);
-                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, false);
+                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
                                 var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
 
                                 if (lockUser.Succeeded && lockDate.Succeeded)

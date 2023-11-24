@@ -49,12 +49,11 @@ namespace risk.control.system.Controllers
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                 if (companyDocument is not null)
                 {
-                    string newFileName = Guid.NewGuid().ToString();
+                    string newFileName = clientCompany.Email;
                     string fileExtension = Path.GetExtension(companyDocument.FileName);
                     newFileName += fileExtension;
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
 
-                    clientCompany.Document = companyDocument;
                     using var dataStream = new MemoryStream();
                     companyDocument.CopyTo(dataStream);
                     clientCompany.DocumentImage = dataStream.ToArray();
@@ -187,7 +186,7 @@ namespace risk.control.system.Controllers
                     IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                     if (companyDocument is not null)
                     {
-                        string newFileName = Guid.NewGuid().ToString();
+                        string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(companyDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);

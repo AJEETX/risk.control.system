@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers
                     IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                     if (vendorDocument is not null)
                     {
-                        string newFileName = Guid.NewGuid().ToString();
+                        string newFileName = vendor.Email;
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -191,11 +191,14 @@ namespace risk.control.system.Controllers
             var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                string newFileName = Guid.NewGuid().ToString();
+                string newFileName = userFullEmail;
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                using var dataStream = new MemoryStream();
+                user.ProfileImage.CopyTo(dataStream);
+                user.ProfilePicture = dataStream.ToArray();
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
             user.Email = userFullEmail;
@@ -297,11 +300,14 @@ namespace risk.control.system.Controllers
                     var user = await userManager.FindByIdAsync(id);
                     if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
-                        string newFileName = Guid.NewGuid().ToString();
+                        string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                        using var dataStream = new MemoryStream();
+                        applicationUser.ProfileImage.CopyTo(dataStream);
+                        applicationUser.ProfilePicture = dataStream.ToArray();
                         applicationUser.ProfilePictureUrl = "/img/" + newFileName;
                     }
 

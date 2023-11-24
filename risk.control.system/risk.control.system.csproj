@@ -177,7 +177,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\upload-case\" />
+    <Folder Include="wwwroot\upload-case\*.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\upload-case\*" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\img\*.jpg" />

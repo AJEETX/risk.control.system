@@ -134,7 +134,7 @@ namespace risk.control.system.Controllers
                     thisViewModel.CountryId = user.CountryId;
                     thisViewModel.StateId = user.StateId;
                     thisViewModel.State = state.Name;
-                    thisViewModel.PinCode = pinCode.Name;
+                    thisViewModel.PinCode = pinCode.Name + "-" + pinCode.Code;
                     thisViewModel.PinCodeId = pinCode.PinCodeId;
                     thisViewModel.CompanyName = company.Name;
                     thisViewModel.CompanyId = user.ClientCompanyId;
@@ -189,11 +189,14 @@ namespace risk.control.system.Controllers
         {
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                string newFileName = Guid.NewGuid().ToString();
+                string newFileName = user.Email;
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                using var dataStream = new MemoryStream();
+                user.ProfileImage.CopyTo(dataStream);
+                user.ProfilePicture = dataStream.ToArray();
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
             user.EmailConfirmed = true;
@@ -248,15 +251,15 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             clientCompanyApplicationUser.ClientCompany = clientCompany;
-            var country = _context.Country.Where(c => c.CountryId == clientCompany.CountryId);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
+            var country = _context.Country.Where(c => c.CountryId == clientCompanyApplicationUser.CountryId);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
 
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompany.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompany.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompany.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompanyApplicationUser.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
             return View(clientCompanyApplicationUser);
         }
 
@@ -280,17 +283,20 @@ namespace risk.control.system.Controllers
                     var user = await userManager.FindByIdAsync(id);
                     if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
-                        string newFileName = Guid.NewGuid().ToString();
+                        string newFileName = user.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                        using var dataStream = new MemoryStream();
+                        applicationUser.ProfileImage.CopyTo(dataStream);
+                        applicationUser.ProfilePicture = dataStream.ToArray();
                         applicationUser.ProfilePictureUrl = "/img/" + newFileName;
                     }
 
                     if (user != null)
                     {
-                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
+                        user.ProfilePicture = applicationUser?.ProfilePicture ?? user.ProfilePicture;
                         user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                         user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                         user.FirstName = applicationUser?.FirstName;
