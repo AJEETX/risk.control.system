@@ -48,7 +48,7 @@
             position: fixed;
             z-index: 10000;
             color: red;
-            transform: rotate(-45deg);
+            transform: rotate(-40deg);
             opacity: 0.1;
             height: 60px;
         }
@@ -97,12 +97,13 @@
                     </div>
                 </div>
             </div>*@
+            <div id="watermark">
+                <img class="watermark" src="~/img/demo.png" />
+            </div>
             <breadcrumb></breadcrumb>
             <div id="main-content" class="content">
                 <main>
-                    <div id="watermark">
-                        <img class="watermark" src="~/img/demo.png" />
-                    </div>
+                    
                 @RenderBody()
                 </main>
             </div>

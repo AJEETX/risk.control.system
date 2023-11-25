@@ -113,8 +113,8 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="number" asp-for="PhoneNumber" class="form-control" required maxlength="10" value="" placeholder="Phone # (10 digit)"
-                                            min="2222222222" max="9999999999" />
+                                            <input type="text" asp-for="PhoneNumber" class="form-control" required maxlength="14" value="" placeholder="Phone # with country code"
+                                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
                                     </div>

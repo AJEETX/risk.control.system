@@ -8,6 +8,8 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -42,14 +44,14 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Create(ClientCompany clientCompany)
+        public async Task<IActionResult> Create(ClientCompany clientCompany, string domainAddress, string mailAddress)
         {
             if (clientCompany is not null)
             {
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                 if (companyDocument is not null)
                 {
-                    string newFileName = clientCompany.Email;
+                    string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
                     string fileExtension = Path.GetExtension(companyDocument.FileName);
                     newFileName += fileExtension;
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -60,7 +62,11 @@ namespace risk.control.system.Controllers
                     companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                     clientCompany.DocumentUrl = "/img/" + newFileName;
                 }
-                clientCompany.Email = clientCompany.Email.Trim().ToLower();
+                Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
+
+                clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
+
+                var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
                 clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(clientCompany);

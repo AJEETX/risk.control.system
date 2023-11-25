@@ -78,13 +78,15 @@ body {
     position: fixed;
     z-index: 10000;
     color: red;
-    transform: rotate(-45deg);
+    transform: rotate(-40deg);
     opacity: 0.1;
     height: 60px;
 }
+
 .watermark {
     height: 60px;
 }
+
 .footer {
     position: absolute;
     bottom: 0;
@@ -600,11 +602,13 @@ dl.row {
     color: red;
     padding-bottom: 1rem;
 }
+
 .asterik-style-none {
     font-size: .4rem;
     color: #e9ecef;
     padding-bottom: 1rem;
 }
+
 div. {
     min-height: 70vh;
 }
