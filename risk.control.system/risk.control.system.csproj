@@ -175,9 +175,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="wwwroot\upload-case" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="wwwroot\upload-file" />
+    <Folder Include="wwwroot\download-case\" />
+    <Folder Include="wwwroot\download-file\" />
+    <Folder Include="wwwroot\upload-case\" />
+    <Folder Include="wwwroot\upload-file\" />
+    <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 </Project>
