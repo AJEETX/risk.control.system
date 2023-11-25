@@ -47,10 +47,9 @@ builder.Services.AddCors(opt =>
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
-    x.ValueLengthLimit = int.MaxValue;
-    x.MultipartBodyLengthLimit = int.MaxValue; // In case of multipart
-    x.ValueLengthLimit = int.MaxValue; //not recommended value
-    x.MemoryBufferThreshold = Int32.MaxValue;
+    x.MultipartBodyLengthLimit = 1000000; // In case of multipart
+    x.ValueLengthLimit = 1000000; //not recommended value
+    x.MemoryBufferThreshold = 1000000;
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -88,7 +87,7 @@ builder.Services.AddControllersWithViews()
 //         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=uoload-good.db"));
+                    options.UseSqlite("Data Source=try-upload.db"));
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -171,12 +170,12 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 app.UseSwagger();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Home/Error");
+//    app.UseHsts();
+//}
+//app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
 app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);
