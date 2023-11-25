@@ -34,11 +34,13 @@ namespace risk.control.system.Controllers
         private readonly IMailboxService mailboxService;
         private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
 
         public ClaimsVendorController(
             IClaimsInvestigationService claimsInvestigationService,
             UserManager<VendorApplicationUser> userManager,
+            IWebHostEnvironment webHostEnvironment,
             IDashboardService dashboardService,
             IMailboxService mailboxService,
             IToastNotification toastNotification,
@@ -50,6 +52,7 @@ namespace risk.control.system.Controllers
             this.mailboxService = mailboxService;
             this.toastNotification = toastNotification;
             this._context = context;
+            this.webHostEnvironment = webHostEnvironment;
             UserList = new List<UsersViewModel>();
         }
 
@@ -975,9 +978,28 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
+        [HttpGet]
+        public async Task<IActionResult> PrintReport(int id)
         {
-            return new List<string>(await userManager.GetRolesAsync(user));
+            var file = "report.pdf";
+
+            string folder = Path.Combine(webHostEnvironment.WebRootPath, Path.GetFileNameWithoutExtension(file));
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, Path.GetFileNameWithoutExtension(file), file);
+
+            ReportRunner.Run(webHostEnvironment.WebRootPath).Build(filePath); ;
+            if (file == null) return null;
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+            return File(memory, "application/pdf", file);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -228,7 +227,6 @@ namespace risk.control.system.Controllers
                     await _context.SaveChangesAsync();
 
                     var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
-
                 }
                 catch (DbUpdateConcurrencyException)
                 {

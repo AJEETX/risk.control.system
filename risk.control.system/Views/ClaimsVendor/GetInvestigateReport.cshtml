@@ -81,7 +81,10 @@
                                 <article>
                                     <div class="bb-blog-inner">
                                         <header class="bb-blog-header">
-                                            <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Policy # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber</h5>
+                                            <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i>
+                                                <a asp-controller="ClaimsVendor" asp-action="PrintReport" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId">
+                                                Policy # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber </a>
+                                            </h5>
                                         </header>
                                         <div class="card card-solid">
                                             <div class="progress">
@@ -688,7 +691,7 @@
                                                                         <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
                                                                     </a>
                                                                     <a asp-controller="ClaimsVendor" asp-action="ReSelectVendorAgent" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
-                                                                        <i class="fas fa-sync" aria-hidden="true"></i> Re- Allocate
+                                                                        <i class="fas fa-sync" aria-hidden="true"></i> Allocate
                                                                     </a>
                                                                     <button disabled id="allocate-case" type="submit" asp-action="ProcessReport" class="btn btn-success">
                                                                         <i class="far fa-file-alt" aria-hidden="true"></i> SUBMIT
