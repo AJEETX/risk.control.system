@@ -39,7 +39,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = false,
                 IsVendorAdmin = true,
                 Addressline = "123 Benaras Gali",
-                PhoneNumber = Applicationsettings.MOBILE,
+                PhoneNumber = Applicationsettings.ADMIN_MOBILE,
                 VendorId = vendor.VendorId,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = district?.DistrictId ?? default!,

@@ -5,6 +5,7 @@
         public const string Password = "R1$kcontrol!";
         public const string TestPassword = "R1$kcontrol";
         public const string PERMISSION = "Permission";
+        public static readonly string ADMIN_MOBILE = "61404723089";
         public static readonly string MOBILE = "61432854196";
         //WEBSITE SETTINGS
 

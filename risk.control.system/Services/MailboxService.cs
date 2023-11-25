@@ -59,6 +59,7 @@ namespace risk.control.system.Services
             //1. get vendor admin and supervisor email
 
             var supervisorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Supervisor.ToString()));
+            var agencyAdminRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.AgencyAdmin.ToString()));
 
             var vendorUsers = _context.VendorApplicationUser.Where(u => u.VendorId == vendorId);
 
@@ -66,8 +67,13 @@ namespace risk.control.system.Services
 
             foreach (var assignedUser in vendorUsers)
             {
-                var isTrue = await userVendorManager.IsInRoleAsync(assignedUser, supervisorRole?.Name);
-                if (isTrue)
+                var isAdmin = await userVendorManager.IsInRoleAsync(assignedUser, agencyAdminRole?.Name);
+                if (isAdmin)
+                {
+                    userEmailsToSend.Add(assignedUser);
+                }
+                var isSupervisor = await userVendorManager.IsInRoleAsync(assignedUser, supervisorRole?.Name);
+                if (isSupervisor)
                 {
                     userEmailsToSend.Add(assignedUser);
                 }
