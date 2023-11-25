@@ -15,7 +15,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Company User")]
+    [Breadcrumb("Company User", FromController = typeof(ClientCompanyController))]
     public class CompanyUserController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -172,7 +172,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanyApplicationUser/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add User", FromController = typeof(ClientCompanyController))]
         public IActionResult Create(string id)
         {
             var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == id);
@@ -212,7 +212,6 @@ namespace risk.control.system.Controllers
                 var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account created. Domain : " + user.Email);
 
                 return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
-
             }
             else
             {
@@ -234,7 +233,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanyApplicationUser/Edit/5
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit User", FromController = typeof(ClientCompanyController))]
         public async Task<IActionResult> Edit(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)

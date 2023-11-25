@@ -185,7 +185,6 @@ namespace risk.control.system.Controllers
                     await _context.SaveChangesAsync();
 
                     var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company edited. Domain : " + clientCompany.Email);
-
                 }
                 catch (Exception)
                 {
@@ -262,7 +261,7 @@ namespace risk.control.system.Controllers
                 else
                 {
                     toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
-                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created . Email : " + user.Email);
+                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created . Email : " + user.Email);
                     return RedirectToAction(nameof(CompanyController.User), "Company");
                 }
                 toastNotification.AddSuccessToastMessage("User created successfully!");

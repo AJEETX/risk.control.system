@@ -169,10 +169,17 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", clientCompany.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", clientCompany.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode, "PinCodeId", "Name", clientCompany.PinCodeId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", clientCompany.StateId);
+
+            var country = _context.Country.Where(c => c.CountryId == clientCompany.CountryId);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
+
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompany.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompany.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompany.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompany.PinCodeId);
+
             return View(clientCompany);
         }
 

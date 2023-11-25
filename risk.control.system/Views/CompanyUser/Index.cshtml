@@ -11,20 +11,20 @@
             <div class="col-md-12">
                     <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title">@Model.Company.Name @Applicationsettings.USER</h3>
+                        <h3 class="card-title"><i class="fas fa-user-plus"></i> Company @Applicationsettings.USER</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-12 text-right">
                                     @*<a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.Company.ClientCompanyId" class="btn btn-secondary"><i class='fas fa-undo'></i> @Applicationsettings.BACK</a>*@
-                                    <a class="btn btn-success" asp-controller="CompanyUser" asp-action="Create" asp-route-id="@Model.Company.ClientCompanyId"><i class="fas fa-plus"></i> @Applicationsettings.CREATE</a>
+                                    <a class="btn btn-success" asp-controller="CompanyUser" asp-action="Create" asp-route-id="@Model.Company.ClientCompanyId"><i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User</a>
                                 </div>
                             </div>
                         </div>
                 </div>
                 <div class="card card-secondary">
                     <div class="card-header">
-                            <h3 class="card-title">@Model.Company.Name Users</h3>
+                        <h3 class="card-title"><i class="fas fa-list"></i>  Company Users</h3>
                         </div>
                     <div class="card-body">
                         

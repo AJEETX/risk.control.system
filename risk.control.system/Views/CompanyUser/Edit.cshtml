@@ -2,18 +2,23 @@
 
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
+    var email = Model.ClientCompany.Email;
+    var emailAtIndex = email.IndexOf("@");
+    if (emailAtIndex > 0)
+    {
+        email = email.Substring(emailAtIndex + 1);
+    }
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
-<h3><i class="fas fa-folder-open"></i> Client Companies</h3>
 
-<section class="content">
-    <div class="container-fluid ">
+<section class="content pt-2">
+    <div class="container-fluid">
         <form asp-action="Edit" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-warning">
+                    <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen"></i> Edit  @Applicationsettings.CLIENT_COMPANY @Model.ClientCompany.Name @Applicationsettings.USER</h3>
+                            <h3 class="card-title"><i class="fas fa-user-plus"></i> Edit @Applicationsettings.USER</h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -84,7 +89,7 @@
 
                                    <div class="form-group">
                                         <label asp-for="ProfileImage" class="control-label"></label>
-                                        @if (Model?.ProfilePicture is not null)
+                                        @if (Model?.ProfilePictureUrl is not null)
                                         {
                                                     <img id="ProfileImage" class="form-Image" src="@Model?.ProfilePictureUrl">
                                         }
@@ -101,7 +106,7 @@
                                             @Applicationsettings.CANCEL
                                         </a>
                                         <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-plus"></i> @Applicationsettings.EDIT
+                                            <i class="fas fa-user-plus"></i> @Applicationsettings.EDIT User
                                         </button>
                                     </div>
                                 </div>

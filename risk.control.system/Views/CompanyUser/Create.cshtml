@@ -2,23 +2,64 @@
 
 @{
     ViewData["Title"] = Applicationsettings.CREATE;
+    var email = Model.ClientCompany.Email;
+    var emailAtIndex = email.IndexOf("@");
+    if (emailAtIndex > 0)
+    {
+        email = email.Substring(emailAtIndex + 1);
+    }
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
-<h3><i class="fas fa-folder-open"></i> Client Companies</h3>
-
-<section class="content">
+<section class="content pt-2">
     <div class="container-fluid ">
-        <form asp-action="Create" enctype="multipart/form-data">
+        
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-success">
+                    <div class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-plus"></i>  Create @Applicationsettings.CLIENT_COMPANY @Model.ClientCompany.Name @Applicationsettings.USER</h3>
+                            <h3 class="card-title"><i class="fas fa-user-plus"></i>  Add @Applicationsettings.USER</h3>
                         </div>
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-md-3">
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <span class="input-group-label"> Email:</span>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
+                                        </div>
+                                        <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" value="" onblur="CheckIfEmailValid();" required
+                                               placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="off">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="Email">@@@email</span>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <button disabled id="check-email" class="input-group-text" onclick="checkUserEmail();">
+                                                <span class="badge badge-default">Check</span>
+                                            </button>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <span id="result"></span>
+                                        </div>
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                            </div>
+
+                        </div>
+                    </div>
+                        
+                    <form asp-action="Create" enctype="multipart/form-data">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <div class="form-group hide-id">
                                         <label asp-for="ClientCompanyId" class="control-label"></label>
                                         <input asp-for="ClientCompanyId" class="form-control" value="@Model.ClientCompany.ClientCompanyId" />
@@ -41,7 +82,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Password" class="control-label"></label>
-                                        <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password"  />
+                                        <input asp-for="Password" type="password" class="form-control" required placeholder="Enter Password" />
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
 
@@ -56,58 +97,64 @@
                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
-                                    <div class="form-group">
-                                        <label asp-for="ProfileImage" class="control-label"></label>
-                                            <img id="ProfileImage" class="form-Image">
-                                        <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
-                                    </div>
+
                                 </div>
                                 <div class="col-md-6">
-                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                        <div class="form-group">
-                                            <label asp-for="CountryId" class="control-label"></label>
-                                            <select required asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                                <option>--- SELECT COUNTRY ---</option>
-                                            </select>
-                                            <span asp-validation-for="CountryId" class="text-danger"></span>
+                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                    <div class="form-group">
+                                        <label asp-for="CountryId" class="control-label"></label>
+                                        <select required asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                            <option>--- SELECT COUNTRY ---</option>
+                                        </select>
+                                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="StateId" class="control-label"></label>
+                                        <select required id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                            <option>--- SELECT STATE ---</option>
+                                        </select>
+                                        <span asp-validation-for="StateId" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="DistrictId" class="control-label"></label>
+                                        <select required id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                            <option>--- SELECT DISTRICT ---</option>
+                                        </select>
+                                        <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label asp-for="PinCodeId" class="control-label"></label>
+                                        <select required id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                            <option>--- SELECT PINCODE ---</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Photo:</span>
+                                        <div class="input-group mb-3">
+
+                                            <img id="ProfileImage" class="form-Image" src="/img/user.png">
+
+                                            <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+
                                         </div>
-                                        <div class="form-group">
-                                            <label asp-for="StateId" class="control-label"></label>
-                                            <select required id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                                <option>--- SELECT STATE ---</option>
-                                            </select>
-                                            <span asp-validation-for="StateId" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="DistrictId" class="control-label"></label>
-                                            <select required id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                                <option>--- SELECT DISTRICT ---</option>
-                                            </select>
-                                            <span asp-validation-for="DistrictId" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <label asp-for="PinCodeId" class="control-label"></label>
-                                            <select required id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
-                                                <option>--- SELECT PINCODE ---</option>
-                                            </select>
-                                        </div>
-                                    
+                                    </div>
                                     <div class="form-group text-right">
                                         <a asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompany.ClientCompanyId" class="btn btn-secondary">
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
                                         </a>
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="fas fa-plus"></i> @Applicationsettings.CREATE
-                                            </button>
-                                        </div>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-user-plus"></i> @Applicationsettings.CREATE User
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </form>
+
                     </div>
                 </div>
             </div>
-        </form>
     </div>
 </section>
 
