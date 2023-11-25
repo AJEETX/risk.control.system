@@ -8,6 +8,7 @@ using risk.control.system.Models;
 using SmartBreadcrumbs.Attributes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
@@ -143,6 +144,9 @@ namespace risk.control.system.Controllers
                         if (result.Succeeded)
                         {
                             toastNotification.AddSuccessToastMessage("User profile edited successfully!");
+
+                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited. Email : " + user.Email);
+
                             return RedirectToAction(nameof(Index), "Dashboard");
                         }
                         Errors(result);

@@ -6,6 +6,7 @@ using NToastNotify;
 using risk.control.system.AppConstant;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -94,6 +95,7 @@ namespace risk.control.system.Controllers
             var currentUser = await userManager.GetUserAsync(User);
             await signInManager.RefreshSignInAsync(currentUser);
 
+            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User role edited. Email : " + user.Email);
             toastNotification.AddSuccessToastMessage("roles updated successfully!");
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { Id = model.VendorId });
         }

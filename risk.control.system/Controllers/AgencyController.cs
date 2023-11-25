@@ -147,6 +147,9 @@ namespace risk.control.system.Controllers
                     vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.Vendor.Update(vendor);
                     await _context.SaveChangesAsync();
+
+                    var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -219,12 +222,15 @@ namespace risk.control.system.Controllers
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
                         toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+
                         return RedirectToAction(nameof(AgencyController.User), "Agency");
                     }
                 }
                 else
                 {
                     toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
+                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
             }
@@ -347,6 +353,7 @@ namespace risk.control.system.Controllers
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
                                     toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User edited and locked successfully!");
+                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
                                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                                 }
                             }
@@ -359,6 +366,7 @@ namespace risk.control.system.Controllers
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
                                     toastNotification.AddSuccessToastMessage("User edited and unlocked successfully!");
+                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                                 }
                             }
@@ -445,6 +453,7 @@ namespace risk.control.system.Controllers
                 Where(x => x.Selected).Select(y => y.RoleName));
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
+            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user role edited. Email : " + user.Email);
 
             toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
             return RedirectToAction(nameof(AgencyController.User), "Agency");

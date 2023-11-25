@@ -752,6 +752,7 @@ namespace risk.control.system.Services
                 _context.InvestigationTransaction.Add(log);
 
                 await _context.SaveChangesAsync();
+
                 return claimsCaseToAllocateToVendor;
             }
             return null;

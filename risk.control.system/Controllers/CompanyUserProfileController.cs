@@ -8,6 +8,7 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -144,6 +145,7 @@ namespace risk.control.system.Controllers
                         if (result.Succeeded)
                         {
                             toastNotification.AddSuccessToastMessage("user profile edited successfully!");
+                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User edited . Email : " + user.Email);
                             return RedirectToAction(nameof(Index), "Dashboard");
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");

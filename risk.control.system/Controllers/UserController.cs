@@ -9,6 +9,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -101,6 +102,8 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 toastNotification.AddSuccessToastMessage("User created successfully!");
+                var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created. Email : " + user.Email);
+
                 return RedirectToAction(nameof(Index));
             }
             else
@@ -206,6 +209,7 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
+                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User edited. Email : " + user.Email);
                             toastNotification.AddSuccessToastMessage("User edited successfully!");
                             return RedirectToAction(nameof(Index));
                         }

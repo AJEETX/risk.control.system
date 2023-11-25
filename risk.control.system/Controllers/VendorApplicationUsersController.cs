@@ -15,6 +15,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -134,11 +135,13 @@ namespace risk.control.system.Controllers
 
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
+                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
                         toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
                     }
                 }
                 else
                 {
+                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
                     toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
                 }
                 return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
@@ -265,7 +268,8 @@ namespace risk.control.system.Controllers
 
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
-                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User edited and locked successfully!");
                                 }
                             }
                             else
@@ -276,6 +280,7 @@ namespace risk.control.system.Controllers
 
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
+                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                                     toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> User edited and unlocked successfully!");
                                 }
                             }

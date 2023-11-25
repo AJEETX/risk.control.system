@@ -8,6 +8,7 @@ using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
@@ -133,6 +134,9 @@ namespace risk.control.system.Controllers
 
                     _context.Add(vendor);
                     await _context.SaveChangesAsync();
+                    var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
+
+
                     toastNotification.AddSuccessToastMessage("agency created successfully!");
                     return RedirectToAction(nameof(Index));
                 }
@@ -241,6 +245,7 @@ namespace risk.control.system.Controllers
                             _context.ClientCompany.Update(company);
                         }
                     }
+                    var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

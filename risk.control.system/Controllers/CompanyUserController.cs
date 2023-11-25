@@ -9,6 +9,7 @@ using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
 
@@ -207,7 +208,12 @@ namespace risk.control.system.Controllers
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)
+            {
+                var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account created. Domain : " + user.Email);
+
                 return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
+
+            }
             else
             {
                 toastNotification.AddErrorToastMessage("Error to create user!");
@@ -322,6 +328,8 @@ namespace risk.control.system.Controllers
                         if (result.Succeeded)
                         {
                             toastNotification.AddSuccessToastMessage("Company user edited successfully!");
+                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
+
                             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user con't be edited!");

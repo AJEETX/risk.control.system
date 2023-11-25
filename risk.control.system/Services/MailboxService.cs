@@ -10,6 +10,8 @@ using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
 namespace risk.control.system.Services
 {
     public interface IMailboxService
@@ -117,11 +119,10 @@ namespace risk.control.system.Services
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
-
                 //SEND SMS
                 if (company.SendSMS)
                 {
-                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, "Claim(s) allocated: Policy #" + policy + " ");
+                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, "Claim(s) allocated (" + userEmailToSend.Email + "): Policy #" + policy + " ", true);
                 }
                 //SMS ::END
             }
@@ -139,26 +140,20 @@ namespace risk.control.system.Services
         public async Task NotifyClaimAssignmentToAssigner(string senderUserEmail, List<string> claims)
         {
             var applicationUser = _context.ApplicationUser.Where(u => u.Email == senderUserEmail).FirstOrDefault();
-            List<string> userEmailsToSend = new();
+            List<ClientCompanyApplicationUser> userEmailsToSend = new List<ClientCompanyApplicationUser>();
 
             var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == applicationUser.Email);
-            if (clientCompanyUser == null)
-            {
-                userEmailsToSend.Add(senderUserEmail);
-            }
-            else
-            {
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+            var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
-                foreach (var companyUser in companyUsers)
+            var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
+
+            foreach (var companyUser in companyUsers)
+            {
+                var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
+                if (isAssigner)
                 {
-                    var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
-                    if (isAssigner)
-                    {
-                        userEmailsToSend.Add(companyUser.Email);
-                    }
+                    userEmailsToSend.Add(companyUser);
                 }
             }
 
@@ -171,10 +166,11 @@ namespace risk.control.system.Services
             StreamReader str = new StreamReader(FilePath);
             string MailText = str.ReadToEnd();
             str.Close();
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
             foreach (var userEmailToSend in userEmailsToSend)
             {
-                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend);
+                var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmailToSend.Email);
                 var contactMessage = new InboxMessage
                 {
                     //ReceipientEmail = userEmailToSend,
@@ -209,6 +205,12 @@ namespace risk.control.system.Services
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
+                //SEND SMS
+                if (company.SendSMS)
+                {
+                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigations.Count() + " ");
+                }
+                //SMS ::END
             }
             try
             {
@@ -225,6 +227,7 @@ namespace risk.control.system.Services
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
             var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == agentEmail);
+            var recepientUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == agentEmail);
 
             string claimsUrl = $"{AgencyBaseUrl + claimId}";
 
@@ -237,6 +240,7 @@ namespace risk.control.system.Services
                 .Include(i => i.PolicyDetail)
                 .Include(i => i.InvestigationCaseSubStatus)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
 
             var contactMessage = new InboxMessage
             {
@@ -268,6 +272,10 @@ namespace risk.control.system.Services
             try
             {
                 var rows = await _context.SaveChangesAsync();
+                if (company.SendSMS)
+                {
+                    var result = SmsService.SendSingleMessage(recepientUser.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                }
             }
             catch (Exception ex)
             {
@@ -379,6 +387,8 @@ namespace risk.control.system.Services
                     .Include(i => i.InvestigationCaseSubStatus)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
 
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
+
                 foreach (var user in users)
                 {
                     var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == user.Email);
@@ -409,6 +419,10 @@ namespace risk.control.system.Services
                     recepientMailbox?.Inbox.Add(contactMessage);
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
+                    if (company.SendSMS)
+                    {
+                        var result = SmsService.SendSingleMessage(user.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                    }
                 }
                 try
                 {
@@ -451,6 +465,7 @@ namespace risk.control.system.Services
                     .Include(i => i.PolicyDetail)
                     .Include(i => i.InvestigationCaseSubStatus)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
 
                 foreach (var user in users)
                 {
@@ -482,6 +497,10 @@ namespace risk.control.system.Services
                     recepientMailbox?.Inbox.Add(contactMessage);
                     _context.Mailbox.Attach(recepientMailbox);
                     _context.Mailbox.Update(recepientMailbox);
+                    if (company.SendSMS)
+                    {
+                        var result = SmsService.SendSingleMessage(user.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                    }
                 }
                 try
                 {
@@ -522,6 +541,7 @@ namespace risk.control.system.Services
                 .Include(i => i.PolicyDetail)
                 .Include(i => i.InvestigationCaseSubStatus)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
 
             foreach (var user in users)
             {
@@ -553,6 +573,10 @@ namespace risk.control.system.Services
                 recepientMailbox?.Inbox.Add(contactMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);
+                if (company.SendSMS)
+                {
+                    var result = SmsService.SendSingleMessage(user.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                }
             }
             try
             {

@@ -67,6 +67,7 @@ namespace risk.control.system.Controllers
                 clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
 
                 var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
+
                 clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(clientCompany);
@@ -121,6 +122,9 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
+
             toastNotification.AddSuccessToastMessage("client company deleted successfully!");
             return RedirectToAction(nameof(Index));
         }
@@ -215,6 +219,9 @@ namespace risk.control.system.Controllers
                     clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(clientCompany);
                     await _context.SaveChangesAsync();
+
+                    var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account edited. Domain : " + clientCompany.Email);
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
