@@ -83,12 +83,18 @@ builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlite("Data Source=mobile.db"));
+var isProd = builder.Configuration.GetSection("IsProd").Value;
+var prod = bool.Parse(isProd);
+if (prod)
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
+else
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                        options.UseSqlite("Data Source=mobile.db"));
+}
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -171,12 +177,12 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 app.UseSwagger();
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Home/Error");
-//    app.UseHsts();
-//}
-//app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
 app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);
