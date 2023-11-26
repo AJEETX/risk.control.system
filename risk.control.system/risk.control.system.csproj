@@ -35,6 +35,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
     <PackageReference Include="Gehtsoft.PDFFlowLib" Version="2.1.1" />
     <PackageReference Include="Haru.Net" Version="1.0.11" />
+    <PackageReference Include="Gehtsoft.PDFFlowLib.Barcodes" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -182,6 +183,5 @@
     <Folder Include="wwwroot\upload-case\" />
     <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\img\" />
-    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 </Project>

@@ -49,5 +49,14 @@ namespace risk.control.system.Controllers.Api
 
             return Ok(verifiedPanResponse);
         }
+
+        [AllowAnonymous]
+        [HttpGet("GetAddressByLatLng")]
+        public async Task<IActionResult> GetAddressByLatLng(string lat, string lng)
+        {
+            var verifiedPanResponse = await httpClientService.GetAddress(lat, lng);
+
+            return Ok(verifiedPanResponse);
+        }
     }
 }

@@ -164,7 +164,7 @@ namespace risk.control.system.Helpers
                 .AddColumnPercentToTable("", 19)
                 .AddColumnPercentToTable("", 17)
                 .AddColumnPercentToTable("", 16)
-                .AddColumnPercent("", 16);
+                .AddColumnPercentToTable("", 16);
             var rowBuilder = tableBuilder.AddRow();
             rowBuilder
                 .ApplyStyle(

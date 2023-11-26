@@ -10,18 +10,24 @@ using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text.RegularExpressions;
 using risk.control.system.Helpers;
+using Microsoft.AspNetCore.Hosting;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
     public class ReportController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IHttpClientService httpClientService;
         private readonly HttpClient _httpClient;
         private Regex longLatRegex = new Regex("(?<lat>[-|+| ]\\d+.\\d+)\\s* \\/\\s*(?<lon>\\d+.\\d+)");
 
-        public ReportController(ApplicationDbContext context)
+        public ReportController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IHttpClientService httpClientService)
         {
             this._context = context;
+            this.webHostEnvironment = webHostEnvironment;
+            this.httpClientService = httpClientService;
             _httpClient = new HttpClient();
         }
 
@@ -111,7 +117,7 @@ namespace risk.control.system.Controllers
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.LocationUrl = url;
-                RootObject rootObject = getAddress(latitude, longitude);
+                RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
 
                 double registeredLatitude = 0;
                 double registeredLongitude = 0;
@@ -133,7 +139,7 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                RootObject rootObject = getAddress("-37.839542", "145.164834");
+                RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
                 ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 ViewBag.LocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
@@ -145,7 +151,7 @@ namespace risk.control.system.Controllers
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
                 ViewBag.OcrLocationUrl = url;
-                RootObject rootObject = getAddress(latitude, longitude);
+                RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
 
                 double registeredLatitude = 0;
                 double registeredLongitude = 0;
@@ -162,7 +168,7 @@ namespace risk.control.system.Controllers
             }
             else
             {
-                RootObject rootObject = getAddress("-37.839542", "145.164834");
+                RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
                 ViewBag.OcrLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 ViewBag.OcrLocationUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
@@ -178,15 +184,39 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        public static RootObject getAddress(string lat, string lon)
+        [HttpGet]
+        [Breadcrumb(title: " Report", FromAction = "Detail")]
+        public async Task<IActionResult> PrintReport(string id)
         {
-            WebClient webClient = new WebClient();
-            webClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
-            webClient.Headers.Add("Referer", "http://www.microsoft.com");
-            var jsonData = webClient.DownloadData("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
-            RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
-            return rootObject;
+            var file = "report" + id + ".pdf";
+
+            var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(r => r.ClaimReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == id);
+
+            var policy = claim.PolicyDetail;
+            var customer = claim.CustomerDetail;
+            var beneficiary = claim.CaseLocations.FirstOrDefault();
+            var report = claim.CaseLocations.FirstOrDefault()?.ClaimReport;
+
+            string folder = Path.Combine(webHostEnvironment.WebRootPath, Path.GetFileNameWithoutExtension(file));
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, Path.GetFileNameWithoutExtension(file), file);
+
+            PdfReportRunner.Run(webHostEnvironment.WebRootPath).Build(filePath); ;
+            if (file == null) return null;
+            var memory = new MemoryStream();
+            using var stream = new FileStream(filePath, FileMode.Open);
+            await stream.CopyToAsync(memory);
+            memory.Position = 0;
+            return File(memory, "application/pdf", file);
         }
 
         public async Task<RootObject> GetAddress(string lat, string lon)

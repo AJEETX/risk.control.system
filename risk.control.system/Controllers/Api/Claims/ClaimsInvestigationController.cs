@@ -18,6 +18,7 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Collections.Generic;
 using Highsoft.Web.Mvc.Charts;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
@@ -30,12 +31,14 @@ namespace risk.control.system.Controllers.Api.Claims
         private String _password = "C0##ect10n";
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IHttpClientService httpClientService;
         private static HttpClient httpClient = new HttpClient();
 
-        public ClaimsInvestigationController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+        public ClaimsInvestigationController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IHttpClientService httpClientService)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.httpClientService = httpClientService;
         }
 
         [HttpGet("GetActive")]
@@ -1919,7 +1922,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 faceLat = beneficiary.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
                 faceLng = beneficiary.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim();
                 var longLatString = faceLat + "," + faceLng;
-                RootObject rootObject = ReportController.getAddress((faceLat), (faceLng));
+                RootObject rootObject = await httpClientService.GetAddress((faceLat), (faceLng));
                 imageAddress = rootObject.display_name;
                 mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
@@ -1933,7 +1936,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 ocrLatitude = beneficiary.ClaimReport.OcrLongLat.Substring(0, ocrlongLat)?.Trim();
                 ocrLongitude = beneficiary.ClaimReport.OcrLongLat.Substring(ocrlongLat + 1)?.Trim();
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
-                RootObject rootObject = ReportController.getAddress((ocrLatitude), (ocrLongitude));
+                RootObject rootObject = await httpClientService.GetAddress((ocrLatitude), (ocrLongitude));
                 ocrAddress = rootObject.display_name;
                 ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             }
@@ -1982,7 +1985,7 @@ namespace risk.control.system.Controllers.Api.Claims
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
 
             var longLatString = latitude + "," + longitude;
-            RootObject rootObject = ReportController.getAddress((latitude), (longitude));
+            RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
             var imageAddress = rootObject.display_name;
             var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             var data = new
@@ -2019,7 +2022,7 @@ namespace risk.control.system.Controllers.Api.Claims
             string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \r\nElevation(sea level):{weatherData.elevation} metres";
 
             var longLatString = latitude + "," + longitude;
-            RootObject rootObject = ReportController.getAddress((latitude), (longitude));
+            RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
             var imageAddress = rootObject.display_name;
             var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
             var data = new
