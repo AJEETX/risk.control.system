@@ -187,8 +187,6 @@ namespace risk.control.system.Controllers
         [HttpGet]
         public async Task<IActionResult> PrintReport(string id)
         {
-            var file = "report" + id + ".pdf";
-
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
@@ -201,21 +199,57 @@ namespace risk.control.system.Controllers
             var beneficiary = claim.CaseLocations.FirstOrDefault();
             var report = claim.CaseLocations.FirstOrDefault()?.ClaimReport;
 
-            string folder = Path.Combine(webHostEnvironment.WebRootPath, Path.GetFileNameWithoutExtension(file));
+            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
 
             if (!Directory.Exists(folder))
             {
                 Directory.CreateDirectory(folder);
             }
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, Path.GetFileNameWithoutExtension(file), file);
 
-            PdfReportRunner.Run(webHostEnvironment.WebRootPath).Build(filePath); ;
-            if (file == null) return null;
+            var filename = "report" + id + ".pdf";
+
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
+
+            ReportRunner.Run(webHostEnvironment.WebRootPath).Build(filePath); ;
             var memory = new MemoryStream();
             using var stream = new FileStream(filePath, FileMode.Open);
             await stream.CopyToAsync(memory);
             memory.Position = 0;
-            return File(memory, "application/pdf", file);
+            return File(memory, "application/pdf", filename);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> PrintPdfReport(string id)
+        {
+            var claim = _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(r => r.ClaimReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == id);
+
+            var policy = claim.PolicyDetail;
+            var customer = claim.CustomerDetail;
+            var beneficiary = claim.CaseLocations.FirstOrDefault();
+            var report = claim.CaseLocations.FirstOrDefault()?.ClaimReport;
+
+            string folder = Path.Combine(webHostEnvironment.WebRootPath, "report");
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            var filename = "report" + id + ".pdf";
+
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "report", filename);
+
+            PdfReportRunner.Run(webHostEnvironment.WebRootPath).Build(filePath); ;
+            var memory = new MemoryStream();
+            using var stream = new FileStream(filePath, FileMode.Open);
+            await stream.CopyToAsync(memory);
+            memory.Position = 0;
+            return File(memory, "application/pdf", filename);
         }
 
         public async Task<RootObject> GetAddress(string lat, string lon)

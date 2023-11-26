@@ -12,6 +12,9 @@ namespace risk.control.system.Helpers
 {
     public class PdfReportBuilder
     {
+        public BoardingData BoardingData { get; internal set; }
+        public TicketData1 TicketData1 { get; internal set; }
+        public List<string> WhatsNextData { get; internal set; }
         public TicketData TicketData { get; internal set; }
         public ConcertData ConcertData { get; internal set; }
 
@@ -21,11 +24,12 @@ namespace risk.control.system.Helpers
         internal const PageOrientation Orientation
             = PageOrientation.Portrait;
 
-        internal static readonly Box Margins = new Box(30, 27, 30, 27);
+        internal static readonly Box Margins = new Box(29, 20, 29, 20);
 
         internal static readonly XUnit PageWidth =
             (PredefinedSizeBuilder.ToSize(PaperSize.Letter).Width -
                 (Margins.Left + Margins.Right));
+
 
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);
@@ -33,6 +37,28 @@ namespace risk.control.system.Helpers
         internal static readonly FontBuilder FNT12B = Fonts.Helvetica(12f).SetBold(true);
         internal static readonly FontBuilder FNT20 = Fonts.Helvetica(20f);
         internal static readonly FontBuilder FNT19B = Fonts.Helvetica(19f).SetBold();
+
+        internal static readonly FontBuilder FNT8 = Fonts.Helvetica(8f);
+
+        internal static readonly FontBuilder FNT8_G =
+            Fonts.Helvetica(8f).SetColor(Color.Gray);
+
+        internal static readonly FontBuilder FNT9B =
+            Fonts.Helvetica(9f).SetBold();
+
+        internal static readonly FontBuilder FNT11B =
+            Fonts.Helvetica(11f).SetBold();
+
+        internal static readonly FontBuilder FNT15 = Fonts.Helvetica(15f);
+        internal static readonly FontBuilder FNT16 = Fonts.Helvetica(16f);
+
+        internal static readonly FontBuilder FNT16_R =
+            Fonts.Helvetica(16f).SetColor(Color.Red);
+
+        internal static readonly FontBuilder FNT17 = Fonts.Helvetica(17f);
+        internal static readonly FontBuilder FNT18 = Fonts.Helvetica(18f);
+
+        internal static readonly BoardingCell EMPTY_ITEM = new BoardingCell("", new FontText[0]);
         private string imgPath = string.Empty;
 
         internal DocumentBuilder Build(string imagePath)
@@ -40,12 +66,14 @@ namespace risk.control.system.Helpers
             imgPath = imagePath;
             DocumentBuilder documentBuilder = DocumentBuilder.New();
             var concertSection = documentBuilder.AddSection();
+            BoardingCell[,] boardingItems = GetBoardingItems();
 
             concertSection
                  .SetOrientation(Orientation)
                  .SetMargins(Margins);
 
             addConcertTable(concertSection);
+            FillBoardingHandBugTable(concertSection.AddTable(), boardingItems);
             addInfoTable(concertSection);
             addCounterFoil(concertSection);
 
@@ -250,6 +278,287 @@ namespace risk.control.system.Helpers
             cellBuilder.AddParagraph(TicketData.TicketType).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(TicketData.Price).SetLineSpacing(1.4f);
             cellBuilder.AddParagraph(TicketData.Name).SetLineSpacing(1.4f);
+        }
+
+        private void FillBoardingHandBugTable(TableBuilder tableBuilder, BoardingCell[,] boardingItems)
+        {
+            tableBuilder
+                .SetWidth(XUnit.FromPercent(100))
+                .SetBorder(Stroke.None)
+                .AddColumnToTable("", 415.5f)
+                .AddColumn("", 138.5f);
+            FillBoardingTableFirstRow(tableBuilder, boardingItems[0, 0]);
+            var rowBuilder = tableBuilder.AddRow();
+            rowBuilder.AddCell().AddTable(builder =>
+            {
+                builder.SetWidth(415.5f);
+                FillBoardingTable(builder, boardingItems, 1);
+            });
+            rowBuilder.AddCell(FillHandBugTableCell);
+
+            var rr = tableBuilder.AddRow();
+            rr.AddCell().AddTable(b =>
+            {
+                b.SetWidth(415.5f);
+                b.SetBorder(Stroke.Dashed)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercent("", 25);
+            });
+            rr.AddCell(FillHandBugTableCell0);
+
+            FillBoardingTableFirstRow(tableBuilder, boardingItems[0, 0]);
+            var rb = tableBuilder.AddRow();
+            rb.AddCell().AddTable(builder =>
+            {
+                builder.SetWidth(415.5f);
+                FillBoardingTable(builder, boardingItems, 1);
+            });
+            rb.AddCell(FillHandBugTableCell);
+        }
+
+        private void FillHandBugTableCell0(TableCellBuilder cellBuilder)
+        {
+            cellBuilder
+                .SetPadding(19, 6, 0, 0)
+                .AddParagraph("-")
+                .SetFont(FNT9)
+                .SetMarginBottom(19);
+        }
+
+        private void FillHandBugTableCell(TableCellBuilder cellBuilder)
+        {
+            cellBuilder
+                .SetPadding(19, 6, 0, 0)
+                .AddParagraph("Hand baggage allowance")
+                .SetFont(FNT9)
+                .SetMarginBottom(19);
+            cellBuilder.AddImage(
+                Path.Combine(imgPath, "images", "BP_handbag_2x.png"),
+                XSize.FromHeight(108));
+        }
+
+        private void FillBoardingTable(TableBuilder tableBuilder,
+         BoardingCell[,] boardingItems, int startRow = 0)
+        {
+            tableBuilder
+                .SetBorder(Stroke.None)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercentToTable("", 25)
+                .AddColumnPercent("", 25);
+            int rows = boardingItems.GetLength(0);
+            int columns = boardingItems.GetLength(1);
+            for (int i = startRow; i < rows; i++)
+            {
+                for (int k = 0; k < 2; k++)
+                {
+                    var rowBuilder = tableBuilder.AddRow();
+                    if (k == 0)
+                    {
+                        rowBuilder.ApplyStyle(
+                            StyleBuilder.New()
+                                .SetPaddingTop(4)
+                            );
+                    }
+                    else if (i < rows - 1)
+                    {
+                        rowBuilder.ApplyStyle(
+                            StyleBuilder.New()
+                                .SetBorderBottom(0.5f,
+                                    Stroke.Solid, Color.Black)
+                                .SetPaddingBottom(4)
+                            );
+                    }
+                    for (int j = 0; j < columns; j++)
+                    {
+                        BoardingCell bi = boardingItems[i, j];
+                        if (!bi.isEmpty())
+                        {
+                            var cellBuilder = rowBuilder.AddCell();
+                            if (bi.colSpan > 1)
+                            {
+                                cellBuilder.SetColSpan(bi.colSpan);
+                            }
+                            if (k == 0)
+                            {
+                                cellBuilder
+                                    .AddParagraph(bi.name).SetFont(FNT9);
+                            }
+                            else
+                            {
+                                if (bi.image != null)
+                                {
+                                    cellBuilder.AddTable(builder =>
+                                    {
+                                        ImageThenText(builder, bi);
+                                    });
+                                }
+                                else
+                                {
+                                    TextOnly(cellBuilder.AddParagraph(), bi);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ImageThenText(TableBuilder tableBuilder, BoardingCell bi)
+        {
+            tableBuilder
+                .SetWidth(XUnit.FromPercent(100))
+                .SetBorder(Stroke.None)
+                .AddColumnToTable("", 13)
+                .AddColumn("");
+            var rowBuilder = tableBuilder.AddRow();
+            rowBuilder.AddCell()
+                .SetPadding(0, 4, 0, 0)
+                //.SetVerticalAlignment(VerticalAlignment.Bottom)
+                .AddImage(Path.Combine(imgPath, "images", bi.image),
+                    XSize.FromWidth(11));
+            TextOnly(rowBuilder.AddCell().AddParagraph(), bi);
+        }
+
+        private void TextOnly(ParagraphBuilder paragraphBuilder, BoardingCell bi)
+        {
+            foreach (FontText ft in bi.fontTexts)
+            {
+                paragraphBuilder.AddText(ft.text).SetFont(ft.font);
+            }
+        }
+
+        private void FillBoardingTableFirstRow(TableBuilder tableBuilder,
+                BoardingCell bi)
+        {
+            for (int k = 0; k < 2; k++)
+            {
+                var rowBuilder = tableBuilder.AddRow();
+                if (k == 1)
+                {
+                    rowBuilder.ApplyStyle(
+                        StyleBuilder.New()
+                            .SetBorderBottom(0.5f, Stroke.Solid, Color.Black)
+                            .SetPaddingBottom(6)
+                        );
+                }
+                var cellBuilder = rowBuilder.AddCell();
+                cellBuilder.SetColSpan(2);
+                if (k == 0)
+                {
+                    cellBuilder.SetFont(FNT9).AddParagraph(bi.name);
+                }
+                else
+                {
+                    if (bi.image != null)
+                    {
+                        cellBuilder.AddTable(builder =>
+                        {
+                            ImageThenText(builder, bi);
+                        });
+                    }
+                    else
+                    {
+                        TextOnly(cellBuilder.AddParagraph(), bi);
+                    }
+                }
+            }
+        }
+
+        private BoardingCell[,] GetBoardingItems()
+        {
+            BoardingCell[,] result =
+            {
+                {
+                new BoardingCell("Passenger name", FNT18,
+                    TicketData1.Passenger, 4),
+                    EMPTY_ITEM,
+                    EMPTY_ITEM,
+                    EMPTY_ITEM
+                },
+                {
+                new BoardingCell("From", new FontText[] {
+                    new FontText (FNT12, BoardingData.DepartureAirport + " / "),
+                    new FontText (FNT12B, BoardingData.DepartureAbvr)
+                }, 2),
+                EMPTY_ITEM,
+                new BoardingCell("To", new FontText[] {
+                    new FontText (FNT12, BoardingData.ArrivalAirport + " / "),
+                    new FontText (FNT12B, BoardingData.ArrivalAbvr)
+                }, 2),
+                EMPTY_ITEM
+                },
+                {
+                new BoardingCell("Flight", FNT16_R, BoardingData.Flight),
+                new BoardingCell("Gate", FNT16, BoardingData.BoardingGate),
+                new BoardingCell("Class", FNT16, BoardingData.Class + " "
+                    +  BoardingData.ClassAdd),
+                new BoardingCell("Seat", FNT16_R, BoardingData.Seat,
+                    Path.Combine(imgPath, "images", "BP_seat_2x.png"))
+                },
+                {
+                new BoardingCell("Date", FNT16,
+                    BoardingData.DepartureTime.ToString(
+                                "dd MMMM", DocumentLocale)),
+                new BoardingCell("Boarding time till", FNT16,
+                    BoardingData.BoardingTill.ToString(
+                                "HH:mm", DocumentLocale)),
+                new BoardingCell("Departure time", FNT16,
+                    BoardingData.DepartureTime.ToString(
+                                "HH:mm", DocumentLocale)),
+                new BoardingCell("Arrive", FNT16,
+                    BoardingData.Arrival.ToString(
+                                "HH:mm", DocumentLocale))
+                }
+            };
+            return result;
+        }
+
+        internal struct BoardingCell
+        {
+            internal string name;
+            internal FontText[] fontTexts;
+            internal string image;
+            internal int colSpan;
+
+            internal BoardingCell(string name, FontBuilder font, string text, int colSpan = 1) : this(name, font, text, null, colSpan)
+            {
+            }
+
+            internal BoardingCell(string name, FontBuilder font, string text, string image, int colSpan = 1)
+            {
+                this.name = name;
+                fontTexts = new FontText[] { new FontText(font, text) };
+                this.image = image;
+                this.colSpan = colSpan;
+            }
+
+            internal BoardingCell(string name, FontText[] fontTexts, int colSpan = 1)
+            {
+                this.name = name;
+                this.fontTexts = fontTexts;
+                this.image = null;
+                this.colSpan = colSpan;
+            }
+
+            internal bool isEmpty()
+            {
+                return fontTexts.Length == 0;
+            }
+        }
+
+        internal struct FontText
+        {
+            internal FontBuilder font;
+            internal string text;
+
+            internal FontText(FontBuilder font, string text)
+            {
+                this.font = font;
+                this.text = text;
+            }
         }
     }
 }
