@@ -39,8 +39,21 @@ namespace risk.control.system.Helpers
             BoardingData boardingData =
                 JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent);
 
+            string ticketJsonFile0 = CheckFile(Path.Combine("Files", "bp-ticket-data1.json"));
+            string ticketJsonContent0 = File.ReadAllText(ticketJsonFile0);
+            TicketData1 ticketData0 =
+               JsonConvert.DeserializeObject<TicketData1>(ticketJsonContent0);
+
+            string boardingJsonFile0 = CheckFile(
+                Path.Combine("Files", "boarding-data1.json"));
+            string boardingJsonContent0 = File.ReadAllText(boardingJsonFile0);
+            BoardingData boardingData0 =
+                JsonConvert.DeserializeObject<BoardingData>(boardingJsonContent0);
+
             ConcertTicketBuilder.BoardingData = boardingData;
+            ConcertTicketBuilder.BoardingData0 = boardingData0;
             ConcertTicketBuilder.TicketData1 = ticketData1;
+            ConcertTicketBuilder.TicketData0 = ticketData0;
 
             return ConcertTicketBuilder.Build(imagePath);
         }

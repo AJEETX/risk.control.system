@@ -14,6 +14,8 @@ namespace risk.control.system.Helpers
     {
         public BoardingData BoardingData { get; internal set; }
         public TicketData1 TicketData1 { get; internal set; }
+        public BoardingData BoardingData0 { get; internal set; }
+        public TicketData1 TicketData0 { get; internal set; }
         public List<string> WhatsNextData { get; internal set; }
         public TicketData TicketData { get; internal set; }
         public ConcertData ConcertData { get; internal set; }
@@ -29,7 +31,6 @@ namespace risk.control.system.Helpers
         internal static readonly XUnit PageWidth =
             (PredefinedSizeBuilder.ToSize(PaperSize.Letter).Width -
                 (Margins.Left + Margins.Right));
-
 
         internal static readonly FontBuilder FNT9 = Fonts.Helvetica(9f);
         internal static readonly FontBuilder FNT10 = Fonts.Helvetica(10f);
@@ -67,13 +68,14 @@ namespace risk.control.system.Helpers
             DocumentBuilder documentBuilder = DocumentBuilder.New();
             var concertSection = documentBuilder.AddSection();
             BoardingCell[,] boardingItems = GetBoardingItems();
+            BoardingCell[,] boardingItems0 = GetBoardingItems0();
 
             concertSection
                  .SetOrientation(Orientation)
                  .SetMargins(Margins);
 
             addConcertTable(concertSection);
-            FillBoardingHandBugTable(concertSection.AddTable(), boardingItems);
+            FillBoardingHandBugTable(concertSection.AddTable(), boardingItems, boardingItems0);
             addInfoTable(concertSection);
             addCounterFoil(concertSection);
 
@@ -280,7 +282,7 @@ namespace risk.control.system.Helpers
             cellBuilder.AddParagraph(TicketData.Name).SetLineSpacing(1.4f);
         }
 
-        private void FillBoardingHandBugTable(TableBuilder tableBuilder, BoardingCell[,] boardingItems)
+        private void FillBoardingHandBugTable(TableBuilder tableBuilder, BoardingCell[,] boardingItems, BoardingCell[,] boardingItems0)
         {
             tableBuilder
                 .SetWidth(XUnit.FromPercent(100))
@@ -308,14 +310,14 @@ namespace risk.control.system.Helpers
             });
             rr.AddCell(FillHandBugTableCell0);
 
-            FillBoardingTableFirstRow(tableBuilder, boardingItems[0, 0]);
+            FillBoardingTableFirstRow(tableBuilder, boardingItems0[0, 0]);
             var rb = tableBuilder.AddRow();
             rb.AddCell().AddTable(builder =>
             {
                 builder.SetWidth(415.5f);
-                FillBoardingTable(builder, boardingItems, 1);
+                FillBoardingTable(builder, boardingItems0, 1);
             });
-            rb.AddCell(FillHandBugTableCell);
+            rb.AddCell(FillHandBugTableCell1);
         }
 
         private void FillHandBugTableCell0(TableCellBuilder cellBuilder)
@@ -331,12 +333,28 @@ namespace risk.control.system.Helpers
         {
             cellBuilder
                 .SetPadding(19, 6, 0, 0)
-                .AddParagraph("Hand baggage allowance")
+                .AddParagraph("Address visited")
                 .SetFont(FNT9)
                 .SetMarginBottom(19);
             cellBuilder.AddImage(
-                Path.Combine(imgPath, "images", "BP_handbag_2x.png"),
+                Path.Combine(imgPath, "images", "CT_Location.png"),
                 XSize.FromHeight(108));
+            cellBuilder.AddParagraph("")
+               .AddUrl("https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s", "map");
+        }
+
+        private void FillHandBugTableCell1(TableCellBuilder cellBuilder)
+        {
+            cellBuilder
+                .SetPadding(19, 6, 0, 0)
+                .AddParagraph("Location visited")
+                .SetFont(FNT9)
+                .SetMarginBottom(19);
+            cellBuilder.AddImage(
+                Path.Combine(imgPath, "images", "CT_Scheme.png"),
+                XSize.FromHeight(108));
+            cellBuilder.AddParagraph("")
+                .AddUrl("https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s", "map");
         }
 
         private void FillBoardingTable(TableBuilder tableBuilder,
@@ -472,44 +490,91 @@ namespace risk.control.system.Helpers
             BoardingCell[,] result =
             {
                 {
-                new BoardingCell("Passenger name", FNT18,
+                new BoardingCell("Investigation Type", FNT18,
                     TicketData1.Passenger, 4),
                     EMPTY_ITEM,
                     EMPTY_ITEM,
                     EMPTY_ITEM
                 },
                 {
-                new BoardingCell("From", new FontText[] {
+                new BoardingCell("Person Name", new FontText[] {
                     new FontText (FNT12, BoardingData.DepartureAirport + " / "),
                     new FontText (FNT12B, BoardingData.DepartureAbvr)
                 }, 2),
                 EMPTY_ITEM,
-                new BoardingCell("To", new FontText[] {
+                new BoardingCell("Address", new FontText[] {
                     new FontText (FNT12, BoardingData.ArrivalAirport + " / "),
                     new FontText (FNT12B, BoardingData.ArrivalAbvr)
                 }, 2),
                 EMPTY_ITEM
                 },
                 {
-                new BoardingCell("Flight", FNT16_R, BoardingData.Flight),
-                new BoardingCell("Gate", FNT16, BoardingData.BoardingGate),
-                new BoardingCell("Class", FNT16, BoardingData.Class + " "
+                new BoardingCell("Match", FNT16_R, BoardingData.Flight),
+                new BoardingCell("Contact Number", FNT16, BoardingData.BoardingGate),
+                new BoardingCell("Status", FNT16, BoardingData.Class + " "
                     +  BoardingData.ClassAdd),
-                new BoardingCell("Seat", FNT16_R, BoardingData.Seat,
+                new BoardingCell("Verified", FNT16_R, BoardingData.Seat,
                     Path.Combine(imgPath, "images", "BP_seat_2x.png"))
                 },
                 {
-                new BoardingCell("Date", FNT16,
+                new BoardingCell("Visit Date", FNT16,
                     BoardingData.DepartureTime.ToString(
                                 "dd MMMM", DocumentLocale)),
-                new BoardingCell("Boarding time till", FNT16,
+                new BoardingCell("Time", FNT16,
                     BoardingData.BoardingTill.ToString(
                                 "HH:mm", DocumentLocale)),
-                new BoardingCell("Departure time", FNT16,
-                    BoardingData.DepartureTime.ToString(
-                                "HH:mm", DocumentLocale)),
-                new BoardingCell("Arrive", FNT16,
+                new BoardingCell("", FNT16,
+                    ""),
+                new BoardingCell("Weather", FNT16,
                     BoardingData.Arrival.ToString(
+                                "HH:mm", DocumentLocale))
+                }
+            };
+            return result;
+        }
+
+        private BoardingCell[,] GetBoardingItems0()
+        {
+            BoardingCell[,] result =
+            {
+                {
+                new BoardingCell("Investigation Type", FNT18,
+                    TicketData0.Passenger, 4),
+                    EMPTY_ITEM,
+                    EMPTY_ITEM,
+                    EMPTY_ITEM
+                },
+                {
+                new BoardingCell("Document Name", new FontText[] {
+                    new FontText (FNT12, BoardingData0.DepartureAirport + " / "),
+                    new FontText (FNT12B, BoardingData0.DepartureAbvr)
+                }, 2),
+                EMPTY_ITEM,
+                new BoardingCell("Address", new FontText[] {
+                    new FontText (FNT12, BoardingData0.ArrivalAirport + " / "),
+                    new FontText (FNT12B, BoardingData0.ArrivalAbvr)
+                }, 2),
+                EMPTY_ITEM
+                },
+                {
+                new BoardingCell("Match", FNT16_R, BoardingData0.Flight),
+                new BoardingCell("PAN Number", FNT16, BoardingData0.BoardingGate),
+                new BoardingCell("Status", FNT16, BoardingData0.Class + " "
+                    +  BoardingData0.ClassAdd),
+                new BoardingCell("Verified", FNT16_R, BoardingData0.Seat,
+                    Path.Combine(imgPath, "images", "PAN.jpg"))
+                },
+                {
+                new BoardingCell("Visit Date", FNT16,
+                    BoardingData0.DepartureTime.ToString(
+                                "dd MMMM", DocumentLocale)),
+                new BoardingCell("Time", FNT16,
+                    BoardingData0.BoardingTill.ToString(
+                                "HH:mm", DocumentLocale)),
+                new BoardingCell("", FNT16,
+                    ""),
+                new BoardingCell("Weather", FNT16,
+                    BoardingData0.Arrival.ToString(
                                 "HH:mm", DocumentLocale))
                 }
             };
