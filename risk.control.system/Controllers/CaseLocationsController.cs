@@ -13,6 +13,7 @@ using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -115,7 +116,7 @@ namespace risk.control.system.Controllers
                 Addressline = random.Next(100, 999) + " GREAT ROAD",
                 BeneficiaryDateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
                 BeneficiaryIncome = Income.MEDIUUM_INCOME,
-                BeneficiaryName = ClaimsInvestigationController.GenerateName(),
+                BeneficiaryName = NameGenerator.GenerateName(),
                 BeneficiaryRelationId = beneRelationId,
                 CountryId = countryId,
                 StateId = stateId,
@@ -179,27 +180,6 @@ namespace risk.control.system.Controllers
 
                 caseLocation.PinCode.Latitude = pincode.Latitude;
                 caseLocation.PinCode.Longitude = pincode.Longitude;
-                //var request = new HttpRequestMessage
-                //{
-                //    Method = HttpMethod.Get,
-                //    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pincode.Code}"),
-                //    Headers =
-                //            {
-                //                { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                //                { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                //            },
-                //};
-                //using (var response = await client.SendAsync(request))
-                //{
-                //    response.EnsureSuccessStatusCode();
-                //    var body = await response.Content.ReadAsStringAsync();
-
-                //    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
-
-                //    caseLocation.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                //    caseLocation.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
-                //    Console.WriteLine(body);
-                //}
 
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
@@ -315,28 +295,6 @@ namespace risk.control.system.Controllers
                         var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
                         caseLocation.PinCode.Latitude = pinCode.Latitude;
                         caseLocation.PinCode.Longitude = pinCode.Longitude;
-
-                        //var request = new HttpRequestMessage
-                        //{
-                        //    Method = HttpMethod.Get,
-                        //    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pinCode.Code}"),
-                        //    Headers =
-                        //    {
-                        //        { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                        //        { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                        //    },
-                        //};
-                        //using (var response = await client.SendAsync(request))
-                        //{
-                        //    response.EnsureSuccessStatusCode();
-                        //    var body = await response.Content.ReadAsStringAsync();
-
-                        //    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
-
-                        //    caseLocation.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                        //    caseLocation.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
-                        //    Console.WriteLine(body);
-                        //}
 
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();

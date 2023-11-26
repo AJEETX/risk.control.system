@@ -88,7 +88,11 @@
                                 <article>
                                     <div class="bb-blog-inner">
                                         <header class="bb-blog-header">
-                                            <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Policy # : @Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</h5>
+                                            <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i>
+                                                <a asp-controller="Report" asp-action="PrintReport" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId">
+                                                Policy # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber
+                                                </a>
+                                            </h5>
                                         </header>
                                         <div class="card card-solid">
                                             <div class="progress">

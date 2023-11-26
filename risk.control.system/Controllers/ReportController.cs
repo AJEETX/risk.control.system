@@ -185,7 +185,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb(title: " Report", FromAction = "Detail")]
         public async Task<IActionResult> PrintReport(string id)
         {
             var file = "report" + id + ".pdf";
