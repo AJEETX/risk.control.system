@@ -18,79 +18,52 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <dl class="row">
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         Domain
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         <a href=""> @Html.DisplayFor(model => model.Email)</a>
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Name)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Name)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Code)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Code)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Description)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Description)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.PhoneNumber)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.PhoneNumber)
                                     </dd>
-                                    
-                                    <dt class="col-sm-3">
+
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Branch)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Branch)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.Addressline)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(model => model.Addressline)
+
                                     </dd>
 
-                                    <dt class="col-sm-3">
-                                        line of business
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @if(Model.VendorInvestigationServiceTypes.Count > 0)
-                                        {
-                                            @foreach (var service in Model.VendorInvestigationServiceTypes)
-                                            {
-                                                <span class="badge badge-light">@service.LineOfBusiness.Name</span> <span class="badge badge-light">@service.Price</span>
-                                                foreach (var pincode in service.PincodeServices)
-                                                {
-                                                    <span class="badge badge-light">@pincode.Pincode : @pincode.Name</span>
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                        <span class="badge badge-danger">No service added</span>
-                                        }
-                                        
-                                    </dd>
-
-                                   
                                 </dl>
                                 <dl class="row">
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         Document
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @if (Model?.DocumentUrl is not null)
                                         {
                                             <img id="profileImage" class="form-Image" src="@Model?.DocumentUrl">
@@ -100,31 +73,37 @@
                                             <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                         }
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.Addressline)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.Addressline)
+                                    </dd>
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.District)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.District.Name)
                                     </dd>
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.State)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.State.Name)
                                     </dd>
-                                    <dt class="col-sm-3">
-                                        @Html.DisplayNameFor(model => model.PinCode)
-                                    </dt>
-                                    <dd class="col-sm-8">
-                                        @Html.DisplayFor(model => model.PinCode.Code)
-                                    </dd>
-
-                                    <dt class="col-sm-3">
+                                    <dt class="col-sm-5">
                                         @Html.DisplayNameFor(model => model.Country)
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Country.Name)
                                     </dd>
+                                    <dt class="col-sm-5">
+                                        @Html.DisplayNameFor(model => model.PinCode)
+                                    </dt>
+                                    <dd class="col-sm-5">
+                                        @Html.DisplayFor(model => model.PinCode.Code)
+
+
                                 </dl>
                             </div>
                             <div class="col-md-6">
@@ -132,6 +111,65 @@
                                 <div id="maps">
                                 </div>
                                 <div id="pop-face-map"></div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="card-body">
+
+                                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Line of business
+                                                </th>
+                                                <th>
+                                                    Service type
+                                                </th>
+                                                <th>
+                                                    Price
+                                                </th>
+                                                <th>
+                                                    District
+                                                </th>
+                                                <th>
+                                                    State
+                                                </th>
+                                                <th>
+                                                    Pincodes
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model.VendorInvestigationServiceTypes)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.Price)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.District.Name)
+                                                    </td>
+                                                    <td>
+                                                        @Html.DisplayFor(modelItem => item.State.Name)
+                                                    </td>
+                                                    <td>
+                                                        @foreach (var pin in item.PincodeServices)
+                                                        {
+                                                            <span>
+                                                                @pin.Pincode
+                                                            </span>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <div class="row">

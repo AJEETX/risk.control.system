@@ -134,6 +134,7 @@ namespace risk.control.system.Controllers
 
                     _context.Add(vendor);
                     await _context.SaveChangesAsync();
+
                     var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
 
 
