@@ -100,6 +100,9 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
+                       Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
                        Pincode = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
                             a.CustomerDetail.PinCode.Code : a.CaseLocations.FirstOrDefault().PinCode.Code,
                        Company = a.PolicyDetail.ClientCompany.Name,

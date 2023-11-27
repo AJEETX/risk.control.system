@@ -63,48 +63,44 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl == "dashboard";
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-            if (result.Succeeded)
+            if (ModelState.IsValid)
             {
-                if (!model.Mobile)
+                ViewData["ReturnUrl"] = returnUrl == "dashboard";
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
                 {
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    var claims = new List<Claim> {
+                        new Claim(ClaimTypes.NameIdentifier, model.Email) ,
+                        new Claim(ClaimTypes.Name, model.Email)
+                    };
+                    var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                    if (model.Mobile)
+                    {
+                        return Ok();
+                    }
                     toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
                     return RedirectToLocal(returnUrl);
                 }
-                var claims = new List<Claim> {
-                        new Claim(ClaimTypes.Name, model.Email) ,
-                        new Claim(ClaimTypes.Email, model.Email)
-                    };
-                var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                HttpContext.Response.Cookies.Append("UserLoginCookie", "UserLoginCookie", new CookieOptions() { HttpOnly = true });
-                return Ok(new { success = model.Email });
-            }
-
-            if (result.IsLockedOut && returnUrl != mobileAppUrl)
-            {
-                _logger.LogWarning("User account locked out.");
-                model.Error = "User account locked out.";
-                return View(model);
-            }
-            else if (result.Succeeded && returnUrl == mobileAppUrl)
-            {
-                var claims = new List<Claim> {
-                        new Claim(ClaimTypes.Name, model.Email) ,
-                        new Claim(ClaimTypes.Email, model.Email)
-                    };
-                var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                HttpContext.Response.Cookies.Append("UserLoginCookie", "UserLoginCookie", new CookieOptions() { HttpOnly = true });
-                return Ok(new { success = model.Email });
+                else if (result.IsLockedOut)
+                {
+                    _logger.LogWarning("User account locked out.");
+                    model.Error = "User account locked out.";
+                    return View(model);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    model.Error = "Invalid login attempt.";
+                    return View(model);
+                }
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                model.Error = "Invalid login attempt.";
+                ModelState.AddModelError(string.Empty, "Bad Request.");
+                model.Error = "Bad Request.";
                 return View(model);
             }
         }

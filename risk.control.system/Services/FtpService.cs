@@ -429,7 +429,7 @@ namespace risk.control.system.Services
                                     CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                                     LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
                                     ClientCompanyId = companyUser?.ClientCompanyId,
-                                    DocumentImage = image
+                                    DocumentImage = image,
                                 };
 
                                 var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
@@ -462,7 +462,7 @@ namespace risk.control.system.Services
                                     StateId = state.StateId,
                                     DistrictId = district.DistrictId,
                                     Description = rowData[20]?.Trim(),
-                                    ProfilePicture = customerImage
+                                    ProfilePicture = customerImage,
                                 };
                                 claim.CustomerDetail.PinCode = pinCode;
                                 claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
@@ -493,7 +493,10 @@ namespace risk.control.system.Services
                                     StateId = beneState.StateId,
                                     CountryId = country.CountryId,
                                     InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                    ProfilePicture = beneficairyImage
+                                    ProfilePicture = beneficairyImage,
+                                    Updated = DateTime.UtcNow,
+                                    UpdatedBy = userEmail,
+                                    Created = DateTime.UtcNow,
                                 };
 
                                 var addedClaim = _context.ClaimsInvestigation.Add(claim);

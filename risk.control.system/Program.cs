@@ -127,32 +127,16 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.Response.StatusCode = 401;
             return Task.CompletedTask;
         };
+        options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.SlidingExpiration = true;
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+        options.SlidingExpiration = true;
     });
-//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-//                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-//                {
-//                    options.Events.OnRedirectToLogin = (context) =>
-//                    {
-//                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-//                        return Task.CompletedTask;
-//                    };
-//                    options.Cookie.Name = "UserLoginCookie";
-//                    options.LoginPath = "/Account/Login";
-//                    options.LogoutPath = "/Account/Logout"; // If the LogoutPath is not set here, ASP.NET Core will default to /Account/Logout
-//                    options.AccessDeniedPath = "/Account/AccessDenied"; // If the AccessDeniedPath is not set here, ASP.NET Core will default to /Account/AccessDenied
-//                    options.Cookie.HttpOnly = true;
-//                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-//                    options.Cookie.SameSite = SameSiteMode.None;
-//                    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-//                    options.SlidingExpiration = true;
-//                });
 
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.FallbackPolicy = new AuthorizationPolicyBuilder()
-//        .RequireAuthenticatedUser()
-//        .Build();
-//});
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -197,15 +181,29 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 });
-//app.UseCookiePolicy(
-//    new CookiePolicyOptions
-//    {
-//        Secure = CookieSecurePolicy.Always
-//    });
+app.UseCookiePolicy(
+    new CookiePolicyOptions
+    {
+        Secure = CookieSecurePolicy.Always
+    });
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseNToastNotify();
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path;
+    if (path.Value.Contains("/swagger/", StringComparison.OrdinalIgnoreCase))
+    {
+        if (!context.User.Identity.IsAuthenticated)
+        {
+            context.Response.Redirect("/login");
+            return;
+        }
+    }
+
+    await next();
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");

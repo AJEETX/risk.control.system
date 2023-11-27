@@ -17,6 +17,6 @@ namespace risk.control.system.Models.ViewModel
 
         public bool Mobile { get; set; }
 
-        public string Error { get; set; }
+        public string? Error { get; set; }
     }
 }

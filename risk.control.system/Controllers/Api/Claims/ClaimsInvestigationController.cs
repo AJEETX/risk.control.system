@@ -154,6 +154,9 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
+                        Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
                         Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : "/img/no-policy.jpg",
                         Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : "/img/user.png",
@@ -493,6 +496,9 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
+                        Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
                         Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                         Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                         Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -828,6 +834,9 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
+                        Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
                         Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                         Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
@@ -1697,6 +1706,9 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 SelectedToAssign = false,
+                Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
                 Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                 Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",

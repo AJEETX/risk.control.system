@@ -305,7 +305,10 @@ namespace risk.control.system.Services
                             claimsInvestigation.PolicyDetail.DocumentImage = existingPolicy.PolicyDetail.DocumentImage;
                             claimsInvestigation.PolicyDetail.Document = existingPolicy.PolicyDetail.Document;
                         }
-                        claimsInvestigation.CurrentClaimOwner = userEmail;
+                        claimsInvestigation.Updated = DateTime.UtcNow;
+                        claimsInvestigation.UpdatedBy = userEmail;
+                        claimsInvestigation.CurrentUserEmail = userEmail;
+                        claimsInvestigation.CurrentClaimOwner = currentUser.Email;
                         var aaddedClaimId = _context.ClaimsInvestigation.Add(claimsInvestigation);
                         addedClaimId = aaddedClaimId.Entity.ClaimsInvestigationId;
                         if (existingPolicy == null)
@@ -371,6 +374,7 @@ namespace risk.control.system.Services
                         existingPolicy.Updated = DateTime.UtcNow;
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
+                        existingPolicy.CurrentClaimOwner = userEmail;
                         existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
                         existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
 
@@ -428,6 +432,7 @@ namespace risk.control.system.Services
                         existingPolicy.Updated = DateTime.UtcNow;
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
+                        existingPolicy.CurrentClaimOwner = userEmail;
                         existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
                         existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
                         if (customerDocument is not null)
@@ -475,6 +480,7 @@ namespace risk.control.system.Services
                         existingPolicy.Updated = DateTime.UtcNow;
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
+                        existingPolicy.CurrentClaimOwner = userEmail;
                         existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
                         existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
                     }
@@ -516,27 +522,6 @@ namespace risk.control.system.Services
                     existingPolicy.CustomerDetail.PinCode.Latitude = pincode.Latitude;
                     existingPolicy.CustomerDetail.PinCode.Longitude = pincode.Longitude;
 
-                    //var request = new HttpRequestMessage
-                    //{
-                    //    Method = HttpMethod.Get,
-                    //    RequestUri = new Uri($"https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/{pincode.Code}"),
-                    //    Headers =
-                    //        {
-                    //            { "X-RapidAPI-Key", "327fd8beb9msh8a441504790e80fp142ea8jsnf74b9208776a" },
-                    //            { "X-RapidAPI-Host", "india-pincode-with-latitude-and-longitude.p.rapidapi.com" },
-                    //        },
-                    //};
-                    //using (var response = await client.SendAsync(request))
-                    //{
-                    //    response.EnsureSuccessStatusCode();
-                    //    var body = await response.Content.ReadAsStringAsync();
-
-                    //    var pinCodeData = JsonConvert.DeserializeObject<List<PincodeApiData>>(body);
-
-                    //    existingPolicy.CustomerDetail.PinCode.Latitude = pincode.Latitude;
-                    //    existingPolicy.CustomerDetail.PinCode.Longitude = pincode.Longitude;
-                    //    Console.WriteLine(body);
-                    //}
                     _context.ClaimsInvestigation.Update(existingPolicy);
 
                     await _context.SaveChangesAsync();

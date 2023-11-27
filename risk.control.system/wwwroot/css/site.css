@@ -140,6 +140,9 @@ table {
     border: 1px solid #ccc;
 }
 
+a.table-link{
+    width:100px;
+}
 .face-Image {
     height: 200px;
     width: 200px;
