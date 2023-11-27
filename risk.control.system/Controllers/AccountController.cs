@@ -15,6 +15,7 @@ using NToastNotify;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers
 {
@@ -24,6 +25,7 @@ namespace risk.control.system.Controllers
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IToastNotification toastNotification;
+        private readonly IAccountService accountService;
         private readonly ILogger _logger;
         private readonly ApplicationDbContext _context;
 
@@ -31,12 +33,14 @@ namespace risk.control.system.Controllers
             UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
             IToastNotification toastNotification,
+            IAccountService accountService,
             ILogger<AccountController> logger,
             ApplicationDbContext context)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
             this.toastNotification = toastNotification ?? throw new ArgumentNullException();
+            this.accountService = accountService;
             this._context = context;
             _logger = logger;
         }
@@ -109,8 +113,8 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public IActionResult Forgot(string useremail, long mobile)
         {
-            string connectionString = "";
-            return Ok();
+            accountService.ForgotPassword(useremail, mobile);
+            return RedirectToAction("login");
         }
 
         [HttpPost]
