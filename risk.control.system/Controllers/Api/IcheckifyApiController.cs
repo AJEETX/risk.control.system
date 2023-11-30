@@ -23,7 +23,6 @@ namespace risk.control.system.Controllers.Api
             this.httpClientService = httpClientService;
         }
 
-        [AllowAnonymous]
         [HttpPost("mask")]
         public async Task<IActionResult> Mask(MaskImage image)
         {
@@ -32,7 +31,6 @@ namespace risk.control.system.Controllers.Api
             return Ok(maskedImageDetail);
         }
 
-        [AllowAnonymous]
         [HttpPost("match")]
         public async Task<IActionResult> Match(MatchImage image)
         {
@@ -41,7 +39,6 @@ namespace risk.control.system.Controllers.Api
             return Ok(maskedImageDetail);
         }
 
-        [AllowAnonymous]
         [HttpGet("pan")]
         public async Task<IActionResult> Pan(string pan = "FNLPM8635N")
         {
@@ -50,7 +47,6 @@ namespace risk.control.system.Controllers.Api
             return Ok(verifiedPanResponse);
         }
 
-        [AllowAnonymous]
         [HttpGet("GetAddressByLatLng")]
         public async Task<IActionResult> GetAddressByLatLng(string lat, string lng)
         {

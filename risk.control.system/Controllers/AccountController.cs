@@ -1,4 +1,6 @@
-﻿using System.Net.Mail;
+﻿using System.Configuration;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 
@@ -6,12 +8,15 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 using Newtonsoft.Json.Linq;
 
 using NToastNotify;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
@@ -76,32 +81,72 @@ namespace risk.control.system.Controllers
                     };
                     var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                        new AuthenticationProperties
+                        {
+                            IsPersistent = true,
+                            AllowRefresh = true,
+                            ExpiresUtc = DateTime.UtcNow.AddDays(1)
+                        });
                     if (model.Mobile)
                     {
-                        return Ok();
+                        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@1"));
+                        var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+                        var tokenOptions = new JwtSecurityToken(
+                            issuer: "https://localhost:7208/",
+                            audience: "https://localhost:7208/",
+                            claims: new List<Claim>() { new Claim(ClaimTypes.Name, user.Email ?? string.Empty) },
+                            expires: DateTime.Now.AddMinutes(30),
+                            signingCredentials: signinCredentials
+                        );
+                        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                        return Ok(new { Token = tokenString });
                     }
-                    toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
-                    return RedirectToLocal(returnUrl);
+                    else
+                    {
+                        toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
+                        return RedirectToLocal(returnUrl);
+                    }
                 }
                 else if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out.");
-                    model.Error = "User account locked out.";
-                    return View(model);
+                    if (model.Mobile)
+                    {
+                        return BadRequest();
+                    }
+                    else
+                    {
+                        _logger.LogWarning("User account locked out.");
+                        model.Error = "User account locked out.";
+                        return View(model);
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    model.Error = "Invalid login attempt.";
-                    return View(model);
+                    if (model.Mobile)
+                    {
+                        return BadRequest();
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        model.Error = "Invalid login attempt.";
+                        return View(model);
+                    }
                 }
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Bad Request.");
-                model.Error = "Bad Request.";
-                return View(model);
+                if (model.Mobile)
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Bad Request.");
+                    model.Error = "Bad Request.";
+                    return View(model);
+                }
             }
         }
 
