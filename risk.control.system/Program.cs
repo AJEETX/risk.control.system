@@ -89,19 +89,20 @@ builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-var isProd = builder.Configuration.GetSection("IsProd").Value;
-var prod = bool.Parse(isProd);
-if (prod)
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
-else
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=mobile.db"));
-}
-
+//var isProd = builder.Configuration.GetSection("IsProd").Value;
+//var prod = bool.Parse(isProd);
+//if (prod)
+//{
+//    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//}
+//else
+//{
+//    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//                        options.UseSqlite("Data Source=mobile.db"));
+//}
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
