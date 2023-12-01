@@ -24,6 +24,52 @@ namespace risk.control.system.Controllers.Api.Company
             _context = context;
         }
 
+        [HttpGet("CompanyUsers")]
+        public async Task<IActionResult> CompanyUsers(string id)
+        {
+            var userEmail = HttpContext.User?.Identity?.Name;
+            var adminUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            if (!adminUser.IsSuperAdmin)
+            {
+                return BadRequest();
+            }
+
+            var company = _context.ClientCompany
+                .Include(c => c.CompanyApplicationUser)
+                .ThenInclude(u => u.PinCode)
+                .Include(c => c.CompanyApplicationUser)
+                .ThenInclude(u => u.Country)
+                .Include(c => c.CompanyApplicationUser)
+                .ThenInclude(u => u.District)
+                .Include(c => c.CompanyApplicationUser)
+                .ThenInclude(u => u.State)
+                .FirstOrDefault(c => c.ClientCompanyId == id);
+
+            var users = company.CompanyApplicationUser
+                .Where(u => !u.Deleted)
+                .AsQueryable();
+            var result =
+                users.Select(u =>
+                new
+                {
+                    Id = u.Id,
+                    Name = u.FirstName + " " + u.LastName,
+                    Email = "<a href=''>" + u.Email + "</a>",
+                    Phone = u.PhoneNumber,
+                    Photo = u.ProfilePictureUrl,
+                    Active = u.Active,
+                    Addressline = u.Addressline,
+                    District = u.District.Name,
+                    State = u.State.Name,
+                    Country = u.Country.Name,
+                    Roles = string.Join(",", GetUserRoles(u).Result),
+                    Pincode = u.PinCode.Code,
+                });
+            await Task.Delay(1000);
+
+            return Ok(result.ToArray());
+        }
+
         [HttpGet("AllUsers")]
         public async Task<IActionResult> AllUsers()
         {

@@ -78,13 +78,13 @@ body {
     position: fixed;
     z-index: 10000;
     color: red;
-    transform: rotate(-40deg);
+    transform: rotate(-60deg);
     opacity: 0.1;
-    height: 60px;
+    height: 50px;
 }
 
 .watermark {
-    height: 60px;
+    height: 50px;
 }
 
 .footer {
