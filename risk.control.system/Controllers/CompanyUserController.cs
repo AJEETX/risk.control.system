@@ -186,11 +186,12 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientCompanyApplicationUser user)
+        public async Task<IActionResult> Create(ClientCompanyApplicationUser user, string emailSuffix)
         {
+            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                string newFileName = user.Email;
+                string newFileName = userFullEmail;
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -200,9 +201,10 @@ namespace risk.control.system.Controllers
                 user.ProfilePicture = dataStream.ToArray();
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
+            user.Email = userFullEmail;
             user.EmailConfirmed = true;
-            user.UserName = user.Email;
-            user.Mailbox = new Mailbox { Name = user.Email };
+            user.UserName = userFullEmail;
+            user.Mailbox = new Mailbox { Name = userFullEmail };
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
@@ -234,7 +236,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanyApplicationUser/Edit/5
         [Breadcrumb("Edit User", FromController = typeof(ClientCompanyController))]
-        public async Task<IActionResult> Edit(long? userId)
+        public async Task<IActionResult>   Edit(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
             {
