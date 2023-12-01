@@ -13,12 +13,17 @@
                         <h3 class="card-title"><i class="fas fa-list"></i> Companies</h3>
                      </div>
                     <div class="card-body">
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
-
+                                    <th>
+                                        Id
+                                    </th>
                                     <th>
                                         Document
+                                    </th>
+                                    <th>
+                                        Domain
                                     </th>
                                     <th>
                                         Name
@@ -27,67 +32,24 @@
                                         Code
                                     </th>
                                     <th>
-                                        Phone Number
+                                        Phone
+                                    </th>
+
+                                    <th>
+                                        Address
                                     </th>
                                     <th>
-                                        Email
-                                    </th>
-                                    <th>
-                                        Addressline
+                                        District
                                     </th>
                                     <th>
                                         State
                                     </th>
-                                    <th>Actions</th>
+                                    <th>
+                                        Country
+                                    </th>
+                                    <th></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-
-                                        <td>
-                                            @if (item?.DocumentUrl is not null)
-                                            {
-                                                <img id="profileImage" class="table-row-image" src="@item?.DocumentUrl">
-                                            }
-                                            else
-                                            {
-                                                <img id="profileImage" class="table-row-image" src="@Applicationsettings.NO_IMAGE">
-                                            }
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Code)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.PhoneNumber)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Email)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Addressline)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.State.Name)
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-xs btn-info" asp-action="Details" asp-route-id="@item.ClientCompanyId">
-                                                <i class="fa fa-search"></i> @Applicationsettings.DETAILS
-                                            </a> &nbsp;
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.ClientCompanyId">
-                                                <i class="fas fa-pen"></i> @Applicationsettings.EDIT
-                                            </a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.ClientCompanyId">
-                                                <i class="fas fa-trash"></i> @Applicationsettings.DELETE
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -95,3 +57,58 @@
         </div>
     </div>
 </section>
+
+@section Scripts    {
+    <script>
+        $(document).ready(function () {
+            $("#customerTable").DataTable({
+                ajax: {
+                    url: '/api/Company/AllCompanies',
+                    dataSrc: ''
+                },
+                fixedHeader: true,
+                processing: true,
+                paging: true,
+                language: {
+                    loadingRecords: '&nbsp;',
+                    processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                columns: [
+                    /* Name of the keys from
+                    data file source */
+                    {
+                        "data": "id", "name": "Id", "bVisible": false
+                    },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var img = '<img src="' + row.document + '" src height="30" width="30" />';
+                            return img;
+                        }
+                    },
+                    { "data": "domain" },
+                    { "data": "name" },
+                    { "data": "code" },
+                    { "data": "phone" },
+                    { "data": "address" },
+                    { "data": "district" },
+                    { "data": "state" },
+                    { "data": "country" },
+                    {
+                        "sDefaultContent": "",
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            var buttons = "";
+                            buttons += '<a href="ClientCompany/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                            buttons += '<a href="ClientCompany/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                            buttons += '<a href="ClientCompany/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
+                            return buttons;
+                        }
+                    }
+                ],
+                error: function (xhr, status, error) { alert('err ' + error) }
+            });
+        });
+    </script>
+}

@@ -24,6 +24,34 @@ namespace risk.control.system.Controllers.Api.Company
             _context = context;
         }
 
+        [HttpGet("AllCompanies")]
+        public async Task<IActionResult> AllCompanies()
+        {
+            var companies = await _context.ClientCompany
+                .Include(v => v.Country)
+                .Include(v => v.PinCode)
+                .Include(v => v.District)
+                .Include(v => v.State)
+                .ToListAsync();
+            var result =
+                companies.Select(u =>
+                new
+                {
+                    Id = u.ClientCompanyId,
+                    Document = u.DocumentUrl,
+                    Domain = "<a href=''>" + u.Email + "</a>",
+                    Name = u.Name,
+                    Code = u.Code,
+                    Phone = u.PhoneNumber,
+                    Address = u.Addressline,
+                    District = u.District.Name,
+                    State = u.State.Name,
+                    Country = u.Country.Name
+                });
+
+            return Ok(result.ToArray());
+        }
+
         [HttpGet("CompanyUsers")]
         public async Task<IActionResult> CompanyUsers(string id)
         {
