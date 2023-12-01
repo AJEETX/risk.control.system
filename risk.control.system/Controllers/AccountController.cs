@@ -88,25 +88,8 @@ namespace risk.control.system.Controllers
                             AllowRefresh = true,
                             ExpiresUtc = DateTime.UtcNow.AddDays(1)
                         });
-                    if (model.Mobile)
-                    {
-                        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@1"));
-                        var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-                        var tokenOptions = new JwtSecurityToken(
-                            issuer: "https://localhost:7208/",
-                            audience: "https://localhost:7208/",
-                            claims: new List<Claim>() { new Claim(ClaimTypes.Name, user.Email ?? string.Empty) },
-                            expires: DateTime.Now.AddMinutes(30),
-                            signingCredentials: signinCredentials
-                        );
-                        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-                        return Ok(new { Token = tokenString });
-                    }
-                    else
-                    {
-                        toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
-                        return RedirectToLocal(returnUrl);
-                    }
+                    toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
+                    return RedirectToLocal(returnUrl);
                 }
                 else if (result.IsLockedOut)
                 {
