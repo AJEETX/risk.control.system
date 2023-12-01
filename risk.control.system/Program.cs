@@ -178,13 +178,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             return Task.CompletedTask;
         };
         options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SameSite = SameSiteMode.None;
         options.SlidingExpiration = true;
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-        //options.SlidingExpiration = true;
     });
 
 builder.Services.AddSwaggerGen(c =>
