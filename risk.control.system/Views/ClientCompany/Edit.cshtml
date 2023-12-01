@@ -303,7 +303,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <span class="input-group-label"> Verify Ocr:</span>
+                                        <span class="input-group-label"> Verify Pan:</span>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="ocr-verify"><i class="fas fa-crosshairs"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -329,7 +329,7 @@
 
 
                                     <div class="form-group text-right">
-                                        <a asp-action="Index" class="btn btn-secondary">
+                                        <a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.ClientCompanyId" class="btn btn-secondary">
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
                                         </a>

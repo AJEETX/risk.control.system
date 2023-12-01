@@ -142,6 +142,7 @@ namespace risk.control.system.Controllers
                 .Include(c => c.Country)
                 .Include(c => c.PinCode)
                 .Include(c => c.State)
+                .Include(c => c.District)
                 .FirstOrDefaultAsync(m => m.ClientCompanyId == id);
             if (clientCompany == null)
             {
