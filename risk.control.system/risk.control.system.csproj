@@ -183,6 +183,7 @@
     <Folder Include="wwwroot\upload-case\" />
     <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\imgages\" />
     <Folder Include="wwwroot\report\" />
   </ItemGroup>
 </Project>

@@ -180,8 +180,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
         options.SlidingExpiration = true;
         options.LoginPath = "/Account/Login";
-        options.LogoutPath = "/Account/Logout";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+        options.Cookie.HttpOnly = true;
+        // Only use this when the sites are on different domains
+        options.Cookie.SameSite = SameSiteMode.None;
     });
 
 builder.Services.AddSwaggerGen(c =>

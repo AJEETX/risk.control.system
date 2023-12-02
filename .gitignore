@@ -364,11 +364,3 @@ FodyWeavers.xsd
 /risk.control.system/*.db
 /risk.control.system/*-shm
 /risk.control.system/*.db-wal
-/risk.control.system/wwwroot/upload-case
-/risk.control.system/wwwroot/upload-file
-/risk.control.system/Files
-/risk.control.system/wwwroot/img
-/risk.control.system/wwwroot/images
-/risk.control.system/wwwroot/download-case
-/risk.control.system/wwwroot/download-file
-/risk.control.system/wwwroot/report/report.pdf

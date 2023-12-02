@@ -47,10 +47,13 @@ namespace risk.control.system.Controllers
         {
             if (clientCompany is not null)
             {
+                Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
+
+                clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
                 IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                 if (companyDocument is not null)
                 {
-                    string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
+                    string newFileName = clientCompany.Email;
                     string fileExtension = Path.GetExtension(companyDocument.FileName);
                     newFileName += fileExtension;
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -61,9 +64,6 @@ namespace risk.control.system.Controllers
                     companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                     clientCompany.DocumentUrl = "/img/" + newFileName;
                 }
-                Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
-
-                clientCompany.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
 
                 var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account created. Domain : " + clientCompany.Email);
 
@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers
                     IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                     if (companyDocument is not null)
                     {
-                        string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
+                        string newFileName = clientCompany.Email;
                         string fileExtension = Path.GetExtension(companyDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -220,6 +220,7 @@ namespace risk.control.system.Controllers
                         if (existingClientCompany.DocumentImage != null)
                         {
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
+                            clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
                         }
                     }
                     clientCompany.Updated = DateTime.UtcNow;
