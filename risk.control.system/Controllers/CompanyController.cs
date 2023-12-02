@@ -438,7 +438,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AvailableVendors(string id, List<string> vendors)
+        public async Task<IActionResult> AvailableVendors(List<string> vendors)
         {
             if (vendors is not null && vendors.Count > 0)
             {
@@ -451,19 +451,19 @@ namespace risk.control.system.Controllers
 
                 if (company != null)
                 {
-                    var empanelledVendors = _context.Vendor.Include(v => v.Clients).AsNoTracking().Where(v => vendors.Contains(v.VendorId))
-                    ?.ToList();
+                    var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId));
+                    company.EmpanelledVendors.AddRange(vendors2Empanel.ToList());
 
-                    company.EmpanelledVendors.AddRange(empanelledVendors);
-
-                    foreach (var item in empanelledVendors)
-                    {
-                        item.Clients.Add(company);
-                    }
                     company.Updated = DateTime.UtcNow;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
+
+                    foreach (var vendor2Empanel in vendors2Empanel)
+                    {
+                        vendor2Empanel.Clients.Add(company);
+                    }
+
                     toastNotification.AddSuccessToastMessage("Agency(s) empanel successful!");
                     try
                     {
@@ -475,7 +475,6 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
-            ViewBag.CompanyId = id;
             return Problem();
         }
 
