@@ -61,14 +61,17 @@ namespace risk.control.system.Models
         [Required]
         public string? Password { get; set; }
 
-        [Display(Name = "Mails")]
-        public bool Active { get; set; } = true;
+        [Display(Name = "Active")]
+        public bool Active { get; set; } = false;
 
         public Mailbox? Mailbox { get; set; } = new();
 
         public List<ApplicationRole> ApplicationRoles { get; set; } = new();
 
         public bool Deleted { get; set; } = false;
+
+        public string? SecretPin { get; set; }
+        public string? MobileUId { get; set; }
     }
 
     public class ApplicationRole : IdentityRole<long>

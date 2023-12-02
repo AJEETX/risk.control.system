@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -11,6 +12,8 @@ using Highsoft.Web.Mvc.Charts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using NuGet.Packaging.Signing;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -47,6 +50,44 @@ namespace risk.control.system.Controllers.Api
             this.webHostEnvironment = webHostEnvironment;
             this.iCheckifyService = iCheckifyService;
             this.logger = logger;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("VerifyMobile")]
+        public IActionResult VerifyMobile(string mobile, string uid)
+        {
+            if (string.IsNullOrWhiteSpace(mobile) || mobile.Length < 11 || string.IsNullOrWhiteSpace(uid) || uid.Length < 5)
+            {
+                return BadRequest($"{nameof(mobile)} {uid} and/or {nameof(uid)} {uid} invalid");
+            }
+            var mobileUidExist = _context.VendorApplicationUser.Any(
+                v => v.MobileUId == uid);
+            if (mobileUidExist)
+            {
+                return BadRequest($"{nameof(uid)} {uid} exists");
+            }
+            var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
+                u => u.PhoneNumber == mobile);
+
+            if (user2Onboard == null)
+            {
+                return BadRequest($"mobile number does not exist");
+            }
+
+            user2Onboard.MobileUId = uid;
+            user2Onboard.SecretPin = uid.Substring(0, 4);
+            _context.VendorApplicationUser.Update(user2Onboard);
+            _context.SaveChanges();
+
+            //SEND SMS
+            string device = "0";
+            long? timestamp = null;
+            bool isMMS = false;
+            string? attachments = null;
+            bool priority = false;
+            string message = $"Pin : {user2Onboard.SecretPin}";
+            var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
+            return Ok(new { pin = user2Onboard.SecretPin });
         }
 
         [AllowAnonymous]
