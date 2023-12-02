@@ -99,10 +99,9 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=appstart.db"));
+                        options.UseSqlite("Data Source=sqllite.db"));
 }
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
     options.User.RequireUniqueEmail = true;

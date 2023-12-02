@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\imgages\**" />
+    <Content Remove="wwwroot\imgages\**" />
+    <EmbeddedResource Remove="wwwroot\imgages\**" />
+    <None Remove="wwwroot\imgages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.1.0.2" />
     <PackageReference Include="MailKit" Version="4.2.0" />
@@ -182,8 +189,6 @@
     <Folder Include="wwwroot\download-file\" />
     <Folder Include="wwwroot\upload-case\" />
     <Folder Include="wwwroot\upload-file\" />
-    <Folder Include="wwwroot\img\" />
-    <Folder Include="wwwroot\imgages\" />
     <Folder Include="wwwroot\report\" />
   </ItemGroup>
 </Project>

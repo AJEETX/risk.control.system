@@ -88,6 +88,10 @@ namespace risk.control.system.Controllers
                             AllowRefresh = true,
                             ExpiresUtc = DateTime.UtcNow.AddDays(1)
                         });
+                    if (model.Mobile)
+                    {
+                        return Ok();
+                    }
                     toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
                     return RedirectToLocal(returnUrl);
                 }
