@@ -54,7 +54,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("VerifyMobile")]
-        public IActionResult VerifyMobile(string mobile, string uid)
+        public IActionResult VerifyMobile(string mobile, string uid, bool sendSMS = false)
         {
             if (string.IsNullOrWhiteSpace(mobile) || mobile.Length < 11 || string.IsNullOrWhiteSpace(uid) || uid.Length < 5)
             {
@@ -79,14 +79,18 @@ namespace risk.control.system.Controllers.Api
             _context.VendorApplicationUser.Update(user2Onboard);
             _context.SaveChanges();
 
-            //SEND SMS
-            string device = "0";
-            long? timestamp = null;
-            bool isMMS = false;
-            string? attachments = null;
-            bool priority = false;
-            string message = $"Pin : {user2Onboard.SecretPin}";
-            var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
+            if (sendSMS)
+            {
+                //SEND SMS
+                string device = "0";
+                long? timestamp = null;
+                bool isMMS = false;
+                string? attachments = null;
+                bool priority = false;
+                string message = $"Pin : {user2Onboard.SecretPin}";
+                var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
+            }
+
             return Ok(new { pin = user2Onboard.SecretPin });
         }
 
