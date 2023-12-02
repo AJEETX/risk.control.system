@@ -112,31 +112,31 @@ namespace risk.control.system.Controllers
                     Domain domainData = (Domain)Enum.Parse(typeof(Domain), domainAddress, true);
 
                     vendor.Email = mailAddress.ToLower() + domainData.GetEnumDisplayName();
+
+                    IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
+                    if (vendorDocument is not null)
+                    {
+                        string newFileName = vendor.Email;
+                        string fileExtension = Path.GetExtension(vendorDocument.FileName);
+                        newFileName += fileExtension;
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+                        vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                        vendor.DocumentUrl = "/img/" + newFileName;
+
+                        using var dataStream = new MemoryStream();
+                        vendorDocument.CopyTo(dataStream);
+                        vendor.DocumentImage = dataStream.ToArray();
+                    }
                     vendor.Status = VendorStatus.ACTIVE;
                     vendor.ActivatedDate = DateTime.UtcNow;
                     vendor.DomainName = domainData;
                     vendor.Updated = DateTime.UtcNow;
                     vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
 
-                    IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-                    if (vendorDocument is not null)
-                    {
-                        string fileExtension = Path.GetExtension(vendorDocument.FileName);
-                        mailAddress += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", mailAddress);
-
-                        using var dataStream = new MemoryStream();
-                        vendorDocument.CopyTo(dataStream);
-                        vendor.DocumentImage = dataStream.ToArray();
-                        vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                        vendor.DocumentUrl = "/img/" + mailAddress;
-                    }
-
                     _context.Add(vendor);
                     await _context.SaveChangesAsync();
 
                     var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
-
 
                     toastNotification.AddSuccessToastMessage("agency created successfully!");
                     return RedirectToAction(nameof(Index));
