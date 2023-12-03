@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class first_inti : Migration
+    public partial class first_init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -686,6 +686,8 @@ namespace risk.control.system.Migrations
                     Password = table.Column<string>(type: "TEXT", nullable: false),
                     Active = table.Column<bool>(type: "INTEGER", nullable: false),
                     Deleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    SecretPin = table.Column<string>(type: "TEXT", nullable: true),
+                    MobileUId = table.Column<string>(type: "TEXT", nullable: true),
                     Discriminator = table.Column<string>(type: "TEXT", nullable: false),
                     ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
                     Comments = table.Column<string>(type: "TEXT", nullable: true),
