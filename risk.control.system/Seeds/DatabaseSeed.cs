@@ -13,6 +13,7 @@ namespace risk.control.system.Seeds
         {
             using var scope = app.Services.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var webHostEnvironment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var httpClientService = scope.ServiceProvider.GetRequiredService<IHttpClientService>();
             var vendorUserManager = scope.ServiceProvider.GetRequiredService<UserManager<VendorApplicationUser>>();
@@ -293,15 +294,15 @@ namespace risk.control.system.Seeds
 
             await PortalAdminSeed.Seed(context, indiaCountry, userManager, roleManager);
 
-            await ClientApplicationUserSeed.Seed(context, indiaCountry, clientUserManager, canaraId);
+            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, canaraId);
 
-            await ClientApplicationUserSeed.Seed(context, indiaCountry, clientUserManager, hdfcId);
+            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, hdfcId);
 
-            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, checker);
+            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, checker);
 
-            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, verify);
+            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, verify);
 
-            await VendorApplicationUserSeed.Seed(context, indiaCountry, vendorUserManager, investigate);
+            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, investigate);
 
             await context.SaveChangesAsync(null, false);
 

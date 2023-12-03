@@ -12,7 +12,7 @@ namespace risk.control.system.Seeds
 {
     public static class VendorApplicationUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, Vendor vendor)
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, Vendor vendor)
         {
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
             //Seed Vendor Admin
@@ -24,7 +24,8 @@ namespace risk.control.system.Seeds
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-            var adminImage = File.ReadAllBytes(AGENCY_ADMIN.PROFILE_IMAGE);
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "vendor-admin.png");
+            var adminImage = File.ReadAllBytes(adminImagePath);
 
             if (adminImage == null)
             {
@@ -85,7 +86,8 @@ namespace risk.control.system.Seeds
             var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
             var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
-            var supervisorImage = File.ReadAllBytes(SUPERVISOR.PROFILE_IMAGE);
+            string supervisorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "supervisor.png");
+            var supervisorImage = File.ReadAllBytes(supervisorImagePath);
 
             if (supervisorImage == null)
             {
@@ -141,7 +143,8 @@ namespace risk.control.system.Seeds
             var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
             var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
             var checkerState = context.State.FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
-            var agentImage = File.ReadAllBytes(AGENT.PROFILE_IMAGE);
+            string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "agent.jpg");
+            var agentImage = File.ReadAllBytes(agentImagePath);
 
             if (agentImage == null)
             {

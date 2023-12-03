@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -12,7 +13,7 @@ namespace risk.control.system.Seeds
 {
     public static class ClientApplicationUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<ClientCompanyApplicationUser> userManager, string clientCompanyId)
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, EntityEntry<Country> indiaCountry, UserManager<ClientCompanyApplicationUser> userManager, string clientCompanyId)
         {
             //Seed client admin
             var company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyId);
@@ -25,7 +26,8 @@ namespace risk.control.system.Seeds
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-            var adminImage = File.ReadAllBytes(ADMIN.PROFILE_IMAGE);
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "admin.png");
+            var adminImage = File.ReadAllBytes(adminImagePath);
 
             if (adminImage == null)
             {
@@ -88,8 +90,9 @@ namespace risk.control.system.Seeds
             var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
             var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+            string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "creator.jpg");
 
-            var creatorImage = File.ReadAllBytes(CREATOR.PROFILE_IMAGE);
+            var creatorImage = File.ReadAllBytes(creatorImagePath);
 
             if (creatorImage == null)
             {
@@ -137,8 +140,9 @@ namespace risk.control.system.Seeds
             {
                 Name = assignerEmailwithSuffix
             };
+            string assignerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assigner.png");
 
-            var assignerImage = File.ReadAllBytes(ASSIGNER.PROFILE_IMAGE);
+            var assignerImage = File.ReadAllBytes(assignerImagePath);
 
             if (assignerImage == null)
             {
@@ -188,11 +192,12 @@ namespace risk.control.system.Seeds
                 Name = assessorEmailwithSuffix
             };
 
-            var assessorImage = File.ReadAllBytes(ASSESSOR.PROFILE_IMAGE);
+            string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assessor.png");
+            var assessorImage = File.ReadAllBytes(assessorImagePath);
 
             if (assessorImage == null)
             {
-                assessorImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+                assessorImage = File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, Applicationsettings.NO_IMAGE));
             }
 
             var clientAssessor = new ClientCompanyApplicationUser()
