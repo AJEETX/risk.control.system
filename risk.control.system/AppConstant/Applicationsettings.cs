@@ -199,8 +199,6 @@
         {
             public const string DISPLAY_NAME = "ADMIN";
             public const string CODE = "admin";
-            public const string USERNAME = "admin@" + CANARADOMAIN;
-            public const string EMAIL = USERNAME;
             public const string FIRST_NAME = "Amit";
             public const string LAST_NAME = "Kumar";
             public const string PROFILE_IMAGE = "/img/admin.png";

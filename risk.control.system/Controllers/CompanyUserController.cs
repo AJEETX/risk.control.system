@@ -236,7 +236,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanyApplicationUser/Edit/5
         [Breadcrumb("Edit User", FromController = typeof(ClientCompanyController))]
-        public async Task<IActionResult>   Edit(long? userId)
+        public async Task<IActionResult> Edit(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
             {

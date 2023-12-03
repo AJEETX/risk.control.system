@@ -14,7 +14,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, Vendor vendor)
         {
-            string adminEmailwithSuffix = AGENCY_ADMIN.USERNAME + "@" + vendor.Email;
+            string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
             //Seed Vendor Admin
             var vaMailBox = new Mailbox
             {
@@ -24,7 +24,12 @@ namespace risk.control.system.Seeds
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var adminImage = File.ReadAllBytes(AGENCY_ADMIN.PROFILE_IMAGE);
 
+            if (adminImage == null)
+            {
+                adminImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+            }
             var vendorAdmin = new VendorApplicationUser()
             {
                 Mailbox = vaMailBox,
@@ -39,14 +44,15 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = true,
-                Addressline = "123 Benaras Gali",
+                Addressline = "123 Carnegie St",
                 PhoneNumber = Applicationsettings.ADMIN_MOBILE,
                 VendorId = vendor.VendorId,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = AGENCY_ADMIN.PROFILE_IMAGE
+                ProfilePictureUrl = AGENCY_ADMIN.PROFILE_IMAGE,
+                ProfilePicture = adminImage
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
             {
@@ -70,7 +76,7 @@ namespace risk.control.system.Seeds
 
             //Seed Vendor Supervisor
 
-            string supervisorEmailwithSuffix = SUPERVISOR.USERNAME + "@" + vendor.Email;
+            string supervisorEmailwithSuffix = SUPERVISOR.CODE + "@" + vendor.Email;
 
             var vsMailBox = new Mailbox
             {
@@ -79,7 +85,12 @@ namespace risk.control.system.Seeds
             var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
             var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+            var supervisorImage = File.ReadAllBytes(SUPERVISOR.PROFILE_IMAGE);
 
+            if (supervisorImage == null)
+            {
+                supervisorImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+            }
             var vendorSupervisor = new VendorApplicationUser()
             {
                 Mailbox = vsMailBox,
@@ -95,13 +106,14 @@ namespace risk.control.system.Seeds
                 VendorId = vendor.VendorId,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
-                Addressline = "123 Pakki Gali",
+                Addressline = "55 Donvale Road",
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = investigateDistrict?.DistrictId ?? default!,
                 StateId = investigateState?.StateId ?? default!,
                 PinCodeId = investigatePinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE
+                ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE,
+                ProfilePicture = supervisorImage
             };
             if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
             {
@@ -120,7 +132,7 @@ namespace risk.control.system.Seeds
             }
 
             //Seed Vendor Agent
-            string agentEmailwithSuffix = AGENT.USERNAME + "@" + vendor.Email;
+            string agentEmailwithSuffix = AGENT.CODE + "@" + vendor.Email;
             var faMailBox = new Mailbox
             {
                 Name = agentEmailwithSuffix
@@ -129,6 +141,12 @@ namespace risk.control.system.Seeds
             var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
             var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
             var checkerState = context.State.FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
+            var agentImage = File.ReadAllBytes(AGENT.PROFILE_IMAGE);
+
+            if (agentImage == null)
+            {
+                agentImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+            }
             var vendorAgent = new VendorApplicationUser()
             {
                 Mailbox = faMailBox,
@@ -145,12 +163,13 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
-                Addressline = "99 Mandir ke paas",
+                Addressline = "23 Vincent Avenue",
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = checkerDistrict?.DistrictId ?? default!,
                 StateId = checkerState?.StateId ?? default!,
                 PinCodeId = checkerPinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = AGENT.PROFILE_IMAGE
+                ProfilePictureUrl = AGENT.PROFILE_IMAGE,
+                ProfilePicture = agentImage
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))
             {

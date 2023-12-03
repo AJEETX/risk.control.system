@@ -25,7 +25,12 @@ namespace risk.control.system.Seeds
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var adminImage = File.ReadAllBytes(ADMIN.PROFILE_IMAGE);
 
+            if (adminImage == null)
+            {
+                adminImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+            }
             var clientAdmin = new ClientCompanyApplicationUser()
             {
                 Mailbox = caMailBox,
@@ -40,14 +45,15 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = true,
                 Active = true,
                 PhoneNumber = Applicationsettings.MOBILE,
-                Addressline = "123 Agra Road",
+                Addressline = "43 Golden Road",
                 IsVendorAdmin = false,
                 ClientCompanyId = clientCompanyId,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = ADMIN.PROFILE_IMAGE
+                ProfilePictureUrl = ADMIN.PROFILE_IMAGE,
+                ProfilePicture = adminImage
             };
             if (userManager.Users.All(u => u.Id != clientAdmin.Id))
             {
@@ -82,6 +88,13 @@ namespace risk.control.system.Seeds
             var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
             var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+
+            var creatorImage = File.ReadAllBytes(CREATOR.PROFILE_IMAGE);
+
+            if (creatorImage == null)
+            {
+                creatorImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+            }
             var clientCreator = new ClientCompanyApplicationUser()
             {
                 Mailbox = ccMailBox,
@@ -96,14 +109,15 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
-                Addressline = "987 Kanpur Road",
+                Addressline = "987 Canterbury Road",
                 PhoneNumber = Applicationsettings.MOBILE,
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = investigateDistrict?.DistrictId ?? default!,
                 StateId = investigateState?.StateId ?? default!,
                 PinCodeId = investigatePinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = CREATOR.PROFILE_IMAGE
+                ProfilePictureUrl = CREATOR.PROFILE_IMAGE,
+                ProfilePicture = creatorImage
             };
             if (userManager.Users.All(u => u.Id != clientCreator.Id))
             {
@@ -123,6 +137,14 @@ namespace risk.control.system.Seeds
             {
                 Name = assignerEmailwithSuffix
             };
+
+            var assignerImage = File.ReadAllBytes(ASSIGNER.PROFILE_IMAGE);
+
+            if (assignerImage == null)
+            {
+                assignerImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+            }
+
             var clientAssigner = new ClientCompanyApplicationUser()
             {
                 Mailbox = asMailBox,
@@ -137,14 +159,15 @@ namespace risk.control.system.Seeds
                 Password = Password,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
-                Addressline = "453 Lucknow Road",
+                Addressline = "453 Main Road",
                 PhoneNumber = Applicationsettings.MOBILE,
                 IsVendorAdmin = false,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = ASSIGNER.PROFILE_IMAGE
+                ProfilePictureUrl = ASSIGNER.PROFILE_IMAGE,
+                ProfilePicture = assignerImage
             };
             if (userManager.Users.All(u => u.Id != clientAssigner.Id))
             {
@@ -164,6 +187,14 @@ namespace risk.control.system.Seeds
             {
                 Name = assessorEmailwithSuffix
             };
+
+            var assessorImage = File.ReadAllBytes(ASSESSOR.PROFILE_IMAGE);
+
+            if (assessorImage == null)
+            {
+                assessorImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+            }
+
             var clientAssessor = new ClientCompanyApplicationUser()
             {
                 Mailbox = ssMailBox,
@@ -179,13 +210,14 @@ namespace risk.control.system.Seeds
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
-                Addressline = "453 Patna Road",
+                Addressline = "11 Nurlendi Street",
                 PhoneNumber = Applicationsettings.MOBILE,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = ASSESSOR.PROFILE_IMAGE
+                ProfilePictureUrl = ASSESSOR.PROFILE_IMAGE,
+                ProfilePicture = assessorImage
             };
             if (userManager.Users.All(u => u.Id != clientAssessor.Id))
             {
