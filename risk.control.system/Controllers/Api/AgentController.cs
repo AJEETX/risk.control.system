@@ -126,7 +126,7 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("VerifyDocument")]
-        public async Task<IActionResult> VerifyDocument(string type, string image, string uid)
+        public async Task<IActionResult> VerifyDocument(string type, string image, string uid, bool verifyPan = false)
         {
             var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == uid);
             if (mobileUidExist == null)
@@ -143,6 +143,10 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest("document issue");
             }
+            if (!verifyPan)
+            {
+                return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+            }
             var body = await httpClientService.VerifyPan(maskedImage.DocumentId, PanIdfyUrl, RapidAPIKey, PanTask_id, PanGroup_id);
 
             if (body != null && body?.status == "completed" &&
@@ -150,7 +154,7 @@ namespace risk.control.system.Controllers.Api
                 body.result?.source_output != null
                 && body.result?.source_output?.status == "id_found")
             {
-                Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+                return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
             }
             return BadRequest("document verify issue");
         }
