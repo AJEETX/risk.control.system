@@ -22,6 +22,8 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
 namespace risk.control.system.Controllers.Api
 {
     [Route("api/[controller]")]
@@ -29,6 +31,10 @@ namespace risk.control.system.Controllers.Api
     public class AgentController : ControllerBase
     {
         private Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
+        private static string PanIdfyUrl = "https://idfy-verification-suite.p.rapidapi.com";
+        private static string RapidAPIKey = "df0893831fmsh54225589d7b9ad1p15ac51jsnb4f768feed6f";
+        private static string PanTask_id = "74f4c926-250c-43ca-9c53-453e87ceacd1";
+        private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
@@ -36,6 +42,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IICheckifyService iCheckifyService;
         private static HttpClient httpClient = new();
+        private static string FaceMatchBaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
 
         private ILogger<AgentController> logger;
 
@@ -95,7 +102,57 @@ namespace risk.control.system.Controllers.Api
                 var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
             }
 
-            return Ok(new { pin = user2Onboard.SecretPin, Email = user2Onboard.Email });
+            return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("VerifyId")]
+        public async Task<IActionResult> VerifyId(string image, string uid)
+        {
+            var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == uid);
+            if (mobileUidExist == null)
+            {
+                return BadRequest($"{nameof(uid)} {uid} not exists");
+            }
+            var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
+            var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = image }, FaceMatchBaseUrl);
+
+            if (faceImageDetail == null)
+            {
+                return BadRequest("face mismatch");
+            }
+            return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("VerifyDocument")]
+        public async Task<IActionResult> VerifyDocument(string type, string image, string uid)
+        {
+            var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == uid);
+            if (mobileUidExist == null)
+            {
+                return BadRequest($"{nameof(uid)} {uid} not exists");
+            }
+            if (type.ToUpper() != "PAN")
+            {
+                return BadRequest("incorrect document verify issue");
+            }
+            var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
+            var maskedImage = await httpClientService.GetMaskedImage(new MaskImage { Image = image }, FaceMatchBaseUrl);
+            if (maskedImage == null || maskedImage.DocType.ToUpper() != "PAN")
+            {
+                return BadRequest("document issue");
+            }
+            var body = await httpClientService.VerifyPan(maskedImage.DocumentId, PanIdfyUrl, RapidAPIKey, PanTask_id, PanGroup_id);
+
+            if (body != null && body?.status == "completed" &&
+                body?.result != null &&
+                body.result?.source_output != null
+                && body.result?.source_output?.status == "id_found")
+            {
+                Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+            }
+            return BadRequest("document verify issue");
         }
 
         [AllowAnonymous]
