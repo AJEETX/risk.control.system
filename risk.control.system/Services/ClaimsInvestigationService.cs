@@ -448,7 +448,7 @@ namespace risk.control.system.Services
                             existingPolicy.CustomerDetail.ProfilePictureUrl = "/document/" + newFileName;
 
                             using var dataStream = new MemoryStream();
-                            await existingPolicy.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
+                            customerDocument.CopyTo(dataStream);
                             existingPolicy.CustomerDetail.ProfilePicture = dataStream.ToArray();
                         }
                         var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
