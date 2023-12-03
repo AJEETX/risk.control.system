@@ -54,18 +54,22 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("VerifyMobile")]
-        public IActionResult VerifyMobile(string mobile, string uid, bool sendSMS = false)
+        public IActionResult VerifyMobile(string mobile, string uid, bool checkUid = false, bool sendSMS = false)
         {
             if (string.IsNullOrWhiteSpace(mobile) || mobile.Length < 11 || string.IsNullOrWhiteSpace(uid) || uid.Length < 5)
             {
                 return BadRequest($"{nameof(mobile)} {uid} and/or {nameof(uid)} {uid} invalid");
             }
-            var mobileUidExist = _context.VendorApplicationUser.Any(
-                v => v.MobileUId == uid);
-            if (mobileUidExist)
+            if (checkUid)
             {
-                return BadRequest($"{nameof(uid)} {uid} exists");
+                var mobileUidExist = _context.VendorApplicationUser.Any(
+                                v => v.MobileUId == uid);
+                if (mobileUidExist)
+                {
+                    return BadRequest($"{nameof(uid)} {uid} exists");
+                }
             }
+
             var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
                 u => u.PhoneNumber == mobile);
 
@@ -91,7 +95,7 @@ namespace risk.control.system.Controllers.Api
                 var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
             }
 
-            return Ok(new { pin = user2Onboard.SecretPin });
+            return Ok(new { pin = user2Onboard.SecretPin, Email = user2Onboard.Email });
         }
 
         [AllowAnonymous]
