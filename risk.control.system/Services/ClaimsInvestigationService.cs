@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using Newtonsoft.Json;
@@ -53,9 +54,10 @@ namespace risk.control.system.Services
         private readonly IMailboxService mailboxService;
         private readonly UserManager<ApplicationUser> userManager;
         private HttpClient client = new HttpClient();
+        private readonly IWebHostEnvironment webHostEnvironment;
 
         public ClaimsInvestigationService(ApplicationDbContext context, IHttpClientService httpClientService, RoleManager<ApplicationRole> roleManager,
-            IMailboxService mailboxService,
+            IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment,
             UserManager<ApplicationUser> userManager)
         {
             this._context = context;
@@ -63,6 +65,7 @@ namespace risk.control.system.Services
             this.roleManager = roleManager;
             this.mailboxService = mailboxService;
             this.userManager = userManager;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail)
@@ -437,9 +440,13 @@ namespace risk.control.system.Services
                         existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
                         if (customerDocument is not null)
                         {
-                            var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
-                            var extension = Path.GetExtension(customerDocument.FileName);
-                            existingPolicy.CustomerDetail.ProfileImage = customerDocument;
+                            var newFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName) + Guid.NewGuid().ToString();
+                            var fileExtension = Path.GetExtension(customerDocument.FileName);
+                            newFileName += fileExtension;
+                            var upload = Path.Combine(webHostEnvironment.WebRootPath, "document", newFileName);
+                            customerDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                            existingPolicy.CustomerDetail.ProfilePictureUrl = "/document/" + newFileName;
+
                             using var dataStream = new MemoryStream();
                             await existingPolicy.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
                             existingPolicy.CustomerDetail.ProfilePicture = dataStream.ToArray();
