@@ -107,12 +107,16 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("VerifyId")]
-        public async Task<IActionResult> VerifyId(string image, string uid)
+        public async Task<IActionResult> VerifyId(string image, string uid, bool verifyId = false)
         {
             var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == uid);
             if (mobileUidExist == null)
             {
                 return BadRequest($"{nameof(uid)} {uid} not exists");
+            }
+            if (!verifyId)
+            {
+                return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
             }
             var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
             var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = image }, FaceMatchBaseUrl);
@@ -126,27 +130,29 @@ namespace risk.control.system.Controllers.Api
 
         [AllowAnonymous]
         [HttpPost("VerifyDocument")]
-        public async Task<IActionResult> VerifyDocument(string type, string image, string uid, bool verifyPan = false)
+        public async Task<IActionResult> VerifyDocument(string image, string uid, string type = "PAN", bool verifyPan = false)
         {
             var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == uid);
             if (mobileUidExist == null)
             {
                 return BadRequest($"{nameof(uid)} {uid} not exists");
             }
+            if (!verifyPan)
+            {
+                return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+            }
             if (type.ToUpper() != "PAN")
             {
-                return BadRequest("incorrect document verify issue");
+                return BadRequest("incorrect document");
             }
+            //VERIFY PAN
             var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
             var maskedImage = await httpClientService.GetMaskedImage(new MaskImage { Image = image }, FaceMatchBaseUrl);
             if (maskedImage == null || maskedImage.DocType.ToUpper() != "PAN")
             {
                 return BadRequest("document issue");
             }
-            if (!verifyPan)
-            {
-                return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
-            }
+
             var body = await httpClientService.VerifyPan(maskedImage.DocumentId, PanIdfyUrl, RapidAPIKey, PanTask_id, PanGroup_id);
 
             if (body != null && body?.status == "completed" &&
