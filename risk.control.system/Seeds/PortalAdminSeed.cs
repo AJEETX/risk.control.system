@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -14,7 +15,7 @@ namespace risk.control.system.Seeds
 {
     public static class PortalAdminSeed
     {
-        public static async Task Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, EntityEntry<Country> indiaCountry, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             var mailBox = new Mailbox
             {
@@ -24,6 +25,14 @@ namespace risk.control.system.Seeds
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "superadmin.jpg");
+            var adminImage = File.ReadAllBytes(adminImagePath);
+
+            if (adminImage == null)
+            {
+                adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+                adminImage = File.ReadAllBytes(adminImagePath);
+            }
             //Seed portal admin
             var portalAdmin = new ApplicationUser()
             {
@@ -35,6 +44,8 @@ namespace risk.control.system.Seeds
                 Password = Password,
                 EmailConfirmed = true,
                 IsSuperAdmin = true,
+                Active = true,
+                Addressline = "100, Admin Road",
                 IsClientAdmin = true,
                 IsVendorAdmin = true,
                 PhoneNumberConfirmed = true,
@@ -43,7 +54,8 @@ namespace risk.control.system.Seeds
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = PORTAL_ADMIN.PROFILE_IMAGE
+                ProfilePictureUrl = PORTAL_ADMIN.PROFILE_IMAGE,
+                ProfilePicture = adminImage
             };
             if (userManager.Users.All(u => u.Id != portalAdmin.Id))
             {

@@ -14,6 +14,8 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, Vendor vendor)
         {
+            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
             //Seed Vendor Admin
             var vaMailBox = new Mailbox
@@ -29,7 +31,7 @@ namespace risk.control.system.Seeds
 
             if (adminImage == null)
             {
-                adminImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+                adminImage = File.ReadAllBytes(noUserImagePath);
             }
             var vendorAdmin = new VendorApplicationUser()
             {
@@ -91,7 +93,7 @@ namespace risk.control.system.Seeds
 
             if (supervisorImage == null)
             {
-                supervisorImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+                supervisorImage = File.ReadAllBytes(noUserImagePath);
             }
             var vendorSupervisor = new VendorApplicationUser()
             {
@@ -148,7 +150,7 @@ namespace risk.control.system.Seeds
 
             if (agentImage == null)
             {
-                agentImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+                agentImage = File.ReadAllBytes(noUserImagePath);
             }
             var vendorAgent = new VendorApplicationUser()
             {

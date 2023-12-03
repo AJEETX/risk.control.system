@@ -44,31 +44,35 @@ namespace risk.control.system.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var users = await userManager.Users
-                .Include(u => u.Country)
-                .Include(u => u.State)
-                .Include(u => u.District)
-                .Include(u => u.PinCode).ToListAsync();
+            //var users = await userManager.Users
+            //    .Include(u => u.Country)
+            //    .Include(u => u.State)
+            //    .Include(u => u.District)
+            //    .Include(u => u.PinCode).ToListAsync();
 
-            foreach (Models.ApplicationUser user in users)
-            {
-                var thisViewModel = new UsersViewModel();
-                thisViewModel.UserId = user.Id.ToString();
-                thisViewModel.Email = user?.Email;
-                thisViewModel.UserName = user?.UserName;
-                thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
-                thisViewModel.FirstName = user.FirstName;
-                thisViewModel.LastName = user.LastName;
-                thisViewModel.Country = user.Country.Name;
-                thisViewModel.CountryId = user.CountryId;
-                thisViewModel.StateId = user.StateId;
-                thisViewModel.State = user.State.Name;
-                thisViewModel.PinCode = user.PinCode.Name;
-                thisViewModel.PinCodeId = user.PinCode.PinCodeId;
-                thisViewModel.Roles = await GetUserRoles(user);
-                UserList.Add(thisViewModel);
-            }
-            return View(UserList);
+            //foreach (Models.ApplicationUser user in users)
+            //{
+            //    var thisViewModel = new UsersViewModel();
+            //    thisViewModel.UserId = user.Id.ToString();
+            //    thisViewModel.Email = user?.Email;
+            //    thisViewModel.UserName = user?.UserName;
+            //    thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
+            //    thisViewModel.FirstName = user.FirstName;
+            //    thisViewModel.LastName = user.LastName;
+            //    thisViewModel.Country = user.Country.Name;
+            //    thisViewModel.CountryId = user.CountryId;
+            //    thisViewModel.StateId = user.StateId;
+            //    thisViewModel.State = user.State.Name;
+            //    thisViewModel.District = user.District.Name;
+            //    thisViewModel.DistrictId = user.DistrictId;
+            //    thisViewModel.PinCode = user.PinCode.Code;
+            //    thisViewModel.PinCodeId = user.PinCode.PinCodeId;
+            //    thisViewModel.Addressline = user.Addressline;
+            //    thisViewModel.Active = user.Active;
+            //    thisViewModel.Roles = await GetUserRoles(user);
+            //    UserList.Add(thisViewModel);
+            //}
+            return View();
         }
 
         [Breadcrumb(" Create")]
@@ -116,12 +120,17 @@ namespace risk.control.system.Controllers
             return View(user);
         }
 
-        private void GetCountryStateEdit(ApplicationUser? user)
+        private void GetCountryStateEdit(ApplicationUser? applicationUser)
         {
-            ViewData["CountryId"] = new SelectList(context.Country, "CountryId", "Name", user?.CountryId);
-            ViewData["DistrictId"] = new SelectList(context.District, "DistrictId", "Name", user?.DistrictId);
-            ViewData["StateId"] = new SelectList(context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
-            ViewData["PinCodeId"] = new SelectList(context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
+            var country = context.Country.Where(c => c.CountryId == applicationUser.CountryId);
+            var relatedStates = context.State.Include(s => s.Country).Where(s => s.Country.CountryId == applicationUser.CountryId).OrderBy(d => d.Name);
+            var districts = context.District.Include(d => d.State).Where(d => d.State.StateId == applicationUser.StateId).OrderBy(d => d.Name);
+            var pincodes = context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == applicationUser.DistrictId).OrderBy(d => d.Name);
+
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", applicationUser.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", applicationUser.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", applicationUser.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", applicationUser.PinCodeId);
         }
 
         [Breadcrumb(" Edit")]
@@ -133,6 +142,7 @@ namespace risk.control.system.Controllers
             }
 
             var applicationUser = await userManager.FindByIdAsync(userId);
+
             GetCountryStateEdit(applicationUser);
 
             if (applicationUser != null)
@@ -177,12 +187,16 @@ namespace risk.control.system.Controllers
                     var user = await userManager.FindByIdAsync(id);
                     if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
-                        string newFileName = Guid.NewGuid().ToString();
+                        string newFileName = user.Email;
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                         applicationUser.ProfilePictureUrl = "/img/" + newFileName;
+
+                        using var dataStream = new MemoryStream();
+                        applicationUser.ProfileImage.CopyTo(dataStream);
+                        applicationUser.ProfilePicture = dataStream.ToArray();
                     }
 
                     if (user != null)
@@ -197,6 +211,8 @@ namespace risk.control.system.Controllers
                             user.Password = applicationUser.Password;
                         }
                         user.Country = applicationUser.Country;
+                        user.Active = applicationUser.Active;
+                        user.Addressline = applicationUser.Addressline;
                         user.CountryId = applicationUser.CountryId;
                         user.State = applicationUser.State;
                         user.StateId = applicationUser.StateId;

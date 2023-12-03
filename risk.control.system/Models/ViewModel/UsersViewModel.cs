@@ -14,6 +14,8 @@ namespace risk.control.system.Models.ViewModel
         public string? PinCode { get; set; }
         public string? StateId { get; set; }
         public string? State { get; set; }
+        public string? DistrictId { get; set; }
+        public string? District { get; set; }
         public string? Country { get; set; }
         public string? CountryId { get; set; }
         public string Email { get; set; }
@@ -23,6 +25,7 @@ namespace risk.control.system.Models.ViewModel
         public string CompanyName { get; set; }
         public string PhoneNumber { get; set; }
         public string Addressline { get; set; }
+        public bool Active { get; set; }
         public IEnumerable<string> Roles { get; set; }
 
         [Display(Name = "Profile")]

@@ -17,6 +17,7 @@ namespace risk.control.system.Seeds
         {
             //Seed client admin
             var company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyId);
+            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
             string adminEmailwithSuffix = Applicationsettings.ADMIN.CODE + "@" + company.Email;
             var caMailBox = new Mailbox
@@ -31,7 +32,7 @@ namespace risk.control.system.Seeds
 
             if (adminImage == null)
             {
-                adminImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+                adminImage = File.ReadAllBytes(noUserImagePath);
             }
             var clientAdmin = new ClientCompanyApplicationUser()
             {
@@ -96,7 +97,7 @@ namespace risk.control.system.Seeds
 
             if (creatorImage == null)
             {
-                creatorImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+                creatorImage = File.ReadAllBytes(noUserImagePath);
             }
             var clientCreator = new ClientCompanyApplicationUser()
             {
@@ -146,7 +147,7 @@ namespace risk.control.system.Seeds
 
             if (assignerImage == null)
             {
-                assignerImage = File.ReadAllBytes(Applicationsettings.NO_IMAGE);
+                assignerImage = File.ReadAllBytes(noUserImagePath);
             }
 
             var clientAssigner = new ClientCompanyApplicationUser()
@@ -197,7 +198,7 @@ namespace risk.control.system.Seeds
 
             if (assessorImage == null)
             {
-                assessorImage = File.ReadAllBytes(Path.Combine(webHostEnvironment.WebRootPath, Applicationsettings.NO_IMAGE));
+                assessorImage = File.ReadAllBytes(noUserImagePath);
             }
 
             var clientAssessor = new ClientCompanyApplicationUser()

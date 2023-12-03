@@ -292,7 +292,7 @@ namespace risk.control.system.Seeds
 
             #region APPLICATION USERS ROLES
 
-            await PortalAdminSeed.Seed(context, indiaCountry, userManager, roleManager);
+            await PortalAdminSeed.Seed(context, webHostEnvironment, indiaCountry, userManager, roleManager);
 
             await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, canaraId);
 
