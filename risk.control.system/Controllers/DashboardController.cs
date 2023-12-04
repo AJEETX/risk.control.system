@@ -29,19 +29,23 @@ namespace risk.control.system.Controllers
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) 
-                || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
-                || userRole.Value.Contains(AppRoles.Assigner.ToString())
-                )
+            if (userRole != null)
             {
-                Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyCaseStatus(userEmail);
-                return new JsonResult(monthlyExpense);
+                if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString())
+                                || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
+                                || userRole.Value.Contains(AppRoles.Assigner.ToString())
+                                )
+                {
+                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyCaseStatus(userEmail);
+                    return new JsonResult(monthlyExpense);
+                }
+                else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
+                {
+                    Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgentCaseStatus(userEmail);
+                    return new JsonResult(monthlyExpense);
+                }
             }
-            else if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
-            {
-                Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgentCaseStatus(userEmail);
-                return new JsonResult(monthlyExpense);
-            }
+
             return new JsonResult(null);
         }
 

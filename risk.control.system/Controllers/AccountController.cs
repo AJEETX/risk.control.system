@@ -75,25 +75,32 @@ namespace risk.control.system.Controllers
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByEmailAsync(model.Email);
-                    var claims = new List<Claim> {
-                        new Claim(ClaimTypes.NameIdentifier, model.Email) ,
-                        new Claim(ClaimTypes.Name, model.Email)
-                    };
-                    var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                        new AuthenticationProperties
-                        {
-                            IsPersistent = true,
-                            AllowRefresh = true,
-                            ExpiresUtc = DateTime.UtcNow.AddDays(1)
-                        });
-                    if (model.Mobile)
+
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (roles != null && roles.Count > 0)
                     {
-                        return Ok();
+                        var claims = new List<Claim> {
+                            new Claim(ClaimTypes.NameIdentifier, model.Email) ,
+                            new Claim(ClaimTypes.Name, model.Email)
+                            };
+                        var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                            new AuthenticationProperties
+                            {
+                                IsPersistent = true,
+                                AllowRefresh = true,
+                                ExpiresUtc = DateTime.UtcNow.AddDays(1)
+                            });
+                        if (model.Mobile)
+                        {
+                            return Ok();
+                        }
+                        toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
+                        return RedirectToLocal(returnUrl);
                     }
-                    toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
-                    return RedirectToLocal(returnUrl);
+
+                    return RedirectToAction("login");
                 }
                 else if (result.IsLockedOut)
                 {
@@ -122,18 +129,15 @@ namespace risk.control.system.Controllers
                     }
                 }
             }
+            if (model.Mobile)
+            {
+                return BadRequest();
+            }
             else
             {
-                if (model.Mobile)
-                {
-                    return BadRequest();
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Bad Request.");
-                    model.Error = "Bad Request.";
-                    return View(model);
-                }
+                ModelState.AddModelError(string.Empty, "Bad Request.");
+                model.Error = "Bad Request.";
+                return View(model);
             }
         }
 
