@@ -119,9 +119,18 @@
                                                                     <div class="input-group mb-3">
                                                                         
                                                                         <img id="profileImage" class="form-Image" src="/img/user.png">
+                                                                        @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                                                                        {
 
-                                                                        <input accept="image/*" asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                                            <input accept="image/*" asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <i class="fa fa-asterisk asterik-style"></i>
 
+                                                                            <input accept="image/*" asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
+
+                                                                        }
                                                                     </div>
                                                                 </div>
 

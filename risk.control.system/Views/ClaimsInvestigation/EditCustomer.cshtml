@@ -50,26 +50,14 @@
                                                     <div class="card-body pt-0">
                                                         <div class="row">
                                                             <div class="col-sm-6">
-                                                                <div class="form-group">
-                                                                    <span class="input-group-label"> Customer Type:</span>
-                                                                    <div class="input-group mb-3">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text" asp-for="CustomerType"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                                                        </div>
-                                                                        <select id="customer-type" required asp-for="CustomerDetail.CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
-                                                                            <option value="">--- SELECT ---</option>
-                                                                        </select>
-                                                                        <span asp-validation-for="CustomerDetail.CustomerType" class="text-danger"></span>
-                                                                    </div>
-                                                                </div>
-
+                                                                
                                                                 <div class="form-group">
                                                                     <span class="input-group-label"> Customer Name:</span>
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="CustomerName"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input required asp-for="CustomerDetail.CustomerName" class="form-control title-name" type="text" placeholder="Customer Name" maxlength="20" />
+                                                                        <input id="customer-name" required asp-for="CustomerDetail.CustomerName" class="form-control title-name" type="text" placeholder="Customer Name" maxlength="20" />
                                                                         <span asp-validation-for="CustomerDetail.CustomerName" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -93,6 +81,18 @@
                                                                             <option value="">--- SELECT ---</option>
                                                                         </select>
                                                                         <span asp-validation-for="CustomerDetail.Gender" class="text-danger"></span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <span class="input-group-label"> Customer Type:</span>
+                                                                    <div class="input-group mb-3">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text" asp-for="CustomerType"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                        </div>
+                                                                        <select id="customer-type" required asp-for="CustomerDetail.CustomerType" class="form-control" asp-items="Html.GetEnumSelectList<CustomerType>()">
+                                                                            <option value="">--- SELECT ---</option>
+                                                                        </select>
+                                                                        <span asp-validation-for="CustomerDetail.CustomerType" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
 
@@ -240,8 +240,24 @@
                                                                         {
                                                                             <img id="profileImage" class="form-Image" src="/img/user.png">
                                                                         }
-                                                                        <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
 
+                                                                        @if (Model.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                                                                        {
+                                                                            <i class="fa fa-asterisk asterik-style"></i>
+                                                                            @if (Model?.CustomerDetail.ProfilePicture is not null)
+                                                                            {
+                                                                                <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])"/>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+
+                                                                        }
                                                                     </div>
                                                                 </div>
 
@@ -308,7 +324,7 @@
         $(document).ready(function () {
             $("#create-form").validate();
         });
-        $("#customer-type").focus();
+        $("#customer-name").focus();
 
         dateCustomerId.max = new Date().toISOString().split("T")[0];
     </script>

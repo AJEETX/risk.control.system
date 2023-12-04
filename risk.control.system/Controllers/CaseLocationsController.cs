@@ -91,6 +91,7 @@ namespace risk.control.system.Controllers
         public IActionResult Create(string id)
         {
             var claim = _context.ClaimsInvestigation
+                .Include(i => i.PolicyDetail)
                 .Include(i => i.CaseLocations)
                 .ThenInclude(c => c.District)
                                 .Include(i => i.CaseLocations)
@@ -212,6 +213,7 @@ namespace risk.control.system.Controllers
 
             var services = _context.CaseLocation
                 .Include(v => v.ClaimsInvestigation)
+                .ThenInclude(c => c.PolicyDetail)
                 .Include(v => v.District)
                 .First(v => v.CaseLocationId == id);
 

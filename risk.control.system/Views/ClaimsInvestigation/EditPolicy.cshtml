@@ -83,7 +83,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input required asp-for="PolicyDetail.ContractNumber" style="text-transform:uppercase" class="form-control" type="text" placeholder="Policy #" maxlength="20" />
+                                                                        <input id="contractnum" required asp-for="PolicyDetail.ContractNumber" style="text-transform:uppercase" class="form-control" type="text" placeholder="Policy #" maxlength="20" />
                                                                         <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -234,7 +234,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        $("#InvestigationServiceTypeId").focus();
+        $("#contractnum").focus();
         $.validator.setDefaults({
             submitHandler: function (form) {
                 $.confirm({
