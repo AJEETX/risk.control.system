@@ -203,7 +203,7 @@ namespace risk.control.system.Controllers
                     IFormFile? companyDocument = Request.Form?.Files?.FirstOrDefault();
                     if (companyDocument is not null)
                     {
-                        string newFileName = clientCompany.Email;
+                        string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(companyDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);

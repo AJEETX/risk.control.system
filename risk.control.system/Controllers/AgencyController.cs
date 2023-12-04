@@ -124,7 +124,7 @@ namespace risk.control.system.Controllers
                     IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                     if (vendorDocument is not null)
                     {
-                        string newFileName = vendor.Email;
+                        string newFileName = vendor.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -141,6 +141,7 @@ namespace risk.control.system.Controllers
                         if (existingVendor.DocumentImage != null)
                         {
                             vendor.DocumentImage = existingVendor.DocumentImage;
+                            vendor.DocumentUrl = existingVendor.DocumentUrl;
                         }
                     }
                     vendor.Updated = DateTime.UtcNow;
@@ -149,7 +150,6 @@ namespace risk.control.system.Controllers
                     await _context.SaveChangesAsync();
 
                     var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
-
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -273,15 +273,15 @@ namespace risk.control.system.Controllers
             }
             vendorApplicationUser.Vendor = vendor;
 
-            var country = _context.Country.Where(c => c.CountryId == vendorUser.CountryId);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorUser.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorUser.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorUser.DistrictId).OrderBy(d => d.Name);
+            var country = _context.Country.Where(c => c.CountryId == vendorApplicationUser.CountryId);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
 
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorUser.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorUser.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorUser.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorUser.PinCodeId);
+            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
+            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
+            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
+            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
 
             return View(vendorApplicationUser);
         }
