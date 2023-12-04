@@ -234,7 +234,8 @@ namespace risk.control.system.Controllers
 
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
-
+            //DEMO
+            user.Password = Applicationsettings.Password;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;

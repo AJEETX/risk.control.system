@@ -117,6 +117,8 @@ namespace risk.control.system.Controllers
                 user.ProfilePictureUrl = "/img/" + newFileName;
             }
             var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+            //DEMO
+            user.Password = Applicationsettings.Password;
             user.Email = userFullEmail;
             user.EmailConfirmed = true;
             user.UserName = userFullEmail;
