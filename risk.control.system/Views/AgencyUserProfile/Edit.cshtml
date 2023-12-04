@@ -124,7 +124,7 @@
                                             </div>
 
                                             <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
-                                                <option>--- SELECT ---</option>
+                                                <option value="">--- SELECT ---</option>
                                             </select>
 
                                             <span asp-validation-for="DistrictId" class="text-danger"></span>

@@ -72,7 +72,7 @@
                                                     <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this, false)" required>
-                                                    <option>--- SELECT ---</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="CountryId" class="text-danger"></span>
 
@@ -86,7 +86,7 @@
                                                     <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this, false)" required>
-                                                    <option>--- SELECT ---</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="StateId" class="text-danger"></span>
                                             </div>
@@ -98,7 +98,7 @@
                                                     <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
                                                 <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadRemainingServicePinCode(this, false,'@Model.Vendor.VendorId')" required>
-                                                    <option>--- SELECT ---</option>
+                                                    <option value="">--- SELECT ---</option>
                                                 </select>
                                                 <span asp-validation-for="DistrictId" class="text-danger"></span>
                                             </div>
