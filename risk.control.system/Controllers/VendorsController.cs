@@ -211,7 +211,7 @@ namespace risk.control.system.Controllers
                     IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                     if (vendorDocument is not null)
                     {
-                        string newFileName = vendor.DomainName.GetEnumDisplayName();
+                        string newFileName = vendor.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
