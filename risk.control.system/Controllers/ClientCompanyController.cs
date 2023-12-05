@@ -190,10 +190,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClientCompany clientCompany)
         {
-            if (string.IsNullOrWhiteSpace(clientCompany.ClientCompanyId))
+            if (clientCompany is null || string.IsNullOrWhiteSpace(clientCompany.ClientCompanyId))
             {
                 toastNotification.AddErrorToastMessage("client company not found!");
-                return NotFound();
+                return RedirectToAction("Index");
             }
 
             if (clientCompany is not null)
