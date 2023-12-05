@@ -1,6 +1,4 @@
-﻿using System.Web.Helpers;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -194,7 +192,7 @@ namespace risk.control.system.Controllers
             var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
-                string newFileName = userFullEmail;
+                string newFileName = Guid.NewGuid().ToString();
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -308,7 +306,7 @@ namespace risk.control.system.Controllers
                     var user = await userManager.FindByIdAsync(id);
                     if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
-                        string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
+                        string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);

@@ -188,9 +188,9 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ClientCompany clientCompany)
+        public async Task<IActionResult> Edit(ClientCompany clientCompany)
         {
-            if (id != clientCompany.ClientCompanyId)
+            if (string.IsNullOrWhiteSpace(clientCompany.ClientCompanyId))
             {
                 toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
@@ -216,8 +216,8 @@ namespace risk.control.system.Controllers
                     }
                     else
                     {
-                        var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == id);
-                        if (existingClientCompany.DocumentImage != null)
+                        var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
+                        if (existingClientCompany.DocumentUrl != null)
                         {
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                             clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
