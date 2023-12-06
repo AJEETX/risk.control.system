@@ -183,6 +183,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.HttpOnly = true;
         // Only use this when the sites are on different domains
         options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 
 builder.Services.AddSwaggerGen(c =>
@@ -232,7 +233,8 @@ app.UseSwaggerUI(options =>
 app.UseCookiePolicy(
     new CookiePolicyOptions
     {
-        Secure = CookieSecurePolicy.Always
+        Secure = CookieSecurePolicy.Always,
+        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
     });
 app.UseCors();
 app.UseAuthentication();

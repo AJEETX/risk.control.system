@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers
                             {
                                 IsPersistent = true,
                                 AllowRefresh = true,
-                                ExpiresUtc = DateTime.UtcNow.AddDays(1)
+                                ExpiresUtc = DateTime.UtcNow.AddMinutes(5)
                             });
                         if (model.Mobile)
                         {
