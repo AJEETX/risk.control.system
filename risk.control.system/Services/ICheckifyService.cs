@@ -90,13 +90,12 @@ namespace risk.control.system.Services
                         var image = Convert.FromBase64String(data.LocationImage);
                         var locationRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
-                        claimCase.ClaimReport.AgentLocationPicture = image;
                         var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
                         claimCase.ClaimReport.AgentLocationPictureUrl = filePath;
                         CompressImage.Compressimage(stream, filePath);
 
                         var savedImage = await File.ReadAllBytesAsync(filePath);
-
+                        claimCase.ClaimReport.AgentLocationPicture = savedImage;
                         var saveImageBase64String = Convert.ToBase64String(savedImage);
 
                         claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
@@ -222,7 +221,19 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.OcrImage))
             {
-                var inputImage = new MaskImage { Image = data.OcrImage };
+                var byteimage = Convert.FromBase64String(data.OcrImage);
+
+                var locationRealImage = ByteArrayToImage(byteimage);
+                MemoryStream mstream = new MemoryStream(byteimage);
+                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                claimCase.ClaimReport.AgentLocationPictureUrl = mfilePath;
+                CompressImage.Compressimage(mstream, mfilePath);
+
+                var savedImage = await File.ReadAllBytesAsync(mfilePath);
+
+                var base64Image = Convert.ToBase64String(savedImage);
+                var inputImage = new MaskImage { Image = base64Image };
+
                 this.logger.LogInformation("DOCUMENT ID : PAN image {ocrImage} ", data.OcrImage);
 
                 var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);

@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 using NToastNotify;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -20,15 +21,21 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
+        private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly UserManager<ClientCompanyApplicationUser> userManager;
 
         public ClientCompanyController(
             ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
+            RoleManager<ApplicationRole> roleManager,
+            UserManager<ClientCompanyApplicationUser> userManager,
             IToastNotification toastNotification)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
+            this.roleManager = roleManager;
+            this.userManager = userManager;
         }
 
         // GET: ClientCompanies/Create
@@ -223,6 +230,35 @@ namespace risk.control.system.Controllers
                             clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
                         }
                     }
+
+                    var assignerRole = roleManager.Roles.FirstOrDefault(r =>
+                            r.Name.Contains(AppRoles.Assigner.ToString()));
+                    var creatorRole = roleManager.Roles.FirstOrDefault(r =>
+                            r.Name.Contains(AppRoles.Creator.ToString()));
+
+                    var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompany.ClientCompanyId);
+
+                    string currentOwner = string.Empty;
+                    foreach (var companyuser in companyUsers)
+                    {
+                        var isCreator = await userManager.IsInRoleAsync(companyuser, creatorRole?.Name);
+                        if (isCreator)
+                        {
+                            currentOwner = companyuser.Email;
+
+                            ClientCompanyApplicationUser user = await userManager.FindByEmailAsync(currentOwner);
+
+                            if (clientCompany.Auto)
+                            {
+                                var result = await userManager.AddToRoleAsync(user, assignerRole.Name);
+                            }
+                            else
+                            {
+                                var result = await userManager.RemoveFromRoleAsync(user, assignerRole.Name);
+                            }
+                        }
+                    }
+
                     clientCompany.Updated = DateTime.UtcNow;
                     clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(clientCompany);

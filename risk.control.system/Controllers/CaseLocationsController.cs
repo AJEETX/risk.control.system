@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,12 +18,14 @@ namespace risk.control.system.Controllers
     public class CaseLocationsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
         private HttpClient client = new HttpClient();
 
-        public CaseLocationsController(ApplicationDbContext context, IToastNotification toastNotification)
+        public CaseLocationsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IToastNotification toastNotification)
         {
             _context = context;
+            this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
         }
 
@@ -155,10 +158,15 @@ namespace risk.control.system.Controllers
                 {
                     var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
                     var extension = Path.GetExtension(customerDocument.FileName);
-                    caseLocation.ProfileImage = customerDocument;
+                    messageDocumentFileName += extension;
                     using var dataStream = new MemoryStream();
                     await caseLocation.ProfileImage.CopyToAsync(dataStream);
-                    caseLocation.ProfilePicture = dataStream.ToArray();
+                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{messageDocumentFileName}");
+                    CompressImage.Compressimage(dataStream, filePath);
+
+                    var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
+                    caseLocation.ProfilePicture = savedImage;
+                    caseLocation.ProfilePictureUrl = "/document/" + messageDocumentFileName;
                 }
 
                 _context.Add(caseLocation);
@@ -271,18 +279,24 @@ namespace risk.control.system.Controllers
                         {
                             var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
                             var extension = Path.GetExtension(customerDocument.FileName);
-                            caseLocation.ProfileImage = customerDocument;
+                            messageDocumentFileName += extension;
                             using var dataStream = new MemoryStream();
                             await caseLocation.ProfileImage.CopyToAsync(dataStream);
-                            caseLocation.ProfilePicture = dataStream.ToArray();
+                            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{messageDocumentFileName}");
+                            CompressImage.Compressimage(dataStream, filePath);
+
+                            var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
+                            caseLocation.ProfilePicture = savedImage;
+                            caseLocation.ProfilePictureUrl = "/document/" + messageDocumentFileName;
                         }
                         else
                         {
                             var existingLocation = _context.CaseLocation.AsNoTracking().Where(c =>
                                 c.CaseLocationId == caseLocation.CaseLocationId && c.CaseLocationId == id).FirstOrDefault();
-                            if (existingLocation.ProfilePicture != null)
+                            if (existingLocation.ProfilePicture != null || !string.IsNullOrWhiteSpace(existingLocation.ProfilePictureUrl))
                             {
                                 caseLocation.ProfilePicture = existingLocation.ProfilePicture;
+                                caseLocation.ProfilePictureUrl = existingLocation.ProfilePictureUrl;
                             }
                         }
 

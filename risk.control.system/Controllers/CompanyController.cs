@@ -150,29 +150,27 @@ namespace risk.control.system.Controllers
                     var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == companyUser.ClientCompanyId);
 
                     string currentOwner = string.Empty;
-                    foreach (var companyUse in companyUsers)
+                    foreach (var companyuser in companyUsers)
                     {
-                        var isCreator = await userManager.IsInRoleAsync(companyUse, creatorRole?.Name);
+                        var isCreator = await userManager.IsInRoleAsync(companyuser, creatorRole?.Name);
                         if (isCreator)
                         {
-                            currentOwner = companyUse.Email;
-                            break;
+                            currentOwner = companyuser.Email;
+
+                            ClientCompanyApplicationUser user = await userManager.FindByEmailAsync(currentOwner);
+
+                            if (clientCompany.Auto)
+                            {
+                                var result = await userManager.AddToRoleAsync(user, assignerRole.Name);
+                            }
+                            else
+                            {
+                                var result = await userManager.RemoveFromRoleAsync(user, assignerRole.Name);
+                            }
                         }
                     }
-                    ClientCompanyApplicationUser user = await userManager.FindByEmailAsync(currentOwner);
-
-                    if (clientCompany.Auto)
-                    {
-                        var result = await userManager.AddToRoleAsync(user, assignerRole.Name);
-                        var currentUser = await userManager.FindByEmailAsync(userEmail);
-                        await signInManager.RefreshSignInAsync(currentUser);
-                    }
-                    else
-                    {
-                        var result = await userManager.RemoveFromRoleAsync(user, assignerRole.Name);
-                        var currentUser = await userManager.FindByEmailAsync(userEmail);
-                        await signInManager.RefreshSignInAsync(currentUser);
-                    }
+                    var currentUser = await userManager.FindByEmailAsync(userEmail);
+                    await signInManager.RefreshSignInAsync(currentUser);
 
                     var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == clientCompany.PinCodeId);
 

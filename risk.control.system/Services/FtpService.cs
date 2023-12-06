@@ -6,6 +6,7 @@ using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -414,8 +415,15 @@ namespace risk.control.system.Services
 
                                 var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "POLICY.jpg");
 
-                                var image = System.IO.File.ReadAllBytes(policyImagePath);
-                                dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
+                                var image = File.ReadAllBytes(policyImagePath);
+
+                                using MemoryStream stream = new MemoryStream(image);
+
+                                CompressImage.Compressimage(stream, policyImagePath);
+
+                                var savedImage = await File.ReadAllBytesAsync(policyImagePath);
+
+                                dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedImage)}";
                                 claim.PolicyDetail = new PolicyDetail
                                 {
                                     ContractNumber = rowData[0]?.Trim(),
@@ -429,7 +437,7 @@ namespace risk.control.system.Services
                                     CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                                     LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
                                     ClientCompanyId = companyUser?.ClientCompanyId,
-                                    DocumentImage = image,
+                                    DocumentImage = savedImage,
                                 };
 
                                 var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
@@ -442,7 +450,7 @@ namespace risk.control.system.Services
 
                                 var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "CUSTOMER.jpg");
 
-                                var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+                                var customerImage = File.ReadAllBytes(customerImagePath);
 
                                 dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
 
@@ -533,6 +541,13 @@ namespace risk.control.system.Services
             }
             var dataObject = ConvertDataTable<UploadClaim>(dt);
             _context.UploadClaim.AddRange(dataObject);
+        }
+
+        private System.Drawing.Image? ByteArrayToImage(byte[] data)
+        {
+            MemoryStream ms = new MemoryStream(data);
+            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
+            return returnImage;
         }
 
         private static T GetItem<T>(DataRow dr)
