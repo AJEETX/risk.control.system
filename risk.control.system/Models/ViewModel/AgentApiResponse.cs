@@ -99,19 +99,22 @@
         public string Remarks { get; set; }
     }
 
-    public class PostData
+    public class FaceData
     {
         public string Email { get; set; }
         public string ClaimId { get; set; }
-        public string? LocationImage { get; set; }
-        public string? LocationData { get; set; }
-        public string? LocationLongLat { get; set; }
-        public string? OcrImage { get; set; }
-        public string? OcrLongLat { get; set; }
-        public string? OcrData { get; set; }
-        public string? Question1 { get; set; }
-        public string? Question2 { get; set; }
-        public string? Remarks { get; set; }
+        public string LocationImage { get; set; }
+        public string LocationData { get; set; }
+        public string LocationLongLat { get; set; }
+    }
+
+    public class DocumentData
+    {
+        public string Email { get; set; }
+        public string ClaimId { get; set; }
+        public string OcrImage { get; set; }
+        public string OcrLongLat { get; set; }
+        public string OcrData { get; set; }
     }
 
     public class VendorData

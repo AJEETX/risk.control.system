@@ -12,9 +12,9 @@ namespace risk.control.system.Services
 {
     public interface IICheckifyService
     {
-        Task<AppiCheckifyResponse> GetFaceId(PostData data);
+        Task<AppiCheckifyResponse> GetFaceId(FaceData data);
 
-        Task<AppiCheckifyResponse> GetDocumentId(PostData data);
+        Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
     }
 
     public class ICheckifyService : IICheckifyService
@@ -39,7 +39,7 @@ namespace risk.control.system.Services
             this.logger = logger;
         }
 
-        public async Task<AppiCheckifyResponse> GetFaceId(PostData data)
+        public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
         {
             var claimCase = _context.CaseLocation
                 .Include(c => c.BeneficiaryRelation)
@@ -193,7 +193,7 @@ namespace risk.control.system.Services
             return returnImage;
         }
 
-        public async Task<AppiCheckifyResponse> GetDocumentId(PostData data)
+        public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
         {
             var claimCase = _context.CaseLocation
                 .Include(c => c.BeneficiaryRelation)

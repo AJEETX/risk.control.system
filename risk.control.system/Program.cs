@@ -17,6 +17,7 @@ using NToastNotify;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
@@ -182,8 +183,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
         options.Cookie.HttpOnly = true;
         // Only use this when the sites are on different domains
-        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.Domain = "check.azurewebsites.com";
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.CookieManager = new CookieManager();
     });
 
 builder.Services.AddSwaggerGen(c =>
@@ -235,7 +238,8 @@ app.UseCookiePolicy(
     {
         Secure = CookieSecurePolicy.Always,
         HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
-    });
+        MinimumSameSitePolicy = SameSiteMode.Strict
+    }); ;
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

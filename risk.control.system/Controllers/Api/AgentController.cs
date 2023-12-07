@@ -517,20 +517,39 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [RequestSizeLimit(100_000_000)]
+        [RequestSizeLimit(10000000)]
         [HttpPost("faceid")]
-        public async Task<IActionResult> FaceId(PostData data)
+        public async Task<IActionResult> FaceId(FaceData data)
         {
+            if (data == null ||
+                string.IsNullOrWhiteSpace(data.LocationImage) ||
+                !data.LocationImage.IsBase64String() ||
+                string.IsNullOrEmpty(data.LocationData) ||
+                string.IsNullOrEmpty(data.LocationLongLat))
+            {
+                return BadRequest();
+            }
+
             var response = await iCheckifyService.GetFaceId(data);
 
             return Ok(response);
         }
 
         [AllowAnonymous]
-        [RequestSizeLimit(100_000_000)]
+        [RequestSizeLimit(10000000)]
         [HttpPost("documentid")]
-        public async Task<IActionResult> DocumentId(PostData data)
+        public async Task<IActionResult> DocumentId(DocumentData data)
         {
+            if (data == null
+                || string.IsNullOrWhiteSpace(data.OcrImage)
+                || !data.OcrImage.IsBase64String()
+                || string.IsNullOrEmpty(data.OcrData)
+                || string.IsNullOrEmpty(data.OcrLongLat)
+                )
+            {
+                return BadRequest();
+            }
+
             var response = await iCheckifyService.GetDocumentId(data);
 
             return Ok(response);

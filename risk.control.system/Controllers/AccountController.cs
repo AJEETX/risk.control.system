@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -58,7 +59,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Login(string returnUrl = null)
         {
             // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             ViewData["ReturnUrl"] = returnUrl;
             return View();
@@ -68,9 +69,11 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid || !model.Email.ValidateEmail())
             {
                 ViewData["ReturnUrl"] = returnUrl == "dashboard";
+                var email = HttpUtility.HtmlEncode(model.Email);
+                var pwd = HttpUtility.HtmlEncode(model.Password);
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -85,10 +88,11 @@ namespace risk.control.system.Controllers
                             };
                         var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                         ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                             new AuthenticationProperties
                             {
-                                IsPersistent = true,
+                                IsPersistent = false,
                                 AllowRefresh = true,
                                 ExpiresUtc = DateTime.UtcNow.AddMinutes(5)
                             });
