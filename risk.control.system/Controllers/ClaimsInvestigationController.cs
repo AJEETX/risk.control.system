@@ -195,6 +195,7 @@ namespace risk.control.system.Controllers
             _context.SaveChanges();
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(" Add New")]
         public async Task<IActionResult> CreateClaim()
         {
@@ -216,6 +217,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(" Claims")]
         public IActionResult Index()
         {
@@ -224,18 +226,21 @@ namespace risk.control.system.Controllers
             return View();
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Assign()
         {
             return View();
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(" Assess", FromAction = "Index")]
         public async Task<IActionResult> Assessor()
         {
             return View();
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(" Allocate(manual)", FromAction = "Index")]
         public IActionResult Assigner()
         {
@@ -244,12 +249,14 @@ namespace risk.control.system.Controllers
 
         // GET: ClaimsInvestigation
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Draft()
         {
             return View();
         }
 
+        [ValidateAntiForgeryToken]
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
@@ -422,6 +429,7 @@ namespace risk.control.system.Controllers
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation });
         }
 
+        [ValidateAntiForgeryToken]
         [HttpGet]
         [Breadcrumb(" Allocate (to agency)")]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
@@ -478,6 +486,7 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpGet]
         [Breadcrumb(" Re-allocate to agency")]
         public async Task<IActionResult> ReAllocateToVendor(string selectedcase)
@@ -528,6 +537,7 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> CaseAllocatedToVendor(string selectedcase, string claimId, long caseLocationId)
         {
@@ -553,6 +563,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Case-locations")]
+        [ValidateAntiForgeryToken]
         public IActionResult CaseLocation(string id)
         {
             if (id == null)
@@ -594,12 +605,14 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Assessed")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approved()
         {
             return View();
         }
 
         [Breadcrumb(" Rejected", FromAction = "Index")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -678,24 +691,28 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Re Allocate", FromAction = "Index")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Review()
         {
             return View();
         }
 
         [Breadcrumb(title: "Active")]
+        [ValidateAntiForgeryToken]
         public IActionResult Active()
         {
             return View();
         }
 
         [Breadcrumb(title: "Withdraw", FromAction = "Index")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToInvestigate()
         {
             return View();
         }
 
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -817,6 +834,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Report", FromAction = "Approved")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetApprovedReport(string selectedcase)
         {
             if (selectedcase == null || _context.ClaimsInvestigation == null)
@@ -956,6 +974,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> ProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
         {
@@ -972,6 +991,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor));
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> ReProcessCaseReport(string assessorRemarks, string assessorRemarkType, string claimId, long caseLocationId)
         {
@@ -992,6 +1012,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor));
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> Assign(List<string> claims)
         {
@@ -1054,6 +1075,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Details/5
+        [ValidateAntiForgeryToken]
         [Breadcrumb("Details", FromAction = "Draft")]
         public async Task<IActionResult> Details(string id)
         {
@@ -1142,6 +1164,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> CaseReadyToAssign(ClaimTransactionModel model)
         {
@@ -1161,6 +1184,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Draft));
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Detail", FromAction = "Active")]
         public async Task<IActionResult> Detail(string id)
         {
@@ -1242,6 +1266,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Detail", FromAction = "Index")]
         public async Task<IActionResult> ReadyDetail(string id)
         {
@@ -1309,6 +1334,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Detail", FromAction = "Assign")]
         public async Task<IActionResult> AssignDetail(string id)
         {
@@ -1440,6 +1466,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Details), new { id = claim.ClaimsInvestigationId });
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Edit Policy", FromAction = "Draft")]
         public async Task<IActionResult> EditPolicy(string id)
         {
@@ -1476,6 +1503,7 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
         {
@@ -1510,6 +1538,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Details), new { id = claim.ClaimsInvestigationId });
         }
 
+        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Add Customer", FromAction = "Draft")]
         public async Task<IActionResult> CreateCustomer(string id)
         {
@@ -1571,6 +1600,7 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
@@ -1702,6 +1732,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClaimsInvestigation/Edit/5
         [Breadcrumb(title: " Withdraw", FromAction = "Active")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Withdraw(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -1771,6 +1802,7 @@ namespace risk.control.system.Controllers
         // POST: ClaimsInvestigation/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetWithdraw(ClaimsInvestigation claimsInvestigation)
         {
             if (claimsInvestigation == null || _context.ClaimsInvestigation == null)
@@ -1808,6 +1840,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Delete/5
+        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Delete", FromAction = "Draft")]
         public async Task<IActionResult> Delete(string id)
         {

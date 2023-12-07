@@ -16,7 +16,7 @@ function initMap(url) {
 }
 
 async function success(position) {
-    var apiKey = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
+    var hexData = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     var bounds = new google.maps.LatLngBounds();
@@ -24,7 +24,7 @@ async function success(position) {
     var long = position.coords.longitude;
     var locresponse = $.ajax({
         type: "GET",
-        url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${apiKey}`,
+        url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${hexData}`,
         async: false
     }).responseText;
     current_data = JSON.parse(locresponse);
