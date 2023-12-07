@@ -171,7 +171,6 @@ namespace risk.control.system.Controllers
 
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} added successfully !", caseLocation.BeneficiaryName));
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == caseLocation.ClaimsInvestigationId);

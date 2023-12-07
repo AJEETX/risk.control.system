@@ -163,7 +163,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public async Task<int?> CheckUserName(string input, string domain)
         {
             if (string.IsNullOrWhiteSpace(input) || string.IsNullOrWhiteSpace(domain))
@@ -189,7 +188,6 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
         public async Task<int?> CheckUserEmail(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
