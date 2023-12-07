@@ -524,7 +524,6 @@ namespace risk.control.system.Controllers.Api
             if (data == null ||
                 string.IsNullOrWhiteSpace(data.LocationImage) ||
                 !data.LocationImage.IsBase64String() ||
-                string.IsNullOrEmpty(data.LocationData) ||
                 string.IsNullOrEmpty(data.LocationLongLat))
             {
                 return BadRequest();
@@ -543,7 +542,6 @@ namespace risk.control.system.Controllers.Api
             if (data == null
                 || string.IsNullOrWhiteSpace(data.OcrImage)
                 || !data.OcrImage.IsBase64String()
-                || string.IsNullOrEmpty(data.OcrData)
                 || string.IsNullOrEmpty(data.OcrLongLat)
                 )
             {

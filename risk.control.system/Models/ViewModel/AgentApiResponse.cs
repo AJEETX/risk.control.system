@@ -114,7 +114,6 @@
         public string ClaimId { get; set; }
         public string OcrImage { get; set; }
         public string OcrLongLat { get; set; }
-        public string OcrData { get; set; }
     }
 
     public class VendorData

@@ -324,12 +324,6 @@ namespace risk.control.system.Services
 
             #endregion PAN IMAGE PROCESSING
 
-            if (string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrData) && !string.IsNullOrWhiteSpace(data.OcrData))
-            {
-                claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ".\n " +
-                    "" + data.OcrData;
-            }
-
             if (!string.IsNullOrWhiteSpace(data.OcrLongLat))
             {
                 claimCase.ClaimReport.OcrLongLat = data.OcrLongLat;
