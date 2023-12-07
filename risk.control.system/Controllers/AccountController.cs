@@ -146,6 +146,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [AllowAnonymous]
         public IActionResult Forgot(string useremail, long mobile)
         {

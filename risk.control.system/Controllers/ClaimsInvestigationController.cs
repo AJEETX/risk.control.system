@@ -1445,7 +1445,6 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Details), new { id = claim.ClaimsInvestigationId });
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Edit Policy", FromAction = "Draft")]
         public async Task<IActionResult> EditPolicy(string id)
         {
@@ -1672,7 +1671,6 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
-        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
