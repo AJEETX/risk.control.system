@@ -994,17 +994,19 @@ function GetChart(title, url, container) {
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
-            var keys = Object.keys(result);
-            var weeklydata = new Array();
-            var totalspent = 0.0;
-            for (var i = 0; i < keys.length; i++) {
-                var arrL = new Array();
-                arrL.push(keys[i]);
-                arrL.push(result[keys[i]]);
-                totalspent += result[keys[i]];
-                weeklydata.push(arrL);
+            if (result) {
+                var keys = Object.keys(result);
+                var weeklydata = new Array();
+                var totalspent = 0.0;
+                for (var i = 0; i < keys.length; i++) {
+                    var arrL = new Array();
+                    arrL.push(keys[i]);
+                    arrL.push(result[keys[i]]);
+                    totalspent += result[keys[i]];
+                    weeklydata.push(arrL);
+                }
+                createMonthChart(container, title, weeklydata, keys, totalspent);
             }
-            createMonthChart(container, title, weeklydata, keys, totalspent);
         }
     })
 }
@@ -1017,17 +1019,19 @@ function GetWeekly(title, url, container) {
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
-            var keys = Object.keys(result);
-            var weeklydata = new Array();
-            var totalspent = 0.0;
-            for (var i = 0; i < keys.length; i++) {
-                var arrL = new Array();
-                arrL.push(keys[i]);
-                arrL.push(result[keys[i]]);
-                totalspent += result[keys[i]];
-                weeklydata.push(arrL);
+            if (result) {
+                var keys = Object.keys(result);
+                var weeklydata = new Array();
+                var totalspent = 0.0;
+                for (var i = 0; i < keys.length; i++) {
+                    var arrL = new Array();
+                    arrL.push(keys[i]);
+                    arrL.push(result[keys[i]]);
+                    totalspent += result[keys[i]];
+                    weeklydata.push(arrL);
+                }
+                createChartColumn(container, title, weeklydata, titleMessage, totalspent);
             }
-            createChartColumn(container, title, weeklydata, titleMessage, totalspent);
         }
     })
 }
@@ -1039,17 +1043,19 @@ function GetWeeklyPie(title, url, container) {
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
-            var keys = Object.keys(result);
-            var weeklydata = new Array();
-            var totalspent = 0.0;
-            for (var i = 0; i < keys.length; i++) {
-                var arrL = new Array();
-                arrL.push(keys[i]);
-                arrL.push(result[keys[i]]);
-                totalspent += result[keys[i]];
-                weeklydata.push(arrL);
+            if (result) {
+                var keys = Object.keys(result);
+                var weeklydata = new Array();
+                var totalspent = 0.0;
+                for (var i = 0; i < keys.length; i++) {
+                    var arrL = new Array();
+                    arrL.push(keys[i]);
+                    arrL.push(result[keys[i]]);
+                    totalspent += result[keys[i]];
+                    weeklydata.push(arrL);
+                }
+                createCharts(container, title, weeklydata, titleMessage, totalspent);
             }
-            createCharts(container, title, weeklydata, titleMessage, totalspent);
         }
     })
 }
@@ -1063,17 +1069,19 @@ function GetMonthly(title, url, container) {
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
-            var keys = Object.keys(result);
-            var monthlydata = new Array();
-            var totalspent = 0.0;
-            for (var i = 0; i < keys.length; i++) {
-                var arrL = new Array();
-                arrL.push(keys[i]);
-                arrL.push(result[keys[i]]);
-                totalspent += result[keys[i]];
-                monthlydata.push(arrL);
+            if (result) {
+                var keys = Object.keys(result);
+                var monthlydata = new Array();
+                var totalspent = 0.0;
+                for (var i = 0; i < keys.length; i++) {
+                    var arrL = new Array();
+                    arrL.push(keys[i]);
+                    arrL.push(result[keys[i]]);
+                    totalspent += result[keys[i]];
+                    monthlydata.push(arrL);
+                }
+                createChartColumn(container, title, monthlydata, titleMessage, totalspent);
             }
-            createChartColumn(container, title, monthlydata, titleMessage, totalspent);
         }
     })
 }
@@ -1086,17 +1094,19 @@ function GetMonthlyPie(title, url, container) {
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
-            var keys = Object.keys(result);
-            var monthlydata = new Array();
-            var totalspent = 0.0;
-            for (var i = 0; i < keys.length; i++) {
-                var arrL = new Array();
-                arrL.push(keys[i]);
-                arrL.push(result[keys[i]]);
-                totalspent += result[keys[i]];
-                monthlydata.push(arrL);
+            if (result) {
+                var keys = Object.keys(result);
+                var monthlydata = new Array();
+                var totalspent = 0.0;
+                for (var i = 0; i < keys.length; i++) {
+                    var arrL = new Array();
+                    arrL.push(keys[i]);
+                    arrL.push(result[keys[i]]);
+                    totalspent += result[keys[i]];
+                    monthlydata.push(arrL);
+                }
+                createCharts(container, title, monthlydata, titleMessage, totalspent);
             }
-            createCharts(container, title, monthlydata, titleMessage, totalspent);
         }
     })
 }
@@ -1142,17 +1152,19 @@ function GetWeeklyTat(title, url, container) {
         contentType: "application/json",
         dataType: "json",
         success: function (result) {
-            var keys = Object.keys(result);
-            var weeklydata = new Array();
-            var totalspent = 0.0;
-            for (var i = 0; i < keys.length; i++) {
-                var arrL = new Array();
-                arrL.push(keys[i]);
-                arrL.push(result[keys[i]]);
-                totalspent += result[keys[i]];
-                weeklydata.push(arrL);
+            if (result) {
+                var keys = Object.keys(result);
+                var weeklydata = new Array();
+                var totalspent = 0.0;
+                for (var i = 0; i < keys.length; i++) {
+                    var arrL = new Array();
+                    arrL.push(keys[i]);
+                    arrL.push(result[keys[i]]);
+                    totalspent += result[keys[i]];
+                    weeklydata.push(arrL);
+                }
+                createChartTat(container, title, result.tatDetails, titleMessage, result.count);
             }
-            createChartTat(container, title, result.tatDetails, titleMessage, result.count);
         }
     })
 }
