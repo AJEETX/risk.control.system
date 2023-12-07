@@ -26,9 +26,6 @@ namespace risk.control.system.Controllers.Api.Claims
     [ApiController]
     public class ClaimsInvestigationController : ControllerBase
     {
-        private String _ftpPath = "ftp://files.000webhost.com/public_html/";
-        private String _login = "holosync";
-        private String _password = "C0##ect10n";
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHttpClientService httpClientService;
@@ -353,9 +350,9 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetFtpData")]
         public List<string> GetFtpData()
         {
-            var request = System.Net.WebRequest.Create(_ftpPath);
+            var request = System.Net.WebRequest.Create(Applicationsettings.FTP_SITE);
             request.Method = System.Net.WebRequestMethods.Ftp.ListDirectory;
-            request.Credentials = new System.Net.NetworkCredential(_login, _password);
+            request.Credentials = new System.Net.NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA);
 
             var files = new List<string>();
 

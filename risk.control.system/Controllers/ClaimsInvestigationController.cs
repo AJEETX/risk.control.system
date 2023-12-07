@@ -72,6 +72,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [Breadcrumb(" FTP")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> FtpDownload()
         {
             try
@@ -92,6 +93,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> FtpUpload(IFormFile postedFtp)
         {
             if (postedFtp != null)
@@ -127,10 +129,11 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
+        [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> UploadClaims(IFormFile postedFile)
         {
-            if (postedFile != null)
+            if (postedFile != null && Path.GetExtension(postedFile.FileName) == ".zip")
             {
                 string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
                 if (!Directory.Exists(path))
@@ -195,7 +198,13 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Add New")]
         public async Task<IActionResult> CreateClaim()
         {
-            var claim = new ClaimsInvestigation { PolicyDetail = new PolicyDetail { LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId } };
+            var claim = new ClaimsInvestigation
+            {
+                PolicyDetail = new PolicyDetail
+                {
+                    LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId
+                }
+            };
 
             var model = new ClaimTransactionModel
             {

@@ -13,7 +13,7 @@ namespace SMS
     internal static class API
     {
         private static readonly string Server = "https://app.droidsend.com";
-        private static readonly string Key = "21b6d8a0aaae37042427504621f204db0aa56236";
+        private static readonly string DROID = "21b6d8a0aaae37042427504621f204db0aa56236";
 
         public enum Option
         {
@@ -42,7 +42,7 @@ namespace SMS
                 { "number", number },
                 { "message", message },
                 { "schedule", schedule },
-                { "key", Key },
+                { "key", DROID },
                 { "devices", device },
                 { "type", isMMS ? "mms" : "sms" },
                 { "attachments", attachments },
@@ -72,7 +72,7 @@ namespace SMS
             {
                 { "messages", JsonConvert.SerializeObject(messages) },
                 { "schedule", schedule },
-                { "key", Key },
+                { "key", DROID },
                 { "devices", devices },
                 { "option", (int)option },
                 { "useRandomDevice", useRandomDevice }
@@ -104,7 +104,7 @@ namespace SMS
                 { "listID", listID },
                 { "message", message },
                 { "schedule", schedule },
-                { "key", Key },
+                { "key", DROID },
                 { "devices", devices },
                 { "option", (int)option },
                 { "type", isMMS ? "mms" : "sms" },
@@ -124,7 +124,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "id", id }
             };
 
@@ -141,7 +141,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "groupId", groupID }
             };
 
@@ -164,7 +164,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "status", status },
                 { "deviceID", deviceID },
                 { "simSlot", simSlot },
@@ -185,7 +185,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "id", id }
             };
 
@@ -203,7 +203,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "groupId", groupID },
                 { "status", status }
             };
@@ -227,7 +227,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "status", status },
                 { "deviceID", deviceID },
                 { "simSlot", simSlot },
@@ -251,7 +251,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "listID", listID },
                 { "number", number },
                 { "name", name },
@@ -271,7 +271,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "listID", listID },
                 { "number", number },
                 { "unsubscribe", '1' }
@@ -289,7 +289,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key }
+                { "key", DROID }
             };
             JToken credits = GetResponse($"{Server}/services/send.php", values)["credits"];
             if (credits.Type != JTokenType.Null)
@@ -312,7 +312,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "request", request },
                 { "device", device },
                 { "sim", simSlot }
@@ -332,7 +332,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "id", id }
             };
 
@@ -354,7 +354,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key },
+                { "key", DROID },
                 { "request", request },
                 { "deviceID", deviceID },
                 { "simSlot", simSlot },
@@ -374,7 +374,7 @@ namespace SMS
         {
             var values = new Dictionary<string, object>
             {
-                { "key", Key }
+                { "key", DROID }
             };
 
             return GetObjects(GetResponse($"{Server}/services/get-devices.php", values)["devices"]);
