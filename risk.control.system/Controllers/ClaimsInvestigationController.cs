@@ -219,9 +219,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Claims")]
         public IActionResult Index()
         {
-            var claimsPage = new MvcBreadcrumbNode("Active", "Claims", "Claims");
-            ViewData["BreadcrumbNode"] = claimsPage;
-            return View();
+            return RedirectToAction("Draft");
         }
 
         [Breadcrumb(" Assign", FromAction = "Index")]
@@ -1672,6 +1670,7 @@ namespace risk.control.system.Controllers
         }
 
         [ValidateAntiForgeryToken]
+        [HttpPost]
         public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
             var userEmail = HttpContext.User.Identity.Name;
