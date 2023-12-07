@@ -195,7 +195,6 @@ namespace risk.control.system.Controllers
             _context.SaveChanges();
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(" Add New")]
         public async Task<IActionResult> CreateClaim()
         {
@@ -217,7 +216,6 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(" Claims")]
         public IActionResult Index()
         {
@@ -226,21 +224,18 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Assign()
         {
             return View();
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(" Assess", FromAction = "Index")]
         public async Task<IActionResult> Assessor()
         {
             return View();
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(" Allocate(manual)", FromAction = "Index")]
         public IActionResult Assigner()
         {
@@ -249,14 +244,12 @@ namespace risk.control.system.Controllers
 
         // GET: ClaimsInvestigation
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Draft()
         {
             return View();
         }
 
-        [ValidateAntiForgeryToken]
         [HttpGet]
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
@@ -429,7 +422,6 @@ namespace risk.control.system.Controllers
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation });
         }
 
-        [ValidateAntiForgeryToken]
         [HttpGet]
         [Breadcrumb(" Allocate (to agency)")]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
@@ -486,7 +478,6 @@ namespace risk.control.system.Controllers
             return View(claimsInvestigation);
         }
 
-        [ValidateAntiForgeryToken]
         [HttpGet]
         [Breadcrumb(" Re-allocate to agency")]
         public async Task<IActionResult> ReAllocateToVendor(string selectedcase)
@@ -563,7 +554,6 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Case-locations")]
-        [ValidateAntiForgeryToken]
         public IActionResult CaseLocation(string id)
         {
             if (id == null)
@@ -605,14 +595,12 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Assessed")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Approved()
         {
             return View();
         }
 
         [Breadcrumb(" Rejected", FromAction = "Index")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
@@ -691,28 +679,24 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Re Allocate", FromAction = "Index")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Review()
         {
             return View();
         }
 
         [Breadcrumb(title: "Active")]
-        [ValidateAntiForgeryToken]
         public IActionResult Active()
         {
             return View();
         }
 
         [Breadcrumb(title: "Withdraw", FromAction = "Index")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToInvestigate()
         {
             return View();
         }
 
         [Breadcrumb(title: "Report", FromAction = "Assessor")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -834,7 +818,6 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Report", FromAction = "Approved")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> GetApprovedReport(string selectedcase)
         {
             if (selectedcase == null || _context.ClaimsInvestigation == null)
@@ -1075,7 +1058,6 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Details/5
-        [ValidateAntiForgeryToken]
         [Breadcrumb("Details", FromAction = "Draft")]
         public async Task<IActionResult> Details(string id)
         {
@@ -1184,7 +1166,6 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Draft));
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Detail", FromAction = "Active")]
         public async Task<IActionResult> Detail(string id)
         {
@@ -1266,7 +1247,6 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Detail", FromAction = "Index")]
         public async Task<IActionResult> ReadyDetail(string id)
         {
@@ -1334,7 +1314,6 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Detail", FromAction = "Assign")]
         public async Task<IActionResult> AssignDetail(string id)
         {
@@ -1538,7 +1517,6 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Details), new { id = claim.ClaimsInvestigationId });
         }
 
-        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Add Customer", FromAction = "Draft")]
         public async Task<IActionResult> CreateCustomer(string id)
         {
@@ -1695,6 +1673,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
             var userEmail = HttpContext.User.Identity.Name;
@@ -1730,117 +1709,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Details), new { id = claim.ClaimsInvestigationId });
         }
 
-        // GET: ClaimsInvestigation/Edit/5
-        [Breadcrumb(title: " Withdraw", FromAction = "Active")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Withdraw(string id)
-        {
-            if (id == null || _context.ClaimsInvestigation == null)
-            {
-                return NotFound();
-            }
-
-            var caseLogs = await _context.InvestigationTransaction
-                .Include(i => i.InvestigationCaseStatus)
-                .Include(i => i.InvestigationCaseSubStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.CaseLocations)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseSubStatus)
-                .Where(t => t.ClaimsInvestigationId == id)
-                .OrderByDescending(c => c.HopCount)?.ToListAsync();
-
-            var claimsInvestigation = await _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
-
-            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
-
-            if (claimsInvestigation == null)
-            {
-                return NotFound();
-            }
-            var model = new ClaimTransactionModel
-            {
-                Claim = claimsInvestigation,
-                Log = caseLogs,
-                Location = location
-            };
-
-            return View(model);
-        }
-
-        // POST: ClaimsInvestigation/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetWithdraw(ClaimsInvestigation claimsInvestigation)
-        {
-            if (claimsInvestigation == null || _context.ClaimsInvestigation == null)
-            {
-                return NotFound();
-            }
-
-            var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED);
-
-            var withDrawnByCompanySubStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY);
-
-            var existingClaim = await _context.ClaimsInvestigation.FindAsync(claimsInvestigation.ClaimsInvestigationId);
-            if (existingClaim != null)
-            {
-                string userEmail = HttpContext?.User?.Identity.Name;
-                existingClaim.Updated = DateTime.UtcNow;
-                existingClaim.UpdatedBy = userEmail;
-                existingClaim.Deleted = true;
-                existingClaim.InvestigationCaseSubStatus = withDrawnByCompanySubStatus;
-                existingClaim.InvestigationCaseStatus = finishedStatus;
-                existingClaim.PolicyDetail.Comments = claimsInvestigation.PolicyDetail.Comments;
-                _context.ClaimsInvestigation.Update(existingClaim);
-                await _context.SaveChangesAsync();
-
-                toastNotification.AddSuccessToastMessage("claim case withdrawn successfully!");
-
-                return RedirectToAction(nameof(ToInvestigate));
-            }
-
-            toastNotification.AddErrorToastMessage("Err: claim withdrawl!");
-
-            return RedirectToAction(nameof(ToInvestigate));
-        }
-
         // GET: ClaimsInvestigation/Delete/5
-        [ValidateAntiForgeryToken]
         [Breadcrumb(title: " Delete", FromAction = "Draft")]
         public async Task<IActionResult> Delete(string id)
         {
