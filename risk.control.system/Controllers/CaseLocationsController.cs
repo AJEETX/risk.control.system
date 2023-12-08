@@ -160,7 +160,7 @@ namespace risk.control.system.Controllers
                     var extension = Path.GetExtension(customerDocument.FileName);
                     messageDocumentFileName += extension;
                     using var dataStream = new MemoryStream();
-                    await caseLocation.ProfileImage.CopyToAsync(dataStream);
+                    customerDocument.CopyTo(dataStream);
                     var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{messageDocumentFileName}");
                     CompressImage.Compressimage(dataStream, filePath);
 
@@ -280,7 +280,7 @@ namespace risk.control.system.Controllers
                             var extension = Path.GetExtension(customerDocument.FileName);
                             messageDocumentFileName += extension;
                             using var dataStream = new MemoryStream();
-                            await caseLocation.ProfileImage.CopyToAsync(dataStream);
+                            customerDocument.CopyTo(dataStream);
                             var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{messageDocumentFileName}");
                             CompressImage.Compressimage(dataStream, filePath);
 
