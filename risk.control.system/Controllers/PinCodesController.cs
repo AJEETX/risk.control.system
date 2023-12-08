@@ -24,65 +24,15 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index()
         {
-            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
-            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.DistrictSortParm = string.IsNullOrEmpty(sortOrder) ? "district_desc" : "";
-            ViewBag.StateSortParm = string.IsNullOrEmpty(sortOrder) ? "state_desc" : "";
-            if (searchString != null)
-            {
-                currentPage = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
 
-            ViewBag.CurrentFilter = searchString;
-
-            var applicationDbContext = _context.PinCode.Include(p => p.Country).Include(p => p.District).Include(p => p.State).AsQueryable();
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                applicationDbContext = applicationDbContext.Where(a =>
-                a.Code.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.District.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.Name.ToLower().Contains(searchString.Trim().ToLower()));
-            }
-
-            switch (sortOrder)
-            {
-                case "code_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
-                    break;
-
-                case "name_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-
-                case "district_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.District.Name);
-                    break;
-
-                case "state_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.State.Name);
-                    break;
-
-                default:
-                    applicationDbContext.OrderByDescending(s => s.State.Name);
-                    break;
-            }
-            int pageNumber = (currentPage ?? 1);
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-
-            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var applicationDbContext = _context.PinCode.
+                Include(p => p.Country)
+                .Include(p => p.District)
+                .Include(p => p.State).AsQueryable();
+ 
+            var applicationDbContextResult = await applicationDbContext.ToListAsync();
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
             return View(applicationDbContextResult);

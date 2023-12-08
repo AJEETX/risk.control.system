@@ -26,59 +26,9 @@ namespace risk.control.system.Controllers
         // GET: District
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
-            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.StateSortParm = string.IsNullOrEmpty(sortOrder) ? "state_desc" : "";
-            ViewBag.CountrySortParm = string.IsNullOrEmpty(sortOrder) ? "country_desc" : "";
-            if (searchString != null)
-            {
-                currentPage = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-
-            ViewBag.CurrentFilter = searchString;
-
             var applicationDbContext = _context.District.Include(d => d.Country).Include(d => d.State).AsQueryable();
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                applicationDbContext = applicationDbContext.Where(a =>
-                a.Code.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.State.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.Country.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.Name.ToLower().Contains(searchString.Trim().ToLower()));
-            }
 
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-
-                case "state_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.State.Name);
-                    break;
-
-                case "country_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Country.Name);
-                    break;
-
-                default:
-                    applicationDbContext.OrderByDescending(s => s.State.Name);
-                    break;
-            }
-            int pageNumber = (currentPage ?? 1);
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-
-            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var applicationDbContextResult = await applicationDbContext.ToListAsync();
 
             return View(applicationDbContextResult);
         }
