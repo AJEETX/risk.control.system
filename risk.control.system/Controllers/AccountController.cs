@@ -27,7 +27,6 @@ namespace risk.control.system.Controllers
 {
     public class AccountController : Controller
     {
-        private const string mobileAppUrl = "mobileapp";
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
         private readonly IToastNotification toastNotification;
@@ -56,7 +55,7 @@ namespace risk.control.system.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl)
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

@@ -364,7 +364,7 @@
                                                 if (!string.IsNullOrWhiteSpace(Model.Location?.ClaimReport?.AgentRemarks))
                                                 {
                                                     <header class="bb-blog-header">
-                                                        <h5 class="bb-blog-title" itemprop="name"> @Model.Location.Vendor.Name Report</h5>
+                                                        <h5 class="bb-blog-title" itemprop="name"><i class="fas fa-print nav-icon"></i> Agency Report: <span class="badge badge-light">@Model.Location.Vendor.Email</span> </h5>
                                                     </header>
                                                     <div class="row">
                                                         @{
