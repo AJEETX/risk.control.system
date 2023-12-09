@@ -77,7 +77,7 @@ async function success(position) {
         }
     } else {
         bounds.extend(center);
-        map.setZoom(12);
+        map.setZoom(18);
     }
 
     map.fitBounds(bounds);
