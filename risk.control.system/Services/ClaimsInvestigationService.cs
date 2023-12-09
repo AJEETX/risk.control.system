@@ -858,15 +858,15 @@ namespace risk.control.system.Services
             claimReport.Question1 = question1;
 
             var status_fin = "Low";
-            if (claimReport?.Question2 == "0" || claimReport?.Question2 == "0.0")
+            if (question2 == "0" || question2 == "0.0")
             {
                 status_fin = "Low";
             }
-            else if (claimReport?.Question2 == ".5" || claimReport?.Question2 == "0.5")
+            else if (question2 == ".5" || question2 == "0.5")
             {
                 status_fin = "Medium";
             }
-            else if (claimReport?.Question2 == "1" || claimReport?.Question2 == "1.0")
+            else if (question2 == "1" || question2 == "1.0")
             {
                 status_fin = "High";
             }
