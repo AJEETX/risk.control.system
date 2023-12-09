@@ -22,6 +22,10 @@ async function success(position) {
     var bounds = new google.maps.LatLngBounds();
     var lat = position.coords.latitude;
     var long = position.coords.longitude;
+    var center = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+    };
     var locresponse = $.ajax({
         type: "GET",
         url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${hexData}`,
