@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231205141957_edit_working")]
-    partial class edit_working
+    [Migration("20231209033643_icheckify_1_0")]
+    partial class icheckify_1_0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
