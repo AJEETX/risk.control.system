@@ -857,25 +857,20 @@ namespace risk.control.system.Services
 
             claimReport.Question1 = question1;
 
-            var status_fin = "Low";
             if (question2 == "0" || question2 == "0.0")
             {
-                status_fin = "Low";
+                question2 = "Low";
             }
             else if (question2 == ".5" || question2 == "0.5")
             {
-                status_fin = "Medium";
+                question2 = "Medium";
             }
             else if (question2 == "1" || question2 == "1.0")
             {
-                status_fin = "High";
-            }
-            else
-            {
-                status_fin = claimReport?.Question2;
+                question2 = "High";
             }
 
-            claimReport.Question2 = status_fin;
+            claimReport.Question2 = question2;
             claimReport.Question3 = question3;
             claimReport.Question4 = question4;
             claimReport.AgentRemarks = remarks;
