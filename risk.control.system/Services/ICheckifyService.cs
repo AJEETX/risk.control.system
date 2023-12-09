@@ -319,6 +319,7 @@ namespace risk.control.system.Services
                     CompressImage.Compressimage(stream, filePath);
                     claimCase.ClaimReport.AgentOcrUrl = filePath;
                     claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                    claimCase.ClaimReport.AgentOcrData = "no data: ";
                 }
             }
 
