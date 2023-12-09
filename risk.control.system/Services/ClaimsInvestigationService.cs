@@ -37,7 +37,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
 
-        Task<ClaimsInvestigation> AssignToVendorAgent(string userEmail, string currentUser, string vendorId, string claimsInvestigationId);
+        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, string vendorId, string claimsInvestigationId);
 
         Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? question1, string? question2, string? question3, string? question4);
 
@@ -45,7 +45,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> ProcessCaseReport(string userEmail, string assessorRemarks, long caseLocationId, string claimsInvestigationId, AssessorRemarkType assessorRemarkType);
 
-        Task<List<VendorCaseModel>> GetAgencyLoad(List<Vendor> existingVendors);
+        List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors);
 
         Task<List<string>> ProcessAutoAllocation(List<string> claims, ClientCompany company, string userEmail);
     }
@@ -53,19 +53,16 @@ namespace risk.control.system.Services
     public class ClaimsInvestigationService : IClaimsInvestigationService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IHttpClientService httpClientService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IMailboxService mailboxService;
         private readonly UserManager<ApplicationUser> userManager;
-        private HttpClient client = new HttpClient();
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public ClaimsInvestigationService(ApplicationDbContext context, IHttpClientService httpClientService, RoleManager<ApplicationRole> roleManager,
+        public ClaimsInvestigationService(ApplicationDbContext context, RoleManager<ApplicationRole> roleManager,
             IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment,
             UserManager<ApplicationUser> userManager)
         {
             this._context = context;
-            this.httpClientService = httpClientService;
             this.roleManager = roleManager;
             this.mailboxService = mailboxService;
             this.userManager = userManager;
@@ -179,7 +176,7 @@ namespace risk.control.system.Services
                 //3. CALL SERVICE WITH VENDORID
                 if (vendorsInPincode is not null && vendorsInPincode.Count > 0)
                 {
-                    var vendorsWithCaseLoad = (await GetAgencyLoad(distinctVendors)).OrderBy(o => o.CaseCount)?.ToList();
+                    var vendorsWithCaseLoad = GetAgencyLoad(distinctVendors).OrderBy(o => o.CaseCount)?.ToList();
 
                     if (vendorsWithCaseLoad is not null && vendorsWithCaseLoad.Count > 0)
                     {
@@ -196,7 +193,7 @@ namespace risk.control.system.Services
             return autoAllocatedClaims;
         }
 
-        public async Task<List<VendorCaseModel>> GetAgencyLoad(List<Vendor> existingVendors)
+        public List<VendorCaseModel> GetAgencyLoad(List<Vendor> existingVendors)
         {
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
