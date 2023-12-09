@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
                     var user = await userManager.FindByIdAsync(id);
                     if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
-                        string newFileName = user.Email = Guid.NewGuid().ToString();
+                        string newFileName = user.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
