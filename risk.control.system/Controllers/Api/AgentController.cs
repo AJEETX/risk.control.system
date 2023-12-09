@@ -517,7 +517,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [RequestSizeLimit(10000000)]
+        [RequestSizeLimit(100_000_000)]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
@@ -535,7 +535,7 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [RequestSizeLimit(10000000)]
+        [RequestSizeLimit(100_000_000)]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
