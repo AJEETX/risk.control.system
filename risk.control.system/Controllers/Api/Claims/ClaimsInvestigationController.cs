@@ -2048,7 +2048,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetFaceDetail")]
-        public async Task<IActionResult> GetFaceDetail(string claimid)
+        public IActionResult GetFaceDetail(string claimid)
         {
             var claim = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
@@ -2117,7 +2117,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetOcrDetail")]
-        public async Task<IActionResult> GetOcrDetail(string claimid)
+        public IActionResult GetOcrDetail(string claimid)
         {
             var claim = _context.ClaimsInvestigation
                .Include(c => c.PolicyDetail)
