@@ -1931,7 +1931,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var noDataimage = await System.IO.File.ReadAllBytesAsync(noDataImagefilePath);
 
-            string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             string imageAddress = string.Empty;
             string faceLat = string.Empty, faceLng = string.Empty;
             if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.LocationLongLat))
@@ -1942,10 +1942,10 @@ namespace risk.control.system.Controllers.Api.Claims
                 var longLatString = faceLat + "," + faceLng;
                 RootObject rootObject = await httpClientService.GetAddress((faceLat), (faceLng));
                 imageAddress = rootObject.display_name;
-                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
             }
 
-            string ocrUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            string ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             string ocrAddress = string.Empty;
             string ocrLatitude = string.Empty, ocrLongitude = string.Empty;
             if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.OcrLongLat))
@@ -1956,7 +1956,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
                 RootObject rootObject = await httpClientService.GetAddress((ocrLatitude), (ocrLongitude));
                 ocrAddress = rootObject.display_name;
-                ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+                ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={ocrLongLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{ocrLongLatString}&key={Applicationsettings.GMAPData}";
             }
 
             var data = new
@@ -2005,7 +2005,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var longLatString = latitude + "," + longitude;
             RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
             var imageAddress = rootObject.display_name;
-            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
             var data = new
             {
                 profileMap = customerMapUrl,
@@ -2042,7 +2042,7 @@ namespace risk.control.system.Controllers.Api.Claims
             var longLatString = latitude + "," + longitude;
             RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
             var imageAddress = rootObject.display_name;
-            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key=AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+            var customerMapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
             var data = new
             {
                 profileMap = customerMapUrl,

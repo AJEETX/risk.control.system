@@ -370,184 +370,173 @@ namespace risk.control.system.Services
             {
                 if (!string.IsNullOrEmpty(row))
                 {
-                    if (!string.IsNullOrEmpty(row))
+                    if (firstRow)
                     {
-                        if (firstRow)
+                        foreach (string cell in row.Split(','))
                         {
-                            foreach (string cell in row.Split(','))
-                            {
-                                dt.Columns.Add(cell.Trim());
-                            }
-                            firstRow = false;
+                            dt.Columns.Add(cell.Trim());
                         }
-                        else
+                        firstRow = false;
+                    }
+                    else
+                    {
+                        try
                         {
-                            try
+                            dt.Rows.Add();
+                            int i = 0;
+                            var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
+                            var rowData = output.Split(',').ToList();
+                            foreach (string cell in rowData)
                             {
-                                dt.Rows.Add();
-                                int i = 0;
-                                var output = regex.Replace(row, m => m.Value.Replace(',', '@'));
-                                var rowData = output.Split(',').ToList();
-                                foreach (string cell in rowData)
-                                {
-                                    dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
-                                    i++;
-                                }
-                                var claim = new ClaimsInvestigation
-                                {
-                                    InvestigationCaseStatusId = status.InvestigationCaseStatusId,
-                                    InvestigationCaseStatus = status,
-                                    InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                    InvestigationCaseSubStatus = subStatus,
-                                    Updated = DateTime.UtcNow,
-                                    UpdatedBy = userEmail,
-                                    CurrentUserEmail = userEmail,
-                                    CurrentClaimOwner = userEmail,
-                                    Created = DateTime.UtcNow,
-                                    Deleted = false,
-                                    HasClientCompany = true,
-                                    IsReady2Assign = true,
-                                    IsReviewCase = false,
-                                    SelectedToAssign = false,
-                                };
-
-                                var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
-
-                                var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "POLICY.jpg");
-
-                                var image = File.ReadAllBytes(policyImagePath);
-
-                                using MemoryStream stream = new MemoryStream(image);
-
-                                CompressImage.Compressimage(stream, policyImagePath);
-
-                                var savedImage = await File.ReadAllBytesAsync(policyImagePath);
-
-                                dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedImage)}";
-                                claim.PolicyDetail = new PolicyDetail
-                                {
-                                    ContractNumber = rowData[0]?.Trim(),
-                                    SumAssuredValue = Convert.ToDecimal(rowData[1]?.Trim()),
-                                    ContractIssueDate = DateTime.UtcNow.AddDays(-20),
-                                    ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
-                                    InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
-                                    DateOfIncident = DateTime.UtcNow.AddDays(-5),
-                                    CauseOfLoss = rowData[6]?.Trim(),
-                                    CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
-                                    CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
-                                    LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
-                                    ClientCompanyId = companyUser?.ClientCompanyId,
-                                    DocumentImage = savedImage,
-                                };
-
-                                var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
-
-                                var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-
-                                var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-
-                                var country = _context.Country.FirstOrDefault();
-
-                                var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "CUSTOMER.jpg");
-
-                                var customerImage = File.ReadAllBytes(customerImagePath);
-
-                                dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
-
-                                claim.CustomerDetail = new CustomerDetail
-                                {
-                                    CustomerName = rowData[10]?.Trim(),
-                                    CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
-                                    Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
-                                    CustomerDateOfBirth = DateTime.UtcNow.AddYears(-20),
-                                    ContactNumber = Convert.ToInt64(rowData[14]?.Trim()),
-                                    CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
-                                    CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
-                                    CustomerIncome = (Income)Enum.Parse(typeof(Income), rowData[17]?.Trim()),
-                                    Addressline = rowData[18]?.Trim(),
-                                    CountryId = country.CountryId,
-                                    PinCodeId = pinCode.PinCodeId,
-                                    StateId = state.StateId,
-                                    DistrictId = district.DistrictId,
-                                    Description = rowData[20]?.Trim(),
-                                    ProfilePicture = customerImage,
-                                };
-                                claim.CustomerDetail.PinCode = pinCode;
-                                claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
-                                claim.CustomerDetail.PinCode.Longitude = pinCode.Longitude;
-
-                                var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
-
-                                var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
-
-                                var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
-                                var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
-
-                                var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "BENEFICIARY.jpg");
-
-                                var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
-                                dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
-
-                                var beneficairy = new CaseLocation
-                                {
-                                    BeneficiaryName = rowData[22]?.Trim(),
-                                    BeneficiaryRelationId = relation.BeneficiaryRelationId,
-                                    BeneficiaryDateOfBirth = DateTime.UtcNow.AddYears(-22),
-                                    BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25]?.Trim()),
-                                    BeneficiaryContactNumber = Convert.ToInt64(rowData[26]?.Trim()),
-                                    Addressline = rowData[27]?.Trim(),
-                                    PinCodeId = benePinCode.PinCodeId,
-                                    DistrictId = beneDistrict.DistrictId,
-                                    StateId = beneState.StateId,
-                                    CountryId = country.CountryId,
-                                    InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                    ProfilePicture = beneficairyImage,
-                                    Updated = DateTime.UtcNow,
-                                    UpdatedBy = userEmail,
-                                    Created = DateTime.UtcNow,
-                                };
-
-                                var addedClaim = _context.ClaimsInvestigation.Add(claim);
-
-                                beneficairy.ClaimsInvestigationId = addedClaim.Entity.ClaimsInvestigationId;
-
-                                beneficairy.PinCode = benePinCode;
-                                beneficairy.PinCode.Latitude = benePinCode.Latitude;
-                                beneficairy.PinCode.Longitude = benePinCode.Longitude;
-
-                                _context.CaseLocation.Add(beneficairy);
-
-                                var log = new InvestigationTransaction
-                                {
-                                    ClaimsInvestigationId = addedClaim.Entity.ClaimsInvestigationId,
-                                    CurrentClaimOwner = userEmail,
-                                    Created = DateTime.UtcNow,
-                                    HopCount = 0,
-                                    Time2Update = 0,
-                                    InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
-                                    InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
-                                    UpdatedBy = userEmail
-                                };
-                                _context.InvestigationTransaction.Add(log);
+                                dt.Rows[dt.Rows.Count - 1][i] = cell?.Trim() ?? NO_DATA;
+                                i++;
                             }
-                            catch (Exception ex)
+                            var claim = new ClaimsInvestigation
                             {
-                                Console.WriteLine(ex.StackTrace);
-                                throw ex;
-                            }
+                                InvestigationCaseStatusId = status.InvestigationCaseStatusId,
+                                InvestigationCaseStatus = status,
+                                InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
+                                InvestigationCaseSubStatus = subStatus,
+                                Updated = DateTime.UtcNow,
+                                UpdatedBy = userEmail,
+                                CurrentUserEmail = userEmail,
+                                CurrentClaimOwner = userEmail,
+                                Created = DateTime.UtcNow,
+                                Deleted = false,
+                                HasClientCompany = true,
+                                IsReady2Assign = true,
+                                IsReviewCase = false,
+                                SelectedToAssign = false,
+                            };
+
+                            var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
+
+                            var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "POLICY.jpg");
+
+                            var image = File.ReadAllBytes(policyImagePath);
+
+                            using MemoryStream stream = new MemoryStream(image);
+
+                            CompressImage.Compressimage(stream, policyImagePath);
+
+                            var savedImage = await File.ReadAllBytesAsync(policyImagePath);
+
+                            dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedImage)}";
+                            claim.PolicyDetail = new PolicyDetail
+                            {
+                                ContractNumber = rowData[0]?.Trim(),
+                                SumAssuredValue = Convert.ToDecimal(rowData[1]?.Trim()),
+                                ContractIssueDate = DateTime.UtcNow.AddDays(-20),
+                                ClaimType = (ClaimType)Enum.Parse(typeof(ClaimType), rowData[3]?.Trim()),
+                                InvestigationServiceTypeId = servicetype?.InvestigationServiceTypeId,
+                                DateOfIncident = DateTime.UtcNow.AddDays(-5),
+                                CauseOfLoss = rowData[6]?.Trim(),
+                                CaseEnablerId = _context.CaseEnabler.FirstOrDefault(c => c.Code.ToLower() == rowData[7].Trim().ToLower()).CaseEnablerId,
+                                CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
+                                LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
+                                ClientCompanyId = companyUser?.ClientCompanyId,
+                                DocumentImage = savedImage,
+                            };
+
+                            var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
+
+                            var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
+
+                            var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+
+                            var country = _context.Country.FirstOrDefault();
+
+                            var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "CUSTOMER.jpg");
+
+                            var customerImage = File.ReadAllBytes(customerImagePath);
+
+                            dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
+
+                            claim.CustomerDetail = new CustomerDetail
+                            {
+                                CustomerName = rowData[10]?.Trim(),
+                                CustomerType = (CustomerType)Enum.Parse(typeof(CustomerType), rowData[11]?.Trim()),
+                                Gender = (Gender)Enum.Parse(typeof(Gender), rowData[12]?.Trim()),
+                                CustomerDateOfBirth = DateTime.UtcNow.AddYears(-20),
+                                ContactNumber = Convert.ToInt64(rowData[14]?.Trim()),
+                                CustomerEducation = (Education)Enum.Parse(typeof(Education), rowData[15]?.Trim()),
+                                CustomerOccupation = (Occupation)Enum.Parse(typeof(Occupation), rowData[16]?.Trim()),
+                                CustomerIncome = (Income)Enum.Parse(typeof(Income), rowData[17]?.Trim()),
+                                Addressline = rowData[18]?.Trim(),
+                                CountryId = country.CountryId,
+                                PinCodeId = pinCode.PinCodeId,
+                                StateId = state.StateId,
+                                DistrictId = district.DistrictId,
+                                Description = rowData[20]?.Trim(),
+                                ProfilePicture = customerImage,
+                            };
+                            claim.CustomerDetail.PinCode = pinCode;
+                            claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
+                            claim.CustomerDetail.PinCode.Longitude = pinCode.Longitude;
+
+                            var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
+
+                            var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
+
+                            var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
+                            var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
+
+                            var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "BENEFICIARY.jpg");
+
+                            var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
+                            dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
+
+                            var beneficairy = new CaseLocation
+                            {
+                                BeneficiaryName = rowData[22]?.Trim(),
+                                BeneficiaryRelationId = relation.BeneficiaryRelationId,
+                                BeneficiaryDateOfBirth = DateTime.UtcNow.AddYears(-22),
+                                BeneficiaryIncome = (Income)Enum.Parse(typeof(Income), rowData[25]?.Trim()),
+                                BeneficiaryContactNumber = Convert.ToInt64(rowData[26]?.Trim()),
+                                Addressline = rowData[27]?.Trim(),
+                                PinCodeId = benePinCode.PinCodeId,
+                                DistrictId = beneDistrict.DistrictId,
+                                StateId = beneState.StateId,
+                                CountryId = country.CountryId,
+                                InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
+                                ProfilePicture = beneficairyImage,
+                                Updated = DateTime.UtcNow,
+                                UpdatedBy = userEmail,
+                                Created = DateTime.UtcNow,
+                            };
+
+                            var addedClaim = _context.ClaimsInvestigation.Add(claim);
+
+                            beneficairy.ClaimsInvestigationId = addedClaim.Entity.ClaimsInvestigationId;
+
+                            beneficairy.PinCode = benePinCode;
+                            beneficairy.PinCode.Latitude = benePinCode.Latitude;
+                            beneficairy.PinCode.Longitude = benePinCode.Longitude;
+
+                            _context.CaseLocation.Add(beneficairy);
+
+                            var log = new InvestigationTransaction
+                            {
+                                ClaimsInvestigationId = addedClaim.Entity.ClaimsInvestigationId,
+                                CurrentClaimOwner = userEmail,
+                                Created = DateTime.UtcNow,
+                                HopCount = 0,
+                                Time2Update = 0,
+                                InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId,
+                                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId,
+                                UpdatedBy = userEmail
+                            };
+                            _context.InvestigationTransaction.Add(log);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.StackTrace);
                         }
                     }
                 }
             }
             var dataObject = ConvertDataTable<UploadClaim>(dt);
             _context.UploadClaim.AddRange(dataObject);
-        }
-
-        private System.Drawing.Image? ByteArrayToImage(byte[] data)
-        {
-            MemoryStream ms = new MemoryStream(data);
-            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
-            return returnImage;
         }
 
         private static T GetItem<T>(DataRow dr)

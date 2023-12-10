@@ -11,7 +11,8 @@
         public static readonly string ValidIssuer = "icheckify";
         public static readonly string ValidAudience = "canarahdfclife";
         public static readonly int TokenTimeoutMinutes = 5;
-        public static readonly string SendGrid = "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";
+        public static readonly string GMAPData = "AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
+        public static readonly string SGKData = "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";
         //WEBSITE SETTINGS
 
         public const string WEBSITE_SITE_MENU_BRAND = "aby";
