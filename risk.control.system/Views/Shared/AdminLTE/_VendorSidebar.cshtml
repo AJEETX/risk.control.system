@@ -198,6 +198,31 @@
                         </p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClientCompany","") @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("CompanyUser","") @Url.MakeActiveClass("CompanyUserRoles","") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","")">
+                        <i class="nav-icon fas fa-shield-alt"></i>
+                        <p class="sidebar-menu-header-label">
+                            @Applicationsettings.ADMIN_SETTINGS
+                            <i class="right fas fa-angle-right"></i>
+                        </p>
+                    </a>
+                </li>
+                @*<li class="nav-item">
+                    <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
+                        <i class="fas fa-rupee-sign nav-icon"></i>
+                        <p>
+                            @Applicationsettings.INVESTIGATION_CLAIM ^
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
+                        <i class="fas fa-handshake nav-icon"></i>
+                        <p>
+                            @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
+                        </p>
+                    </a>
+                </li>*@
                 @{
                     if (User.IsInRole(AppRoles.AgencyAdmin.ToString()) || User.IsInRole(AppRoles.Supervisor.ToString()))
                     {

@@ -210,15 +210,7 @@
                                 </p>
                             </a>
                         </li>
-                        //<li class="nav-item">
-                        //    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="FtpDownload" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","FtpDownload") ">
-                        //        <i class="fa fa-download nav-icon"></i>
-                        //        <p>
-                        //            <span class="badge badge-warning">Ftp Download</span>
-                        //        </p>
-                        //    </a>
-                        //</li>
-
+                       
                         <li class="nav-item">
                             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="CreateClaim" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","CreateClaim")
                                             @Url.MakeActiveClass("ClaimsInvestigation","CreatePolicy") @Url.MakeActiveClass("ClaimsInvestigation","Details") 
@@ -234,14 +226,7 @@
                                 </p>
                             </a>
                         </li>
-                        //<li class="nav-item">
-                        //    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assign" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assign") @Url.MakeActiveClass("ClaimsInvestigation","AssignDetail") ">
-                        //        <i class="fas fa-thumbtack nav-icon"></i>
-                        //        <p>
-                        //            <span class="badge badge-danger">ASSIGN</span>
-                        //        </p>
-                        //    </a>
-                        //</li>
+
                     }
                     if (User.IsInRole(AppRoles.Assigner.ToString()))
                     {
@@ -332,6 +317,23 @@
                             </a>
                         </li>
                     }
+
+                    //<li class="nav-item">
+                    //    <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
+                    //        <i class="fas fa-rupee-sign nav-icon"></i>
+                    //        <p>
+                    //            @Applicationsettings.INVESTIGATION_CLAIM ^
+                    //        </p>
+                    //    </a>
+                    //</li>
+                    //<li class="nav-item">
+                    //    <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
+                    //        <i class="fas fa-handshake nav-icon"></i>
+                    //        <p>
+                    //            @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
+                    //        </p>
+                    //    </a>
+                    //</li>
                     if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
                     {
                         <li class="nav-item">
