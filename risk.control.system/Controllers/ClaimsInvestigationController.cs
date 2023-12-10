@@ -145,7 +145,7 @@ namespace risk.control.system.Controllers
                 {
                     Directory.CreateDirectory(docPath);
                 }
-                string fileName = Path.GetFileName(postedFile.FileName);
+                string fileName = Path.GetTempFileName();
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(postedFile.FileName);
                 string filePath = Path.Combine(path, fileName);
 
