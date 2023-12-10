@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.1.0.2" />
     <PackageReference Include="MailKit" Version="4.2.0" />
@@ -44,7 +45,7 @@
     <PackageReference Include="Gehtsoft.PDFFlowLib.Barcodes" Version="1.0.0" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="7.0.1" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.0" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 
