@@ -97,16 +97,10 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            if (userRole.Value.Contains(AppRoles.Creator.ToString()))
+            if (userRole.Value.Contains(AppRoles.Creator.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
-                claimsSubmitted = await applicationDbContext.ToListAsync();
-            }
-            if (userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatus.Name != CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
                 claimsSubmitted = await applicationDbContext.ToListAsync();
             }
             else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
@@ -261,7 +255,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var claimsSubmitted = new List<ClaimsInvestigation>();
 
-            if (userRole.Value.Contains(AppRoles.Creator.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.PortalAdmin.ToString()))
+            if (userRole.Value.Contains(AppRoles.Creator.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
