@@ -70,134 +70,8 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        [HttpPost]
-        [Breadcrumb(" FTP")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FtpDownload()
-        {
-            try
-            {
-                var userEmail = HttpContext.User.Identity.Name;
-
-                await ftpService.DownloadFtp(userEmail);
-
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Downloaded Claims ready"));
-
-                return RedirectToAction("Draft");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw ex;
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FtpUpload(IFormFile postedFtp)
-        {
-            if (postedFtp != null)
-            {
-                string folder = Path.Combine(webHostEnvironment.WebRootPath, "document");
-                if (!Directory.Exists(folder))
-                {
-                    Directory.CreateDirectory(folder);
-                }
-
-                string fileName = Path.GetFileName(postedFtp.FileName);
-                string filePath = Path.Combine(folder, fileName);
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                {
-                    postedFtp.CopyTo(stream);
-                }
-                var wc = new WebClient
-                {
-                    Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
-                };
-                var response = wc.UploadFile(Applicationsettings.FTP_SITE + fileName, filePath);
-
-                var data = Encoding.UTF8.GetString(response);
-
-                var userEmail = HttpContext.User.Identity.Name;
-
-                await SaveUpload(postedFtp, filePath, "Ftp upload", userEmail);
-
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Uploaded Claims."));
-
-                return RedirectToAction("Draft");
-            }
-            return Problem();
-        }
-
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        public async Task<IActionResult> UploadClaims(IFormFile postedFile)
-        {
-            if (postedFile != null && Path.GetExtension(postedFile.FileName) == ".zip")
-            {
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                string docPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
-                if (!Directory.Exists(docPath))
-                {
-                    Directory.CreateDirectory(docPath);
-                }
-                string fileName = Path.GetTempFileName();
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(postedFile.FileName);
-                string filePath = Path.Combine(path, fileName);
-
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                {
-                    postedFile.CopyTo(stream);
-                }
-                var userEmail = HttpContext.User.Identity.Name;
-
-                await ftpService.UploadFile(userEmail, filePath, docPath, fileNameWithoutExtension);
-
-                await SaveUpload(postedFile, filePath, "File upload", userEmail);
-                try
-                {
-                    var rows = _context.SaveChanges();
-
-                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> File uploaded Claims ready"));
-
-                    return RedirectToAction("Draft");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            toastNotification.AddErrorToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> File uploaded err "));
-
-            return RedirectToAction("Draft");
-        }
-
-        private async Task SaveUpload(IFormFile file, string filePath, string description, string uploadedBy)
-        {
-            var fileName = Path.GetFileNameWithoutExtension(file.FileName);
-            var extension = Path.GetExtension(file.FileName);
-            var company = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == uploadedBy);
-            var fileModel = new FileOnFileSystemModel
-            {
-                CreatedOn = DateTime.UtcNow,
-                FileType = file.ContentType,
-                Extension = extension,
-                Name = fileName,
-                Description = description,
-                FilePath = filePath,
-                UploadedBy = uploadedBy,
-                CompanyId = company.ClientCompanyId
-            };
-            _context.FilesOnFileSystem.Add(fileModel);
-            _context.SaveChanges();
-        }
-
         [Breadcrumb(" Add New")]
-        public async Task<IActionResult> CreateClaim()
+        public IActionResult CreateClaim()
         {
             var claim = new ClaimsInvestigation
             {
@@ -229,8 +103,70 @@ namespace risk.control.system.Controllers
             return View();
         }
 
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public async Task<IActionResult> Assign(List<string> claims)
+        {
+            if (claims == null || claims.Count == 0)
+            {
+                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be assigned.");
+                return RedirectToAction(nameof(Draft));
+            }
+
+            //IF AUTO ALLOCATION TRUE
+            var userEmail = HttpContext.User.Identity.Name;
+            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
+            var company = _context.ClientCompany
+                .Include(c => c.EmpanelledVendors)
+                .ThenInclude(e => e.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.PincodeServices)
+                .Include(c => c.EmpanelledVendors)
+                .ThenInclude(e => e.VendorInvestigationServiceTypes)
+                .ThenInclude(v => v.District)
+                .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId);
+
+            if (company is not null && company.Auto)
+            {
+                var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, userEmail);
+
+                if (claims.Count == autoAllocatedClaims.Count)
+                {
+                    toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
+                }
+
+                if (claims.Count > autoAllocatedClaims.Count)
+                {
+                    if (autoAllocatedClaims.Count > 0)
+                    {
+                        toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
+                    }
+
+                    var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
+
+                    await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
+
+                    await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
+
+                    toastNotification.AddWarningToastMessage($"<i class='far fa-file-powerpoint'></i> {notAutoAllocated.Count}/{claims.Count} claim(s) assigned successfully !");
+
+                    return RedirectToAction(nameof(Assigner));
+                }
+            }
+            else
+            {
+                await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, claims);
+
+                await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
+
+                toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {claims.Count}/{claims.Count} claim(s) assigned successfully !");
+            }
+
+            return RedirectToAction(nameof(Draft));
+        }
+
         [Breadcrumb(" Assess", FromAction = "Index")]
-        public async Task<IActionResult> Assessor()
+        public IActionResult Assessor()
         {
             return View();
         }
@@ -594,13 +530,13 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Assessed")]
-        public async Task<IActionResult> Approved()
+        public IActionResult Approved()
         {
             return View();
         }
 
         [Breadcrumb(" Rejected", FromAction = "Index")]
-        public async Task<IActionResult> Reject()
+        public IActionResult Reject()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -678,7 +614,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Re Allocate", FromAction = "Index")]
-        public async Task<IActionResult> Review()
+        public IActionResult Review()
         {
             return View();
         }
@@ -690,7 +626,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Withdraw", FromAction = "Index")]
-        public async Task<IActionResult> ToInvestigate()
+        public IActionResult ToInvestigate()
         {
             return View();
         }
@@ -992,68 +928,6 @@ namespace risk.control.system.Controllers
             toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # <i> {0} </i> ] investigation reassigned !", claim.PolicyDetail.ContractNumber));
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor));
-        }
-
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        public async Task<IActionResult> Assign(List<string> claims)
-        {
-            if (claims == null || claims.Count == 0)
-            {
-                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be assigned.");
-                return RedirectToAction(nameof(Draft));
-            }
-
-            //IF AUTO ALLOCATION TRUE
-            var userEmail = HttpContext.User.Identity.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
-
-            var company = _context.ClientCompany
-                .Include(c => c.EmpanelledVendors)
-                .ThenInclude(e => e.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
-                .Include(c => c.EmpanelledVendors)
-                .ThenInclude(e => e.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId);
-
-            if (company is not null && company.Auto)
-            {
-                var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, userEmail);
-
-                if (claims.Count == autoAllocatedClaims.Count)
-                {
-                    toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
-                }
-
-                if (claims.Count > autoAllocatedClaims.Count)
-                {
-                    if (autoAllocatedClaims.Count > 0)
-                    {
-                        toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
-                    }
-
-                    var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
-
-                    await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
-
-                    await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
-
-                    toastNotification.AddWarningToastMessage($"<i class='far fa-file-powerpoint'></i> {notAutoAllocated.Count}/{claims.Count} claim(s) assigned successfully !");
-
-                    return RedirectToAction(nameof(Assigner));
-                }
-            }
-            else
-            {
-                await claimsInvestigationService.AssignToAssigner(HttpContext.User.Identity.Name, claims);
-
-                await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
-
-                toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {claims.Count}/{claims.Count} claim(s) assigned successfully !");
-            }
-
-            return RedirectToAction(nameof(Draft));
         }
 
         // GET: ClaimsInvestigation/Details/5
@@ -1358,7 +1232,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Add New")]
-        public async Task<IActionResult> CreatePolicy()
+        public IActionResult CreatePolicy()
         {
             var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
 

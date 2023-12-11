@@ -37,7 +37,7 @@
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="profileImage" src="/img/upload.png">
                                             <input accept=".zip" type="file" class="form-control" name="postedFile" id="postedFile" />
-                                            <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload File</button>
+                                            <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload File</button>
                                         </div>
                                     </div>
                                 </div>
@@ -48,8 +48,8 @@
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="ftpImage" src="/img/upload.png">
                                             <input accept=".zip" type="file" class="form-control" name="postedFtp" id="postedFtp" />
-                                            <button id="UploadFtpButton" disabled type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="FtpUpload"><i class="nav-icon fa fa-upload"></i> Upload FTP</button>&nbsp;
-                                            <button id="DownloadFtpButton" type="submit" class="btn btn-info" asp-controller="ClaimsInvestigation" asp-action="FtpDownload"><i class="nav-icon fa fa-download"></i> Download FTP</button>
+                                            <button id="UploadFtpButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FtpUpload"><i class="nav-icon fa fa-upload"></i> Upload FTP</button>&nbsp;
+                                            <button id="DownloadFtpButton" type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FtpDownload"><i class="nav-icon fa fa-download"></i> Download FTP</button>
                                         </div>
                                     </div>
                                 </div>
