@@ -58,14 +58,14 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ApplicationRole role)
+        public async Task<IActionResult> Edit(string Id, ApplicationRole role)
         {
             if (role is not null)
             {
                 var existingRole = await _roleManager.FindByIdAsync(role.Id.ToString());
                 existingRole.Name = role.Name;
                 await _roleManager.UpdateAsync(existingRole);
-                toastNotification.AddSuccessToastMessage("role created successfully!");
+                toastNotification.AddSuccessToastMessage("role edited successfully!");
                 return RedirectToAction(nameof(Index));
             }
 

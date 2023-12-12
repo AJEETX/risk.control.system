@@ -76,6 +76,10 @@ namespace risk.control.system.Models
 
     public class ApplicationRole : IdentityRole<long>
     {
+        public ApplicationRole()
+        {
+            
+        }
         public ApplicationRole(string code, string name)
         {
             Name = name;

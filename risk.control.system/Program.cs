@@ -60,6 +60,7 @@ builder.Services.Configure<FormOptions>(x =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
+builder.Services.AddScoped<IEmpanelledAgencyService, EmpanelledAgencyService>();
 builder.Services.AddScoped<IICheckifyService, ICheckifyService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IReportService, ReportService>();
