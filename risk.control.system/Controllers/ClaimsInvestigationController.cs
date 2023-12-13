@@ -45,6 +45,7 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
+        private readonly IClaimPolicyService claimPolicyService;
         private static HttpClient httpClient = new();
 
         public ClaimsInvestigationController(ApplicationDbContext context,
@@ -56,6 +57,7 @@ namespace risk.control.system.Controllers
             UserManager<ClientCompanyApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
             RoleManager<ApplicationRole> roleManager,
+            IClaimPolicyService claimPolicyService,
             IToastNotification toastNotification)
         {
             _context = context;
@@ -66,6 +68,7 @@ namespace risk.control.system.Controllers
             this.userManager = userManager;
             this.webHostEnvironment = webHostEnvironment;
             this.roleManager = roleManager;
+            this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
             this.toastNotification = toastNotification;
         }
@@ -804,73 +807,13 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var caseLogs = await _context.InvestigationTransaction
-                .Include(i => i.InvestigationCaseStatus)
-                .Include(i => i.InvestigationCaseSubStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.CaseLocations)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseSubStatus)
-                .Where(t => t.ClaimsInvestigationId == id)
-                .OrderByDescending(c => c.HopCount)?.ToListAsync();
-
-            var claimsInvestigation = await _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
-
-            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
-
-            if (claimsInvestigation == null)
-            {
-                return NotFound();
-            }
-            var model = new ClaimTransactionModel
-            {
-                Claim = claimsInvestigation,
-                Log = caseLogs,
-                Location = location
-            };
-            var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
+            var model = await claimPolicyService.GetClaimDetail(id);
+            var customerLatLong = model.Claim.CustomerDetail.PinCode.Latitude + "," + model.Claim.CustomerDetail.PinCode.Longitude;
 
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
             ViewBag.CustomerLocationUrl = url;
 
-            var beneficiarylatLong = location.PinCode.Latitude + "," + location.PinCode.Longitude;
+            var beneficiarylatLong = model.Location.PinCode.Latitude + "," + model.Location.PinCode.Longitude;
             var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key={Applicationsettings.GMAPData}";
             ViewBag.BeneficiaryLocationUrl = bUrl;
 
@@ -884,62 +827,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-
-            var caseLogs = await _context.InvestigationTransaction
-                .Include(i => i.InvestigationCaseStatus)
-                .Include(i => i.InvestigationCaseSubStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.CaseLocations)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseSubStatus)
-                .Where(t => t.ClaimsInvestigationId == id)
-                .OrderByDescending(c => c.HopCount)?.ToListAsync();
-
-            var claimsInvestigation = await _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.BeneficiaryRelation)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
-
-            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
-
-            if (claimsInvestigation == null)
-            {
-                return NotFound();
-            }
-            var model = new ClaimTransactionModel
-            {
-                Claim = claimsInvestigation,
-                Log = caseLogs,
-                Location = location
-            };
+            var model = await claimPolicyService.GetClaimDetail(id);
 
             return View(model);
         }
@@ -991,42 +879,11 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: " Add New")]
         public IActionResult CreatePolicy()
         {
-            var lineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Name.ToLower() == "claims").LineOfBusinessId;
-
-            var random = new Random();
-            var cNumber = random.Next(3333, 9999);
-            var contractNumber = "POLX" + cNumber;
-
-            var existingContractNumber = _context.PolicyDetail.Any(p => p.ContractNumber == contractNumber);
-            if (existingContractNumber)
-            {
-                cNumber = cNumber + random.Next(3333, 9999);
-            }
-            var model = new ClaimsInvestigation
-            {
-                PolicyDetail = new PolicyDetail
-                {
-                    LineOfBusinessId = lineOfBusinessId,
-                    CaseEnablerId = _context.CaseEnabler.FirstOrDefault().CaseEnablerId,
-                    CauseOfLoss = "LOST IN ACCIDENT",
-                    ClaimType = ClaimType.DEATH,
-                    ContractIssueDate = DateTime.UtcNow.AddDays(-10),
-                    CostCentreId = _context.CostCentre.FirstOrDefault().CostCentreId,
-                    DateOfIncident = DateTime.UtcNow.AddDays(-3),
-                    InvestigationServiceTypeId = _context.InvestigationServiceType.FirstOrDefault(i => i.Code == "COMP").InvestigationServiceTypeId,
-                    Comments = "SOMETHING FISHY",
-                    SumAssuredValue = random.Next(100000, 9999999),
-                    ContractNumber = "POLX" + cNumber,
-                }
-            };
-
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
-            var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
+            var model = claimPolicyService.AddClaimPolicy(userEmail.Value);
 
-            model.PolicyDetail.ClientCompanyId = clientCompanyUser.ClientCompanyId;
-
-            ViewBag.ClientCompanyId = clientCompanyUser.ClientCompanyId;
+            ViewBag.ClientCompanyId = model.PolicyDetail.ClientCompanyId;
 
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", model.PolicyDetail.InvestigationServiceTypeId);
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
@@ -1330,8 +1187,6 @@ namespace risk.control.system.Controllers
             }
 
             var claim = await claimsInvestigationService.EditCustomer(userEmail, claimsInvestigation, profileFile);
-
-            //await mailboxService.NotifyClaimCreation(userEmail, claimsInvestigation);
 
             toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-check'></i> Customer {0} edited successfully !", claimsInvestigation.CustomerDetail.CustomerName));
 
