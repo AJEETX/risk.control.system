@@ -2,7 +2,7 @@
 
 System feature list
 
-iCheckify tm engine [a seamless workflow ]
+iCheckify™️ engine [a seamless workflow ]
 
     Admin task :
         Configurable Manual/Auto Allocation
