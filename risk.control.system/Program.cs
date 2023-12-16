@@ -222,7 +222,7 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("Content-Security-Policy",
         "default-src https: 'self';" +
         "connect-src https: 'self' https://maps.googleapis.com; " +
-        "script-src https: 'self' 'unsafe-inline' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
+        "script-src https: 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
         "style-src https: 'self' 'unsafe-inline'; " +
         "font-src https: 'self' 'unsafe-inline' https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +
         "img-src https: 'self' 'unsafe-inline' data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
