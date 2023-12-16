@@ -6,7 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - checkify
 on:
   push:
     branches:
-      - master
+      - checkify
   workflow_dispatch:
 
 jobs:
