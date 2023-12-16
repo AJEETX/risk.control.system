@@ -215,6 +215,7 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("X-Frame-Options", "DENY");
     context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+    context.Response.Headers.Remove("X-Powered-By");
     context.Response.Headers.Add("X-Powered-By", "Moq");
     context.Response.Headers.Add("Server", "iCheckify");
     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
