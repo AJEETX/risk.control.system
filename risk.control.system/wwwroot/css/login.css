@@ -26,18 +26,20 @@ body {
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     perspective: 2700px;
 }
-
-    .container .cover {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        height: 100%;
-        width: 50%;
-        z-index: 98;
-        transition: all 1s ease;
-        transform-origin: left;
-        transform-style: preserve-3d;
-    }
+.login-form form {
+    padding-top: 3rem;
+}
+.container .cover {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 100%;
+    width: 50%;
+    z-index: 98;
+    transition: all 1s ease;
+    transform-origin: left;
+    transform-style: preserve-3d;
+}
 
     .container #flip:checked ~ .cover {
         transform: rotateY(-180deg);
