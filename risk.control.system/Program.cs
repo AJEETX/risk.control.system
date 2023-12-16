@@ -1,8 +1,4 @@
-using System.Configuration;
 using System.Reflection;
-using System.Text;
-
-using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -10,13 +6,10 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 
 using NToastNotify;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -26,8 +19,6 @@ using risk.control.system.Seeds;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Extensions;
-
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -213,13 +204,11 @@ app.UseCookiePolicy(
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Add("X-Frame-Options", "DENY");
-    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    context.Response.Headers.Remove("X-Powered-By");
-    context.Response.Headers.Add("X-Powered-By", "Moq");
-    context.Response.Headers.Add("Server", "iCheckify");
-    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
     context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
+    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
+    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+    context.Response.Headers.Add("Permissions-Policy", "camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()");
     context.Response.Headers.Add("Content-Security-Policy",
         "default-src https: 'self';" +
         "connect-src https: 'self' https://maps.googleapis.com; " +
