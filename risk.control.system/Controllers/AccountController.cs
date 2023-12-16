@@ -65,6 +65,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {

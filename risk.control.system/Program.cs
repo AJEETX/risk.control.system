@@ -24,6 +24,13 @@ using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Services.AddControllers(options =>
+//{
+//    var jsonInputFormatter = options.InputFormatters
+//        .OfType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>()
+//        .Single();
+//    jsonInputFormatter.SupportedMediaTypes.Add("application/csp-report");
+//});
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -194,15 +201,17 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 });
-app.UseCookiePolicy(
-    new CookiePolicyOptions
-    {
-        Secure = CookieSecurePolicy.Always,
-        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
-        MinimumSameSitePolicy = SameSiteMode.Strict
-    });
+//app.UseCookiePolicy(
+//    new CookiePolicyOptions
+//    {
+//        Secure = CookieSecurePolicy.Always,
+//        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+//        MinimumSameSitePolicy = SameSiteMode.Strict
+//    });
 app.Use(async (context, next) =>
 {
+    context.Response.Headers.Remove("Server");
+    context.Response.Headers.Remove("X-Powered-By");
     context.Response.Headers.Add("X-Frame-Options", "DENY");
     context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
     context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
@@ -210,13 +219,14 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
     context.Response.Headers.Add("Permissions-Policy", "camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()");
     context.Response.Headers.Add("Content-Security-Policy",
-        "default-src https: 'self';" +
-        "connect-src https: 'self' https://maps.googleapis.com; " +
-        "script-src https: 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
-        "style-src https: 'self' ; " +
-        "font-src https: 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +
-        "img-src https: 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
-        "frame-src 'self'");
+        "default-src 'self';" +
+        "connect-src 'self' wss: https://maps.googleapis.com; " +
+        "script-src 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
+        "style-src 'self' ; " +
+        "font-src 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +
+        "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
+        "frame-src 'self';" +
+        "frame-ancestors 'none';");
 
     await next();
 });
