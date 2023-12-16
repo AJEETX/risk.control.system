@@ -389,38 +389,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        $(document).ready(function () {
+    <script src="~/js/policy-detail.js"></script>
 
-            var askConfirmation = true;
-            $('#create-form').submit(function (e) {
-                if (askConfirmation) {
-                    e.preventDefault();
-                    $.confirm({
-                        title: "Confirm Set To Ready",
-                        content: "Are you sure?",
-                        icon: 'fas fa-thumbtack',
-                        columnClass: 'small',
-                        closeIcon: true,
-                        type: 'red',
-                        buttons: {
-                            confirm: {
-                                text: "Set Ready To Assign",
-                                btnClass: 'btn-danger',
-                                action: function () {
-                                    askConfirmation = false;
-                                    $('#create-form').submit();
-                                }
-                            },
-                            cancel: {
-                                text: "Cancel",
-                                btnClass: 'btn-default'
-                            }
-                        }
-                    });
-                }
-            })
-
-        });
-    </script>
 }

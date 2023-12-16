@@ -5,17 +5,7 @@
     var hasClientCompany = @Model.HasClientCompany ? "none" : "";
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
-<style>
-    .form-group input::placeholder{
-        opacity:.5;
-    }
-    .form-group input:focus, .form-group input:not(:placeholder-shown){
-        & + .custom_label{
-            left:-8rem;
-            transform:translate(10rem);
-        }   
-    }
-</style>
+
 <section class="content pt-2">
     <div class="container-fluid ">
         <div class="row">
@@ -36,17 +26,14 @@
 
                                     <div class="card card-solid">
                                         <div class="progress">
-                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:33%;background-color:green;">
+                                            <div class="progress-bar green-progress-bar" role="progressbar">
                                                 add policy
                                             </div>
-                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:33%;background-color:lightgrey">
+                                            <div class="progress-bar grey-progress-bar" role="progressbar">
                                                 customer
                                             </div>
-                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
 
-                                            <div class="progress-bar" role="progressbar" style="width:34%;background-color:lightgray">
+                                            <div class="progress-bar grey-progress-bar" role="progressbar">
                                                 beneficiary
                                             </div>
                                         </div>
@@ -60,13 +47,7 @@
                                                     <div class="card-body pt-0">
                                                         <div class="row">
                                                             <div class="col-sm-6">
-                                                                <div style="display:@hasClientCompany;" class="form-group">
-                                                                    <span asp-for="ClientCompanyId" class="control-label"></span>
-                                                                    <select id="ClientCompanyId" asp-for="PolicyDetail.ClientCompanyId" class="form-control" asp-items="ViewBag.ClientCompanyId">
-                                                                        <option>--- SELECT COMPANY ---</option>
-                                                                    </select>
-                                                                </div>
-
+                                                                
                                                                 <div class="form-group">
                                                                     <span class="input-group-label"> Policy #:</span>
                                                                     <div class="input-group mb-3">
@@ -220,38 +201,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        $.validator.setDefaults({
-            submitHandler: function (form) {
-                $.confirm({
-                    title: "Confirm Add Policy",
-                    content: "Are you sure?",
-                    icon: 'far fa-file-powerpoint',
-                    columnClass: 'medium',
-                    type: 'green',
-                    closeIcon: true,
-                    buttons: {
-                        confirm: {
-                            text: "Add",
-                            btnClass: 'btn-success',
-                            action: function () {
-                                form.submit();
-                            }
-                        },
-                        cancel: {
-                            text: "Cancel",
-                            btnClass: 'btn-default'
-                        }
-                    }
-                });
-            }
-        });
-        $(document).ready(function () {
-            $("#create-form").validate();
-        });
-        $("#ContractNumber").focus();
-
-        dateContractId.max = new Date().toISOString().split("T")[0];
-        dateIncidentId.max = new Date().toISOString().split("T")[0];
-    </script>
+    <script src="~/js/policy.js"></script>
 }

@@ -41,7 +41,6 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.LiClasses = "breadcrumb-item";
     options.ActiveLiClasses = "breadcrumb-item active";
 });
-
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(builder =>
@@ -148,7 +147,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.Response.StatusCode = 401;
             return Task.CompletedTask;
         };
-        options.Cookie.Name = "authCookie";
+        options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
         options.SlidingExpiration = true;
         options.LoginPath = "/Account/Login";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
@@ -216,14 +215,17 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("X-Frame-Options", "DENY");
     context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+    context.Response.Headers.Add("X-Powered-By", "Moq");
+    context.Response.Headers.Add("Server", "iCheckify");
+    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
     context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
     context.Response.Headers.Add("Content-Security-Policy",
         "default-src https: 'self';" +
         "connect-src https: 'self' https://maps.googleapis.com; " +
-        "script-src https: 'self'  https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
-        "style-src https: 'self'; " +
-        "font-src https: 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +
-        "img-src https: 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
+        "script-src https: 'self' 'unsafe-inline' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
+        "style-src https: 'self' 'unsafe-inline'; " +
+        "font-src https: 'self' 'unsafe-inline' https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +
+        "img-src https: 'self' 'unsafe-inline' data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
         "frame-src 'self'");
 
     await next();

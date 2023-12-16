@@ -3,78 +3,7 @@
 @{
     ViewData["Title"] = "Details";
 }
-<style>
-    body {
-        background-color: #eee;
-        font-family: "Poppins", sans-serif;
-        font-weight: 300;
-    }
 
-    .container {
-        width: 100%;
-        padding-bottom: 1rem;
-    }
-
-    .progresses {
-        display: flex;
-        align-items: center;
-        width: 100%;
-    }
-
-    .line {
-        width: 100%;
-        height: 6px;
-        background: lightgrey;
-    }
-
-    .line0 {
-        width: 100%;
-        height: 6px;
-        background: grey;
-    }
-
-    .line1 {
-        width: 100%;
-        height: 6px;
-        background: green;
-    }
-
-    .steps {
-        display: flex;
-        background-color: green;
-        color: #fff;
-        font-size: 14px;
-        width: 80px;
-        height: 40px;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-    }
-
-    .steps2 {
-        display: flex;
-        background-color: grey;
-        color: #fff;
-        font-size: 14px;
-        width: 80px;
-        height: 40px;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-    }
-
-    .steps3 {
-        display: flex;
-        background-color: lightgray;
-        color: #fff;
-        font-size: 14px;
-        width: 80px;
-        height: 40px;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-    }
-</style>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <section class="content pt-2">
     <div class="container-fluid">
@@ -610,37 +539,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        $(document).ready(function () {
+    <script src="~/js/policy-detail.js"></script>
 
-            var askConfirmation = true;
-            $('#create-form').submit(function (e) {
-                if (askConfirmation) {
-                    e.preventDefault();
-                    $.confirm({
-                        title: "Confirm <span class='fas fa-thumbtack'></span> <b> <u><i> Lock </i></u></b> Details",
-                        content: "Are you sure?",
-                        columnClass: 'medium',
-                        closeIcon: true,
-                        type: 'red',
-                        buttons: {
-                            confirm: {
-                                text: "<span class='fas fa-thumbtack'></span> <u><i> Lock </i></u></b> Details",
-                                btnClass: 'btn-danger',
-                                action: function () {
-                                    askConfirmation = false;
-                                    $('#create-form').submit();
-                                }
-                            },
-                            cancel: {
-                                text: "Cancel",
-                                btnClass: 'btn-default'
-                            }
-                        }
-                    });
-                }
-            })
-
-        });
-    </script>
 }

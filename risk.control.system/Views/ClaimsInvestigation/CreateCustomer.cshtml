@@ -26,17 +26,14 @@
 
                                     <div class="card card-solid">
                                         <div class="progress">
-                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:33%;background-color:lightgray;">
-                                                policy
+                                            <div class="progress-bar green-progress-bar" role="progressbar">
+                                                add policy
                                             </div>
-                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                                            <div class="progress-bar" role="progressbar" style="width:33%;background-color:green;">
-                                                add customer
+                                            <div class="progress-bar edit-progress-bar" role="progressbar">
+                                                customer
                                             </div>
-                                            <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
 
-                                            <div class="progress-bar" role="progressbar" style="width:34%;background-color:lightgray;">
+                                            <div class="progress-bar grey-progress-bar" role="progressbar">
                                                 beneficiary
                                             </div>
                                         </div>
@@ -277,37 +274,5 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        $.validator.setDefaults({
-            submitHandler: function (form) {
-                $.confirm({
-                    title: "Confirm Customer Add",
-                    content: "Are you sure?",
-                    icon: 'fas fa-user-plus',
-                    columnClass: 'medium',
-                    type: 'green',
-                    closeIcon: true,
-                    buttons: {
-                        confirm: {
-                            text: "Add",
-                            btnClass: 'btn-success',
-                            action: function () {
-                                form.submit();
-                            }
-                        },
-                        cancel: {
-                            text: "Cancel",
-                            btnClass: 'btn-default'
-                        }
-                    }
-                });
-            }
-        });
-        $(document).ready(function () {
-            $("#create-form").validate();
-        });
-        $("#customer-name").focus();
-
-        dateCustomerId.max = new Date().toISOString().split("T")[0];
-    </script>
+    <script src="~/js/create-cust.js"></script>
 }

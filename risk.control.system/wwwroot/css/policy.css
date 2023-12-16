@@ -1,0 +1,12 @@
+﻿.form-group input::placeholder {
+    opacity: .5;
+}
+
+.form-group input:focus, .form-group input:not(:placeholder-shown) {
+    & + .custom_label
+
+{
+    left: -8rem;
+    transform: translate(10rem);
+}
+}

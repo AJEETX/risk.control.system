@@ -44,21 +44,21 @@
         <div>
             @if (Model?.DocumentUrl is not null)
             {
-                <img src="@Model.DocumentUrl" alt="logo" class="brand-image elevation-2" style="opacity: .8">
+                <img src="@Model.DocumentUrl" alt="logo" class="brand-image elevation-2">
             }
             else
             {
-                <img src="@Applicationsettings.NO_IMAGE" alt="logo" class="brand-image elevation-2" style="opacity: .8">
+                <img src="@Applicationsettings.NO_IMAGE" alt="logo" class="brand-image elevation-2">
             }
         </div>
         <div>
             @if (Model?.Name is not null)
             {
-                <span style="font-size:small;" class="brand-text font-weight-bold">@Model.Name </span>
+                <span class="brand-text font-weight-bold">@Model.Name </span>
             }
             else
             {
-                <span style="font-size:small;" class="brand-text font-weight-bold">add name.. </span>
+                <span class="brand-text font-weight-bold">add name.. </span>
             }
         </div>
     </a>
