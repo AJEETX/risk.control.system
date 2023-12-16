@@ -1,5 +1,5 @@
 ﻿/* Google Font Link */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+@import url('css3.css');
 
 * {
     margin: 0;
@@ -290,3 +290,39 @@ p.account, p.account1 {
         p.account a:hover, p.account1 a:hover {
             text-decoration: none;
         }
+#watermark {
+    position: fixed;
+    z-index: 10000;
+    bottom: 400px;
+    left: 150px;
+    font-size: 30px;
+    font-weight: bold;
+    font-style: italic;
+    color: red;
+    transform: rotate(-40deg);
+    opacity: 0.2;
+}
+
+img.logo {
+    height: 40px !important;
+    width: 40px !important;
+    position: absolute;
+}
+
+#togglePassword {
+    cursor: pointer;
+    position: relative;
+    visibility: hidden;
+}
+
+    #togglePassword:hover {
+        visibility: visible !important;
+    }
+
+.login-form {
+    height: 450px;
+}
+
+.signup-form {
+    height: 450px;
+}

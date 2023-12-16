@@ -46,9 +46,10 @@ builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(builder =>
     {
-        builder.AllowAnyOrigin()
+        builder
+        .WithOrigins(" https://chek.azurewebsites.net, https://icheckify.azurewebsites.net, https://localhost:5001")
         .AllowAnyHeader()
-            .AllowAnyMethod();
+        .AllowAnyMethod();
     });
 });
 // For FileUpload
@@ -191,7 +192,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.Response.StatusCode = 401;
             return Task.CompletedTask;
         };
-        options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
+        options.Cookie.Name = "authCookie";
         options.SlidingExpiration = true;
         options.LoginPath = "/Account/Login";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
@@ -253,7 +254,18 @@ app.UseCookiePolicy(
         Secure = CookieSecurePolicy.Always,
         HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
         MinimumSameSitePolicy = SameSiteMode.Strict
-    }); ;
+    });
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("X-Frame-Options", "DENY");
+    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
+    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+    context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
+    context.Response.Headers.Add("Feature-Policy", "none");
+    context.Response.Headers.Add("Content-Security-Policy", "default-src https: 'self';connect-src https: 'self' https://maps.googleapis.com; script-src https: 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; style-src https: 'self' 'unsafe-inline'; font-src https: 'self' 'unsafe-inline' https://fonts.gstatic.com https://cdnjs.cloudflare.com ; img-src https: 'self' 'unsafe-inline' data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; frame-src 'self'");
+
+    await next();
+});
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

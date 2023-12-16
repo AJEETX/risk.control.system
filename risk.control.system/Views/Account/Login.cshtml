@@ -14,46 +14,10 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="~/css/login.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="~/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';  style-src 'self' https://cdnjs.cloudflare.com; font-src 'self' 'https://fonts.googleapis.com'; img-src 'self' https://hostedscan.com; frame-src 'self'" />
 </head>
-<style>
-    #watermark {
-        position: fixed;
-        z-index: 10000;
-        bottom:400px;
-        left:150px;
-        font-size: 30px;
-        font-weight:bold;
-        font-style:italic;
-        color: red;
-        transform: rotate(-40deg);
-        opacity: 0.2;
-    }
-    img.logo{
-        height: 40px !important;
-        width: 40px !important;
-        position:absolute;
-    }
-    #togglePassword {
-        cursor: pointer;
-        position: relative;
-        visibility: hidden;
-    }
-
-    #togglePassword:hover {
-        visibility: visible !important;
-    }
-
-    .login-form{
-        height:450px;
-    }
-
-    .signup-form {
-        height: 450px;
-    }
-</style>
 <body>
     <div class="container">
         <input type="checkbox" id="flip">
