@@ -31,21 +31,6 @@ namespace risk.control.system.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [HttpPost, ActionName("GetSubstatusBystatusId")]
-        public async Task<IActionResult> GetSubstatusBystatusId(string InvestigationCaseStatusId)
-        {
-            string lId;
-            var subStatuses = new List<InvestigationCaseSubStatus>();
-            if (!string.IsNullOrEmpty(InvestigationCaseStatusId))
-            {
-                lId = InvestigationCaseStatusId;
-                subStatuses = await _context.InvestigationCaseSubStatus
-                    .Include(i => i.InvestigationCaseStatus).Where(s =>
-                    s.InvestigationCaseStatus.InvestigationCaseStatusId.Equals(lId)).ToListAsync();
-            }
-            return Ok(subStatuses?.Select(s => new { s.Code, s.InvestigationCaseSubStatusId }));
-        }
-
         // GET: InvestigationCaseSubStatus/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(string id)

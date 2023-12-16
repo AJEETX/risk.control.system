@@ -7,6 +7,8 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Controllers.Api
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class MasterDataController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -16,7 +18,35 @@ namespace risk.control.system.Controllers.Api
             this.context = context;
         }
 
-        [HttpPost, ActionName("GetStatesByCountryId")]
+        [HttpGet("GetSubstatusBystatusId")]
+        public async Task<IActionResult> GetSubstatusBystatusId(string InvestigationCaseStatusId)
+        {
+            string lId;
+            var subStatuses = new List<InvestigationCaseSubStatus>();
+            if (!string.IsNullOrEmpty(InvestigationCaseStatusId))
+            {
+                lId = InvestigationCaseStatusId;
+                subStatuses = await context.InvestigationCaseSubStatus
+                    .Include(i => i.InvestigationCaseStatus).Where(s =>
+                    s.InvestigationCaseStatus.InvestigationCaseStatusId.Equals(lId)).ToListAsync();
+            }
+            return Ok(subStatuses?.Select(s => new { s.Code, s.InvestigationCaseSubStatusId }));
+        }
+
+        [HttpGet("GetInvestigationServicesByLineOfBusinessId")]
+        public async Task<IActionResult> GetInvestigationServicesByLineOfBusinessId(string LineOfBusinessId)
+        {
+            string lId;
+            var services = new List<InvestigationServiceType>();
+            if (!string.IsNullOrEmpty(LineOfBusinessId))
+            {
+                lId = LineOfBusinessId;
+                services = await context.InvestigationServiceType.Where(s => s.LineOfBusiness.LineOfBusinessId.Equals(lId)).ToListAsync();
+            }
+            return Ok(services);
+        }
+
+        [HttpGet("GetStatesByCountryId")]
         public async Task<IActionResult> GetStatesByCountryId(string countryId)
         {
             string cId;
@@ -29,7 +59,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(states);
         }
 
-        [HttpPost, ActionName("GetDistrictByStateId")]
+        [HttpGet("GetDistrictByStateId")]
         public async Task<IActionResult> GetDistrictByStateId(string stateId)
         {
             string sId;
@@ -42,7 +72,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(districts);
         }
 
-        [HttpPost, ActionName("GetPinCodesByDistrictId")]
+        [HttpGet("GetPinCodesByDistrictId")]
         public async Task<IActionResult> GetPinCodesByDistrictId(string districtId)
         {
             string sId;
@@ -55,7 +85,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(pincodes);
         }
 
-        [HttpPost, ActionName("GetPincodesByDistrictIdWithoutPreviousSelected")]
+        [HttpGet("GetPincodesByDistrictIdWithoutPreviousSelected")]
         public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelected(string districtId, string caseId)
         {
             string sId;
@@ -86,7 +116,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(pincodes);
         }
 
-        [HttpPost, ActionName("GetPincodesByDistrictIdWithoutPreviousSelectedService")]
+        [HttpGet("GetPincodesByDistrictIdWithoutPreviousSelectedService")]
         public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(string districtId, string vendorId, string lobId, string serviceId)
         {
             string sId;
@@ -137,7 +167,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(pincodes);
         }
 
-        [HttpPost, ActionName("GetUserBySearch")]
+        [HttpGet("GetUserBySearch")]
         public async Task<IActionResult> GetUserBySearch(string search)
         {
             var applicationUsers = new List<ApplicationUser>();

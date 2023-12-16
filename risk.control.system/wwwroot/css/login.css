@@ -26,9 +26,19 @@ body {
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     perspective: 2700px;
 }
+
 .login-form form {
     padding-top: 3rem;
 }
+
+div .error-message {
+    text-align: -webkit-center;
+}
+
+.signup-form form {
+    padding-top: 3rem;
+}
+
 .container .cover {
     position: absolute;
     top: 0;
@@ -41,18 +51,18 @@ body {
     transform-style: preserve-3d;
 }
 
-    .container #flip:checked ~ .cover {
-        transform: rotateY(-180deg);
-    }
+.container #flip:checked ~ .cover {
+    transform: rotateY(-180deg);
+}
 
-    .container .cover .front,
-    .container .cover .back {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-    }
+.container .cover .front,
+.container .cover .back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
 
 .cover .back {
     transform: rotateY(180deg);
@@ -240,9 +250,11 @@ body {
     text-align: center;
     margin-top: 25px;
 }
+
 .forms .form-content label.login-link {
     color: rgba(0, 0, 238);
 }
+
 .container #flip {
     display: none;
 }
@@ -282,16 +294,18 @@ p.account, p.account1 {
         font-size: 11px;
         text-decoration: underline;
     }
-    p.account a.error {
-        color: #ff4040;
-        font-size: 11px;
-        text-decoration: none;
-        font-weight:bold;
-    }
+
+        p.account a.error {
+            color: #ff4040;
+            font-size: 11px;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
         p.account a:hover, p.account1 a:hover {
             text-decoration: none;
         }
+
 #watermark {
     position: fixed;
     z-index: 10000;

@@ -124,19 +124,6 @@ namespace risk.control.system.Controllers
             return View(vendorInvestigationServiceType);
         }
 
-        [HttpPost, ActionName("GetInvestigationServicesByLineOfBusinessId")]
-        public async Task<JsonResult> GetInvestigationServicesByLineOfBusinessId(string LineOfBusinessId)
-        {
-            string lId;
-            var services = new List<InvestigationServiceType>();
-            if (!string.IsNullOrEmpty(LineOfBusinessId))
-            {
-                lId = LineOfBusinessId;
-                services = await _context.InvestigationServiceType.Where(s => s.LineOfBusiness.LineOfBusinessId.Equals(lId)).ToListAsync();
-            }
-            return Json(services);
-        }
-
         // GET: VendorService/Edit/5
         [Breadcrumb(" Edit")]
         public async Task<IActionResult> Edit(string id)

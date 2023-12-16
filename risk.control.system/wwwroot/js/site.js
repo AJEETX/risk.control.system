@@ -727,19 +727,19 @@ async function initPopMap(_position, title) {
 
 function loadState(obj, showDefaultOption = true) {
     var value = obj.value;
-    $.post("/MasterData/GetStatesByCountryId", { countryId: value }, function (data) {
+    $.get("/api/MasterData/GetStatesByCountryId", { countryId: value }, function (data) {
         PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", showDefaultOption);
     });
 }
 function loadDistrict(obj, showDefaultOption = true) {
     var value = obj.value;
-    $.post("/MasterData/GetDistrictByStateId", { stateId: value }, function (data) {
+    $.get("/api/MasterData/GetDistrictByStateId", { stateId: value }, function (data) {
         PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", showDefaultOption);
     });
 }
 function loadPinCode(obj, showDefaultOption = true) {
     var value = obj.value;
-    $.post("/MasterData/GetPinCodesByDistrictId", { districtId: value }, function (data) {
+    $.get("/api/MasterData/GetPinCodesByDistrictId", { districtId: value }, function (data) {
         PopulatePinCodeDropDown("#PinCodeId", data, "<option>--- SELECT ---</option>", showDefaultOption);
     });
 }
@@ -751,7 +751,7 @@ function enableSubmitButton(obj, showDefaultOption = true) {
 
 function loadSubStatus(obj) {
     var value = obj.value;
-    $.post("/InvestigationCaseSubStatus/GetSubstatusBystatusId", { InvestigationCaseStatusId: value }, function (data) {
+    $.get("/api/MasterData/GetSubstatusBystatusId", { InvestigationCaseStatusId: value }, function (data) {
         PopulateSubStatus("#InvestigationCaseSubStatusId", data, "<option>--- SELECT ---</option>");
     });
 }
@@ -770,7 +770,7 @@ function loadInvestigationServices(obj) {
     var value = obj.value;
     lobObj = value;
     localStorage.setItem('lobId', value);
-    $.post("/VendorService/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
+    $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
         PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
     });
 }
@@ -850,7 +850,7 @@ function readURL(input) {
 
 function loadRemainingPinCode(obj, showDefaultOption = true, caseId) {
     var value = obj.value;
-    $.post("/MasterData/GetPincodesByDistrictIdWithoutPreviousSelected", { districtId: value, caseId: caseId }, function (data) {
+    $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelected", { districtId: value, caseId: caseId }, function (data) {
         PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
     });
 }
@@ -861,7 +861,7 @@ function loadRemainingServicePinCode(obj, showDefaultOption = true, vendorId, li
 
     var serviceId = localStorage.getItem('serviceId');
 
-    $.post("/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: value, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
+    $.get("/api/MasterData/GetPincodesByDistrictIdWithoutPreviousSelectedService", { districtId: value, vendorId: vendorId, lobId: lobId, serviceId: serviceId }, function (data) {
         PopulatePinCodeDropDown("#PinCodeId", data, "<option>--SELECT PINCODE--</option>", showDefaultOption);
     });
 }
