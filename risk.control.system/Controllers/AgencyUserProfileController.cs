@@ -92,6 +92,7 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
         {
             if (id != applicationUser.Id.ToString())
@@ -184,6 +185,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (ModelState.IsValid)

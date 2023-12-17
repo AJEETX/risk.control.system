@@ -93,6 +93,7 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ClientCompanyApplicationUser applicationUser)
         {
             if (id != applicationUser.Id.ToString())
