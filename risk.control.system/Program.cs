@@ -202,13 +202,12 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 });
-//app.UseCookiePolicy(
-//    new CookiePolicyOptions
-//    {
-//        Secure = CookieSecurePolicy.Always,
-//        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
-//        MinimumSameSitePolicy = SameSiteMode.Strict
-//    });
+app.UseCookiePolicy(
+    new CookiePolicyOptions
+    {
+        Secure = CookieSecurePolicy.Always,
+        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always
+    });
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Add("X-Frame-Options", "DENY");
@@ -216,11 +215,11 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    context.Response.Headers.Add("Permissions-Policy", "geolocation self");
+    context.Response.Headers.Add("Permissions-Policy", "geolocation 'self'");
 
     context.Response.Headers.Add("Content-Security-Policy",
         "default-src 'self';" +
-        "connect-src 'self' https://maps.googleapis.com; " +
+        "connect-src 'self' wss: https://maps.googleapis.com; " +
         "script-src 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
         "style-src 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com; " +
         "font-src 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
