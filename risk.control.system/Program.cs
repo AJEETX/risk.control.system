@@ -219,6 +219,7 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
     context.Response.Headers.Add("Permissions-Policy", "camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()");
     context.Response.Headers.Add("Content-Security-Policy",
+        "base-uri 'self';" +
         "default-src 'self';" +
         "connect-src 'self' wss: https://maps.googleapis.com; " +
         "script-src 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
@@ -226,7 +227,9 @@ app.Use(async (context, next) =>
         "font-src 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +
         "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
         "frame-src 'self';" +
-        "frame-ancestors 'none';");
+        "form-action 'self';" +
+        "frame-ancestors 'none';" +
+        "upgrade-insecure-requests;");
 
     await next();
 });
