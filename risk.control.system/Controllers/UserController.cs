@@ -155,6 +155,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteImage(string id)
         {
             var user = await context.ApplicationUser.FirstOrDefaultAsync(a => a.Id.ToString() == id);
