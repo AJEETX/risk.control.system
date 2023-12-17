@@ -220,7 +220,7 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("Content-Security-Policy",
         "base-uri 'self';" +
         "default-src 'self';" +
-        "connect-src 'self' https://maps.googleapis.com; " +
+        "connect-src 'self' wss: https://maps.googleapis.com; " +
         "script-src 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
         "style-src 'self' ; " +
         "font-src 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +
