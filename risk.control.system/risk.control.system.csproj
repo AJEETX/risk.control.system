@@ -191,6 +191,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\download-case\" />
     <Folder Include="wwwroot\download-file\" />
+    <Folder Include="wwwroot\webfonts\" />
     <Folder Include="wwwroot\upload-case\" />
     <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\report\" />
