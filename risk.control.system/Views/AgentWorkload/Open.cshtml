@@ -111,9 +111,7 @@
                                 <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th style="display:@hasClientCompany">
-                                                Company
-                                            </th>
+                                            
                                             <th>
                                                 Policy Document
                                             </th>
@@ -151,9 +149,7 @@
                                             var dateOnly = item.Created.ToString("dd-MM-yyyy");
 
                                             <tr>
-                                                <td style="display:@hasClientCompany">
-                                                    @Html.DisplayFor(modelItem => item.PolicyDetail.ClientCompany.Name)
-                                                </td>
+                                               
                                                 <td>
                                                     @if (item?.PolicyDetail.DocumentImage is not null)
                                                     {

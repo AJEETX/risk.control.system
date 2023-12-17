@@ -16,14 +16,13 @@
                             <h3 class="card-title"><i class="fas fa-truck"></i> Add @Applicationsettings.SERVICE</h3>
                         </div>
                         <div class="card-body">
-                            <form asp-action="Create">
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                 <div class="row">
                                     <div class="col-md-6">
 
                                         <div style="display:none" class="form-group">
-                                            <label asp-for="VendorId" class="control-label"></label>
-                                            <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
+                                            <input type="hidden" asp-for="VendorId" class="control-label" />
+                                            <input type="hidden" asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
                                             <span asp-validation-for="VendorId" class="text-danger"></span>
                                         </div>
 
@@ -136,7 +135,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </form>
                         </div>
                     </div>
                 </div>
