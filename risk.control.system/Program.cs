@@ -23,7 +23,7 @@ using SmartBreadcrumbs.Extensions;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseKestrel(option => option.AddServerHeader = false);
+builder.WebHost.UseKestrel(option => option.AddServerHeader = false).UseIIS();
 //builder.Services.AddControllers(options =>
 //{
 //    var jsonInputFormatter = options.InputFormatters
@@ -44,7 +44,7 @@ builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(builder =>
     {
         builder
-        .WithOrigins("https://chek.azurewebsites.net,https://icheckify.azurewebsites.net,https://checkify.azurewebsites.net,https://localhost:5001")
+        .WithOrigins("https://chek.azurewebsites.net,https://icheckify.azurewebsites.net,https://checkify.azurewebsites.net,https://icheckify-prod.azurewebsites.net,https://localhost:5001")
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
