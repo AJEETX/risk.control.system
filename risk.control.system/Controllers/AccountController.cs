@@ -160,7 +160,7 @@ namespace risk.control.system.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(DashboardController.Index), "Dashboard");
+            return RedirectToAction(nameof(AccountController.Login), "Account");
         }
 
         [HttpGet]

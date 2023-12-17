@@ -1,5 +1,6 @@
 using System.Reflection;
 
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
@@ -215,7 +216,7 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    context.Response.Headers.Add("Permissions-Policy", "geolocation=(self 'https://map.google.coms' 'https://maps.googleapis.com')");
+    context.Response.Headers.Add("Permissions-Policy", "geolocation self");
 
     context.Response.Headers.Add("Content-Security-Policy",
         "default-src 'self';" +
@@ -230,6 +231,21 @@ app.Use(async (context, next) =>
         "upgrade-insecure-requests;");
 
     await next();
+});
+var antiforgery = app.Services.GetRequiredService<IAntiforgery>();
+
+app.Use((context, next) =>
+{
+    var requestPath = context.Request.Path.Value;
+
+    if (string.Equals(requestPath, "/", StringComparison.OrdinalIgnoreCase))
+    {
+        var tokenSet = antiforgery.GetAndStoreTokens(context);
+        context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!,
+            new CookieOptions { HttpOnly = false });
+    }
+
+    return next(context);
 });
 app.UseCors();
 app.UseAuthentication();

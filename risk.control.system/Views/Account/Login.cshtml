@@ -25,13 +25,13 @@
         <input type="checkbox" id="flip">
         <div class="cover">
             <div class="front">
-                <img src="~/agency/bgs.jpg" alt="">
+                <img src="~/agency/bgs.jpg" alt="verify">
                 <div class="text">
                     <span class="text-2">Simple verification process</span>
                 </div>
             </div>
             <div class="back">
-                <img class="backImg" src="images/backImg.jpg" alt="">
+                <img class="backImg" src="~/agency/bgs.jpg" alt="verify">
                 <div class="text">
                     <span class="text-1">Complete miles of journey <br> with one step</span>
                     <span class="text-2">Let's get started</span>
@@ -49,15 +49,15 @@
                     </div>
                     <div class="title">Login</div>
                     @Html.AntiForgeryToken()
-                    <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                    <form asp-route-returnurl="@ViewData["ReturnUrl"]" asp-controller="account" asp-action="login" method="post">
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope"></i>
-                                <input asp-for=Email id="email" type="email" placeholder="Enter your email" value="" autocomplete="off" required />
+                                <input asp-for=Email id="email" type="email" placeholder="Enter your email" title="Enter your email" value="" autocomplete="off" required />
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock"></i>
-                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" value="" autocomplete="off" required />
+                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" title="Enter your password" value="" autocomplete="off" required />
                             </div>
                             
                             <p class="account">By clicking login, you agree to our <a href="#">Terms & Conditions!</a></p>
