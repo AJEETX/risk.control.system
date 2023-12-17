@@ -23,7 +23,7 @@ using SmartBreadcrumbs.Extensions;
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.UseKestrel(option => option.AddServerHeader = false);
 //builder.Services.AddControllers(options =>
 //{
 //    var jsonInputFormatter = options.InputFormatters
@@ -217,11 +217,10 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    context.Response.Headers.Add("Permissions-Policy", "camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()");
     context.Response.Headers.Add("Content-Security-Policy",
         "base-uri 'self';" +
         "default-src 'self';" +
-        "connect-src 'self' wss: https://maps.googleapis.com; " +
+        "connect-src 'self' https://maps.googleapis.com; " +
         "script-src 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
         "style-src 'self' ; " +
         "font-src 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +

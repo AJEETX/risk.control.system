@@ -48,15 +48,16 @@
                     </div>
                     <div class="title">Login</div>
                     <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                        @Html.AntiForgeryToken()
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope"></i>
-                                <input asp-for=Email id="email" type="email" placeholder="Enter your email" value="@Applicationsettings.CREATOR.EMAIL" autocomplete="off" required>
+                                <input asp-for=Email id="email" type="email" placeholder="Enter your email" value="" autocomplete="off" required>
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock"></i>
-                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" value="@Applicationsettings.TestPassword"
-                                       autocomplete="off" required onfocus="myFunction(this, true)" onblur="myFunction(this, false)">
+                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" value=""
+                                       autocomplete="off" required >
                                        <span class="">
                                     <i class="far fa-eye" id="togglePassword"></i>
                                 </span>
@@ -84,6 +85,7 @@
 
                     <div class="title">Forgot Password</div>
                     <form action="Forgot" method="post">
+                        @Html.AntiForgeryToken()
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope"></i>
@@ -107,6 +109,4 @@
         </div>
     </div>
 </body>
-<script src="~/js/login.js"></script>
-
 </html>

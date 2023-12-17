@@ -108,6 +108,7 @@ namespace risk.control.system.Controllers
 
             var model = new CaseLocation
             {
+                ClaimsInvestigationId = id,
                 ClaimsInvestigation = claim,
                 Addressline = random.Next(100, 999) + " GREAT ROAD",
                 BeneficiaryDateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddMonths(3),
@@ -142,7 +143,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CaseLocation caseLocation)
+        public async Task<IActionResult> Create(string claimId, CaseLocation caseLocation)
         {
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -168,12 +169,12 @@ namespace risk.control.system.Controllers
                     caseLocation.ProfilePicture = savedImage;
                     caseLocation.ProfilePictureUrl = "/document/" + messageDocumentFileName;
                 }
-
+                caseLocation.ClaimsInvestigationId = claimId;
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == caseLocation.ClaimsInvestigationId);
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimId);
                 claimsInvestigation.IsReady2Assign = true;
 
                 var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
