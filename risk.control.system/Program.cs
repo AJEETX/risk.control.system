@@ -210,8 +210,6 @@ app.UseSwaggerUI(options =>
 //    });
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Remove("Server");
-    context.Response.Headers.Remove("X-Powered-By");
     context.Response.Headers.Add("X-Frame-Options", "DENY");
     context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
     context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
@@ -222,7 +220,7 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("Content-Security-Policy",
         "base-uri 'self';" +
         "default-src 'none';" +
-        "connect-src 'self' ftps: https://maps.googleapis.com; " +
+        "connect-src 'self' https://maps.googleapis.com; " +
         "script-src 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
         "style-src 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com; " +
         "font-src 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
