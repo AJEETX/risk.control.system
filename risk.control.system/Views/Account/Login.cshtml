@@ -53,11 +53,11 @@
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope"></i>
-                                <input asp-for=Email id="email" type="email" placeholder="Enter your email" title="Enter your email" value="" autocomplete="off" required />
+                                <input asp-for=Email id="email" type="email" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.CREATOR.USERNAME" autocomplete="off" required />
                             </div>
                             <div class="input-box">
                                 <i class="fas fa-lock"></i>
-                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" title="Enter your password" value="" autocomplete="off" required />
+                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
                             </div>
                             
                             <p class="account">By clicking login, you agree to our <a href="#">Terms & Conditions!</a></p>
