@@ -215,12 +215,12 @@ app.Use(async (context, next) =>
     context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
     context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
     context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    context.Response.Headers.Add("Permissions-Policy", "geolocation =('self')");
+    context.Response.Headers.Add("Permissions-Policy", "geolocation=(self)");
 
     context.Response.Headers.Add("Content-Security-Policy",
         "default-src 'self';" +
         "connect-src  wss: 'self' https://maps.googleapis.com; " +
-        "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com '; " +
+        "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com; " +
         "style-src  'unsafe-inline' 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com ; " +
         "font-src 'unsafe-inline' 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
         "img-src 'unsafe-inline' 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
