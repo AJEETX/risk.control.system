@@ -64,7 +64,6 @@ button.accept-policy {
     line-height: inherit;
 }
 
-
 #watermark {
     position: fixed;
     z-index: 10000;
@@ -81,26 +80,32 @@ button.accept-policy {
 .brand-image {
     opacity: .8
 }
+
 .brand-text {
     font-size: small;
 }
+
 .green-progress-bar {
     width: 33%;
     background-color: green;
 }
+
 .cust-progress-bar {
     width: 33%;
     background-color: lightgrey;
 }
+
 .edit-progress-bar {
     width: 33%;
     background-color: #ffc107;
     color: black;
 }
+
 .grey-progress-bar {
     width: 34%;
     background-color: lightgray;
 }
+
 .footer {
     position: absolute;
     bottom: 0;
@@ -151,9 +156,10 @@ table {
     border: 1px solid #ccc;
 }
 
-a.table-link{
-    width:100px;
+a.table-link {
+    width: 100px;
 }
+
 .face-Image {
     height: 200px;
     width: 200px;
@@ -616,20 +622,20 @@ dl.row {
     padding-bottom: 1rem;
 }
 
-    div.fg-toolbar.ui-toolbar.ui-corner-tl {
-        position: inherit;
-    }
+div.fg-toolbar.ui-toolbar.ui-corner-tl {
+    position: inherit;
+}
 
-    div.fg-toolbar.ui-toolbar.ui-corner-bl {
-        position: absolute;
-        bottom: 0;
-        width: 100%
-    }
+div.fg-toolbar.ui-toolbar.ui-corner-bl {
+    position: absolute;
+    bottom: 0;
+    width: 100%
+}
 
-    div.dataTables_paginate {
-        position: relative;
-        float: right;
-    }
+div.dataTables_paginate {
+    position: relative;
+    float: right;
+}
 
 footer {
     position: relative;
@@ -650,7 +656,6 @@ footer {
     border: 1px solid #ccc;
     padding: 5px;
 }
-
 
 /*
      * Always set the map height explicitly to define the size of the div element
@@ -823,17 +828,18 @@ footer {
     /*
      * Shop icon colors.
      */
-.property.highlight:has(.fa-shop) .icon {
-    color: var(--shop-color);
-}
+    .property.highlight:has(.fa-shop) .icon {
+        color: var(--shop-color);
+    }
 
-.property:not(.highlight):has(.fa-shop) {
-    background-color: var(--shop-color);
-}
+    .property:not(.highlight):has(.fa-shop) {
+        background-color: var(--shop-color);
+    }
 
-.property:not(.highlight):has(.fa-shop)::after {
-    border-top: 9px solid var(--shop-color);
-}
+        .property:not(.highlight):has(.fa-shop)::after {
+            border-top: 9px solid var(--shop-color);
+        }
+
 .noty_theme__mint.noty_type__success {
     background-color: green !important;
     position: absolute;
@@ -907,13 +913,45 @@ main {
     justify-content: center;
     border-radius: 50%;
 }
+
 #view-type.card-title {
     float: right;
 }
+
 #list-type.input-group-label {
     display: none;
 }
+
 a.footer-link {
     color: black;
     text-decoration: none;
+}
+
+#total-expense {
+    background-color: green;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.container-claim {
+    height: auto;
+    margin: 0 auto;
+    min-height: 20rem;
+}
+
+.container-claim-monthly {
+    height: auto;
+    margin: 0 auto;
+    min-height: 25rem;
+}
+
+.sup-percent {
+    font-size: 20px
+}
+
+a.CaseReadyToAssign {
+    pointer-events: none;
+    color: lightgrey;
 }

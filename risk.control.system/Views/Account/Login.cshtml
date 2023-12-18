@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="~/css/login.css">
     <link rel="stylesheet" href="~/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none';connect-src 'self' wss:; script-src 'self';  style-src 'self' https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' https://hostedscan.com; frame-src 'self';form-action 'self';upgrade-insecure-requests;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none';connect-src 'self'; script-src 'self';  style-src 'self' https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; img-src 'self' https://hostedscan.com; frame-src 'self';form-action 'self';upgrade-insecure-requests;" />
 
 </head>
 <body>
@@ -39,11 +39,11 @@
             </div>
         </div>
         <div class="forms">
-            <a href="https://hostedscan.com"><img src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan | An automated vulnerability scanner" height="30px" width="auto" /></a>
+            <a href="https://hostedscan.com"><img id="hostedscan" src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan | An automated vulnerability scanner" /></a>
 
             <div class="form-content">
                 <div class="login-form">
-                    <img src="/img/iCheckifyLogo.png" height="40px" />™️
+                    <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
                     <div id="watermark">
                        - DEMO -
                     </div>
@@ -78,7 +78,7 @@
                     </div>
                 </div>
                 <div class="signup-form">
-                    <img src="/img/iCheckifyLogo.png" height="40px" />™️
+                    <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
 
                     <div class="title">Forgot Password</div>
                     @Html.AntiForgeryToken()

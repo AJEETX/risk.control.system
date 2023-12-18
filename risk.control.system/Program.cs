@@ -95,13 +95,13 @@ builder.Services.AddControllersWithViews(options =>
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-builder.Services.AddAntiforgery(options =>
-{
-    // Set Cookie properties using CookieBuilder properties†.
-    options.FormFieldName = "AntiforgeryFieldname";
-    options.HeaderName = "X-CSRF-TOKEN-HEADERNAME";
-    options.SuppressXFrameOptionsHeader = false;
-});
+//builder.Services.AddAntiforgery(options =>
+//{
+//    // Set Cookie properties using CookieBuilder properties†.
+//    options.FormFieldName = "AntiforgeryFieldname";
+//    options.HeaderName = "X-CSRF-TOKEN-HEADERNAME";
+//    options.SuppressXFrameOptionsHeader = false;
+//});
 builder.Services.AddMvc();
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
@@ -219,7 +219,7 @@ app.Use(async (context, next) =>
 
     context.Response.Headers.Add("Content-Security-Policy",
         "default-src 'self';" +
-        "connect-src 'self' wss: https://maps.googleapis.com; " +
+        "connect-src 'self' https://maps.googleapis.com; " +
         "script-src 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
         "style-src 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com; " +
         "font-src 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
@@ -231,21 +231,21 @@ app.Use(async (context, next) =>
 
     await next();
 });
-var antiforgery = app.Services.GetRequiredService<IAntiforgery>();
+//var antiforgery = app.Services.GetRequiredService<IAntiforgery>();
 
-app.Use((context, next) =>
-{
-    var requestPath = context.Request.Path.Value;
+//app.Use((context, next) =>
+//{
+//    var requestPath = context.Request.Path.Value;
 
-    if (string.Equals(requestPath, "/", StringComparison.OrdinalIgnoreCase))
-    {
-        var tokenSet = antiforgery.GetAndStoreTokens(context);
-        context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!,
-            new CookieOptions { HttpOnly = false });
-    }
+//    if (string.Equals(requestPath, "/", StringComparison.OrdinalIgnoreCase))
+//    {
+//        var tokenSet = antiforgery.GetAndStoreTokens(context);
+//        context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!,
+//            new CookieOptions { HttpOnly = false });
+//    }
 
-    return next(context);
-});
+//    return next(context);
+//});
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
