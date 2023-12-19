@@ -45,7 +45,9 @@ builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(builder =>
     {
         builder
-        .WithOrigins("https://chek.azurewebsites.net,https://icheckify.azurewebsites.net,https://checkify.azurewebsites.net,https://icheckify-prod.azurewebsites.net,https://localhost:5001")
+        .WithOrigins(
+            "https://chek.azurewebsites.net,https://icheckify.azurewebsites.net,https://checkify.azurewebsites.net,https://icheck.azurewebsites.net,https://localhost:5001"
+            )
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
