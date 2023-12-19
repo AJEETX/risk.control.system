@@ -208,7 +208,8 @@ app.UseCookiePolicy(
     new CookiePolicyOptions
     {
         Secure = CookieSecurePolicy.Always,
-        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always
+        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+        MinimumSameSitePolicy = SameSiteMode.Strict
     });
 app.Use(async (context, next) =>
 {
