@@ -1,22 +1,16 @@
-using System.Configuration;
 using System.Reflection;
-using System.Text;
 
-using Highsoft.Web.Mvc.Charts;
-
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 
 using NToastNotify;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -27,12 +21,17 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Extensions;
 
-using static Org.BouncyCastle.Math.EC.ECCurve;
-
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.WebHost.UseKestrel(option => option.AddServerHeader = false).UseIIS();
+//builder.Services.AddControllers(options =>
+//{
+//    var jsonInputFormatter = options.InputFormatters
+//        .OfType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>()
+//        .Single();
+//    jsonInputFormatter.SupportedMediaTypes.Add("application/csp-report");
+//});
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -46,7 +45,9 @@ builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(builder =>
     {
         builder
-        .WithOrigins("https://chek.azurewebsites.net,https://icheckify.azurewebsites.net,https://checkify.azurewebsites.net,https://localhost:5001")
+        .WithOrigins(
+            "https://chek.azurewebsites.net,https://icheckify.azurewebsites.net,https://checkify.azurewebsites.net,https://icheck.azurewebsites.net,https://localhost:5001"
+            )
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
@@ -96,13 +97,13 @@ builder.Services.AddControllersWithViews(options =>
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-builder.Services.AddAntiforgery(options =>
-{
-    // Set Cookie properties using CookieBuilder properties†.
-    options.FormFieldName = "AntiforgeryFieldname";
-    options.HeaderName = "X-CSRF-TOKEN-HEADERNAME";
-    options.SuppressXFrameOptionsHeader = false;
-});
+//builder.Services.AddAntiforgery(options =>
+//{
+//    // Set Cookie properties using CookieBuilder properties†.
+//    options.FormFieldName = "AntiforgeryFieldname";
+//    options.HeaderName = "X-CSRF-TOKEN-HEADERNAME";
+//    options.SuppressXFrameOptionsHeader = false;
+//});
 builder.Services.AddMvc();
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
@@ -156,7 +157,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Strict;
         options.Cookie.Domain = "chek.azurewebsites.com";
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.CookieManager = new CookieManager();
+        //options.CookieManager = new CookieManager();
     });
 
 builder.Services.AddSwaggerGen(c =>
@@ -213,24 +214,42 @@ app.UseCookiePolicy(
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Add("X-Frame-Options", "DENY");
-    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    context.Response.Headers.Remove("X-Powered-By");
-    context.Response.Headers.Add("X-Powered-By", "Moq");
-    context.Response.Headers.Add("Server", "iCheckify");
-    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
     context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
+    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
+    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+    context.Response.Headers.Add("Permissions-Policy", "geolocation=(self)");
+
     context.Response.Headers.Add("Content-Security-Policy",
-        "default-src https: 'self';" +
-        "connect-src https: 'self' https://maps.googleapis.com; " +
-        "script-src https: 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com ; " +
-        "style-src https: 'self' 'unsafe-inline'; " +
-        "font-src https: 'self' 'unsafe-inline' https://fonts.gstatic.com https://cdnjs.cloudflare.com ; " +
-        "img-src https: 'self' 'unsafe-inline' data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
-        "frame-src 'self'");
+        "default-src 'self';" +
+        "connect-src  wss: 'self' https://maps.googleapis.com; " +
+        "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com; " +
+        "style-src  'unsafe-inline' 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com ; " +
+        "font-src 'unsafe-inline' 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
+        "img-src 'unsafe-inline' 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
+        "frame-src 'none';" +
+        "object-src 'none';" +
+        "form-action 'self';" +
+        "frame-ancestors 'self' https://maps.googleapis.com;" +
+        "upgrade-insecure-requests;");
 
     await next();
 });
+//var antiforgery = app.Services.GetRequiredService<IAntiforgery>();
+
+//app.Use((context, next) =>
+//{
+//    var requestPath = context.Request.Path.Value;
+
+//    if (string.Equals(requestPath, "/", StringComparison.OrdinalIgnoreCase))
+//    {
+//        var tokenSet = antiforgery.GetAndStoreTokens(context);
+//        context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!,
+//            new CookieOptions { HttpOnly = false });
+//    }
+
+//    return next(context);
+//});
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

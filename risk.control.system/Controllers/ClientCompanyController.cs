@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
 
 using risk.control.system.AppConstant;
@@ -50,6 +51,7 @@ namespace risk.control.system.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClientCompany clientCompany, string domainAddress, string mailAddress)
         {
             if (clientCompany is not null)
@@ -507,6 +509,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AvailableVendors(string id, List<string> vendors)
         {
             if (vendors is not null && vendors.Count > 0)
@@ -554,6 +557,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EmpanelledVendors(string id, List<string> vendors)
         {
             if (vendors is not null && vendors.Count() > 0)

@@ -72,6 +72,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(string userId, CompanyUserRolesViewModel model)
         {
             var user = await userManager.FindByIdAsync(userId);

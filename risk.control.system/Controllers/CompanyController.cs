@@ -437,6 +437,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AvailableVendors(List<string> vendors)
         {
             if (vendors is not null && vendors.Count > 0)
@@ -484,6 +485,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EmpanelledVendors(List<string> vendors)
         {
             if (vendors is not null && vendors.Count() > 0)
@@ -649,6 +651,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(string userId, CompanyUserRolesViewModel model)
         {
             var user = await userManager.FindByIdAsync(userId);

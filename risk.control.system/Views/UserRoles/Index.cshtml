@@ -45,39 +45,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script>
-        $(document).ready(function () {
-
-            var askConfirmation = true;
-            $('#create-form').submit(function (e) {
-                if (askConfirmation) {
-                    e.preventDefault();
-                    $.confirm({
-                        title: "Confirm Edit",
-                        content: "Are you sure to edit user role?",
-                        columnClass: 'medium',
-                        type: 'orange',
-                        closeIcon: true,
-                        typeAnimated: true,
-
-                        buttons: {
-                            confirm: {
-                                text: "Edit user role",
-                                btnClass: 'btn-warning',
-                                action: function () {
-                                    askConfirmation = false;
-                                    $('#create-form').submit();
-                                }
-                            },
-                            cancel: {
-                                text: "Cancel",
-                                btnClass: 'btn-default'
-                            }
-                        }
-                    });
-                }
-            })
-        });
+    <script src="~/js/user-role.js">
     </script>
 
 }

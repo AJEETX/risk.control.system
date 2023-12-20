@@ -129,6 +129,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> InboxDetailsReply(OutboxMessage contactMessage)
         {
             contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
@@ -312,6 +313,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SentDetailsReply(SentMessage contactMessage)
         {
             contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);

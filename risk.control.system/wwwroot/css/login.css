@@ -342,3 +342,12 @@ img.logo {
 .signup-form {
     height: 450px;
 }
+
+#hostedscan {
+    height: 30px;
+    width: auto;
+}
+
+.login-logo {
+    height: 40px;
+}

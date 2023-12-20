@@ -9,6 +9,7 @@
 <section class="content pt-2">
     <div class="container-fluid ">
         <form id="create-form" asp-action="Create" enctype="multipart/form-data">
+            <input type="hidden" name="claimId" value="@Model.ClaimsInvestigationId" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row">
                 <div class="col-md-12">
@@ -232,37 +233,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/css/bootstrap-multiselect.js"></script>
-    <script>
-        $("#BeneficiaryName").focus();
-        BeneficiaryDateOfBirthId.max = new Date().toISOString().split("T")[0];
+    <script src="~/js/create-beneficiary.js">
 
-        $.validator.setDefaults({
-            submitHandler: function (form) {
-                $.confirm({
-                    title: "Confirm Beneficary Add",
-                    content: "Are you sure?",
-                    icon: 'fas fa-user-tie',
-                    columnClass: 'medium',
-                    type: 'green',
-                    closeIcon: true,
-                    buttons: {
-                        confirm: {
-                            text: "Add",
-                            btnClass: 'btn-success',
-                            action: function () {
-                                form.submit();
-                            }
-                        },
-                        cancel: {
-                            text: "Cancel",
-                            btnClass: 'btn-default'
-                        }
-                    }
-                });
-            }
-        });
-        $(document).ready(function () {
-            $("#create-form").validate();
-        });
     </script>
 }

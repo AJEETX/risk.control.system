@@ -65,6 +65,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
@@ -153,13 +154,12 @@ namespace risk.control.system.Controllers
             return RedirectToAction("login");
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(DashboardController.Index), "Dashboard");
+            return RedirectToAction(nameof(AccountController.Login), "Account");
         }
 
         [HttpGet]

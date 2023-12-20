@@ -9,9 +9,9 @@
                 <div class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-print"></i> Investigation Report</h3>
-                        <h3 id="view-type" class="card-title" style="float:right;">
+                        <h3 id="view-type" class="card-title">
                             <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
-                            <a href="#" id="list-type" style="display:none;" class="input-group-label"> <i class="fas fa-server"></i> List</a>
+                            <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
                         </h3>
                     </div>
                     <div class="card-body">
@@ -34,7 +34,7 @@
                                             <th>Owner</th>
                                             <th>Created On</th>
                                             <th>
-                                                Day(s) <i class="fa fa-asterisk" style="color:red;font-size:12px" title="Days since Active"></i>
+                                                Day(s) <span class="badge badge-light"><i class="fa fa-asterisk" title="Days since Active"></i></span>
                                             </th>
                                             <th></th>
                                         </tr>
@@ -54,97 +54,7 @@
 </section>
 @section Scripts    {
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script src="https://use.fontawesome.com/releases/v6.2.0/js/all.js"></script>
     <script src="~/js/map-list.js"></script>
+    <script src="~/js/company-report.js"></script>
 
-    <script>
-        $(document).ready(function () {
-
-            $('#view-type a').on('click', function () {
-                var id = this.id;
-                if (this.id == 'map-type') {
-                    $('#checkboxes').css('display', 'none');
-                    $('#maps').css('display', 'block');
-                    $('#map-type').css('display', 'none');
-                    $('#list-type').css('display', 'block');
-                }
-                else {
-                    $('#checkboxes').css('display', 'block');
-                    $('#maps').css('display', 'none');
-                    $('#map-type').css('display', 'block');
-                    $('#list-type').css('display', 'none');
-                }
-            });
-
-
-            $("#customerTable").DataTable({
-                ajax: {
-                    url: '/api/ClaimsInvestigation/GetReport',
-                    dataSrc: ''
-                },
-                fixedHeader: true,
-                processing: true,
-                paging: true,
-                language: {
-                    loadingRecords: '&nbsp;',
-                    processing: '<i class="fas fa-sync fa-spin fa-4x fa-fw"></i><span class="sr-only">Loading...</span>'
-                },
-                columns: [
-                    /* Name of the keys from
-                    data file source */
-                    {
-                        "data": "id", "name": "Id", "bVisible": false
-                    },
-                    { "data": "policyNum", "bSortable": false },
-                    {
-                        "sDefaultContent": "",
-                        "bSortable": false,
-                        "mRender": function (data, type, row) {
-                            var img = '<img src="' + row.document + '" src height="30" width="30" />';
-                            return img;
-                        }
-                    },
-                    {
-                        "sDefaultContent": "",
-                        "bSortable": false,
-                        "mRender": function (data, type, row) {
-                            var img = '<img src="' + row.customer + '" src height="30" width="30" />';
-                            return img;
-                        }
-                    },
-                    { "data": "name" },
-                    {
-                        "sDefaultContent": "",
-                        "bSortable": false,
-                        "mRender": function (data, type, row) {
-                            var img = '<img src="' + row.beneficiaryPhoto + '" src height="30" width="30" />';
-                            return img;
-                        }
-                    },
-                    { "data": "beneficiaryName" },
-                    { "data": "serviceType" },
-                    { "data": "pincode" },
-                    { "data": "location" },
-                    { "data": "agent" },
-                    { "data": "created" },
-                    { "data": "timePending" },
-                    {
-                        "sDefaultContent": "",
-                        "bSortable": false,
-                        "mRender": function (data, type, row) {
-                            var buttons = "";
-                            buttons += '<a href="/Report/Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
-                            buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>&nbsp;'
-                            return buttons;
-                        }
-                    }
-                ],
-                error: function (xhr, status, error) { alert('err ' + error) }
-            });
-
-
-            initMap("/api/ClaimsInvestigation/GetReportMap");
-
-        });
-    </script>
 }
