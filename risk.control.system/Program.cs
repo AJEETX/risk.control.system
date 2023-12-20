@@ -45,9 +45,7 @@ builder.Services.AddCors(opt =>
     opt.AddDefaultPolicy(builder =>
     {
         builder
-        .WithOrigins(
-            "https://chek.azurewebsites.net,https://icheckify.azurewebsites.net,https://checkify.azurewebsites.net,https://icheck.azurewebsites.net,https://localhost:5001"
-            )
+        .AllowAnyOrigin()
         .AllowAnyHeader()
         .AllowAnyMethod();
     });
@@ -187,10 +185,10 @@ app.UseSwagger();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
+    //app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-//app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
 app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);
