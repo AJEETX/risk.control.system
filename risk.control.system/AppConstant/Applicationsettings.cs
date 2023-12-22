@@ -167,10 +167,23 @@
         public const string CANARADOMAIN = "canarahsbclife.com";
         public const string CANARALOGO = "/img/chl.png";
 
+        public const string BAJAJ = "bajaj life";
+        public const string BAJAJ_CODE = "bal";
+        public const string BAJAJ_DOMAIN = "bajajlife.com";
+        public const string BAJAJ_LOGO = "/img/bajaj-allianz.jpg";
+        public const string BAJAJ_CREATOR = "creator@" + BAJAJ_DOMAIN;
+
+        public const string TATA = "Tata life";
+        public const string TATA_CODE = "tli";
+        public const string TATA_DOMAIN = "tataaia.com";
+        public const string TATA_LOGO = "/img/tata_logo.png";
+        public const string TATA_CREATOR = "creator@" + TATA_DOMAIN;
+
         public const string HDFC = "hdfc life";
         public const string HDFCCODE = "hdl";
         public const string HDFCDOMAIN = "hdfclife.com";
         public const string HDFCLOGO = "/img/hdfc.jpg";
+        public const string HDFC_CREATOR = "creator@" + HDFCDOMAIN;
 
         public const string AGENCY1NAME = "Checker";
         public const string AGENCY1CODE = "CHA";
@@ -192,18 +205,18 @@
             public const string CODE = "admin";
             public const string USERNAME = "admin@icheckify.co.in";
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Ajeet";
-            public const string LAST_NAME = "Kumar";
-            public const string PROFILE_IMAGE = "/img/superadmin.jpg";
+            public const string FIRST_NAME = "Simmy";
+            public const string LAST_NAME = "Collins";
+            public const string PROFILE_IMAGE = "/img/portal-admin.jpeg";
         }
 
         public static class ADMIN
         {
             public const string DISPLAY_NAME = "ADMIN";
             public const string CODE = "admin";
-            public const string FIRST_NAME = "Amit";
-            public const string LAST_NAME = "Kumar";
-            public const string PROFILE_IMAGE = "/img/admin.png";
+            public const string FIRST_NAME = "Andy";
+            public const string LAST_NAME = "Murrey";
+            public const string PROFILE_IMAGE = "/img/company-admin.jpeg";
         }
 
         public static class CREATOR
@@ -212,9 +225,9 @@
             public const string CODE = "creator";
             public const string USERNAME = "creator@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = "Rashmi";
-            public const string LAST_NAME = "Kumar";
-            public const string PROFILE_IMAGE = "/img/creator.jpg";
+            public const string FIRST_NAME = "Reita";
+            public const string LAST_NAME = "Cremorne";
+            public const string PROFILE_IMAGE = "/img/creator.jpeg";
         }
 
         public static class ASSIGNER
@@ -223,9 +236,9 @@
             public const string CODE = "assigner";
             public const string USERNAME = "assigner@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = CODE;
-            public const string LAST_NAME = "Kumar";
-            public const string PROFILE_IMAGE = "/img/assigner.png";
+            public const string FIRST_NAME = "Jesse";
+            public const string LAST_NAME = "Trantor";
+            public const string PROFILE_IMAGE = "/img/assigner.jpeg";
         }
 
         public static class ASSESSOR
@@ -234,9 +247,9 @@
             public const string CODE = "assessor";
             public const string USERNAME = "assessor@" + CANARADOMAIN;
             public const string EMAIL = USERNAME;
-            public const string FIRST_NAME = CODE;
-            public const string LAST_NAME = "Kumar";
-            public const string PROFILE_IMAGE = "/img/assessor.png";
+            public const string FIRST_NAME = "Samy";
+            public const string LAST_NAME = "Patrick";
+            public const string PROFILE_IMAGE = "/img/assessor.jpeg";
         }
 
         public static class AGENCY_ADMIN
@@ -244,9 +257,9 @@
             public const string DISPLAY_NAME = "ADMIN";
             public const string CODE = "admin";
             public const string USERNAME = "admin";
-            public const string FIRST_NAME = CODE;
-            public const string LAST_NAME = "Kumar";
-            public const string PROFILE_IMAGE = "/img/vendor-admin.png";
+            public const string FIRST_NAME = "Mathew";
+            public const string LAST_NAME = "George";
+            public const string PROFILE_IMAGE = "/img/agency-admin.jpeg";
         }
 
         public static class SUPERVISOR
@@ -254,9 +267,9 @@
             public const string DISPLAY_NAME = "SUPERVISOR";
             public const string CODE = "supervisor";
             public const string USERNAME = "supervisor";
-            public const string FIRST_NAME = CODE;
-            public const string LAST_NAME = "Kumar";
-            public const string PROFILE_IMAGE = "/img/supervisor.png";
+            public const string FIRST_NAME = "Adam";
+            public const string LAST_NAME = "Victor";
+            public const string PROFILE_IMAGE = "/img/supervisor.jpeg";
         }
 
         public static class AGENT
@@ -264,9 +277,9 @@
             public const string DISPLAY_NAME = "AGENT";
             public const string CODE = "agent";
             public const string USERNAME = "agent";
-            public const string FIRST_NAME = CODE;
-            public const string LAST_NAME = "Kumar";
-            public const string PROFILE_IMAGE = "/img/agent.jpg";
+            public const string FIRST_NAME = "Denny";
+            public const string LAST_NAME = "Travolta";
+            public const string PROFILE_IMAGE = "/img/agent.jpeg";
         }
     }
 }

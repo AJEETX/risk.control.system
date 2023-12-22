@@ -27,7 +27,7 @@ namespace risk.control.system.Seeds
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
-            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "admin.png");
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "company-admin.jpeg");
             var adminImage = File.ReadAllBytes(adminImagePath);
 
             if (adminImage == null)
@@ -91,7 +91,7 @@ namespace risk.control.system.Seeds
             var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
             var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
-            string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "creator.jpg");
+            string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "creator.jpeg");
 
             var creatorImage = File.ReadAllBytes(creatorImagePath);
 
@@ -141,7 +141,7 @@ namespace risk.control.system.Seeds
             {
                 Name = assignerEmailwithSuffix
             };
-            string assignerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assigner.png");
+            string assignerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assigner.jpeg");
 
             var assignerImage = File.ReadAllBytes(assignerImagePath);
 
@@ -193,7 +193,7 @@ namespace risk.control.system.Seeds
                 Name = assessorEmailwithSuffix
             };
 
-            string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assessor.png");
+            string assessorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assessor.jpeg");
             var assessorImage = File.ReadAllBytes(assessorImagePath);
 
             if (assessorImage == null)

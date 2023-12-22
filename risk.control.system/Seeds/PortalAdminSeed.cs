@@ -25,7 +25,7 @@ namespace risk.control.system.Seeds
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
             var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
-            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "superadmin.jpg");
+            string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "portal-admin.jpeg");
             var adminImage = File.ReadAllBytes(adminImagePath);
 
             if (adminImage == null)
