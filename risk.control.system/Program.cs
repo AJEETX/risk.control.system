@@ -1,16 +1,21 @@
+using System.Configuration;
 using System.Reflection;
+using System.Text;
 
-using Microsoft.AspNetCore.Antiforgery;
+using Highsoft.Web.Mvc.Charts;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 
 using NToastNotify;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -21,17 +26,12 @@ using risk.control.system.Services;
 
 using SmartBreadcrumbs.Extensions;
 
+using static Org.BouncyCastle.Math.EC.ECCurve;
+
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseKestrel(option => option.AddServerHeader = false).UseIIS();
-//builder.Services.AddControllers(options =>
-//{
-//    var jsonInputFormatter = options.InputFormatters
-//        .OfType<Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter>()
-//        .Single();
-//    jsonInputFormatter.SupportedMediaTypes.Add("application/csp-report");
-//});
+
 builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
 {
     options.TagName = "nav";
@@ -40,14 +40,14 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.LiClasses = "breadcrumb-item";
     options.ActiveLiClasses = "breadcrumb-item active";
 });
+
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(builder =>
     {
-        builder
-        .AllowAnyOrigin()
+        builder.AllowAnyOrigin()
         .AllowAnyHeader()
-        .AllowAnyMethod();
+            .AllowAnyMethod();
     });
 });
 // For FileUpload
@@ -80,10 +80,7 @@ builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
-builder.Services.AddControllersWithViews(options =>
-{
-    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-})
+builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()
     .AddNToastNotifyNoty(new NotyOptions
     {
@@ -95,14 +92,6 @@ builder.Services.AddControllersWithViews(options =>
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-//builder.Services.AddAntiforgery(options =>
-//{
-//    // Set Cookie properties using CookieBuilder properties†.
-//    options.FormFieldName = "AntiforgeryFieldname";
-//    options.HeaderName = "X-CSRF-TOKEN-HEADERNAME";
-//    options.SuppressXFrameOptionsHeader = false;
-//});
-builder.Services.AddMvc();
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
 if (prod)
@@ -113,7 +102,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=icheckify_1_0_0_0.db"));
+                        options.UseSqlite("Data Source=icheckify_1_0_0_6.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -137,6 +126,50 @@ builder.Services.Configure<IdentityOptions>(options =>
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
+
+//builder.Services.AddAuthentication(options =>
+//{
+//    // custom scheme defined in .AddPolicyScheme() below
+//    options.DefaultScheme = "JWT_OR_COOKIE";
+//    options.DefaultChallengeScheme = "JWT_OR_COOKIE";
+//})
+//    .AddCookie("Cookies", options =>
+//    {
+//        options.LoginPath = "/Account/Login";
+//        options.ExpireTimeSpan = TimeSpan.FromDays(1);
+//        //options.LogoutPath = "/Account/Logout";
+//        //options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+//        //options.Cookie.HttpOnly = true;
+//        //// Only use this when the sites are on different domains
+//        //options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
+//    })
+//    .AddJwtBearer("Bearer", options =>
+//    {
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuer = true,
+//            ValidateAudience = true,
+//            ValidateIssuerSigningKey = true,
+//            ValidIssuer = "https://localhost:7208/",
+//            ValidAudience = "https://localhost:7208/",
+//            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@1"))
+//        };
+//    })
+//    // this is the key piece!
+//    .AddPolicyScheme("JWT_OR_COOKIE", "JWT_OR_COOKIE", options =>
+//    {
+//        // runs on each request
+//        options.ForwardDefaultSelector = context =>
+//        {
+//            // filter by auth type
+//            string authorization = context.Request.Headers[HeaderNames.Authorization];
+//            if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer "))
+//                return "Bearer";
+
+//            // otherwise always check for cookie auth
+//            return "Cookies";
+//        };
+//    });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -185,10 +218,10 @@ app.UseSwagger();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
-    //app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+//app.UseStatusCodePagesWithRedirects("/Home/Error?code={0}");
 app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);
@@ -208,46 +241,7 @@ app.UseCookiePolicy(
         Secure = CookieSecurePolicy.Always,
         HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
         MinimumSameSitePolicy = SameSiteMode.Strict
-    });
-//app.Use(async (context, next) =>
-//{
-//    context.Response.Headers.Add("X-Frame-Options", "DENY");
-//    context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
-//    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-//    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-//    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-//    context.Response.Headers.Add("Permissions-Policy", "geolocation=(self)");
-
-//    context.Response.Headers.Add("Content-Security-Policy",
-//        "default-src 'self';" +
-//        "connect-src 'self'  wss: https://maps.googleapis.com; " +
-//        "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com; " +
-//        "style-src  'unsafe-inline' 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com ; " +
-//        "font-src 'unsafe-inline' 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
-//        "img-src 'unsafe-inline' 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
-//        "frame-src 'none';" +
-//        "object-src 'none';" +
-//        "form-action 'self';" +
-//        "frame-ancestors 'self' https://maps.googleapis.com;" +
-//        "upgrade-insecure-requests;");
-
-//    await next();
-//});
-//var antiforgery = app.Services.GetRequiredService<IAntiforgery>();
-
-//app.Use((context, next) =>
-//{
-//    var requestPath = context.Request.Path.Value;
-
-//    if (string.Equals(requestPath, "/", StringComparison.OrdinalIgnoreCase))
-//    {
-//        var tokenSet = antiforgery.GetAndStoreTokens(context);
-//        context.Response.Cookies.Append("XSRF-TOKEN", tokenSet.RequestToken!,
-//            new CookieOptions { HttpOnly = false });
-//    }
-
-//    return next(context);
-//});
+    }); ;
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
