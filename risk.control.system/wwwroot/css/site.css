@@ -955,3 +955,9 @@ a.CaseReadyToAssign {
     pointer-events: none;
     color: lightgrey;
 }
+#map-type{
+    float:right;
+}
+#list-type {
+    display:none;
+}
