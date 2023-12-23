@@ -188,7 +188,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Strict;
         options.Cookie.Domain = "check.azurewebsites.com";
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.CookieManager = new CookieManager();
+        //options.CookieManager = new CookieManager();
     });
 
 builder.Services.AddSwaggerGen(c =>
