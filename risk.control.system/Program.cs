@@ -255,6 +255,7 @@ app.Use(async (context, next) =>
         "object-src 'none';" +
         "form-action 'self';" +
         "frame-ancestors 'self' https://maps.googleapis.com;" +
+        "require-trusted-types-for 'script';" +
         "upgrade-insecure-requests;");
 
     await next();
