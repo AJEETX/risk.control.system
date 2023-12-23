@@ -1,0 +1,2 @@
+Policy,Amount,IssueDate,ClaimType,ServiceType,DateOfIncident,CauseOfLoss,Reason,Dept,PDocument,Name,CustomerType,Gender,CustomerDob,Contact,Education,Occupation,Income,CAddress,Pincode,Comment,CPhoto,BeneficiaryName,Relation,BeneficiaryDob,BeneficiaryIncome,BeneficiaryContact,BAddress,BPincode, BPhoto
+P001,500000,12-10-2023,HEALTH,DISCREET,16-10-2023,Lost in fire,DBD,loans,,Ajeet Kumar,HNI,MALE,22-09-1990, 9896487281, GRADUATE, ENGINEER, UPPER_INCOME, 100 GOOD STREET, 3131 , good guy,, Suresh Kumar, father , 22-12-1999,MEDIUUM_INCOME, 9090909090 , 23 Blackburn Road, 3130,

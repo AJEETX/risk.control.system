@@ -130,6 +130,15 @@ namespace risk.control.system.Models
         PROFESSIONAL,
     }
 
+    public enum UploadType
+    {
+        [Display(Name = "File Upload")]
+        FILE,
+
+        [Display(Name = "FTP Upload")]
+        FTP,
+    }
+
     public class VerificationLocation
     {
         [Key]

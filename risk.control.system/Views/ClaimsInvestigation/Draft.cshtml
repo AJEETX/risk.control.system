@@ -33,23 +33,25 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <span class="input-group-label">File Uploads:</span>
+                                        <span class="input-group-label"> Upload Type:</span>
                                         <div class="input-group mb-3">
-                                            <img class="form-Image" id="profileImage" src="/img/upload.png">
-                                            <input accept=".zip" type="file" class="form-control" name="postedFile" id="postedFile" />
-                                            <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="UploadClaims"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <select name="uploadtype" id="uploadtype" required class="form-control" asp-items="Html.GetEnumSelectList<UploadType>()">
+                                                <option value="">--- SELECT---</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                             
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <span class="input-group-label"> FTP Uploads / Downloads: </span>
+                                        <span class="input-group-label"> Perform Upload: </span>
                                         <div class="input-group mb-3">
                                             <img class="form-Image" id="ftpImage" src="/img/upload.png">
-                                            <input accept=".zip" type="file" class="form-control" name="postedFtp" id="postedFtp" />
-                                            <button id="UploadFtpButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FtpUpload"><i class="nav-icon fa fa-upload"></i> Upload</button>&nbsp;
-                                            <button id="DownloadFtpButton" type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FtpDownload"><i class="nav-icon fa fa-download"></i> Download</button>
+                                            <input accept=".zip" type="file" class="form-control" name="postedFile" id="postedFile" />
+                                            <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FileUpload"><i class="nav-icon fa fa-upload"></i> Upload</button>
                                         </div>
                                     </div>
                                 </div>

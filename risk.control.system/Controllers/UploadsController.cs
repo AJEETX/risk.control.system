@@ -141,46 +141,46 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult FtpUpload(IFormFile postedFtp)
+        public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype)
         {
-            if (postedFtp != null)
+            if (postedFile != null)
             {
-                string folder = Path.Combine(webHostEnvironment.WebRootPath, "document");
-                if (!Directory.Exists(folder))
+                UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
+
+                if (uploadType == UploadType.FTP)
                 {
-                    Directory.CreateDirectory(folder);
+                    await FtpUploadClaims(postedFile);
+
+                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Downloaded Claims ready"));
+
+                    return RedirectToAction("Draft", "ClaimsInvestigation");
                 }
 
-                string fileName = Path.GetFileName(postedFtp.FileName);
-                string filePath = Path.Combine(folder, fileName);
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
                 {
-                    postedFtp.CopyTo(stream);
+                    try
+                    {
+                        await FileUploadClaims(postedFile);
+
+                        toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> File uploaded Claims ready"));
+
+                        return RedirectToAction("Draft", "ClaimsInvestigation");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
-                var wc = new WebClient
-                {
-                    Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
-                };
-                var response = wc.UploadFile(Applicationsettings.FTP_SITE + fileName, filePath);
-
-                var data = Encoding.UTF8.GetString(response);
-
-                var userEmail = HttpContext.User.Identity.Name;
-
-                SaveUpload(postedFtp, filePath, "Ftp upload", userEmail);
-
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Uploaded Claims."));
-
-                return RedirectToAction("Draft", "ClaimsInvestigation");
             }
-            return Problem();
+
+            toastNotification.AddErrorToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Upload Error. Pls try again"));
+
+            return RedirectToAction("Draft", "ClaimsInvestigation");
         }
 
-        [ValidateAntiForgeryToken]
-        [HttpPost]
-        public async Task<IActionResult> UploadClaims(IFormFile postedFile)
+        private async Task FileUploadClaims(IFormFile postedFile)
         {
-            if (postedFile != null && Path.GetExtension(postedFile.FileName) == ".zip")
+            try
             {
                 string path = Path.Combine(webHostEnvironment.WebRootPath, "upload-file");
                 if (!Directory.Exists(path))
@@ -204,26 +204,53 @@ namespace risk.control.system.Controllers
 
                 await ftpService.UploadFile(userEmail, filePath, docPath, fileNameWithoutExtension);
 
-                SaveUpload(postedFile, filePath, "File upload", userEmail);
-                try
-                {
-                    var rows = _context.SaveChanges();
+                await SaveUpload(postedFile, filePath, "File upload", userEmail);
 
-                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> File uploaded Claims ready"));
-
-                    return RedirectToAction("Draft", "ClaimsInvestigation");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
+                var rows = _context.SaveChanges();
             }
-            toastNotification.AddErrorToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> File uploaded err "));
-
-            return RedirectToAction("Draft", "ClaimsInvestigation");
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
-        private void SaveUpload(IFormFile file, string filePath, string description, string uploadedBy)
+        private async Task FtpUploadClaims(IFormFile postedFile)
+        {
+            try
+            {
+                string folder = Path.Combine(webHostEnvironment.WebRootPath, "document");
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+
+                string fileName = Path.GetFileName(postedFile.FileName);
+                string filePath = Path.Combine(folder, fileName);
+                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                {
+                    postedFile.CopyTo(stream);
+                }
+                var wc = new WebClient
+                {
+                    Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
+                };
+                var response = wc.UploadFile(Applicationsettings.FTP_SITE + fileName, filePath);
+
+                var data = Encoding.UTF8.GetString(response);
+
+                var userEmail = HttpContext.User.Identity.Name;
+
+                SaveUpload(postedFile, filePath, "Ftp upload", userEmail);
+
+                await ftpService.DownloadFtp(userEmail);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private async Task SaveUpload(IFormFile file, string filePath, string description, string uploadedBy)
         {
             var fileName = Path.GetFileNameWithoutExtension(file.FileName);
             var extension = Path.GetExtension(file.FileName);
@@ -240,7 +267,7 @@ namespace risk.control.system.Controllers
                 CompanyId = company.ClientCompanyId
             };
             _context.FilesOnFileSystem.Add(fileModel);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }
