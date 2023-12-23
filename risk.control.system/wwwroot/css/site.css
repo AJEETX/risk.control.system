@@ -955,9 +955,20 @@ a.CaseReadyToAssign {
     pointer-events: none;
     color: lightgrey;
 }
-#map-type{
-    float:right;
+
+#map-type {
+    float: right;
 }
+
 #list-type {
-    display:none;
+    display: none;
+}
+
+.supervisor-doc {
+    height: 2.4rem;
+    border: 1px solid #ccc;
+}
+
+#dataTbl tbody {
+    overflow-y: auto;
 }

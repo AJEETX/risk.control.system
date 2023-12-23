@@ -248,14 +248,13 @@ app.Use(async (context, next) =>
         "default-src 'self';" +
         "connect-src 'self'  wss: https://maps.googleapis.com; " +
         "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com; " +
-        "style-src  'unsafe-inline' 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com ; " +
-        "font-src 'unsafe-inline' 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
-        "img-src 'unsafe-inline' 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
+        "style-src  'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com ; " +
+        "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
+        "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
         "frame-src 'none';" +
         "object-src 'none';" +
         "form-action 'self';" +
         "frame-ancestors 'self' https://maps.googleapis.com;" +
-        "require-trusted-types-for 'script';" +
         "upgrade-insecure-requests;");
 
     await next();
