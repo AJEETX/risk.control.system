@@ -235,13 +235,37 @@ app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
 });
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("X-Frame-Options", "DENY");
+    context.Response.Headers.Add("X-Permitted-Cross-Domain-Policies", "none");
+    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
+    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+    context.Response.Headers.Add("Permissions-Policy", "geolocation=(self)");
+
+    context.Response.Headers.Add("Content-Security-Policy",
+        "default-src 'self';" +
+        "connect-src 'self'  wss: https://maps.googleapis.com; " +
+        "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com; " +
+        "style-src  'unsafe-inline' 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com ; " +
+        "font-src 'unsafe-inline' 'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
+        "img-src 'unsafe-inline' 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
+        "frame-src 'none';" +
+        "object-src 'none';" +
+        "form-action 'self';" +
+        "frame-ancestors 'self' https://maps.googleapis.com;" +
+        "upgrade-insecure-requests;");
+
+    await next();
+});
 app.UseCookiePolicy(
     new CookiePolicyOptions
     {
         Secure = CookieSecurePolicy.Always,
         HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
         MinimumSameSitePolicy = SameSiteMode.Strict
-    }); ;
+    });
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
