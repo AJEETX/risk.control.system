@@ -1043,6 +1043,37 @@ namespace risk.control.system.Services
                 .Include(c => c.State)
                 .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
+            var currentUser = _context.ClientCompanyApplicationUser
+                .Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == currentUser.ClientCompanyId);
+            string currentOwner = string.Empty;
+            var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
+            var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+            if (currentUser.ClientCompany.Auto)
+            {
+                foreach (var companyUser in companyUsers)
+                {
+                    var isAssigner = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
+                    if (isAssigner)
+                    {
+                        currentOwner = companyUser.Email;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var companyUser in companyUsers)
+                {
+                    var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
+                    if (isAssigner)
+                    {
+                        currentOwner = companyUser.Email;
+                        break;
+                    }
+                }
+            }
+
             var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
             report.AssessorRemarkType = assessorRemarkType;
             report.AssessorRemarks = assessorRemarks;
@@ -1051,6 +1082,7 @@ namespace risk.control.system.Services
 
             _context.ClaimReport.Update(report);
             claimsCaseLocation.ClaimReport = report;
+
             claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
             claimsCaseLocation.IsReviewCaseLocation = true;
@@ -1063,6 +1095,7 @@ namespace risk.control.system.Services
             claimsCaseToReassign.UpdatedBy = userEmail;
             claimsCaseToReassign.CurrentUserEmail = userEmail;
             claimsCaseToReassign.IsReviewCase = true;
+            claimsCaseToReassign.CurrentClaimOwner = currentOwner;
             claimsCaseToReassign.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
 

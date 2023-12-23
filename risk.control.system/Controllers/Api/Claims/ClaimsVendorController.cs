@@ -310,7 +310,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 foreach (var item in applicationDbContext)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                    && !c.IsReviewCaseLocation)?.ToList();
+                    || c.IsReviewCaseLocation)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claims.Add(item);
@@ -422,7 +422,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 foreach (var item in applicationDbContext)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                    && !c.IsReviewCaseLocation)?.ToList();
+                    || c.IsReviewCaseLocation)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claims.Add(item);
