@@ -443,7 +443,10 @@ namespace risk.control.system.Services
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
                         existingPolicy.CurrentClaimOwner = userEmail;
-                        var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
+
+                        var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
+                        claimsInvestigation.CustomerDetail.PinCode = pincode;
+                        var customerLatLong = pincode.Latitude + "," + pincode.Longitude;
 
                         var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
                         existingPolicy.CustomerDetail.CustomerLocationMap = url;
@@ -522,17 +525,9 @@ namespace risk.control.system.Services
                     }
                     if (create)
                     {
-                        if (customerDocument == null && existingPolicy.CustomerDetail?.ProfilePicture != null)
-                        {
-                            claimsInvestigation.CustomerDetail.ProfilePictureUrl = existingPolicy.CustomerDetail.ProfilePictureUrl;
-                            claimsInvestigation.CustomerDetail.ProfilePicture = existingPolicy.CustomerDetail.ProfilePicture;
-                            claimsInvestigation.CustomerDetail.ProfileImage = existingPolicy.CustomerDetail.ProfileImage;
-                        }
+                        var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == claimsInvestigation.CustomerDetail.PinCodeId);
 
-                        var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
-
-                        existingPolicy.CustomerDetail.PinCode.Latitude = pincode.Latitude;
-                        existingPolicy.CustomerDetail.PinCode.Longitude = pincode.Longitude;
+                        claimsInvestigation.CustomerDetail.PinCode = pincode;
 
                         var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
 

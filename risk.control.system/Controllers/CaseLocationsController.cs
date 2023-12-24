@@ -172,8 +172,7 @@ namespace risk.control.system.Controllers
                 caseLocation.ClaimsInvestigationId = claimId;
                 var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
 
-                caseLocation.PinCode.Latitude = pincode.Latitude;
-                caseLocation.PinCode.Longitude = pincode.Longitude;
+                caseLocation.PinCode = pincode;
 
                 var customerLatLong = caseLocation.PinCode.Latitude + "," + caseLocation.PinCode.Longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
@@ -276,7 +275,7 @@ namespace risk.control.system.Controllers
                         caseLocation.PinCodeId = ecaseLocation.PinCodeId;
                         caseLocation.StateId = ecaseLocation.StateId;
                         var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
-
+                        caseLocation.PinCode = pincode;
                         var customerLatLong = pincode.Latitude + "," + pincode.Longitude;
                         var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
                         caseLocation.BeneficiaryLocationMap = url;
