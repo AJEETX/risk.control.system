@@ -716,32 +716,6 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E&callback=initReportMap">
     </script>
     <script src="~/js/map.js"></script>
+    <script src="~/js/get-investigate-report.js"></script>
 
-    <script>
-        $(document).ready(function () {
-
-            $('#create-form').on('submit', function (e) {
-                var report = $('#supervisorRemarks').val();
-
-                if (report == '') {
-                    askConfirmation = false;
-                    e.preventDefault();
-                    $.alert({
-                        title: "Supervisor Comments !!!",
-                        content: "Please enter comments?",
-                        icon: 'fas fa-exclamation-triangle',
-                        columnClass: 'medium',
-                        type: 'red',
-                        closeIcon: true,
-                        buttons: {
-                            cancel: {
-                                text: "OK",
-                                btnClass: 'btn-danger'
-                            }
-                        }
-                    });
-                }
-            });
-        });
-    </script>
 }
