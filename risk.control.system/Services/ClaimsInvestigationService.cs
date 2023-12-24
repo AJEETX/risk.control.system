@@ -1119,7 +1119,8 @@ namespace risk.control.system.Services
                 Vendor = report.Vendor,
                 VendorId = report.VendorId,
             };
-            claimsCaseLocation.PreviousClaimReports.Add(saveReport);
+            var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
+            claimsCaseLocation.PreviousClaimReports.Add(currentSavedReport.Entity);
             claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
             claimsCaseLocation.IsReviewCaseLocation = true;
