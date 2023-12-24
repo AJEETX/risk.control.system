@@ -44,7 +44,6 @@ namespace risk.control.system.Services
             var claimCase = _context.CaseLocation
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
-                .Include(c => c.PreviousClaimReports)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
@@ -55,10 +54,7 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            if (claimCase.PreviousClaimReports.Count > 0)
-            {
-                claimCase.ClaimReport = new ClaimReport();
-            }
+
             claimCase.ClaimReport.AgentEmail = data.Email;
 
             var claim = _context.ClaimsInvestigation
@@ -203,7 +199,6 @@ namespace risk.control.system.Services
             var claimCase = _context.CaseLocation
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
-                .Include(c => c.PreviousClaimReports)
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
@@ -214,10 +209,7 @@ namespace risk.control.system.Services
             {
                 return null;
             }
-            if (claimCase.PreviousClaimReports.Count > 0)
-            {
-                claimCase.ClaimReport = new ClaimReport();
-            }
+
             claimCase.ClaimReport.AgentEmail = data.Email;
 
             var claim = _context.ClaimsInvestigation
