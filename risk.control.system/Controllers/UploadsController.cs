@@ -119,28 +119,6 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FtpDownload()
-        {
-            try
-            {
-                var userEmail = HttpContext.User.Identity.Name;
-
-                await ftpService.DownloadFtp(userEmail);
-
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Downloaded Claims ready"));
-
-                return RedirectToAction("Draft", "ClaimsInvestigation");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                toastNotification.AddErrorToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Downloaded err !!!"));
-                return RedirectToAction("Draft", "ClaimsInvestigation");
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype)
         {
             if (postedFile != null)

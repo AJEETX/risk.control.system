@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
+using MimeKit.Encodings;
+
 using NToastNotify;
 
 using risk.control.system.AppConstant;
@@ -211,6 +213,14 @@ namespace risk.control.system.Services
                                         ProfilePicture = customerImage
                                     };
 
+                                    claim.CustomerDetail.PinCode = pinCode;
+                                    claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
+                                    claim.CustomerDetail.PinCode.Longitude = pinCode.Longitude;
+                                    var customerLatLong = pinCode.Latitude + "," + pinCode.Longitude;
+
+                                    var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                                    claim.CustomerDetail.CustomerLocationMap = url;
+
                                     var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
 
                                     var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
@@ -238,6 +248,13 @@ namespace risk.control.system.Services
                                         InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
                                         ProfilePicture = beneficairyImage
                                     };
+                                    beneficairy.PinCode = benePinCode;
+                                    beneficairy.PinCode.Latitude = benePinCode.Latitude;
+                                    beneficairy.PinCode.Longitude = benePinCode.Longitude;
+                                    var beneLatLong = benePinCode.Latitude + "," + benePinCode.Longitude;
+
+                                    var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneLatLong}&key={Applicationsettings.GMAPData}";
+                                    beneficairy.BeneficiaryLocationMap = beneUrl;
 
                                     var addedClaim = _context.ClaimsInvestigation.Add(claim);
 
@@ -473,6 +490,10 @@ namespace risk.control.system.Services
                             claim.CustomerDetail.PinCode = pinCode;
                             claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
                             claim.CustomerDetail.PinCode.Longitude = pinCode.Longitude;
+                            var customerLatLong = pinCode.Latitude + "," + pinCode.Longitude;
+
+                            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                            claim.CustomerDetail.CustomerLocationMap = url;
 
                             var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
 
@@ -512,6 +533,10 @@ namespace risk.control.system.Services
                             beneficairy.PinCode = benePinCode;
                             beneficairy.PinCode.Latitude = benePinCode.Latitude;
                             beneficairy.PinCode.Longitude = benePinCode.Longitude;
+                            var beneLatLong = benePinCode.Latitude + "," + benePinCode.Longitude;
+
+                            var beneUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneLatLong}&key={Applicationsettings.GMAPData}";
+                            beneficairy.BeneficiaryLocationMap = beneUrl;
 
                             _context.CaseLocation.Add(beneficairy);
 
