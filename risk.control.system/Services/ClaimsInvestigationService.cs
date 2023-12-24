@@ -1111,7 +1111,8 @@ namespace risk.control.system.Services
                 Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
                 InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId,
-                UpdatedBy = userEmail
+                UpdatedBy = userEmail,
+                CurrentClaimOwner = currentOwner
             };
             _context.InvestigationTransaction.Add(log);
 
