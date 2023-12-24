@@ -337,24 +337,24 @@
                                             </div>
                                             <div class="card-body pb-0">
                                                 @{
-                                                    var QR1 = @Model.CaseLocation?.ClaimReport?.AgentOcrData ?? "OCR Scan Info";
+                                                    var QR1 = @Model.CaseLocation?.ClaimReport?.DocumentIdImageData ?? "OCR Scan Info";
                                                     var image = @ViewBag.LocationUrl;
                                                     var ocrImage = @ViewBag.OcrLocationUrl;
-                                                    var locationData = @Model.CaseLocation?.ClaimReport?.LocationData ?? "Image DATA";
+                                                    var locationData = @Model.CaseLocation?.ClaimReport?.DigitalIdImageData ?? "Image DATA";
                                                 }
                                                 <div class="row">
                                                     @{
-                                                        if (@Model.CaseLocation.ClaimReport?.LocationData != null && @Model.CaseLocation.ClaimReport?.LocationLongLatTime != null && image != null)
+                                                        if (@Model.CaseLocation.ClaimReport?.DigitalIdImageData != null && @Model.CaseLocation.ClaimReport?.DigitalIdLongLatTime != null && image != null)
                                                         {
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
                                                                     <div class="card-header text-muted border-bottom-0">
 
-                                                                        <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.LocationLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                                        <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.DigitalIdLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
                                                                     <div class="card-footer text-center">
                                                                         <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                                                                        @if (string.IsNullOrWhiteSpace(@Model.CaseLocation.ClaimReport.LocationPictureConfidence))
+                                                                        @if (string.IsNullOrWhiteSpace(@Model.CaseLocation.ClaimReport.DigitalIdImageMatchConfidence))
                                                                         {
                                                                             <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                                                                         }
@@ -370,9 +370,9 @@
                                                                                     <span class="badge badge-light"><i class="far fa-image"></i> Digital Image</span>:
                                                                                     <br />
                                                                                     @{
-                                                                                        if (Model.CaseLocation.ClaimReport?.AgentLocationPicture != null)
+                                                                                        if (Model.CaseLocation.ClaimReport?.DigitalIdImage != null)
                                                                                         {
-                                                                                            <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentLocationPicture))">
+                                                                                            <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.DigitalIdImage))">
                                                                                         }
                                                                                         else
                                                                                         {
@@ -414,17 +414,17 @@
                                                                 </div>
                                                             </div>
                                                         }
-                                                        if (@Model.CaseLocation.ClaimReport?.OcrLongLatTime != null && ocrImage != null)
+                                                        if (@Model.CaseLocation.ClaimReport?.DocumentIdImageLongLatTime != null && ocrImage != null)
                                                         {
                                                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                                                 <div class="card bg-light d-flex flex-fill">
                                                                     <div class="card-header text-muted border-bottom-0">
 
-                                                                        <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span><span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.OcrLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                                        <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span><span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.CaseLocation.ClaimReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                                     </div>
                                                                     <div class="card-footer text-center">
                                                                         <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                                                                        @if (@Model.CaseLocation.ClaimReport.PanValid.HasValue && @Model.CaseLocation.ClaimReport.PanValid.Value)
+                                                                        @if (@Model.CaseLocation.ClaimReport.DocumentIdImageValid.HasValue && @Model.CaseLocation.ClaimReport.DocumentIdImageValid.Value)
                                                                         {
                                                                             <i style='color:green;' class='fas fa-check-circle'></i>
                                                                         }
@@ -440,9 +440,9 @@
                                                                                     <span class="badge badge-light"><i class="fas fa-film"></i> Document Image</span>:
                                                                                     <br />
                                                                                     @{
-                                                                                        if (Model.CaseLocation.ClaimReport?.AgentOcrPicture != null)
+                                                                                        if (Model.CaseLocation.ClaimReport?.DocumentIdImage != null)
                                                                                         {
-                                                                                            <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.AgentOcrPicture))">
+                                                                                            <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.DocumentIdImage))">
                                                                                         }
                                                                                         else
                                                                                         {

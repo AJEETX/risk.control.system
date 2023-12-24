@@ -91,14 +91,14 @@ namespace risk.control.system.Services
                         var locationRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
                         var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                        claimCase.ClaimReport.AgentLocationPictureUrl = filePath;
+                        claimCase.ClaimReport.DigitalIdImagePath = filePath;
                         CompressImage.Compressimage(stream, filePath);
 
                         var savedImage = await File.ReadAllBytesAsync(filePath);
-                        claimCase.ClaimReport.AgentLocationPicture = savedImage;
+                        claimCase.ClaimReport.DigitalIdImage = savedImage;
                         var saveImageBase64String = Convert.ToBase64String(savedImage);
 
-                        claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.DigitalIdLongLatTime = DateTime.UtcNow;
                         this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
 
                         var base64Image = Convert.ToBase64String(registeredImage);
@@ -108,25 +108,25 @@ namespace risk.control.system.Services
                         {
                             var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
 
-                            claimCase.ClaimReport.LocationPictureConfidence = faceImageDetail.Confidence;
+                            claimCase.ClaimReport.DigitalIdImageMatchConfidence = faceImageDetail.Confidence;
                         }
                         catch (Exception)
                         {
-                            claimCase.ClaimReport.LocationPictureConfidence = string.Empty;
+                            claimCase.ClaimReport.DigitalIdImageMatchConfidence = string.Empty;
                         }
                     }
                     else
                     {
-                        claimCase.ClaimReport.LocationPictureConfidence = "no face image";
+                        claimCase.ClaimReport.DigitalIdImageMatchConfidence = "no face image";
                     }
                 }
                 catch (Exception ex)
                 {
-                    claimCase.ClaimReport.LocationPictureConfidence = "err " + ImageData;
+                    claimCase.ClaimReport.DigitalIdImageMatchConfidence = "err " + ImageData;
                 }
                 if (registeredImage == null)
                 {
-                    claimCase.ClaimReport.LocationPictureConfidence = "no image";
+                    claimCase.ClaimReport.DigitalIdImageMatchConfidence = "no image";
                 }
             }
 
@@ -134,15 +134,15 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.LocationLongLat))
             {
-                claimCase.ClaimReport.LocationLongLatTime = DateTime.UtcNow;
-                claimCase.ClaimReport.LocationLongLat = data.LocationLongLat;
+                claimCase.ClaimReport.DigitalIdLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.DigitalIdLongLat = data.LocationLongLat;
             }
 
-            if (!string.IsNullOrWhiteSpace(claimCase.ClaimReport.LocationLongLat))
+            if (!string.IsNullOrWhiteSpace(claimCase.ClaimReport.DigitalIdLongLat))
             {
-                var longLat = claimCase.ClaimReport.LocationLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.LocationLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.LocationLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var longLat = claimCase.ClaimReport.DigitalIdLongLat.IndexOf("/");
+                var latitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
                 var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
@@ -151,7 +151,7 @@ namespace risk.control.system.Services
                     $"\r\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m}" +
                     $"\r\n" +
                     $"\r\nElevation(sea level):{weatherData.elevation} metres";
-                claimCase.ClaimReport.LocationData = weatherCustomData;
+                claimCase.ClaimReport.DigitalIdImageData = weatherCustomData;
             }
 
             _context.CaseLocation.Update(claimCase);
@@ -171,18 +171,18 @@ namespace risk.control.system.Services
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claimCase.CaseLocationId,
-                LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentLocationPictureUrl) ?
-                Convert.ToBase64String(File.ReadAllBytes(claimCase.ClaimReport.AgentLocationPictureUrl)) :
+                LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.DigitalIdImagePath) ?
+                Convert.ToBase64String(File.ReadAllBytes(claimCase.ClaimReport.DigitalIdImagePath)) :
                 Convert.ToBase64String(noDataimage),
-                LocationLongLat = claimCase.ClaimReport.LocationLongLat,
-                LocationTime = claimCase.ClaimReport.LocationLongLatTime,
-                OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrUrl) ?
-                Convert.ToBase64String(File.ReadAllBytes(claimCase.ClaimReport.AgentOcrUrl)) :
+                LocationLongLat = claimCase.ClaimReport.DigitalIdLongLat,
+                LocationTime = claimCase.ClaimReport.DigitalIdLongLatTime,
+                OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.DocumentIdImagePath) ?
+                Convert.ToBase64String(File.ReadAllBytes(claimCase.ClaimReport.DocumentIdImagePath)) :
                 Convert.ToBase64String(noDataimage),
-                OcrLongLat = claimCase.ClaimReport.OcrLongLat,
-                OcrTime = claimCase.ClaimReport.OcrLongLatTime,
-                FacePercent = claimCase.ClaimReport.LocationPictureConfidence,
-                PanValid = claimCase.ClaimReport.PanValid
+                OcrLongLat = claimCase.ClaimReport.DocumentIdImageLongLat,
+                OcrTime = claimCase.ClaimReport.DocumentIdImageLongLatTime,
+                FacePercent = claimCase.ClaimReport.DigitalIdImageMatchConfidence,
+                PanValid = claimCase.ClaimReport.DocumentIdImageValid
             };
         }
 
@@ -226,7 +226,7 @@ namespace risk.control.system.Services
                 var locationRealImage = ByteArrayToImage(byteimage);
                 MemoryStream mstream = new MemoryStream(byteimage);
                 var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                claimCase.ClaimReport.AgentLocationPictureUrl = mfilePath;
+                claimCase.ClaimReport.DigitalIdImagePath = mfilePath;
                 CompressImage.Compressimage(mstream, mfilePath);
 
                 var savedImage = await File.ReadAllBytesAsync(mfilePath);
@@ -259,21 +259,21 @@ namespace risk.control.system.Services
                                         body.result?.source_output != null
                                         && body.result?.source_output?.status == "id_found")
                                     {
-                                        claimCase.ClaimReport.PanValid = true;
+                                        claimCase.ClaimReport.DocumentIdImageValid = true;
                                     }
                                     else
                                     {
-                                        claimCase.ClaimReport.PanValid = false;
+                                        claimCase.ClaimReport.DocumentIdImageValid = false;
                                     }
                                 }
                                 catch (Exception)
                                 {
-                                    claimCase.ClaimReport.PanValid = false;
+                                    claimCase.ClaimReport.DocumentIdImageValid = false;
                                 }
                             }
                             else
                             {
-                                claimCase.ClaimReport.PanValid = true;
+                                claimCase.ClaimReport.DocumentIdImageValid = true;
                             }
                         }
 
@@ -282,17 +282,17 @@ namespace risk.control.system.Services
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
-                        claimCase.ClaimReport.AgentOcrPicture = image;
+                        claimCase.ClaimReport.DocumentIdImage = image;
                         var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{maskedImage.DocType}{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
                         CompressImage.Compressimage(stream, filePath);
-                        claimCase.ClaimReport.AgentOcrUrl = filePath;
-                        claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
-                        claimCase.ClaimReport.ImageType = maskedImage.DocType;
-                        claimCase.ClaimReport.AgentOcrData = maskedImage.DocType + " data: ";
+                        claimCase.ClaimReport.DocumentIdImagePath = filePath;
+                        claimCase.ClaimReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.DocumentIdImageType = maskedImage.DocType;
+                        claimCase.ClaimReport.DocumentIdImageData = maskedImage.DocType + " data: ";
 
                         if (!string.IsNullOrWhiteSpace(maskedImage.OcrData))
                         {
-                            claimCase.ClaimReport.AgentOcrData = claimCase.ClaimReport.AgentOcrData + ". \r\n " +
+                            claimCase.ClaimReport.DocumentIdImageData = claimCase.ClaimReport.DocumentIdImageData + ". \r\n " +
                                 "" + maskedImage.OcrData.Replace(maskedImage.DocumentId, "xxxxxxxxxx");
                         }
                     }
@@ -301,11 +301,11 @@ namespace risk.control.system.Services
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
                         var OcrRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
-                        claimCase.ClaimReport.AgentOcrPicture = image;
+                        claimCase.ClaimReport.DocumentIdImage = image;
                         var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{maskedImage.DocType}{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
-                        claimCase.ClaimReport.AgentOcrUrl = filePath;
+                        claimCase.ClaimReport.DocumentIdImagePath = filePath;
                         CompressImage.Compressimage(stream, filePath);
-                        claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                        claimCase.ClaimReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
                     }
                 }
                 else
@@ -314,12 +314,12 @@ namespace risk.control.system.Services
                     var image = Convert.FromBase64String(data.OcrImage);
                     var OcrRealImage = ByteArrayToImage(image);
                     MemoryStream stream = new MemoryStream(image);
-                    claimCase.ClaimReport.AgentOcrPicture = image;
+                    claimCase.ClaimReport.DocumentIdImage = image;
                     var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
                     CompressImage.Compressimage(stream, filePath);
-                    claimCase.ClaimReport.AgentOcrUrl = filePath;
-                    claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
-                    claimCase.ClaimReport.AgentOcrData = "no data: ";
+                    claimCase.ClaimReport.DocumentIdImagePath = filePath;
+                    claimCase.ClaimReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
+                    claimCase.ClaimReport.DocumentIdImageData = "no data: ";
                 }
             }
 
@@ -327,8 +327,8 @@ namespace risk.control.system.Services
 
             if (!string.IsNullOrWhiteSpace(data.OcrLongLat))
             {
-                claimCase.ClaimReport.OcrLongLat = data.OcrLongLat;
-                claimCase.ClaimReport.OcrLongLatTime = DateTime.UtcNow;
+                claimCase.ClaimReport.DocumentIdImageLongLat = data.OcrLongLat;
+                claimCase.ClaimReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
             }
 
             _context.CaseLocation.Update(claimCase);
@@ -348,18 +348,18 @@ namespace risk.control.system.Services
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claimCase.CaseLocationId,
-                LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentLocationPictureUrl) ?
-                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentLocationPictureUrl)) :
+                LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.DigitalIdImagePath) ?
+                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.DigitalIdImagePath)) :
                 Convert.ToBase64String(noDataimage),
-                LocationLongLat = claimCase.ClaimReport.LocationLongLat,
-                LocationTime = claimCase.ClaimReport.LocationLongLatTime,
-                OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.AgentOcrUrl) ?
-                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.AgentOcrUrl)) :
+                LocationLongLat = claimCase.ClaimReport.DigitalIdLongLat,
+                LocationTime = claimCase.ClaimReport.DigitalIdLongLatTime,
+                OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.DocumentIdImagePath) ?
+                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.DocumentIdImagePath)) :
                 Convert.ToBase64String(noDataimage),
-                OcrLongLat = claimCase.ClaimReport.OcrLongLat,
-                OcrTime = claimCase.ClaimReport.OcrLongLatTime,
-                FacePercent = claimCase.ClaimReport.LocationPictureConfidence,
-                PanValid = claimCase.ClaimReport.PanValid
+                OcrLongLat = claimCase.ClaimReport.DocumentIdImageLongLat,
+                OcrTime = claimCase.ClaimReport.DocumentIdImageLongLatTime,
+                FacePercent = claimCase.ClaimReport.DigitalIdImageMatchConfidence,
+                PanValid = claimCase.ClaimReport.DocumentIdImageValid
             };
         }
     }

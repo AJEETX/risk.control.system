@@ -82,6 +82,7 @@ namespace risk.control.system.Models
         [Display(Name = "Case sub status")]
         public InvestigationCaseSubStatus? InvestigationCaseSubStatus { get; set; } = default!;
 
+        public string? BeneficiaryLocationMap { get; set; }
         public string? AssignedAgentUserEmail { get; set; }
         public ClaimReport? ClaimReport { get; set; } = new ClaimReport();
         public List<PreviousClaimReport> PreviousClaimReports { get; set; } = new List<PreviousClaimReport>();

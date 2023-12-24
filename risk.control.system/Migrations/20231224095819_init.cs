@@ -505,7 +505,8 @@ namespace risk.control.system.Migrations
                     CustomerEducation = table.Column<int>(type: "INTEGER", nullable: false),
                     ProfilePictureUrl = table.Column<string>(type: "TEXT", nullable: true),
                     ProfilePicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    Description = table.Column<string>(type: "TEXT", nullable: true)
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    CustomerLocationMap = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1036,6 +1037,7 @@ namespace risk.control.system.Migrations
                     ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: false),
                     VendorId = table.Column<string>(type: "TEXT", nullable: true),
                     InvestigationCaseSubStatusId = table.Column<string>(type: "TEXT", nullable: true),
+                    BeneficiaryLocationMap = table.Column<string>(type: "TEXT", nullable: true),
                     AssignedAgentUserEmail = table.Column<string>(type: "TEXT", nullable: true),
                     IsReviewCaseLocation = table.Column<bool>(type: "INTEGER", nullable: false),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -1153,24 +1155,23 @@ namespace risk.control.system.Migrations
                     Question3 = table.Column<string>(type: "TEXT", nullable: true),
                     Question4 = table.Column<string>(type: "TEXT", nullable: true),
                     Question5 = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentLocationPictureUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentLocationPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    LocationData = table.Column<string>(type: "TEXT", nullable: true),
-                    LocationPictureConfidence = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentOcrUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentOcrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    PanValid = table.Column<bool>(type: "INTEGER", nullable: true),
-                    ImageType = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentOcrData = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentQrUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    AgentQrPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    QrData = table.Column<string>(type: "TEXT", nullable: true),
-                    LocationLongLat = table.Column<string>(type: "TEXT", nullable: true),
-                    LocationLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    OcrLongLat = table.Column<string>(type: "TEXT", nullable: true),
-                    OcrLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    AgentReportId = table.Column<string>(type: "TEXT", nullable: true),
-                    SupervisorPicture = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    DigitalIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    DigitalIdImageData = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdLongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DigitalIdImageMatchConfidence = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    DocumentIdImageValid = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DocumentIdImageType = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageData = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
                     SupervisorRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     SupervisorEmail = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorRemarks = table.Column<string>(type: "TEXT", nullable: true),
@@ -1184,11 +1185,6 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ClaimReport", x => x.ClaimReportId);
-                    table.ForeignKey(
-                        name: "FK_ClaimReport_AgentReport_AgentReportId",
-                        column: x => x.AgentReportId,
-                        principalTable: "AgentReport",
-                        principalColumn: "AgentReportId");
                     table.ForeignKey(
                         name: "FK_ClaimReport_CaseLocation_CaseLocationId",
                         column: x => x.CaseLocationId,
@@ -1708,11 +1704,6 @@ namespace risk.control.system.Migrations
                 name: "IX_ClaimNote_ParentClaimNoteClaimNoteId",
                 table: "ClaimNote",
                 column: "ParentClaimNoteClaimNoteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClaimReport_AgentReportId",
-                table: "ClaimReport",
-                column: "AgentReportId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClaimReport_CaseLocationId",

@@ -21,64 +21,46 @@ namespace risk.control.system.Models
         public string? Question4 { get; set; }
         public string? Question5 { get; set; }
 
-        [Display(Name = "Agent Location Image")]
-        public string? AgentLocationPictureUrl { get; set; }
+        [Display(Name = "Digital Id Image")]
+        public string? DigitalIdImagePath { get; set; }
 
-        [Display(Name = "Agent Location Image")]
-        public byte[]? AgentLocationPicture { get; set; }
+        [Display(Name = "Digital Id Image")]
+        public byte[]? DigitalIdImage { get; set; }
 
-        [Display(Name = "Location Data")]
-        public string? LocationData { get; set; }
+        [Display(Name = "Digital Id Data")]
+        public string? DigitalIdImageData { get; set; }
 
-        public string? LocationPictureConfidence { get; set; } = string.Empty;
+        [Display(Name = "Digital Id Location")]
+        public string? DigitalIdImageLocationUrl { get; set; }
 
-        [Display(Name = "Agent Location Image")]
-        [NotMapped]
-        public IFormFile? AgentLocationImage { get; set; }
+        [Display(Name = "Digital Id Location Address")]
+        public string? DigitalIdImageLocationAddress { get; set; }
 
-        [Display(Name = "Agent Ocr Image")]
-        public string? AgentOcrUrl { get; set; }
+        public string? DigitalIdLongLat { get; set; }
+        public DateTime? DigitalIdLongLatTime { get; set; } = DateTime.UtcNow;
 
-        [Display(Name = "Agent Ocr Image")]
-        public byte[]? AgentOcrPicture { get; set; }
+        public string? DigitalIdImageMatchConfidence { get; set; } = string.Empty;
 
-        [Display(Name = "Agent Ocr Image")]
-        [NotMapped]
-        public IFormFile? AgentOcrImage { get; set; }
+        [Display(Name = "Document Id Image")]
+        public string? DocumentIdImagePath { get; set; }
 
-        public bool? PanValid { get; set; } = false;
-        public string? ImageType { get; set; }
+        [Display(Name = "Document Id Image")]
+        public byte[]? DocumentIdImage { get; set; }
 
-        [Display(Name = "Agent Ocr Data")]
-        public string? AgentOcrData { get; set; }
+        public bool? DocumentIdImageValid { get; set; } = false;
+        public string? DocumentIdImageType { get; set; }
 
-        [Display(Name = "Agent Qr Image")]
-        public string? AgentQrUrl { get; set; }
+        [Display(Name = "Document Id Data")]
+        public string? DocumentIdImageData { get; set; }
 
-        [Display(Name = "Agent Qr Image")]
-        public byte[]? AgentQrPicture { get; set; }
+        [Display(Name = "Document Id Location")]
+        public string? DocumentIdImageLocationUrl { get; set; }
 
-        [Display(Name = "Agent Qr Image")]
-        [NotMapped]
-        public IFormFile? AgentQrImage { get; set; }
+        [Display(Name = "Document Id Location Address")]
+        public string? DocumentIdImageLocationAddress { get; set; }
 
-        [Display(Name = "Agent Qr Data")]
-        public string? QrData { get; set; }
-
-        public string? LocationLongLat { get; set; }
-        public DateTime? LocationLongLatTime { get; set; } = DateTime.UtcNow;
-        public string? OcrLongLat { get; set; }
-        public DateTime? OcrLongLatTime { get; set; } = DateTime.UtcNow;
-        public string? AgentReportId { get; set; }
-
-        public AgentReport? AgentReport { get; set; }
-
-        [Display(Name = "Supervisor Document")]
-        public byte[]? SupervisorPicture { get; set; }
-
-        [Display(Name = "Supervisor Document")]
-        [NotMapped]
-        public IFormFile? SupervisorDocumentImage { get; set; }
+        public string? DocumentIdImageLongLat { get; set; }
+        public DateTime? DocumentIdImageLongLatTime { get; set; } = DateTime.UtcNow;
 
         public DateTime? SupervisorRemarksUpdated { get; set; }
         public string? SupervisorEmail { get; set; }

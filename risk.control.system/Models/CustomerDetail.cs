@@ -79,5 +79,6 @@ namespace risk.control.system.Models
         public IFormFile? ProfileImage { get; set; }
 
         public string? Description { get; set; }
+        public string? CustomerLocationMap { get; set; }
     }
 }

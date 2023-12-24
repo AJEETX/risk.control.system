@@ -196,14 +196,14 @@ namespace risk.control.system.Controllers.Api
                 {
                     if (type.ToLower() == "face")
                     {
-                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.AgentLocationPicture));
-                        return Ok(new { Image = image, Valid = caseLocation.ClaimReport.LocationPictureConfidence ?? "00.00" });
+                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.DigitalIdImage));
+                        return Ok(new { Image = image, Valid = caseLocation.ClaimReport.DigitalIdImageMatchConfidence ?? "00.00" });
                     }
 
                     if (type.ToLower() == "ocr")
                     {
-                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.AgentOcrPicture));
-                        return Ok(new { Image = image, Valid = caseLocation.ClaimReport.PanValid.ToString() });
+                        var image = string.Format("data:image/*;base64,{0}", Convert.ToBase64String(caseLocation.ClaimReport?.DocumentIdImage));
+                        return Ok(new { Image = image, Valid = caseLocation.ClaimReport.DocumentIdImageValid.ToString() });
                     }
                 }
             }
@@ -502,15 +502,15 @@ namespace risk.control.system.Controllers.Api
                     },
                     InvestigationData = new
                     {
-                        LocationImage = claimCase?.ClaimReport?.AgentLocationPicture != null ?
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.AgentLocationPicture)) :
+                        LocationImage = claimCase?.ClaimReport?.DigitalIdImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.DigitalIdImage)) :
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                        OcrImage = claimCase?.ClaimReport?.AgentOcrPicture != null ?
-                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.AgentOcrPicture)) :
+                        OcrImage = claimCase?.ClaimReport?.DocumentIdImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimCase?.ClaimReport?.DocumentIdImage)) :
                         string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                        OcrData = claimCase?.ClaimReport?.AgentOcrData,
-                        LocationLongLat = claimCase?.ClaimReport?.LocationLongLat,
-                        OcrLongLat = claimCase?.ClaimReport?.OcrLongLat,
+                        OcrData = claimCase?.ClaimReport?.DocumentIdImageData,
+                        LocationLongLat = claimCase?.ClaimReport?.DigitalIdLongLat,
+                        OcrLongLat = claimCase?.ClaimReport?.DocumentIdImageLongLat,
                     },
                     Remarks = claimCase?.ClaimReport?.AgentRemarks
                 });

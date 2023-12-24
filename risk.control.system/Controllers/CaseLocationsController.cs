@@ -170,17 +170,20 @@ namespace risk.control.system.Controllers
                     caseLocation.ProfilePictureUrl = "/document/" + messageDocumentFileName;
                 }
                 caseLocation.ClaimsInvestigationId = claimId;
+                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+
+                caseLocation.PinCode.Latitude = pincode.Latitude;
+                caseLocation.PinCode.Longitude = pincode.Longitude;
+
+                var customerLatLong = caseLocation.PinCode.Latitude + "," + caseLocation.PinCode.Longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                caseLocation.BeneficiaryLocationMap = url;
                 _context.Add(caseLocation);
                 await _context.SaveChangesAsync();
 
                 var claimsInvestigation = await _context.ClaimsInvestigation
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == claimId);
                 claimsInvestigation.IsReady2Assign = true;
-
-                var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
-
-                caseLocation.PinCode.Latitude = pincode.Latitude;
-                caseLocation.PinCode.Longitude = pincode.Longitude;
 
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
@@ -272,6 +275,11 @@ namespace risk.control.system.Controllers
                         caseLocation.DistrictId = ecaseLocation.DistrictId;
                         caseLocation.PinCodeId = ecaseLocation.PinCodeId;
                         caseLocation.StateId = ecaseLocation.StateId;
+                        var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
+
+                        var customerLatLong = pincode.Latitude + "," + pincode.Longitude;
+                        var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                        caseLocation.BeneficiaryLocationMap = url;
 
                         IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
                         if (customerDocument is not null)

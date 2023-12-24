@@ -476,6 +476,9 @@ namespace risk.control.system.Migrations
                     b.Property<int?>("BeneficiaryIncome")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("BeneficiaryLocationMap")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("BeneficiaryName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -616,34 +619,10 @@ namespace risk.control.system.Migrations
                     b.Property<string>("AgentEmail")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("AgentLocationPicture")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("AgentLocationPictureUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AgentOcrData")
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("AgentOcrPicture")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("AgentOcrUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("AgentQrPicture")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("AgentQrUrl")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("AgentRemarks")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("AgentRemarksUpdated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AgentReportId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("AssessorEmail")
@@ -661,32 +640,56 @@ namespace risk.control.system.Migrations
                     b.Property<long>("CaseLocationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ImageType")
+                    b.Property<byte[]>("DigitalIdImage")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("DigitalIdImageData")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LocationData")
+                    b.Property<string>("DigitalIdImageLocationAddress")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LocationLongLat")
+                    b.Property<string>("DigitalIdImageLocationUrl")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("LocationLongLatTime")
+                    b.Property<string>("DigitalIdImageMatchConfidence")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LocationPictureConfidence")
+                    b.Property<string>("DigitalIdImagePath")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OcrLongLat")
+                    b.Property<string>("DigitalIdLongLat")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("OcrLongLatTime")
+                    b.Property<DateTime?>("DigitalIdLongLatTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool?>("PanValid")
+                    b.Property<byte[]>("DocumentIdImage")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("DocumentIdImageData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImageLocationAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImageLocationUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImageLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DocumentIdImageLongLatTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImagePath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImageType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("DocumentIdImageValid")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("QrData")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Question1")
                         .HasColumnType("TEXT");
@@ -706,9 +709,6 @@ namespace risk.control.system.Migrations
                     b.Property<string>("SupervisorEmail")
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("SupervisorPicture")
-                        .HasColumnType("BLOB");
-
                     b.Property<int?>("SupervisorRemarkType")
                         .HasColumnType("INTEGER");
 
@@ -722,8 +722,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("ClaimReportId");
-
-                    b.HasIndex("AgentReportId");
 
                     b.HasIndex("CaseLocationId")
                         .IsUnique();
@@ -1005,6 +1003,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<int>("CustomerIncome")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomerLocationMap")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
@@ -2882,10 +2883,6 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ClaimReport", b =>
                 {
-                    b.HasOne("risk.control.system.Models.AgentReport", "AgentReport")
-                        .WithMany()
-                        .HasForeignKey("AgentReportId");
-
                     b.HasOne("risk.control.system.Models.CaseLocation", "CaseLocation")
                         .WithOne("ClaimReport")
                         .HasForeignKey("risk.control.system.Models.ClaimReport", "CaseLocationId")
@@ -2895,8 +2892,6 @@ namespace risk.control.system.Migrations
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId");
-
-                    b.Navigation("AgentReport");
 
                     b.Navigation("CaseLocation");
 

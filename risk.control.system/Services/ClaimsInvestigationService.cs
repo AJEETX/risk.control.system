@@ -443,6 +443,11 @@ namespace risk.control.system.Services
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
                         existingPolicy.CurrentClaimOwner = userEmail;
+                        var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
+
+                        var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                        existingPolicy.CustomerDetail.CustomerLocationMap = url;
+
                         if (customerDocument is not null)
                         {
                             var newFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName) + Guid.NewGuid().ToString();
@@ -461,11 +466,7 @@ namespace risk.control.system.Services
                             existingPolicy.CustomerDetail.ProfilePicture = savedImage;
                             existingPolicy.CustomerDetail.ProfilePictureUrl = "/document/" + newFileName;
                         }
-                        var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
-                        //var pinCodeData = await httpClientService.GetPinCodeLatLng(pinCode.Code);
 
-                        //existingPolicy.CustomerDetail.PinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                        //existingPolicy.CustomerDetail.PinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
                         _context.ClaimsInvestigation.Update(existingPolicy);
 
                         await _context.SaveChangesAsync();
@@ -527,6 +528,17 @@ namespace risk.control.system.Services
                             claimsInvestigation.CustomerDetail.ProfilePicture = existingPolicy.CustomerDetail.ProfilePicture;
                             claimsInvestigation.CustomerDetail.ProfileImage = existingPolicy.CustomerDetail.ProfileImage;
                         }
+
+                        var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
+
+                        existingPolicy.CustomerDetail.PinCode.Latitude = pincode.Latitude;
+                        existingPolicy.CustomerDetail.PinCode.Longitude = pincode.Longitude;
+
+                        var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
+
+                        var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
+                        claimsInvestigation.CustomerDetail.CustomerLocationMap = url;
+
                         var addedClaim = _context.CustomerDetail.Add(claimsInvestigation.CustomerDetail);
                         existingPolicy.CustomerDetail = addedClaim.Entity;
                     }
@@ -542,10 +554,6 @@ namespace risk.control.system.Services
                         var addedClaim = _context.CustomerDetail.Update(claimsInvestigation.CustomerDetail);
                         existingPolicy.CustomerDetail = addedClaim.Entity;
                     }
-                    var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == existingPolicy.CustomerDetail.PinCodeId);
-
-                    existingPolicy.CustomerDetail.PinCode.Latitude = pincode.Latitude;
-                    existingPolicy.CustomerDetail.PinCode.Longitude = pincode.Longitude;
 
                     _context.ClaimsInvestigation.Update(existingPolicy);
 
@@ -1077,42 +1085,37 @@ namespace risk.control.system.Services
             report.AssessorEmail = userEmail;
 
             _context.ClaimReport.Update(report);
-            claimsCaseLocation.ClaimReport = report;
+            claimsCaseLocation.ClaimReport = null;
             var saveReport = new PreviousClaimReport
             {
                 AgentEmail = report.AgentEmail,
-                AgentLocationPicture = report.AgentLocationPicture,
-                AgentLocationPictureUrl = report.AgentLocationPictureUrl,
-                AgentOcrData = report.AgentOcrData,
-                AgentOcrPicture = report.AgentOcrPicture,
-                AgentOcrUrl = report.AgentOcrUrl,
-                AgentQrPicture = report.AgentQrPicture,
-                AgentQrUrl = report.AgentQrUrl,
+                AgentLocationPicture = report.DigitalIdImage,
+                AgentLocationPictureUrl = report.DigitalIdImagePath,
+                AgentOcrData = report.DocumentIdImageData,
+                AgentOcrPicture = report.DocumentIdImage,
+                AgentOcrUrl = report.DocumentIdImagePath,
                 AgentRemarks = report.AgentRemarks,
                 AgentRemarksUpdated = DateTime.UtcNow,
-                AgentReportId = report.AgentReportId,
                 AssessorEmail = report.AssessorEmail,
                 AssessorRemarks = report.AssessorRemarks,
                 AssessorRemarkType = report.AssessorRemarkType,
                 AssessorRemarksUpdated = DateTime.UtcNow,
                 CaseLocation = report.CaseLocation,
                 CaseLocationId = report.CaseLocationId,
-                ImageType = report.ImageType,
-                LocationData = report.LocationData,
-                LocationLongLat = report.LocationLongLat,
-                LocationLongLatTime = report.LocationLongLatTime,
-                LocationPictureConfidence = report.LocationPictureConfidence,
-                OcrLongLat = report.OcrLongLat,
-                OcrLongLatTime = report.OcrLongLatTime,
-                PanValid = report.PanValid,
-                QrData = report.QrData,
+                ImageType = report.DocumentIdImageType,
+                LocationData = report.DigitalIdImageData,
+                LocationLongLat = report.DigitalIdLongLat,
+                LocationLongLatTime = report.DigitalIdLongLatTime,
+                LocationPictureConfidence = report.DigitalIdImageMatchConfidence,
+                OcrLongLat = report.DocumentIdImageLongLat,
+                OcrLongLatTime = report.DocumentIdImageLongLatTime,
+                PanValid = report.DocumentIdImageValid,
                 Question1 = report.Question1,
                 Question2 = report.Question2,
                 Question3 = report.Question3,
                 Question4 = report.Question4,
                 Question5 = report.Question5,
                 SupervisorEmail = report.SupervisorEmail,
-                SupervisorPicture = report.SupervisorPicture,
                 SupervisorRemarks = report.SupervisorRemarks,
                 SupervisorRemarksUpdated = report.SupervisorRemarksUpdated,
                 SupervisorRemarkType = report.SupervisorRemarkType,
