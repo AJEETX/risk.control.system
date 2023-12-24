@@ -1080,7 +1080,7 @@ namespace risk.control.system.Services
             report.AssessorEmail = userEmail;
 
             _context.ClaimReport.Update(report);
-            claimsCaseLocation.ClaimReport = null;
+            claimsCaseLocation.ClaimReport = new ClaimReport();
             var saveReport = new PreviousClaimReport
             {
                 AgentEmail = report.AgentEmail,
