@@ -259,7 +259,6 @@ namespace risk.control.system.Controllers
                     {
                         var caseLocation = _context.CaseLocation.FirstOrDefault(c => c.CaseLocationId == ecaseLocation.CaseLocationId);
                         caseLocation.Updated = DateTime.UtcNow;
-                        caseLocation.InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId;
                         caseLocation.UpdatedBy = HttpContext.User?.Identity?.Name;
                         caseLocation.Addressline = ecaseLocation.Addressline;
                         caseLocation.BeneficiaryContactNumber = ecaseLocation.BeneficiaryContactNumber;

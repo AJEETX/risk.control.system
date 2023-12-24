@@ -387,8 +387,6 @@ namespace risk.control.system.Services
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
                         existingPolicy.CurrentClaimOwner = userEmail;
-                        existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
-                        existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
 
                         if (claimDocument is not null)
                         {
@@ -445,8 +443,6 @@ namespace risk.control.system.Services
                         existingPolicy.UpdatedBy = userEmail;
                         existingPolicy.CurrentUserEmail = userEmail;
                         existingPolicy.CurrentClaimOwner = userEmail;
-                        existingPolicy.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INITIATED).InvestigationCaseStatusId;
-                        existingPolicy.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR).InvestigationCaseSubStatusId;
                         if (customerDocument is not null)
                         {
                             var newFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName) + Guid.NewGuid().ToString();
