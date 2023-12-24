@@ -159,7 +159,7 @@ namespace risk.control.system.Controllers
 
                             ClientCompanyApplicationUser user = await userManager.FindByEmailAsync(currentOwner);
 
-                            if (clientCompany.Auto)
+                            if (clientCompany.AutoAllocation)
                             {
                                 var result = await userManager.AddToRoleAsync(user, assignerRole.Name);
                             }

@@ -818,7 +818,7 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("Auto")
+                    b.Property<bool>("AutoAllocation")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("BankAccountNumber")
@@ -1848,6 +1848,131 @@ namespace risk.control.system.Migrations
                     b.HasIndex("LineOfBusinessId");
 
                     b.ToTable("PolicyDetail");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.PreviousClaimReport", b =>
+                {
+                    b.Property<string>("PreviousClaimReportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("AgentLocationPicture")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AgentLocationPictureUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentOcrData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("AgentOcrPicture")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AgentOcrUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("AgentQrPicture")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AgentQrUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("AgentRemarksUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AgentReportId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AssessorEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("AssessorRemarkType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AssessorRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("AssessorRemarksUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CaseLocationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImageType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LocationData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LocationLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LocationLongLatTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LocationPictureConfidence")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OcrLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("OcrLongLatTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("PanValid")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("QrData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question2")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question3")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question4")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Question5")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SupervisorEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("SupervisorPicture")
+                        .HasColumnType("BLOB");
+
+                    b.Property<int?>("SupervisorRemarkType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SupervisorRemarks")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("SupervisorRemarksUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VendorId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PreviousClaimReportId");
+
+                    b.HasIndex("AgentReportId");
+
+                    b.HasIndex("CaseLocationId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("PreviousClaimReport");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
@@ -3072,6 +3197,29 @@ namespace risk.control.system.Migrations
                     b.Navigation("LineOfBusiness");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.PreviousClaimReport", b =>
+                {
+                    b.HasOne("risk.control.system.Models.AgentReport", "AgentReport")
+                        .WithMany()
+                        .HasForeignKey("AgentReportId");
+
+                    b.HasOne("risk.control.system.Models.CaseLocation", "CaseLocation")
+                        .WithMany("PreviousClaimReports")
+                        .HasForeignKey("CaseLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("risk.control.system.Models.Vendor", "Vendor")
+                        .WithMany()
+                        .HasForeignKey("VendorId");
+
+                    b.Navigation("AgentReport");
+
+                    b.Navigation("CaseLocation");
+
+                    b.Navigation("Vendor");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
                 {
                     b.HasOne("risk.control.system.Models.Mailbox", "Mailbox")
@@ -3266,6 +3414,8 @@ namespace risk.control.system.Migrations
             modelBuilder.Entity("risk.control.system.Models.CaseLocation", b =>
                 {
                     b.Navigation("ClaimReport");
+
+                    b.Navigation("PreviousClaimReports");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ClaimsInvestigation", b =>

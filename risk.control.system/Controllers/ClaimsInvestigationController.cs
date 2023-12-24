@@ -129,7 +129,7 @@ namespace risk.control.system.Controllers
                 .ThenInclude(v => v.District)
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId);
 
-            if (company is not null && company.Auto)
+            if (company is not null && company.AutoAllocation)
             {
                 var autoAllocatedClaims = await claimsInvestigationService.ProcessAutoAllocation(claims, company, userEmail);
 

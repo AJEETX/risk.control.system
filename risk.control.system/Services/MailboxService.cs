@@ -367,9 +367,20 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation.Include(p => p.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
             if (claim != null)
             {
-                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+                var companyUsers = _context.ClientCompanyApplicationUser
+                    .Include(u => u.ClientCompany)
+                    .Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .Include(i => i.PolicyDetail)
+                    .Include(i => i.InvestigationCaseSubStatus)
+                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
 
                 var clientAdminrRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CompanyAdmin.ToString()));
+                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
+                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
                 List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
                 foreach (var user in companyUsers)
@@ -379,6 +390,25 @@ namespace risk.control.system.Services
                     {
                         users.Add(user);
                     }
+                    if (claimsInvestigation.IsReviewCase)
+                    {
+                        if (company.AutoAllocation)
+                        {
+                            var isCreator = await userManager.IsInRoleAsync(user, creatorRole?.Name);
+                            if (isCreator)
+                            {
+                                users.Add(user);
+                            }
+                        }
+                        else
+                        {
+                            var isAssigner = await userManager.IsInRoleAsync(user, assignerRole?.Name);
+                            if (isAssigner)
+                            {
+                                users.Add(user);
+                            }
+                        }
+                    }
                 }
 
                 string claimsUrl = $"{BaseUrl + claimId}";
@@ -387,13 +417,6 @@ namespace risk.control.system.Services
                 StreamReader str = new StreamReader(FilePath);
                 string MailText = str.ReadToEnd();
                 str.Close();
-
-                var claimsInvestigation = _context.ClaimsInvestigation
-                    .Include(i => i.PolicyDetail)
-                    .Include(i => i.InvestigationCaseSubStatus)
-                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
-
-                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claimsInvestigation.PolicyDetail.ClientCompanyId);
 
                 foreach (var user in users)
                 {

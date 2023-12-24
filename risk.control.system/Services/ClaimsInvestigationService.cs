@@ -1045,7 +1045,7 @@ namespace risk.control.system.Services
             string currentOwner = string.Empty;
             var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
             var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
-            if (currentUser.ClientCompany.Auto)
+            if (currentUser.ClientCompany.AutoAllocation)
             {
                 foreach (var companyUser in companyUsers)
                 {
@@ -1078,7 +1078,48 @@ namespace risk.control.system.Services
 
             _context.ClaimReport.Update(report);
             claimsCaseLocation.ClaimReport = report;
-
+            var saveReport = new PreviousClaimReport
+            {
+                AgentEmail = report.AgentEmail,
+                AgentLocationPicture = report.AgentLocationPicture,
+                AgentLocationPictureUrl = report.AgentLocationPictureUrl,
+                AgentOcrData = report.AgentOcrData,
+                AgentOcrPicture = report.AgentOcrPicture,
+                AgentOcrUrl = report.AgentOcrUrl,
+                AgentQrPicture = report.AgentQrPicture,
+                AgentQrUrl = report.AgentQrUrl,
+                AgentRemarks = report.AgentRemarks,
+                AgentRemarksUpdated = DateTime.UtcNow,
+                AgentReportId = report.AgentReportId,
+                AssessorEmail = report.AssessorEmail,
+                AssessorRemarks = report.AssessorRemarks,
+                AssessorRemarkType = report.AssessorRemarkType,
+                AssessorRemarksUpdated = DateTime.UtcNow,
+                CaseLocation = report.CaseLocation,
+                CaseLocationId = report.CaseLocationId,
+                ImageType = report.ImageType,
+                LocationData = report.LocationData,
+                LocationLongLat = report.LocationLongLat,
+                LocationLongLatTime = report.LocationLongLatTime,
+                LocationPictureConfidence = report.LocationPictureConfidence,
+                OcrLongLat = report.OcrLongLat,
+                OcrLongLatTime = report.OcrLongLatTime,
+                PanValid = report.PanValid,
+                QrData = report.QrData,
+                Question1 = report.Question1,
+                Question2 = report.Question2,
+                Question3 = report.Question3,
+                Question4 = report.Question4,
+                Question5 = report.Question5,
+                SupervisorEmail = report.SupervisorEmail,
+                SupervisorPicture = report.SupervisorPicture,
+                SupervisorRemarks = report.SupervisorRemarks,
+                SupervisorRemarksUpdated = report.SupervisorRemarksUpdated,
+                SupervisorRemarkType = report.SupervisorRemarkType,
+                Vendor = report.Vendor,
+                VendorId = report.VendorId,
+            };
+            claimsCaseLocation.PreviousClaimReports.Add(saveReport);
             claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
             claimsCaseLocation.IsReviewCaseLocation = true;
