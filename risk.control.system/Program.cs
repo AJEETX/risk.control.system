@@ -102,7 +102,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=icheckify_1_0_1_0.db"));
+                        options.UseSqlite("Data Source=icheckify_1_0_1_1.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
