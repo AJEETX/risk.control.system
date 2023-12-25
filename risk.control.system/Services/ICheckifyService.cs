@@ -228,7 +228,7 @@ namespace risk.control.system.Services
                 var locationRealImage = ByteArrayToImage(byteimage);
                 MemoryStream mstream = new MemoryStream(byteimage);
                 var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                claimCase.ClaimReport.DigitalIdImagePath = mfilePath;
+                claimCase.ClaimReport.DocumentIdImagePath = mfilePath;
                 CompressImage.Compressimage(mstream, mfilePath);
 
                 var savedImage = await File.ReadAllBytesAsync(mfilePath);
