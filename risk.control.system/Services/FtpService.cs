@@ -180,13 +180,17 @@ namespace risk.control.system.Services
                                         DocumentImage = image
                                     };
 
-                                    var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
+                                    var pinCode = _context.PinCode
+                                        .Include(p => p.District)
+                                        .Include(p => p.Country)
+                                        .Include(p => p.State)
+                                        .FirstOrDefault(p => p.Code == rowData[19].Trim());
 
                                     var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
 
                                     var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
-                                    var country = _context.Country.FirstOrDefault();
+                                    var country = _context.Country.FirstOrDefault(c => c.CountryId == pinCode.Country.CountryId);
 
                                     var customerImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "CUSTOMER.jpg");
 
@@ -221,11 +225,18 @@ namespace risk.control.system.Services
                                     var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
                                     claim.CustomerDetail.CustomerLocationMap = url;
 
-                                    var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
+                                    var benePinCode = _context.PinCode
+                                        .Include(p => p.District)
+                                        .Include(p => p.Country)
+                                        .Include(p => p.State)
+                                        .FirstOrDefault(p => p.Code == rowData[28].Trim());
 
                                     var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
 
                                     var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
+
+                                    var beneCountry = _context.Country.FirstOrDefault(c => c.CountryId == benePinCode.Country.CountryId);
+
                                     var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
                                     var beneficairyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "BENEFICIARY.jpg");
@@ -244,7 +255,7 @@ namespace risk.control.system.Services
                                         PinCodeId = benePinCode.PinCodeId,
                                         DistrictId = beneDistrict.DistrictId,
                                         StateId = beneState.StateId,
-                                        CountryId = country.CountryId,
+                                        CountryId = beneCountry.CountryId,
                                         InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
                                         ProfilePicture = beneficairyImage
                                     };
@@ -455,13 +466,17 @@ namespace risk.control.system.Services
                                 DocumentImage = savedImage,
                             };
 
-                            var pinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[19].Trim());
+                            var pinCode = _context.PinCode
+                                .Include(p => p.District)
+                                .Include(p => p.State)
+                                .Include(p => p.Country)
+                                .FirstOrDefault(p => p.Code == rowData[19].Trim());
 
                             var district = _context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
 
                             var state = _context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
 
-                            var country = _context.Country.FirstOrDefault();
+                            var country = _context.Country.FirstOrDefault(c => c.CountryId == pinCode.Country.CountryId);
 
                             var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "CUSTOMER.jpg");
 
@@ -495,11 +510,18 @@ namespace risk.control.system.Services
                             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
                             claim.CustomerDetail.CustomerLocationMap = url;
 
-                            var benePinCode = _context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == rowData[28].Trim());
+                            var benePinCode = _context.PinCode
+                                .Include(p => p.District)
+                                .Include(p => p.State)
+                                .Include(p => p.Country)
+                                .FirstOrDefault(p => p.Code == rowData[28].Trim());
 
                             var beneDistrict = _context.District.FirstOrDefault(c => c.DistrictId == benePinCode.District.DistrictId);
 
                             var beneState = _context.State.FirstOrDefault(s => s.StateId == benePinCode.State.StateId);
+
+                            var beneCountry = _context.Country.FirstOrDefault(c => c.CountryId == benePinCode.Country.CountryId);
+
                             var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
                             var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "BENEFICIARY.jpg");
@@ -518,7 +540,7 @@ namespace risk.control.system.Services
                                 PinCodeId = benePinCode.PinCodeId,
                                 DistrictId = beneDistrict.DistrictId,
                                 StateId = beneState.StateId,
-                                CountryId = country.CountryId,
+                                CountryId = beneCountry.CountryId,
                                 InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
                                 ProfilePicture = beneficairyImage,
                                 Updated = DateTime.UtcNow,
