@@ -38,14 +38,23 @@ namespace risk.control.system.Seeds
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.Supervisor.ToString().Substring(0, 2).ToUpper(), AppRoles.Supervisor.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.Agent.ToString().Substring(0, 2).ToUpper(), AppRoles.Agent.ToString()));
 
-            var india = new Country
+            var australia = new Country
             {
                 Name = "AUSTRALIA",
                 Code = "AU",
             };
+            var australiaCountry = await context.Country.AddAsync(australia);
+
+            await PinCodeStateSeed.SeedPincode(context, australiaCountry.Entity);
+
+            var india = new Country
+            {
+                Name = "INDIA",
+                Code = "IND",
+            };
             var indiaCountry = await context.Country.AddAsync(india);
 
-            await PinCodeStateSeed.SeedPincode(context, indiaCountry.Entity);
+            await PinCodeStateSeed.SeedPincode_India(context, indiaCountry.Entity);
 
             await context.SaveChangesAsync(null, false);
 

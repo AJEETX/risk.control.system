@@ -1019,7 +1019,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             var countryId = _context.Country.FirstOrDefault().CountryId;
-            var stateId = _context.State.FirstOrDefault().StateId;
+            var stateId = _context.State.Include(s => s.Country).FirstOrDefault(s => s.Country.CountryId == countryId).StateId;
             var districtId = _context.District.Include(d => d.State).FirstOrDefault(d => d.StateId == stateId).DistrictId;
             var pinCodeId = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.DistrictId == districtId).PinCodeId;
             var random = new Random();
