@@ -631,6 +631,14 @@ namespace risk.control.system.Controllers
                 location.ClaimReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             }
 
+            var serviceCost = location.Vendor;
+            var vendor = _context.Vendor.Include(v => v.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == location.VendorId);
+
+            var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+            if (investigationServiced != null)
+            {
+                model.Price = investigationServiced.Price;
+            }
             return View(model);
         }
 
@@ -867,7 +875,6 @@ namespace risk.control.system.Controllers
 
             ViewBag.ClientCompanyId = model.PolicyDetail.ClientCompanyId;
 
-            ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", model.PolicyDetail.InvestigationServiceTypeId);
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType.Where(i =>
             i.LineOfBusinessId == model.PolicyDetail.LineOfBusinessId).OrderBy(s => s.Code), "InvestigationServiceTypeId", "Name", model.PolicyDetail.InvestigationServiceTypeId);

@@ -137,9 +137,7 @@ namespace risk.control.system.Controllers
             else
             {
                 RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
-                ViewBag.LocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 location.ClaimReport.DigitalIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-                ViewBag.OcrLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
                 location.ClaimReport.DigitalIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             }
             if (location.ClaimReport.DocumentIdImageLongLat != null)
@@ -170,6 +168,15 @@ namespace risk.control.system.Controllers
                 RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
                 location.ClaimReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 location.ClaimReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
+            }
+
+            var serviceCost = location.Vendor;
+            var vendor = _context.Vendor.Include(v => v.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == location.VendorId);
+
+            var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
+            if (investigationServiced != null)
+            {
+                model.Price = investigationServiced.Price;
             }
             return View(model);
         }
