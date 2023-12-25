@@ -130,10 +130,15 @@ namespace risk.control.system.Controllers
             var locationPage = new MvcBreadcrumbNode("Add", "CaseLocations", "Add Beneficiary") { Parent = incompleteClaim, RouteValues = new { id = id } };
 
             ViewData["BreadcrumbNode"] = locationPage;
+
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == countryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == stateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == districtId).OrderBy(d => d.Name);
+
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
-            ViewData["DistrictId"] = new SelectList(_context.District.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
-            ViewData["StateId"] = new SelectList(_context.State.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
-            ViewData["PinCodeId"] = new SelectList(_context.PinCode.OrderBy(s => s.Code), "PinCodeId", "Code", model.PinCodeId);
+            ViewData["DistrictId"] = new SelectList(districts.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);
+            ViewData["StateId"] = new SelectList(relatedStates.OrderBy(s => s.Code), "StateId", "Name", model.StateId);
+            ViewData["PinCodeId"] = new SelectList(pincodes.OrderBy(s => s.Code), "PinCodeId", "Code", model.PinCodeId);
 
             return View(model);
         }
