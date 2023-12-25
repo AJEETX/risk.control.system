@@ -13,7 +13,7 @@ namespace SMS
     internal static class API
     {
         private static readonly string Server = "https://app.droidsend.com";
-        private static readonly string DROID = "21b6d8a0aaae37042427504621f204db0aa56236";
+        private static readonly string DROID = "7bbe73e161adf7b8a70e8ed7e16b3dd4551b213a";
 
         public enum Option
         {
