@@ -15,20 +15,12 @@ namespace risk.control.system.Seeds
         public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string canaraId, string hdfcId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
             InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpClientService httpClientService)
         {
-            var companyPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE);
-            var companyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == companyPinCode.District.DistrictId);
-            var companyStateId = context.State.FirstOrDefault(s => s.StateId == companyDistrict.State.StateId)?.StateId ?? default!;
-
-            //var pinCodeData = await httpClientService.GetPinCodeLatLng(companyPinCode.Code);
-
-            //companyPinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-            //companyPinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
-
             //CREATE VENDOR COMPANY
 
             var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
             var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
-            var checkerState = context.State.FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
+            var checkerState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
+            var checkerCountryId = context.Country.FirstOrDefault(s => s.CountryId == checkerState.Country.CountryId)?.CountryId ?? default!;
 
             var checker = new Vendor
             {
@@ -41,7 +33,7 @@ namespace risk.control.system.Seeds
                 BankName = "WESTPAC",
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = checkerCountryId,
                 DistrictId = checkerDistrict.DistrictId,
                 StateId = checkerState.StateId,
                 PinCodeId = checkerPinCode.PinCodeId,
@@ -55,7 +47,8 @@ namespace risk.control.system.Seeds
 
             var verifyPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE3);
             var verifyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == verifyPinCode.District.DistrictId);
-            var verifyState = context.State.FirstOrDefault(s => s.StateId == verifyDistrict.State.StateId);
+            var verifyState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == verifyDistrict.State.StateId);
+            var verifyCountryId = context.Country.FirstOrDefault(s => s.CountryId == verifyState.Country.CountryId)?.CountryId ?? default!;
 
             var verify = new Vendor
             {
@@ -68,10 +61,10 @@ namespace risk.control.system.Seeds
                 BankName = "SBI BANK",
                 BankAccountNumber = "9876543",
                 IFSCCode = "IFSC999",
-                CountryId = indiaCountry.Entity.CountryId,
-                DistrictId = companyDistrict.DistrictId,
-                StateId = companyStateId,
-                PinCodeId = companyPinCode.PinCodeId,
+                CountryId = verifyCountryId,
+                DistrictId = verifyDistrict.DistrictId,
+                StateId = verifyState.StateId,
+                PinCodeId = verifyPinCode.PinCodeId,
                 Description = "HEAD OFFICE ",
                 Email = Applicationsettings.AGENCY2DOMAIN,
                 PhoneNumber = "4444404739",
@@ -82,7 +75,8 @@ namespace risk.control.system.Seeds
 
             var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
             var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
-            var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+            var investigateState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+            var investigateCountryId = context.Country.FirstOrDefault(s => s.CountryId == investigateState.Country.CountryId)?.CountryId ?? default!;
 
             var investigate = new Vendor
             {
@@ -95,7 +89,7 @@ namespace risk.control.system.Seeds
                 BankName = "HDFC BANK",
                 BankAccountNumber = "9876543",
                 IFSCCode = "IFSC999",
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = investigateCountryId,
                 DistrictId = investigateDistrict.DistrictId,
                 StateId = investigateState.StateId,
                 PinCodeId = investigatePinCode.PinCodeId,
@@ -106,6 +100,11 @@ namespace risk.control.system.Seeds
             };
 
             var investigateAgency = await context.Vendor.AddAsync(investigate);
+
+            var companyPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE);
+            var companyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == companyPinCode.District.DistrictId);
+            var companyState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == companyDistrict.State.StateId);
+            var countryId = context.Country.FirstOrDefault(s => s.CountryId == companyState.Country.CountryId)?.CountryId ?? default!;
 
             //CREATE COMPANY1
 
@@ -121,9 +120,9 @@ namespace risk.control.system.Seeds
                 BankName = "NAB",
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = companyDistrict.DistrictId,
-                StateId = companyStateId,
+                StateId = companyState.StateId,
                 PinCodeId = companyPinCode.PinCodeId,
                 Description = "CORPORATE OFFICE ",
                 Email = Applicationsettings.CANARADOMAIN,
@@ -148,9 +147,9 @@ namespace risk.control.system.Seeds
                 BankName = "NAB",
                 BankAccountNumber = "1234567",
                 IFSCCode = "IFSC100",
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = companyDistrict.DistrictId,
-                StateId = companyStateId,
+                StateId = companyState.StateId,
                 PinCodeId = companyPinCode.PinCodeId,
                 Description = "CORPORATE OFFICE ",
                 Email = Applicationsettings.HDFCDOMAIN,
@@ -168,9 +167,9 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
                     Price = 199,
                     DistrictId = companyDistrict.DistrictId,
-                    StateId = companyStateId,
+                    StateId = companyState.StateId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    CountryId = indiaCountry.Entity.CountryId,
+                    CountryId = countryId,
                     PincodeServices = new List<ServicedPinCode>
                     {
                         new ServicedPinCode
@@ -185,9 +184,9 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = docServiceType.InvestigationServiceTypeId,
                     Price = 99,
                     DistrictId = companyDistrict.DistrictId,
-                    StateId = companyStateId,
+                    StateId = companyState.StateId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
-                    CountryId = indiaCountry.Entity.CountryId,
+                    CountryId = countryId,
                     PincodeServices = new List<ServicedPinCode>
                     {
                         new ServicedPinCode
@@ -206,8 +205,8 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
                     Price = 399,
                     DistrictId = companyDistrict.DistrictId,
-                    StateId = companyStateId,
-                    CountryId = indiaCountry.Entity.CountryId,
+                    StateId = companyState.StateId,
+                    CountryId = countryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     PincodeServices = new List<ServicedPinCode>
                     {
@@ -223,8 +222,8 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = discreetServiceType.InvestigationServiceTypeId,
                     Price = 299,
                     DistrictId = companyDistrict.DistrictId,
-                    StateId = companyStateId,
-                    CountryId = indiaCountry.Entity.CountryId,
+                    StateId = companyState.StateId,
+                    CountryId = countryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     PincodeServices = new List<ServicedPinCode>
                     {
@@ -244,8 +243,8 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = docServiceType.InvestigationServiceTypeId,
                     Price = 199,
                     DistrictId = companyDistrict.DistrictId,
-                    StateId = companyStateId,
-                    CountryId = indiaCountry.Entity.CountryId,
+                    StateId = companyState.StateId,
+                    CountryId = countryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     PincodeServices = new List<ServicedPinCode>
                     {
@@ -261,8 +260,8 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = discreetServiceType.InvestigationServiceTypeId,
                     Price = 299,
                     DistrictId = companyDistrict.DistrictId,
-                    StateId = companyStateId,
-                    CountryId = indiaCountry.Entity.CountryId,
+                    StateId = companyState.StateId,
+                    CountryId = countryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     PincodeServices = new List<ServicedPinCode>
                     {
@@ -278,8 +277,8 @@ namespace risk.control.system.Seeds
                     InvestigationServiceTypeId = investigationServiceType.InvestigationServiceTypeId,
                     Price = 599,
                     DistrictId = companyDistrict.DistrictId,
-                    StateId = companyStateId,
-                    CountryId = indiaCountry.Entity.CountryId,
+                    StateId = companyState.StateId,
+                    CountryId = countryId,
                     LineOfBusinessId = lineOfBusiness.LineOfBusinessId,
                     PincodeServices = new List<ServicedPinCode>
                     {

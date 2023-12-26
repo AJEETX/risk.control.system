@@ -5,16 +5,16 @@ System feature list
 iCheckify™️ engine [a seamless workflow ]
 
     Admin task :
-        Configurable Manual/Auto Allocation
         Multi-tenant SAAS option*
         Domain-based nomenclature for seamless external Application integration
         Company User Management
-        Agency Marketplace option*
-        Agency Workload visibility
+        Agency Marketplace*
+        Agent Workload visibility
         Agency User Management
         Agency Empanel/ Depanel Management
-        Agent onboarding
+        Agent onboarding with complete ID verification process-flow
         Customize Agent document / questionairre / template
+        Configurable Manual/Auto Claim Allocation
 
     Claim workflow: 
         Multiple methods to ingest Claims data:
@@ -33,22 +33,24 @@ Mobile App
 
     First-install Agent onboarding
     Offline-First
-    Fraud-prevention design (All info/document collected through App) 
+    Fraud-prevention design (All information/document collected through App) 
     Claims list with Mapview 
-    Face-detection and face-match
-    Document image OCR 
-    Multiple Language detection / conversion
-    Multiple Language Handwritten document OCR
-    Document OCR / Verification through Govt records
-        ADHAR
-        PAN
-        DRIVING LICENSE
-        OTHERS
-    Document image sensitive data masking
-    Speech-to-Text and Text-to-Speech  with location
-    Audio / Video data capture with location
-    Real-time agent tracking
-    Document-tampering detection
+    Capture photo and extract complete information of the location i.e. weather, demography, etc
+        Face-detection and Face-match
+        Document image digitization [extract text/information from image]
+        Multiple Language detection / conversion
+        Multiple Language Handwritten document scan 
+        Document ID Verification through Govt records
+            ADHAR
+            PAN
+            DRIVING LICENSE
+            OTHERS
+        Document image sensitive data masking
+        Speech-to-Text
+        Text-to-Speech 
+        Audio / Video data capture
+        Real-time agent tracking
+        Document-tampering detection
 
 Notification Service
 
