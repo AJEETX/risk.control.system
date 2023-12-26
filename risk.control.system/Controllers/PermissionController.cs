@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 
 using NToastNotify;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 using SmartBreadcrumbs.Attributes;
+
+using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Controllers
 {
@@ -29,7 +32,8 @@ namespace risk.control.system.Controllers
 
             var models = new List<PermissionViewModel>();
 
-            var moduleList = new List<Type> { typeof(Permissions.Claim), typeof(Permissions.Underwriting) };
+            //var moduleList = new List<Type> { typeof(Permissions.Claim), typeof(Permissions.Underwriting) };
+            var moduleList = new List<string> { nameof(Underwriting), nameof(Claim) };
 
             var role = await _roleManager.FindByIdAsync(Id);
 
@@ -37,7 +41,7 @@ namespace risk.control.system.Controllers
             {
                 var permission = new PermissionViewModel
                 {
-                    RoleClaims = await GetModulePermission(module, role)
+                    RoleClaims = await GetModulePermission(role, module)
                 };
                 models.Add(permission);
             }
@@ -47,11 +51,20 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        private async Task<List<RoleClaimsViewModel>> GetModulePermission(Type type, ApplicationRole role)
+        private async Task<List<RoleClaimsViewModel>> GetModulePermission(ApplicationRole role, string module)
         {
             var claims = await _roleManager.GetClaimsAsync(role);
             var modulePermissions = new List<RoleClaimsViewModel>();
-            modulePermissions.GetPermissions(type);
+            var modulePermission = Permissions.GeneratePermissionsForModule(module);
+            foreach (var item in modulePermission)
+            {
+                modulePermissions.Add(new RoleClaimsViewModel
+                {
+                    Type = Applicationsettings.PERMISSION,
+                    Value = item
+                });
+            }
+
             var allClaimValues = modulePermissions.Select(a => a.Value).ToList();
             var roleClaimValues = claims.Select(a => a.Value).ToList();
             var authorizedClaims = allClaimValues.Intersect(roleClaimValues).ToList();
