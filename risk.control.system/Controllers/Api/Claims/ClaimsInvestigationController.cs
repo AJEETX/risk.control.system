@@ -819,7 +819,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) ||
-            (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId));
+            (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
 
@@ -827,7 +827,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
                     && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
-                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId)
+                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == AssignedStatus.InvestigationCaseSubStatusId)
                     )?.ToList();
                 if (item.CaseLocations.Any())
                 {
@@ -926,7 +926,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) ||
-            (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId));
+            (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
 
@@ -934,7 +934,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
                     && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
-                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId)
+                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                     )?.ToList();
                 if (item.CaseLocations.Any())
                 {
