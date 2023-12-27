@@ -964,6 +964,9 @@ a.CaseReadyToAssign {
 #map-type {
     float: right;
 }
+.profile-country {
+    height: 1px;
+}
 
 #list-type {
     display: none;
