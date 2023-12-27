@@ -134,8 +134,10 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.State)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
-            var caseLocations = claimsInvestigation.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
-            && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId).ToList();
+            var caseLocations = claimsInvestigation.CaseLocations.Where(c =>
+            (string.IsNullOrWhiteSpace(c.VendorId) && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId) ||
+            (claimsInvestigation.IsReviewCase && claimsInvestigation.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
+            ).ToList();
 
             claimsInvestigation.CaseLocations = caseLocations;
 
