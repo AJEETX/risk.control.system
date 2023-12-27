@@ -827,7 +827,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
                     && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
-                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == AssignedStatus.InvestigationCaseSubStatusId)
+                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                     )?.ToList();
                 if (item.CaseLocations.Any())
                 {
