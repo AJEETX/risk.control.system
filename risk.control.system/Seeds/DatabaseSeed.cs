@@ -293,7 +293,7 @@ namespace risk.control.system.Seeds
 
             #region CLIENT/ VENDOR COMPANY
 
-            var (checker, verify, investigate, canaraId, hdfcId) = await ClientVendorSeed.Seed(context, indiaCountry,
+            var (checker, verify, investigate, canaraId, hdfcId, bajajId, tataId) = await ClientVendorSeed.Seed(context, indiaCountry,
                 claimComprehensiveService.Entity, claimDiscreetService.Entity,
                 claimDocumentCollectionService.Entity, claimCaseType.Entity, httpClientService);
 
@@ -314,6 +314,10 @@ namespace risk.control.system.Seeds
             await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, canaraId);
 
             await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, hdfcId);
+
+            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, bajajId);
+
+            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, tataId);
 
             await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, checker);
 

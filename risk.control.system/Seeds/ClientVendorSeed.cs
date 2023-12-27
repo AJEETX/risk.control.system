@@ -12,8 +12,8 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string canaraId, string hdfcId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
-            InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpClientService httpClientService)
+        public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string canaraId, string hdfcId, string bajajId, string tataId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
+                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpClientService httpClientService)
         {
             //CREATE VENDOR COMPANY
 
@@ -160,6 +160,59 @@ namespace risk.control.system.Seeds
 
             var hdfcCompany = await context.ClientCompany.AddAsync(hdfc);
 
+            //CREATE COMPANY3
+
+            var bajaj = new ClientCompany
+            {
+                ClientCompanyId = Guid.NewGuid().ToString(),
+                Name = Applicationsettings.BAJAJ,
+                Addressline = "34 Lasiandra Avenue ",
+                Branch = "FOREST HILL CHASE",
+                Code = Applicationsettings.BAJAJ_CODE,
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "NAB",
+                BankAccountNumber = "1234567",
+                IFSCCode = "IFSC100",
+                CountryId = countryId,
+                DistrictId = companyDistrict.DistrictId,
+                StateId = companyState.StateId,
+                PinCodeId = companyPinCode.PinCodeId,
+                Description = "CORPORATE OFFICE ",
+                Email = Applicationsettings.BAJAJ_DOMAIN,
+                DocumentUrl = Applicationsettings.BAJAJ_LOGO,
+                PhoneNumber = "9988004739",
+                EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            };
+
+            var bajajCompany = await context.ClientCompany.AddAsync(bajaj);
+
+            //CREATE COMPANY4
+            var tata = new ClientCompany
+            {
+                ClientCompanyId = Guid.NewGuid().ToString(),
+                Name = Applicationsettings.TATA,
+                Addressline = "34 Lasiandra Avenue ",
+                Branch = "FOREST HILL CHASE",
+                Code = Applicationsettings.TATA_CODE,
+                ActivatedDate = DateTime.Now,
+                AgreementDate = DateTime.Now,
+                BankName = "NAB",
+                BankAccountNumber = "1234567",
+                IFSCCode = "IFSC100",
+                CountryId = countryId,
+                DistrictId = companyDistrict.DistrictId,
+                StateId = companyState.StateId,
+                PinCodeId = companyPinCode.PinCodeId,
+                Description = "CORPORATE OFFICE ",
+                Email = Applicationsettings.TATA_DOMAIN,
+                DocumentUrl = Applicationsettings.TATA_LOGO,
+                PhoneNumber = "9988004739",
+                EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            };
+
+            var tataCompany = await context.ClientCompany.AddAsync(tata);
+
             var checkerServices = new List<VendorInvestigationServiceType>
             {
                 new VendorInvestigationServiceType{
@@ -303,8 +356,16 @@ namespace risk.control.system.Seeds
             verify.Clients.Add(hdfcCompany.Entity);
             investigate.Clients.Add(hdfcCompany.Entity);
 
+            checker.Clients.Add(bajajCompany.Entity);
+            verify.Clients.Add(bajajCompany.Entity);
+            investigate.Clients.Add(bajajCompany.Entity);
+
+            checker.Clients.Add(tataCompany.Entity);
+            verify.Clients.Add(tataCompany.Entity);
+            investigate.Clients.Add(tataCompany.Entity);
+
             await context.SaveChangesAsync(null, false);
-            return (checker, verify, investigate, canaraCompany.Entity.ClientCompanyId, hdfcCompany.Entity.ClientCompanyId);
+            return (checker, verify, investigate, canaraCompany.Entity.ClientCompanyId, hdfcCompany.Entity.ClientCompanyId, bajajCompany.Entity.ClientCompanyId, tataCompany.Entity.ClientCompanyId);
         }
     }
 }

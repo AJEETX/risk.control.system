@@ -170,6 +170,7 @@
         public const string CANARACODE = "chl";
         public const string CANARADOMAIN = "canarahsbclife.com";
         public const string CANARALOGO = "/img/chl.png";
+        public const string CANARA_CREATOR = "creator@" + CANARADOMAIN;
 
         public const string BAJAJ = "bajaj life";
         public const string BAJAJ_CODE = "bal";
