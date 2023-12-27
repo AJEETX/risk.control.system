@@ -1,5 +1,7 @@
 # risk control system
 
+<img src="Flyer.gif" style="height:90%;" />
+
 System feature list
 
 iCheckify™️ engine, a simple and secure workflow [Multi-tenant SAAS*]
