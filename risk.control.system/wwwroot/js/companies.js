@@ -46,8 +46,8 @@ async function success(position) {
     });
     b_getInfoWindow.open(map, b_marker);
 
-    var lat = position.coords.latitude;
-    var long = position.coords.longitude;
+    var lat = parseFloat(position.coords.latitude);
+    var long = parseFloat(position.coords.longitude);
     var locresponse = $.ajax({
         type: "GET",
         url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${apiKey}`,

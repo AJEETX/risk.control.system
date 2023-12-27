@@ -250,7 +250,7 @@ app.Use(async (context, next) =>
         "script-src 'unsafe-inline' 'self' https://maps.googleapis.com https://polyfill.io https://highcharts.com https://export.highcharts.com https://cdnjs.cloudflare.com; " +
         "style-src 'unsafe-inline' 'self' https://cdnjs.cloudflare.com/ https://fonts.googleapis.com ; " +
         "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
-        "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com  https://developers.google.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
+        "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
         "frame-src 'none';" +
         "object-src 'none';" +
         "form-action 'self';" +
