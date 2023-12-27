@@ -675,7 +675,10 @@ namespace risk.control.system.Services
                         }
                     }
                 }
-
+                var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+                var reassigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
                 foreach (var claimsInvestigation in cases2Assign)
                 {
                     claimsInvestigation.Updated = DateTime.UtcNow;
@@ -683,12 +686,12 @@ namespace risk.control.system.Services
                     claimsInvestigation.CurrentUserEmail = userEmail;
                     claimsInvestigation.CurrentClaimOwner = currentOwner;
                     claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
-                    claimsInvestigation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
+                    claimsInvestigation.InvestigationCaseSubStatusId = claimsInvestigation.IsReviewCase && currentUser.ClientCompany.AutoAllocation ?
+                        reassigned.InvestigationCaseSubStatusId : assigned.InvestigationCaseSubStatusId;
                     foreach (var caseLocation in claimsInvestigation.CaseLocations)
                     {
-                        caseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
+                        caseLocation.InvestigationCaseSubStatusId = caseLocation.IsReviewCaseLocation && currentUser.ClientCompany.AutoAllocation ?
+                        reassigned.InvestigationCaseSubStatusId : assigned.InvestigationCaseSubStatusId;
                     }
 
                     var lastLog = _context.InvestigationTransaction

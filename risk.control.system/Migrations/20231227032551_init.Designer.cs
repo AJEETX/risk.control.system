@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231224120340_init")]
+    [Migration("20231227032551_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -132,6 +132,30 @@ namespace risk.control.system.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.AgencyRating", b =>
+                {
+                    b.Property<string>("AgencyRatingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Rate")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("VendorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("AgencyRatingId");
+
+                    b.HasIndex("VendorId");
+
+                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.AgentReport", b =>
@@ -1740,6 +1764,84 @@ namespace risk.control.system.Migrations
                     b.ToTable("OutboxMessage");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.PermissionModule", b =>
+                {
+                    b.Property<string>("PermissionModuleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModuleName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PermissionModuleId");
+
+                    b.ToTable("PermissionModule");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.PermissionSubModule", b =>
+                {
+                    b.Property<string>("PermissionSubModuleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PermissionModuleId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SubModuleName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PermissionSubModuleId");
+
+                    b.HasIndex("PermissionModuleId");
+
+                    b.ToTable("PermissionSubModule");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.PermissionType", b =>
+                {
+                    b.Property<string>("PermissionTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PermissionModuleId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PermissionSubModuleId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PermissionTypeId");
+
+                    b.HasIndex("PermissionModuleId");
+
+                    b.HasIndex("PermissionSubModuleId");
+
+                    b.ToTable("PermissionType");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.PinCode", b =>
                 {
                     b.Property<string>("PinCodeId")
@@ -2296,6 +2398,10 @@ namespace risk.control.system.Migrations
                     b.Property<string>("PinCodeId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Rating")
+                        .HasMaxLength(5)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("StateId")
                         .HasColumnType("TEXT");
 
@@ -2773,6 +2879,17 @@ namespace risk.control.system.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.AgencyRating", b =>
+                {
+                    b.HasOne("risk.control.system.Models.Vendor", "Vendor")
+                        .WithMany("ratings")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vendor");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.ApplicationRole", b =>
                 {
                     b.HasOne("risk.control.system.Models.ApplicationUser", "ApplicationUser")
@@ -3135,6 +3252,24 @@ namespace risk.control.system.Migrations
                     b.Navigation("Mailbox");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.PermissionSubModule", b =>
+                {
+                    b.HasOne("risk.control.system.Models.PermissionModule", null)
+                        .WithMany("Sections")
+                        .HasForeignKey("PermissionModuleId");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.PermissionType", b =>
+                {
+                    b.HasOne("risk.control.system.Models.PermissionModule", null)
+                        .WithMany("PermissionTypes")
+                        .HasForeignKey("PermissionModuleId");
+
+                    b.HasOne("risk.control.system.Models.PermissionSubModule", null)
+                        .WithMany("PermissionTypes")
+                        .HasForeignKey("PermissionSubModuleId");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.PinCode", b =>
                 {
                     b.HasOne("risk.control.system.Models.Country", "Country")
@@ -3459,11 +3594,25 @@ namespace risk.control.system.Migrations
                     b.Navigation("Trash");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.PermissionModule", b =>
+                {
+                    b.Navigation("PermissionTypes");
+
+                    b.Navigation("Sections");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.PermissionSubModule", b =>
+                {
+                    b.Navigation("PermissionTypes");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>
                 {
                     b.Navigation("VendorApplicationUser");
 
                     b.Navigation("VendorInvestigationServiceTypes");
+
+                    b.Navigation("ratings");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.VendorInvestigationServiceType", b =>

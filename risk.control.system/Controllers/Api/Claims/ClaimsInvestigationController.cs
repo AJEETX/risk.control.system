@@ -798,6 +798,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -816,14 +818,17 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
+            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) ||
+            (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
 
             foreach (var item in applicationDbContext)
             {
                 item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
-                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
+                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId)
+                    )?.ToList();
                 if (item.CaseLocations.Any())
                 {
                     claimsAssigned.Add(item);
@@ -900,6 +905,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var reAssignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
             var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -918,14 +925,17 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
+            applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null) ||
+            (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId));
 
             var claimsAssigned = new List<ClaimsInvestigation>();
 
             foreach (var item in applicationDbContext)
             {
                 item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
-                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
+                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId)
+                    )?.ToList();
                 if (item.CaseLocations.Any())
                 {
                     claimsAssigned.Add(item);

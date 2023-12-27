@@ -212,6 +212,21 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PermissionModule",
+                columns: table => new
+                {
+                    PermissionModuleId = table.Column<string>(type: "TEXT", nullable: false),
+                    ModuleName = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PermissionModule", x => x.PermissionModuleId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UploadClaim",
                 columns: table => new
                 {
@@ -324,6 +339,27 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PermissionSubModule",
+                columns: table => new
+                {
+                    PermissionSubModuleId = table.Column<string>(type: "TEXT", nullable: false),
+                    SubModuleName = table.Column<string>(type: "TEXT", nullable: false),
+                    PermissionModuleId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PermissionSubModule", x => x.PermissionSubModuleId);
+                    table.ForeignKey(
+                        name: "FK_PermissionSubModule_PermissionModule_PermissionModuleId",
+                        column: x => x.PermissionModuleId,
+                        principalTable: "PermissionModule",
+                        principalColumn: "PermissionModuleId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "District",
                 columns: table => new
                 {
@@ -384,6 +420,30 @@ namespace risk.control.system.Migrations
                         column: x => x.LineOfBusinessId,
                         principalTable: "LineOfBusiness",
                         principalColumn: "LineOfBusinessId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PermissionType",
+                columns: table => new
+                {
+                    PermissionTypeId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    PermissionModuleId = table.Column<string>(type: "TEXT", nullable: true),
+                    PermissionSubModuleId = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PermissionType", x => x.PermissionTypeId);
+                    table.ForeignKey(
+                        name: "FK_PermissionType_PermissionModule_PermissionModuleId",
+                        column: x => x.PermissionModuleId,
+                        principalTable: "PermissionModule",
+                        principalColumn: "PermissionModuleId");
+                    table.ForeignKey(
+                        name: "FK_PermissionType_PermissionSubModule_PermissionSubModuleId",
+                        column: x => x.PermissionSubModuleId,
+                        principalTable: "PermissionSubModule",
+                        principalColumn: "PermissionSubModuleId");
                 });
 
             migrationBuilder.CreateTable(
@@ -1335,6 +1395,7 @@ namespace risk.control.system.Migrations
                     DocumentUrl = table.Column<string>(type: "TEXT", nullable: true),
                     DocumentImage = table.Column<byte[]>(type: "BLOB", nullable: true),
                     Deleted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Rating = table.Column<string>(type: "TEXT", maxLength: 5, nullable: true),
                     ClaimsInvestigationId = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -1499,6 +1560,26 @@ namespace risk.control.system.Migrations
                         column: x => x.VendorId,
                         principalTable: "Vendor",
                         principalColumn: "VendorId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ratings",
+                columns: table => new
+                {
+                    AgencyRatingId = table.Column<string>(type: "TEXT", nullable: false),
+                    Rate = table.Column<int>(type: "INTEGER", nullable: false),
+                    IpAddress = table.Column<string>(type: "TEXT", nullable: false),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ratings", x => x.AgencyRatingId);
+                    table.ForeignKey(
+                        name: "FK_Ratings_Vendor_VendorId",
+                        column: x => x.VendorId,
+                        principalTable: "Vendor",
+                        principalColumn: "VendorId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -1873,6 +1954,21 @@ namespace risk.control.system.Migrations
                 column: "MailboxId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PermissionSubModule_PermissionModuleId",
+                table: "PermissionSubModule",
+                column: "PermissionModuleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PermissionType_PermissionModuleId",
+                table: "PermissionType",
+                column: "PermissionModuleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PermissionType_PermissionSubModuleId",
+                table: "PermissionType",
+                column: "PermissionSubModuleId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PinCode_CountryId",
                 table: "PinCode",
                 column: "CountryId");
@@ -1925,6 +2021,11 @@ namespace risk.control.system.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PreviousClaimReport_VendorId",
                 table: "PreviousClaimReport",
+                column: "VendorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ratings_VendorId",
+                table: "Ratings",
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
@@ -2246,7 +2347,13 @@ namespace risk.control.system.Migrations
                 name: "OutboxMessage");
 
             migrationBuilder.DropTable(
+                name: "PermissionType");
+
+            migrationBuilder.DropTable(
                 name: "PreviousClaimReport");
+
+            migrationBuilder.DropTable(
+                name: "Ratings");
 
             migrationBuilder.DropTable(
                 name: "SentMessage");
@@ -2270,6 +2377,9 @@ namespace risk.control.system.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "PermissionSubModule");
+
+            migrationBuilder.DropTable(
                 name: "AgentReport");
 
             migrationBuilder.DropTable(
@@ -2280,6 +2390,9 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "CaseLocation");
+
+            migrationBuilder.DropTable(
+                name: "PermissionModule");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

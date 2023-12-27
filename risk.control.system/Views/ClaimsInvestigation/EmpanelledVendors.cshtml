@@ -356,6 +356,7 @@
                                 <tbody>
                                     @foreach (var item in Model.Vendors)
                                     {
+                                        var vendorId = item.Vendor.VendorId;
                                         <tr>
                                             <td>
                                                 <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" />
@@ -372,6 +373,24 @@
                                             </td>
                                             <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.Name)
+                                            <br />
+                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="1" class="rating" vendorId="@vendorId" />
+                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="2" class="rating" vendorId="@vendorId" />
+                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="3" class="rating" vendorId="@vendorId" />
+                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="4" class="rating" vendorId="@vendorId" />
+                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="5" class="rating" vendorId="@vendorId" />
+                                                    <span class="badge badge-light">
+                                                    (@item.Vendor.RateCount)
+                                                </span>
+                                                @if (item.Vendor.RateCount != null && item.Vendor.RateCount > 0)
+                                                {
+                                                    decimal a = @item.Vendor.RateTotal.Value / @item.Vendor.RateCount.Value;
+                                                    <span class="badge badge-light avr"> @a</span>
+                                                }
+                                                <br />
+                                                <span class="badge badge-light">
+                                                    <div class="result"></div>
+                                                    </span>
                                             </td>
                                             <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)
@@ -434,3 +453,8 @@
         </div>
     </div>
 </section>
+@section Scripts    {
+
+<script type="text/javascript" src="~/js/get-empanelled-vendors.js">
+</script>
+}

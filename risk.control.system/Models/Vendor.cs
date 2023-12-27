@@ -98,6 +98,25 @@ namespace risk.control.system.Models
         public bool SelectedByCompany { get; set; }
 
         public bool Deleted { get; set; } = false;
+
+        [RegularExpression(@"^[A-Z]+[a-zA-Z''-'\s]*$")]
+        [StringLength(5)]
+        public string? Rating { get; set; }
+
+        public int? RateCount
+        {
+            get { return ratings != null ? ratings.Count : 1; }
+        }
+
+        public int? RateTotal
+        {
+            get
+            {
+                return (ratings != null ? ratings.Sum(m => m.Rate) : 1);
+            }
+        }
+
+        public virtual ICollection<AgencyRating>? ratings { get; set; }
     }
 
     public enum VendorStatus

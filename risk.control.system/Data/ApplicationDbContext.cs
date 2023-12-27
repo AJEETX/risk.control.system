@@ -16,6 +16,7 @@ namespace risk.control.system.Data
             base.OnModelCreating(builder);
         }
 
+        public virtual DbSet<AgencyRating> Ratings { get; set; }
         public virtual DbSet<PermissionModule> PermissionModule { get; set; }
         public virtual DbSet<PermissionType> PermissionType { get; set; }
         public virtual DbSet<UploadClaim> UploadClaim { get; set; }

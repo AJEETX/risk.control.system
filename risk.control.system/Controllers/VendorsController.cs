@@ -35,6 +35,22 @@ namespace risk.control.system.Controllers
             return View();
         }
 
+        public JsonResult PostRating(int rating, string mid)
+        {
+            //save data into the database
+
+            var rt = new AgencyRating();
+            string ip = "123";
+            rt.Rate = rating;
+            rt.IpAddress = ip;
+            rt.VendorId = mid;
+
+            //save into the database
+            _context.Ratings.Add(rt);
+            _context.SaveChanges();
+            return Json("You rated this " + rating.ToString() + " star(s)");
+        }
+
         // GET: Vendors/Details/5
         [Breadcrumb(" Manage Agency")]
         public async Task<IActionResult> Details(string id)

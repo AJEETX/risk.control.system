@@ -156,6 +156,11 @@ table {
     border: 1px solid #ccc;
 }
 
+.rating {
+    height: .7rem;
+    width: .7rem;
+    border: none;
+}
 a.table-link {
     width: 100px;
 }
