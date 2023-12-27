@@ -43,6 +43,7 @@ async function success(position) {
 
     var map = new google.maps.Map(document.getElementById("map"), mapOptions);
     var marker = new google.maps.Marker({
+        icon: "../images/beachflag.png",
         position: LatLng,
         title: "You are here: " + current_data.results[0].formatted_address
     });
