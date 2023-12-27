@@ -214,7 +214,7 @@
                                                                         }
                                                                     </p>
                                                                     <p class="text-muted text-sm">
-                                                                        <img id="profileImageMap" class="img-fluid block-data" src="@customerLocationMap">
+                                                                        <img id="profileImageMap" class="img-fluid block-data" src="@Model.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
                                                                     </p>
 
                                                                 </div>
@@ -277,7 +277,7 @@
                                                                         }
                                                                     </p>
                                                                     <p class="text-muted text-sm">
-                                                                        <img id="bImageMap" class="img-fluid block-data" src="@beneficiaryLocationMap">
+                                                                        <img id="bImageMap" class="img-fluid block-data" src="@Model?.CaseLocation?.BeneficiaryLocationMap">
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -374,23 +374,23 @@
                                             <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.Name)
                                             <br />
-                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="1" class="rating" vendorId="@vendorId" />
-                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="2" class="rating" vendorId="@vendorId" />
-                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="3" class="rating" vendorId="@vendorId" />
-                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="4" class="rating" vendorId="@vendorId" />
-                                                <img src="~/images/EmptyStar.png" alt="Star Rating" align="middle" id="5" class="rating" vendorId="@vendorId" />
-                                                    <span class="badge badge-light">
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="rating" vendorId="@vendorId" />
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="rating" vendorId="@vendorId" />
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="rating" vendorId="@vendorId" />
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="rating" vendorId="@vendorId" />
+                                                <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="rating" vendorId="@vendorId" />
+                                                <span class="badge badge-light">
                                                     (@item.Vendor.RateCount)
                                                 </span>
                                                 @if (item.Vendor.RateCount != null && item.Vendor.RateCount > 0)
                                                 {
                                                     decimal a = @item.Vendor.RateTotal.Value / @item.Vendor.RateCount.Value;
-                                                    <span class="badge badge-light avr"> @a</span>
+                                                    <span class="avr"> @a</span>
                                                 }
                                                 <br />
                                                 <span class="badge badge-light">
-                                                    <div class="result"></div>
-                                                    </span>
+                                                    <span class="result"></span>
+                                                </span>
                                             </td>
                                             <td>
                                             @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)

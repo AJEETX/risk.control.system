@@ -5,7 +5,7 @@
     });
 
     $("img.rating").mouseout(function () {
-        giveRating($(this), "EmptyStar.png");
+        giveRating($(this), "StarFade.gif");
         refilRating($(this));
     });
 
@@ -17,7 +17,7 @@
         var vendorId = $(this).attr("vendorId");
         var url = "/Vendors/PostRating?rating=" + parseInt($(this).attr("id")) + "&mid=" + $(this).attr("vendorId");
         $.post(url, null, function (data) {
-            $(e.currentTarget).closest('tr').find('div.result').text(data).css('color', 'red');
+            $(e.currentTarget).closest('tr').find('span.result').text(data).css('color', 'red');
             $("#result").text(data);
         });
     });

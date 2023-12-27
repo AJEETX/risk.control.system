@@ -192,9 +192,6 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
-            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
-                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-
             if (string.IsNullOrWhiteSpace(selectedcase))
             {
                 toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
@@ -206,15 +203,6 @@ namespace risk.control.system.Controllers
             ViewBag.CompanyId = claimCase.ClaimsInvestigation.PolicyDetail.ClientCompanyId;
 
             ViewBag.Selectedcase = selectedcase;
-
-            var customerLatLong = claimsInvestigation.CustomerDetail.PinCode.Latitude + "," + claimsInvestigation.CustomerDetail.PinCode.Longitude;
-
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
-            ViewBag.CustomerLocationUrl = url;
-
-            var beneficiarylatLong = claimCase.PinCode.Latitude + "," + claimCase.PinCode.Longitude;
-            var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=8&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key={Applicationsettings.GMAPData}";
-            ViewBag.BeneficiaryLocationUrl = bUrl;
 
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation });
         }
