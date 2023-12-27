@@ -645,18 +645,34 @@ namespace risk.control.system.Services
                     .Include(c => c.CaseLocations)
                     .Where(v => claims.Contains(v.ClaimsInvestigationId));
 
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
-
-                var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+                var currentUser = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                 var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == currentUser.ClientCompanyId);
                 string currentOwner = string.Empty;
-                foreach (var companyUser in companyUsers)
+                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
+                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+
+                if (currentUser.ClientCompany.AutoAllocation)
                 {
-                    var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
-                    if (isAssigner)
+                    foreach (var companyUser in companyUsers)
                     {
-                        currentOwner = companyUser.Email;
-                        break;
+                        var isCeatorr = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
+                        if (isCeatorr)
+                        {
+                            currentOwner = companyUser.Email;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var companyUser in companyUsers)
+                    {
+                        var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
+                        if (isAssigner)
+                        {
+                            currentOwner = companyUser.Email;
+                            break;
+                        }
                     }
                 }
 

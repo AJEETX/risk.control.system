@@ -299,6 +299,14 @@ namespace risk.control.system.Seeds
 
             #endregion CLIENT/ VENDOR COMPANY
 
+            #region PERMISSIONS ROLES
+
+            //PermissionModuleSeed.SeedMailbox(context);
+
+            //PermissionModuleSeed.SeedClaim(context);
+
+            #endregion PERMISSIONS ROLES
+
             #region APPLICATION USERS ROLES
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, indiaCountry, userManager, roleManager);

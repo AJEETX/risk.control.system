@@ -93,6 +93,7 @@ namespace risk.control.system.Seeds
                 //ADD PERMISSIONS
 
                 var moduleList = new List<string> { nameof(Underwriting), nameof(Claim) };
+                var modules = context.PermissionModule.ToList();
 
                 foreach (var module in moduleList)
                 {
