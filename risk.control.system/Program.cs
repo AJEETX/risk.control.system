@@ -102,7 +102,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=seed-tata-again.db"));
+                        options.UseSqlite("Data Source=reassign-fail.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

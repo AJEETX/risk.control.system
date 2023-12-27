@@ -686,12 +686,10 @@ namespace risk.control.system.Services
                     claimsInvestigation.CurrentUserEmail = userEmail;
                     claimsInvestigation.CurrentClaimOwner = currentOwner;
                     claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
-                    claimsInvestigation.InvestigationCaseSubStatusId = claimsInvestigation.IsReviewCase && currentUser.ClientCompany.AutoAllocation ?
-                        reassigned.InvestigationCaseSubStatusId : assigned.InvestigationCaseSubStatusId;
+                    claimsInvestigation.InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId;
                     foreach (var caseLocation in claimsInvestigation.CaseLocations)
                     {
-                        caseLocation.InvestigationCaseSubStatusId = caseLocation.IsReviewCaseLocation && currentUser.ClientCompany.AutoAllocation ?
-                        reassigned.InvestigationCaseSubStatusId : assigned.InvestigationCaseSubStatusId;
+                        caseLocation.InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId;
                     }
 
                     var lastLog = _context.InvestigationTransaction
