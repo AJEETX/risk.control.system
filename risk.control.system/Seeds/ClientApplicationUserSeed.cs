@@ -26,7 +26,9 @@ namespace risk.control.system.Seeds
             };
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-            var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
+
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "company-admin.jpeg");
             var adminImage = File.ReadAllBytes(adminImagePath);
 
@@ -51,7 +53,7 @@ namespace risk.control.system.Seeds
                 Addressline = "43 Golden Road",
                 IsVendorAdmin = false,
                 ClientCompanyId = clientCompanyId,
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
@@ -116,7 +118,7 @@ namespace risk.control.system.Seeds
                 Addressline = "987 Canterbury Road",
                 PhoneNumber = Applicationsettings.MOBILE,
                 IsVendorAdmin = false,
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = investigateDistrict?.DistrictId ?? default!,
                 StateId = investigateState?.StateId ?? default!,
                 PinCodeId = investigatePinCode?.PinCodeId ?? default!,
@@ -167,7 +169,7 @@ namespace risk.control.system.Seeds
                 Addressline = "453 Main Road",
                 PhoneNumber = Applicationsettings.MOBILE,
                 IsVendorAdmin = false,
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
@@ -218,7 +220,7 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = false,
                 Addressline = "11 Nurlendi Street",
                 PhoneNumber = Applicationsettings.MOBILE,
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,

@@ -25,7 +25,9 @@ namespace risk.control.system.Seeds
 
             var pinCode = context.PinCode.Include(p => p.District).Include(p => p.State).FirstOrDefault(p => p.Code == CURRENT_PINCODE);
             var district = context.District.FirstOrDefault(c => c.DistrictId == pinCode.District.DistrictId);
-            var state = context.State.FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var state = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == pinCode.State.StateId);
+            var countryId = context.Country.FirstOrDefault(s => s.CountryId == state.Country.CountryId)?.CountryId ?? default!;
+
             string adminImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "agency-admin.jpeg");
             var adminImage = File.ReadAllBytes(adminImagePath);
 
@@ -50,7 +52,7 @@ namespace risk.control.system.Seeds
                 Addressline = "123 Carnegie St",
                 PhoneNumber = Applicationsettings.ADMIN_MOBILE,
                 VendorId = vendor.VendorId,
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
@@ -112,7 +114,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = false,
                 Addressline = "55 Donvale Road",
                 IsVendorAdmin = false,
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = investigateDistrict?.DistrictId ?? default!,
                 StateId = investigateState?.StateId ?? default!,
                 PinCodeId = investigatePinCode?.PinCodeId ?? default!,
@@ -169,7 +171,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
                 Addressline = "23 Vincent Avenue",
-                CountryId = indiaCountry.Entity.CountryId,
+                CountryId = countryId,
                 DistrictId = checkerDistrict?.DistrictId ?? default!,
                 StateId = checkerState?.StateId ?? default!,
                 PinCodeId = checkerPinCode?.PinCodeId ?? default!,
