@@ -90,9 +90,7 @@ namespace risk.control.system.Seeds
             {
                 Name = creatorEmailwithSuffix
             };
-            var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
-            var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
-            var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+
             string creatorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "creator.jpeg");
 
             var creatorImage = File.ReadAllBytes(creatorImagePath);
@@ -119,9 +117,9 @@ namespace risk.control.system.Seeds
                 PhoneNumber = Applicationsettings.MOBILE,
                 IsVendorAdmin = false,
                 CountryId = countryId,
-                DistrictId = investigateDistrict?.DistrictId ?? default!,
-                StateId = investigateState?.StateId ?? default!,
-                PinCodeId = investigatePinCode?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = CREATOR.PROFILE_IMAGE,
                 ProfilePicture = creatorImage
             };

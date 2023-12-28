@@ -87,9 +87,7 @@ namespace risk.control.system.Seeds
             {
                 Name = supervisorEmailwithSuffix
             };
-            var investigatePinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE4);
-            var investigateDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == investigatePinCode.District.DistrictId);
-            var investigateState = context.State.FirstOrDefault(s => s.StateId == investigateDistrict.State.StateId);
+
             string supervisorImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "supervisor.jpeg");
             var supervisorImage = File.ReadAllBytes(supervisorImagePath);
 
@@ -115,9 +113,9 @@ namespace risk.control.system.Seeds
                 Addressline = "55 Donvale Road",
                 IsVendorAdmin = false,
                 CountryId = countryId,
-                DistrictId = investigateDistrict?.DistrictId ?? default!,
-                StateId = investigateState?.StateId ?? default!,
-                PinCodeId = investigatePinCode?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE,
                 ProfilePicture = supervisorImage
             };
@@ -144,9 +142,6 @@ namespace risk.control.system.Seeds
                 Name = agentEmailwithSuffix
             };
 
-            var checkerPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
-            var checkerDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == checkerPinCode.District.DistrictId);
-            var checkerState = context.State.FirstOrDefault(s => s.StateId == checkerDistrict.State.StateId);
             string agentImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "agent.jpeg");
             var agentImage = File.ReadAllBytes(agentImagePath);
 
@@ -172,9 +167,9 @@ namespace risk.control.system.Seeds
                 IsVendorAdmin = false,
                 Addressline = "23 Vincent Avenue",
                 CountryId = countryId,
-                DistrictId = checkerDistrict?.DistrictId ?? default!,
-                StateId = checkerState?.StateId ?? default!,
-                PinCodeId = checkerPinCode?.PinCodeId ?? default!,
+                DistrictId = district?.DistrictId ?? default!,
+                StateId = state?.StateId ?? default!,
+                PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = AGENT.PROFILE_IMAGE,
                 ProfilePicture = agentImage
             };
