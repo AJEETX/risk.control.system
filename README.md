@@ -3,7 +3,7 @@
 
 <img src="Flyer.gif" style="height:90%;" />
 
-#### System features
+#### iCheckify™️ engine highlights
 
     Setup task :
         Domain-based nomenclature for seamless external Application integration including Azure AD
@@ -37,7 +37,7 @@
         Real-time Claim status tracking
         Query Management / Re-allocate Claim workflow
     
-#### Mobile App
+#### Mobile App capabilities
 
     First-install Agent onboarding
     Offline-First

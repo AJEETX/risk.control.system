@@ -12,8 +12,8 @@ namespace risk.control.system.Seeds
 {
     public class ClientVendorSeed
     {
-        public static async Task<(Vendor checker, Vendor verify, Vendor investigate, string canaraId, string hdfcId, string bajajId, string tataId)> Seed(ApplicationDbContext context, EntityEntry<Country> indiaCountry,
-                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness, IHttpClientService httpClientService)
+        public static async Task<(List<Vendor> vendors, List<string> companyIds)> Seed(ApplicationDbContext context,
+                    InvestigationServiceType investigationServiceType, InvestigationServiceType discreetServiceType, InvestigationServiceType docServiceType, LineOfBusiness lineOfBusiness)
         {
             //CREATE VENDOR COMPANY
 
@@ -100,6 +100,8 @@ namespace risk.control.system.Seeds
             };
 
             var investigateAgency = await context.Vendor.AddAsync(investigate);
+
+            var vendors = new List<Vendor> { checker, verify, investigate };
 
             var companyPinCode = context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE);
             var companyDistrict = context.District.Include(d => d.State).FirstOrDefault(s => s.DistrictId == companyPinCode.District.DistrictId);
@@ -212,6 +214,8 @@ namespace risk.control.system.Seeds
             };
 
             var tataCompany = await context.ClientCompany.AddAsync(tata);
+
+            var companyIds = new List<string> { canaraCompany.Entity.ClientCompanyId, hdfcCompany.Entity.ClientCompanyId, bajajCompany.Entity.ClientCompanyId, tataCompany.Entity.ClientCompanyId };
 
             var checkerServices = new List<VendorInvestigationServiceType>
             {
@@ -365,7 +369,7 @@ namespace risk.control.system.Seeds
             investigate.Clients.Add(tataCompany.Entity);
 
             await context.SaveChangesAsync(null, false);
-            return (checker, verify, investigate, canaraCompany.Entity.ClientCompanyId, hdfcCompany.Entity.ClientCompanyId, bajajCompany.Entity.ClientCompanyId, tataCompany.Entity.ClientCompanyId);
+            return (vendors, companyIds);
         }
     }
 }

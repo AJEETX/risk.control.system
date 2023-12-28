@@ -12,7 +12,7 @@ namespace risk.control.system.Seeds
 {
     public static class VendorApplicationUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, EntityEntry<Country> indiaCountry, UserManager<VendorApplicationUser> userManager, Vendor vendor)
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<VendorApplicationUser> userManager, Vendor vendor)
         {
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 

@@ -293,9 +293,8 @@ namespace risk.control.system.Seeds
 
             #region CLIENT/ VENDOR COMPANY
 
-            var (checker, verify, investigate, canaraId, hdfcId, bajajId, tataId) = await ClientVendorSeed.Seed(context, indiaCountry,
-                claimComprehensiveService.Entity, claimDiscreetService.Entity,
-                claimDocumentCollectionService.Entity, claimCaseType.Entity, httpClientService);
+            var (vendors, companyIds) = await ClientVendorSeed.Seed(context, claimComprehensiveService.Entity,
+                claimDiscreetService.Entity, claimDocumentCollectionService.Entity, claimCaseType.Entity);
 
             #endregion CLIENT/ VENDOR COMPANY
 
@@ -311,19 +310,28 @@ namespace risk.control.system.Seeds
 
             await PortalAdminSeed.Seed(context, webHostEnvironment, indiaCountry, userManager, roleManager);
 
-            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, canaraId);
+            foreach (var companyId in companyIds)
+            {
+                await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, companyId);
+            }
 
-            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, hdfcId);
+            //await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, canaraId);
 
-            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, bajajId);
+            //await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, hdfcId);
 
-            await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, tataId);
+            //await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, bajajId);
 
-            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, checker);
+            //await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, tataId);
 
-            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, verify);
+            foreach (var vendor in vendors)
+            {
+                await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, vendor);
+            }
+            //await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, checker);
 
-            await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, investigate);
+            //await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, verify);
+
+            //await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, investigate);
 
             await context.SaveChangesAsync(null, false);
 
