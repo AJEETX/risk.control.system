@@ -1056,6 +1056,8 @@ function GetWeeklyPie(title, url, container) {
                     totalspent += result[keys[i]];
                     weeklydata.push(arrL);
                 }
+                $('#active-claims').html(totalspent);
+
                 createCharts(container, title, weeklydata, titleMessage, totalspent);
             }
         }
@@ -1082,6 +1084,7 @@ function GetMonthly(title, url, container) {
                     totalspent += result[keys[i]];
                     monthlydata.push(arrL);
                 }
+                $('#approved-claims').html(totalspent);
                 createChartColumn(container, title, monthlydata, titleMessage, totalspent);
             }
         }
@@ -1107,6 +1110,7 @@ function GetMonthlyPie(title, url, container) {
                     totalspent += result[keys[i]];
                     monthlydata.push(arrL);
                 }
+
                 createCharts(container, title, monthlydata, titleMessage, totalspent);
             }
         }
@@ -1165,6 +1169,8 @@ function GetWeeklyTat(title, url, container) {
                     totalspent += result[keys[i]];
                     weeklydata.push(arrL);
                 }
+                $('#submit-claims').html(totalspent);
+
                 createChartTat(container, title, result.tatDetails, titleMessage, result.count);
             }
         }
