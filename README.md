@@ -1,10 +1,9 @@
-# risk control system
+# iCheckify™️ engine
+### a simple and secure investigation workflow system [Multi-tenant SAAS*]
 
 <img src="Flyer.gif" style="height:90%;" />
 
-System feature list
-
-iCheckify™️ engine, a simple and secure workflow [Multi-tenant SAAS*]
+#### System features
 
     Setup task :
         Domain-based nomenclature for seamless external Application integration including Azure AD
@@ -20,7 +19,7 @@ iCheckify™️ engine, a simple and secure workflow [Multi-tenant SAAS*]
         Agency Investigation service Management
         Agent onboarding with complete ID verification process-flow
         Agent Workload visibility
-        Setup Agent document / questionairre / template
+        Setup Agent document / questionnaire / template
         Setup Manual/Auto Claim Allocation
         Mailbox for internal communication
 
@@ -31,19 +30,19 @@ iCheckify™️ engine, a simple and secure workflow [Multi-tenant SAAS*]
             2. FTP integration
             3. API integration
             4. Manual claim creation
-        Claims list with Mapview 
+        Claims list with Map view 
         Seamless Claim allocation to Agency
         Fraud-free agent investigation report
         Claim investigation report with timeline
         Real-time Claim status tracking
         Query Management / Re-allocate Claim workflow
     
-Mobile App
+#### Mobile App
 
     First-install Agent onboarding
     Offline-First
     Fraud-prevention design (All information/document collected through App) 
-    Claims list with Mapview 
+    Claims list with Map view 
     Capture photo and extract complete information of the location i.e. weather, demography, etc
         Face-detection and Face-match
         Document image digitization [extract text/information from image]
@@ -61,7 +60,7 @@ Mobile App
         Real-time agent tracking
         Document-tampering detection
 
-Notification Service
+#### Notification Service
 
     Internal Domain-based Mailbox to:
         Receive QuickEMAIL notification or communication
