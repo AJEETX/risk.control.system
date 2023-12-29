@@ -66,7 +66,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -176,22 +176,6 @@ namespace risk.control.system.Controllers.Api.Claims
             return Ok(response);
         }
 
-        private string GetPincode(ClaimType? claimType, CustomerDetail cdetail, CaseLocation location)
-        {
-            if (claimType == ClaimType.HEALTH)
-            {
-                if (cdetail is null)
-                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
-                return cdetail.PinCode.Code;
-            }
-            else
-            {
-                if (location is null)
-                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
-                return location.PinCode.Code;
-            }
-        }
-
         [HttpGet("GetActiveMap")]
         public async Task<IActionResult> GetActiveMap()
         {
@@ -224,7 +208,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -373,6 +357,22 @@ namespace risk.control.system.Controllers.Api.Claims
             return zipFiles?.ToList();
         }
 
+        private string GetPincode(ClaimType? claimType, CustomerDetail cdetail, CaseLocation location)
+        {
+            if (claimType == ClaimType.HEALTH)
+            {
+                if (cdetail is null)
+                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
+                return cdetail.PinCode.Code;
+            }
+            else
+            {
+                if (location is null)
+                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
+                return location.PinCode.Code;
+            }
+        }
+
         private decimal? GetLat(ClaimType? claimType, CustomerDetail a, CaseLocation location)
         {
             if (claimType == ClaimType.HEALTH)
@@ -437,7 +437,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -563,7 +563,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -690,7 +690,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
 
@@ -792,7 +792,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -899,7 +899,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -1018,7 +1018,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -1146,7 +1146,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -1288,7 +1288,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -1389,7 +1389,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -1504,7 +1504,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -1603,7 +1603,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -1704,7 +1704,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.Vendor)
                 .Where(c => !c.Deleted &&
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
-                c.CaseLocations.All(c => c.ClaimReport != null));
+                c.CaseLocations.All(c => c.ClaimReport != null)).OrderByDescending(c => c.Updated);
             var user = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
@@ -1783,7 +1783,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.State)
                 .Where(c => !c.Deleted &&
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
-                c.CaseLocations.All(c => c.ClaimReport != null));
+                c.CaseLocations.All(c => c.ClaimReport != null)).OrderByDescending(c => c.Updated);
             var user = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);

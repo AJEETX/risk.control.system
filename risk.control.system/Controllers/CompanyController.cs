@@ -409,20 +409,11 @@ namespace risk.control.system.Controllers
                             }
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
-                        Errors(result);
                         return RedirectToAction(nameof(CompanyController.User), "Company");
                     }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VendorApplicationUserExists(applicationUser.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
                 }
             }
 
@@ -672,27 +663,6 @@ namespace risk.control.system.Controllers
 
             toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
             return RedirectToAction(nameof(CompanyController.User));
-        }
-
-        private bool VendorApplicationUserExists(long id)
-        {
-            return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-
-        private void Errors(IdentityResult result)
-        {
-            foreach (IdentityError error in result.Errors)
-                ModelState.AddModelError("", error.Description);
-        }
-
-        private async Task<List<string>> GetUserRoles(ClientCompanyApplicationUser user)
-        {
-            return new List<string>(await userManager.GetRolesAsync(user));
-        }
-
-        private bool ClientCompanyExists(string id)
-        {
-            return (_context.ClientCompany?.Any(e => e.ClientCompanyId == id)).GetValueOrDefault();
         }
 
         private void GetCountryStateEdit(ClientCompanyApplicationUser? user)

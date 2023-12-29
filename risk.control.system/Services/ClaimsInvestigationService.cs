@@ -997,6 +997,7 @@ namespace risk.control.system.Services
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.FINISHED).InvestigationCaseStatusId;
                     claim.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR).InvestigationCaseSubStatusId;
+                    claim.Updated = DateTime.UtcNow;
                     _context.ClaimsInvestigation.Update(claim);
 
                     var finalHop = _context.InvestigationTransaction
@@ -1107,7 +1108,7 @@ namespace risk.control.system.Services
                 AgentOcrPicture = report.DocumentIdImage,
                 AgentOcrUrl = report.DocumentIdImagePath,
                 AgentRemarks = report.AgentRemarks,
-                AgentRemarksUpdated = DateTime.UtcNow,
+                AgentRemarksUpdated = report.AssessorRemarksUpdated,
                 AssessorEmail = report.AssessorEmail,
                 AssessorRemarks = report.AssessorRemarks,
                 AssessorRemarkType = report.AssessorRemarkType,

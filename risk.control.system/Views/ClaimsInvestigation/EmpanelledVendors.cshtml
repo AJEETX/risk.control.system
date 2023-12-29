@@ -311,7 +311,7 @@
                         <h3 class="card-title"><i class="fas fa-tasks"></i> Empanelled Agencies</h3>
                     </div>
                     <div class="card-body">
-                        <form id="radioButtons" method="post" asp-action="CaseAllocatedToVendor" enctype="multipart/form-data">
+                        <form id="radioButtons" method="post" asp-controller="ClaimsInvestigationPost" asp-action="CaseAllocatedToVendor" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                             <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
@@ -438,7 +438,7 @@
                             </table>
                             <div class="row">
                                 <div class="col-md-12">
-                                    <a asp-action="Assigner" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+                                    <a asp-controller="ClaimsInvestigation" asp-action="Assigner" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
 
                                     <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
                                         <i class="fas fa-external-link-alt" aria-hidden="true"></i> ALLOCATE 
