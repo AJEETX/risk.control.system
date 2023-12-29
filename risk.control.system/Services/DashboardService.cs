@@ -70,7 +70,7 @@ namespace risk.control.system.Services
 
             var rejectedClaims = claims.Where(c => c.IsReviewCase)?.ToList();
 
-            var creatorActiveClaims = _context.ClaimsInvestigation.Where(c => !openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
+            var creatorActiveClaims = _context.ClaimsInvestigation.Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
             var agencyActiveClaims = activeClaims.Where(c => c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
             c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
             c.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
