@@ -27,19 +27,8 @@
 
                         <div class="small-box bg-info">
                             <div class="inner">
-                                <h3 id="new-claims">@Model.Active</h3>
-                                @{
-                                    if (userRole != null && (userRole.Value.Contains(AppRoles.Assessor.ToString()) 
-                                    || userRole.Value.Contains(AppRoles.Creator.ToString()))
-                                    || userRole.Value.Contains(AppRoles.Assigner.ToString()))
-                                    {
-                                        <p>Active Claims</p>
-                                    }
-                                    else
-                                    {
-                                        <p>New Claims</p>
-                                    }
-                                }
+                                <h3 id="new-claims">@Model.FirstBlockCount</h3>
+                                <p>@Model.FirstBlockName</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -52,8 +41,8 @@
 
                         <div class="small-box bg-success">
                             <div class="inner">
-                                <h3 id="active-claims">@Model.Allocated</h3>
-                                <p>Pending Claims</p>
+                                <h3 id="active-claims">@Model.SecondBlockCount</h3>
+                                <p>@Model.SecondBlockName</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -66,8 +55,8 @@
 
                         <div class="small-box bg-warning">
                             <div class="inner">
-                                <h3 id="submit-claims">@Model.Approved</h3>
-                                <p>Approved Claims</p>
+                                <h3 id="submit-claims">@Model.ThirdBlockCount</h3>
+                                <p>@Model.ThirdBlockName</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
@@ -80,8 +69,8 @@
 
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3 id="approved-claims">@Model.Rejected</h3>
-                                <p>Review Claims</p>
+                                <h3 id="approved-claims">@Model.LastBlockCount</h3>
+                                <p>@Model.LastBlockName</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>

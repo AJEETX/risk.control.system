@@ -2,9 +2,15 @@
 {
     public class DashboardData
     {
-        public int Active { get; set; }
-        public int Allocated { get; set; }
-        public int Rejected { get; set; }
-        public int Approved { get; set; }
+        public string FirstBlockName { get; set; }
+        public int FirstBlockCount { get; set; }
+
+        public string SecondBlockName { get; set; }
+        public int SecondBlockCount { get; set; }
+        public string ThirdBlockName { get; set; }
+        public int ThirdBlockCount { get; set; }
+
+        public string LastBlockName { get; set; }
+        public int LastBlockCount { get; set; }
     }
 }

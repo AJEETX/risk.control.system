@@ -1030,8 +1030,6 @@ function GetWeekly(title, url, container) {
                     totalspent += result[keys[i]];
                     weeklydata.push(arrL);
                 }
-                $('#new-claims').html(totalspent);
-
                 createChartColumn(container, title, weeklydata, titleMessage, totalspent);
             }
         }

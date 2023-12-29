@@ -41,31 +41,78 @@ namespace risk.control.system.Services
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED))?.ToList();
+
+            var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            var submittededToSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+
+            var submittededToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+
+            var reAssigned2AssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
+
             var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
-            var activeClaims = _context.ClaimsInvestigation.Where(c => !openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
+            var activeClaims = _context.ClaimsInvestigation.Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
 
             var claims = _context.ClaimsInvestigation.Where(c => c.CurrentClaimOwner == userEmail).ToList();
 
-            var allocated = claims.Count;
-
-            var active = activeClaims.Count;
-
             var approvedClaims = claims.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
 
-            var approved = approvedClaims.Count;
             var rejectedClaims = claims.Where(c => c.IsReviewCase)?.ToList();
-            var rejected = rejectedClaims.Count;
 
-            return new DashboardData
+            var creatorActiveClaims = _context.ClaimsInvestigation.Where(c => !openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
+            var agencyActiveClaims = activeClaims.Where(c => c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
+            c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+            c.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
+
+            var agentActiveClaims = _context.ClaimsInvestigation.Where(c =>
+            c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
+
+            var submitClaims = _context.ClaimsInvestigation.Where(c =>
+            c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
+
+            var data = new DashboardData();
+
+            if (companyUser != null)
             {
-                Active = active,
-                Approved = approved,
-                Allocated = allocated,
-                Rejected = rejected,
-            };
+                data.FirstBlockName = "Active Claims";
+                data.FirstBlockCount = creatorActiveClaims.Count;
+
+                data.SecondBlockName = "Pending Claims";
+                data.SecondBlockCount = claims.Count;
+
+                data.ThirdBlockName = "Approved Claims";
+                data.ThirdBlockCount = approvedClaims.Count;
+
+                data.LastBlockName = "Review Claims";
+                data.LastBlockCount = rejectedClaims.Count;
+            }
+            else
+            {
+                data.FirstBlockName = "Active Claims";
+                data.FirstBlockCount = agencyActiveClaims.Count;
+
+                data.SecondBlockName = "Pending Claims";
+                data.SecondBlockCount = claims.Count;
+
+                data.ThirdBlockName = "Allocated Claims";
+                data.ThirdBlockCount = agentActiveClaims.Count;
+
+                data.LastBlockName = "Submitted Claims";
+                data.LastBlockCount = submitClaims.Count;
+            }
+
+            return data;
         }
 
         public Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail)
