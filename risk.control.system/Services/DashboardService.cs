@@ -1,8 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Security.Claims;
+
+using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
 
 namespace risk.control.system.Services
 {
@@ -19,6 +22,8 @@ namespace risk.control.system.Services
         Dictionary<string, int> CalculateCaseChart(string userEmail);
 
         TatResult CalculateTimespan(string userEmail);
+
+        DashboardData GetClaimsCount(string userEmail);
     }
 
     public class DashboardService : IDashboardService
@@ -28,6 +33,39 @@ namespace risk.control.system.Services
         public DashboardService(ApplicationDbContext context)
         {
             this._context = context;
+        }
+
+        public DashboardData GetClaimsCount(string userEmail)
+        {
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+
+            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED))?.ToList();
+            var assessorApprovedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
+            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
+
+            var activeClaims = _context.ClaimsInvestigation.Where(c => !openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
+
+            var claims = _context.ClaimsInvestigation.Where(c => c.CurrentClaimOwner == userEmail).ToList();
+
+            var allocated = claims.Count;
+
+            var active = activeClaims.Count;
+
+            var approvedClaims = claims.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+
+            var approved = approvedClaims.Count;
+            var rejectedClaims = claims.Where(c => c.IsReviewCase)?.ToList();
+            var rejected = rejectedClaims.Count;
+
+            return new DashboardData
+            {
+                Active = active,
+                Approved = approved,
+                Allocated = allocated,
+                Rejected = rejected,
+            };
         }
 
         public Dictionary<string, int> CalculateAgencyCaseStatus(string userEmail)

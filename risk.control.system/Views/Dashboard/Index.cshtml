@@ -1,5 +1,6 @@
 ﻿@using System.Security.Claims;
 @using risk.control.system.Helpers;
+@model DashboardData;
 @inject ApplicationDbContext _context
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -10,7 +11,7 @@
     var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
     var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
     var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-
+    var claims = _context.ClaimsInvestigation.Where(c => c.CurrentClaimOwner == userEmail).ToList();
 }
 
 <section class="content pt-2">
@@ -26,8 +27,19 @@
 
                         <div class="small-box bg-info">
                             <div class="inner">
-                                <h3 id="new-claims">..</h3>
-                                <p>Submitted Claims</p>
+                                <h3 id="new-claims">@Model.Active</h3>
+                                @{
+                                    if (userRole != null && (userRole.Value.Contains(AppRoles.Assessor.ToString()) 
+                                    || userRole.Value.Contains(AppRoles.Creator.ToString()))
+                                    || userRole.Value.Contains(AppRoles.Assigner.ToString()))
+                                    {
+                                        <p>Active Claims</p>
+                                    }
+                                    else
+                                    {
+                                        <p>New Claims</p>
+                                    }
+                                }
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
@@ -40,8 +52,8 @@
 
                         <div class="small-box bg-success">
                             <div class="inner">
-                                <h3 id="active-claims">..</h3>
-                                <p>Active Claims</p>
+                                <h3 id="active-claims">@Model.Allocated</h3>
+                                <p>Pending Claims</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars"></i>
@@ -54,8 +66,8 @@
 
                         <div class="small-box bg-warning">
                             <div class="inner">
-                                <h3 id="submit-claims">..</h3>
-                                <p>Submitted Claims</p>
+                                <h3 id="submit-claims">@Model.Approved</h3>
+                                <p>Approved Claims</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
@@ -68,8 +80,8 @@
 
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3 id="approved-claims">0</h3>
-                                <p>Approved Claims</p>
+                                <h3 id="approved-claims">@Model.Rejected</h3>
+                                <p>Review Claims</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>
