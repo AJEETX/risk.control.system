@@ -181,22 +181,22 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
-                                <i class="fas fa-rupee-sign nav-icon"></i>
-                                <p>
-                                    @Applicationsettings.INVESTIGATION_CLAIM ^
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
-                                <i class="fas fa-handshake nav-icon"></i>
-                                <p>
-                                    @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
-                                </p>
-                            </a>
-                        </li>
+                        //<li class="nav-item">
+                        //    <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
+                        //        <i class="fas fa-rupee-sign nav-icon"></i>
+                        //        <p>
+                        //            @Applicationsettings.INVESTIGATION_CLAIM ^
+                        //        </p>
+                        //    </a>
+                        //</li>
+                        //<li class="nav-item">
+                        //    <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
+                        //        <i class="fas fa-handshake nav-icon"></i>
+                        //        <p>
+                        //            @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
+                        //        </p>
+                        //    </a>
+                        //</li>
                         if (User.IsInRole(AppRoles.PortalAdmin.ToString()))
                         {
                             <li class="nav-item">
