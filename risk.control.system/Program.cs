@@ -53,9 +53,9 @@ builder.Services.AddCors(opt =>
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
-    x.MultipartBodyLengthLimit = 1000000; // In case of multipart
-    x.ValueLengthLimit = 1000000; //not recommended value
-    x.MemoryBufferThreshold = 1000000;
+    x.MultipartBodyLengthLimit = 5000000; // In case of multipart
+    x.ValueLengthLimit = 5000000; //not recommended value
+    x.MemoryBufferThreshold = 5000000;
 });
 
 builder.Services.AddHttpContextAccessor();
