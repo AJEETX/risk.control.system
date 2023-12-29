@@ -37,9 +37,6 @@ namespace risk.control.system.Services
 
         public DashboardData GetClaimsCount(string userEmail)
         {
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED))?.ToList();
 
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -62,34 +59,36 @@ namespace risk.control.system.Services
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR);
             var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
 
-            var activeClaims = _context.ClaimsInvestigation.Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
-
-            var claims = _context.ClaimsInvestigation.Where(c => c.CurrentClaimOwner == userEmail).ToList();
-
-            var approvedClaims = claims.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
-
-            var rejectedClaims = claims.Where(c => c.IsReviewCase)?.ToList();
-
-            var creatorActiveClaims = _context.ClaimsInvestigation.Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
-            var agencyActiveClaims = activeClaims.Where(c => c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
-            c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
-            c.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
-
-            var agentActiveClaims = _context.ClaimsInvestigation.Where(c =>
-            c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
-
-            var submitClaims = _context.ClaimsInvestigation.Where(c =>
-            c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
+            var companyUser = _context.ClientCompanyApplicationUser
+                .Include(c => c.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
+            var vendorUser = _context.VendorApplicationUser
+                .Include(v => v.Vendor).FirstOrDefault(c => c.Email == userEmail);
 
             var data = new DashboardData();
 
             if (companyUser != null)
             {
+                var pendinClaims = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId) && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId).ToList();
+
+                var approvedClaims = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+
+                var rejectedClaims = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Where(c => c.IsReviewCase && openStatusesIds.Contains(c.InvestigationCaseStatusId) && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+
+                var creatorActiveClaims = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+
                 data.FirstBlockName = "Active Claims";
                 data.FirstBlockCount = creatorActiveClaims.Count;
 
                 data.SecondBlockName = "Pending Claims";
-                data.SecondBlockCount = claims.Count;
+                data.SecondBlockCount = pendinClaims.Count;
 
                 data.ThirdBlockName = "Approved Claims";
                 data.ThirdBlockCount = approvedClaims.Count;
@@ -99,15 +98,33 @@ namespace risk.control.system.Services
             }
             else
             {
+                var activeClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations)
+                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
+                var agencyActiveClaims = activeClaims.Where(c =>
+                (c.CaseLocations?.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
+                (c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
+                c.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId))?.ToList();
+
                 data.FirstBlockName = "Active Claims";
                 data.FirstBlockCount = agencyActiveClaims.Count;
 
+                var pendinClaims = _context.ClaimsInvestigation
+                     .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId)).ToList();
+
                 data.SecondBlockName = "Pending Claims";
-                data.SecondBlockCount = claims.Count;
+                data.SecondBlockCount = pendinClaims.Count;
+
+                var agentActiveClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations).Where(c =>
+                (c.CaseLocations.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
+                c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
 
                 data.ThirdBlockName = "Allocated Claims";
                 data.ThirdBlockCount = agentActiveClaims.Count;
 
+                var submitClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations).Where(c =>
+                (c.CaseLocations.Count() > 0 && c.CaseLocations.Any(l => l.VendorId == vendorUser.VendorId)) &&
+                    c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
                 data.LastBlockName = "Submitted Claims";
                 data.LastBlockCount = submitClaims.Count;
             }
