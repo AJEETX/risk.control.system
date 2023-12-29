@@ -26,7 +26,7 @@ namespace risk.control.system.Controllers
             var userEmail = HttpContext.User?.Identity?.Name;
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
 
-            var model = dashboardService.GetClaimsCount(userEmail);
+            var model = dashboardService.GetClaimsCount(userEmail, userRole.Value);
 
             return View(model);
         }

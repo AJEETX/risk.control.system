@@ -2,6 +2,8 @@
 
 using Microsoft.EntityFrameworkCore;
 
+using Newtonsoft.Json.Linq;
+
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
@@ -23,7 +25,7 @@ namespace risk.control.system.Services
 
         TatResult CalculateTimespan(string userEmail);
 
-        DashboardData GetClaimsCount(string userEmail);
+        DashboardData GetClaimsCount(string userEmail, string role);
     }
 
     public class DashboardService : IDashboardService
@@ -35,7 +37,7 @@ namespace risk.control.system.Services
             this._context = context;
         }
 
-        public DashboardData GetClaimsCount(string userEmail)
+        public DashboardData GetClaimsCount(string userEmail, string role)
         {
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED))?.ToList();
 
@@ -70,22 +72,52 @@ namespace risk.control.system.Services
             {
                 var pendinClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
-                    .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId) && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId).ToList();
+                    .Where(c => c.CurrentClaimOwner == userEmail && openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId).ToList();
 
                 var approvedClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
-                    .Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+                    .Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId &&
+                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
 
                 var rejectedClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
-                    .Where(c => c.IsReviewCase && openStatusesIds.Contains(c.InvestigationCaseStatusId) && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+                    .Where(c => c.IsReviewCase && openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
 
-                var creatorActiveClaims = _context.ClaimsInvestigation
+                var activeCount = 0;
+
+                if (role.Contains(AppRoles.Creator.ToString()) && companyUser.ClientCompany.AutoAllocation)
+                {
+                    var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
-                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) && c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+                    activeCount = creatorActiveClaims.Count;
+                }
+
+                if (role.Contains(AppRoles.Assigner.ToString()) && !companyUser.ClientCompany.AutoAllocation)
+                {
+                    var creatorActiveClaims = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+                    c.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId &&
+                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId)?.ToList();
+                    activeCount = creatorActiveClaims.Count;
+                }
+                if (role.Contains(AppRoles.Assessor.ToString()))
+                {
+                    var creatorActiveClaims = _context.ClaimsInvestigation
+                    .Include(c => c.PolicyDetail)
+                    .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId) &&
+                    c.PolicyDetail.ClientCompanyId == companyUser.ClientCompany.ClientCompanyId &&
+                    c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
+                    )?.ToList();
+                    activeCount = creatorActiveClaims.Count;
+                }
 
                 data.FirstBlockName = "Active Claims";
-                data.FirstBlockCount = creatorActiveClaims.Count;
+                data.FirstBlockCount = activeCount;
 
                 data.SecondBlockName = "Pending Claims";
                 data.SecondBlockCount = pendinClaims.Count;
