@@ -87,7 +87,7 @@ namespace risk.control.system.Services
 
                 var activeCount = 0;
 
-                if (role.Contains(AppRoles.Creator.ToString()) && companyUser.ClientCompany.AutoAllocation)
+                if (role.Contains(AppRoles.CompanyAdmin.ToString()) || role.Contains(AppRoles.Creator.ToString()))
                 {
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
@@ -96,7 +96,7 @@ namespace risk.control.system.Services
                     activeCount = creatorActiveClaims.Count;
                 }
 
-                if (role.Contains(AppRoles.Assigner.ToString()) && !companyUser.ClientCompany.AutoAllocation)
+                if (role.Contains(AppRoles.Assigner.ToString()) && !role.Contains(AppRoles.Creator.ToString()))
                 {
                     var creatorActiveClaims = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
