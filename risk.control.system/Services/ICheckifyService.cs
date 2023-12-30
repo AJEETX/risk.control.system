@@ -7,6 +7,9 @@ using System.Net.Http;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Controllers.Api;
 using risk.control.system.Data;
+using risk.control.system.AppConstant;
+using System.Net;
+using System.Runtime.Serialization.Json;
 
 namespace risk.control.system.Services
 {
@@ -137,10 +140,7 @@ namespace risk.control.system.Services
             {
                 claimCase.ClaimReport.DigitalIdLongLatTime = DateTime.UtcNow;
                 claimCase.ClaimReport.DigitalIdLongLat = data.LocationLongLat;
-            }
 
-            if (!string.IsNullOrWhiteSpace(claimCase.ClaimReport.DigitalIdLongLat))
-            {
                 var longLat = claimCase.ClaimReport.DigitalIdLongLat.IndexOf("/");
                 var latitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
                 var longitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
@@ -153,6 +153,27 @@ namespace risk.control.system.Services
                     $"\r\n" +
                     $"\r\nElevation(sea level):{weatherData.elevation} metres";
                 claimCase.ClaimReport.DigitalIdImageData = weatherCustomData;
+
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
+                claimCase.ClaimReport.DigitalIdImageLocationUrl = url;
+                RootObject rootObject = getAddress((latitude), (longitude));
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Longitude);
+                }
+                else
+                {
+                    registeredLatitude = Convert.ToDouble(claimCase.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimCase.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                var address = rootObject.display_name;
+
+                claimCase.ClaimReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
 
             _context.CaseLocation.Update(claimCase);
@@ -192,6 +213,17 @@ namespace risk.control.system.Services
             MemoryStream ms = new MemoryStream(data);
             System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
             return returnImage;
+        }
+
+        public static RootObject getAddress(string lat, string lon)
+        {
+            WebClient webClient = new WebClient();
+            webClient.Headers.Add("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
+            webClient.Headers.Add("Referer", "http://www.icheckify.co.in");
+            var jsonData = webClient.DownloadData("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + lat + "&lon=" + lon);
+            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
+            RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
+            return rootObject;
         }
 
         public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
@@ -331,6 +363,26 @@ namespace risk.control.system.Services
             {
                 claimCase.ClaimReport.DocumentIdImageLongLat = data.OcrLongLat;
                 claimCase.ClaimReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
+                var longLat = claimCase.ClaimReport.DocumentIdImageLongLat.IndexOf("/");
+                var latitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var latLongString = latitude + "," + longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
+                claimCase.ClaimReport.DocumentIdImageLocationUrl = url;
+                RootObject rootObject = getAddress((latitude), (longitude));
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Longitude);
+                }
+
+                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                var address = rootObject.display_name;
+
+                claimCase.ClaimReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
 
             _context.CaseLocation.Update(claimCase);

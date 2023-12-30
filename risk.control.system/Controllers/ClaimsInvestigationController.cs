@@ -45,11 +45,13 @@ namespace risk.control.system.Controllers
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
+        private readonly IClaimsInvestigationReportService investigationReportService;
         private readonly IClaimPolicyService claimPolicyService;
         private static HttpClient httpClient = new();
 
         public ClaimsInvestigationController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
+            IClaimsInvestigationReportService investigationReportService,
             IFtpService ftpService,
             IHttpClientService httpClientService,
             IClaimsInvestigationService claimsInvestigationService,
@@ -70,6 +72,7 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
+            this.investigationReportService = investigationReportService;
             this.toastNotification = toastNotification;
         }
 
@@ -303,111 +306,9 @@ namespace risk.control.system.Controllers
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
 
-            var claimsInvestigation = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.Vendor)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
-            var submittedToAssessorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var claimCase = _context.CaseLocation
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.PinCode)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.ClaimReport)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
-                .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
-                && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
-            );
+            var model = await investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
 
-            if (claimCase.ClaimReport.DigitalIdLongLat != null)
-            {
-                var longLat = claimCase.ClaimReport.DigitalIdLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-                var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DigitalIdImageLocationUrl = url;
-                RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
-                double registeredLatitude = 0;
-                double registeredLongitude = 0;
-                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
-                }
-                else
-                {
-                    registeredLatitude = Convert.ToDouble(claimCase.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimCase.PinCode.Longitude);
-                }
-                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
-
-                var address = rootObject.display_name;
-
-                claimCase.ClaimReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-            }
-            else
-            {
-                RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
-                claimCase.ClaimReport.DigitalIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-                claimCase.ClaimReport.DigitalIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
-            }
-            if (claimCase.ClaimReport.DocumentIdImageLongLat != null)
-            {
-                var longLat = claimCase.ClaimReport.DocumentIdImageLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-                var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DocumentIdImageLocationUrl = url;
-                RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
-                double registeredLatitude = 0;
-                double registeredLongitude = 0;
-                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
-                }
-                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
-
-                var address = rootObject.display_name;
-
-                claimCase.ClaimReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-            }
-            else
-            {
-                RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
-                claimCase.ClaimReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-                claimCase.ClaimReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
-            }
-
-            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
+            return View(model);
         }
 
         [Breadcrumb(title: "Report", FromAction = "Approved")]
@@ -417,135 +318,7 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-
-            var caseLogs = await _context.InvestigationTransaction
-                .Include(i => i.InvestigationCaseStatus)
-                .Include(i => i.InvestigationCaseSubStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.CaseLocations)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseSubStatus)
-                .Where(t => t.ClaimsInvestigationId == selectedcase)
-                .OrderByDescending(c => c.HopCount)?.ToListAsync();
-
-            var claimsInvestigation = await _context.ClaimsInvestigation
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.ClientCompany)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CaseEnabler)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.BeneficiaryRelation)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.Country)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.District)
-              .Include(c => c.InvestigationCaseStatus)
-              .Include(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.InvestigationServiceType)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.LineOfBusiness)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State)
-                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
-
-            var location = await _context.CaseLocation
-                .Include(l => l.ClaimReport)
-                .Include(l => l.Vendor)
-                .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
-
-            if (claimsInvestigation == null)
-            {
-                return NotFound();
-            }
-            var model = new ClaimTransactionModel
-            {
-                Claim = claimsInvestigation,
-                Log = caseLogs,
-                Location = location
-            };
-
-            if (location.ClaimReport.DigitalIdLongLat != null)
-            {
-                var longLat = location.ClaimReport.DigitalIdLongLat.IndexOf("/");
-                var latitude = location.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
-                var longitude = location.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "");
-                var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                location.ClaimReport.DigitalIdImageLocationUrl = url;
-                RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
-                double registeredLatitude = 0;
-                double registeredLongitude = 0;
-                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
-                }
-                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
-
-                var address = rootObject.display_name;
-
-                location.ClaimReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-            }
-            else
-            {
-                RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
-                location.ClaimReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : "12 Heathcote Drive Forest Hill VIC 3131";
-                location.ClaimReport.DigitalIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
-            }
-            if (location.ClaimReport.DocumentIdImageLongLat != null)
-            {
-                var longLat = location.ClaimReport.DocumentIdImageLongLat.IndexOf("/");
-                var latitude = location.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = location.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "");
-                var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                location.ClaimReport.DocumentIdImageLocationUrl = url;
-                RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
-
-                double registeredLatitude = 0;
-                double registeredLongitude = 0;
-                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
-                }
-                else
-                {
-                    registeredLatitude = Convert.ToDouble(value: location.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(location.PinCode.Longitude);
-                }
-                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
-
-                var address = rootObject.display_name;
-
-                location.ClaimReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-            }
-            else
-            {
-                RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
-                location.ClaimReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-                location.ClaimReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
-            }
-
-            var serviceCost = location.Vendor;
-            var vendor = _context.Vendor.Include(v => v.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == location.VendorId);
-
-            var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
-            if (investigationServiced != null)
-            {
-                model.Price = investigationServiced.Price;
-            }
+            var model = await investigationReportService.GetApprovedReport(selectedcase);
             return View(model);
         }
 
