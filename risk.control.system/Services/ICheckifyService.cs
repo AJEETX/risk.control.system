@@ -7,6 +7,7 @@ using System.Net.Http;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Controllers.Api;
 using risk.control.system.Data;
+using risk.control.system.AppConstant;
 
 namespace risk.control.system.Services
 {
@@ -153,6 +154,8 @@ namespace risk.control.system.Services
                     $"\r\n" +
                     $"\r\nElevation(sea level):{weatherData.elevation} metres";
                 claimCase.ClaimReport.DigitalIdImageData = weatherCustomData;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
+                claimCase.ClaimReport.DigitalIdImageLocationUrl = url;
             }
 
             _context.CaseLocation.Update(claimCase);
@@ -331,6 +334,12 @@ namespace risk.control.system.Services
             {
                 claimCase.ClaimReport.DocumentIdImageLongLat = data.OcrLongLat;
                 claimCase.ClaimReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
+                var longLat = claimCase.ClaimReport.DocumentIdImageLongLat.IndexOf("/");
+                var latitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var latLongString = latitude + "," + longitude;
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
+                claimCase.ClaimReport.DocumentIdImageLocationUrl = url;
             }
 
             _context.CaseLocation.Update(claimCase);
