@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers
 
         // GET: CaseLocations/Create
         //[Breadcrumb("Create", FromController = typeof(ClaimsInvestigationController), FromAction = "Details")]
-        [Breadcrumb("Location", FromController = typeof(ClaimsInvestigationController), FromAction = "Draft")]
+        [Breadcrumb("Add Beneficiary", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public IActionResult Create(string id)
         {
             var claim = _context.ClaimsInvestigation
@@ -122,15 +122,6 @@ namespace risk.control.system.Controllers
                 BeneficiaryContactNumber = random.NextInt64(5555555555, 9999999999),
             };
 
-            var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
-            var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
-
-            var incompleteClaim = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", "Details") { Parent = incompleteClaims, RouteValues = new { id = id } };
-
-            var locationPage = new MvcBreadcrumbNode("Add", "CaseLocations", "Add Beneficiary") { Parent = incompleteClaim, RouteValues = new { id = id } };
-
-            ViewData["BreadcrumbNode"] = locationPage;
-
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == countryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == stateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == districtId).OrderBy(d => d.Name);
@@ -143,9 +134,6 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        // POST: CaseLocations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string claimId, CaseLocation caseLocation)
@@ -204,7 +192,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseLocations/Edit/5
-        [Breadcrumb("Edit ")]
+        [Breadcrumb("Edit Beneficiary", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null || _context.CaseLocation == null)
@@ -236,13 +224,6 @@ namespace risk.control.system.Controllers
 
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation.OrderBy(s => s.Code), "BeneficiaryRelationId", "Name", caseLocation.BeneficiaryRelationId);
 
-            var activeClaims = new MvcBreadcrumbNode("Index", "ClaimsInvestigation", "Claims");
-            var incompleteClaims = new MvcBreadcrumbNode("Draft", "ClaimsInvestigation", "Draft") { Parent = activeClaims };
-
-            var incompleteClaim = new MvcBreadcrumbNode("Details", "ClaimsInvestigation", "Details") { Parent = incompleteClaims, RouteValues = new { id = id } };
-
-            var locationPage = new MvcBreadcrumbNode("Add", "CaseLocations", "Edit Beneficiary") { Parent = incompleteClaim, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = locationPage;
             return View(services);
         }
 

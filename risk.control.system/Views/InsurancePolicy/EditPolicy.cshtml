@@ -1,27 +1,28 @@
 ﻿@model risk.control.system.Models.ClaimsInvestigation
 
 @{
-    ViewData["Title"] = @Applicationsettings.CREATE;
+    ViewData["Title"] = "Edit";
     var hasClientCompany = @Model.HasClientCompany ? "none" : "";
     Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }
-
 <section class="content pt-2">
     <div class="container-fluid ">
         <div class="row">
             <div class="col-md-12">
-                <form id="create-form" asp-controller="ClaimsInvestigationPost" method="post" asp-action="CreatePolicy" enctype="multipart/form-data">
+                <form id="create-form" asp-controller="ClaimsInvestigationPost" method="post" asp-action="EditPolicy" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="ClaimsInvestigationId" />
+                    <input type="hidden" asp-for="InvestigationCaseSubStatusId" />
+                    <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen-alt"></i> Add New</h3>
+                            <h3 class="card-title"><i class="fas fa-pen-alt"></i> Edit New</h3>
                         </div>
-                        <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
                         <div class="card-body">
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name"> <i class="far fa-file-powerpoint"></i> Add Policy </h5>
+                                        <h5 class="bb-blog-title" itemprop="name"> <i class="far fa-file-powerpoint"></i> Edit Policy </h5>
                                     </header>
 
                                     <div class="card card-solid">
@@ -45,16 +46,17 @@
                                                         <i class="far fa-file-powerpoint"></i> Policy Details <i class="far fa-file-powerpoint"></i>
                                                     </div>
                                                     <div class="card-body pt-0">
+
                                                         <div class="row">
                                                             <div class="col-sm-6">
-                                                                
+
                                                                 <div class="form-group">
                                                                     <span class="input-group-label"> Policy #:</span>
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
-                                                                            <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                                                            <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control" type="text" placeholder="Policy #" maxlength="20" value="POLX1001" />
+                                                                        <input id="contractnum" required asp-for="PolicyDetail.ContractNumber" class="form-control" type="text" placeholder="Policy #" maxlength="20" />
                                                                         <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -64,7 +66,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-rupee-sign"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control" type="text" placeholder="Insured Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" value="900001" min="1" maxlength="10" />
+                                                                        <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control" type="text" placeholder="Enter Insured Amount" min="1" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                                                         <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
@@ -74,13 +76,11 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="ContractIssueDate"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        @{
-                                                                            var maxDate = @DateTime.Now.ToString("dd-MM-yyyy");
-                                                                        }
-                                                                        <input required asp-for="PolicyDetail.ContractIssueDate" id="dateContractId" class="form-control date-width" min="2000-01-01" max="@maxDate" type="date" />
+                                                                        <input required asp-for="PolicyDetail.ContractIssueDate" id="dateContractId" class="form-control" type="date" />
                                                                         <span asp-validation-for="PolicyDetail.ContractIssueDate" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
+
                                                                 <div class="form-group">
                                                                     <span class="input-group-label"> Claim Type:</span>
                                                                     <div class="input-group mb-3">
@@ -99,7 +99,7 @@
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                                                                         </div>
-                                                                        <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                                                        <select required id="InvestigationServiceTypeId" asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
                                                                             <option value="">--- SELECT ---</option>
                                                                         </select>
                                                                         <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
@@ -108,9 +108,8 @@
 
                                                             </div>
                                                             <div class="col-sm-6">
-                                                                
+                                                                <span class="input-group-label"> Incident Date:</span>
                                                                 <div class="form-group">
-                                                                    <span class="input-group-label"> Incident Date:</span>
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="DateOfIncident"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
@@ -119,8 +118,7 @@
                                                                         <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
-                                                                
-                                                                
+
 
 
                                                                 <div class="form-group">
@@ -133,7 +131,7 @@
                                                                         <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
-                                                                
+
                                                                 <div class="form-group">
                                                                     <span class="input-group-label"> Reason To Verify:</span>
                                                                     <div class="input-group mb-3">
@@ -146,40 +144,49 @@
                                                                         <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
-                                                                
+
                                                                 <div class="form-group">
                                                                     <span class="input-group-label"> Budget Centre:</span>
                                                                     <div class="input-group mb-3">
                                                                         <div class="input-group-prepend">
                                                                             <span class="input-group-text" asp-for="CostCentreId"><i class="nav-icon fas fa-money-check-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                                         </div>
-                                                                        <select required asp-for="PolicyDetail.CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
+                                                                        <select required asp-for="PolicyDetail.CostCentreId" class="form-control" asp-items="@ViewBag.CostCentreId">
                                                                             <option value="">--- SELECT ---</option>
                                                                         </select>
                                                                         <span asp-validation-for="PolicyDetail.CostCentreId" class="text-danger"></span>
                                                                     </div>
                                                                 </div>
+
+
                                                                 <div class="form-group">
                                                                     <span class="input-group-label"> Policy Document:</span>
                                                                     <div class="input-group mb-3">
-                                                                        
-                                                                        <img class="form-Image" id="policyImage" src="/img/no-document.png">
-                                                                        <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control" id="documentImageInput" onchange="document.getElementById('policyImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                                        @if (Model?.PolicyDetail.DocumentImage is not null)
+                                                                        {
+                                                                            <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.PolicyDetail.DocumentImage))">
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <img id="profileImage" class="form-Image" src="/img/no-policy.jpg">
+                                                                        }
+                                                                        <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
                                                                     </div>
                                                                 </div>
+
+
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="card-footer">
                                                         <div class="text-right">
-                                                            <a asp-controller="CreateClaims" asp-action="CreateClaim" class="btn btn-secondary">
+                                                            <a asp-controller="ClaimsInvestigation" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
                                                                 <i class="fa fa-window-close"></i>
                                                                 @Applicationsettings.CANCEL
                                                             </a>
-                                                            <button type="submit" class="btn btn-success">
-                                                                <i class="far fa-file-powerpoint"></i> Add Policy
+                                                            <button type="submit" class="btn btn-warning">
+                                                                <i class="far fa-file-powerpoint"></i> Edit Policy
                                                             </button>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -195,11 +202,10 @@
         </div>
     </div>
 </section>
-
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/policy.js"></script>
+    <script src="~/js/edit-policy.js"></script>
+
 }
