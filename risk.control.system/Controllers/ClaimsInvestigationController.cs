@@ -351,8 +351,6 @@ namespace risk.control.system.Controllers
                 var latitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
                 var longitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DigitalIdImageLocationUrl = url;
                 RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
                 double registeredLatitude = 0;
                 double registeredLongitude = 0;
@@ -384,8 +382,7 @@ namespace risk.control.system.Controllers
                 var latitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
                 var longitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DocumentIdImageLocationUrl = url;
+
                 RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
                 double registeredLatitude = 0;
                 double registeredLongitude = 0;
@@ -405,6 +402,10 @@ namespace risk.control.system.Controllers
                 RootObject rootObject = await httpClientService.GetAddress("-37.839542", "145.164834");
                 claimCase.ClaimReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 claimCase.ClaimReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
+            }
+            if (claimsInvestigation.IsReviewCase)
+            {
+                claimCase.ClaimReport.AssessorRemarks = null;
             }
 
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
@@ -481,8 +482,6 @@ namespace risk.control.system.Controllers
                 var latitude = location.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
                 var longitude = location.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "");
                 var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                location.ClaimReport.DigitalIdImageLocationUrl = url;
                 RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
                 double registeredLatitude = 0;
                 double registeredLongitude = 0;
@@ -509,8 +508,6 @@ namespace risk.control.system.Controllers
                 var latitude = location.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
                 var longitude = location.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "");
                 var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                location.ClaimReport.DocumentIdImageLocationUrl = url;
                 RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
 
                 double registeredLatitude = 0;

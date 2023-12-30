@@ -112,8 +112,6 @@ namespace risk.control.system.Controllers
                 var longitude = location.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
 
                 var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                location.ClaimReport.DigitalIdImageLocationUrl = url;
                 RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
 
                 double registeredLatitude = 0;
@@ -146,8 +144,6 @@ namespace risk.control.system.Controllers
                 var latitude = location.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
                 var longitude = location.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                location.ClaimReport.DocumentIdImageLocationUrl = url;
                 RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
 
                 double registeredLatitude = 0;

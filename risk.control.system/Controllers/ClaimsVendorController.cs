@@ -782,7 +782,10 @@ namespace risk.control.system.Controllers
                 RootObject rootObject = getAddress("-37.839542", "145.164834");
                 claimCase.ClaimReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
             }
-
+            if (claimsInvestigation.IsReviewCase)
+            {
+                claimCase.ClaimReport.SupervisorRemarks = null;
+            }
             return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
 
