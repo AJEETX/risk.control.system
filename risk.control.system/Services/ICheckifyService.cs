@@ -61,6 +61,7 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation
             .Include(c => c.PolicyDetail)
             .Include(c => c.CustomerDetail)
+            .ThenInclude(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
@@ -156,6 +157,25 @@ namespace risk.control.system.Services
                 claimCase.ClaimReport.DigitalIdImageData = weatherCustomData;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
                 claimCase.ClaimReport.DigitalIdImageLocationUrl = url;
+
+                var rootObject = await httpClientService.GetAddress((latitude), (longitude));
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Longitude);
+                }
+                else
+                {
+                    registeredLatitude = Convert.ToDouble(claimCase.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claimCase.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                var address = rootObject.display_name;
+
+                claimCase.ClaimReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
 
             _context.CaseLocation.Update(claimCase);
@@ -218,6 +238,7 @@ namespace risk.control.system.Services
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
 
             var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
@@ -340,6 +361,19 @@ namespace risk.control.system.Services
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=100x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
                 claimCase.ClaimReport.DocumentIdImageLocationUrl = url;
+                RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
+                double registeredLatitude = 0;
+                double registeredLongitude = 0;
+                if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                {
+                    registeredLatitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Latitude);
+                    registeredLongitude = Convert.ToDouble(claim.CustomerDetail.PinCode.Longitude);
+                }
+                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
+
+                var address = rootObject.display_name;
+
+                claimCase.ClaimReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
 
             _context.CaseLocation.Update(claimCase);

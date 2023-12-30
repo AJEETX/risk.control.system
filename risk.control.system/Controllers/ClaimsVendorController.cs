@@ -722,66 +722,6 @@ namespace risk.control.system.Controllers
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            if (claimCase.ClaimReport.DigitalIdLongLat != null)
-            {
-                var longLat = claimCase.ClaimReport.DigitalIdLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-                var latLongString = latitude + "," + longitude;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DigitalIdImageLocationUrl = url;
-                RootObject rootObject = getAddress((latitude), (longitude));
-                double registeredLatitude = 0;
-                double registeredLongitude = 0;
-                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
-                }
-                else
-                {
-                    registeredLatitude = Convert.ToDouble(claimCase.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimCase.PinCode.Longitude);
-                }
-                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
-
-                var address = rootObject.display_name;
-
-                claimCase.ClaimReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-            }
-            else
-            {
-                RootObject rootObject = getAddress("-37.839542", "145.164834");
-                claimCase.ClaimReport.DigitalIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-            }
-
-            if (claimCase.ClaimReport.DocumentIdImageLongLat != null)
-            {
-                var longLat = claimCase.ClaimReport.DocumentIdImageLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
-                var latLongString = latitude + "," + longitude;
-
-                RootObject rootObject = getAddress((latitude), (longitude));
-                double registeredLatitude = 0;
-                double registeredLongitude = 0;
-                if (claimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                {
-                    registeredLatitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Latitude);
-                    registeredLongitude = Convert.ToDouble(claimsInvestigation.CustomerDetail.PinCode.Longitude);
-                }
-
-                var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
-
-                var address = rootObject.display_name;
-
-                claimCase.ClaimReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
-            }
-            else
-            {
-                RootObject rootObject = getAddress("-37.839542", "145.164834");
-                claimCase.ClaimReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-            }
             if (claimsInvestigation.IsReviewCase)
             {
                 claimCase.ClaimReport.SupervisorRemarks = null;
