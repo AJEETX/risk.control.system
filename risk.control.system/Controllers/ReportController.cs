@@ -28,7 +28,7 @@ namespace risk.control.system.Controllers
             _httpClient = new HttpClient();
         }
 
-        [Breadcrumb(title: " Report", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Completed", FromController = typeof(ClaimsInvestigationController))]
         public IActionResult Index()
         {
             return View();

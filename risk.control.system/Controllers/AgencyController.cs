@@ -15,7 +15,6 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Manage Agency ")]
     public class AgencyController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -44,7 +43,14 @@ namespace risk.control.system.Controllers
             UserList = new List<UsersViewModel>();
         }
 
+        [Breadcrumb("Admin Settings ")]
         public async Task<IActionResult> Index()
+        {
+            return RedirectToAction("Profile");
+        }
+
+        [Breadcrumb("Agency Profile ", FromAction = "Index")]
+        public async Task<IActionResult> Profile()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -174,7 +180,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb("Add User", FromAction = "User")]
+        [Breadcrumb("Add User")]
         public IActionResult CreateUser()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -466,7 +472,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb("Add Service", FromAction = "Service")]
+        [Breadcrumb("Add Service")]
         public IActionResult CreateService()
         {
             var userEmail = HttpContext.User?.Identity?.Name;

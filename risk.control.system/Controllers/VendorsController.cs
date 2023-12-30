@@ -29,8 +29,14 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors
-        [Breadcrumb("All Agencies")]
-        public async Task<IActionResult> Index()
+        [Breadcrumb("Manage Agency(s)")]
+        public IActionResult Index()
+        {
+            return RedirectToAction("Agencies");
+        }
+
+        [Breadcrumb("Agencies", FromAction = "Index")]
+        public IActionResult Agencies()
         {
             return View();
         }
@@ -52,7 +58,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Details/5
-        [Breadcrumb(" Manage Agency")]
+        [Breadcrumb(" Manage Agency",FromAction ="Agencies")]
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -89,7 +95,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        [Breadcrumb("Manage Service")]
+        [Breadcrumb("Manage Service", FromAction = "Agencies")]
         public async Task<IActionResult> Service(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -98,10 +104,10 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             ViewData["vendorId"] = id;
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Services") { Parent = agencyPage, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = editPage;
+            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
+            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Services") { Parent = agencyPage, RouteValues = new { id = id } };
+            //ViewData["BreadcrumbNode"] = editPage;
 
             return View();
         }
@@ -166,7 +172,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        // GET: Vendors/Edit/5
+        [Breadcrumb(" Edit Agency", FromAction = "Agencies")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -190,10 +196,10 @@ namespace risk.control.system.Controllers
             ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
             ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit Agency") { Parent = agencyPage, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = editPage;
+            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            //var editPage = new MvcBreadcrumbNode("Edit", "Vendors", $"Edit Agency") { Parent = agencyPage, RouteValues = new { id = id } };
+            //ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendor);
         }

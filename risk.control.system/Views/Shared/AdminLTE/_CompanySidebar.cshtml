@@ -346,7 +346,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","Index") @Url.MakeActiveClass("CompanyUserRoles","") ">
+                            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","") @Url.MakeActiveClass("CompanyUserRoles","") ">
                                 <i class="nav-icon fas fa-shield-alt"></i>
                                 <p class="sidebar-menu-header-label">
                                     MANAGE COMPANY
@@ -355,7 +355,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Company" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Company","Index")
+                            <a is-active-page asp-controller="Company" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Company","CompanyProfile")
                                         @Url.MakeActiveClass("Company","Edit") @Url.MakeActiveClass("CompanyUserRoles","")">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>
@@ -393,11 +393,11 @@
                         </li>
                         
                         <li class="nav-item">
-                            <a is-active-page asp-controller="Vendors" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Index") @Url.MakeActiveClass("Vendors","Details")
+                            <a is-active-page asp-controller="Vendors" asp-action="Agencies" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Agencies") @Url.MakeActiveClass("Vendors","Details")
                                 @Url.MakeActiveClass("Vendors","Edit") @Url.MakeActiveClass("Vendors","Service") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
                                 <i class="nav-icon fa fa-binoculars"></i>
                                 <p>
-                                    All Agencies
+                                    Agencies
                                 </p>
                             </a>
                         </li>
