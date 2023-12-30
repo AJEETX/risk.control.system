@@ -128,7 +128,7 @@ namespace risk.control.system.Services
                 data.LastBlockName = "Review Claims";
                 data.LastBlockCount = rejectedClaims.Count;
             }
-            else
+            else if (vendorUser != null)
             {
                 var activeClaims = _context.ClaimsInvestigation.Include(c => c.CaseLocations)
                     .Where(c => openStatusesIds.Contains(c.InvestigationCaseStatusId))?.ToList();
