@@ -174,8 +174,7 @@ namespace risk.control.system.Controllers.Api
             if (!string.IsNullOrEmpty(search))
             {
                 applicationUsers = await context.ApplicationUser.Where(s =>
-                   (!string.IsNullOrEmpty(search) && s.Email.ToLower().Contains(search.Trim().ToLower()))
-                   || true
+                   (!string.IsNullOrEmpty(search) && s.Email.ToLower().StartsWith(search.Trim().ToLower()))
                 ).ToListAsync();
             }
             return Ok(applicationUsers?.Select(a => a.Email).OrderBy(s => s).ToList());

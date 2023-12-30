@@ -19,11 +19,7 @@
                                     <div class="col-md-6">
                                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <input type="hidden" asp-for="VendorInvestigationServiceTypeId" />
-                                        <div style="display:none" class="form-group">
-                                            <label asp-for="VendorId" class="control-label"></label>
-                                            <input asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
-                                            <span asp-validation-for="VendorId" class="text-danger"></span>
-                                        </div>
+                                            <input type="hidden" asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
                                         <div class="form-group">
                                             <span class="input-group-label"> Line Of Business:</span>
                                             <div class="input-group mb-3">

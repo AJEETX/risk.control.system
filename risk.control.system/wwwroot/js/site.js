@@ -52,8 +52,8 @@ $(document).ready(function () {
     $("#receipient-email").autocomplete({
         source: function (request, response) {
             $.ajax({
-                url: "/MasterData/GetUserBySearch",
-                type: "POST",
+                url: "/api/MasterData/GetUserBySearch",
+                type: "GET",
                 data: { search: request.term },
                 success: function (data) {
                     response($.map(data, function (item) {

@@ -980,3 +980,6 @@ a.CaseReadyToAssign {
 #dataTbl tbody {
     overflow-y: auto;
 }
+.bookmark-green {
+    font-size: 1.1rem;
+}
