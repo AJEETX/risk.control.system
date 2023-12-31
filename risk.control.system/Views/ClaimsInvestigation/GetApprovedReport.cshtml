@@ -651,6 +651,12 @@
                                                                             </span>
                                                                             Reason: @Model.Claim?.PolicyDetail.CaseEnabler.Name;
                                                                         </li>
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-sun"></i>
+                                                                            </span>
+                                                                            Total Amount Rs: @Model.VendorInvoice.GrandTotal;
+                                                                        </li>
                                                                        
                                                                     </ul>
                                                                 </div>
@@ -658,8 +664,8 @@
                                                         </div>
                                                         <div class="card-footer">
                                                             <div class="text-right">
-                                                                <a class="btn btn-sm bg-teal">
-                                                                    <i class="fas fa-money-bill-wave"> Rs. @Model.VendorInvoice?.GrandTotal</i>
+                                                                <a class="btn btn-sm bg-teal" asp-action="ShowInvoice" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
+                                                                    <i class="fa fa-print"> Print Invoice</i>
                                                                 </a>
                                                             </div>
                                                         </div>

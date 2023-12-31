@@ -174,7 +174,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb(title: "Invoice", FromAction = "Approved")]
+        [Breadcrumb(title: "Invoice", FromAction = "GetApprovedReport")]
         public async Task<IActionResult> ShowInvoice(string id)
         {
             var invoice = await _context.VendorInvoice

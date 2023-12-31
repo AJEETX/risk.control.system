@@ -31,6 +31,7 @@ namespace risk.control.system.Controllers
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
+        private readonly IClaimsVendorService vendorService;
         private readonly IMailboxService mailboxService;
         private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext _context;
@@ -42,6 +43,7 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
             IDashboardService dashboardService,
+            IClaimsVendorService vendorService,
             IMailboxService mailboxService,
             IToastNotification toastNotification,
             ApplicationDbContext context)
@@ -49,6 +51,7 @@ namespace risk.control.system.Controllers
             this.claimsInvestigationService = claimsInvestigationService;
             this.userManager = userManager;
             this.dashboardService = dashboardService;
+            this.vendorService = vendorService;
             this.mailboxService = mailboxService;
             this.toastNotification = toastNotification;
             this._context = context;
@@ -740,6 +743,11 @@ namespace risk.control.system.Controllers
             }
 
             string userEmail = HttpContext?.User?.Identity.Name;
+
+            //POST FACE IMAGE AND DOCUMENT
+
+            await vendorService.PostFaceId(userEmail, claimId);
+            await vendorService.PostDocumentId(userEmail, claimId);
 
             var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks, question1, question2, question3, question4);
 
