@@ -56,5 +56,7 @@ namespace risk.control.system.Models
 
         public string? ClaimReportId { get; set; }
         public virtual ClaimReport? Report { get; set; }
+        public string? InvestigationServiceTypeId { get; set; }
+        public virtual InvestigationServiceType? InvestigationServiceType { get; set; }
     }
 }
