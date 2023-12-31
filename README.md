@@ -4,9 +4,9 @@
 <img src="Flyer.gif" style="height:90%;" />
 
 
-### 1. iCheckify™️ engine highlights
+### 1. iCheckify™️ engine highlights [web-portal]
 
-##### Admin features : [web-portal for admin user from Insurer]
+##### Admin features : [admin user from Insurer]
 
     Domain-based nomenclature for seamless external Application integration including Azure AD
     Company Profile management
@@ -26,7 +26,7 @@
     Custom defined Agent ID/document/questionnaire template*
     Setup Manual/Auto Claim Allocation
 
-##### Claim workflow highlights: [web-portal for all user from Insurer and Investigating Agencies]
+##### Claim workflow highlights: [user from Insurer and Investigating Agencies]
 
     Always encrypted and secure
     Fraud-free agent investigation report
@@ -45,14 +45,15 @@
 
 
 
-### 2. Proxy Agent capabilities: [Mobile App for all `Investigating Agencies`` field agent]
+### 2. Proxy Agent capabilities: [Mobile App for all `Investigating Agencies` field agent]
 
     Simple and Secure Agent onboarding [real-time Face/ID/document verification]
     Fraud-prevention design (All information/document collected through App) 
-    Offline-First
-    Agent Mobile Map view  of the Claims on ground 
+    Always Offline-First 
+    Encrypted and secure data storage on Mobile
+    Agent Mobile Map view  of the Claims on ground and efficient decision making
     Capture photo and extract complete information of the location i.e. weather, demography, etc
-        Face-detection and Face-match
+        Face-detection, Face-liveliness cognition and Face-match features
         Document image digitization [extract text/information from image]
         Multiple Language detection / conversion
         Multiple Language Handwritten document scan 
@@ -60,7 +61,7 @@
             ADHAR
             PAN
             DRIVING LICENSE
-            OTHERS
+            ...
         Document image sensitive data masking
         Speech-to-Text
         Text-to-Speech 
