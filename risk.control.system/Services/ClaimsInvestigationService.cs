@@ -1024,6 +1024,13 @@ namespace risk.control.system.Services
                     var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == caseLocation.VendorId);
                     var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                     var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
+
+                    //THIS SHOULD NOT HAPPEN IN PROD : demo purpose
+                    if (investigationServiced == null)
+                    {
+                        investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault();
+                    }
+                    //END
                     var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
 
                     var invoice = new VendorInvoice
