@@ -628,13 +628,39 @@
                                                 <div class="col-12 d-flex align-items-stretch flex-column">
                                                     <div class="card bg-light d-flex flex-fill">
                                                         <div class="card-header text-muted border-bottom-0">
-                                                            <i class="fas fa-user-check"></i> Total Service Price <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                                            <i class="fas fa-money-check-alt"></i> Billing Info<span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                                         </div>
                                                         <div class="card-body pt-0">
                                                             <div class="row">
-                                                                <div class="col-12">
-                                                                    <h4 class="lead"><span class="badge badge-light">Rs. @Model.Price</span></h4>
+                                                                <div class="col-7">
+                                                                    <h2 class="lead"><b>Insurance Type: </b>@Model.Claim?.PolicyDetail.LineOfBusiness.Name</h2>
+                                                                    <p class="text-muted text-sm">
+                                                                        <b>Claim Type: </b>@Model.Claim?.PolicyDetail.ClaimType
+                                                                    </p>
+                                                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-tools"></i>
+                                                                            </span>
+                                                                            Service: @Model.Claim?.PolicyDetail.InvestigationServiceType.Name
+                                                                        </li>
+                                                                        
+                                                                        <li class="small">
+                                                                            <span class="fa-li">
+                                                                                <i class="fas fa-sun"></i>
+                                                                            </span>
+                                                                            Reason: @Model.Claim?.PolicyDetail.CaseEnabler.Name;
+                                                                        </li>
+                                                                       
+                                                                    </ul>
                                                                 </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="card-footer">
+                                                            <div class="text-right">
+                                                                <a class="btn btn-sm bg-teal">
+                                                                    <i class="fas fa-money-bill-wave"> Rs. @Model.Price</i>
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </div>
