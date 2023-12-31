@@ -6,7 +6,7 @@
 
 ### iCheckify™️ engine highlights
 
-#### Admin features :
+#### Admin features : [web-portal for admin user from Insurer]
 
         Domain-based nomenclature for seamless external Application integration including Azure AD
         Company Profile management
@@ -23,11 +23,10 @@
         Manage Agency Investigation service Management
         Agent onboarding with complete ID verification process-flow
         Agent Workload visibility
-        Custom defined Agent document / questionnaire / template
+        Custom defined Agent ID/document/questionnaire template*
         Setup Manual/Auto Claim Allocation
-        Mailbox for internal communication
 
-#### Claim workflow highlights: 
+#### Claim workflow highlights: [web-portal for all user from Insurer and Investigating Agencies]
 
         Always encrypted and secure
         Fraud-free agent investigation report
@@ -41,15 +40,16 @@
             2. FTP integration
             3. API integration
             4. Manual claim creation
-        Claims list with Map view for better visibility on the ground
+        Map view  for better visibility of the Claims on ground
+        Mailbox for internal communication
 
 
-#### Mobile App capabilities
+#### Proxy Agent capabilities: [Mobile App for all `Investigating Agencies`` field agent]
 
-    First-install Agent onboarding
-    Offline-First
+    Simple and Secure Agent onboarding [real-time Face/ID/document verification]
     Fraud-prevention design (All information/document collected through App) 
-    Claims list with Map view 
+    Offline-First
+    Agent Mobile Map view  of the Claims on ground 
     Capture photo and extract complete information of the location i.e. weather, demography, etc
         Face-detection and Face-match
         Document image digitization [extract text/information from image]
@@ -67,7 +67,7 @@
         Real-time agent tracking
         Document-tampering detection
 
-#### Notification Service
+#### Notification Service: [web-portal for all user]
 
     Internal Domain-based Mailbox to:
         Receive QuickEMAIL notification or communication
@@ -76,8 +76,9 @@
         Claim allocation [to agency and/or agent]
         Password change PIN
         Agent onboarding PIN
+    Other platform Integration
 
     
 ####
     ^ = Available on Secure Cloud with Complete Regulatory and Statutatory Compliance.
-    * = Under Development
+    * = TBD for bespoke solution
