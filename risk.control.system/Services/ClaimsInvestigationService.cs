@@ -1021,7 +1021,7 @@ namespace risk.control.system.Services
 
                     //create invoice
 
-                    var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == caseLocation.VendorId);
+                    var vendor = _context.Vendor.Include(s => s.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == caseLocation.VendorId);
                     var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
                     var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
                     var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
@@ -1042,14 +1042,17 @@ namespace risk.control.system.Services
                     };
 
                     _context.VendorInvoice.Add(invoice);
-                    return await _context.SaveChangesAsync() > 0 ? claim : null;
+
+                    var saveCount = await _context.SaveChangesAsync();
+
+                    return saveCount > 0 ? claim : null!;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                Console.WriteLine(ex.Message);
             }
-            return null;
+            return null!;
         }
 
         private async Task<VendorApplicationUser> GetSupervisor(string vendorId)
