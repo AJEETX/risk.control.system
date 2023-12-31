@@ -4,7 +4,7 @@
     {
         public ClaimsInvestigation Claim { get; set; }
         public CaseLocation Location { get; set; }
-        public decimal? Price { get; set; }
+        public VendorInvoice? VendorInvoice { get; set; }
         public List<InvestigationTransaction> Log { get; set; }
     }
 }

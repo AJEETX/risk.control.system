@@ -74,21 +74,15 @@ namespace risk.control.system.Services
                 .Include(l => l.ClaimReport)
                 .Include(l => l.Vendor)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
+
+            var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
             var model = new ClaimTransactionModel
             {
                 Claim = claimsInvestigation,
                 Log = caseLogs,
-                Location = location
+                Location = location,
+                VendorInvoice = invoice,
             };
-
-            var serviceCost = location.Vendor;
-            var vendor = _context.Vendor.Include(v => v.VendorInvestigationServiceTypes).FirstOrDefault(v => v.VendorId == location.VendorId);
-
-            var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claimsInvestigation.PolicyDetail.InvestigationServiceTypeId);
-            if (investigationServiced != null)
-            {
-                model.Price = investigationServiced.Price;
-            }
             return model;
         }
 

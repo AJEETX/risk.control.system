@@ -1019,6 +1019,29 @@ namespace risk.control.system.Services
 
                     _context.InvestigationTransaction.Add(finalLog);
 
+                    //create invoice
+
+                    var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == caseLocation.VendorId);
+                    var currentUser = _context.ClientCompanyApplicationUser.Include(u => u.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                    var investigationServiced = vendor.VendorInvestigationServiceTypes.FirstOrDefault(s => s.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
+                    var investigatService = _context.InvestigationServiceType.FirstOrDefault(i => i.InvestigationServiceTypeId == claim.PolicyDetail.InvestigationServiceTypeId);
+
+                    var invoice = new VendorInvoice
+                    {
+                        ClientCompanyId = currentUser.ClientCompany.ClientCompanyId,
+                        GrandTotal = investigationServiced.Price + investigationServiced.Price * 10,
+                        NoteToRecipient = "Auto generated Invoice",
+                        Updated = DateTime.UtcNow,
+                        Vendor = vendor,
+                        ClientCompany = currentUser.ClientCompany,
+                        UpdatedBy = userEmail,
+                        VendorId = vendor.VendorId,
+                        ClaimReportId = caseLocation.ClaimReport?.ClaimReportId,
+                        SubTotal = investigationServiced.Price,
+                        TaxAmount = investigationServiced.Price * 10
+                    };
+
+                    _context.VendorInvoice.Add(invoice);
                     return await _context.SaveChangesAsync() > 0 ? claim : null;
                 }
             }
