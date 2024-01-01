@@ -17,19 +17,19 @@
                         int currentAgeinYrs = 0;
                         bool customerExist = false;
                         bool beneficiaryExist = false;
-                        if (Model.Claim != null && Model.Claim.CustomerDetail != null)
+                        if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
                         {
-                            address = @Model.Claim?.CustomerDetail.Addressline + " " + @Model.Claim?.CustomerDetail.District.Name + " " + @Model.Claim?.CustomerDetail.State.Name + " " + @Model.Claim?.CustomerDetail.Country.Name + " " + @Model.Claim?.CustomerDetail.PinCode.Code;
+                            address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
                             baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
                             @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
                             @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
-                            if (Model.Claim?.CustomerDetail.CustomerDateOfBirth != null)
+                            if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
                             {
-                                var age = DateTime.Now.Subtract(Model.Claim.CustomerDetail.CustomerDateOfBirth).TotalDays;
+                                var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
                                 currentAgeinYrs = (int)age / 365;
                             }
                         }
-                        if (!string.IsNullOrWhiteSpace(Model.Claim.PolicyDetail?.ContractNumber))
+                        if (!string.IsNullOrWhiteSpace(Model.ClaimsInvestigation.PolicyDetail?.ContractNumber))
                         {
                             customerExist = true;
                         }
@@ -59,7 +59,7 @@
                             <article>
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name">Policy # : @Model.Claim?.PolicyDetail?.ContractNumber</h5>
+                                        <h5 class="bb-blog-title" itemprop="name">Policy # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</h5>
                                     </header>
                                     <div class="card card-solid">
                                         <div class="progress">
@@ -87,47 +87,47 @@
                                                         <div class="card-body pt-0">
                                                             <div class="row">
                                                                 <div class="col-7">
-                                                                    <h2 class="lead"><b>@Model.Claim?.PolicyDetail.LineOfBusiness.Name</b></h2>
+                                                                    <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name</b></h2>
                                                                     <p class="text-muted text-sm">
-                                                                        <b>Claim Type: </b>@Model.Claim?.PolicyDetail.ClaimType
+                                                                        <b>Claim Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
                                                                     </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-money-bill-wave"></i>
                                                                             </span>
-                                                                            Amount: <i class="fas fa-rupee-sign"></i>@Model.Claim?.PolicyDetail.SumAssuredValue
+                                                                            Amount: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.SumAssuredValue
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-tools"></i>
                                                                             </span>
-                                                                            Service: @Model.Claim?.PolicyDetail.InvestigationServiceType.Name
+                                                                            Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-money-check-alt"></i>
                                                                             </span>
-                                                                            Budget center: @Model.Claim?.PolicyDetail.CostCentre.Name
+                                                                            Budget center: @Model.ClaimsInvestigation?.PolicyDetail.CostCentre.Name
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-sun"></i>
                                                                             </span>
-                                                                            Reason: @Model.Claim?.PolicyDetail.CaseEnabler.Name;
+                                                                            Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="far fa-clock"></i>
                                                                             </span>
-                                                                            Issue Date: @Model.Claim?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
+                                                                            Issue Date: @Model.ClaimsInvestigation?.PolicyDetail.ContractIssueDate.ToString("dd-MMM-yyyy")
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                                 <div class="col-5 text-center">
-                                                                    @if (Model?.Claim?.PolicyDetail.DocumentImage is not null)
+                                                                    @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
                                                                     {
-                                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim?.PolicyDetail.DocumentImage))">
+                                                                        <img id="documentImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
                                                                     }
                                                                     else
                                                                     {
@@ -147,16 +147,16 @@
                                                         <div class="card-body pt-0">
                                                             <div class="row">
                                                                 <div class="col-7">
-                                                                    <h2 class="lead"><b>@Model.Claim?.CustomerDetail?.CustomerName</b></h2>
+                                                                    <h2 class="lead"><b>@Model.ClaimsInvestigation?.CustomerDetail?.CustomerName</b></h2>
                                                                     <p class="text-muted text-sm">
-                                                                        <b>Occupation: </b> @Model.Claim?.CustomerDetail?.CustomerOccupation
+                                                                        <b>Occupation: </b> @Model.ClaimsInvestigation?.CustomerDetail?.CustomerOccupation
                                                                     </p>
                                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                                                         <li class="small">
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-rupee-sign"></i>
                                                                             </span>
-                                                                            Income: @Model.Claim?.CustomerDetail?.CustomerIncome
+                                                                            Income: @Model.ClaimsInvestigation?.CustomerDetail?.CustomerIncome
                                                                         </li>
                                                                         <li class="small">
                                                                             <span class="fa-li">
@@ -175,14 +175,14 @@
                                                                             <span class="fa-li">
                                                                                 <i class="fas fa-lg fa-phone"></i>
                                                                             </span>
-                                                                            Phone #: + @Model.Claim?.CustomerDetail?.ContactNumber
+                                                                            Phone #: + @Model.ClaimsInvestigation?.CustomerDetail?.ContactNumber
                                                                         </li>
                                                                     </ul>
                                                                 </div>
                                                                 <div class="col-5 text-center">
-                                                                    @if (Model?.Claim?.CustomerDetail?.ProfilePicture is not null)
+                                                                    @if (Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture is not null)
                                                                     {
-                                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Claim?.CustomerDetail?.ProfilePicture))">
+                                                                        <img id="profileImage" class="form-Image" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.CustomerDetail?.ProfilePicture))">
                                                                     }
                                                                     else
                                                                     {

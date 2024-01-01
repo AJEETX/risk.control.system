@@ -1,0 +1,42 @@
+﻿@model ClaimTransactionModel
+<div class="card card-solid">
+    <div class="card-body pb-0">
+        @{
+            string timeTaken = "< 1";
+            var totalTime = @Model.Log.FirstOrDefault().Created.Subtract(Model.Log.LastOrDefault().Created).Days;
+            if(totalTime > 0)
+            {
+                timeTaken = totalTime.ToString();
+            }
+        }
+        <span class="badge badge-light"> Total Time taken (days)</span>: <span class="badge badge-info"> @timeTaken</span>
+        <div class="row">
+            <div class="col-12 d-flex align-items-stretch flex-column">
+                <div class="bb-blog-content" itemprop="articleBody">
+                    <div class="timeline">
+                        @{
+                            foreach (var log in Model.Log)
+                            {
+                                <div class="time-label"><span class="bg-red">@log.Created.ToString("dd-MMM-yyyy")</span></div>
+
+                                <div>
+                                    <i class="nav-icon fas fa-envelope bg-blue"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="nav-icon fas fa-clock"></i> @log.Created.ToString("hh:mm tt")</span>
+                                        <h3 class="timeline-header"><a href="#">@log.UpdatedBy</a> has actioned the case to: <span class="badge badge-success"> @log.InvestigationCaseStatus.Name : @log.InvestigationCaseSubStatus.Name.</span></h3>
+                                        <div class="timeline-body">
+                                            The case is moved to <span class="badge badge-info">@log.CurrentClaimOwner</span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        <div><i class="nav-icon fas fa-clock bg-gray"></i></div>
+                    </div>
+                </div> <!-- class bb-blog-content -->
+            </div>
+        </div>
+    </div>
+</div>

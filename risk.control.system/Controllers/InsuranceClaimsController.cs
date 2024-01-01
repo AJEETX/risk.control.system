@@ -30,7 +30,7 @@ namespace risk.control.system.Controllers
 
             var model = new ClaimTransactionModel
             {
-                Claim = claim,
+                ClaimsInvestigation = claim,
                 Log = null,
                 Location = new CaseLocation { }
             };

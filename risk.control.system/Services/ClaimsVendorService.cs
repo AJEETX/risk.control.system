@@ -453,7 +453,7 @@ namespace risk.control.system.Services
 
             var model = new ClaimTransactionModel
             {
-                Claim = claimsInvestigation,
+                ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
                 Location = location
             };

@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.ClaimsInvestigation'  is null.");
             }
-            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.Claim.ClaimsInvestigationId);
+            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
             string userEmail = HttpContext?.User?.Identity.Name;
             claimsInvestigation.Updated = DateTime.UtcNow;
             claimsInvestigation.UpdatedBy = userEmail;

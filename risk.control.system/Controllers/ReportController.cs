@@ -102,7 +102,7 @@ namespace risk.control.system.Controllers
 
             var model = new ClaimTransactionModel
             {
-                Claim = claimsInvestigation,
+                ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
                 Location = location,
                 VendorInvoice = invoice,

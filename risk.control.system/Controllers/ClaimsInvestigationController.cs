@@ -234,9 +234,9 @@ namespace risk.control.system.Controllers
 
             var model = await investigationReportService.GetClaimDetails(id);
 
-            if (model.Claim.CustomerDetail is not null)
+            if (model.ClaimsInvestigation.CustomerDetail is not null)
             {
-                var customerLatLong = model.Claim.CustomerDetail.PinCode.Latitude + "," + model.Claim.CustomerDetail.PinCode.Longitude;
+                var customerLatLong = model.ClaimsInvestigation.CustomerDetail.PinCode.Latitude + "," + model.ClaimsInvestigation.CustomerDetail.PinCode.Longitude;
 
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
                 ViewBag.CustomerLocationUrl = url;
@@ -261,7 +261,7 @@ namespace risk.control.system.Controllers
             }
 
             var model = await claimPolicyService.GetClaimDetail(id);
-            var customerLatLong = model.Claim.CustomerDetail.PinCode.Latitude + "," + model.Claim.CustomerDetail.PinCode.Longitude;
+            var customerLatLong = model.ClaimsInvestigation.CustomerDetail.PinCode.Latitude + "," + model.ClaimsInvestigation.CustomerDetail.PinCode.Longitude;
 
             var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
             ViewBag.CustomerLocationUrl = url;

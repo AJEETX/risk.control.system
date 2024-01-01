@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
 
@@ -20,7 +19,6 @@ namespace risk.control.system.Controllers
 {
     public class ClaimsVendorController : Controller
     {
-        public List<UsersViewModel> UserList;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
@@ -49,7 +47,6 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
             this._context = context;
             this.webHostEnvironment = webHostEnvironment;
-            UserList = new List<UsersViewModel>();
         }
 
         [Breadcrumb(" Allocate To Agent")]
@@ -226,7 +223,6 @@ namespace risk.control.system.Controllers
 
             return View(model);
         }
-
 
         [Breadcrumb(" Active")]
         public IActionResult Open()

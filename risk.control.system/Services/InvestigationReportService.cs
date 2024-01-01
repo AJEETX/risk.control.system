@@ -78,7 +78,7 @@ namespace risk.control.system.Services
             var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
             var model = new ClaimTransactionModel
             {
-                Claim = claimsInvestigation,
+                ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
                 Location = location,
                 VendorInvoice = invoice,
@@ -174,7 +174,7 @@ namespace risk.control.system.Services
 
             var model = new ClaimTransactionModel
             {
-                Claim = claimsInvestigation,
+                ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
                 Location = location
             };
