@@ -61,8 +61,6 @@
                         {
                             benficiaryProgressColor = "lightgrey";
                         }
-                        var customerLocationMap = @ViewBag.CustomerLocationUrl;
-                        var beneficiaryLocationMap = @ViewBag.BeneficiaryLocationUrl;
                         <div class="card-body">
                             <article>
                                 <input type="hidden" id="policyDetailId" value="@Model.Claim?.PolicyDetail.PolicyDetailId" />
@@ -244,7 +242,7 @@
                                                                         }
                                                                     </p>
                                                                     <p class="text-muted text-sm">
-                                                                        <img id="profileImageMap" class="img-fluid block-data" src="@customerLocationMap">
+                                                                        <img id="profileImageMap" class="img-fluid block-data" src="@Model.Claim?.CustomerDetail?.CustomerLocationMap">
                                                                     </p>
 
                                                                 </div>
@@ -320,7 +318,7 @@
                                                                         }
                                                                     </p>
                                                                     <p class="text-muted text-sm">
-                                                                        <img id="bImageMap" class="img-fluid block-data" src="@beneficiaryLocationMap">
+                                                                        <img id="bImageMap" class="img-fluid block-data" src="@Model.Location?.BeneficiaryLocationMap">
                                                                     </p>
                                                                 </div>
                                                             </div>
