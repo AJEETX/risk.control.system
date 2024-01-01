@@ -13,12 +13,12 @@ namespace risk.control.system.Services
 
     public class ClaimsVendorService : IClaimsVendorService
     {
-        private readonly ICheckifyService checkifyService;
+        private readonly IICheckifyService checkifyService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static string latitude = "-37.839542";
         private static string longitude = "145.164834";
 
-        public ClaimsVendorService(ICheckifyService checkifyService, IWebHostEnvironment webHostEnvironment)
+        public ClaimsVendorService(IICheckifyService checkifyService, IWebHostEnvironment webHostEnvironment)
         {
             this.checkifyService = checkifyService;
             this.webHostEnvironment = webHostEnvironment;
