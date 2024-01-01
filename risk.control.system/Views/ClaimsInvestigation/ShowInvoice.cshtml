@@ -7,12 +7,6 @@
 <section class="content pt-2">
     <div class="container-fluid">
         <div class="row">
-            <div class="pad margin no-print">
-                <div class="callout callout-info" style="margin-bottom: 0!important;">
-                    <h4><i class="fa fa-info"></i> Note:</h4>
-                    This page has been enhanced for printing. Click the print button at the bottom to print.
-                </div>
-            </div>
             <div class="col-md-12">
                 <div id="article" class="card card-secondary">
                     <div class="card-header">
@@ -20,18 +14,25 @@
                         
                     </div>
                     <div class="card-body">
+                        <div class="pad margin no-print">
+                            <div class="callout callout-info" style="margin-bottom: 0!important;">
+                                <h4><i class="fa fa-info"></i> Note:</h4>
+                                This page has been enhanced for printing. Click the print button at the bottom to print.
+                            </div>
+                        </div>
                         <section class="invoice">
 
                             <!-- title row -->
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <h2 class="page-header">
-                                        <i class="fa fa-globe"></i> Invoice:
+                                    <h3 class="page-header">
+                                        <i class="fa fa-globe"></i> Agency Invoice:
                                         <small class="pull-right">Date: @Model.InvoiceDate.ToString("dd-MMM-yyyy")</small>
-                                    </h2>
+                                    </h3>
                                 </div>
                                 <!-- /.col -->
                             </div>
+                            <hr />
                             <!-- info row -->
                             <div class="row invoice-info">
                                 <div class="col-sm-4 invoice-col">
@@ -94,16 +95,16 @@
                                 <!-- /.col -->
                             </div>
                             <!-- /.row -->
-                            <div class="row">
+                            <div class="row invoice-info">
                                 <!-- accepted payments column -->
-                                <div class="col-xs-6">
+                                <div class="col-sm-8 invoice-col">
                                     <p class="lead">Note to recipients:</p>
-                                    <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
+                                    <p class="text-muted well well-sm no-shadow">
                                         @Model.NoteToRecipient
                                     </p>
                                 </div>
                                 <!-- /.col -->
-                                <div class="col-xs-6">
+                                <div class="col-sm-4 invoice-col">
                                     <p class="lead">Amount Details</p>
                                     <div class="table-responsive">
                                         <table class="table">
@@ -129,9 +130,9 @@
                             <!-- this row will not appear when printing -->
                             <div class="row no-print">
                                 <div class="col-xs-12">
-                                    <a asp-action="GetApprovedReport" asp-route-selectedcase="@Model.ClaimId" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
+                                    <a asp-action="GetApprovedReport" asp-route-selectedcase="@Model.ClaimId" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> 
 
-                                    <a href="@Url.Action("PrintInvoice", new { id = Model.VendorInvoiceId })" target="_blank" class="btn btn-primary"><i class="fa fa-print"></i> Print</a>
+                                    <a href="@Url.Action("PrintInvoice", new { id = Model.VendorInvoiceId })" target="_blank" class="btn btn-primary"><i class="fa fa-print"></i> Print Invoice</a>
                                 </div>
                             </div>
                         </section>
