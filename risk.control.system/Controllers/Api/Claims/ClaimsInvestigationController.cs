@@ -1947,11 +1947,11 @@ namespace risk.control.system.Controllers.Api.Claims
             string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             string imageAddress = string.Empty;
             string faceLat = string.Empty, faceLng = string.Empty;
-            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.DigitalIdLongLat))
+            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat))
             {
-                var longLat = beneficiary.ClaimReport.DigitalIdLongLat.IndexOf("/");
-                faceLat = beneficiary.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
-                faceLng = beneficiary.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim();
+                var longLat = beneficiary.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                faceLat = beneficiary.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                faceLng = beneficiary.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
                 var longLatString = faceLat + "," + faceLng;
                 RootObject rootObject = await httpClientService.GetAddress((faceLat), (faceLng));
                 imageAddress = rootObject.display_name;
@@ -1961,11 +1961,11 @@ namespace risk.control.system.Controllers.Api.Claims
             string ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             string ocrAddress = string.Empty;
             string ocrLatitude = string.Empty, ocrLongitude = string.Empty;
-            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.DocumentIdImageLongLat))
+            if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat))
             {
-                var ocrlongLat = beneficiary.ClaimReport.DocumentIdImageLongLat.IndexOf("/");
-                ocrLatitude = beneficiary.ClaimReport.DocumentIdImageLongLat.Substring(0, ocrlongLat)?.Trim();
-                ocrLongitude = beneficiary.ClaimReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
+                var ocrlongLat = beneficiary.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
+                ocrLatitude = beneficiary.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, ocrlongLat)?.Trim();
+                ocrLongitude = beneficiary.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(ocrlongLat + 1)?.Trim();
                 var ocrLongLatString = ocrLatitude + "," + ocrLongitude;
                 RootObject rootObject = await httpClientService.GetAddress((ocrLatitude), (ocrLongitude));
                 ocrAddress = rootObject.display_name;
@@ -1975,15 +1975,15 @@ namespace risk.control.system.Controllers.Api.Claims
             var data = new
             {
                 Title = "Investigation Data",
-                QrData = beneficiary.ClaimReport?.DocumentIdImageData,
-                LocationData = beneficiary.ClaimReport?.DigitalIdImageData ?? "Location Data",
+                QrData = beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImageData,
+                LocationData = beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImageData ?? "Location Data",
                 LatLong = mapUrl,
                 ImageAddress = imageAddress,
-                Location = beneficiary.ClaimReport?.DigitalIdImage != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.DigitalIdImage)) :
+                Location = beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
-                OcrData = beneficiary.ClaimReport?.DocumentIdImage != null ?
-                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.DocumentIdImage)) :
+                OcrData = beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImage != null ?
+                string.Format("data:image/*;base64,{0}", Convert.ToBase64String(beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImage)) :
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 OcrLatLong = ocrUrl,
                 OcrAddress = ocrAddress,
@@ -2100,6 +2100,10 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.State)
                .Include(c => c.CaseLocations)
                .ThenInclude(l => l.ClaimReport)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(l => l.ClaimReport.DigitalIdReport)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(l => l.ClaimReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -2107,11 +2111,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
 
-                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.DigitalIdLongLat is not null)
+                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat is not null)
                 {
-                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.DigitalIdLongLat.IndexOf("/");
-                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });
@@ -2122,11 +2126,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Latitude), Lng = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Latitude), Lng = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Longitude) };
 
-                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.DigitalIdLongLat is not null)
+                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat is not null)
                 {
-                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.DigitalIdLongLat.IndexOf("/");
-                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });
@@ -2169,6 +2173,10 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.State)
                .Include(c => c.CaseLocations)
                .ThenInclude(l => l.ClaimReport)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(l => l.ClaimReport.DigitalIdReport)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(l => l.ClaimReport.DocumentIdReport)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == claimid);
 
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
@@ -2176,11 +2184,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CustomerDetail.PinCode.Latitude), Lng = decimal.Parse(claim.CustomerDetail.PinCode.Longitude) };
 
-                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.DocumentIdImageLongLat is not null)
+                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat is not null)
                 {
-                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.DocumentIdImageLongLat.IndexOf("/");
-                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });
@@ -2191,11 +2199,11 @@ namespace risk.control.system.Controllers.Api.Claims
                 var center = new { Lat = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Latitude), Lng = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Longitude) };
                 var dakota = new { Lat = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Latitude), Lng = decimal.Parse(claim.CaseLocations.FirstOrDefault().PinCode.Longitude) };
 
-                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.DocumentIdImageLongLat is not null)
+                if (claim.CaseLocations.FirstOrDefault().ClaimReport is not null && claim.CaseLocations.FirstOrDefault().ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat is not null)
                 {
-                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.DocumentIdImageLongLat.IndexOf("/");
-                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
+                    var longLat = claim.CaseLocations.FirstOrDefault().ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
+                    var latitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                    var longitude = claim.CaseLocations.FirstOrDefault()?.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim();
 
                     var frick = new { Lat = decimal.Parse(latitude), Lng = decimal.Parse(longitude) };
                     return Ok(new { center, dakota, frick });

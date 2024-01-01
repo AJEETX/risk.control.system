@@ -71,7 +71,10 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var location = await _context.CaseLocation
-                .Include(l => l.ClaimReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .Include(l => l.Vendor)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
 
@@ -219,6 +222,9 @@ namespace risk.control.system.Services
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)

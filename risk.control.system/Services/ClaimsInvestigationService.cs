@@ -1126,7 +1126,10 @@ namespace risk.control.system.Services
                 }
             }
 
-            var report = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
+            var report = _context.ClaimReport
+                .Include(r => r.DigitalIdReport)
+                .Include(r => r.DocumentIdReport)
+                .FirstOrDefault(c => c.ClaimReportId == claimsCaseLocation.ClaimReport.ClaimReportId);
             report.AssessorRemarkType = assessorRemarkType;
             report.AssessorRemarks = assessorRemarks;
             report.AssessorRemarksUpdated = DateTime.UtcNow;
@@ -1137,11 +1140,11 @@ namespace risk.control.system.Services
             var saveReport = new PreviousClaimReport
             {
                 AgentEmail = report.AgentEmail,
-                AgentLocationPicture = report.DigitalIdImage,
-                AgentLocationPictureUrl = report.DigitalIdImagePath,
-                AgentOcrData = report.DocumentIdImageData,
-                AgentOcrPicture = report.DocumentIdImage,
-                AgentOcrUrl = report.DocumentIdImagePath,
+                AgentLocationPicture = report.DigitalIdReport?.DigitalIdImage,
+                AgentLocationPictureUrl = report.DigitalIdReport?.DigitalIdImagePath,
+                AgentOcrData = report.DocumentIdReport?.DocumentIdImageData,
+                AgentOcrPicture = report.DocumentIdReport?.DocumentIdImage,
+                AgentOcrUrl = report.DocumentIdReport?.DocumentIdImagePath,
                 AgentRemarks = report.AgentRemarks,
                 AgentRemarksUpdated = report.AssessorRemarksUpdated,
                 AssessorEmail = report.AssessorEmail,
@@ -1150,14 +1153,14 @@ namespace risk.control.system.Services
                 AssessorRemarksUpdated = DateTime.UtcNow,
                 CaseLocation = report.CaseLocation,
                 CaseLocationId = report.CaseLocationId,
-                ImageType = report.DocumentIdImageType,
-                LocationData = report.DigitalIdImageData,
-                LocationLongLat = report.DigitalIdLongLat,
-                LocationLongLatTime = report.DigitalIdLongLatTime,
-                LocationPictureConfidence = report.DigitalIdImageMatchConfidence,
-                OcrLongLat = report.DocumentIdImageLongLat,
-                OcrLongLatTime = report.DocumentIdImageLongLatTime,
-                PanValid = report.DocumentIdImageValid,
+                ImageType = report.DocumentIdReport?.DocumentIdImageType,
+                LocationData = report.DigitalIdReport?.DigitalIdImageData,
+                LocationLongLat = report.DigitalIdReport?.DigitalIdImageLongLat,
+                LocationLongLatTime = report.DigitalIdReport?.DigitalIdImageLongLatTime,
+                LocationPictureConfidence = report.DigitalIdReport?.DigitalIdImageMatchConfidence,
+                OcrLongLat = report.DocumentIdReport?.DocumentIdImageLongLat,
+                OcrLongLatTime = report.DocumentIdReport?.DocumentIdImageLongLatTime,
+                PanValid = report.DocumentIdReport?.DocumentIdImageValid,
                 Question1 = report.Question1,
                 Question2 = report.Question2,
                 Question3 = report.Question3,

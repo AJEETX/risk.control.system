@@ -664,56 +664,11 @@ namespace risk.control.system.Migrations
                     b.Property<long>("CaseLocationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("DigitalIdImage")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("DigitalIdImageData")
+                    b.Property<string>("DigitalIdReportId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DigitalIdImageLocationAddress")
+                    b.Property<string>("DocumentIdReportId")
                         .HasColumnType("TEXT");
-
-                    b.Property<string>("DigitalIdImageLocationUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DigitalIdImageMatchConfidence")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DigitalIdImagePath")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DigitalIdLongLat")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DigitalIdLongLatTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("DocumentIdImage")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("DocumentIdImageData")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DocumentIdImageLocationAddress")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DocumentIdImageLocationUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DocumentIdImageLongLat")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("DocumentIdImageLongLatTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DocumentIdImagePath")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DocumentIdImageType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool?>("DocumentIdImageValid")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Question1")
                         .HasColumnType("TEXT");
@@ -749,6 +704,10 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("CaseLocationId")
                         .IsUnique();
+
+                    b.HasIndex("DigitalIdReportId");
+
+                    b.HasIndex("DocumentIdReportId");
 
                     b.HasIndex("VendorId");
 
@@ -1155,6 +1114,41 @@ namespace risk.control.system.Migrations
                     b.ToTable("DeletedMessage");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.DigitalIdReport", b =>
+                {
+                    b.Property<string>("DigitalIdReportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("DigitalIdImage")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("DigitalIdImageData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DigitalIdImageLocationAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DigitalIdImageLocationUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DigitalIdImageLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DigitalIdImageLongLatTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DigitalIdImageMatchConfidence")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DigitalIdImagePath")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("DigitalIdReportId");
+
+                    b.ToTable("DigitalIdReport");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.District", b =>
                 {
                     b.Property<string>("DistrictId")
@@ -1192,6 +1186,44 @@ namespace risk.control.system.Migrations
                     b.HasIndex("StateId");
 
                     b.ToTable("District");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.DocumentIdReport", b =>
+                {
+                    b.Property<string>("DocumentIdReportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("DocumentIdImage")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("DocumentIdImageData")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImageLocationAddress")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImageLocationUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImageLongLat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DocumentIdImageLongLatTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImagePath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdImageType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("DocumentIdImageValid")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("DocumentIdReportId");
+
+                    b.ToTable("DocumentIdReport");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.DraftMessage", b =>
@@ -2490,6 +2522,9 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ClaimId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ClaimReportId")
                         .HasColumnType("TEXT");
 
@@ -3069,11 +3104,23 @@ namespace risk.control.system.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("risk.control.system.Models.DigitalIdReport", "DigitalIdReport")
+                        .WithMany()
+                        .HasForeignKey("DigitalIdReportId");
+
+                    b.HasOne("risk.control.system.Models.DocumentIdReport", "DocumentIdReport")
+                        .WithMany()
+                        .HasForeignKey("DocumentIdReportId");
+
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId");
 
                     b.Navigation("CaseLocation");
+
+                    b.Navigation("DigitalIdReport");
+
+                    b.Navigation("DocumentIdReport");
 
                     b.Navigation("Vendor");
                 });

@@ -90,7 +90,10 @@ namespace risk.control.system.Controllers
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = await _context.CaseLocation
-                .Include(l => l.ClaimReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .Include(l => l.Vendor)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 

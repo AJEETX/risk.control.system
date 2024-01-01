@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class remove : Migration
+    public partial class rereport : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -117,6 +117,45 @@ namespace risk.control.system.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Country", x => x.CountryId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DigitalIdReport",
+                columns: table => new
+                {
+                    DigitalIdReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    DigitalIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    DigitalIdImageData = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageMatchConfidence = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DigitalIdReport", x => x.DigitalIdReportId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DocumentIdReport",
+                columns: table => new
+                {
+                    DocumentIdReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    DocumentIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    DocumentIdImageValid = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DocumentIdImageType = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageData = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentIdReport", x => x.DocumentIdReportId);
                 });
 
             migrationBuilder.CreateTable(
@@ -1215,23 +1254,8 @@ namespace risk.control.system.Migrations
                     Question3 = table.Column<string>(type: "TEXT", nullable: true),
                     Question4 = table.Column<string>(type: "TEXT", nullable: true),
                     Question5 = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    DigitalIdImageData = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdLongLat = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DigitalIdImageMatchConfidence = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    DocumentIdImageValid = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DocumentIdImageType = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageData = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageLongLat = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DigitalIdReportId = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdReportId = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     SupervisorEmail = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorRemarks = table.Column<string>(type: "TEXT", nullable: true),
@@ -1251,6 +1275,16 @@ namespace risk.control.system.Migrations
                         principalTable: "CaseLocation",
                         principalColumn: "CaseLocationId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClaimReport_DigitalIdReport_DigitalIdReportId",
+                        column: x => x.DigitalIdReportId,
+                        principalTable: "DigitalIdReport",
+                        principalColumn: "DigitalIdReportId");
+                    table.ForeignKey(
+                        name: "FK_ClaimReport_DocumentIdReport_DocumentIdReportId",
+                        column: x => x.DocumentIdReportId,
+                        principalTable: "DocumentIdReport",
+                        principalColumn: "DocumentIdReportId");
                 });
 
             migrationBuilder.CreateTable(
@@ -1637,6 +1671,52 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VendorInvoice",
+                columns: table => new
+                {
+                    VendorInvoiceId = table.Column<string>(type: "TEXT", nullable: false),
+                    InvoiceNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    InvoiceDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    ClientCompanyId = table.Column<string>(type: "TEXT", nullable: true),
+                    NoteToRecipient = table.Column<string>(type: "TEXT", nullable: false),
+                    SubTotal = table.Column<decimal>(type: "TEXT", nullable: false),
+                    TaxAmount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    GrandTotal = table.Column<decimal>(type: "TEXT", nullable: false),
+                    ClaimReportId = table.Column<string>(type: "TEXT", nullable: true),
+                    InvestigationServiceTypeId = table.Column<string>(type: "TEXT", nullable: true),
+                    ClaimId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VendorInvoice", x => x.VendorInvoiceId);
+                    table.ForeignKey(
+                        name: "FK_VendorInvoice_ClaimReport_ClaimReportId",
+                        column: x => x.ClaimReportId,
+                        principalTable: "ClaimReport",
+                        principalColumn: "ClaimReportId");
+                    table.ForeignKey(
+                        name: "FK_VendorInvoice_ClientCompany_ClientCompanyId",
+                        column: x => x.ClientCompanyId,
+                        principalTable: "ClientCompany",
+                        principalColumn: "ClientCompanyId");
+                    table.ForeignKey(
+                        name: "FK_VendorInvoice_InvestigationServiceType_InvestigationServiceTypeId",
+                        column: x => x.InvestigationServiceTypeId,
+                        principalTable: "InvestigationServiceType",
+                        principalColumn: "InvestigationServiceTypeId");
+                    table.ForeignKey(
+                        name: "FK_VendorInvoice_Vendor_VendorId",
+                        column: x => x.VendorId,
+                        principalTable: "Vendor",
+                        principalColumn: "VendorId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ServicedPinCode",
                 columns: table => new
                 {
@@ -1791,6 +1871,16 @@ namespace risk.control.system.Migrations
                 table: "ClaimReport",
                 column: "CaseLocationId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClaimReport_DigitalIdReportId",
+                table: "ClaimReport",
+                column: "DigitalIdReportId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClaimReport_DocumentIdReportId",
+                table: "ClaimReport",
+                column: "DocumentIdReportId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClaimReport_VendorId",
@@ -2104,6 +2194,26 @@ namespace risk.control.system.Migrations
                 column: "VendorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_VendorInvoice_ClaimReportId",
+                table: "VendorInvoice",
+                column: "ClaimReportId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorInvoice_ClientCompanyId",
+                table: "VendorInvoice",
+                column: "ClientCompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorInvoice_InvestigationServiceTypeId",
+                table: "VendorInvoice",
+                column: "InvestigationServiceTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VendorInvoice_VendorId",
+                table: "VendorInvoice",
+                column: "VendorId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_VerificationLocation_ClaimsInvestigationId",
                 table: "VerificationLocation",
                 column: "ClaimsInvestigationId");
@@ -2311,9 +2421,6 @@ namespace risk.control.system.Migrations
                 name: "ClaimNote");
 
             migrationBuilder.DropTable(
-                name: "ClaimReport");
-
-            migrationBuilder.DropTable(
                 name: "ClientCompanyVendor");
 
             migrationBuilder.DropTable(
@@ -2368,6 +2475,9 @@ namespace risk.control.system.Migrations
                 name: "UploadClaim");
 
             migrationBuilder.DropTable(
+                name: "VendorInvoice");
+
+            migrationBuilder.DropTable(
                 name: "VerificationLocation");
 
             migrationBuilder.DropTable(
@@ -2389,13 +2499,22 @@ namespace risk.control.system.Migrations
                 name: "Mailbox");
 
             migrationBuilder.DropTable(
-                name: "CaseLocation");
+                name: "ClaimReport");
 
             migrationBuilder.DropTable(
                 name: "PermissionModule");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "CaseLocation");
+
+            migrationBuilder.DropTable(
+                name: "DigitalIdReport");
+
+            migrationBuilder.DropTable(
+                name: "DocumentIdReport");
 
             migrationBuilder.DropTable(
                 name: "BeneficiaryRelation");

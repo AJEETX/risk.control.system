@@ -263,6 +263,9 @@ namespace risk.control.system.Services
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
@@ -270,14 +273,14 @@ namespace risk.control.system.Services
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
                     );
 
-            if (claimCase.ClaimReport.DigitalIdLongLat != null)
+            if (claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat != null)
             {
-                var longLat = claimCase.ClaimReport.DigitalIdLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.DigitalIdLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var longLat = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
+                var latitude = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DigitalIdImageLocationUrl = url;
+                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
 
                 RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
 
@@ -297,7 +300,7 @@ namespace risk.control.system.Services
 
                 var address = rootObject.display_name;
 
-                claimCase.ClaimReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {
@@ -306,23 +309,23 @@ namespace risk.control.system.Services
                 var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
 
                 RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
-                claimCase.ClaimReport.DigitalIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
 
                 var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
                 string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \nElevation(sea level):{weatherData.elevation} metres";
-                claimCase.ClaimReport.DigitalIdImageData = weatherCustomData;
+                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
 
-                claimCase.ClaimReport.DigitalIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
+                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             }
 
-            if (claimCase.ClaimReport.DocumentIdImageLongLat != null)
+            if (claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null)
             {
-                var longLat = claimCase.ClaimReport.DocumentIdImageLongLat.IndexOf("/");
-                var latitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
-                var longitude = claimCase.ClaimReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
+                var longLat = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
+                var latitude = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(0, longLat)?.Trim();
+                var longitude = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.Substring(longLat + 1)?.Trim().Replace("/", "").Trim();
                 var latLongString = latitude + "," + longitude;
                 var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DocumentIdImageLocationUrl = url;
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
                 RootObject rootObject = await httpClientService.GetAddress((latitude), (longitude));
                 double registeredLatitude = 0;
                 double registeredLongitude = 0;
@@ -336,7 +339,7 @@ namespace risk.control.system.Services
 
                 var address = rootObject.display_name;
 
-                claimCase.ClaimReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {
@@ -344,8 +347,8 @@ namespace risk.control.system.Services
                 var longitude = "145.164834";
 
                 RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
-                claimCase.ClaimReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-                claimCase.ClaimReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             }
             var model = new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation };
 
@@ -390,6 +393,9 @@ namespace risk.control.system.Services
                 .Include(c => c.PinCode)
                 .Include(c => c.BeneficiaryRelation)
                 .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DigitalIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
@@ -447,6 +453,10 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.PinCode)
                 .Include(c => c.CustomerDetail)
                 .ThenInclude(c => c.State)
+                .Include(c=>c.CaseLocations)
+                .ThenInclude(c=>c.ClaimReport.DigitalIdReport)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport.DocumentIdReport)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();
