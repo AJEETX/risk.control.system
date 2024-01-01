@@ -312,7 +312,7 @@
                         <h3 class="card-title"><i class="fas fa-list"></i>  @Applicationsettings.AGENTS</h3>
                     </div>
                     <div class="card-body">
-                        <form id="radioButtons" method="post" asp-asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
+                        <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                             <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">

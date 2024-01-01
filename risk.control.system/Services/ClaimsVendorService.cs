@@ -101,17 +101,6 @@ namespace risk.control.system.Services
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
 
-            var claimsCaseLocation = _context.CaseLocation
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.Vendor)
-                .Include(c => c.PinCode)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.District)
-                .Include(c => c.State)
-                .Include(c => c.Country)
-                .FirstOrDefault(c => c.CaseLocationId == Int64.Parse(selectedcase));
-
             var claimsInvestigation = _context.ClaimsInvestigation
               .Include(c => c.PolicyDetail)
               .ThenInclude(c => c.ClientCompany)
@@ -137,7 +126,7 @@ namespace risk.control.system.Services
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
-                .FirstOrDefault(m => m.ClaimsInvestigationId == claimsCaseLocation.ClaimsInvestigation.ClaimsInvestigationId);
+                .FirstOrDefault(m => m.ClaimsInvestigationId == selectedcase && m.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
             claimsInvestigation.CaseLocations = claimsInvestigation.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
                         && c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId)?.ToList();
 

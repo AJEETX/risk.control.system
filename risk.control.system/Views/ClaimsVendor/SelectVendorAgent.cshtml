@@ -61,7 +61,7 @@
                             <article>
                                 <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
                                 <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-                                <input type="hidden" id="beneficiaryId" value="@Model.CaseLocation?.CaseLocationId" />
+                                <input type="hidden" id="caseLocationId" value="@Model.CaseLocation?.CaseLocationId" />
                                 <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
                                 <div class="bb-blog-inner">
                                     <header class="bb-blog-header">
@@ -312,7 +312,7 @@
                         <h3 class="card-title"><i class="fas fa-list"></i>  @Applicationsettings.AGENTS</h3>
                     </div>
                     <div class="card-body">
-                        <form id="radioButtons" method="post" asp-asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
+                        <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                             <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
