@@ -106,7 +106,7 @@
                         <h3 class="card-title"><i class="fas fa-list"></i> @Applicationsettings.VERIFICTION_LOCATIONS</h3>
                     </div>
                     <div class="card-body">
-                        <form id="radioButtons" asp-action="SelectVendorAgent" method="post" enctype="multipart/form-data">
+                        <form id="radioButtons" asp-controller="ClaimsVendorPost" asp-action="SelectVendorAgent" method="post" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigationId" />
                             <div class="col-md-12">
                                 <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">

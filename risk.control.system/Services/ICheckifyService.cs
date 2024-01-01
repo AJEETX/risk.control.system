@@ -111,7 +111,7 @@ namespace risk.control.system.Services
                         {
                             var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
 
-                            claimCase.ClaimReport.DigitalIdImageMatchConfidence = faceImageDetail.Confidence;
+                            claimCase.ClaimReport.DigitalIdImageMatchConfidence = faceImageDetail?.Confidence;
                         }
                         catch (Exception)
                         {

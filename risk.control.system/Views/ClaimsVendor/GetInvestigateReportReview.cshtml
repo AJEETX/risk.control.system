@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form asp-action="ProcessReport" method="post">
+                <form asp-controller="ClaimsVendorPost" asp-action="ProcessReport" method="post">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                     <div class="card card-success">
@@ -188,7 +188,7 @@
                         <h3 class="card-title"><i class="fas fa-folder-open"></i> @Applicationsettings.AGENTS</h3>
                     </div>
                     <div class="card-body">
-                        <form id="radioButtons" method="post" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
+                        <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
                             <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                             <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                             
