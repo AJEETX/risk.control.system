@@ -129,9 +129,9 @@
                             <!-- this row will not appear when printing -->
                             <div class="row no-print">
                                 <div class="col-xs-12">
+                                    <a asp-action="GetApprovedReport" asp-route-selectedcase="@Model.ClaimId" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
 
                                     <a href="@Url.Action("PrintInvoice", new { id = Model.VendorInvoiceId })" target="_blank" class="btn btn-primary"><i class="fa fa-print"></i> Print</a>
-
                                 </div>
                             </div>
                         </section>

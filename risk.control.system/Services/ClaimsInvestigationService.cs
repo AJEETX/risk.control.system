@@ -1047,6 +1047,7 @@ namespace risk.control.system.Services
                         SubTotal = investigationServiced.Price,
                         TaxAmount = investigationServiced.Price * 10,
                         InvestigationServiceType = investigatService,
+                        ClaimId = claimsInvestigationId
                     };
 
                     _context.VendorInvoice.Add(invoice);
