@@ -1,23 +1,15 @@
-using System.Configuration;
 using System.Reflection;
-using System.Text;
-
-using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 
 using NToastNotify;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
-using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
@@ -25,8 +17,6 @@ using risk.control.system.Seeds;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Extensions;
-
-using static Org.BouncyCastle.Math.EC.ECCurve;
 
 using SameSiteMode = Microsoft.AspNetCore.Http.SameSiteMode;
 
@@ -128,50 +118,6 @@ builder.Services.Configure<IdentityOptions>(options =>
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 });
-
-//builder.Services.AddAuthentication(options =>
-//{
-//    // custom scheme defined in .AddPolicyScheme() below
-//    options.DefaultScheme = "JWT_OR_COOKIE";
-//    options.DefaultChallengeScheme = "JWT_OR_COOKIE";
-//})
-//    .AddCookie("Cookies", options =>
-//    {
-//        options.LoginPath = "/Account/Login";
-//        options.ExpireTimeSpan = TimeSpan.FromDays(1);
-//        //options.LogoutPath = "/Account/Logout";
-//        //options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-//        //options.Cookie.HttpOnly = true;
-//        //// Only use this when the sites are on different domains
-//        //options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
-//    })
-//    .AddJwtBearer("Bearer", options =>
-//    {
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuer = true,
-//            ValidateAudience = true,
-//            ValidateIssuerSigningKey = true,
-//            ValidIssuer = "https://localhost:7208/",
-//            ValidAudience = "https://localhost:7208/",
-//            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@1"))
-//        };
-//    })
-//    // this is the key piece!
-//    .AddPolicyScheme("JWT_OR_COOKIE", "JWT_OR_COOKIE", options =>
-//    {
-//        // runs on each request
-//        options.ForwardDefaultSelector = context =>
-//        {
-//            // filter by auth type
-//            string authorization = context.Request.Headers[HeaderNames.Authorization];
-//            if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer "))
-//                return "Bearer";
-
-//            // otherwise always check for cookie auth
-//            return "Cookies";
-//        };
-//    });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
