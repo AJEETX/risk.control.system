@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240102004728_re-report-re")]
-    partial class rereportre
+    [Migration("20240102033155_report-template")]
+    partial class reporttemplate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,12 +140,21 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("IpAddress")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Rate")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("VendorId")
                         .IsRequired()
@@ -536,6 +545,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("ClaimsInvestigationId")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Message")
                         .HasColumnType("TEXT");
 
@@ -543,6 +555,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SenderEmail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ClaimMessageId");
@@ -620,6 +638,9 @@ namespace risk.control.system.Migrations
                     b.Property<long>("CaseLocationId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("DigitalIdReportId")
                         .HasColumnType("TEXT");
 
@@ -641,6 +662,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Question5")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ServiceReportTemplateId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SupervisorEmail")
                         .HasColumnType("TEXT");
 
@@ -651,6 +675,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("SupervisorRemarksUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VendorId")
@@ -664,6 +694,8 @@ namespace risk.control.system.Migrations
                     b.HasIndex("DigitalIdReportId");
 
                     b.HasIndex("DocumentIdReportId");
+
+                    b.HasIndex("ServiceReportTemplateId");
 
                     b.HasIndex("VendorId");
 
@@ -934,6 +966,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("CountryId")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CustomerDateOfBirth")
                         .HasColumnType("TEXT");
 
@@ -975,6 +1010,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StateId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
                     b.HasKey("CustomerDetailId");
@@ -1076,6 +1117,9 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<byte[]>("DigitalIdImage")
                         .HasColumnType("BLOB");
 
@@ -1098,6 +1142,15 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DigitalIdImagePath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ReportType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
                     b.HasKey("DigitalIdReportId");
@@ -1150,6 +1203,9 @@ namespace risk.control.system.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<byte[]>("DocumentIdImage")
                         .HasColumnType("BLOB");
 
@@ -1176,6 +1232,15 @@ namespace risk.control.system.Migrations
 
                     b.Property<bool?>("DocumentIdImageValid")
                         .HasColumnType("INTEGER");
+
+                    b.Property<int>("DocumentIdReportType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("DocumentIdReportId");
 
@@ -1911,6 +1976,9 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("DateOfIncident")
                         .HasColumnType("TEXT");
 
@@ -1925,6 +1993,12 @@ namespace risk.control.system.Migrations
 
                     b.Property<decimal>("SumAssuredValue")
                         .HasColumnType("decimal(15,2)");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("PolicyDetailId");
 
@@ -1971,6 +2045,9 @@ namespace risk.control.system.Migrations
                     b.Property<long>("CaseLocationId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("DigitalIdReportId")
                         .HasColumnType("TEXT");
 
@@ -1992,6 +2069,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Question5")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ServiceReportTemplateId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SupervisorEmail")
                         .HasColumnType("TEXT");
 
@@ -2002,6 +2082,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("SupervisorRemarksUpdated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("VendorId")
@@ -2015,9 +2101,81 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("DocumentIdReportId");
 
+                    b.HasIndex("ServiceReportTemplateId");
+
                     b.HasIndex("VendorId");
 
                     b.ToTable("PreviousClaimReport");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ReportQuestionaire", b =>
+                {
+                    b.Property<string>("ReportQuestionaireId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Detail")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool?>("Optional")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReportTemplateId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ReportQuestionaireId");
+
+                    b.HasIndex("ReportTemplateId");
+
+                    b.ToTable("ReportQuestionaire");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ReportTemplate", b =>
+                {
+                    b.Property<string>("ReportTemplateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DigitalIdReportId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentIdReportId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ReportTemplateId");
+
+                    b.HasIndex("DigitalIdReportId");
+
+                    b.HasIndex("DocumentIdReportId");
+
+                    b.ToTable("ReportTemplate");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
@@ -2098,6 +2256,50 @@ namespace risk.control.system.Migrations
                     b.HasIndex("MailboxId");
 
                     b.ToTable("SentMessage");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ServiceReportTemplate", b =>
+                {
+                    b.Property<string>("ServiceReportTemplateId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClientCompanyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InvestigationServiceTypeId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LineOfBusinessId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReportTemplateId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ServiceReportTemplateId");
+
+                    b.HasIndex("ClientCompanyId");
+
+                    b.HasIndex("InvestigationServiceTypeId");
+
+                    b.HasIndex("LineOfBusinessId");
+
+                    b.HasIndex("ReportTemplateId");
+
+                    b.ToTable("ServiceReportTemplate");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ServicedPinCode", b =>
@@ -2509,6 +2711,9 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("DistrictId")
                         .HasColumnType("TEXT");
 
@@ -2516,6 +2721,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StateId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
                     b.HasKey("VerificationLocationId");
@@ -2714,6 +2925,9 @@ namespace risk.control.system.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CustomerDob")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -2775,6 +2989,12 @@ namespace risk.control.system.Migrations
 
                     b.Property<string>("ServiceType")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -3022,6 +3242,10 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("DocumentIdReportId");
 
+                    b.HasOne("risk.control.system.Models.ServiceReportTemplate", "ServiceReportTemplate")
+                        .WithMany()
+                        .HasForeignKey("ServiceReportTemplateId");
+
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId");
@@ -3031,6 +3255,8 @@ namespace risk.control.system.Migrations
                     b.Navigation("DigitalIdReport");
 
                     b.Navigation("DocumentIdReport");
+
+                    b.Navigation("ServiceReportTemplate");
 
                     b.Navigation("Vendor");
                 });
@@ -3363,6 +3589,10 @@ namespace risk.control.system.Migrations
                         .WithMany()
                         .HasForeignKey("DocumentIdReportId");
 
+                    b.HasOne("risk.control.system.Models.ServiceReportTemplate", "ServiceReportTemplate")
+                        .WithMany()
+                        .HasForeignKey("ServiceReportTemplateId");
+
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany()
                         .HasForeignKey("VendorId");
@@ -3373,7 +3603,31 @@ namespace risk.control.system.Migrations
 
                     b.Navigation("DocumentIdReport");
 
+                    b.Navigation("ServiceReportTemplate");
+
                     b.Navigation("Vendor");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ReportQuestionaire", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ReportTemplate", null)
+                        .WithMany("ReportQuestionaire")
+                        .HasForeignKey("ReportTemplateId");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ReportTemplate", b =>
+                {
+                    b.HasOne("risk.control.system.Models.DigitalIdReport", "DigitalIdReport")
+                        .WithMany()
+                        .HasForeignKey("DigitalIdReportId");
+
+                    b.HasOne("risk.control.system.Models.DocumentIdReport", "DocumentIdReport")
+                        .WithMany()
+                        .HasForeignKey("DocumentIdReportId");
+
+                    b.Navigation("DigitalIdReport");
+
+                    b.Navigation("DocumentIdReport");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
@@ -3385,6 +3639,33 @@ namespace risk.control.system.Migrations
                         .IsRequired();
 
                     b.Navigation("Mailbox");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ServiceReportTemplate", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ClientCompany", "ClientCompany")
+                        .WithMany()
+                        .HasForeignKey("ClientCompanyId");
+
+                    b.HasOne("risk.control.system.Models.InvestigationServiceType", "InvestigationServiceType")
+                        .WithMany()
+                        .HasForeignKey("InvestigationServiceTypeId");
+
+                    b.HasOne("risk.control.system.Models.LineOfBusiness", "LineOfBusiness")
+                        .WithMany()
+                        .HasForeignKey("LineOfBusinessId");
+
+                    b.HasOne("risk.control.system.Models.ReportTemplate", "ReportTemplate")
+                        .WithMany()
+                        .HasForeignKey("ReportTemplateId");
+
+                    b.Navigation("ClientCompany");
+
+                    b.Navigation("InvestigationServiceType");
+
+                    b.Navigation("LineOfBusiness");
+
+                    b.Navigation("ReportTemplate");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ServicedPinCode", b =>
@@ -3654,6 +3935,11 @@ namespace risk.control.system.Migrations
             modelBuilder.Entity("risk.control.system.Models.PermissionSubModule", b =>
                 {
                     b.Navigation("PermissionTypes");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.ReportTemplate", b =>
+                {
+                    b.Navigation("ReportQuestionaire");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.Vendor", b =>

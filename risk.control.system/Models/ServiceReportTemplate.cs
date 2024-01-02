@@ -9,6 +9,8 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ServiceReportTemplateId { get; set; } = Guid.NewGuid().ToString();
 
+        public string Name { get; set; }
+
         public string? ClientCompanyId { get; set; }
         public virtual ClientCompany? ClientCompany { get; set; }
         public string? LineOfBusinessId { get; set; }
@@ -25,8 +27,11 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ReportTemplateId { get; set; } = Guid.NewGuid().ToString();
 
-        public List<DigitalIdReport> DigitalIdReport { get; set; } = new List<DigitalIdReport>();
-        public List<DocumentIdReport> DocumentIdReport { get; set; } = new List<DocumentIdReport>();
+        public string? Name { get; set; }
+        public string? DigitalIdReportId { get; set; }
+        public DigitalIdReport? DigitalIdReport { get; set; } = new DigitalIdReport();
+        public string? DocumentIdReportId { get; set; }
+        public DocumentIdReport? DocumentIdReport { get; set; } = new DocumentIdReport();
         public List<ReportQuestionaire> ReportQuestionaire { get; set; } = new List<ReportQuestionaire>();
     }
 
@@ -36,10 +41,10 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ReportQuestionaireId { get; set; } = Guid.NewGuid().ToString();
 
-        public string? QuestionName { get; set; }
+        public string? Name { get; set; }
 
-        public string? QuestionDetail { get; set; }
-        public string? QuestionType { get; set; }
-        public bool? Optional { get; set; }
+        public string? Detail { get; set; }
+        public string? Type { get; set; }
+        public bool Optional { get; set; } = true;
     }
 }
