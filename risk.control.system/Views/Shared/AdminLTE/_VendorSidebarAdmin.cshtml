@@ -1,0 +1,81 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@using risk.control.system.Helpers;
+@using risk.control.system.Models;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext context
+@inject UserManager<ApplicationUser> UserManager
+@model Vendor
+@{
+    var userEmail = User?.Identity?.Name;
+    var applicationUser = context.VendorApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+    var userMailbox = context.Mailbox
+    .Include(m => m.Inbox)
+    .Include(m => m.Outbox)
+    .Include(m => m.Sent)
+    .FirstOrDefault(c => c.Name == applicationUser.Email);
+
+}
+@{
+    if (User.IsInRole(AppRoles.AgencyAdmin.ToString()) || User.IsInRole(AppRoles.Supervisor.ToString()))
+    {
+        if (User.IsInRole(AppRoles.Supervisor.ToString()))
+        {
+            <li class="nav-item">
+                <a is-active-page asp-controller="ClaimsVendor" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Index")
+                            @Url.MakeActiveClass("ClaimsVendor","AllocateToVendorAgent") @Url.MakeActiveClass("ClaimsVendor","SelectVendorAgent")">
+                    <i class="fas fa-external-link-alt nav-icon"></i>
+                    <p>
+                        <span class="badge badge-danger">ALLOCATE</span>
+                    </p>
+                </a>
+            </li>
+            //<li class="nav-item">
+            //    <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReportReview" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReportReview")">
+            //        <i class="far fa-file-excel nav-icon"></i>
+            //        <p>
+            //            <span class="badge badge-danger">RE ALLOCATE</span>
+            //        </p>
+            //    </a>
+            //</li>
+        }
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")
+                                                @Url.MakeActiveClass("ClaimsVendor","GetInvestigateReport")">
+                <i class="far fa-file-archive nav-icon"></i>
+                <p>
+                    <span class="badge badge-info">AGENT REPORT</span>
+                </p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsVendor" asp-action="Open" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Open")
+                                @Url.MakeActiveClass("ClaimsVendor","Detail")">
+                <i class="fa fa-toggle-on nav-icon"></i>
+                <p>
+                    <span class="badge badge-primary">ACTIVE</span>
+                </p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("AgentWorkload","")">
+                <i class="nav-icon fas fa-shield-alt"></i>
+                <p class="sidebar-menu-header-label">
+                    AGENTS
+                    <i class="right fas fa-angle-right"></i>
+                </p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a is-active-page asp-controller="AgentWorkload" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("AgentWorkload","Index")
+                                            @Url.MakeActiveClass("AgentWorkload","Open") @Url.MakeActiveClass("AgentWorkload","Details")">
+                <i class="fas fa-user-friends nav-icon"></i>
+                <p>
+                    <span class="badge badge-warning">AGENCY WORKLOAD</span>
+                </p>
+            </a>
+        </li>
+    }
+}

@@ -1,0 +1,293 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@using risk.control.system.Helpers;
+@using risk.control.system.Models;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext context
+@inject UserManager<ApplicationUser> UserManager
+@model ClientCompany
+@{
+    if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
+    {
+        <li class="nav-item">
+            <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
+                                    @Url.MakeActiveClass("Report","Detail")">
+                <i class="fas fa-print nav-icon"></i>
+                <p>
+                    <span class="badge badge-info"> COMPLETED </span>
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Company","") @Url.MakeActiveClass("CompanyUserRoles","") ">
+                <i class="nav-icon fas fa-shield-alt"></i>
+                <p class="sidebar-menu-header-label">
+                    MANAGE COMPANY
+                    <i class="right fas fa-angle-right"></i>
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Company" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Company","CompanyProfile")
+                                                @Url.MakeActiveClass("Company","Edit") @Url.MakeActiveClass("CompanyUserRoles","")">
+                <i class="nav-icon fas fa-building"></i>
+                <p>
+                    @Applicationsettings.CLIENT_COMPANIY_PROFILE
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Company" asp-action="User" class="actual-link nav-link @Url.MakeActiveClass("Company","User")
+                                            @Url.MakeActiveClass("Company","EditUser") @Url.MakeActiveClass("Company","UserRoles")">
+                <i class="fas fa-user-friends nav-icon"></i>
+                <p>
+                    @Applicationsettings.COMPANY_USERS
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Company" asp-action="CreateUser" class="actual-link nav-link @Url.MakeActiveClass("Company","CreateUser")
+                                    ">
+                <i class="fas fa-user-plus nav-icon"></i>
+                <p>
+                    Add User
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page class="navlink-border nav-link  @Url.MakeActiveClass("Vendors","") @Url.MakeActiveClass("Company","AvailableVendors") @Url.MakeActiveClass("Company","EmpanelledVendors")
+                                                   @Url.MakeActiveClass("Company","VendorDetail") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+                <i class="nav-icon fas fa-shield-alt"></i>
+                <p class="sidebar-menu-header-label">
+                    MANAGE AGENCY(s)
+                    <i class="right fas fa-angle-right"></i>
+                </p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a is-active-page asp-controller="Vendors" asp-action="Agencies" class="actual-link nav-link @Url.MakeActiveClass("Vendors","Agencies") @Url.MakeActiveClass("Vendors","Details")
+                                        @Url.MakeActiveClass("Vendors","Edit") @Url.MakeActiveClass("Vendors","Service") @Url.MakeActiveClass("VendorUser","") @Url.MakeActiveClass("VendorService","") @Url.MakeActiveClass("VendorApplicationUsers","")">
+                <i class="nav-icon fa fa-binoculars"></i>
+                <p>
+                    Agencies
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Company" asp-action="EmpanelledVendors" class="actual-link nav-link
+                                            @Url.MakeActiveClass("Company","VendorDetails") @Url.MakeActiveClass("Company","EmpanelledVendors")">
+                <i class="nav-icon fas fa-handshake"></i>
+                <p>
+                    Empanelled Agencies
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Company" asp-action="AvailableVendors" class="actual-link nav-link @Url.MakeActiveClass("Company","AvailableVendors")
+                                        @Url.MakeActiveClass("Company","VendorDetail")">
+                <i class="nav-icon fas fa-hand-pointer"></i>
+                <p>
+                    Available Agencies
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Vendors" asp-action="Create" class="actual-link nav-link
+                                                    @Url.MakeActiveClass("Vendors","Create")">
+                <i class="nav-icon fas fa-building"></i>
+                <p>
+                    Add Agency
+                </p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","")
+                            @Url.MakeActiveClass("InvestigationCaseStatus","") @Url.MakeActiveClass("CaseEnabler","") @Url.MakeActiveClass("Costcentre","")
+                                @Url.MakeActiveClass("InvestigationCaseOutcome","")
+
+                            @Url.MakeActiveClass("BeneficiaryRelation","")">
+                <i class="nav-icon fas fa-cog"></i>
+                <p class="sidebar-menu-header-label">
+                    @Applicationsettings.COMPANY_SETTINGS
+                    <i class="right fas fa-angle-right"></i>
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="LineOfBusiness" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("LineOfBusiness","")">
+                <i class="fas fa-business-time nav-icon"></i>
+                <p>
+                    @Applicationsettings.LINE_OF_BUSINESS
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="InvestigationServiceTypes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationServiceTypes","")">
+                <i class="fas fa-tools nav-icon"></i>
+                <p>
+                    @Applicationsettings.INVESTIGATION_SERVICE
+                </p>
+            </a>
+        </li>
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="ReportQuestionaires" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ReportQuestionaires","")">
+        //        <i class="fas fa-info nav-icon"></i>
+        //        <p>
+        //            Questionaire
+        //        </p>
+        //    </a>
+        //</li>
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="ReportTemplates" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ReportTemplates","")">
+        //        <i class="fas fa-info nav-icon"></i>
+        //        <p>
+        //            Investigation Template
+        //        </p>
+        //    </a>
+        //</li>
+
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="DigitalIdReports" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("DigitalIdReports","")">
+        //        <i class="fas fa-info nav-icon"></i>
+        //        <p>
+        //            Digital Id Template
+        //        </p>
+        //    </a>
+        //</li>
+
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="DocumentIdReports" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("DocumentIdReports","")">
+        //        <i class="fas fa-info nav-icon"></i>
+        //        <p>
+        //            Document Id Template
+        //        </p>
+        //    </a>
+        //</li>
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="ServiceReportTemplates" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ServiceReportTemplates","")">
+        //        <i class="fas fa-info nav-icon"></i>
+        //        <p>
+        //            Service Template
+        //        </p>
+        //    </a>
+        //</li>
+
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="InvestigationCaseStatus" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationCaseStatus","")">
+        //        <i class="fas fa-battery-full nav-icon"></i>
+        //        <p>
+        //            @Applicationsettings.INVESTIGATION_CASE_STATUS
+        //        </p>
+        //    </a>
+        //</li>
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="InvestigationCaseSubStatus" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationCaseSubStatus","")">
+        //        <i class="fas fa-battery-half nav-icon"></i>
+        //        <p>
+        //            @Applicationsettings.CASE_SUBSTATUS
+        //        </p>
+        //    </a>
+        //</li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="CaseEnabler" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("CaseEnabler","")">
+                <i class="fas fa-puzzle-piece nav-icon"></i>
+                <p>
+                    @Applicationsettings.CASE_ENABLER
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Costcentre" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Costcentre","")">
+                <i class="fas fa-money-check-alt nav-icon"></i>
+                <p>
+                    Budget Centre
+                </p>
+            </a>
+        </li>
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="InvestigationCaseOutcome" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InvestigationCaseOutcome","")">
+        //        <i class="fas fa-clipboard-check nav-icon"></i>
+        //        <p>
+        //            @Applicationsettings.CASE_OUTCOME
+        //        </p>
+        //    </a>
+        //</li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="BeneficiaryRelation" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("BeneficiaryRelation","")">
+                <i class="fas fa-user-tie nav-icon"></i>
+                <p>
+                    @Applicationsettings.BENEFICIARY
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Audit" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Audit","")">
+                <i class="nav-icon fa fa-align-center"></i>
+                <p>
+                    @Applicationsettings.AUDIT_LOG
+                </p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")">
+                <i class="nav-icon fas fa-wrench"></i>
+                <p class="sidebar-menu-header-label">
+                    @Applicationsettings.GENERAL_SETUP
+                    <i class="right fas fa-angle-right"></i>
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Country" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Country","")">
+                <i class="nav-icon fas fa-map-marked-alt"></i>
+                <p>
+                    @Applicationsettings.COUNTRY
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="State" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("State","")">
+                <i class="nav-icon fas fa-map-marker-alt"></i>
+                <p>
+                    @Applicationsettings.STATE
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="District" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("District","")">
+                <i class="nav-icon fas fa-city"></i>
+                <p>
+                    @Applicationsettings.DISTRICT
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="PinCodes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("PinCodes","")">
+                <i class="nav-icon fas fa-map-pin"></i>
+                <p>
+                    @Applicationsettings.PINCODE
+                </p>
+            </a>
+        </li>
+
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="File" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("File","")">
+        //        <i class="nav-icon fa fa-upload"></i>
+        //        <p>
+        //            @Applicationsettings.MULTIPLE_UPLOAD
+        //        </p>
+        //    </a>
+        //</li>
+
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="Uploads" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Uploads","")">
+        //        <i class="nav-icon fa fa-upload"></i>
+        //        <p>
+        //            @Applicationsettings.PINCODE_UPLOAD
+        //        </p>
+        //    </a>
+        //</li>
+    }
+}

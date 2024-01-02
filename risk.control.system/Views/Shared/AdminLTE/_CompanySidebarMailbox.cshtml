@@ -1,0 +1,98 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@using risk.control.system.Helpers;
+@using risk.control.system.Models;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext context
+@inject UserManager<ApplicationUser> UserManager
+@model ClientCompany
+
+@{
+    var userEmail = User?.Identity?.Name;
+    var applicationUser = context.ClientCompanyApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
+    var userMailbox = context.Mailbox
+    .Include(m => m.Inbox)
+    .Include(m => m.Outbox)
+    .Include(m => m.Sent)
+    .FirstOrDefault(c => c.Name == applicationUser.Email);
+
+    var roleCode = string.Empty;
+    var newInboxMessgeDisplay = string.Empty;
+    var newOutboxMessgeDisplay = string.Empty;
+    var newSentMessgeDisplay = string.Empty;
+    var newTrashMessgeDisplay = string.Empty;
+
+
+    var newInboxMessages = userMailbox?.Inbox.Where(i => i.Read == false);
+    if (newInboxMessages is not null && newInboxMessages.Count() > 0)
+    {
+        newInboxMessgeDisplay = "(" + newInboxMessages.Count().ToString() + ")";
+    }
+
+    var newOutboxMessages = userMailbox?.Outbox.Where(i => i.Read == false);
+    if (newOutboxMessages is not null && newOutboxMessages.Count() > 0)
+    {
+        newOutboxMessgeDisplay = "(" + newOutboxMessages.Count().ToString() + ")";
+    }
+    var newSentMessages = userMailbox?.Sent.Where(i => i.Read == false);
+    if (newSentMessages is not null && newSentMessages.Count() > 0)
+    {
+        newSentMessgeDisplay = "(" + newSentMessages.Count().ToString() + ")";
+    }
+}
+<li class="nav-item ">
+    <a asp-controller="Dashboard" asp-action="Index" class="navlink-border nav-link @Url.MakeActiveClass("Dashboard","")">
+        <i class="nav-icon fas fa-home"></i>
+        <p class="sidebar-menu-header-label">
+            @Applicationsettings.DASHBOARD
+        </p>
+    </a>
+</li>
+<li class="nav-item ">
+    <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ContactMessage","")">
+        <i class="nav-icon fas fa-envelope"></i>
+        <p class="sidebar-menu-header-label">
+            @Applicationsettings.MAILBOX
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="ContactMessage" asp-action="Inbox" class="actual-link nav-link
+                        @Url.MakeActiveClass("ContactMessage","Inbox") @Url.MakeActiveClass("ContactMessage","InboxDetails") @Url.MakeActiveClass("ContactMessage","InboxDetailsReply")">
+        <i class="fas fa-inbox nav-icon"></i>
+        <p>
+            @Applicationsettings.INBOX <span class="badge badge-danger">@newInboxMessgeDisplay</span>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="ContactMessage" asp-action="Create" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Create")">
+        <i class="fa fa-edit nav-icon"></i>
+        <p>
+            @Applicationsettings.COMPOSE
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="ContactMessage" asp-action="Sent" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Sent") @Url.MakeActiveClass("ContactMessage","Sentdetails") @Url.MakeActiveClass("ContactMessage","SentdetailsReply")">
+        <i class="fas fa-paper-plane nav-icon"></i>
+        <p>
+            @Applicationsettings.SENT_MAIL <span class="badge badge-light">@newSentMessgeDisplay</span>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="ContactMessage" asp-action="Outbox" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Outbox") @Url.MakeActiveClass("ContactMessage","OutboxDetails")">
+        <i class="fa fa-exclamation-triangle nav-icon"></i>
+        <p>
+            @Applicationsettings.OUTBOX  <span class="badge badge-warning">@newOutboxMessgeDisplay</span>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="ContactMessage" asp-action="Trash" class="actual-link nav-link @Url.MakeActiveClass("ContactMessage","Trash") @Url.MakeActiveClass("ContactMessage","TrashDetails")">
+        <i class="fas fa-trash-alt nav-icon"></i>
+        <p>
+            @Applicationsettings.TRASH_MAIL
+        </p>
+    </a>
+</li>
