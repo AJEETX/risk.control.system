@@ -1141,6 +1141,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("DigitalIdImagePath")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ReportTemplateId")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ReportType")
                         .HasColumnType("INTEGER");
 
@@ -1151,6 +1154,8 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("DigitalIdReportId");
+
+                    b.HasIndex("ReportTemplateId");
 
                     b.ToTable("DigitalIdReport");
                 });
@@ -1233,6 +1238,9 @@ namespace risk.control.system.Migrations
                     b.Property<int>("DocumentIdReportType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ReportTemplateId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("TEXT");
 
@@ -1240,6 +1248,8 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("DocumentIdReportId");
+
+                    b.HasIndex("ReportTemplateId");
 
                     b.ToTable("DocumentIdReport");
                 });
@@ -2120,7 +2130,7 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool?>("Optional")
+                    b.Property<bool>("Optional")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ReportTemplateId")
@@ -2151,12 +2161,6 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DigitalIdReportId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DocumentIdReportId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
@@ -2167,10 +2171,6 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("ReportTemplateId");
-
-                    b.HasIndex("DigitalIdReportId");
-
-                    b.HasIndex("DocumentIdReportId");
 
                     b.ToTable("ReportTemplate");
                 });
@@ -3360,6 +3360,13 @@ namespace risk.control.system.Migrations
                     b.Navigation("Mailbox");
                 });
 
+            modelBuilder.Entity("risk.control.system.Models.DigitalIdReport", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ReportTemplate", null)
+                        .WithMany("DigitalIdReports")
+                        .HasForeignKey("ReportTemplateId");
+                });
+
             modelBuilder.Entity("risk.control.system.Models.District", b =>
                 {
                     b.HasOne("risk.control.system.Models.Country", "Country")
@@ -3375,6 +3382,13 @@ namespace risk.control.system.Migrations
                     b.Navigation("Country");
 
                     b.Navigation("State");
+                });
+
+            modelBuilder.Entity("risk.control.system.Models.DocumentIdReport", b =>
+                {
+                    b.HasOne("risk.control.system.Models.ReportTemplate", null)
+                        .WithMany("DocumentIdReports")
+                        .HasForeignKey("ReportTemplateId");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.DraftMessage", b =>
@@ -3610,21 +3624,6 @@ namespace risk.control.system.Migrations
                     b.HasOne("risk.control.system.Models.ReportTemplate", null)
                         .WithMany("ReportQuestionaire")
                         .HasForeignKey("ReportTemplateId");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.ReportTemplate", b =>
-                {
-                    b.HasOne("risk.control.system.Models.DigitalIdReport", "DigitalIdReport")
-                        .WithMany()
-                        .HasForeignKey("DigitalIdReportId");
-
-                    b.HasOne("risk.control.system.Models.DocumentIdReport", "DocumentIdReport")
-                        .WithMany()
-                        .HasForeignKey("DocumentIdReportId");
-
-                    b.Navigation("DigitalIdReport");
-
-                    b.Navigation("DocumentIdReport");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.SentMessage", b =>
@@ -3936,6 +3935,10 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ReportTemplate", b =>
                 {
+                    b.Navigation("DigitalIdReports");
+
+                    b.Navigation("DocumentIdReports");
+
                     b.Navigation("ReportQuestionaire");
                 });
 

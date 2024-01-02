@@ -97,53 +97,6 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DigitalIdReport",
-                columns: table => new
-                {
-                    DigitalIdReportId = table.Column<string>(type: "TEXT", nullable: false),
-                    DigitalIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    DigitalIdImageData = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImageMatchConfidence = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImageLongLat = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdImageLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    ReportType = table.Column<int>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DigitalIdReport", x => x.DigitalIdReportId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DocumentIdReport",
-                columns: table => new
-                {
-                    DocumentIdReportId = table.Column<string>(type: "TEXT", nullable: false),
-                    DocumentIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    DocumentIdImageValid = table.Column<bool>(type: "INTEGER", nullable: true),
-                    DocumentIdImageType = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageData = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageLongLat = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdImageLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    DocumentIdReportType = table.Column<int>(type: "INTEGER", nullable: false),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DocumentIdReport", x => x.DocumentIdReportId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "FilesOnDatabase",
                 columns: table => new
                 {
@@ -251,6 +204,21 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ReportTemplate",
+                columns: table => new
+                {
+                    ReportTemplateId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReportTemplate", x => x.ReportTemplateId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UploadClaim",
                 columns: table => new
                 {
@@ -316,33 +284,6 @@ namespace risk.control.system.Migrations
                         principalTable: "Country",
                         principalColumn: "CountryId",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReportTemplate",
-                columns: table => new
-                {
-                    ReportTemplateId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdReportId = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdReportId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReportTemplate", x => x.ReportTemplateId);
-                    table.ForeignKey(
-                        name: "FK_ReportTemplate_DigitalIdReport_DigitalIdReportId",
-                        column: x => x.DigitalIdReportId,
-                        principalTable: "DigitalIdReport",
-                        principalColumn: "DigitalIdReportId");
-                    table.ForeignKey(
-                        name: "FK_ReportTemplate_DocumentIdReport_DocumentIdReportId",
-                        column: x => x.DocumentIdReportId,
-                        principalTable: "DocumentIdReport",
-                        principalColumn: "DocumentIdReportId");
                 });
 
             migrationBuilder.CreateTable(
@@ -414,6 +355,89 @@ namespace risk.control.system.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DigitalIdReport",
+                columns: table => new
+                {
+                    DigitalIdReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    DigitalIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    DigitalIdImageData = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageMatchConfidence = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdImageLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ReportType = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReportTemplateId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DigitalIdReport", x => x.DigitalIdReportId);
+                    table.ForeignKey(
+                        name: "FK_DigitalIdReport_ReportTemplate_ReportTemplateId",
+                        column: x => x.ReportTemplateId,
+                        principalTable: "ReportTemplate",
+                        principalColumn: "ReportTemplateId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DocumentIdReport",
+                columns: table => new
+                {
+                    DocumentIdReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    DocumentIdImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImage = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    DocumentIdImageValid = table.Column<bool>(type: "INTEGER", nullable: true),
+                    DocumentIdImageType = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageData = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLocationUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLocationAddress = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLongLat = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdImageLongLatTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    DocumentIdReportType = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReportTemplateId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentIdReport", x => x.DocumentIdReportId);
+                    table.ForeignKey(
+                        name: "FK_DocumentIdReport_ReportTemplate_ReportTemplateId",
+                        column: x => x.ReportTemplateId,
+                        principalTable: "ReportTemplate",
+                        principalColumn: "ReportTemplateId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReportQuestionaire",
+                columns: table => new
+                {
+                    ReportQuestionaireId = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Detail = table.Column<string>(type: "TEXT", nullable: true),
+                    Type = table.Column<string>(type: "TEXT", nullable: true),
+                    Optional = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ReportTemplateId = table.Column<string>(type: "TEXT", nullable: true),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReportQuestionaire", x => x.ReportQuestionaireId);
+                    table.ForeignKey(
+                        name: "FK_ReportQuestionaire_ReportTemplate_ReportTemplateId",
+                        column: x => x.ReportTemplateId,
+                        principalTable: "ReportTemplate",
+                        principalColumn: "ReportTemplateId");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "District",
                 columns: table => new
                 {
@@ -440,30 +464,6 @@ namespace risk.control.system.Migrations
                         column: x => x.StateId,
                         principalTable: "State",
                         principalColumn: "StateId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReportQuestionaire",
-                columns: table => new
-                {
-                    ReportQuestionaireId = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    Detail = table.Column<string>(type: "TEXT", nullable: true),
-                    Type = table.Column<string>(type: "TEXT", nullable: true),
-                    Optional = table.Column<bool>(type: "INTEGER", nullable: true),
-                    ReportTemplateId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReportQuestionaire", x => x.ReportQuestionaireId);
-                    table.ForeignKey(
-                        name: "FK_ReportQuestionaire_ReportTemplate_ReportTemplateId",
-                        column: x => x.ReportTemplateId,
-                        principalTable: "ReportTemplate",
-                        principalColumn: "ReportTemplateId");
                 });
 
             migrationBuilder.CreateTable(
@@ -2073,6 +2073,11 @@ namespace risk.control.system.Migrations
                 column: "MailboxId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DigitalIdReport_ReportTemplateId",
+                table: "DigitalIdReport",
+                column: "ReportTemplateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_District_CountryId",
                 table: "District",
                 column: "CountryId");
@@ -2081,6 +2086,11 @@ namespace risk.control.system.Migrations
                 name: "IX_District_StateId",
                 table: "District",
                 column: "StateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentIdReport_ReportTemplateId",
+                table: "DocumentIdReport",
+                column: "ReportTemplateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DraftMessage_MailboxId",
@@ -2237,16 +2247,6 @@ namespace risk.control.system.Migrations
                 name: "IX_ReportQuestionaire_ReportTemplateId",
                 table: "ReportQuestionaire",
                 column: "ReportTemplateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReportTemplate_DigitalIdReportId",
-                table: "ReportTemplate",
-                column: "DigitalIdReportId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ReportTemplate_DocumentIdReportId",
-                table: "ReportTemplate",
-                column: "DocumentIdReportId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SentMessage_MailboxId",
@@ -2661,6 +2661,12 @@ namespace risk.control.system.Migrations
                 name: "CaseLocation");
 
             migrationBuilder.DropTable(
+                name: "DigitalIdReport");
+
+            migrationBuilder.DropTable(
+                name: "DocumentIdReport");
+
+            migrationBuilder.DropTable(
                 name: "ServiceReportTemplate");
 
             migrationBuilder.DropTable(
@@ -2668,12 +2674,6 @@ namespace risk.control.system.Migrations
 
             migrationBuilder.DropTable(
                 name: "ReportTemplate");
-
-            migrationBuilder.DropTable(
-                name: "DigitalIdReport");
-
-            migrationBuilder.DropTable(
-                name: "DocumentIdReport");
 
             migrationBuilder.DropTable(
                 name: "ClientCompany");
