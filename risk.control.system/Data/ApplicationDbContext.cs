@@ -17,6 +17,9 @@ namespace risk.control.system.Data
         }
 
         public virtual DbSet<AgencyRating> Ratings { get; set; }
+        public virtual DbSet<ServiceReportTemplate> ServiceReportTemplate { get; set; }
+        public virtual DbSet<ReportTemplate> ReportTemplate { get; set; }
+        public virtual DbSet<ReportQuestionaire> ReportQuestionaire { get; set; }
         public virtual DbSet<VendorInvoice> VendorInvoice { get; set; }
         public virtual DbSet<PermissionModule> PermissionModule { get; set; }
         public virtual DbSet<PermissionType> PermissionType { get; set; }

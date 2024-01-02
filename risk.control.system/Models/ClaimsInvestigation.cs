@@ -139,7 +139,7 @@ namespace risk.control.system.Models
         FTP,
     }
 
-    public class VerificationLocation
+    public class VerificationLocation : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

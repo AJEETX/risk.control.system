@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-    public class ClaimReport
+    public class ClaimReport : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -39,6 +39,8 @@ namespace risk.control.system.Models
 
         public long CaseLocationId { get; set; }
         public CaseLocation CaseLocation { get; set; }
+        public string? ServiceReportTemplateId { get; set; }
+        public virtual ServiceReportTemplate? ServiceReportTemplate { get; set; }
     }
 
     public enum SupervisorRemarkType
