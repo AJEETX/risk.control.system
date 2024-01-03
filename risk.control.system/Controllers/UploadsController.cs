@@ -172,6 +172,8 @@ namespace risk.control.system.Controllers
                 }
                 string fileName = Path.GetTempFileName();
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(postedFile.FileName);
+                fileNameWithoutExtension += DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss");
+
                 string filePath = Path.Combine(path, fileName);
 
                 using (FileStream stream = new FileStream(filePath, FileMode.Create))
