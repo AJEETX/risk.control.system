@@ -16,7 +16,10 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DigitalIdReport.ReportType)
+                @Html.DisplayNameFor(model => model.DigitalIdReport)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DocumentIdReport)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Created)
@@ -36,9 +39,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-                <th>
-                    @Html.DisplayNameFor(model => model.DigitalIdReport.ReportType)
-                </th>
+            <td>
+                @Html.DisplayFor(modelItem => item.DigitalIdReport.DigitalIdReportId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DocumentIdReport.DocumentIdReportId)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Created)
             </td>

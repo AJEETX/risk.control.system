@@ -820,38 +820,38 @@ namespace risk.control.system.Services
                 claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT).InvestigationCaseSubStatusId;
 
-                var reportQuestion = new ReportQuestionaire
-                {
-                    Question1 = "What is your name"
-                };
-                var reportQuestions = new List<ReportQuestionaire> { reportQuestion };
+                //var reportQuestion = new ReportQuestionaire
+                //{
+                //    Question1 = "What is your name"
+                //};
+                //var reportQuestions = new List<ReportQuestionaire> { reportQuestion };
 
-                var reportTempate = new ReportTemplate
-                {
-                    Name = claim.PolicyDetail.InvestigationServiceType.Name,
-                    DigitalIdReport = new DigitalIdReport { ReportType = DigitalIdReportType.SINGLE_FACE },
-                    DocumentIdReport = new DocumentIdReport { DocumentIdReportType = DocumentIdReportType.PAN },
-                    ReportQuestionaire = reportQuestions
-                };
+                //var reportTempate = new ReportTemplate
+                //{
+                //    Name = claim.PolicyDetail.InvestigationServiceType.Name,
+                //    DigitalIdReport = new DigitalIdReport { ReportType = DigitalIdReportType.SINGLE_FACE },
+                //    DocumentIdReport = new DocumentIdReport { DocumentIdReportType = DocumentIdReportType.PAN },
+                //    ReportQuestionaire = reportQuestions
+                //};
 
-                var serviceTemplate = new ServiceReportTemplate
-                {
-                    ClientCompanyId = claim.PolicyDetail.ClientCompanyId,
-                    LineOfBusinessId = claim.PolicyDetail.LineOfBusinessId,
-                    InvestigationServiceTypeId = claim.PolicyDetail.InvestigationServiceTypeId,
-                    Name = claim.PolicyDetail.ClientCompany.Name + claim.PolicyDetail.InvestigationServiceType.Name,
-                    ReportTemplate = reportTempate
-                };
+                //var serviceTemplate = new ServiceReportTemplate
+                //{
+                //    ClientCompanyId = claim.PolicyDetail.ClientCompanyId,
+                //    LineOfBusinessId = claim.PolicyDetail.LineOfBusinessId,
+                //    InvestigationServiceTypeId = claim.PolicyDetail.InvestigationServiceTypeId,
+                //    Name = claim.PolicyDetail.ClientCompany.Name + claim.PolicyDetail.InvestigationServiceType.Name,
+                //    ReportTemplate = reportTempate
+                //};
 
-                var claimReport = new ClaimReport
-                {
-                    ServiceReportTemplate = serviceTemplate,
-                };
-                claimsCaseLocation.ClaimReport = claimReport;
-                _context.ReportQuestionaire.AddRange(reportQuestions);
-                _context.ReportTemplate.Add(reportTempate);
-                _context.ServiceReportTemplate.Add(serviceTemplate);
-                _context.ClaimReport.Add(claimReport);
+                //var claimReport = new ClaimReport
+                //{
+                //    ServiceReportTemplate = serviceTemplate,
+                //};
+                //claimsCaseLocation.ClaimReport = claimReport;
+                //_context.ReportQuestionaire.AddRange(reportQuestions);
+                //_context.ReportTemplate.Add(reportTempate);
+                //_context.ServiceReportTemplate.Add(serviceTemplate);
+                //_context.ClaimReport.Add(claimReport);
                 _context.CaseLocation.Update(claimsCaseLocation);
 
                 var agentUser = _context.VendorApplicationUser.FirstOrDefault(u => u.Email == vendorAgentEmail);

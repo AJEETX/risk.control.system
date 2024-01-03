@@ -28,8 +28,10 @@ namespace risk.control.system.Models
         public string ReportTemplateId { get; set; } = Guid.NewGuid().ToString();
 
         public string? Name { get; set; }
-        public DigitalIdReport? DigitalIdReport { get; set; } = new DigitalIdReport();
-        public DocumentIdReport? DocumentIdReport { get; set; } = new DocumentIdReport();
+        public string? DigitalIdReportId { get; set; }
+        public DigitalIdReport? DigitalIdReport { get; set; }
+        public string? DocumentIdReportId { get; set; }
+        public DocumentIdReport? DocumentIdReport { get; set; }
         public List<ReportQuestionaire> ReportQuestionaire { get; set; } = new List<ReportQuestionaire>();
     }
 
