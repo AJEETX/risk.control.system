@@ -49,5 +49,7 @@ namespace risk.control.system.Models
         public string? Question3 { get; set; }
         public string? Question4 { get; set; }
         public string? Question5 { get; set; }
+        public string? ReportTemplateId { get; set; }
+        public ReportTemplate? ReportTemplate { get; set; }
     }
 }

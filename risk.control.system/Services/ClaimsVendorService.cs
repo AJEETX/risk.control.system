@@ -271,6 +271,12 @@ namespace risk.control.system.Services
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
+                .Include(c => c.ClaimReport)
+                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
                     );
@@ -400,6 +406,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.DocumentIdReport)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.ReportQuestionaire)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
+                .Include(c => c.ClaimReport)
+                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .Include(c => c.District)
                 .Include(c => c.Country)
                 .Include(c => c.State)
@@ -461,6 +473,12 @@ namespace risk.control.system.Services
                 .ThenInclude(c => c.ClaimReport.DigitalIdReport)
                 .Include(c => c.CaseLocations)
                 .ThenInclude(c => c.ClaimReport.DocumentIdReport)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.ClaimReport.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
+                .Include(c => c.CaseLocations)
+                    .ThenInclude(c => c.ClaimReport.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();

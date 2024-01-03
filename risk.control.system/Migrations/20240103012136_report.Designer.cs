@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240102235247_report")]
+    [Migration("20240103012136_report")]
     partial class report
     {
         /// <inheritdoc />
@@ -3617,9 +3617,11 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ReportQuestionaire", b =>
                 {
-                    b.HasOne("risk.control.system.Models.ReportTemplate", null)
+                    b.HasOne("risk.control.system.Models.ReportTemplate", "ReportTemplate")
                         .WithMany("ReportQuestionaire")
                         .HasForeignKey("ReportTemplateId");
+
+                    b.Navigation("ReportTemplate");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ReportTemplate", b =>

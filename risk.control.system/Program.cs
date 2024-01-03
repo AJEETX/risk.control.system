@@ -94,7 +94,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=report-tempate_01.db"));
+                        options.UseSqlite("Data Source=report-tempate_02.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

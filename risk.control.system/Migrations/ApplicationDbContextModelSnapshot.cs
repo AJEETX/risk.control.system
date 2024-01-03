@@ -3614,9 +3614,11 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ReportQuestionaire", b =>
                 {
-                    b.HasOne("risk.control.system.Models.ReportTemplate", null)
+                    b.HasOne("risk.control.system.Models.ReportTemplate", "ReportTemplate")
                         .WithMany("ReportQuestionaire")
                         .HasForeignKey("ReportTemplateId");
+
+                    b.Navigation("ReportTemplate");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.ReportTemplate", b =>

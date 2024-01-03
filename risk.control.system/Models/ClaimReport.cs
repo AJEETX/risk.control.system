@@ -11,10 +11,6 @@ namespace risk.control.system.Models
 
         public string? VendorId { get; set; }
         public Vendor? Vendor { get; set; }
-        public string? AgentEmail { get; set; }
-
-        public DateTime? AgentRemarksUpdated { get; set; }
-        public string? AgentRemarks { get; set; }
 
         public DigitalIdReport? DigitalIdReport { get; set; } = new DigitalIdReport();
 
@@ -22,6 +18,9 @@ namespace risk.control.system.Models
 
         public DocumentIdReport? DocumentIdReport { get; set; } = new DocumentIdReport();
 
+        public string? AgentEmail { get; set; }
+        public DateTime? AgentRemarksUpdated { get; set; }
+        public string? AgentRemarks { get; set; }
         public DateTime? SupervisorRemarksUpdated { get; set; }
         public string? SupervisorEmail { get; set; }
         public string? SupervisorRemarks { get; set; }
