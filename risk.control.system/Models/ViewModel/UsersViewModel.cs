@@ -38,12 +38,14 @@ namespace risk.control.system.Models.ViewModel
 
     public class VendorUsersViewModel
     {
+        [Display(Name = "Agency name")]
         public Vendor Vendor { get; set; }
         public List<UsersViewModel> Users { get; set; } = new();
     }
 
     public class CompanyUsersViewModel
     {
+        [Display(Name = "Insurer name")]
         public ClientCompany Company { get; set; }
         public List<UsersViewModel> Users { get; set; } = new();
     }

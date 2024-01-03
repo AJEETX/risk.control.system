@@ -10,10 +10,10 @@ namespace risk.control.system.Models
         public string PolicyDetailId { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
-        [Display(Name = "Company name")]
+        [Display(Name = "Insurer name")]
         public string? ClientCompanyId { get; set; }
 
-        [Display(Name = "Company name")]
+        [Display(Name = "Insurer name")]
         public ClientCompany? ClientCompany { get; set; }
 
         [Display(Name = "Line of Business")]

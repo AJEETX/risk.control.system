@@ -58,7 +58,6 @@ namespace risk.control.system.Controllers
         public IActionResult Create()
         {
             ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name");
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
             ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name");
             return View();
@@ -73,14 +72,17 @@ namespace risk.control.system.Controllers
         {
             if (ModelState.IsValid)
             {
+                var userEmail = HttpContext?.User?.Identity?.Name;
+                serviceReportTemplate.Updated = DateTime.UtcNow;
+                serviceReportTemplate.UpdatedBy = userEmail;
                 _context.Add(serviceReportTemplate);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "ClientCompanyId", serviceReportTemplate.ClientCompanyId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "InvestigationServiceTypeId", serviceReportTemplate.InvestigationServiceTypeId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "LineOfBusinessId", serviceReportTemplate.LineOfBusinessId);
-            ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "ReportTemplateId", serviceReportTemplate.ReportTemplateId);
+            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", serviceReportTemplate.ClientCompanyId);
+            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", serviceReportTemplate.InvestigationServiceTypeId);
+            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", serviceReportTemplate.LineOfBusinessId);
+            ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name", serviceReportTemplate.ReportTemplateId);
             return View(serviceReportTemplate);
         }
 
@@ -97,10 +99,10 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "ClientCompanyId", serviceReportTemplate.ClientCompanyId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "InvestigationServiceTypeId", serviceReportTemplate.InvestigationServiceTypeId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "LineOfBusinessId", serviceReportTemplate.LineOfBusinessId);
-            ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "ReportTemplateId", serviceReportTemplate.ReportTemplateId);
+            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", serviceReportTemplate.ClientCompanyId);
+            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", serviceReportTemplate.InvestigationServiceTypeId);
+            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", serviceReportTemplate.LineOfBusinessId);
+            ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name", serviceReportTemplate.ReportTemplateId);
             return View(serviceReportTemplate);
         }
 
@@ -120,6 +122,9 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    var userEmail = HttpContext?.User?.Identity?.Name;
+                    serviceReportTemplate.Updated = DateTime.UtcNow;
+                    serviceReportTemplate.UpdatedBy = userEmail;
                     _context.Update(serviceReportTemplate);
                     await _context.SaveChangesAsync();
                 }
@@ -136,10 +141,10 @@ namespace risk.control.system.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "ClientCompanyId", serviceReportTemplate.ClientCompanyId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "InvestigationServiceTypeId", serviceReportTemplate.InvestigationServiceTypeId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "LineOfBusinessId", serviceReportTemplate.LineOfBusinessId);
-            ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "ReportTemplateId", serviceReportTemplate.ReportTemplateId);
+            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", serviceReportTemplate.ClientCompanyId);
+            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", serviceReportTemplate.InvestigationServiceTypeId);
+            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", serviceReportTemplate.LineOfBusinessId);
+            ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name", serviceReportTemplate.ReportTemplateId);
             return View(serviceReportTemplate);
         }
 

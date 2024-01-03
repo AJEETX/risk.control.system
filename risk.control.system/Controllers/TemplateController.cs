@@ -12,23 +12,23 @@ using risk.control.system.Models;
 
 namespace risk.control.system.Controllers
 {
-    public class ReportTemplateController : Controller
+    public class TemplateController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ReportTemplateController(ApplicationDbContext context)
+        public TemplateController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: ReportTemplate
+        // GET: Template
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.ReportTemplate.Include(r => r.DigitalIdReport).Include(r => r.DocumentIdReport);
+            var applicationDbContext = _context.ReportTemplate.Include(r => r.DigitalIdReport).Include(r => r.DocumentIdReport).Include(r => r.ReportQuestionaire);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: ReportTemplate/Details/5
+        // GET: Template/Details/5
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.ReportTemplate == null)
@@ -39,6 +39,7 @@ namespace risk.control.system.Controllers
             var reportTemplate = await _context.ReportTemplate
                 .Include(r => r.DigitalIdReport)
                 .Include(r => r.DocumentIdReport)
+                .Include(r => r.ReportQuestionaire)
                 .FirstOrDefaultAsync(m => m.ReportTemplateId == id);
             if (reportTemplate == null)
             {
@@ -48,22 +49,21 @@ namespace risk.control.system.Controllers
             return View(reportTemplate);
         }
 
-        // GET: ReportTemplate/Create
+        // GET: Template/Create
         public IActionResult Create()
         {
             ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType");
             ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType");
             ViewData["ReportQuestionaireId"] = new SelectList(_context.ReportQuestionaire, "ReportQuestionaireId", "Question");
-
             return View();
         }
 
-        // POST: ReportTemplate/Create
+        // POST: Template/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReportTemplateId,Name,DigitalIdReportId,DocumentIdReportId,Created,Updated,UpdatedBy,ReportQuestionaireId")] ReportTemplate reportTemplate)
+        public async Task<IActionResult> Create([Bind("ReportTemplateId,Name,DigitalIdReportId,DocumentIdReportId,ReportQuestionaireId,Created,Updated,UpdatedBy")] ReportTemplate reportTemplate)
         {
             if (ModelState.IsValid)
             {
@@ -74,12 +74,13 @@ namespace risk.control.system.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "DigitalIdReportId", reportTemplate.DigitalIdReportId);
-            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportId", reportTemplate.DocumentIdReportId);
+            ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType", reportTemplate.DigitalIdReportId);
+            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
+            ViewData["ReportQuestionaireId"] = new SelectList(_context.ReportQuestionaire, "ReportQuestionaireId", "Question", reportTemplate.ReportQuestionaireId);
             return View(reportTemplate);
         }
 
-        // GET: ReportTemplate/Edit/5
+        // GET: Template/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.ReportTemplate == null)
@@ -92,17 +93,18 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "DigitalIdReportId", reportTemplate.DigitalIdReportId);
-            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportId", reportTemplate.DocumentIdReportId);
+            ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType", reportTemplate.DigitalIdReportId);
+            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
+            ViewData["ReportQuestionaireId"] = new SelectList(_context.ReportQuestionaire, "ReportQuestionaireId", "Question", reportTemplate.ReportQuestionaireId);
             return View(reportTemplate);
         }
 
-        // POST: ReportTemplate/Edit/5
+        // POST: Template/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("ReportTemplateId,Name,DigitalIdReportId,DocumentIdReportId,Created,Updated,UpdatedBy")] ReportTemplate reportTemplate)
+        public async Task<IActionResult> Edit(string id, [Bind("ReportTemplateId,Name,DigitalIdReportId,DocumentIdReportId,ReportQuestionaireId,Created,Updated,UpdatedBy")] ReportTemplate reportTemplate)
         {
             if (id != reportTemplate.ReportTemplateId)
             {
@@ -132,12 +134,13 @@ namespace risk.control.system.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "DigitalIdReportId", reportTemplate.DigitalIdReportId);
-            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportId", reportTemplate.DocumentIdReportId);
+            ViewData["DigitalIdReportId"] = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType", reportTemplate.DigitalIdReportId);
+            ViewData["DocumentIdReportId"] = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType", reportTemplate.DocumentIdReportId);
+            ViewData["ReportQuestionaireId"] = new SelectList(_context.ReportQuestionaire, "ReportQuestionaireId", "Question", reportTemplate.ReportQuestionaireId);
             return View(reportTemplate);
         }
 
-        // GET: ReportTemplate/Delete/5
+        // GET: Template/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ReportTemplate == null)
@@ -148,6 +151,7 @@ namespace risk.control.system.Controllers
             var reportTemplate = await _context.ReportTemplate
                 .Include(r => r.DigitalIdReport)
                 .Include(r => r.DocumentIdReport)
+                .Include(r => r.ReportQuestionaire)
                 .FirstOrDefaultAsync(m => m.ReportTemplateId == id);
             if (reportTemplate == null)
             {
@@ -157,7 +161,7 @@ namespace risk.control.system.Controllers
             return View(reportTemplate);
         }
 
-        // POST: ReportTemplate/Delete/5
+        // POST: Template/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)

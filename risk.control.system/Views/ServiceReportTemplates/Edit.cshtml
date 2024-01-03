@@ -25,34 +25,26 @@
             </div>
             <div class="form-group">
                 <label asp-for="LineOfBusinessId" class="control-label"></label>
-                <select asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId"></select>
+                <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
+                    <option>--- SELECT BUSINESS ---</option>
+                </select>
                 <span asp-validation-for="LineOfBusinessId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
-                <select asp-for="InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId"></select>
+                <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" onchange="setInvestigationServices(this)" asp-items="ViewBag.InvestigationServiceTypeId">
+                    <option>--- SELECT SERVICE ---</option>
+                </select>
                 <span asp-validation-for="InvestigationServiceTypeId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ReportTemplateId" class="control-label"></label>
-                <select asp-for="ReportTemplateId" class="form-control" asp-items="ViewBag.ReportTemplateId"></select>
+                <select asp-for="ReportTemplateId" class="form-control" asp-items="ViewBag.ReportTemplateId">
+                    <option>--- SELECT TEMPLATE ---</option>
+                </select>
                 <span asp-validation-for="ReportTemplateId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Created" class="control-label"></label>
-                <input asp-for="Created" class="form-control" />
-                <span asp-validation-for="Created" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Updated" class="control-label"></label>
-                <input asp-for="Updated" class="form-control" />
-                <span asp-validation-for="Updated" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedBy" class="control-label"></label>
-                <input asp-for="UpdatedBy" class="form-control" />
-                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
-            </div>
+            
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

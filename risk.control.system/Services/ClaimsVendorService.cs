@@ -413,6 +413,8 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimReport)
                     .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .Include(c => c.District)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);

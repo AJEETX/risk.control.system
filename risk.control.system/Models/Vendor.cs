@@ -91,6 +91,7 @@ namespace risk.control.system.Models
         [Display(Name = "Vendor Users")]
         public List<VendorApplicationUser>? VendorApplicationUser { get; set; }
 
+        [Display(Name = "Insurer names")]
         public List<ClientCompany>? Clients { get; set; } = new List<ClientCompany>();
 
         [Display(Name = "Empanel")]

@@ -37,9 +37,10 @@ namespace risk.control.system.Models
 
         public Vendor? Vendor { get; set; }
 
-        [Display(Name = "Company")]
+        [Display(Name = "Insurer name")]
         public string? ClientCompanyId { get; set; }
 
+        [Display(Name = "Insurer name")]
         public virtual ClientCompany? ClientCompany { get; set; }
 
         [Display(Name = "Note To Recipient")]

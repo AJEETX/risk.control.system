@@ -9,10 +9,10 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ClientCompanyId { get; set; } = Guid.NewGuid().ToString();
 
-        [Display(Name = "Company name")]
+        [Display(Name = "Insurer name")]
         public string Name { get; set; } = default!;
 
-        [Display(Name = "Company code")]
+        [Display(Name = "Insurer code")]
         public string Code { get; set; } = default!;
 
         public string Description { get; set; } = default!;

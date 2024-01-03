@@ -11,8 +11,12 @@ namespace risk.control.system.Models
 
         public string Name { get; set; }
 
+        [Display(Name = "Insurer name")]
         public string? ClientCompanyId { get; set; }
+
+        [Display(Name = "Insurer name")]
         public virtual ClientCompany? ClientCompany { get; set; }
+
         public string? LineOfBusinessId { get; set; }
         public virtual LineOfBusiness? LineOfBusiness { get; set; }
         public string? InvestigationServiceTypeId { get; set; }
@@ -32,7 +36,9 @@ namespace risk.control.system.Models
         public DigitalIdReport? DigitalIdReport { get; set; }
         public string? DocumentIdReportId { get; set; }
         public DocumentIdReport? DocumentIdReport { get; set; }
-        public List<ReportQuestionaire> ReportQuestionaire { get; set; } = new List<ReportQuestionaire>();
+
+        public string? ReportQuestionaireId { get; set; }
+        public ReportQuestionaire? ReportQuestionaire { get; set; }
     }
 
     public class ReportQuestionaire : BaseEntity
@@ -50,7 +56,6 @@ namespace risk.control.system.Models
         public string? Question2 { get; set; }
         public string? Question3 { get; set; }
         public string? Question4 { get; set; }
-        public string? ReportTemplateId { get; set; }
         public ReportTemplate? ReportTemplate { get; set; }
     }
 }

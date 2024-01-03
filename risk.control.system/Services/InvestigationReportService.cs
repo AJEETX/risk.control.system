@@ -76,6 +76,8 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DocumentIdReport)
                 .Include(l => l.Vendor)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ReportQuestionaire)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == selectedcase);
 
             var invoice = _context.VendorInvoice.FirstOrDefault(i => i.ClaimReportId == location.ClaimReport.ClaimReportId);
@@ -228,6 +230,8 @@ namespace risk.control.system.Services
                 .Include(c => c.District)
                 .Include(c => c.State)
                 .Include(c => c.Country)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
             );

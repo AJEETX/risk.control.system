@@ -7,7 +7,7 @@
 <link href="~/css/bootstrap-multiselect.css" rel="stylesheet" />
 
 <section class="content pt-2">
-    <div class="container-fluid ">
+    <div class="container-fluid">
         <form id="create-form" asp-action="CreateService" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
@@ -112,13 +112,7 @@
                                                 </select>
                                                 <span asp-validation-for="SelectedMultiPincodeId" class="text-danger"></span>
                                             </div>
-                                            @*                                            <div class="input-group">
-                                            <span class="input-group-addon icon-custom"><i class="fa fa-flag"></i> pincodes</span>
-                                            @Html.ListBoxFor(m =>
-                                            m.SelectedMultiPincodeId,
-                                            (IEnumerable<SelectListItem>)(new[] { new SelectListItem() { Value = "0",Text=" SELECT PINCODES",Selected=true }}),
-                                            new { id = "PinCodeId", @class = "selectPincode show-tick form-control input-md" })
-                                            </div>*@
+                                           
                                         </div>
                                         <div class="form-group text-right">
                                             <a asp-controller="Agency" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">

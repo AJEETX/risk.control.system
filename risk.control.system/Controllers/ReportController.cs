@@ -95,6 +95,8 @@ namespace risk.control.system.Controllers
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DocumentIdReport)
                 .Include(l => l.Vendor)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ReportQuestionaire)
                 .FirstOrDefaultAsync(l => l.ClaimsInvestigationId == id);
 
             if (claimsInvestigation == null)

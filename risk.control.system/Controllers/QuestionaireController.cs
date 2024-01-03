@@ -2,33 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
 using risk.control.system.Data;
 using risk.control.system.Models;
 
 namespace risk.control.system.Controllers
 {
-    public class ReportQuestionairesController : Controller
+    public class QuestionaireController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ReportQuestionairesController(ApplicationDbContext context)
+        public QuestionaireController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: ReportQuestionaires
+        // GET: Questionaire
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.ReportQuestionaire.Include(r => r.ReportTemplate);
-            return View(await applicationDbContext.ToListAsync());
+              return _context.ReportQuestionaire != null ? 
+                          View(await _context.ReportQuestionaire.ToListAsync()) :
+                          Problem("Entity set 'ApplicationDbContext.ReportQuestionaire'  is null.");
         }
 
-        // GET: ReportQuestionaires/Details/5
+        // GET: Questionaire/Details/5
         public async Task<IActionResult> Details(string id)
         {
             if (id == null || _context.ReportQuestionaire == null)
@@ -37,7 +36,6 @@ namespace risk.control.system.Controllers
             }
 
             var reportQuestionaire = await _context.ReportQuestionaire
-                .Include(r => r.ReportTemplate)
                 .FirstOrDefaultAsync(m => m.ReportQuestionaireId == id);
             if (reportQuestionaire == null)
             {
@@ -47,19 +45,18 @@ namespace risk.control.system.Controllers
             return View(reportQuestionaire);
         }
 
-        // GET: ReportQuestionaires/Create
+        // GET: Questionaire/Create
         public IActionResult Create()
         {
-            ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "ReportTemplateId");
             return View();
         }
 
-        // POST: ReportQuestionaires/Create
+        // POST: Questionaire/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ReportQuestionaireId,Question,Answer,Type,Optional,Question1,Question2,Question3,Question4,ReportTemplateId,Created,Updated,UpdatedBy")] ReportQuestionaire reportQuestionaire)
+        public async Task<IActionResult> Create([Bind("ReportQuestionaireId,Question,Answer,Type,Optional,Question1,Question2,Question3,Question4,Created,Updated,UpdatedBy")] ReportQuestionaire reportQuestionaire)
         {
             if (ModelState.IsValid)
             {
@@ -74,7 +71,7 @@ namespace risk.control.system.Controllers
             return View(reportQuestionaire);
         }
 
-        // GET: ReportQuestionaires/Edit/5
+        // GET: Questionaire/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.ReportQuestionaire == null)
@@ -90,12 +87,12 @@ namespace risk.control.system.Controllers
             return View(reportQuestionaire);
         }
 
-        // POST: ReportQuestionaires/Edit/5
+        // POST: Questionaire/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("ReportQuestionaireId,Question,Answer,Type,Optional,Question1,Question2,Question3,Question4,ReportTemplateId,Created,Updated,UpdatedBy")] ReportQuestionaire reportQuestionaire)
+        public async Task<IActionResult> Edit(string id, [Bind("ReportQuestionaireId,Question,Answer,Type,Optional,Question1,Question2,Question3,Question4,Created,Updated,UpdatedBy")] ReportQuestionaire reportQuestionaire)
         {
             if (id != reportQuestionaire.ReportQuestionaireId)
             {
@@ -129,7 +126,7 @@ namespace risk.control.system.Controllers
             return View(reportQuestionaire);
         }
 
-        // GET: ReportQuestionaires/Delete/5
+        // GET: Questionaire/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ReportQuestionaire == null)
@@ -138,7 +135,6 @@ namespace risk.control.system.Controllers
             }
 
             var reportQuestionaire = await _context.ReportQuestionaire
-                .Include(r => r.ReportTemplate)
                 .FirstOrDefaultAsync(m => m.ReportQuestionaireId == id);
             if (reportQuestionaire == null)
             {
@@ -148,7 +144,7 @@ namespace risk.control.system.Controllers
             return View(reportQuestionaire);
         }
 
-        // POST: ReportQuestionaires/Delete/5
+        // POST: Questionaire/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
@@ -162,14 +158,14 @@ namespace risk.control.system.Controllers
             {
                 _context.ReportQuestionaire.Remove(reportQuestionaire);
             }
-
+            
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ReportQuestionaireExists(string id)
         {
-            return (_context.ReportQuestionaire?.Any(e => e.ReportQuestionaireId == id)).GetValueOrDefault();
+          return (_context.ReportQuestionaire?.Any(e => e.ReportQuestionaireId == id)).GetValueOrDefault();
         }
     }
 }
