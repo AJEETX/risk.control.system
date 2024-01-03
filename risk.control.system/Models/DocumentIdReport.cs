@@ -30,6 +30,8 @@ namespace risk.control.system.Models
         public string? DocumentIdImageLongLat { get; set; }
         public DateTime? DocumentIdImageLongLatTime { get; set; } = DateTime.UtcNow;
         public DocumentIdReportType DocumentIdReportType { get; set; } = DocumentIdReportType.PAN;
+        public string? ReportTemplateId { get; set; }
+        public ReportTemplate? ReportTemplate { get; set; }
     }
 
     public enum DocumentIdReportType

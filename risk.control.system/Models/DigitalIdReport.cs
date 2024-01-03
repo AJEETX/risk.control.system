@@ -29,6 +29,8 @@ namespace risk.control.system.Models
         public string? DigitalIdImageLongLat { get; set; }
         public DateTime? DigitalIdImageLongLatTime { get; set; } = DateTime.UtcNow;
         public DigitalIdReportType ReportType { get; set; } = DigitalIdReportType.SINGLE_FACE;
+        public string? ReportTemplateId { get; set; }
+        public ReportTemplate? ReportTemplate { get; set; }
     }
 
     public enum DigitalIdReportType

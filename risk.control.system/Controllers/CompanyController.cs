@@ -195,7 +195,7 @@ namespace risk.control.system.Controllers
                     toastNotification.AddErrorToastMessage("Error to edit company profile!");
                     return RedirectToAction(nameof(CompanyController.Index), "Company");
                 }
-                toastNotification.AddSuccessToastMessage("<i class='fas fa-building'></i> company Profile edited successfully!");
+                toastNotification.AddSuccessToastMessage("<i class='fas fa-building'></i> Company Profile edited successfully!");
                 return RedirectToAction(nameof(CompanyController.Index), "Company");
             }
             toastNotification.AddErrorToastMessage("Error to edit company profile!");

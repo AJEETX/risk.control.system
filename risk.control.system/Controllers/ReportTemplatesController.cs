@@ -52,6 +52,9 @@ namespace risk.control.system.Controllers
         {
             var model = new ReportTemplate();
 
+            ViewBag.DigitalIdReportId = new SelectList(_context.DigitalIdReport, "DigitalIdReportId", "ReportType");
+            ViewBag.DocumentIdReportId = new SelectList(_context.DocumentIdReport, "DocumentIdReportId", "DocumentIdReportType");
+
             return View(model);
         }
 
@@ -64,6 +67,9 @@ namespace risk.control.system.Controllers
         {
             if (ModelState.IsValid)
             {
+                var userEmail = HttpContext?.User?.Identity?.Name;
+                reportTemplate.Updated = DateTime.UtcNow;
+                reportTemplate.UpdatedBy = userEmail;
                 _context.Add(reportTemplate);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -103,6 +109,9 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
+                    var userEmail = HttpContext?.User?.Identity?.Name;
+                    reportTemplate.Updated = DateTime.UtcNow;
+                    reportTemplate.UpdatedBy = userEmail;
                     _context.Update(reportTemplate);
                     await _context.SaveChangesAsync();
                 }
