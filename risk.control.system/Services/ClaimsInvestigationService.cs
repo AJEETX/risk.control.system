@@ -869,9 +869,9 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimReport)
                 .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
-            var claimReport = _context.ClaimReport.FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
+            var claimReport = _context.ClaimReport.Include(c => c.ReportQuestionaire).FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
 
-            claimReport.Question1 = question1;
+            claimReport.ReportQuestionaire.Question1 = question1;
 
             if (question2 == "0" || question2 == "0.0")
             {
@@ -886,9 +886,9 @@ namespace risk.control.system.Services
                 question2 = "High";
             }
 
-            claimReport.Question2 = question2;
-            claimReport.Question3 = question3;
-            claimReport.Question4 = question4;
+            claimReport.ReportQuestionaire.Question2 = question2;
+            claimReport.ReportQuestionaire.Question3 = question3;
+            claimReport.ReportQuestionaire.Question4 = question4;
             claimReport.AgentRemarks = remarks;
             claimReport.AgentRemarksUpdated = DateTime.UtcNow;
             claimReport.AgentEmail = userEmail;
@@ -1086,6 +1086,7 @@ namespace risk.control.system.Services
         {
             var claimsCaseLocation = _context.CaseLocation
                 .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.ReportQuestionaire)
                 .Include(c => c.ClaimsInvestigation)
                 .Include(c => c.InvestigationCaseSubStatus)
                 .Include(c => c.Vendor)
@@ -1150,11 +1151,7 @@ namespace risk.control.system.Services
                 AssessorRemarksUpdated = DateTime.UtcNow,
                 CaseLocation = report.CaseLocation,
                 CaseLocationId = report.CaseLocationId,
-                Question1 = report.Question1,
-                Question2 = report.Question2,
-                Question3 = report.Question3,
-                Question4 = report.Question4,
-                Question5 = report.Question5,
+                ReportQuestionaire = report.ReportQuestionaire,
                 SupervisorEmail = report.SupervisorEmail,
                 SupervisorRemarks = report.SupervisorRemarks,
                 SupervisorRemarksUpdated = report.SupervisorRemarksUpdated,

@@ -51,8 +51,6 @@ namespace risk.control.system.Controllers
         public IActionResult Create()
         {
             var model = new ReportTemplate();
-            model.DigitalIdReports = _context.DigitalIdReport.ToList();
-            model.DocumentIdReports = _context.DocumentIdReport.ToList();
 
             return View(model);
         }

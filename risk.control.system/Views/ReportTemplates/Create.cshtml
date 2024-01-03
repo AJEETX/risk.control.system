@@ -18,24 +18,18 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             @{
-                foreach(var item in Model.DigitalIdReports)
-                {
-                    <div class="form-group">
-                        <label asp-for="@item.ReportType" class="control-label"></label>
-                        <input asp-for="@item.ReportType" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-                }
+                <div class="form-group">
+                    <label asp-for="@Model.DigitalIdReport.ReportType" class="control-label"></label>
+                    <input asp-for="@Model.DigitalIdReport.ReportType" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
             }
             @{
-                foreach (var item in Model.DocumentIdReports)
-                {
-                    <div class="form-group">
-                        <label asp-for="@item.DocumentIdReportType" class="control-label"></label>
-                        <input asp-for="Name" class="form-control" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-                }
+                <div class="form-group">
+                    <label asp-for="@Model.DocumentIdReport.DocumentIdReportType" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
             }
 
             <div class="form-group">

@@ -15,16 +15,9 @@ namespace risk.control.system.Models
 
         public DateTime? AgentRemarksUpdated { get; set; }
         public string? AgentRemarks { get; set; }
-        public string? Question1 { get; set; }
-        public string? Question2 { get; set; }
-        public string? Question3 { get; set; }
-        public string? Question4 { get; set; }
-        public string? Question5 { get; set; }
+        public ReportQuestionaire ReportQuestionaire { get; set; } = new ReportQuestionaire();
 
-        public string? DigitalIdReportId { get; set; }
         public DigitalIdReport? DigitalIdReport { get; set; } = new DigitalIdReport();
-
-        public string? DocumentIdReportId { get; set; }
 
         public DocumentIdReport? DocumentIdReport { get; set; } = new DocumentIdReport();
 

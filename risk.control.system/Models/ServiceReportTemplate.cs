@@ -28,8 +28,8 @@ namespace risk.control.system.Models
         public string ReportTemplateId { get; set; } = Guid.NewGuid().ToString();
 
         public string? Name { get; set; }
-        public List<DigitalIdReport>? DigitalIdReports { get; set; } = new List<DigitalIdReport>();
-        public List<DocumentIdReport>? DocumentIdReports { get; set; } = new List<DocumentIdReport>();
+        public DigitalIdReport? DigitalIdReport { get; set; } = new DigitalIdReport();
+        public DocumentIdReport? DocumentIdReport { get; set; } = new DocumentIdReport();
         public List<ReportQuestionaire> ReportQuestionaire { get; set; } = new List<ReportQuestionaire>();
     }
 
@@ -39,10 +39,15 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string ReportQuestionaireId { get; set; } = Guid.NewGuid().ToString();
 
-        public string? Name { get; set; }
+        public string? Question { get; set; }
 
-        public string? Detail { get; set; }
+        public string? Answer { get; set; }
         public string? Type { get; set; }
         public bool Optional { get; set; } = true;
+        public string? Question1 { get; set; }
+        public string? Question2 { get; set; }
+        public string? Question3 { get; set; }
+        public string? Question4 { get; set; }
+        public string? Question5 { get; set; }
     }
 }

@@ -75,30 +75,60 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Claims")]
         public IActionResult Index()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return RedirectToAction("Draft");
         }
 
         [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Assign()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
         [Breadcrumb(" Assess", FromAction = "Index")]
         public IActionResult Assessor()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
         [Breadcrumb(" Allocate(manual)", FromAction = "Index")]
         public IActionResult Assigner()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
         [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Draft()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
@@ -106,6 +136,13 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Empanelled Agencies", FromAction = "Assigner")]
         public async Task<IActionResult> EmpanelledVendors(string selectedcase)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             if (string.IsNullOrWhiteSpace(selectedcase))
             {
                 toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
@@ -125,6 +162,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Allocate (to agency)")]
         public async Task<IActionResult> AllocateToVendor(string selectedcase)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             if (string.IsNullOrWhiteSpace(selectedcase))
             {
                 toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
@@ -143,12 +186,24 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Assessed")]
         public IActionResult Approved()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
         [Breadcrumb(title: "Active")]
         public IActionResult Active()
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             return View();
         }
 
@@ -156,7 +211,16 @@ namespace risk.control.system.Controllers
         public IActionResult GetInvestigateReport(string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
-
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (selectedcase == null)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
+            }
             var model = investigationReportService.GetInvestigateReport(currentUserEmail, selectedcase);
 
             return View(model);
@@ -165,10 +229,18 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: "Report", FromAction = "Approved")]
         public async Task<IActionResult> GetApprovedReport(string selectedcase)
         {
-            if (selectedcase == null || _context.ClaimsInvestigation == null)
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
-                return NotFound();
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
+            if (selectedcase == null)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
+            }
+
             var model = await investigationReportService.GetApprovedReport(selectedcase);
 
             return View(model);
@@ -177,6 +249,17 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: "Invoice", FromAction = "GetApprovedReport")]
         public async Task<IActionResult> ShowInvoice(string id)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
+            }
             var invoice = await _context.VendorInvoice
                 .Where(x => x.VendorInvoiceId.Equals(id))
                 .Include(x => x.ClientCompany)
@@ -202,6 +285,12 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
         public async Task<IActionResult> PrintInvoice(string id)
         {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
             var invoice = await _context.VendorInvoice
                 .Where(x => x.VendorInvoiceId.Equals(id))
                 .Include(x => x.ClientCompany)
@@ -227,9 +316,16 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Details", FromAction = "CreatePolicy", FromController = typeof(InsurancePolicyController))]
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null || _context.ClaimsInvestigation == null)
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
-                return NotFound();
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
             }
 
             var model = await investigationReportService.GetClaimDetails(id);
@@ -255,9 +351,16 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: " Detail", FromAction = "Active")]
         public async Task<IActionResult> Detail(string id)
         {
-            if (id == null || _context.ClaimsInvestigation == null)
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
-                return NotFound();
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
             }
 
             var model = await claimPolicyService.GetClaimDetail(id);
@@ -276,9 +379,16 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: " Detail", FromAction = "Index")]
         public async Task<IActionResult> ReadyDetail(string id)
         {
-            if (id == null || _context.ClaimsInvestigation == null)
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
-                return NotFound();
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
             }
             var model = await claimPolicyService.GetClaimDetail(id);
 
@@ -288,9 +398,16 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: " Detail", FromAction = "Assign")]
         public async Task<IActionResult> AssignDetail(string id)
         {
-            if (id == null || _context.ClaimsInvestigation == null)
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
-                return NotFound();
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null)
+            {
+                toastNotification.AddErrorToastMessage("detail not found!");
+                return RedirectToAction(nameof(Index));
             }
 
             var claimsInvestigation = await investigationReportService.GetAssignDetails(id);
@@ -306,10 +423,16 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: " Agency detail", FromAction = "Draft")]
         public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl, string selectedcase)
         {
-            if (id == null || _context.Vendor == null)
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
             {
-                toastNotification.AddErrorToastMessage("agency not found!");
-                return NotFound();
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null || companyId is null || selectedcase is null)
+            {
+                toastNotification.AddErrorToastMessage("id null!");
+                return RedirectToAction(nameof(Index));
             }
 
             var vendor = await _context.Vendor
