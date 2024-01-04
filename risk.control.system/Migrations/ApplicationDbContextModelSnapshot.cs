@@ -2104,6 +2104,18 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Answer")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Answer1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Answer2")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Answer3")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Answer4")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ClientCompanyId")
                         .HasColumnType("TEXT");
 

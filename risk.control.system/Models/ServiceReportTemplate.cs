@@ -87,8 +87,12 @@ namespace risk.control.system.Models
 
         public bool Optional { get; set; } = true;
         public string? Question1 { get; set; }
+        public string? Answer1 { get; set; }
         public string? Question2 { get; set; }
+        public string? Answer2 { get; set; }
         public string? Question3 { get; set; }
+        public string? Answer3 { get; set; }
         public string? Question4 { get; set; }
+        public string? Answer4 { get; set; }
     }
 }

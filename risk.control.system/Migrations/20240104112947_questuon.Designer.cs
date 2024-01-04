@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240103235957_report")]
-    partial class report
+    [Migration("20240104112947_questuon")]
+    partial class questuon
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2105,6 +2105,18 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Answer")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Answer1")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Answer2")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Answer3")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Answer4")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ClientCompanyId")

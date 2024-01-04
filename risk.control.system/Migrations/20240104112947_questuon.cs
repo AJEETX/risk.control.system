@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class report : Migration
+    public partial class questuon : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -700,9 +700,13 @@ namespace risk.control.system.Migrations
                     Type = table.Column<string>(type: "TEXT", nullable: true),
                     Optional = table.Column<bool>(type: "INTEGER", nullable: false),
                     Question1 = table.Column<string>(type: "TEXT", nullable: true),
+                    Answer1 = table.Column<string>(type: "TEXT", nullable: true),
                     Question2 = table.Column<string>(type: "TEXT", nullable: true),
+                    Answer2 = table.Column<string>(type: "TEXT", nullable: true),
                     Question3 = table.Column<string>(type: "TEXT", nullable: true),
+                    Answer3 = table.Column<string>(type: "TEXT", nullable: true),
                     Question4 = table.Column<string>(type: "TEXT", nullable: true),
+                    Answer4 = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)

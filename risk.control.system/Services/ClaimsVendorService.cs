@@ -346,7 +346,7 @@ namespace risk.control.system.Services
                 var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
                 var address = rootObject.display_name;
-
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "Sample data";
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
@@ -355,6 +355,7 @@ namespace risk.control.system.Services
                 var longitude = "145.164834";
 
                 RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "Sample data";
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             }

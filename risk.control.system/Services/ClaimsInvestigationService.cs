@@ -39,7 +39,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, string vendorId, string claimsInvestigationId);
 
-        Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? question1, string? question2, string? question3, string? question4);
+        Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4);
 
         Task<ClaimsInvestigation> ProcessAgentReport(string userEmail, string supervisorRemarks, long caseLocationId, string claimsInvestigationId, SupervisorRemarkType remarks);
 
@@ -862,7 +862,7 @@ namespace risk.control.system.Services
             return claim;
         }
 
-        public async Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? question1, string? question2, string? question3, string? question4)
+        public async Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4)
         {
             var agent = _context.VendorApplicationUser.FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
 
@@ -886,24 +886,24 @@ namespace risk.control.system.Services
 
             var claimReport = _context.ClaimReport.Include(c => c.ReportQuestionaire).FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
 
-            claimReport.ReportQuestionaire.Question1 = question1;
+            claimReport.ReportQuestionaire.Answer1 = answer1;
 
-            if (question2 == "0" || question2 == "0.0")
+            if (answer2 == "0" || answer2 == "0.0")
             {
-                question2 = "Low";
+                answer2 = "Low";
             }
-            else if (question2 == ".5" || question2 == "0.5")
+            else if (answer2 == ".5" || answer2 == "0.5")
             {
-                question2 = "Medium";
+                answer2 = "Medium";
             }
-            else if (question2 == "1" || question2 == "1.0")
+            else if (answer2 == "1" || answer2 == "1.0")
             {
-                question2 = "High";
+                answer2 = "High";
             }
 
-            claimReport.ReportQuestionaire.Question2 = question2;
-            claimReport.ReportQuestionaire.Question3 = question3;
-            claimReport.ReportQuestionaire.Question4 = question4;
+            claimReport.ReportQuestionaire.Answer2 = answer2;
+            claimReport.ReportQuestionaire.Answer3 = answer3;
+            claimReport.ReportQuestionaire.Answer4 = answer4;
             claimReport.AgentRemarks = remarks;
             claimReport.AgentRemarksUpdated = DateTime.UtcNow;
             claimReport.AgentEmail = userEmail;
