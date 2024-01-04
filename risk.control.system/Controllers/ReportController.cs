@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using risk.control.system.Helpers;
 using risk.control.system.Services;
 using risk.control.system.AppConstant;
+using NToastNotify;
 
 namespace risk.control.system.Controllers
 {
@@ -16,14 +17,17 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IToastNotification toastNotification;
         private readonly IHttpClientService httpClientService;
         private readonly HttpClient _httpClient;
         private Regex longLatRegex = new Regex("(?<lat>[-|+| ]\\d+.\\d+)\\s* \\/\\s*(?<lon>\\d+.\\d+)");
 
-        public ReportController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IHttpClientService httpClientService)
+        public ReportController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
+            IToastNotification toastNotification, IHttpClientService httpClientService)
         {
             this._context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.toastNotification = toastNotification;
             this.httpClientService = httpClientService;
             _httpClient = new HttpClient();
         }
@@ -114,6 +118,73 @@ namespace risk.control.system.Controllers
             };
 
             return View(model);
+        }
+
+        [Breadcrumb(title: "Invoice", FromAction = "Detail")]
+        public async Task<IActionResult> ShowInvoice(string id)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
+            }
+            var invoice = await _context.VendorInvoice
+                .Where(x => x.VendorInvoiceId.Equals(id))
+                .Include(x => x.ClientCompany)
+                .ThenInclude(c => c.District)
+                .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.State)
+                .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.PinCode)
+                .Include(x => x.Vendor)
+                .ThenInclude(v => v.State)
+                .Include(v => v.Vendor)
+                .ThenInclude(v => v.District)
+                .Include(v => v.Vendor)
+                .ThenInclude(v => v.Country)
+                .Include(i => i.InvestigationServiceType)
+                .FirstOrDefaultAsync();
+
+            return View(invoice);
+        }
+
+        [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
+        public async Task<IActionResult> PrintInvoice(string id)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            var invoice = await _context.VendorInvoice
+                .Where(x => x.VendorInvoiceId.Equals(id))
+                .Include(x => x.ClientCompany)
+                .ThenInclude(c => c.District)
+                .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.State)
+                .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.ClientCompany)
+                .ThenInclude(c => c.PinCode)
+                .Include(x => x.Vendor)
+                .ThenInclude(v => v.State)
+                .Include(v => v.Vendor)
+                .ThenInclude(v => v.District)
+                .Include(v => v.Vendor)
+                .ThenInclude(v => v.Country)
+                .Include(i => i.InvestigationServiceType)
+                .FirstOrDefaultAsync();
+
+            return View(invoice);
         }
 
         [HttpGet]

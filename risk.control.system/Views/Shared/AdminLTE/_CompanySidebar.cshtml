@@ -60,7 +60,8 @@
                 </li>
                 <li class="nav-item">
                     <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
-                                    @Url.MakeActiveClass("Report","Detail")">
+                                    @Url.MakeActiveClass("Report","Detail") @Url.MakeActiveClass("Report","ShowInvoice")
+                                                            @Url.MakeActiveClass("Report","PrintInvoice")">
                         <i class="fas fa-print nav-icon"></i>
                         <p>
                             <span class="badge badge-info"> COMPLETED </span>

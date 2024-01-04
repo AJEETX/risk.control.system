@@ -185,6 +185,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Views\Shared\AdminLTE\Company\" />
     <Folder Include="wwwroot\download-case\" />
     <Folder Include="wwwroot\download-file\" />
     <Folder Include="wwwroot\fonts\" />
