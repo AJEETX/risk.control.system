@@ -1,0 +1,23 @@
+﻿@model ClientCompany
+<a href="/" class="brand-link">
+    <div>
+        @if (Model?.DocumentUrl is not null)
+        {
+            <img src="@Model.DocumentUrl" alt="logo" class="brand-image elevation-2">
+        }
+        else
+        {
+            <img src="@Applicationsettings.NO_IMAGE" alt="logo" class="brand-image elevation-2">
+        }
+    </div>
+    <div>
+        @if (Model?.Name is not null)
+        {
+            <span class="brand-text font-weight-bold">@Model.Name </span>
+        }
+        else
+        {
+            <span class="brand-text font-weight-bold">add name.. </span>
+        }
+    </div>
+</a>
