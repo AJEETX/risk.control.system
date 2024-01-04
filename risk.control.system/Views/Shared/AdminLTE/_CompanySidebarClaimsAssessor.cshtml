@@ -1,0 +1,40 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@using risk.control.system.Helpers;
+@using risk.control.system.Models;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext context
+@inject UserManager<ApplicationUser> UserManager
+@model ClientCompany
+
+@{
+    if (User.IsInRole(AppRoles.Assessor.ToString()))
+    {
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assessor" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assessor") @Url.MakeActiveClass("ClaimsInvestigation","GetInvestigateReport")">
+                <i class="fas fa-glasses nav-icon"></i>
+                <p>
+                    <span class="badge badge-danger">ASSESS</span>
+                </p>
+            </a>
+        </li>
+        //<li class="nav-item">
+        //    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Review" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Review")">
+        //        <i class="fas fa-random nav-icon"></i>
+        //        <p>
+        //            <span class="badge badge-warning">RE ALLOCATE</span>
+        //        </p>
+        //    </a>
+        //</li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Approved" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Approved")
+                                                        @Url.MakeActiveClass("ClaimsInvestigation","GetApprovedReport") @Url.MakeActiveClass("ClaimsInvestigation","ShowInvoice")
+                                                        @Url.MakeActiveClass("ClaimsInvestigation","PrintInvoice")">
+                <i class="fas fa-thumbs-up nav-icon"></i>
+                <p>
+                    <span class="badge badge-success">ASSESSED</span>
+                </p>
+            </a>
+        </li>
+
+    }
+}

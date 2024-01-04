@@ -1,0 +1,37 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@using risk.control.system.Helpers;
+@using risk.control.system.Models;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext context
+@inject UserManager<ApplicationUser> UserManager
+@model ClientCompany
+
+@{
+    if (User.IsInRole(AppRoles.Creator.ToString()))
+    {
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft") ">
+                <i class="fas fa-thumbtack nav-icon"></i>
+                <p>
+                    <span class="badge badge-warning">ASSIGN</span>
+                </p>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a is-active-page asp-controller="InsuranceClaims" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InsuranceClaims","Index")
+                                                    @Url.MakeActiveClass("InsurancePolicy","CreatePolicy") @Url.MakeActiveClass("ClaimsInvestigation","Details")
+                                                    @Url.MakeActiveClass("ClaimsInvestigation","Delete")
+                                                    @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete")
+                                                            @Url.MakeActiveClass("InsurancePolicy","EditPolicy")
+                                                                @Url.MakeActiveClass("CustomerInsurancePolicy","CreateCustomer") @Url.MakeActiveClass("CustomerInsurancePolicy","EditCustomer")
+                                                                            @Url.MakeActiveClass("CaseLocation","Create") @Url.MakeActiveClass("CaseLocation","Edit")">
+                <i class="fas fa-pen-alt nav-icon"></i>
+                <p>
+                    <span class="badge badge-success">ADD NEW </span>
+                </p>
+            </a>
+        </li>
+
+    }
+}

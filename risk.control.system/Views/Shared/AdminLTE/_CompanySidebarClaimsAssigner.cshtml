@@ -1,0 +1,23 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@using risk.control.system.Helpers;
+@using risk.control.system.Models;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext context
+@inject UserManager<ApplicationUser> UserManager
+@model ClientCompany
+
+@{
+    if (User.IsInRole(AppRoles.Assigner.ToString()))
+    {
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assigner")
+                                            @Url.MakeActiveClass("ClaimsInvestigation","AllocateToVendor") @Url.MakeActiveClass("ClaimsInvestigation","EmpanelledVendors")">
+                <i class="fas fa-external-link-alt nav-icon"></i>
+                <p>
+                    <span class="badge badge-danger">ALLOCATE</span><span class="badge badge-light">manual</span>
+                </p>
+            </a>
+        </li>
+
+    }
+}

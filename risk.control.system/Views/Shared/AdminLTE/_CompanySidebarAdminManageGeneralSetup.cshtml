@@ -1,0 +1,53 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@using risk.control.system.Helpers;
+@using risk.control.system.Models;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ApplicationDbContext context
+@inject UserManager<ApplicationUser> UserManager
+@model ClientCompany
+@{
+    if (User.IsInRole(AppRoles.CompanyAdmin.ToString()))
+    {
+        <li class="nav-item">
+            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Country","") @Url.MakeActiveClass("State","") @Url.MakeActiveClass("District","") @Url.MakeActiveClass("PinCodes","") @Url.MakeActiveClass("File","") @Url.MakeActiveClass("Uploads","") @Url.MakeActiveClass("Audit","")">
+                <i class="nav-icon fas fa-wrench"></i>
+                <p class="sidebar-menu-header-label">
+                    @Applicationsettings.GENERAL_SETUP
+                    <i class="right fas fa-angle-right"></i>
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="Country" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Country","")">
+                <i class="nav-icon fas fa-map-marked-alt"></i>
+                <p>
+                    @Applicationsettings.COUNTRY
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="State" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("State","")">
+                <i class="nav-icon fas fa-map-marker-alt"></i>
+                <p>
+                    @Applicationsettings.STATE
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="District" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("District","")">
+                <i class="nav-icon fas fa-city"></i>
+                <p>
+                    @Applicationsettings.DISTRICT
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="PinCodes" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("PinCodes","")">
+                <i class="nav-icon fas fa-map-pin"></i>
+                <p>
+                    @Applicationsettings.PINCODE
+                </p>
+            </a>
+        </li>
+    }
+}

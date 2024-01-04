@@ -5,7 +5,6 @@
 @inject ApplicationDbContext context
 @inject UserManager<ApplicationUser> UserManager
 @model ClientCompany
-
 @{
     var userEmail = User?.Identity?.Name;
     var applicationUser = context.ClientCompanyApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
@@ -15,29 +14,6 @@
     .Include(m => m.Sent)
     .FirstOrDefault(c => c.Name == applicationUser.Email);
 
-    var roleCode = string.Empty;
-    var newInboxMessgeDisplay = string.Empty;
-    var newOutboxMessgeDisplay = string.Empty;
-    var newSentMessgeDisplay = string.Empty;
-    var newTrashMessgeDisplay = string.Empty;
-
-
-    var newInboxMessages = userMailbox?.Inbox.Where(i => i.Read == false);
-    if (newInboxMessages is not null && newInboxMessages.Count() > 0)
-    {
-        newInboxMessgeDisplay = "(" + newInboxMessages.Count().ToString() + ")";
-    }
-
-    var newOutboxMessages = userMailbox?.Outbox.Where(i => i.Read == false);
-    if (newOutboxMessages is not null && newOutboxMessages.Count() > 0)
-    {
-        newOutboxMessgeDisplay = "(" + newOutboxMessages.Count().ToString() + ")";
-    }
-    var newSentMessages = userMailbox?.Sent.Where(i => i.Read == false);
-    if (newSentMessages is not null && newSentMessages.Count() > 0)
-    {
-        newSentMessgeDisplay = "(" + newSentMessages.Count().ToString() + ")";
-    }
 }
 <aside class="main-sidebar elevation-2 sidebar-light-primary">
     <!-- Brand Logo -->
@@ -66,24 +42,28 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user (optional) -->
-
         <partial name="AdminLTE/_CompanySidebarTopLogo" />
-
-
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
                 <partial name="AdminLTE/_CompanySidebarMailbox" />
                 <partial name="AdminLTE/_CompanySidebarClaims" />
-                
-                
                 <li class="nav-item">
                     <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")
                     @Url.MakeActiveClass("ClaimsInvestigation","Detail") ">
                         <i class="fa fa-toggle-on nav-icon"></i>
                         <p>
                              <span class="badge badge-primary">ACTIVE</span>
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
+                                    @Url.MakeActiveClass("Report","Detail")">
+                        <i class="fas fa-print nav-icon"></i>
+                        <p>
+                            <span class="badge badge-info"> COMPLETED </span>
                         </p>
                     </a>
                 </li>
@@ -119,7 +99,6 @@
                     
                 }
                 <partial name="AdminLTE/_CompanySidebarAdmin" />
-
             </ul>
         </nav>
         <!-- /.sidebar-menu -->
