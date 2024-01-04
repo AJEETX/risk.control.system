@@ -23,49 +23,19 @@ namespace risk.control.system.Controllers
 {
     public class ClaimsInvestigationController : Controller
     {
-        private readonly JsonSerializerOptions options = new()
-        {
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            WriteIndented = true
-        };
-
-        private static string NO_DATA = " NO - DATA ";
-        private static Regex regex = new Regex("\\\"(.*?)\\\"");
         private readonly ApplicationDbContext _context;
-        private readonly IFtpService ftpService;
-        private readonly IHttpClientService httpClientService;
-        private readonly IClaimsInvestigationService claimsInvestigationService;
-        private readonly IMailboxService mailboxService;
-        private readonly UserManager<ClientCompanyApplicationUser> userManager;
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IInvestigationReportService investigationReportService;
         private readonly IClaimPolicyService claimPolicyService;
-        private static HttpClient httpClient = new();
 
         public ClaimsInvestigationController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
             IInvestigationReportService investigationReportService,
-            IFtpService ftpService,
-            IHttpClientService httpClientService,
-            IClaimsInvestigationService claimsInvestigationService,
-            IMailboxService mailboxService,
-            UserManager<ClientCompanyApplicationUser> userManager,
-            IWebHostEnvironment webHostEnvironment,
-            RoleManager<ApplicationRole> roleManager,
             IClaimPolicyService claimPolicyService,
             IToastNotification toastNotification)
         {
             _context = context;
-            this.ftpService = ftpService;
-            this.httpClientService = httpClientService;
-            this.claimsInvestigationService = claimsInvestigationService;
-            this.mailboxService = mailboxService;
-            this.userManager = userManager;
-            this.webHostEnvironment = webHostEnvironment;
-            this.roleManager = roleManager;
             this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
             this.investigationReportService = investigationReportService;
