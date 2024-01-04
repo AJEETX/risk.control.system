@@ -24,11 +24,15 @@ namespace risk.control.system.Controllers
         // GET: ServiceReportTemplates
         public async Task<IActionResult> Index()
         {
+            var userEmail = HttpContext?.User?.Identity?.Name;
+            var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
             var applicationDbContext = _context.ServiceReportTemplate
                 .Include(s => s.ClientCompany)
                 .Include(s => s.InvestigationServiceType)
                 .Include(s => s.LineOfBusiness)
-                .Include(s => s.ReportTemplate);
+                .Include(s => s.ClientCompany)
+                .Include(s => s.ReportTemplate).Where(c => c.ClientCompanyId == user.ClientCompanyId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -57,10 +61,19 @@ namespace risk.control.system.Controllers
         // GET: ServiceReportTemplates/Create
         public IActionResult Create()
         {
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
+            var userEmail = HttpContext?.User?.Identity?.Name;
+            var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
+            var model = new ServiceReportTemplate
+            {
+                ClientCompany = user.ClientCompany,
+                ClientCompanyId = user.ClientCompanyId
+            };
+
+            //ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name");
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
             ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name");
-            return View();
+            return View(model);
         }
 
         // POST: ServiceReportTemplates/Create
@@ -68,18 +81,19 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ServiceReportTemplateId,Name,ClientCompanyId,LineOfBusinessId,InvestigationServiceTypeId,ReportTemplateId,Created,Updated,UpdatedBy")] ServiceReportTemplate serviceReportTemplate)
+        public async Task<IActionResult> Create([Bind("ServiceReportTemplateId,Name,ClientCompanyId,LineOfBusinessId,InvestigationServiceTypeId,ReportTemplateId,Created,Updated,UpdatedBy")] ServiceReportTemplate serviceReportTemplate, string ClientCompanyId)
         {
             if (ModelState.IsValid)
             {
                 var userEmail = HttpContext?.User?.Identity?.Name;
+                var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                serviceReportTemplate.ClientCompanyId = user.ClientCompanyId;
                 serviceReportTemplate.Updated = DateTime.UtcNow;
                 serviceReportTemplate.UpdatedBy = userEmail;
                 _context.Add(serviceReportTemplate);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", serviceReportTemplate.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", serviceReportTemplate.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", serviceReportTemplate.LineOfBusinessId);
             ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name", serviceReportTemplate.ReportTemplateId);
@@ -99,8 +113,11 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", serviceReportTemplate.ClientCompanyId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", serviceReportTemplate.InvestigationServiceTypeId);
+            var lob = _context.LineOfBusiness.FirstOrDefault(l => l.LineOfBusinessId == serviceReportTemplate.LineOfBusinessId);
+            var svc = _context.InvestigationServiceType
+                .Include(b => b.LineOfBusiness)
+                .Where(l => l.LineOfBusinessId == serviceReportTemplate.LineOfBusinessId);
+            ViewData["InvestigationServiceTypeId"] = new SelectList(svc, "InvestigationServiceTypeId", "Name", serviceReportTemplate.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", serviceReportTemplate.LineOfBusinessId);
             ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name", serviceReportTemplate.ReportTemplateId);
             return View(serviceReportTemplate);
@@ -123,6 +140,8 @@ namespace risk.control.system.Controllers
                 try
                 {
                     var userEmail = HttpContext?.User?.Identity?.Name;
+                    var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                    serviceReportTemplate.ClientCompanyId = user.ClientCompanyId;
                     serviceReportTemplate.Updated = DateTime.UtcNow;
                     serviceReportTemplate.UpdatedBy = userEmail;
                     _context.Update(serviceReportTemplate);
@@ -141,7 +160,6 @@ namespace risk.control.system.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientCompanyId"] = new SelectList(_context.ClientCompany, "ClientCompanyId", "Name", serviceReportTemplate.ClientCompanyId);
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", serviceReportTemplate.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", serviceReportTemplate.LineOfBusinessId);
             ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name", serviceReportTemplate.ReportTemplateId);
@@ -157,7 +175,6 @@ namespace risk.control.system.Controllers
             }
 
             var serviceReportTemplate = await _context.ServiceReportTemplate
-                .Include(s => s.ClientCompany)
                 .Include(s => s.InvestigationServiceType)
                 .Include(s => s.LineOfBusiness)
                 .Include(s => s.ReportTemplate)

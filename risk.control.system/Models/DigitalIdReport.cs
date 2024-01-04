@@ -9,6 +9,12 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string DigitalIdReportId { get; set; } = Guid.NewGuid().ToString();
 
+        [Display(Name = "Insurer name")]
+        public string? ClientCompanyId { get; set; }
+
+        [Display(Name = "Insurer name")]
+        public virtual ClientCompany? ClientCompany { get; set; }
+
         [Display(Name = "Digital Id Image")]
         public string? DigitalIdImagePath { get; set; }
 
@@ -29,7 +35,6 @@ namespace risk.control.system.Models
         public string? DigitalIdImageLongLat { get; set; }
         public DateTime? DigitalIdImageLongLatTime { get; set; } = DateTime.UtcNow;
         public DigitalIdReportType ReportType { get; set; } = DigitalIdReportType.SINGLE_FACE;
-        public virtual ReportTemplate? ReportTemplate { get; set; }
     }
 
     public enum DigitalIdReportType

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -22,9 +24,13 @@ namespace risk.control.system.Controllers
         // GET: Questionaire
         public async Task<IActionResult> Index()
         {
-              return _context.ReportQuestionaire != null ? 
-                          View(await _context.ReportQuestionaire.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.ReportQuestionaire'  is null.");
+            var userEmail = HttpContext?.User?.Identity?.Name;
+            var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var model = await _context.ReportQuestionaire
+                            .Include(d => d.ClientCompany)
+                            .Where(c => c.ClientCompanyId == user.ClientCompanyId)?.ToListAsync();
+
+            return View(model);
         }
 
         // GET: Questionaire/Details/5
@@ -61,7 +67,8 @@ namespace risk.control.system.Controllers
             if (ModelState.IsValid)
             {
                 var currentUserEmail = HttpContext.User?.Identity?.Name;
-
+                var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                reportQuestionaire.ClientCompanyId = user.ClientCompanyId;
                 reportQuestionaire.Updated = DateTime.Now;
                 reportQuestionaire.UpdatedBy = currentUserEmail;
                 _context.Add(reportQuestionaire);
@@ -104,7 +111,8 @@ namespace risk.control.system.Controllers
                 try
                 {
                     var currentUserEmail = HttpContext.User?.Identity?.Name;
-
+                    var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == currentUserEmail);
+                    reportQuestionaire.ClientCompanyId = user.ClientCompanyId;
                     reportQuestionaire.Updated = DateTime.Now;
                     reportQuestionaire.UpdatedBy = currentUserEmail;
                     _context.Update(reportQuestionaire);
@@ -158,14 +166,14 @@ namespace risk.control.system.Controllers
             {
                 _context.ReportQuestionaire.Remove(reportQuestionaire);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ReportQuestionaireExists(string id)
         {
-          return (_context.ReportQuestionaire?.Any(e => e.ReportQuestionaireId == id)).GetValueOrDefault();
+            return (_context.ReportQuestionaire?.Any(e => e.ReportQuestionaireId == id)).GetValueOrDefault();
         }
     }
 }

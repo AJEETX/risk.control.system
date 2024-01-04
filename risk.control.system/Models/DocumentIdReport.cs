@@ -9,6 +9,12 @@ namespace risk.control.system.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string DocumentIdReportId { get; set; } = Guid.NewGuid().ToString();
 
+        [Display(Name = "Insurer name")]
+        public string? ClientCompanyId { get; set; }
+
+        [Display(Name = "Insurer name")]
+        public virtual ClientCompany? ClientCompany { get; set; }
+
         [Display(Name = "Document Id Image")]
         public string? DocumentIdImagePath { get; set; }
 
@@ -30,7 +36,6 @@ namespace risk.control.system.Models
         public string? DocumentIdImageLongLat { get; set; }
         public DateTime? DocumentIdImageLongLatTime { get; set; } = DateTime.UtcNow;
         public DocumentIdReportType DocumentIdReportType { get; set; } = DocumentIdReportType.PAN;
-        public virtual ReportTemplate? ReportTemplate { get; set; }
     }
 
     public enum DocumentIdReportType

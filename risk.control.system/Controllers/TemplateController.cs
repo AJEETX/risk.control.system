@@ -24,7 +24,14 @@ namespace risk.control.system.Controllers
         // GET: Template
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.ReportTemplate.Include(r => r.DigitalIdReport).Include(r => r.DocumentIdReport).Include(r => r.ReportQuestionaire);
+            var userEmail = HttpContext?.User?.Identity?.Name;
+            var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+
+            var applicationDbContext = _context.ReportTemplate
+                .Include(r => r.ClientCompany)
+                .Include(r => r.DigitalIdReport)
+                .Include(r => r.ReportQuestionaire)
+                .Include(r => r.DocumentIdReport).Where(c => c.ClientCompanyId == user.ClientCompanyId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -70,6 +77,8 @@ namespace risk.control.system.Controllers
                 var userEmail = HttpContext?.User?.Identity?.Name;
                 reportTemplate.Updated = DateTime.UtcNow;
                 reportTemplate.UpdatedBy = userEmail;
+                var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                reportTemplate.ClientCompanyId = user.ClientCompanyId;
                 _context.Add(reportTemplate);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -118,6 +127,8 @@ namespace risk.control.system.Controllers
                     var userEmail = HttpContext?.User?.Identity?.Name;
                     reportTemplate.Updated = DateTime.UtcNow;
                     reportTemplate.UpdatedBy = userEmail;
+                    var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                    reportTemplate.ClientCompanyId = user.ClientCompanyId;
                     _context.Update(reportTemplate);
                     await _context.SaveChangesAsync();
                 }

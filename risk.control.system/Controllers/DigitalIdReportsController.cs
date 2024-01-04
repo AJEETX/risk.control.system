@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -22,9 +24,13 @@ namespace risk.control.system.Controllers
         // GET: DigitalIdReports
         public async Task<IActionResult> Index()
         {
-              return _context.DigitalIdReport != null ? 
-                          View(await _context.DigitalIdReport.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.DigitalIdReport'  is null.");
+            var userEmail = HttpContext?.User?.Identity?.Name;
+            var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var model = await _context.DigitalIdReport
+                .Include(d => d.ClientCompany)
+                .Where(c => c.ClientCompanyId == user.ClientCompanyId)?.ToListAsync();
+
+            return View(model);
         }
 
         // GET: DigitalIdReports/Details/5
@@ -61,6 +67,8 @@ namespace risk.control.system.Controllers
             if (ModelState.IsValid)
             {
                 var userEmail = HttpContext?.User?.Identity?.Name;
+                var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                digitalIdReport.ClientCompanyId = user.ClientCompanyId;
                 digitalIdReport.Updated = DateTime.UtcNow;
                 digitalIdReport.UpdatedBy = userEmail;
 
@@ -104,6 +112,8 @@ namespace risk.control.system.Controllers
                 try
                 {
                     var userEmail = HttpContext?.User?.Identity?.Name;
+                    var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                    digitalIdReport.ClientCompanyId = user.ClientCompanyId;
                     digitalIdReport.Updated = DateTime.UtcNow;
                     digitalIdReport.UpdatedBy = userEmail;
                     _context.Update(digitalIdReport);
@@ -157,14 +167,14 @@ namespace risk.control.system.Controllers
             {
                 _context.DigitalIdReport.Remove(digitalIdReport);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool DigitalIdReportExists(string id)
         {
-          return (_context.DigitalIdReport?.Any(e => e.DigitalIdReportId == id)).GetValueOrDefault();
+            return (_context.DigitalIdReport?.Any(e => e.DigitalIdReportId == id)).GetValueOrDefault();
         }
     }
 }

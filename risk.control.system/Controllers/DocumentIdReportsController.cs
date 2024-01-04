@@ -24,9 +24,13 @@ namespace risk.control.system.Controllers
         // GET: DocumentIdReports
         public async Task<IActionResult> Index()
         {
-            return _context.DocumentIdReport != null ?
-                        View(await _context.DocumentIdReport.ToListAsync()) :
-                        Problem("Entity set 'ApplicationDbContext.DocumentIdReport'  is null.");
+            var userEmail = HttpContext?.User?.Identity?.Name;
+            var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+            var model = await _context.DocumentIdReport
+                .Include(d => d.ClientCompany)
+                .Where(c => c.ClientCompanyId == user.ClientCompanyId)?.ToListAsync();
+
+            return View(model);
         }
 
         // GET: DocumentIdReports/Details/5
@@ -65,6 +69,9 @@ namespace risk.control.system.Controllers
                 var userEmail = HttpContext?.User?.Identity?.Name;
                 documentIdReport.Updated = DateTime.UtcNow;
                 documentIdReport.UpdatedBy = userEmail;
+                var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                documentIdReport.ClientCompanyId = user.ClientCompanyId;
+
                 _context.Add(documentIdReport);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -107,6 +114,8 @@ namespace risk.control.system.Controllers
                     var userEmail = HttpContext?.User?.Identity?.Name;
                     documentIdReport.Updated = DateTime.UtcNow;
                     documentIdReport.UpdatedBy = userEmail;
+                    var user = _context.ClientCompanyApplicationUser.Include(c => c.ClientCompany).FirstOrDefault(u => u.Email == userEmail);
+                    documentIdReport.ClientCompanyId = user.ClientCompanyId;
                     _context.Update(documentIdReport);
                     await _context.SaveChangesAsync();
                 }
