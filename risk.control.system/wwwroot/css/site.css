@@ -986,3 +986,10 @@ a.CaseReadyToAssign {
 .invoice{
     padding:2rem;
 }
+.sidebar-mini .nav-sidebar, .sidebar-mini .nav-sidebar .nav-link, .sidebar-mini .nav-sidebar > .nav-header
+{
+    overflow:unset;
+}
+.sidebar-mini.sidebar-collapse .main-sidebar, .sidebar-mini.sidebar-collapse .main-sidebar::before{
+    width:5rem;
+}
