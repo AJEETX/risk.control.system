@@ -66,8 +66,6 @@
                         {
                             benficiaryProgressColor = "lightgrey";
                         }
-                        var customerLocationMap = @ViewBag.CustomerLocationUrl;
-                        var beneficiaryLocationMap = @ViewBag.BeneficiaryLocationUrl;
                         <div class="card-body">
                             <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
                             <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
@@ -262,7 +260,7 @@
                                                                         }
                                                                     </p>
                                                                     <p class="text-muted text-sm">
-                                                                        <img id="profileImageMap" class="img-fluid block-data" src="@customerLocationMap">
+                                                                        <img id="profileImageMap" class="img-fluid block-data" src="@Model?.ClaimsInvestigation?.CustomerDetail?.CustomerLocationMap">
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -337,7 +335,7 @@
                                                                         }
                                                                     </p>
                                                                     <p class="text-muted text-sm">
-                                                                        <img id="bImageMap" class="img-fluid block-data" src="@beneficiaryLocationMap">
+                                                                        <img id="bImageMap" class="img-fluid block-data" src="@Model?.Location?.BeneficiaryLocationMap">
                                                                     </p>
 
                                                                 </div>
@@ -370,8 +368,8 @@
                             <div class="row">
                                 <div class="col-md-12 text-right">
 
-                                    <form id="create-form" asp-route--testid="@Model.ClaimsInvestigation.ClaimsInvestigationId">
-                                        <a asp-action="Active" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;&nbsp;&nbsp;
+                                    <form id="create-form">
+                                        <a asp-action="Active" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                                     </form>
                                 </div>
                             </div>

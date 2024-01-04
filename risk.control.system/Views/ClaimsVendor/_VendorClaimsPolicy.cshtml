@@ -29,7 +29,8 @@
                                     <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
                                     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
                                     <input type="hidden" id="caseLocationId" value="@Model.CaseLocation?.CaseLocationId" />
-                                    <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
+                        <input type="hidden" id="beneficiaryId" value="@Model.CaseLocation?.CaseLocationId" />
+                        <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
                                     <div class="bb-blog-inner">
                                         <header class="bb-blog-header">
                                             <h5 class="bb-blog-title" itemprop="name">Customer name : @Model.ClaimsInvestigation?.CustomerDetail.CustomerName</h5>
@@ -104,12 +105,12 @@
                                                                         <p class="text-muted text-sm">
                                                                 @if (Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage is not null)
                                                                 {
-                                                                                    <img id="documentImage" class="img-fluid locationImage" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
+                                                                    <img id="documentImage" class="img-fluid" src="data:image/*;base64,@(Convert.ToBase64String(Model?.ClaimsInvestigation?.PolicyDetail.DocumentImage))">
                                                                 }
                                                                 else
                                                                 {
-                                                                                    <img id="documentImage" alt="user-avatar"
-                                                                                         class="img-circle img-fluid form-Image" src="/img/no-policy.jpg">
+                                                                    <img id="documentImage" alt="user-avatar"
+                                                                         class="img-fluid form-Image" src="/img/no-policy.jpg">
                                                                 }
                                                                         </p>
 

@@ -300,21 +300,6 @@ namespace risk.control.system.Controllers
 
             var model = await investigationReportService.GetClaimDetails(id);
 
-            if (model.ClaimsInvestigation.CustomerDetail is not null)
-            {
-                var customerLatLong = model.ClaimsInvestigation.CustomerDetail.PinCode.Latitude + "," + model.ClaimsInvestigation.CustomerDetail.PinCode.Longitude;
-
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
-                ViewBag.CustomerLocationUrl = url;
-            }
-
-            if (model.Location is not null)
-            {
-                var beneficiarylatLong = model.Location.PinCode.Latitude + "," + model.Location.PinCode.Longitude;
-                var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key={Applicationsettings.GMAPData}";
-                ViewBag.BeneficiaryLocationUrl = bUrl;
-            }
-
             return View(model);
         }
 
@@ -334,14 +319,6 @@ namespace risk.control.system.Controllers
             }
 
             var model = await claimPolicyService.GetClaimDetail(id);
-            var customerLatLong = model.ClaimsInvestigation.CustomerDetail.PinCode.Latitude + "," + model.ClaimsInvestigation.CustomerDetail.PinCode.Longitude;
-
-            var url = $"https://maps.googleapis.com/maps/api/staticmap?center={customerLatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{customerLatLong}&key={Applicationsettings.GMAPData}";
-            ViewBag.CustomerLocationUrl = url;
-
-            var beneficiarylatLong = model.Location.PinCode.Latitude + "," + model.Location.PinCode.Longitude;
-            var bUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={beneficiarylatLong}&zoom=18&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{beneficiarylatLong}&key={Applicationsettings.GMAPData}";
-            ViewBag.BeneficiaryLocationUrl = bUrl;
 
             return View(model);
         }

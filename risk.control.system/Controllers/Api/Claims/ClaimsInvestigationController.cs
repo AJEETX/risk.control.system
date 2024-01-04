@@ -1938,6 +1938,9 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             var beneficiary = await _context.CaseLocation
                 .Include(c => c.ClaimReport)
+                .ThenInclude(c=>c.DigitalIdReport)
+                .Include(c => c.ClaimReport)
+                .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);
 
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "no-photo.jpg");
