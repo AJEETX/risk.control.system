@@ -19,3 +19,53 @@
 <partial name="AdminLTE/_CompanySidebarClaimsCreator" />
 <partial name="AdminLTE/_CompanySidebarClaimsAssigner" />
 <partial name="AdminLTE/_CompanySidebarClaimsAssessor" />
+<li class="nav-item">
+    <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Active" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Active")
+                    @Url.MakeActiveClass("ClaimsInvestigation","Detail") ">
+        <i class="fa fa-toggle-on nav-icon"></i>
+        <p>
+            <span class="badge badge-primary">ACTIVE</span>
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a is-active-page asp-controller="Report" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Report","Index")
+                                    @Url.MakeActiveClass("Report","Detail") @Url.MakeActiveClass("Report","ShowInvoice")
+                                                            @Url.MakeActiveClass("Report","PrintInvoice")">
+        <i class="fas fa-print nav-icon"></i>
+        <p>
+            <span class="badge badge-info"> COMPLETED </span>
+        </p>
+    </a>
+</li>
+@{
+    if (User.IsInRole(AppRoles.Creator.ToString()))
+    {
+        <li class="nav-item">
+            <a is-active-page asp-controller="Uploads" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("Uploads","Uploads")">
+                <i class="nav-icon fas fa-archive"></i>
+                <p>
+                    <span class="badge badge-secondary"> UPLOADS</span>
+                </p>
+            </a>
+        </li>
+    }
+
+    //<li class="nav-item">
+    //    <a is-active-page asp-controller="Claim" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Claim","")">
+    //        <i class="fas fa-rupee-sign nav-icon"></i>
+    //        <p>
+    //            @Applicationsettings.INVESTIGATION_CLAIM ^
+    //        </p>
+    //    </a>
+    //</li>
+    //<li class="nav-item">
+    //    <a is-active-page asp-controller="Underwriting" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("Underwriting","")">
+    //        <i class="fas fa-handshake nav-icon"></i>
+    //        <p>
+    //            @Applicationsettings.INVESTIGATION_UNDERWRITINGS ^
+    //        </p>
+    //    </a>
+            //</li>
+
+}
