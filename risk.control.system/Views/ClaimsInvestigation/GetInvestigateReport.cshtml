@@ -21,12 +21,12 @@
                         <div class="card-body">
                             <partial name="_PolicyDetails" model="@Model" />
                             <partial name="_AgencyReport" model="@Model" />
-                            @{
+                           @* @{
                                 foreach (var item in Model.CaseLocation?.PreviousClaimReports)
                                 {
                                     <partial name="_AgencyReviewReports" model="@item" />
                                 }
-                            }
+                            }*@
                         </div>
                     </div>
                    
