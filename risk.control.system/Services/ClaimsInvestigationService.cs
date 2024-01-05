@@ -1158,7 +1158,7 @@ namespace risk.control.system.Services
                 AssessorEmail = claimsCaseLocation.ClaimReport.AssessorEmail,
                 AssessorRemarks = claimsCaseLocation.ClaimReport.AssessorRemarks,
                 AssessorRemarkType = claimsCaseLocation.ClaimReport.AssessorRemarkType,
-                AssessorRemarksUpdated = DateTime.UtcNow,
+                AssessorRemarksUpdated = claimsCaseLocation.ClaimReport.AssessorRemarksUpdated,
                 CaseLocation = claimsCaseLocation,
                 CaseLocationId = claimsCaseLocation.CaseLocationId,
                 ReportQuestionaire = claimsCaseLocation.ClaimReport.ReportQuestionaire,
@@ -1168,7 +1168,7 @@ namespace risk.control.system.Services
                 SupervisorRemarkType = claimsCaseLocation.ClaimReport.SupervisorRemarkType,
                 Vendor = claimsCaseLocation.Vendor,
                 VendorId = claimsCaseLocation.VendorId,
-                Updated = DateTime.UtcNow,
+                Updated = claimsCaseLocation.Updated,
                 UpdatedBy = userEmail
             };
             var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
