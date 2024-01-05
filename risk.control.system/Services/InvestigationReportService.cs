@@ -236,6 +236,10 @@ namespace risk.control.system.Services
                 && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
             );
 
+            if (claimsInvestigation.IsReviewCase)
+            {
+                claimCase.ClaimReport.AssessorRemarks = null;
+            }
             return (new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
     }

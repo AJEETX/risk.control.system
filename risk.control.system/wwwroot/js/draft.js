@@ -170,28 +170,6 @@
                 }
             });
         }
-        //else if (anyChecked) {
-        //    $.confirm({
-        //        title: "Confirm Claim Assignment",
-        //        content: "Are you sure?",
-        //        icon: 'fas fa-pen-alt',
-        //        type: 'green',
-        //        closeIcon: true,
-        //        buttons: {
-        //            confirm: {
-        //                text: "Assign",
-        //                btnClass: 'btn-success',
-        //                action: function () {
-        //                    form.submit();
-        //                }
-        //            },
-        //            cancel: {
-        //                text: "Cancel",
-        //                btnClass: 'btn-default'
-        //            }
-        //        }
-        //    });
-        //}
     });
 });
 function Delete(userId, status) {

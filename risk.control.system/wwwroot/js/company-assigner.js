@@ -83,6 +83,16 @@
             { "data": "location" },
             { "data": "created" },
             { "data": "timePending" },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<a href="Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    buttons += '<a href="/InsurancePolicy/Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
+                    return buttons;
+                }
+            }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });

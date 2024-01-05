@@ -280,8 +280,15 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
                     );
-
-            if (claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat != null)
+            claimCase.ClaimReport.AgentEmail = userEmail;
+            if (claimsInvestigation.IsReviewCase && claimCase.IsReviewCaseLocation)
+            {
+                claimCase.ClaimReport.ReportQuestionaire = new ReportQuestionaire();
+                claimCase.ClaimReport.DocumentIdReport = new DocumentIdReport();
+                claimCase.ClaimReport.DigitalIdReport = new DigitalIdReport();
+                claimCase.ClaimReport.AgentRemarks = string.Empty;
+            }
+            if (!claimsInvestigation.IsReviewCase && !claimCase.IsReviewCaseLocation && claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat != null)
             {
                 var longLat = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
                 var latitude = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.Substring(0, longLat)?.Trim();
@@ -315,6 +322,7 @@ namespace risk.control.system.Services
                 var latitude = "-37.839542";
                 var longitude = "145.164834";
                 var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
+                var latLongString = latitude + "," + longitude;
 
                 RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
                 claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
@@ -322,8 +330,8 @@ namespace risk.control.system.Services
                 var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
                 string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \nElevation(sea level):{weatherData.elevation} metres";
                 claimCase.ClaimReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
-
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
+                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
             }
 
             if (claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null)
@@ -346,19 +354,21 @@ namespace risk.control.system.Services
                 var distance = DistanceFinder.GetDistance(registeredLatitude, registeredLongitude, Convert.ToDouble(latitude), Convert.ToDouble(longitude));
 
                 var address = rootObject.display_name;
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "Sample data";
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData ?? "Sample data";
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
             else
             {
                 var latitude = "-37.839542";
                 var longitude = "145.164834";
-
+                var latLongString = latitude + "," + longitude;
                 RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "Sample data";
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData ?? "Sample data";
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
+                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
             }
+
             var model = new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation };
 
             return model;

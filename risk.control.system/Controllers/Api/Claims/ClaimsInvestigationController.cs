@@ -123,7 +123,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 foreach (var item in applicationDbContext)
                 {
                     if ((item.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId) ||
-                        (item.IsReviewCase && item.InvestigationCaseSubStatusId == reAssigned2AssignerStatus.InvestigationCaseSubStatusId))
+                        (item.IsReviewCase))
                     {
                         claimsSubmitted.Add(item);
                     }
@@ -264,8 +264,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
+                    if ((item.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId) ||
+                        (item.IsReviewCase))
                     {
                         claimsSubmitted.Add(item);
                     }
@@ -1320,7 +1320,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 foreach (var item in applicationDbContext)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId
-                    || c.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    || c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claimsSubmitted.Add(item);
@@ -1421,7 +1421,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 foreach (var item in applicationDbContext)
                 {
                     item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId
-                    || c.InvestigationCaseSubStatusId == reassignedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    || c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claimsSubmitted.Add(item);
@@ -1938,7 +1938,7 @@ namespace risk.control.system.Controllers.Api.Claims
         {
             var beneficiary = await _context.CaseLocation
                 .Include(c => c.ClaimReport)
-                .ThenInclude(c=>c.DigitalIdReport)
+                .ThenInclude(c => c.DigitalIdReport)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.DocumentIdReport)
                 .FirstOrDefaultAsync(p => p.CaseLocationId == id && p.ClaimsInvestigationId == claimId);

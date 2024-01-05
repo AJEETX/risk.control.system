@@ -1177,7 +1177,7 @@ namespace risk.control.system.Services
             var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
             claimsCaseLocation.PreviousClaimReports.Add(currentSavedReport.Entity);
             claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
+                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
             claimsCaseLocation.IsReviewCaseLocation = true;
             _context.CaseLocation.Update(claimsCaseLocation);
 
@@ -1190,7 +1190,7 @@ namespace risk.control.system.Services
             claimsCaseToReassign.IsReviewCase = true;
             claimsCaseToReassign.CurrentClaimOwner = currentOwner;
             claimsCaseToReassign.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
-                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
+                    i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
 
             _context.ClaimsInvestigation.Update(claimsCaseToReassign);
             var lastLog = _context.InvestigationTransaction.Where(i =>
@@ -1207,7 +1207,7 @@ namespace risk.control.system.Services
                 Created = DateTime.UtcNow,
                 Time2Update = DateTime.UtcNow.Subtract(lastLog.Created).Days,
                 InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId,
-                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId,
+                InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId,
                 UpdatedBy = userEmail,
                 CurrentClaimOwner = currentOwner
             };
