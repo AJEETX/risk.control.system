@@ -179,6 +179,8 @@ namespace risk.control.system.Services
                 var address = rootObject.display_name;
 
                 claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
+                claimCase.ClaimReport.DigitalIdReport.Updated = DateTime.UtcNow;
+                claimCase.ClaimReport.DigitalIdReport.UpdatedBy = claimCase.ClaimReport.AgentEmail;
             }
 
             _context.CaseLocation.Update(claimCase);
@@ -381,7 +383,8 @@ namespace risk.control.system.Services
 
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = string.IsNullOrWhiteSpace(rootObject.display_name) ? "12 Heathcote Drive Forest Hill VIC 3131" : address;
             }
-
+            claimCase.ClaimReport.DocumentIdReport.Updated = DateTime.UtcNow;
+            claimCase.ClaimReport.DocumentIdReport.UpdatedBy = claimCase.ClaimReport.AgentEmail;
             _context.CaseLocation.Update(claimCase);
 
             try

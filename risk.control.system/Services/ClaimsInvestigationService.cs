@@ -1135,7 +1135,6 @@ namespace risk.control.system.Services
                 }
             }
 
-            var report = claimsCaseLocation.ClaimReport;
             claimsCaseLocation.ClaimReport.AssessorRemarkType = assessorRemarkType;
             claimsCaseLocation.ClaimReport.AssessorRemarks = assessorRemarks;
             claimsCaseLocation.ClaimReport.AssessorRemarksUpdated = DateTime.UtcNow;
@@ -1162,13 +1161,15 @@ namespace risk.control.system.Services
                 Vendor = claimsCaseLocation.Vendor,
                 VendorId = claimsCaseLocation.VendorId,
                 Updated = claimsCaseLocation.Updated,
-                UpdatedBy = userEmail
+                UpdatedBy = claimsCaseLocation.UpdatedBy,
             };
             var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
             claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
             claimsCaseLocation.IsReviewCaseLocation = true;
-            //claimsCaseLocation.ClaimReport = new ClaimReport();
+            var newReport = new ClaimReport { CaseLocation = claimsCaseLocation, CaseLocationId = claimsCaseLocation.CaseLocationId, Vendor = claimsCaseLocation.Vendor };
+            claimsCaseLocation.ClaimReport = newReport;
+            _context.ClaimReport.Add(newReport);
             _context.CaseLocation.Update(claimsCaseLocation);
 
             var claimsCaseToReassign = _context.ClaimsInvestigation
