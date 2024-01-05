@@ -1165,7 +1165,6 @@ namespace risk.control.system.Services
                 UpdatedBy = userEmail
             };
             var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
-            claimsCaseLocation.PreviousClaimReports.Add(saveReport);
             claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
             claimsCaseLocation.IsReviewCaseLocation = true;

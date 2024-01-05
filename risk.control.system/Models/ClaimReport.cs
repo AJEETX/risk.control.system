@@ -3,12 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace risk.control.system.Models
 {
-    public class ClaimReport : BaseEntity
+    public class ClaimReportBase : BaseEntity
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ClaimReportId { get; set; } = Guid.NewGuid().ToString();
-
         public string? VendorId { get; set; }
         public Vendor? Vendor { get; set; }
 
@@ -34,6 +30,13 @@ namespace risk.control.system.Models
         public CaseLocation CaseLocation { get; set; }
         public string? ServiceReportTemplateId { get; set; }
         public virtual ServiceReportTemplate? ServiceReportTemplate { get; set; }
+    }
+
+    public class ClaimReport : ClaimReportBase
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string ClaimReportId { get; set; } = Guid.NewGuid().ToString();
     }
 
     public enum SupervisorRemarkType

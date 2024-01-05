@@ -1364,6 +1364,9 @@ namespace risk.control.system.Migrations
                 columns: table => new
                 {
                     ClaimReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     VendorId = table.Column<string>(type: "TEXT", nullable: true),
                     DigitalIdReportId = table.Column<string>(type: "TEXT", nullable: true),
                     ReportQuestionaireId = table.Column<string>(type: "TEXT", nullable: true),
@@ -1380,10 +1383,7 @@ namespace risk.control.system.Migrations
                     AssessorRemarks = table.Column<string>(type: "TEXT", nullable: true),
                     AssessorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
                     CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ServiceReportTemplateId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    ServiceReportTemplateId = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1670,13 +1670,16 @@ namespace risk.control.system.Migrations
                 columns: table => new
                 {
                     PreviousClaimReportId = table.Column<string>(type: "TEXT", nullable: false),
+                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     VendorId = table.Column<string>(type: "TEXT", nullable: true),
+                    DigitalIdReportId = table.Column<string>(type: "TEXT", nullable: true),
+                    ReportQuestionaireId = table.Column<string>(type: "TEXT", nullable: true),
+                    DocumentIdReportId = table.Column<string>(type: "TEXT", nullable: true),
                     AgentEmail = table.Column<string>(type: "TEXT", nullable: true),
                     AgentRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     AgentRemarks = table.Column<string>(type: "TEXT", nullable: true),
-                    ReportQuestionaireId = table.Column<string>(type: "TEXT", nullable: true),
-                    DigitalIdReportId = table.Column<string>(type: "TEXT", nullable: true),
-                    DocumentIdReportId = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorRemarksUpdated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     SupervisorEmail = table.Column<string>(type: "TEXT", nullable: true),
                     SupervisorRemarks = table.Column<string>(type: "TEXT", nullable: true),
@@ -1686,10 +1689,7 @@ namespace risk.control.system.Migrations
                     AssessorRemarks = table.Column<string>(type: "TEXT", nullable: true),
                     AssessorRemarkType = table.Column<int>(type: "INTEGER", nullable: true),
                     CaseLocationId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ServiceReportTemplateId = table.Column<string>(type: "TEXT", nullable: true),
-                    Created = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)
+                    ServiceReportTemplateId = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
