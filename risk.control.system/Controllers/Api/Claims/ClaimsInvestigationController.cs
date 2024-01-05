@@ -118,7 +118,10 @@ namespace risk.control.system.Controllers.Api.Claims
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+                applicationDbContext = applicationDbContext.Where(a =>
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
+                a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null)
+                );
 
                 foreach (var item in applicationDbContext)
                 {
@@ -260,7 +263,10 @@ namespace risk.control.system.Controllers.Api.Claims
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
+                applicationDbContext = applicationDbContext.Where(a =>
+                openStatusesIds.Contains(a.InvestigationCaseStatusId) &&
+                a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null)
+                );
 
                 foreach (var item in applicationDbContext)
                 {

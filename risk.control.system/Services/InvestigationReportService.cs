@@ -232,6 +232,7 @@ namespace risk.control.system.Services
                 .Include(c => c.Country)
                 .Include(c => c.ClaimReport)
                 .ThenInclude(c => c.ReportQuestionaire)
+                 .Include(c => c.PreviousClaimReports)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase
                 && c.InvestigationCaseSubStatusId == submittedToAssessorStatus.InvestigationCaseSubStatusId
             );
