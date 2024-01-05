@@ -1109,6 +1109,7 @@ namespace risk.control.system.Services
                 .Include(c => c.PinCode)
                 .Include(c => c.District)
                 .Include(c => c.State)
+                .Include(c => c.PreviousClaimReports)
                 .FirstOrDefault(c => c.CaseLocationId == caseLocationId && c.ClaimsInvestigationId == claimsInvestigationId);
 
             var currentUser = _context.ClientCompanyApplicationUser
@@ -1172,7 +1173,7 @@ namespace risk.control.system.Services
                 UpdatedBy = userEmail
             };
             var currentSavedReport = _context.PreviousClaimReport.Add(saveReport);
-            claimsCaseLocation.PreviousClaimReports.Add(currentSavedReport.Entity);
+            claimsCaseLocation.PreviousClaimReports.Add(saveReport);
             claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
             claimsCaseLocation.IsReviewCaseLocation = true;
