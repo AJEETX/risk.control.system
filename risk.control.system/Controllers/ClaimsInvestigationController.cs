@@ -125,7 +125,7 @@ namespace risk.control.system.Controllers
 
             ViewBag.Selectedcase = selectedcase;
 
-            return View(new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation });
+            return View(new ClaimsInvestigationVendorsModel { Location = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation });
         }
 
         [HttpGet]

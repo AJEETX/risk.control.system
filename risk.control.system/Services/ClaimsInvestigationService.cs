@@ -1,10 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
-using Newtonsoft.Json;
-
-using NuGet.Packaging.Signing;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -13,9 +8,6 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
 using System.Data;
-using System.IO;
-
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace risk.control.system.Services
 {

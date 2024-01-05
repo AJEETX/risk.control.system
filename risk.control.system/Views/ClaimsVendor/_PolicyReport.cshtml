@@ -20,7 +20,7 @@
                 <div class="card-body pb-0">
                     <div class="row">
                         @{
-                            if (@Model.CaseLocation.ClaimReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.CaseLocation.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                            if (@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                             {
                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                     <div class="card bg-light d-flex flex-fill">
@@ -28,12 +28,12 @@
 
                                             <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> 
                                             <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> 
-                                                @Model.CaseLocation.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                                                @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                                             </span>
                                         </div>
                                         <div class="card-footer text-center">
                                             <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                                            @if (string.IsNullOrWhiteSpace(@Model.CaseLocation.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                                            @if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
                                             {
                                                 <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                                             }
@@ -49,9 +49,9 @@
                                                         <span class="badge badge-light"><i class="far fa-image"></i> Digital Image</span>:
                                                         <br />
                                                         @{
-                                                            if (Model.CaseLocation.ClaimReport?.DigitalIdReport?.DigitalIdImage != null)
+                                                            if (Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImage != null)
                                                             {
-                                                                <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.DigitalIdReport?.DigitalIdImage))">
+                                                                <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImage))">
                                                             }
                                                             else
                                                             {
@@ -63,7 +63,7 @@
 
                                                         <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
                                                         <br />
-                                                        <label class="ocr-data img-fluid"> @Model?.CaseLocation?.ClaimReport?.DigitalIdReport?.DigitalIdImageData</label>
+                                                        <label class="ocr-data img-fluid"> @Model?.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageData</label>
 
                                                     </p>
                                                 </div>
@@ -71,13 +71,13 @@
                                                     <p class="text-muted text-sm">
                                                         <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                                                         <br />
-                                                        <img class="img-fluid locationImage" src="@Model.CaseLocation?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
+                                                        <img class="img-fluid locationImage" src="@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
                                                     </p>
                                                     <p class="text-muted text-sm">
 
                                                         <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                                                         <br />
-                                                        <label class="img-fluid ocr-data"> @Model.CaseLocation?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
+                                                        <label class="img-fluid ocr-data"> @Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
                                                     </p>
                                                 </div>
                                             </div>
@@ -93,7 +93,7 @@
                                     </div>
                                 </div>
                             }
-                            if (@Model.CaseLocation.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null && @Model.CaseLocation?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+                            if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null && @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
                             {
                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                     <div class="card bg-light d-flex flex-fill">
@@ -101,12 +101,12 @@
 
                                             <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span> 
                                             <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i>
-                                            @Model.CaseLocation.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                                            @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
                                             </span>
                                         </div>
                                         <div class="card-footer text-center">
                                             <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                                            @if (@Model.CaseLocation.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
+                                            @if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
                                             {
                                                 <i style='color:green;' class='fas fa-check-circle'></i>
                                             }
@@ -122,9 +122,9 @@
                                                         <span class="badge badge-light"><i class="fas fa-film"></i> Document Image</span>:
                                                         <br />
                                                         @{
-                                                            if (Model.CaseLocation.ClaimReport?.DocumentIdReport?.DocumentIdImage != null)
+                                                            if (Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImage != null)
                                                             {
-                                                                <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.CaseLocation.ClaimReport?.DocumentIdReport?.DocumentIdImage))">
+                                                                <img title="document image" id="agentOcrPicture" class="img-fluid ocr-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImage))">
                                                             }
                                                             else
                                                             {
@@ -136,7 +136,7 @@
 
                                                         <span class="badge badge-light"><i class="fas fa-info"></i> Image Scan Info</span>
                                                         <br />
-                                                        <label class="img-fluid ocr-data"> @Model.CaseLocation?.ClaimReport?.DocumentIdReport?.DocumentIdImageData</label>
+                                                        <label class="img-fluid ocr-data"> @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageData</label>
                                                     </p>
                                                 </div>
                                                 <div class="col-6 text">
@@ -144,13 +144,13 @@
                                                     <p class="text-muted text-sm">
                                                         <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                                                         <br />
-                                                        <img class="img-fluid olocationImage" src="@Model.CaseLocation?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
+                                                        <img class="img-fluid olocationImage" src="@Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
                                                     </p>
                                                     <p class="text-muted text-sm">
 
                                                         <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
                                                         <br />
-                                                                <label class="img-fluid ocr-data"> @Model.CaseLocation?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationAddress</label>
+                                                                <label class="img-fluid ocr-data"> @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationAddress</label>
                                                     </p>
                                                 </div>
                                             </div>
@@ -169,7 +169,7 @@
                         }
 
                         @{
-                            var questionTime = @Model.CaseLocation.ClaimReport.AgentRemarksUpdated != null ? @Model.CaseLocation.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+                            var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
                         }
                         <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
                             <div class="card bg-light d-flex flex-fill">
@@ -177,7 +177,7 @@
                                     <i class="far fa-comment"></i> Questionnaire <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
                                 </div>
                                 <div class="card-footer text-muted border-bottom-0">
-                                    <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.CaseLocation.ClaimReport.AgentEmail </span>
+                                    <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
@@ -186,23 +186,23 @@
                                             <ul class="ml-4 mb-0 fa-ul text-muted">
                                                 <li class="form-group">
                                                     Ownership of residence ?
-                                                <input maxlength="100" name="question1" id="question1" asp-for="CaseLocation.ClaimReport.ReportQuestionaire.Answer1" type="text" class="form-control" placeholder="Ownership of residence..." />
+                                                <input maxlength="100" name="question1" id="question1" asp-for="Location.ClaimReport.ReportQuestionaire.Answer1" type="text" class="form-control" placeholder="Ownership of residence..." />
                                                 </li>
                                                 <li class="form-group">
                                                     Perceived financial status ?
-                                                    <input maxlength="100" name="question2" id="question2" asp-for="CaseLocation.ClaimReport.ReportQuestionaire.Answer2" type="text" class="form-control" placeholder="Perceived financial status..." />
+                                                    <input maxlength="100" name="question2" id="question2" asp-for="Location.ClaimReport.ReportQuestionaire.Answer2" type="text" class="form-control" placeholder="Perceived financial status..." />
                                                 </li>
                                                 <li class="form-group">
                                                     Name of neighbour met ?
-                                                <input maxlength="100" name="question3" id="question3" asp-for="CaseLocation.ClaimReport.ReportQuestionaire.Answer3" type="text" class="form-control" placeholder="Name of neighbour met..." />
+                                                <input maxlength="100" name="question3" id="question3" asp-for="Location.ClaimReport.ReportQuestionaire.Answer3" type="text" class="form-control" placeholder="Name of neighbour met..." />
                                                 </li>
                                                 <li class="form-group">
                                                     Date when met with neighbour ?
-                                                    <input maxlength="100" name="question4" id="question4" asp-for="CaseLocation.ClaimReport.ReportQuestionaire.Answer4" type="text" class="form-control" placeholder="Date when met with neighbour..." />
+                                                    <input maxlength="100" name="question4" id="question4" asp-for="Location.ClaimReport.ReportQuestionaire.Answer4" type="text" class="form-control" placeholder="Date when met with neighbour..." />
                                                 </li>
                                                 <li class="form-group">
                                                     Remarks
-                                                    <input maxlength="100" name="remarks" id="remarks" asp-for="CaseLocation.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
+                                                    <input maxlength="100" name="remarks" id="remarks" asp-for="Location.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
                                                 </li>
                                                 <li class="form-group">
                                                     <input type="checkbox" id="terms_and_conditions" value="1" /> <label style="font-size:xx-small;" class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>

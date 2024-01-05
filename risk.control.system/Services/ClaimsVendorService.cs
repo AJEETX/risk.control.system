@@ -369,7 +369,7 @@ namespace risk.control.system.Services
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
             }
 
-            var model = new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation };
+            var model = new ClaimsInvestigationVendorsModel { Location = claimCase, ClaimsInvestigation = claimsInvestigation };
 
             return model;
         }
@@ -434,7 +434,7 @@ namespace risk.control.system.Services
             {
                 claimCase.ClaimReport.SupervisorRemarks = null;
             }
-            return (new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
+            return (new ClaimsInvestigationVendorsModel { Location = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
 
         public async Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase)

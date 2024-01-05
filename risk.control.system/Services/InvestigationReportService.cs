@@ -248,7 +248,7 @@ namespace risk.control.system.Services
             {
                 claimCase.ClaimReport.AssessorRemarks = null;
             }
-            return (new ClaimsInvestigationVendorsModel { CaseLocation = claimCase, ClaimsInvestigation = claimsInvestigation });
+            return (new ClaimsInvestigationVendorsModel { Location = claimCase, ClaimsInvestigation = claimsInvestigation });
         }
     }
 }

@@ -3,7 +3,7 @@
     public class ClaimsInvestigationVendorsModel
     {
         public ClaimsInvestigation ClaimsInvestigation { get; set; }
-        public CaseLocation CaseLocation { get; set; }
+        public CaseLocation Location { get; set; }
         public List<VendorCaseModel> Vendors { get; set; }
     }
 

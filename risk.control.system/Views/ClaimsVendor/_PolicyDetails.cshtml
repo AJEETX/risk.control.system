@@ -11,18 +11,18 @@
         {
             address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " +
             @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
-            baddress = @Model.CaseLocation != null ? @Model.CaseLocation?.Addressline + " " +
-            @Model.CaseLocation?.District?.Name + " " + @Model.CaseLocation?.State?.Name + " " +
-            @Model.CaseLocation?.Country?.Name + " " + @Model.CaseLocation?.PinCode?.Code : string.Empty;
+            baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
+            @Model.Location?.District?.Name + " " + @Model.Location?.State?.Name + " " +
+            @Model.Location?.Country?.Name + " " + @Model.Location?.PinCode?.Code : string.Empty;
             if (Model.ClaimsInvestigation?.CustomerDetail.CustomerDateOfBirth != null)
             {
                 var age = DateTime.Now.Subtract(Model.ClaimsInvestigation.CustomerDetail.CustomerDateOfBirth).TotalDays;
                 currentAgeinYrs = (int)age / 365;
             }
         }
-        if(Model.CaseLocation.BeneficiaryDateOfBirth!= null)
+        if(Model.Location.BeneficiaryDateOfBirth!= null)
         {
-            var age = DateTime.Now.Subtract(Model.CaseLocation.BeneficiaryDateOfBirth).TotalDays;
+            var age = DateTime.Now.Subtract(Model.Location.BeneficiaryDateOfBirth).TotalDays;
             beneficaryAge = (int)age / 365;
         }
                             
@@ -203,9 +203,9 @@
                                         <div class="card-body pt-0">
                                             <div class="row">
                                                 <div class="col-7">
-                                                    <h4 class="lead"><b>@Model.CaseLocation?.BeneficiaryName</b></h4>
+                                                    <h4 class="lead"><b>@Model.Location?.BeneficiaryName</b></h4>
                                                     <p class="text-muted text-sm">
-                                                        <b>Relation: </b> @Model.CaseLocation?.BeneficiaryRelation.Name
+                                                        <b>Relation: </b> @Model.Location?.BeneficiaryRelation.Name
                                                     </p>
                                                     <ul class="ml-4 mb-0 fa-ul text-muted">
                                                         <li class="small">
@@ -219,7 +219,7 @@
                                                             <span class="fa-li">
                                                                 <i class="fas fa-rupee-sign"></i>
                                                             </span>
-                                                            Income: @Model.CaseLocation?.BeneficiaryIncome
+                                                            Income: @Model.Location?.BeneficiaryIncome
                                                         </li>
                                                         <li class="small">
                                                             <span class="fa-li">
@@ -231,15 +231,15 @@
                                                             <span class="fa-li">
                                                                 <i class="fas fa-lg fa-phone"></i>
                                                             </span>
-                                                            Phone #: + @Model.CaseLocation?.BeneficiaryContactNumber
+                                                            Phone #: + @Model.Location?.BeneficiaryContactNumber
                                                         </li>
                                                     </ul>
                                                 </div>
                                                 <div class="col-5 text-center">
                                                     <p class="text-muted text-sm">
-                                                        @if (Model?.CaseLocation?.ProfilePicture is not null)
+                                                        @if (Model?.Location?.ProfilePicture is not null)
                                                         {
-                                                            <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.CaseLocation?.ProfilePicture))">
+                                                            <img id="bImage" class="img-fluid block-data" src="data:image/*;base64,@(Convert.ToBase64String(Model?.Location?.ProfilePicture))">
                                                         }
                                                         else
                                                         {
@@ -247,7 +247,7 @@
                                                         }
                                                     </p>
                                                     <p class="text-muted text-sm">
-                                                        <img id="bImageMap" class="img-fluid block-data" src="@Model.CaseLocation?.BeneficiaryLocationMap">
+                                                        <img id="bImageMap" class="img-fluid block-data" src="@Model.Location?.BeneficiaryLocationMap">
                                                     </p>
                                                 </div>
                                             </div>
