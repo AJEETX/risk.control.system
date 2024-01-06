@@ -104,7 +104,7 @@
                                         <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span><span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
                                     </div>
                                     <div class="card-footer text-center">
-                                        <span class="badge badge-light">Valid :<i class="far fa-image"></i> </span>
+                                        <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                                         @if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
                                         {
                                             <i style='color:green;' class='fas fa-check-circle'></i>

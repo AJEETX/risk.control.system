@@ -58,5 +58,30 @@
                 }
             });
         }
+        if (askConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm submission",
+                content: "Are you sure?",
+                columnClass: 'medium',
+                icon: 'fas fa-thumbtack',
+                closeIcon: true,
+                type: 'red',
+                buttons: {
+                    confirm: {
+                        text: "Submit case",
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            askConfirmation = false;
+                            $('#create-form').submit();
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
     });
 });
