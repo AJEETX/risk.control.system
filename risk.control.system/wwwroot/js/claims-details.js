@@ -1,10 +1,42 @@
 ﻿$(document).ready(function () {
     var askConfirmation = true;
+
+    var report = $('#remarks').val();
+    if ($(this).is(':checked') && report != '') {
+        //Enable the submit button.
+        $('#submit-case').attr("disabled", false);
+    } else {
+        //If it is not checked, disable the button.
+        $('#submit-case').attr("disabled", true);
+    }
+
+
+    $('#remarks').on('keydown', function () {
+        var report = $('#remarks').val();
+        if (report != '') {
+            //Enable the submit button.
+            $('#submit-case').attr("disabled", false);
+        } else {
+            //If it is not checked, disable the button.
+            $('#submit-case').attr("disabled", true);
+        }
+    })
+    $('#remarks').on('blur', function () {
+        var report = $('#remarks').val();
+        if (report != '') {
+            //Enable the submit button.
+            $('#submit-case').attr("disabled", false);
+        } else {
+            //If it is not checked, disable the button.
+            $('#submit-case').attr("disabled", true);
+        }
+    })
+
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Set To Ready",
+                title: "Confirm withdrwal",
                 content: "Are you sure?",
                 columnClass: 'medium',
                 icon: 'fas fa-thumbtack',
@@ -12,7 +44,7 @@
                 type: 'red',
                 buttons: {
                     confirm: {
-                        text: "Set Ready To Assign",
+                        text: "Withdraw case",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;

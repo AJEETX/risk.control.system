@@ -22,6 +22,8 @@ namespace risk.control.system.Services
 
         Task NotifyClaimAssignmentToAssigner(string userEmail, List<string> claims);
 
+        Task NotifyClaimWithdrawlToCompany(string senderUserEmail, string claimId);
+
         Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, string claimId, string agentEmail, string vendorId, long caseLocationId);
 
         Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimId, long caseLocationId);
@@ -150,6 +152,8 @@ namespace risk.control.system.Services
 
             var clientCompanyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == applicationUser.Email);
 
+            var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
+
             var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
             var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
@@ -225,6 +229,104 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+
+        public async Task NotifyClaimWithdrawlToCompany(string senderUserEmail, string claimId)
+        {
+            var claim = _context.ClaimsInvestigation.Include(i => i.PolicyDetail).Where(c => c.ClaimsInvestigationId == claimId).FirstOrDefault();
+            if (claim != null)
+            {
+                var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+
+                var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == claim.PolicyDetail.ClientCompanyId);
+
+                var assessorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assessor.ToString()));
+
+                var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
+
+                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+
+                List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
+
+                if (company.AutoAllocation)
+                {
+                    foreach (var companyUser in companyUsers)
+                    {
+                        var isCeatorr = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
+                        if (isCeatorr)
+                        {
+                            users.Add(companyUser);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var companyUser in companyUsers)
+                    {
+                        var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
+                        if (isAssigner)
+                        {
+                            users.Add(companyUser);
+                        }
+                    }
+                }
+
+                string claimsUrl = $"{BaseUrl + claimId}";
+
+                string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
+                StreamReader str = new StreamReader(FilePath);
+                string MailText = str.ReadToEnd();
+                str.Close();
+
+                var claimsInvestigation = _context.ClaimsInvestigation
+                    .Include(i => i.PolicyDetail)
+                    .Include(i => i.InvestigationCaseSubStatus)
+                    .FirstOrDefault(v => v.ClaimsInvestigationId == claimId);
+
+                foreach (var user in users)
+                {
+                    var recepientMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == user.Email);
+                    var contactMessage = new InboxMessage
+                    {
+                        //ReceipientEmail = userEmailToSend,
+                        Message = "Claim Withdrawn ",
+                        Created = DateTime.UtcNow,
+                        Subject = "Claim Withdrawn Policy #:" + claimsInvestigation.PolicyDetail.ContractNumber,
+                        SenderEmail = senderUserEmail,
+                        Priority = ContactMessagePriority.NORMAL,
+                        SendDate = DateTime.Now,
+                        Updated = DateTime.Now,
+                        Read = false,
+                        UpdatedBy = senderUserEmail,
+                        ReceipientEmail = recepientMailbox.Name,
+                        RawMessage = MailText
+                        .Replace("[username]", recepientMailbox.Name)
+                        .Replace("[email]", recepientMailbox.Name)
+                        .Replace("[url]", claimsUrl)
+                        .Replace("[stage]", claimsInvestigation.InvestigationCaseSubStatus.Name)
+                        .Replace("[policy]", claimsInvestigation.PolicyDetail.ContractNumber)
+                        .Replace("[logo]",
+                        claimsInvestigation.PolicyDetail?.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(claimsInvestigation.PolicyDetail?.DocumentImage))
+                        : "/img/no-image.png")
+                    };
+                    recepientMailbox?.Inbox.Add(contactMessage);
+                    _context.Mailbox.Attach(recepientMailbox);
+                    _context.Mailbox.Update(recepientMailbox);
+                    if (company.SendSMS)
+                    {
+                        var result = SmsService.SendSingleMessage(user.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                    }
+                }
+                try
+                {
+                    var rows = await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
             }
         }
 

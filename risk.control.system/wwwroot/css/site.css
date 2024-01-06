@@ -289,7 +289,9 @@ a.table-link {
 .timer-image {
     height: 1rem;
 }
-
+.action-image {
+    height: 2rem;
+}
 .profile-image {
     height: 110px;
     border: .1px ridge #ccc;
@@ -619,6 +621,10 @@ dl.row {
     font-size: .4rem;
     color: red;
     padding-bottom: 1rem;
+}
+.asterik-style-red {
+    font-size: .4rem;
+    color: red;
 }
 
 .asterik-style-none {

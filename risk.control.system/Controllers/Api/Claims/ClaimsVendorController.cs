@@ -309,8 +309,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                    || c.IsReviewCaseLocation)?.ToList();
+                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claims.Add(item);
@@ -421,8 +420,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 a.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId);
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId
-                    || c.IsReviewCaseLocation)?.ToList();
+                    item.CaseLocations = item.CaseLocations.Where(c => c.VendorId == vendorUser.VendorId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
                         claims.Add(item);

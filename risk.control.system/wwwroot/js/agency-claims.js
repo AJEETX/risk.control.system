@@ -82,6 +82,15 @@
             { "data": "location" },
             { "data": "created" },
             { "data": "timePending" },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<a href="/ClaimsVendor/Detail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> Withdraw</a>'
+                    return buttons;
+                }
+            }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
     });

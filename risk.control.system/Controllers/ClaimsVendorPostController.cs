@@ -16,6 +16,8 @@ using SmartBreadcrumbs.Nodes;
 
 using System.Security.Claims;
 
+using static risk.control.system.Helpers.Permissions;
+
 namespace risk.control.system.Controllers
 {
     public class ClaimsVendorPostController : Controller
@@ -182,6 +184,25 @@ namespace risk.control.system.Controllers
             {
                 toastNotification.AddSuccessToastMessage("Report sent to review successfully");
             }
+            return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId)
+        {
+            string userEmail = HttpContext?.User?.Identity.Name;
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+            }
+            await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
+
+            await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
+
+            toastNotification.AddSuccessToastMessage("Case withdrawn successfully");
+
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
     }
