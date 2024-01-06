@@ -32,16 +32,15 @@
             $('#submit-case').attr("disabled", true);
         }
     })
-
+    let askConfirmation = false;
     $('#create-form').on('submit', function (e) {
         var report = $('#remarks').val();
 
         if (report == '') {
-            askConfirmation = false;
             e.preventDefault();
             $.alert({
                 title: "Claim Assignment !!!",
-                content: "Please enter remarks?",
+                content: "Please enter remarks ?",
                 icon: 'fas fa-exclamation-triangle',
                 columnClass: 'medium',
                 type: 'red',
@@ -54,6 +53,31 @@
                             $.alert('Canceled!');
                             $('#remarks').focus();
                         }
+                    }
+                }
+            });
+        }
+        else if (!askConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm submission",
+                content: "Are you sure?",
+                icon: 'fas fa-exclamation-triangle',
+                columnClass: 'medium',
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Submit",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askConfirmation = true;
+                            $('#create-form').submit();
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
                     }
                 }
             });

@@ -8,7 +8,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <form id="create-form" method="post">
+                <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="ProcessCaseReport">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
                     <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
@@ -45,12 +45,12 @@
                             <div class="=row">
                                 <div class="col-md-12 float-right">
                                     <a asp-controller="ClaimsInvestigation" class="btn btn-default" asp-action="Assessor">
-                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back &nbsp;&nbsp;&nbsp;
+                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back &nbsp;
                                     </a>
                                     <button type="submit" asp-controller="ClaimsInvestigationPost" asp-action="ReProcessCaseReport" class="btn btn-danger">
                                         <i class="fas fa-sync" aria-hidden="true"></i> Review
                                     </button>
-                                    <button asp-controller="ClaimsInvestigationPost" asp-action="ProcessCaseReport" id="approve-case" type="submit" class="btn btn-success">
+                                    <button id="approve-case" type="submit" class="btn btn-success">
                                         <i class="far fa-thumbs-up" aria-hidden="true"></i> Approve
                                     </button>
                                 </div>

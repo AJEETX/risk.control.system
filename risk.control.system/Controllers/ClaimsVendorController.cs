@@ -177,6 +177,12 @@ namespace risk.control.system.Controllers
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
                 return RedirectToAction(nameof(Index));
             }
+            //POST FACE IMAGE AND DOCUMENT
+
+            await vendorService.PostFaceId(currentUserEmail, selectedcase);
+
+            await vendorService.PostDocumentId(currentUserEmail, selectedcase);
+
             var model = await vendorService.GetInvestigate(currentUserEmail, selectedcase);
 
             return View(model);

@@ -99,11 +99,11 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
             }
 
-            //POST FACE IMAGE AND DOCUMENT
+            ////POST FACE IMAGE AND DOCUMENT
 
-            await vendorService.PostFaceId(userEmail, claimId);
+            //await vendorService.PostFaceId(userEmail, claimId);
 
-            await vendorService.PostDocumentId(userEmail, claimId);
+            //await vendorService.PostDocumentId(userEmail, claimId);
 
             //END : POST FACE IMAGE AND DOCUMENT
 
