@@ -1004,3 +1004,7 @@ a.CaseReadyToAssign {
 .sidebar-mini.sidebar-collapse .main-sidebar, .sidebar-mini.sidebar-collapse .main-sidebar::before{
     width:5rem;
 }
+textarea.rating-comment{
+    height:100px !important;
+    min-height:50px !important;
+}
