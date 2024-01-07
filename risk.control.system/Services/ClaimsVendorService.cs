@@ -288,6 +288,10 @@ namespace risk.control.system.Services
                 claimCase.ClaimReport.DigitalIdReport = new DigitalIdReport();
                 claimCase.ClaimReport.AgentRemarks = string.Empty;
             }
+            await PostFaceId(userEmail, selectedcase);
+
+            await PostDocumentId(userEmail, selectedcase);
+
             if (!claimsInvestigation.IsReviewCase && !claimCase.IsReviewCaseLocation && claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat != null)
             {
                 var longLat = claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");

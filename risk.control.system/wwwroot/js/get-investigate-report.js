@@ -29,7 +29,7 @@
             $.confirm({
                 title: "Confirm Report submission",
                 content: "Are you sure?",
-                icon: 'far fa-bookmark',
+                icon: 'far fa-file-alt',
                 columnClass: 'medium',
                 type: 'green',
                 closeIcon: true,
