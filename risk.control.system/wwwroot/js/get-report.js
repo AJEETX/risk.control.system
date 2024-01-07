@@ -66,7 +66,7 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm Report review",
                 content: "Are you sure?",
-                icon: 'fas fa-exclamation-triangle',
+                icon: 'fas fa-sync',
                 columnClass: 'medium',
                 type: 'red',
                 closeIcon: true,

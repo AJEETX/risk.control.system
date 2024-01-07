@@ -10,7 +10,6 @@
         $('#submit-case').attr("disabled", true);
     }
 
-
     $('#remarks').on('keydown', function () {
         var report = $('#remarks').val();
         if (report != '') {
@@ -39,7 +38,7 @@
                 title: "Confirm withdrwal",
                 content: "Are you sure?",
                 columnClass: 'medium',
-                icon: 'fas fa-thumbtack',
+                icon: 'fas fa-undo',
                 closeIcon: true,
                 type: 'red',
                 buttons: {
