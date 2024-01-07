@@ -53,11 +53,33 @@
                                     <dd class="col-sm-5">
                                         @Html.DisplayFor(model => model.Branch)
                                     </dd>
-
-                                    </dd>
-
                                 </dl>
+                                <div class="col-md-4">
+                                    Rating
+                                </div>
+                                <div class="col-md-6" id="agency-rating">
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="rating" vendorId="@Model.VendorId" />
+                                    
+                                    <span id="rating-result">
+                                        <span class="badge badge-light">
+                                            (@Model.RateCount)
+                                        </span>
+                                        @if (Model.RateCount != null && Model.RateCount > 0)
+                                        {
+                                            decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
+                                            <span class="avr"> @a</span>
+                                        }
+                                        <span class="badge badge-light">
+                                            <span class="result"></span>
+                                        </span>
+                                    </span>
+                                </div>
                             </div>
+                            
                             <div class="col-md-6">
                                 <dl class="row">
                                     <dt class="col-sm-5">
@@ -106,6 +128,7 @@
 
                                 </dl>
                             </div>
+                            
                             <div class="col-md-12">
                                 <div class="card-body">
 
@@ -179,3 +202,9 @@
         </div>
     </div>
 </section>
+
+@section Scripts    {
+
+    <script type="text/javascript" src="~/js/vendor-detail.js">
+    </script>
+}

@@ -13,12 +13,12 @@
         $(this).css('color', 'red');
         var url = "/Vendors/PostRating?rating=" + parseInt($(this).attr("id")) + "&mid=" + $(this).attr("vendorId");
         $.post(url, null, function (data) {
-            $(e.currentTarget).closest('tr').find('span.result').text(data).css('color', 'red');
+            $(e.currentTarget).closest('span #rating-result').find('span.result').text(data).css('color', 'red');
             $("#result").text(data);
         });
     });
 
-    $("#datatable > tbody  > tr, #agency-rating").each(function () {
+    $("#agency-rating").each(function () {
         var av = $(this).find("span.avr").text();
 
         if (av != "" || av != null) {
@@ -33,7 +33,7 @@ function giveRating(img, image) {
         .prevAll("img.rating").attr("src", "/Images/" + image);
 }
 function refilRating(img1) {
-    var rt = $(img1).closest('tr').find("span.avr").text();
-    var img = $(img1).closest('tr').find("img[id='" + parseInt(rt) + "']");
+    var rt = $(img1).closest('span #rating-result').find("span.avr").text();
+    var img = $(img1).closest('span #rating-result').find("img[id='" + parseInt(rt) + "']");
     img.attr("src", "/images/FilledStar.jpeg").prevAll("img.rating").attr("src", "/images/FilledStar.jpeg");
 }

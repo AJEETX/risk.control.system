@@ -383,9 +383,11 @@ namespace risk.control.system.Controllers
             }
 
             var vendor = await _context.Vendor
+                .Include(v => v.ratings)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.State)
+                .Include(v => v.District)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
                 .Include(v => v.VendorInvestigationServiceTypes)
