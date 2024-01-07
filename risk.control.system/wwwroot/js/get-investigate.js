@@ -39,7 +39,7 @@
         if (report == '') {
             e.preventDefault();
             $.alert({
-                title: "Claim Assignment !!!",
+                title: "Report submission !!!",
                 content: "Please enter remarks ?",
                 icon: 'fas fa-exclamation-triangle',
                 columnClass: 'medium',
@@ -60,9 +60,9 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm submission",
+                title: "Confirm Report submission",
                 content: "Are you sure?",
-                icon: 'fas fa-exclamation-triangle',
+                icon: 'far fa-thumbs-up',
                 columnClass: 'medium',
                 type: 'green',
                 closeIcon: true,

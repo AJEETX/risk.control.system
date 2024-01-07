@@ -14,6 +14,7 @@
                     <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
                     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
                     <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+                    <input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-newspaper"></i> Agency Report</h3>
@@ -47,7 +48,7 @@
                                     <a asp-controller="ClaimsInvestigation" class="btn btn-default" asp-action="Assessor">
                                         <i class="fas fa-arrow-left" aria-hidden="true"></i> Back &nbsp;
                                     </a>
-                                    <button type="submit" asp-controller="ClaimsInvestigationPost" asp-action="ReProcessCaseReport" class="btn btn-danger">
+                                    <button id="review-case" type="submit" class="btn btn-danger">
                                         <i class="fas fa-sync" aria-hidden="true"></i> Review
                                     </button>
                                     <button id="approve-case" type="submit" class="btn btn-success">

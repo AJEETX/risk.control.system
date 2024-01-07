@@ -27,9 +27,9 @@
         else if (!askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm submission",
+                title: "Confirm Report submission",
                 content: "Are you sure?",
-                icon: 'fas fa-exclamation-triangle',
+                icon: 'far fa-bookmark',
                 columnClass: 'medium',
                 type: 'green',
                 closeIcon: true,

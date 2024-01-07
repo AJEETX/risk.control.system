@@ -151,13 +151,20 @@ namespace risk.control.system.Controllers
         {
             string userEmail = HttpContext?.User?.Identity.Name;
 
-            var reportUpdateStatus = AssessorRemarkType.OK;
+            AssessorRemarkType reportUpdateStatus = (AssessorRemarkType)Enum.Parse(typeof(AssessorRemarkType), assessorRemarkType, true);
 
             var claim = await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
             await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # <i> {0} </i>] report submitted to Company !", claim.PolicyDetail.ContractNumber));
+            if (reportUpdateStatus == AssessorRemarkType.OK)
+            {
+                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # <i> {0} </i>] report submitted to Company !", claim.PolicyDetail.ContractNumber));
+            }
+            else
+            {
+                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # <i> {0} </i> ] investigation reassigned !", claim.PolicyDetail.ContractNumber));
+            }
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), "ClaimsInvestigation");
         }
@@ -177,8 +184,6 @@ namespace risk.control.system.Controllers
             var claim = await claimsInvestigationService.ProcessCaseReport(userEmail, assessorRemarks, caseLocationId, claimId, reportUpdateStatus);
 
             await mailboxService.NotifyClaimReportProcess(userEmail, claimId, caseLocationId);
-
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # <i> {0} </i> ] investigation reassigned !", claim.PolicyDetail.ContractNumber));
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), "ClaimsInvestigation");
         }

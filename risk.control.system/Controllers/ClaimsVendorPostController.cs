@@ -101,9 +101,9 @@ namespace risk.control.system.Controllers
 
             ////POST FACE IMAGE AND DOCUMENT
 
-            //await vendorService.PostFaceId(userEmail, claimId);
+            await vendorService.PostFaceId(userEmail, claimId);
 
-            //await vendorService.PostDocumentId(userEmail, claimId);
+            await vendorService.PostDocumentId(userEmail, claimId);
 
             //END : POST FACE IMAGE AND DOCUMENT
 
