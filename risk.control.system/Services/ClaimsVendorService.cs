@@ -18,7 +18,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigationVendorAgentModel> ReSelectVendorAgent(string userEmail, string selectedcase);
 
-        Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase);
+        Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase, bool uploaded = false);
 
         Task<ClaimsInvestigationVendorsModel> GetInvestigateReport(string userEmail, string selectedcase);
 
@@ -226,7 +226,7 @@ namespace risk.control.system.Services
             return model;
         }
 
-        public async Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase)
+        public async Task<ClaimsInvestigationVendorsModel> GetInvestigate(string userEmail, string selectedcase, bool uploaded = false)
         {
             var claimsInvestigation = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -281,16 +281,6 @@ namespace risk.control.system.Services
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
                     );
             claimCase.ClaimReport.AgentEmail = userEmail;
-            if (claimsInvestigation.IsReviewCase && claimCase.IsReviewCaseLocation)
-            {
-                claimCase.ClaimReport.ReportQuestionaire = new ReportQuestionaire();
-                claimCase.ClaimReport.DocumentIdReport = new DocumentIdReport();
-                claimCase.ClaimReport.DigitalIdReport = new DigitalIdReport();
-                claimCase.ClaimReport.AgentRemarks = string.Empty;
-            }
-            await PostFaceId(userEmail, selectedcase);
-
-            await PostDocumentId(userEmail, selectedcase);
 
             if (!claimsInvestigation.IsReviewCase && !claimCase.IsReviewCaseLocation && claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat != null)
             {

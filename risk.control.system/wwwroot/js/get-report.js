@@ -12,6 +12,16 @@ $(document).ready(function () {
             review = false;
         }
     });
+    $('#approve-case').click(function () {
+        //If the checkbox is checked.
+        var report = $('#assessorRemarks').val();
+        if (report != '') {
+            review = false;
+            $('#assessorRemarkType').val('OK');
+        } else {
+            review = true;
+        }
+    });
 
     $('#create-form').on('submit', function (e) {
         var report = $('#assessorRemarks').val();

@@ -162,7 +162,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Agent Report", FromAction = "Agent")]
-        public async Task<IActionResult> GetInvestigate(string selectedcase)
+        public async Task<IActionResult> GetInvestigate(string selectedcase, bool uploaded = false)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
             {
@@ -170,16 +170,19 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            var userEmail = HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            if (string.IsNullOrWhiteSpace(userEmail))
             {
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
                 return RedirectToAction(nameof(Index));
             }
             //POST FACE IMAGE AND DOCUMENT
+            await vendorService.PostFaceId(userEmail, selectedcase);
 
-            var model = await vendorService.GetInvestigate(currentUserEmail, selectedcase);
+            await vendorService.PostDocumentId(userEmail, selectedcase);
+
+            var model = await vendorService.GetInvestigate(userEmail, selectedcase, uploaded);
 
             return View(model);
         }

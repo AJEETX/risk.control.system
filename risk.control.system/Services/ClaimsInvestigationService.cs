@@ -1172,7 +1172,16 @@ namespace risk.control.system.Services
             claimsCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                     i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER).InvestigationCaseSubStatusId;
             claimsCaseLocation.IsReviewCaseLocation = true;
-            var newReport = new ClaimReport { CaseLocation = claimsCaseLocation, CaseLocationId = claimsCaseLocation.CaseLocationId, Vendor = claimsCaseLocation.Vendor };
+
+            var newReport = new ClaimReport
+            {
+                CaseLocation = claimsCaseLocation,
+                CaseLocationId = claimsCaseLocation.CaseLocationId,
+                Vendor = claimsCaseLocation.Vendor,
+                ReportQuestionaire = new ReportQuestionaire(),
+                DocumentIdReport = new DocumentIdReport(),
+                DigitalIdReport = new DigitalIdReport()
+            };
             claimsCaseLocation.ClaimReport = newReport;
             _context.ClaimReport.Add(newReport);
             _context.CaseLocation.Update(claimsCaseLocation);

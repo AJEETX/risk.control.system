@@ -1,5 +1,20 @@
 ﻿$(document).ready(function () {
-    //Add a JQuery click event handler onto our checkbox.
+    $('#postedFile').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadFileButton');
+        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+    });
+    $('#UploadFileButton').click(function () {
+        //If the checkbox is checked.
+        var report = $('#remarks').val();
+        if ($(this).is(':checked') && report != '') {
+            //Enable the submit button.
+            $('#submit-case').attr("disabled", false);
+        } else {
+            //If it is not checked, disable the button.
+            $('#submit-case').attr("disabled", true);
+        }
+    });
     $('#terms_and_conditions').click(function () {
         //If the checkbox is checked.
         var report = $('#remarks').val();
@@ -62,14 +77,14 @@
             $.confirm({
                 title: "Confirm Report submission",
                 content: "Are you sure?",
-                icon: 'far fa-thumbs-up',
+                icon: 'fa fa-binoculars',
                 columnClass: 'medium',
-                type: 'green',
+                type: 'red',
                 closeIcon: true,
                 buttons: {
                     confirm: {
                         text: "Submit",
-                        btnClass: 'btn-success',
+                        btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = true;
                             $('#create-form').submit();
