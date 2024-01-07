@@ -52,7 +52,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -130,6 +130,7 @@ namespace risk.control.system.Controllers.Api.Claims
             }
             return Ok(null);
         }
+
         private string GetPincode(ClaimType? claimType, CustomerDetail cdetail, CaseLocation location)
         {
             if (claimType == ClaimType.HEALTH)
@@ -145,6 +146,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 return string.Join("", "<span class='badge badge-light'>" + location.PinCode.Code + "</span>");
             }
         }
+
         private string GetTimePending(ClaimsInvestigation a)
         {
             if (DateTime.UtcNow.Subtract(a.Created).Days == 0)
@@ -193,7 +195,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -311,7 +313,7 @@ namespace risk.control.system.Controllers.Api.Claims
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -421,7 +423,7 @@ namespace risk.control.system.Controllers.Api.Claims
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -539,7 +541,7 @@ namespace risk.control.system.Controllers.Api.Claims
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -636,7 +638,7 @@ namespace risk.control.system.Controllers.Api.Claims
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -741,7 +743,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
+                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
             var allocatedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
