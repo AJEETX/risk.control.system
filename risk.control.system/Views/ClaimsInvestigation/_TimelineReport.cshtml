@@ -1,15 +1,7 @@
 ﻿@model ClaimTransactionModel
 <div class="card card-solid">
     <div class="card-body pb-0">
-        @{
-            string timeTaken = "< 1";
-            var totalTime = @Model.Log.FirstOrDefault().Created.Subtract(Model.Log.LastOrDefault().Created).Days;
-            if(totalTime > 0)
-            {
-                timeTaken = totalTime.ToString();
-            }
-        }
-        <span class="badge badge-light"> Total Time taken (days)</span>: <span class="badge badge-info"> @timeTaken</span>
+        <span class="badge badge-light"> Time taken</span>: <span class="badge badge-light"> @Model.TimeTaken</span>
         <div class="row">
             <div class="col-12 d-flex align-items-stretch flex-column">
                 <div class="bb-blog-content" itemprop="articleBody">

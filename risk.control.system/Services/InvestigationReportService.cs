@@ -87,8 +87,25 @@ namespace risk.control.system.Services
                 Log = caseLogs,
                 Location = location,
                 VendorInvoice = invoice,
+                TimeTaken = GetTimePending(claimsInvestigation)
             };
             return model;
+        }
+
+        private string GetTimePending(ClaimsInvestigation a)
+        {
+            if (DateTime.UtcNow.Subtract(a.Created).Days == 0)
+            {
+                if (DateTime.UtcNow.Subtract(a.Created).Hours == 0)
+                {
+                    return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Minutes + " min</span>");
+                }
+                if (DateTime.UtcNow.Subtract(a.Created).Hours < 24)
+                {
+                    return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Hours + " hr</span>");
+                }
+            }
+            return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Days + " days</span>");
         }
 
         public async Task<ClaimsInvestigation> GetAssignDetails(string id)

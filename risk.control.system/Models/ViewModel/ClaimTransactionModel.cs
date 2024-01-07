@@ -6,5 +6,6 @@
         public CaseLocation Location { get; set; }
         public VendorInvoice? VendorInvoice { get; set; }
         public List<InvestigationTransaction> Log { get; set; }
+        public string? TimeTaken { get; set; }
     }
 }
