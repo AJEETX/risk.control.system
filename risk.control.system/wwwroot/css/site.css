@@ -161,6 +161,11 @@ table {
     width: .7rem;
     border: none;
 }
+.main-rating {
+    height: 2rem;
+    width: 2rem;
+    border: none;
+}
 a.table-link {
     width: 100px;
 }

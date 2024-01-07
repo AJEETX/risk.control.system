@@ -18,7 +18,7 @@
         });
     });
 
-    $("#datatable > tbody  > tr, #agency-rating").each(function () {
+    $("#datatable > tbody  > tr").each(function () {
         var av = $(this).find("span.avr").text();
 
         if (av != "" || av != null) {

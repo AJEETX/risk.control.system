@@ -55,14 +55,14 @@
                                     </dd>
                                 </dl>
                                 <div class="col-md-4">
-                                    Rating
+                                    Rate the agency
                                 </div>
                                 <div class="col-md-6" id="agency-rating">
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="rating" vendorId="@Model.VendorId" />
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="rating" vendorId="@Model.VendorId" />
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="rating" vendorId="@Model.VendorId" />
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="rating" vendorId="@Model.VendorId" />
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="main-rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="main-rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="main-rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="main-rating" vendorId="@Model.VendorId" />
+                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="main-rating" vendorId="@Model.VendorId" />
                                     
                                     <span id="rating-result">
                                         <span class="badge badge-light">
@@ -73,10 +73,11 @@
                                             decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
                                             <span class="avr"> @a</span>
                                         }
-                                        <span class="badge badge-light">
-                                            <span class="result"></span>
-                                        </span>
+                                        
                                     </span>
+                                    <div class="badge badge-light">
+                                        <span id="rating-result-data" class="result"></span>
+                                    </div>
                                 </div>
                             </div>
                             
