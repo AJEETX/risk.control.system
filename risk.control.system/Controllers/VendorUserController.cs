@@ -45,7 +45,7 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> Index(string id)
         {
             ViewData["vendorId"] = id;
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "All Agencies");
+            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
             var editPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
