@@ -132,4 +132,27 @@
     {
         public List<VendorData> data { get; set; }
     }
+
+    public class VerifyMobileRequest
+    {
+        public string Mobile { get; set; }
+        public string Uid { get; set; }
+        public bool CheckUid { get; set; } = false;
+        public bool SendSMS { get; set; } = false;
+    }
+
+    public class VerifyIdRequest
+    {
+        public string Image { get; set; }
+        public string Uid { get; set; }
+        public bool VerifyId { get; set; } = false;
+    }
+
+    public class VerifyDocumentRequest
+    {
+        public string Image { get; set; }
+        public string Uid { get; set; }
+        public string Type { get; set; } = "PAN";
+        public bool VerifyPan { get; set; } = false;
+    }
 }
