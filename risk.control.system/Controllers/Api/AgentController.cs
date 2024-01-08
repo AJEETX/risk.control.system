@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IICheckifyService iCheckifyService;
         private static HttpClient httpClient = new();
         private static string FaceMatchBaseUrl = "http://icheck-webSe-kOnc2X2NMOwe-196777346.ap-southeast-2.elb.amazonaws.com";
-
+        private static Random randomNumber = new Random();
         private ILogger<AgentController> logger;
 
         //test PAN FNLPM8635N
@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.Api
             }
 
             user2Onboard.MobileUId = uid;
-            user2Onboard.SecretPin = uid.Substring(0, 4);
+            user2Onboard.SecretPin = randomNumber.Next(0, 9999).ToString();
             _context.VendorApplicationUser.Update(user2Onboard);
             _context.SaveChanges();
 
