@@ -96,7 +96,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
                 var response = claimsAllocated
-                   .Select(a => new
+                   .Select(a => new ClaimsInvesgationResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
@@ -123,7 +123,8 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                   })?
+                       TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                   })?.OrderByDescending(o => o.TimeElapsed)
                    .ToList();
 
                 return Ok(response);
@@ -365,7 +366,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
             var response = claims
-                   .Select(a => new
+                   .Select(a => new ClaimsInvesgationResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        Company = a.PolicyDetail.ClientCompany.Name,
@@ -389,8 +390,9 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                   })?
-                   .ToList();
+                       TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                   })?.OrderByDescending(o => o.TimeElapsed)
+                    ?.ToList();
 
             return Ok(response);
         }
@@ -580,7 +582,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
             var response = claimsSubmitted
-                   .Select(a => new
+                   .Select(a => new ClaimsInvesgationResponse
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
@@ -604,8 +606,9 @@ namespace risk.control.system.Controllers.Api.Claims
                        BeneficiaryName = a.CaseLocations.Count == 0 ?
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                   })?
-                   .ToList();
+                       TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                   })?.OrderByDescending(o => o.TimeElapsed)
+                    ?.ToList();
 
             return Ok(response);
         }
