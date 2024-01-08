@@ -1321,6 +1321,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                 .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.FINISHED);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -1351,9 +1353,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId
-                    || c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any() || item.IsReviewCase && item.InvestigationCaseStatusId != finishedStatus.InvestigationCaseStatusId)
                     {
                         claimsSubmitted.Add(item);
                     }
@@ -1422,6 +1423,8 @@ namespace risk.control.system.Controllers.Api.Claims
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
                 .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i =>
+               i.Name == CONSTANTS.CASE_STATUS.FINISHED);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -1452,9 +1455,8 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId
-                    || c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
+                    item.CaseLocations = item.CaseLocations.Where(c => c.InvestigationCaseSubStatusId == assessorApprovedStatus.InvestigationCaseSubStatusId)?.ToList();
+                    if (item.CaseLocations.Any() || item.IsReviewCase && item.InvestigationCaseStatusId != finishedStatus.InvestigationCaseStatusId)
                     {
                         claimsSubmitted.Add(item);
                     }
