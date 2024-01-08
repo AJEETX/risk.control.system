@@ -127,14 +127,14 @@ namespace risk.control.system.Controllers
             {
                 if (DateTime.UtcNow.Subtract(a.Created).Hours == 0)
                 {
-                    return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Minutes + " min</span>");
+                    DateTime.UtcNow.Subtract(a.Created).Minutes.ToString();
                 }
                 if (DateTime.UtcNow.Subtract(a.Created).Hours < 24)
                 {
-                    return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Hours + " hr</span>");
+                    return DateTime.UtcNow.Subtract(a.Created).Hours.ToString();
                 }
             }
-            return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Days + " days</span>");
+            return DateTime.UtcNow.Subtract(a.Created).Days.ToString();
         }
 
         [Breadcrumb(title: "Invoice", FromAction = "Detail")]
