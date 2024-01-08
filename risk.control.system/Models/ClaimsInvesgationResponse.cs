@@ -1,0 +1,26 @@
+﻿namespace risk.control.system.Models
+{
+    public class ClaimsInvesgationResponse
+    {
+        public string Id { get; set; }
+        public bool SelectedToAssign { get; set; }
+        public string Agent { get; set; }
+        public string Pincode { get; set; }
+        public string Document { get; set; }
+        public string Name { get; set; }
+        public string Policy { get; set; }
+        public string Customer { get; set; }
+        public string Status { get; set; }
+        public string SubStatus { get; set; }
+        public bool Ready2Assign { get; set; }
+        public string ServiceType { get; set; }
+        public string Location { get; set; }
+        public string Created { get; set; }
+        public string timePending { get; set; }
+        public bool Withdrawable { get; set; }
+        public string PolicyNum { get; set; }
+        public string BeneficiaryPhoto { get; set; }
+        public string BeneficiaryName { get; set; }
+        public double TimeElapsed { get; set; }
+    }
+}
