@@ -16,7 +16,7 @@ using System.Security.Claims;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb(" Agency Workload")]
+    [Breadcrumb(" Agent(s)")]
     public class AgentWorkloadController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -45,6 +45,12 @@ namespace risk.control.system.Controllers
         }
 
         public async Task<IActionResult> Index()
+        {
+            return RedirectToAction("Load");
+        }
+
+        [Breadcrumb(" Agency Workload")]
+        public async Task<IActionResult> Load()
         {
             return View();
         }

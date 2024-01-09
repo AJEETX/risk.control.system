@@ -19,7 +19,7 @@
     if (User.IsInRole(AppRoles.AgencyAdmin.ToString()))
     {
         <li class="nav-item">
-            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Agency","")">
+            <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("Agency","") @Url.MakeActiveClass("AgentWorkload","")">
                 <i class="nav-icon fas fa-shield-alt"></i>
                 <p class="sidebar-menu-header-label">
                     @Applicationsettings.ADMIN_SETTINGS
@@ -70,6 +70,15 @@
                 <i class="fas fa-user-plus nav-icon"></i>
                 <p>
                     Add User
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="AgentWorkload" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("AgentWorkload","Load")
+                                                @Url.MakeActiveClass("AgentWorkload","Open") @Url.MakeActiveClass("AgentWorkload","Details")">
+                <i class="fas fa-user-friends nav-icon"></i>
+                <p>
+                    <span class="badge badge-warning">AGENCY WORKLOAD</span>
                 </p>
             </a>
         </li>

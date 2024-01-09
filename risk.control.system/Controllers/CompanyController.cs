@@ -427,7 +427,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(CompanyController.User), "Company");
         }
 
-        [Breadcrumb("Available Agencies")]
+        [Breadcrumb("Available Agencies", FromAction = "Index", FromController = typeof(VendorsController))]
         public async Task<IActionResult> AvailableVendors()
         {
             return View();
@@ -475,7 +475,7 @@ namespace risk.control.system.Controllers
             return Problem();
         }
 
-        [Breadcrumb("Empanelled Agencies")]
+        [Breadcrumb("Empanelled Agencies", FromAction = "Index", FromController = typeof(VendorsController))]
         public async Task<IActionResult> EmpanelledVendors()
         {
             return View();

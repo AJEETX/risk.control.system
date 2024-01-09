@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-        [Breadcrumb("Agency Profile ", FromAction = "Index")]
+        [Breadcrumb("Manage Agency ", FromAction = "Index")]
         public async Task<IActionResult> Profile()
         {
             var userEmail = HttpContext.User?.Identity?.Name;

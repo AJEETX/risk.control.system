@@ -1,0 +1,48 @@
+﻿@using risk.control.system.AppConstant;
+@using risk.control.system.Models.ViewModel;
+@model List<VendorUserClaim>
+
+@{
+    ViewData["Title"] = @Applicationsettings.USER;
+}
+
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user-friends"></i> Agency Workload</h3>
+                    </div>
+                    <div class="card-body">
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Photo</th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>District</th>
+                                    <th>State</th>
+                                    <th>Country</th>
+                                    <th>Pincode</th>
+                                    <th>Active</th>
+                                    <th>Roles</th>
+                                    <th>Count</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts    {
+    <script src="~/js/agency-workload.js">
+
+    </script>
+}
