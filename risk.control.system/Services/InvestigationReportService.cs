@@ -87,25 +87,31 @@ namespace risk.control.system.Services
                 Log = caseLogs,
                 Location = location,
                 VendorInvoice = invoice,
-                TimeTaken = GetTimePending(claimsInvestigation)
+                TimeTaken = GetElapsedTime(caseLogs)
             };
             return model;
         }
 
-        private string GetTimePending(ClaimsInvestigation a)
+        private string GetElapsedTime(List<InvestigationTransaction> caseLogs)
         {
-            if (DateTime.UtcNow.Subtract(a.Created).Days == 0)
+            var orderedLogs = caseLogs.OrderBy(l => l.Created);
+
+            var startTime = orderedLogs.FirstOrDefault();
+            var completedTime = orderedLogs.LastOrDefault();
+            var elaspedTime = completedTime.Created.Subtract(startTime.Created).Days;
+            if (completedTime.Created.Subtract(startTime.Created).Days >= 1)
             {
-                if (DateTime.UtcNow.Subtract(a.Created).Hours == 0)
-                {
-                    DateTime.UtcNow.Subtract(a.Created).Minutes.ToString();
-                }
-                if (DateTime.UtcNow.Subtract(a.Created).Hours < 24)
-                {
-                    return DateTime.UtcNow.Subtract(a.Created).Hours.ToString();
-                }
+                return elaspedTime + " day(s)";
             }
-            return DateTime.UtcNow.Subtract(a.Created).Days.ToString();
+            if (completedTime.Created.Subtract(startTime.Created).TotalHours < 24 && completedTime.Created.Subtract(startTime.Created).TotalHours >= 1)
+            {
+                return elaspedTime + " hour(s)";
+            }
+            if (completedTime.Created.Subtract(startTime.Created).Minutes < 60 && completedTime.Created.Subtract(startTime.Created).Minutes >= 1)
+            {
+                return elaspedTime + " hour(s)";
+            }
+            return elaspedTime.ToString() + " sec";
         }
 
         public async Task<ClaimsInvestigation> GetAssignDetails(string id)
