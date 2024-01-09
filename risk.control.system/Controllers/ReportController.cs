@@ -134,13 +134,13 @@ namespace risk.control.system.Controllers
             }
             if (completedTime.Created.Subtract(startTime.Created).TotalHours < 24 && completedTime.Created.Subtract(startTime.Created).TotalHours >= 1)
             {
-                return elaspedTime + " hour(s)";
+                return completedTime.Created.Subtract(startTime.Created).Hours + " hour(s)";
             }
             if (completedTime.Created.Subtract(startTime.Created).Minutes < 60 && completedTime.Created.Subtract(startTime.Created).Minutes >= 1)
             {
-                return elaspedTime + " hour(s)";
+                return completedTime.Created.Subtract(startTime.Created).Minutes + " min(s)";
             }
-            return elaspedTime.ToString() + " sec";
+            return completedTime.Created.Subtract(startTime.Created).Seconds + " sec";
         }
 
         private string GetTimePending(ClaimsInvestigation a)
