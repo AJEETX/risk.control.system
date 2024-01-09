@@ -121,6 +121,8 @@
             $("#allocatedcase").prop('disabled', true);
         }
     });
+    let askConfirmation = false;
+
     // Handle form submission event
     $('#checkboxes').on('submit', function (e) {
         var form = this;

@@ -128,7 +128,7 @@
             }
         }
     });
-
+    let askConfirmation = false;
     // Handle form submission event
     $('#checkboxes').on('submit', function (e) {
         var form = this;
@@ -157,7 +157,7 @@
             e.preventDefault();
             $.alert({
                 title: "Claim Assignment !!!",
-                content: "Please select claim to assign?",
+                content: "Please select claim(s) to assign?",
                 icon: 'fas fa-exclamation-triangle',
                 columnClass: 'medium',
                 type: 'red',
@@ -166,6 +166,31 @@
                     cancel: {
                         text: "SELECT",
                         btnClass: 'btn-danger'
+                    }
+                }
+            });
+        }
+        else if (!askConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Assignment",
+                content: "Are you sure to assign?",
+                icon: 'fas fa-thumbtack',
+                columnClass: 'medium',
+                type: 'orange',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Assign",
+                        btnClass: 'btn-warning',
+                        action: function () {
+                            askConfirmation = true;
+                            $('#checkboxes').submit();
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
                     }
                 }
             });
