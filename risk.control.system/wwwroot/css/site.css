@@ -295,7 +295,7 @@ a.table-link {
     height: 1rem;
 }
 .action-image {
-    height: 2rem;
+    height: 1.5rem;
 }
 .profile-image {
     height: 110px;
@@ -1008,3 +1008,28 @@ textarea.rating-comment{
     height:100px !important;
     min-height:50px !important;
 }
+
+
+label.account {
+    padding-top: 20px;
+    padding-bottom: 0px;
+    line-height: 1.5em;
+    font-size: 13px;
+}
+
+    label.account a {
+        color: #ff4040;
+        font-size: 11px;
+        text-decoration: underline;
+    }
+
+        label.account a.error {
+            color: #ff4040;
+            font-size: 11px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        label.account a:hover {
+            text-decoration: none;
+        }

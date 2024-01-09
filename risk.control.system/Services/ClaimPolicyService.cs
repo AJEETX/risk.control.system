@@ -116,9 +116,31 @@ namespace risk.control.system.Services
             {
                 ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
-                Location = location
+                Location = location,
+                TimeTaken = GetElapsedTime(caseLogs)
             };
             return model;
+        }
+        private string GetElapsedTime(List<InvestigationTransaction> caseLogs)
+        {
+            var orderedLogs = caseLogs.OrderBy(l => l.Created);
+
+            var startTime = orderedLogs.FirstOrDefault();
+            var completedTime = orderedLogs.LastOrDefault();
+            var elaspedTime = completedTime.Created.Subtract(startTime.Created).Days;
+            if (completedTime.Created.Subtract(startTime.Created).Days >= 1)
+            {
+                return elaspedTime + " day(s)";
+            }
+            if (completedTime.Created.Subtract(startTime.Created).TotalHours < 24 && completedTime.Created.Subtract(startTime.Created).TotalHours >= 1)
+            {
+                return completedTime.Created.Subtract(startTime.Created).Hours + " hour(s)";
+            }
+            if (completedTime.Created.Subtract(startTime.Created).Minutes < 60 && completedTime.Created.Subtract(startTime.Created).Minutes >= 1)
+            {
+                return completedTime.Created.Subtract(startTime.Created).Minutes + " min(s)";
+            }
+            return completedTime.Created.Subtract(startTime.Created).Seconds + " sec";
         }
     }
 }

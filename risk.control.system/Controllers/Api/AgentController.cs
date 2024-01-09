@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers.Api
             }
 
             user2Onboard.MobileUId = request.Uid;
-            user2Onboard.SecretPin = randomNumber.Next(0, 9999).ToString();
+            user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
             _context.VendorApplicationUser.Update(user2Onboard);
             _context.SaveChanges();
 
