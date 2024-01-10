@@ -18,7 +18,6 @@
 @{
     if (User.IsInRole(AppRoles.AgencyAdmin.ToString()) || User.IsInRole(AppRoles.Supervisor.ToString()))
     {
-        if (User.IsInRole(AppRoles.Supervisor.ToString()))
         {
             <li class="nav-item">
                 <a is-active-page asp-controller="ClaimsVendor" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Index")
