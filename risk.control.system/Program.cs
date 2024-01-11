@@ -174,7 +174,7 @@ app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);
 
-app.UseHttpLogging();
+//app.UseHttpLogging();
 
 app.UseStaticFiles();
 

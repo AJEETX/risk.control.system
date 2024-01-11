@@ -57,7 +57,7 @@ $(document).ready(function () {
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Submit",
+                        text: "Approve",
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = true;
