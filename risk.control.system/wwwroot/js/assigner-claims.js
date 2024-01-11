@@ -63,6 +63,7 @@ $(document).ready(function () {
             },
             { "data": "beneficiaryName" },
             { "data": "serviceType" },
+            { "data": "service" },
             { "data": "status" },
             { "data": "location" },
             { "data": "created" },

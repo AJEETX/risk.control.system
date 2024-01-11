@@ -78,6 +78,7 @@
             },
             { "data": "beneficiaryName" },
             { "data": "serviceType" },
+            { "data": "service" },
             { "data": "pincode" },
             { "data": "location" },
             { "data": "created" },

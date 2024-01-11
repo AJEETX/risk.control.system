@@ -77,6 +77,9 @@ button.accept-policy {
     height: 50px;
 }
 
+.brand-link .brand-image{
+    width:3rem;
+}
 .brand-image {
     opacity: .8
 }
@@ -141,7 +144,6 @@ table {
     width: 40px;
     height: 40px;
     object-fit: cover;
-    border-radius: 0px;
 }
 
 .content-wrapper-main {

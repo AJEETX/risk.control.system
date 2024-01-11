@@ -14,6 +14,7 @@
         public string SubStatus { get; set; }
         public bool Ready2Assign { get; set; }
         public string ServiceType { get; set; }
+        public string? Service { get; set; }
         public string? Location { get; set; }
         public string Created { get; set; }
         public string timePending { get; set; }

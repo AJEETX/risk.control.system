@@ -61,7 +61,7 @@
             },
             { "data": "beneficiaryName" },
             { "data": "serviceType" },
-            { "data": "agent" },
+            { "data": "service" },
             { "data": "pincode" },
             { "data": "location" },
             { "data": "created" },
