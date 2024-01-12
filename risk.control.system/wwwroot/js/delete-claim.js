@@ -6,9 +6,8 @@ $(document).ready(function () {
             $.confirm({
                 title: "Confirm DELETE",
                 content: "Are you sure?",
-                icon: 'fas fa-thumbtack',
-                boxWidth: '30%',
-                useBootstrap: false,
+                icon: 'fas fa-trash',
+                columnClass: 'medium',
                 closeIcon: true,
                 type: 'red',
                 buttons: {

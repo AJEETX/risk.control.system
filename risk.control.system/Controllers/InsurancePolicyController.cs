@@ -99,9 +99,10 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(ClaimTransactionModel model)
         {
-            if (model == null || _context.ClaimsInvestigation == null)
+            if (model is null)
             {
-                return Problem("Entity set 'ApplicationDbContext.ClaimsInvestigation'  is null.");
+                toastNotification.AddAlertToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Err to delete !"));
+                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
             }
             var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
             string userEmail = HttpContext?.User?.Identity.Name;
