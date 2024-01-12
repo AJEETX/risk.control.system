@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers
             return View(fileuploadViewModel);
         }
 
-        public async Task<IActionResult> DownloadLog(int id)
+        public async Task<IActionResult> DownloadLog(long id)
         {
             var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (file == null) return null;
@@ -92,7 +92,7 @@ namespace risk.control.system.Controllers
             return File(memory, file.FileType, file.Name + file.Extension);
         }
 
-        public async Task<IActionResult> DeleteLog(int id)
+        public async Task<IActionResult> DeleteLog(long id)
         {
             var file = await _context.FilesOnFileSystem.Where(x => x.Id == id).FirstOrDefaultAsync();
             if (file == null) return null;

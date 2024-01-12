@@ -122,7 +122,6 @@ namespace risk.control.system.Controllers
 
                     if (user != null)
                     {
-                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                         user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                         user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                         user.FirstName = applicationUser?.FirstName;

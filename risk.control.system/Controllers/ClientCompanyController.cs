@@ -166,7 +166,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb(title: "Edit ")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id == null || _context.ClientCompany == null)
+            if (id == 0 || _context.ClientCompany == null)
             {
                 toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
@@ -226,7 +226,7 @@ namespace risk.control.system.Controllers
                     else
                     {
                         var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == clientCompany.ClientCompanyId);
-                        if (existingClientCompany.DocumentUrl != null)
+                        if (existingClientCompany.DocumentUrl != null || existingClientCompany.DocumentUrl != null)
                         {
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                             clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;

@@ -100,69 +100,65 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("agency not found!");
                 return NotFound();
             }
-
-            if (applicationUser is not null)
+            try
             {
-                try
+                var user = await userManager.FindByIdAsync(id);
+                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    var user = await userManager.FindByIdAsync(id);
-                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
-                    {
-                        string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
-                        newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
-                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "/img/" + newFileName;
-                    }
-
-                    if (user != null)
-                    {
-                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
-                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                        user.FirstName = applicationUser?.FirstName;
-                        user.LastName = applicationUser?.LastName;
-                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                        {
-                            user.Password = applicationUser.Password;
-                        }
-                        user.Email = applicationUser.Email;
-                        user.UserName = applicationUser.Email;
-                        user.EmailConfirmed = true;
-                        user.Country = applicationUser.Country;
-                        user.CountryId = applicationUser.CountryId;
-                        user.State = applicationUser.State;
-                        user.StateId = applicationUser.StateId;
-                        user.PinCode = applicationUser.PinCode;
-                        user.PinCodeId = applicationUser.PinCodeId;
-                        user.Updated = DateTime.UtcNow;
-                        user.Comments = applicationUser.Comments;
-                        user.PhoneNumber = applicationUser.PhoneNumber;
-                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.UtcNow.ToString();
-                        var result = await userManager.UpdateAsync(user);
-                        if (result.Succeeded)
-                        {
-                            toastNotification.AddSuccessToastMessage("User profile edited successfully!");
-
-                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited. Email : " + user.Email);
-
-                            return RedirectToAction(nameof(Index), "Dashboard");
-                        }
-                        Errors(result);
-                    }
+                    string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                    newFileName += fileExtension;
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    applicationUser.ProfilePictureUrl = "/img/" + newFileName;
                 }
-                catch (DbUpdateConcurrencyException)
+
+                if (user != null)
                 {
-                    if (!VendorApplicationUserExists(applicationUser.Id))
+                    user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
+                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                    user.FirstName = applicationUser?.FirstName;
+                    user.LastName = applicationUser?.LastName;
+                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
                     {
-                        return NotFound();
+                        user.Password = applicationUser.Password;
                     }
-                    else
+                    user.Email = applicationUser.Email;
+                    user.UserName = applicationUser.Email;
+                    user.EmailConfirmed = true;
+                    user.Country = applicationUser.Country;
+                    user.CountryId = applicationUser.CountryId;
+                    user.State = applicationUser.State;
+                    user.StateId = applicationUser.StateId;
+                    user.PinCode = applicationUser.PinCode;
+                    user.PinCodeId = applicationUser.PinCodeId;
+                    user.Updated = DateTime.UtcNow;
+                    user.Comments = applicationUser.Comments;
+                    user.PhoneNumber = applicationUser.PhoneNumber;
+                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    user.SecurityStamp = DateTime.UtcNow.ToString();
+                    var result = await userManager.UpdateAsync(user);
+                    if (result.Succeeded)
                     {
-                        throw;
+                        toastNotification.AddSuccessToastMessage("User profile edited successfully!");
+
+                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited. Email : " + user.Email);
+
+                        return RedirectToAction(nameof(Index), "Dashboard");
                     }
+                    Errors(result);
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!VendorApplicationUserExists(applicationUser.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
                 }
             }
 
@@ -196,12 +192,8 @@ namespace risk.control.system.Controllers
                     return RedirectToAction("/Account/Login");
                 }
 
-                // ChangePasswordAsync changes the user password
                 var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
 
-                // The new password did not meet the complexity rules or
-                // the current password is incorrect. Add these errors to
-                // the ModelState and rerender ChangePassword view
                 if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
@@ -211,7 +203,6 @@ namespace risk.control.system.Controllers
                     return View();
                 }
 
-                // Upon successfully changing the password refresh sign-in cookie
                 await signInManager.RefreshSignInAsync(user);
                 return View("ChangePasswordConfirmation");
             }

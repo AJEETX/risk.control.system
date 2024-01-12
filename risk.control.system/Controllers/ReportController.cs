@@ -143,24 +143,8 @@ namespace risk.control.system.Controllers
             return completedTime.Created.Subtract(startTime.Created).Seconds + " sec";
         }
 
-        private string GetTimePending(ClaimsInvestigation a)
-        {
-            if (DateTime.UtcNow.Subtract(a.Created).Days == 0)
-            {
-                if (DateTime.UtcNow.Subtract(a.Created).Hours == 0)
-                {
-                    DateTime.UtcNow.Subtract(a.Created).Minutes.ToString();
-                }
-                if (DateTime.UtcNow.Subtract(a.Created).Hours < 24)
-                {
-                    return DateTime.UtcNow.Subtract(a.Created).Hours.ToString();
-                }
-            }
-            return DateTime.UtcNow.Subtract(a.Created).Days.ToString();
-        }
-
         [Breadcrumb(title: "Invoice", FromAction = "Detail")]
-        public async Task<IActionResult> ShowInvoice(string id)
+        public async Task<IActionResult> ShowInvoice(long id)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))
@@ -196,7 +180,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: "Print", FromAction = "ShowInvoice")]
-        public async Task<IActionResult> PrintInvoice(string id)
+        public async Task<IActionResult> PrintInvoice(long id)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))

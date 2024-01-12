@@ -141,7 +141,7 @@ namespace risk.control.system.Controllers
                     else
                     {
                         var existingClientCompany = await _context.ClientCompany.AsNoTracking().FirstOrDefaultAsync(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                        if (existingClientCompany.DocumentUrl != null)
+                        if (existingClientCompany.DocumentUrl != null || existingClientCompany.DocumentUrl != null)
                         {
                             clientCompany.DocumentImage = existingClientCompany.DocumentImage;
                             clientCompany.DocumentUrl = existingClientCompany.DocumentUrl;
@@ -362,7 +362,6 @@ namespace risk.control.system.Controllers
 
                     if (user != null)
                     {
-                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                         user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                         user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
                         user.FirstName = applicationUser?.FirstName;

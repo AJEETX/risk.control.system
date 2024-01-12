@@ -34,11 +34,11 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetInvestigationServicesByLineOfBusinessId")]
-        public async Task<IActionResult> GetInvestigationServicesByLineOfBusinessId(string LineOfBusinessId)
+        public async Task<IActionResult> GetInvestigationServicesByLineOfBusinessId(long LineOfBusinessId)
         {
-            string lId;
+            long lId;
             var services = new List<InvestigationServiceType>();
-            if (!string.IsNullOrEmpty(LineOfBusinessId))
+            if (LineOfBusinessId >0)
             {
                 lId = LineOfBusinessId;
                 services = await context.InvestigationServiceType.Where(s => s.LineOfBusiness.LineOfBusinessId.Equals(lId)).ToListAsync();
@@ -96,22 +96,6 @@ namespace risk.control.system.Controllers.Api
             {
                 sId = districtId;
                 pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).OrderBy(s => s.Code).ToListAsync();
-
-                //var existingCaseLocations = context.CaseLocation
-                //    .Include(c => c.PincodeServices)
-                //    .Where(c => c.ClaimsInvestigationId == caseId);
-
-                //var existingVerifyPincodes = context.VerifyPinCode
-                //    .Where(v => existingCaseLocations.Any(e => e.CaseLocationId == v.CaseLocationId))?.ToList();
-
-                //if (existingVerifyPincodes is not null && existingVerifyPincodes.Any())
-                //{
-                //    var existingPicodes = existingVerifyPincodes.Select(e => e.Pincode).ToList();
-                //    var pinCodeString = pincodes.Select(p=>p.Code).ToList();
-                //    var remaingPincodesString = pinCodeString.Except(existingPicodes).ToList();
-                //    remaingPincodes = pincodes.Where(p=> remaingPincodesString.Contains(p.Code)).ToList();
-                //    return Ok(remaingPincodes);
-                //}
             }
             return Ok(pincodes);
         }

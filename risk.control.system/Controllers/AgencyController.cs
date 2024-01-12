@@ -93,12 +93,12 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(AgencyController.Index), "Agency");
             }
 
-            var country = _context.Country;
+            var country = _context.Country.OrderBy(c => c.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
 
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendor.CountryId);
+            ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendor.CountryId);
             ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendor.StateId);
             ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
             ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
@@ -142,7 +142,7 @@ namespace risk.control.system.Controllers
                     else
                     {
                         var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
-                        if (existingVendor.DocumentImage != null)
+                        if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
                         {
                             vendor.DocumentImage = existingVendor.DocumentImage;
                             vendor.DocumentUrl = existingVendor.DocumentUrl;
@@ -187,7 +187,7 @@ namespace risk.control.system.Controllers
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
             var model = new VendorApplicationUser { Vendor = vendor };
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name");
             return View(model);
         }
 
@@ -284,7 +284,7 @@ namespace risk.control.system.Controllers
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
 
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
+            ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorApplicationUser.CountryId);
             ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
             ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
             ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
@@ -304,95 +304,90 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("Err !!!");
                 return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
-
-            if (applicationUser is not null)
+            try
             {
-                try
+                var user = await userManager.FindByIdAsync(id);
+                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    var user = await userManager.FindByIdAsync(id);
-                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
-                    {
-                        string newFileName = Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
-                        newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
-                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        using var dataStream = new MemoryStream();
-                        applicationUser.ProfileImage.CopyTo(dataStream);
-                        applicationUser.ProfilePicture = dataStream.ToArray();
-                        applicationUser.ProfilePictureUrl = "/img/" + newFileName;
-                    }
-
-                    if (user != null)
-                    {
-                        user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
-                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                        user.FirstName = applicationUser?.FirstName;
-                        user.LastName = applicationUser?.LastName;
-                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                        {
-                            user.Password = applicationUser.Password;
-                        }
-                        user.Addressline = applicationUser.Addressline;
-                        user.Active = applicationUser.Active;
-                        user.Country = applicationUser.Country;
-                        user.CountryId = applicationUser.CountryId;
-                        user.State = applicationUser.State;
-                        user.StateId = applicationUser.StateId;
-                        user.PinCode = applicationUser.PinCode;
-                        user.PinCodeId = applicationUser.PinCodeId;
-                        user.Updated = DateTime.UtcNow;
-                        user.Comments = applicationUser.Comments;
-                        user.PhoneNumber = applicationUser.PhoneNumber;
-                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.UtcNow.ToString();
-                        var result = await userManager.UpdateAsync(user);
-                        if (result.Succeeded)
-                        {
-                            if (!user.Active)
-                            {
-                                var createdUser = await userManager.FindByEmailAsync(user.Email);
-                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                                var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.MaxValue);
-
-                                if (lockUser.Succeeded && lockDate.Succeeded)
-                                {
-                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User edited and locked successfully!");
-                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
-                                    return RedirectToAction(nameof(AgencyController.User), "Agency");
-                                }
-                            }
-                            if (user.Active)
-                            {
-                                var createdUser = await userManager.FindByEmailAsync(user.Email);
-                                var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, false);
-                                var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
-
-                                if (lockUser.Succeeded && lockDate.Succeeded)
-                                {
-                                    toastNotification.AddSuccessToastMessage("User edited and unlocked successfully!");
-                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                    return RedirectToAction(nameof(AgencyController.User), "Agency");
-                                }
-                            }
-                            toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> Agency user edited successfully!");
-                            return RedirectToAction(nameof(AgencyController.User), "Agency");
-                        }
-                        toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
-                        Errors(result);
-                    }
+                    string newFileName = Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                    newFileName += fileExtension;
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    using var dataStream = new MemoryStream();
+                    applicationUser.ProfileImage.CopyTo(dataStream);
+                    applicationUser.ProfilePicture = dataStream.ToArray();
+                    applicationUser.ProfilePictureUrl = "/img/" + newFileName;
                 }
-                catch (DbUpdateConcurrencyException)
+
+                if (user != null)
                 {
-                    if (!VendorApplicationUserExists(applicationUser.Id))
+                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                    user.FirstName = applicationUser?.FirstName;
+                    user.LastName = applicationUser?.LastName;
+                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
                     {
-                        return NotFound();
+                        user.Password = applicationUser.Password;
                     }
-                    else
+                    user.Addressline = applicationUser.Addressline;
+                    user.Active = applicationUser.Active;
+                    user.Country = applicationUser.Country;
+                    user.CountryId = applicationUser.CountryId;
+                    user.State = applicationUser.State;
+                    user.StateId = applicationUser.StateId;
+                    user.PinCode = applicationUser.PinCode;
+                    user.PinCodeId = applicationUser.PinCodeId;
+                    user.Updated = DateTime.UtcNow;
+                    user.Comments = applicationUser.Comments;
+                    user.PhoneNumber = applicationUser.PhoneNumber;
+                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    user.SecurityStamp = DateTime.UtcNow.ToString();
+                    var result = await userManager.UpdateAsync(user);
+                    if (result.Succeeded)
                     {
-                        throw;
+                        if (!user.Active)
+                        {
+                            var createdUser = await userManager.FindByEmailAsync(user.Email);
+                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                            var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.MaxValue);
+
+                            if (lockUser.Succeeded && lockDate.Succeeded)
+                            {
+                                toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User edited and locked successfully!");
+                                var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
+                                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                            }
+                        }
+                        if (user.Active)
+                        {
+                            var createdUser = await userManager.FindByEmailAsync(user.Email);
+                            var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, false);
+                            var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+
+                            if (lockUser.Succeeded && lockDate.Succeeded)
+                            {
+                                toastNotification.AddSuccessToastMessage("User edited and unlocked successfully!");
+                                var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                            }
+                        }
+                        toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> Agency user edited successfully!");
+                        return RedirectToAction(nameof(AgencyController.User), "Agency");
                     }
+                    toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
+                    Errors(result);
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!VendorApplicationUserExists(applicationUser.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
                 }
             }
 
@@ -404,14 +399,12 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> UserRoles(string userId)
         {
             var userRoles = new List<VendorUserRoleViewModel>();
-            //ViewBag.userId = userId;
             VendorApplicationUser user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 toastNotification.AddErrorToastMessage("user not found!");
                 return RedirectToAction(nameof(AgencyController.User), "Agency");
             }
-            //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles.Where(r =>
                 r.Name.Contains(AppRoles.AgencyAdmin.ToString()) ||
                 r.Name.Contains(AppRoles.Supervisor.ToString()) ||
@@ -515,7 +508,7 @@ namespace risk.control.system.Controllers
 
                 return RedirectToAction(nameof(AgencyController.Service), "Agency");
             }
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", vendorInvestigationServiceType.CountryId);
+            ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name", vendorInvestigationServiceType.CountryId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
@@ -527,7 +520,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Edit Service", FromAction = "Service")]
         public async Task<IActionResult> EditService(long id)
         {
-            if (id == null || _context.VendorInvestigationServiceType == null)
+            if (id == 0 || _context.VendorInvestigationServiceType == null)
             {
                 return NotFound();
             }
@@ -661,7 +654,7 @@ namespace risk.control.system.Controllers
         // POST: VendorService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.VendorInvestigationServiceType == null)
             {
@@ -683,7 +676,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Services", FromAction = "Service")]
         public async Task<IActionResult> ServiceDetail(long id)
         {
-            if (id == null || _context.VendorInvestigationServiceType == null)
+            if (id == 0 || _context.VendorInvestigationServiceType == null)
             {
                 return NotFound();
             }
@@ -733,11 +726,6 @@ namespace risk.control.system.Controllers
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
-        }
-
-        private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
-        {
-            return new List<string>(await userManager.GetRolesAsync(user));
         }
 
         private bool VendorExists(long id)

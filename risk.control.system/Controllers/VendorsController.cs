@@ -224,7 +224,7 @@ namespace risk.control.system.Controllers
                     IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
                     if (vendorDocument is not null)
                     {
-                        string newFileName = vendor.Email + Guid.NewGuid().ToString();
+                        string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
@@ -238,7 +238,7 @@ namespace risk.control.system.Controllers
                     else
                     {
                         var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorId);
-                        if (existingVendor.DocumentImage != null)
+                        if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
                         {
                             vendor.DocumentImage = existingVendor.DocumentImage;
                             vendor.DocumentUrl = existingVendor.DocumentUrl;
@@ -249,24 +249,8 @@ namespace risk.control.system.Controllers
 
                     _context.Vendor.Update(vendor);
 
-                    // var userEmail = HttpContext.User?.Identity?.Name;
-                    // var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-                    // var company = _context.ClientCompany
-                    //.Include(c => c.EmpanelledVendors)
-                    //.AsNoTracking()
-                    //.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
-                    // if (company != null)
-                    // {
-                    //     var empanelledVendors = company.EmpanelledVendors?.ToList();
-                    //     var existingVendor = empanelledVendors.FirstOrDefault(e => e.VendorId == vendor.VendorId);
-                    //     if (existingVendor != null)
-                    //     {
-                    //         company.EmpanelledVendors.Remove(existingVendor);
-                    //         company.EmpanelledVendors.Add(vendor);
-                    //         _context.ClientCompany.Update(company);
-                    //     }
-                    // }
                     var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency edited. Domain : " + vendor.Email);
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -313,7 +297,7 @@ namespace risk.control.system.Controllers
         // POST: Vendors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string VendorId)
+        public async Task<IActionResult> DeleteConfirmed(long VendorId)
         {
             if (_context.Vendor == null)
             {

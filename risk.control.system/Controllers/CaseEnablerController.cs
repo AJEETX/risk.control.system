@@ -152,7 +152,7 @@ namespace risk.control.system.Controllers
         // POST: CaseEnabler/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.CaseEnabler == null)
             {

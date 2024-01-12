@@ -94,12 +94,12 @@ namespace risk.control.system.Controllers
 
         private void GetCountryStateEdit(ApplicationUser? applicationUser)
         {
-            var country = context.Country.Where(c => c.CountryId == applicationUser.CountryId);
+            var country = context.Country.OrderBy(o => o.Name);
             var relatedStates = context.State.Include(s => s.Country).Where(s => s.Country.CountryId == applicationUser.CountryId).OrderBy(d => d.Name);
             var districts = context.District.Include(d => d.State).Where(d => d.State.StateId == applicationUser.StateId).OrderBy(d => d.Name);
             var pincodes = context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == applicationUser.DistrictId).OrderBy(d => d.Name);
 
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", applicationUser.CountryId);
+            ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", applicationUser.CountryId);
             ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", applicationUser.StateId);
             ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", applicationUser.DistrictId);
             ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", applicationUser.PinCodeId);
@@ -219,11 +219,6 @@ namespace risk.control.system.Controllers
         {
             foreach (IdentityError error in result.Errors)
                 ModelState.AddModelError("", error.Description);
-        }
-
-        private async Task<List<string>> GetUserRoles(Models.ApplicationUser user)
-        {
-            return new List<string>(await userManager.GetRolesAsync(user));
         }
     }
 }

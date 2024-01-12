@@ -372,8 +372,6 @@ namespace risk.control.system.Controllers
             var result = await userManager.RemoveFromRolesAsync(user, roles);
             result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
                 Where(x => x.Selected).Select(y => y.RoleName));
-            //var currentUser = await userManager.GetUserAsync(HttpContext.User);
-            //await signInManager.RefreshSignInAsync(currentUser);
 
             toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = model.VendorId });

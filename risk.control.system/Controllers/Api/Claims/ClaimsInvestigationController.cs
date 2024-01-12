@@ -168,7 +168,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>") :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                        timePending = GetTimePending(a),
+                        timePending = a.GetTimePending(),
                         Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
                         PolicyNum = a.PolicyDetail.ContractNumber,
                         BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
@@ -182,26 +182,6 @@ namespace risk.control.system.Controllers.Api.Claims
                     .ToList();
 
             return Ok(response);
-        }
-
-        private string GetTimePending(ClaimsInvestigation a)
-        {
-            if (DateTime.UtcNow.Subtract(a.Created).Days >= 1)
-                return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Days + " day</span>");
-
-            if (DateTime.UtcNow.Subtract(a.Created).Hours < 24 && DateTime.UtcNow.Subtract(a.Created).Hours > 0)
-            {
-                return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Hours + " hr</span>");
-            }
-            if (DateTime.UtcNow.Subtract(a.Created).Hours == 0 && DateTime.UtcNow.Subtract(a.Created).Minutes > 0)
-            {
-                return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Minutes + " min</span>");
-            }
-            if (DateTime.UtcNow.Subtract(a.Created).Minutes == 0 && DateTime.UtcNow.Subtract(a.Created).Seconds > 0)
-            {
-                return string.Join("", "<span class='badge badge-light'>" + DateTime.UtcNow.Subtract(a.Created).Seconds + " sec</span>");
-            }
-            return string.Join("", "<span class='badge badge-light'>...s</span>");
         }
 
         [HttpGet("GetActiveMap")]
@@ -536,7 +516,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                        timePending = GetTimePending(a),
+                        timePending = a.GetTimePending(),
                         PolicyNum = a.PolicyDetail.ContractNumber,
                         BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
@@ -886,7 +866,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                        timePending = GetTimePending(a),
+                        timePending = a.GetTimePending(),
                         PolicyNum = a.PolicyDetail.ContractNumber,
                         BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
@@ -1135,7 +1115,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                timePending = GetTimePending(a),
+                timePending = a.GetTimePending(),
                 PolicyNum = a.PolicyDetail.ContractNumber,
                 BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
@@ -1381,7 +1361,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                timePending = GetTimePending(a),
+                timePending = a.GetTimePending(),
                 PolicyNum = a.PolicyDetail.ContractNumber,
                 BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
@@ -1774,7 +1754,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
-                timePending = GetTimePending(a),
+                timePending = a.GetTimePending(),
                 PolicyNum = a.PolicyDetail.ContractNumber,
                 BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :

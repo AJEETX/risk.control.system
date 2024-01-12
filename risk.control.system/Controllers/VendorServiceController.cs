@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Edit")]
         public async Task<IActionResult> Edit(long id)
         {
-            if (id == null || _context.VendorInvestigationServiceType == null)
+            if (id == 0 || _context.VendorInvestigationServiceType == null)
             {
                 return NotFound();
             }
@@ -241,7 +241,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb(" Delete")]
         public async Task<IActionResult> Delete(long id)
         {
-            if (id == null || _context.VendorInvestigationServiceType == null)
+            if (id == 0 || _context.VendorInvestigationServiceType == null)
             {
                 return NotFound();
             }
@@ -271,7 +271,7 @@ namespace risk.control.system.Controllers
         // POST: VendorService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.VendorInvestigationServiceType == null)
             {

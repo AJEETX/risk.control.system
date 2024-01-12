@@ -783,7 +783,7 @@ function PopulateInvestigationServices(dropDownId, list, option) {
     $(dropDownId).empty();
     $(dropDownId).append(option)
     $.each(list, function (index, row) {
-        $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.code + "</option>")
+        $(dropDownId).append("<option value='" + row.investigationServiceTypeId + "'>" + row.name + "</option>")
     });
 }
 function PopulateDistrictDropDown(pinCodedropDownId, districtDropdownId, list, pincodeOption, districtOption, showDefaultOption) {

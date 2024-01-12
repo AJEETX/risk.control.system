@@ -212,10 +212,5 @@ namespace risk.control.system.Controllers
 
             return View(caseLocation);
         }
-
-        private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
-        {
-            return new List<string>(await userManager.GetRolesAsync(user));
-        }
     }
 }
