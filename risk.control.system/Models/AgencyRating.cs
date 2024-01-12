@@ -7,11 +7,11 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string AgencyRatingId { get; set; } = Guid.NewGuid().ToString();
+        public long AgencyRatingId { get; set; }
 
         public int Rate { get; set; }
         public string IpAddress { get; set; }
-        public string VendorId { get; set; }
+        public long VendorId { get; set; }
 
         public virtual Vendor? Vendor { get; set; }
     }

@@ -87,7 +87,7 @@ namespace risk.control.system.Seeds
                 Name = "COMPREHENSIVE",
                 Code = "COMP",
                 MasterData = true,
-                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
+                LineOfBusiness = claimCaseType.Entity
             };
             var claimComprehensiveService = await context.InvestigationServiceType.AddAsync(claimComprehensive);
 
@@ -96,7 +96,7 @@ namespace risk.control.system.Seeds
                 Name = "NON-COMPREHENSIVE",
                 Code = "NON-COMP",
                 MasterData = true,
-                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
+                LineOfBusiness = claimCaseType.Entity
             };
 
             var claimNonComprehensiveService = await context.InvestigationServiceType.AddAsync(claimNonComprehensive);
@@ -106,7 +106,7 @@ namespace risk.control.system.Seeds
                 Name = "DOCUMENT-COLLECTION",
                 Code = "DOC",
                 MasterData = true,
-                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
+                LineOfBusiness = claimCaseType.Entity
             };
 
             var claimDocumentCollectionService = await context.InvestigationServiceType.AddAsync(claimDocumentCollection);
@@ -116,7 +116,7 @@ namespace risk.control.system.Seeds
                 Name = "DISCREET",
                 Code = "DISCREET",
                 MasterData = true,
-                LineOfBusinessId = claimCaseType.Entity.LineOfBusinessId
+                LineOfBusiness = claimCaseType.Entity
             };
 
             var claimDiscreetService = await context.InvestigationServiceType.AddAsync(claimDiscreet);
@@ -126,7 +126,7 @@ namespace risk.control.system.Seeds
                 Name = "PRE-ONBOARDING-VERIFICATION",
                 Code = "PRE-OV",
                 MasterData = true,
-                LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
+                LineOfBusiness = underwritingCaseType.Entity
             };
 
             var underWritingPreVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPreVerification);
@@ -136,7 +136,7 @@ namespace risk.control.system.Seeds
                 Name = "POST-ONBOARDING-VERIFICATION",
                 Code = "POST-OV",
                 MasterData = true,
-                LineOfBusinessId = underwritingCaseType.Entity.LineOfBusinessId
+                LineOfBusiness = underwritingCaseType.Entity
             };
 
             var underWritingPostVerificationService = await context.InvestigationServiceType.AddAsync(underWritingPostVerification);
@@ -181,7 +181,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR,
                 MasterData = true,
-                InvestigationCaseStatusId = initiatedStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = initiatedStatus.Entity
             };
             var createdSubStatus = await context.InvestigationCaseSubStatus.AddAsync(created);
 
@@ -190,7 +190,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.EDITED_BY_CREATOR,
                 MasterData = true,
-                InvestigationCaseStatusId = initiatedStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = initiatedStatus.Entity
             };
             var editedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(edited);
 
@@ -199,7 +199,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER,
                 MasterData = true,
-                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = inProgressStatus.Entity
             };
 
             var assignedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(assigned);
@@ -209,7 +209,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR,
                 MasterData = true,
-                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = inProgressStatus.Entity
             };
 
             var allocatedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(allocated);
@@ -219,7 +219,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT,
                 MasterData = true,
-                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = inProgressStatus.Entity
             };
 
             var assignedToAgentSubStatus = await context.InvestigationCaseSubStatus.AddAsync(assignedToAgent);
@@ -229,7 +229,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR,
                 MasterData = true,
-                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = inProgressStatus.Entity
             };
 
             var submittedtoSupervisorSubStatus = await context.InvestigationCaseSubStatus.AddAsync(submittedtoSupervisor);
@@ -239,7 +239,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR,
                 MasterData = true,
-                InvestigationCaseStatusId = inProgressStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = inProgressStatus.Entity
             };
 
             var submittedToAssessorSubStatus = await context.InvestigationCaseSubStatus.AddAsync(submittedToAssessor);
@@ -249,7 +249,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR,
                 MasterData = true,
-                InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = finishedStatus.Entity
             };
 
             var approvededSubStatus = await context.InvestigationCaseSubStatus.AddAsync(approved);
@@ -259,7 +259,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REJECTED_BY_ASSESSOR,
                 MasterData = true,
-                InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = finishedStatus.Entity
             };
 
             var rejectedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(rejected);
@@ -269,7 +269,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER,
                 MasterData = true,
-                InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = finishedStatus.Entity
             };
             var acceptedSubStatus = await context.InvestigationCaseSubStatus.AddAsync(reassigned);
 
@@ -278,7 +278,7 @@ namespace risk.control.system.Seeds
                 Name = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
                 Code = CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.WITHDRAWN_BY_COMPANY,
                 MasterData = true,
-                InvestigationCaseStatusId = finishedStatus.Entity.InvestigationCaseStatusId
+                InvestigationCaseStatus = finishedStatus.Entity
             };
 
             var withdrawnByCompanySubStatus = await context.InvestigationCaseSubStatus.AddAsync(withdrawnByCompany);
@@ -314,24 +314,12 @@ namespace risk.control.system.Seeds
             {
                 await ClientApplicationUserSeed.Seed(context, webHostEnvironment, clientUserManager, companyId);
             }
-
-            //await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, canaraId);
-
-            //await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, hdfcId);
-
-            //await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, bajajId);
-
-            //await ClientApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, clientUserManager, tataId);
+            await context.SaveChangesAsync(null, false);
 
             foreach (var vendor in vendors)
             {
                 await VendorApplicationUserSeed.Seed(context, webHostEnvironment, vendorUserManager, vendor);
             }
-            //await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, checker);
-
-            //await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, verify);
-
-            //await VendorApplicationUserSeed.Seed(context, webHostEnvironment, indiaCountry, vendorUserManager, investigate);
 
             await context.SaveChangesAsync(null, false);
 

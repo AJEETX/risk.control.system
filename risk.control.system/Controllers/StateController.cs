@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseStatus/Details/5
         [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.State == null)
             {
@@ -121,7 +121,7 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseStatus/Edit/5
         [Breadcrumb("Edit State")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.State == null)
             {
@@ -145,7 +145,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, State state)
+        public async Task<IActionResult> Edit(long id, State state)
         {
             if (id != state.StateId)
             {
@@ -184,7 +184,7 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseStatus/Delete/5
         [Breadcrumb("Delete State")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.State == null)
             {
@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers
         // POST: RiskCaseStatus/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.State == null)
             {
@@ -225,7 +225,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool StateExists(string id)
+        private bool StateExists(long id)
         {
             return (_context.State?.Any(e => e.StateId == id)).GetValueOrDefault();
         }

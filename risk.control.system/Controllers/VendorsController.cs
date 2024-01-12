@@ -41,7 +41,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        public JsonResult PostRating(int rating, string mid)
+        public JsonResult PostRating(int rating, long mid)
         {
             //save data into the database
 
@@ -58,8 +58,8 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Details/5
-        [Breadcrumb(" Manage Agency",FromAction ="Agencies")]
-        public async Task<IActionResult> Details(string id)
+        [Breadcrumb(" Manage Agency", FromAction = "Agencies")]
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.Vendor == null)
             {
@@ -173,7 +173,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(" Edit Agency", FromAction = "Agencies")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.Vendor == null)
             {
@@ -186,7 +186,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var country = _context.Country.Where(c => c.CountryId == vendor.CountryId);
+            var country = _context.Country.OrderBy(o => o.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
@@ -209,7 +209,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string vendorId, Vendor vendor)
+        public async Task<IActionResult> Edit(long vendorId, Vendor vendor)
         {
             if (vendorId != vendor.VendorId)
             {
@@ -287,7 +287,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.Vendor == null)
             {
@@ -333,7 +333,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool VendorExists(string id)
+        private bool VendorExists(long id)
         {
             return (_context.Vendor?.Any(e => e.VendorId == id)).GetValueOrDefault();
         }

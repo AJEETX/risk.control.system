@@ -7,7 +7,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ReportQuestionId { get; set; } = Guid.NewGuid().ToString();
+        public long ReportQuestionId { get; set; }
 
         public string? Question1 { get; set; }
         public string? Question2 { get; set; }

@@ -13,10 +13,10 @@ namespace risk.control.system.Seeds
 {
     public static class ClientApplicationUserSeed
     {
-        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> userManager, string clientCompanyId)
+        public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> userManager, ClientCompany clientCompany)
         {
             //Seed client admin
-            var company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == clientCompanyId);
+            var company = context.ClientCompany.FirstOrDefault(c => c.Email == clientCompany.Email);
             string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
 
             string adminEmailwithSuffix = Applicationsettings.ADMIN.CODE + "@" + company.Email;
@@ -50,9 +50,9 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = true,
                 Active = true,
                 PhoneNumber = Applicationsettings.MOBILE,
-                Addressline = "43 Golden Road",
+                Addressline = "22 Golden Road",
                 IsVendorAdmin = false,
-                ClientCompanyId = clientCompanyId,
+                ClientCompany = clientCompany,
                 CountryId = countryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,
@@ -109,7 +109,7 @@ namespace risk.control.system.Seeds
                 Active = true,
                 EmailConfirmed = true,
                 Password = Password,
-                ClientCompanyId = clientCompanyId,
+                ClientCompany = clientCompany,
                 PhoneNumberConfirmed = true,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
@@ -159,7 +159,7 @@ namespace risk.control.system.Seeds
                 LastName = ASSIGNER.LAST_NAME,
                 Active = true,
                 EmailConfirmed = true,
-                ClientCompanyId = clientCompanyId,
+                ClientCompany = clientCompany,
                 PhoneNumberConfirmed = true,
                 Password = Password,
                 IsSuperAdmin = false,
@@ -212,7 +212,7 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Password,
                 Active = true,
-                ClientCompanyId = clientCompanyId,
+                ClientCompany = clientCompany,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,

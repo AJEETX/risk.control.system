@@ -42,7 +42,7 @@ namespace risk.control.system.Controllers
             UserList = new List<UsersViewModel>();
         }
 
-        public async Task<IActionResult> Index(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index(long id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
         {
             ViewBag.EmailSortParm = string.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
             ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -138,7 +138,7 @@ namespace risk.control.system.Controllers
                     thisViewModel.PinCode = pinCode.Name + "-" + pinCode.Code;
                     thisViewModel.PinCodeId = pinCode.PinCodeId;
                     thisViewModel.CompanyName = company.Name;
-                    thisViewModel.CompanyId = user.ClientCompanyId;
+                    thisViewModel.CompanyId = user.ClientCompanyId.Value;
                     thisViewModel.ProfileImageInByte = user.ProfilePicture;
                     thisViewModel.Roles = await GetUserRoles(user);
                     UserList.Add(thisViewModel);
@@ -173,7 +173,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanyApplicationUser/Create
         [Breadcrumb("Add User", FromController = typeof(ClientCompanyController))]
-        public IActionResult Create(string id)
+        public IActionResult Create(long id)
         {
             var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == id);
             var model = new ClientCompanyApplicationUser { ClientCompany = company };
@@ -260,7 +260,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             clientCompanyApplicationUser.ClientCompany = clientCompany;
-            var country = _context.Country.Where(c => c.CountryId == clientCompanyApplicationUser.CountryId);
+            var country = _context.Country.OrderBy(o => o.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
@@ -277,9 +277,9 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ClientCompanyApplicationUser applicationUser)
+        public async Task<IActionResult> Edit(long id, ClientCompanyApplicationUser applicationUser)
         {
-            if (id != applicationUser.Id.ToString())
+            if (id != applicationUser.Id)
             {
                 toastNotification.AddErrorToastMessage("company not found!");
                 return NotFound();
@@ -289,7 +289,7 @@ namespace risk.control.system.Controllers
             {
                 try
                 {
-                    var user = await userManager.FindByIdAsync(id);
+                    var user = await userManager.FindByIdAsync(id.ToString());
                     if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                     {
                         string newFileName = user.Email + Guid.NewGuid().ToString();

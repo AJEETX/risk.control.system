@@ -26,12 +26,11 @@ namespace risk.control.system.Controllers
         // GET: PinCodes
         public async Task<IActionResult> Index()
         {
-
             var applicationDbContext = _context.PinCode.
                 Include(p => p.Country)
                 .Include(p => p.District)
                 .Include(p => p.State).AsQueryable();
- 
+
             var applicationDbContextResult = await applicationDbContext.ToListAsync();
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
 
@@ -40,7 +39,7 @@ namespace risk.control.system.Controllers
 
         // GET: PinCodes/Details/5
         [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.PinCode == null)
             {
@@ -113,7 +112,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, PinCode pinCode)
+        public async Task<IActionResult> Edit(long id, PinCode pinCode)
         {
             if (id != pinCode.PinCodeId)
             {
@@ -144,7 +143,7 @@ namespace risk.control.system.Controllers
 
         // GET: PinCodes/Delete/5
         [Breadcrumb("Delete Pincode")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.PinCode == null)
             {
@@ -186,7 +185,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PinCodeExists(string id)
+        private bool PinCodeExists(long id)
         {
             return (_context.PinCode?.Any(e => e.PinCodeId == id)).GetValueOrDefault();
         }

@@ -7,7 +7,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ClaimMessageId { get; set; } = Guid.NewGuid().ToString();
+        public long ClaimMessageId { get; set; }
 
         public string? SenderEmail { get; set; }
         public string? RecepicientEmail { get; set; }

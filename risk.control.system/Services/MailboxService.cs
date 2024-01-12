@@ -18,13 +18,13 @@ namespace risk.control.system.Services
     {
         Task NotifyClaimCreation(string userEmail, ClaimsInvestigation claimsInvestigation);
 
-        Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, string vendorId, long caseLocationId);
+        Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, long vendorId, long caseLocationId);
 
         Task NotifyClaimAssignmentToAssigner(string userEmail, List<string> claims);
 
         Task NotifyClaimWithdrawlToCompany(string senderUserEmail, string claimId);
 
-        Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, string claimId, string agentEmail, string vendorId, long caseLocationId);
+        Task NotifyClaimAssignmentToVendorAgent(string senderUserEmail, string claimId, string agentEmail, long vendorId, long caseLocationId);
 
         Task NotifyClaimReportSubmitToVendorSupervisor(string senderUserEmail, string claimId, long caseLocationId);
 
@@ -56,7 +56,7 @@ namespace risk.control.system.Services
             this.userVendorManager = userVendorManager;
         }
 
-        public async Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, string vendorId, long caseLocationId)
+        public async Task NotifyClaimAllocationToVendor(string userEmail, string policy, string claimsInvestigationId, long vendorId, long caseLocationId)
         {
             //1. get vendor admin and supervisor email
 
@@ -330,7 +330,7 @@ namespace risk.control.system.Services
             }
         }
 
-        public async Task NotifyClaimAssignmentToVendorAgent(string userEmail, string claimId, string agentEmail, string vendorId, long caseLocationId)
+        public async Task NotifyClaimAssignmentToVendorAgent(string userEmail, string claimId, string agentEmail, long vendorId, long caseLocationId)
         {
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 

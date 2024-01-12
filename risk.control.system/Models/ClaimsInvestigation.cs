@@ -10,14 +10,13 @@ namespace risk.control.system.Models
         public string ClaimsInvestigationId { get; set; } = Guid.NewGuid().ToString();
 
         [Display(Name = "Agency name")]
-        public string? VendorId { get; set; }
+        public long? VendorId { get; set; }
 
         [Display(Name = "Agency name")]
         public Vendor? Vendor { get; set; }
 
-        public string? PolicyDetailId { get; set; }
+        public long? PolicyDetailId { get; set; }
         public PolicyDetail? PolicyDetail { get; set; }
-        public string? CustomerDetailId { get; set; }
         public CustomerDetail? CustomerDetail { get; set; }
 
         [NotMapped]
@@ -137,43 +136,6 @@ namespace risk.control.system.Models
 
         [Display(Name = "FTP Upload")]
         FTP,
-    }
-
-    public class VerificationLocation : BaseEntity
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VerificationLocationId { get; set; } = Guid.NewGuid().ToString();
-
-        public virtual ClaimsInvestigation ClaimsInvestigation { get; set; } = default!;
-
-        [Display(Name = "Address line")]
-        public string? Addressline { get; set; }
-
-        [Display(Name = "PinCode name")]
-        public string? PinCodeId { get; set; } = default!;
-
-        [Display(Name = "PinCode name")]
-        public PinCode? PinCode { get; set; } = default!;
-
-        [Display(Name = "State name")]
-        public string? StateId { get; set; } = default!;
-
-        [Display(Name = "State name")]
-        public State? State { get; set; } = default!;
-
-        [Required]
-        [Display(Name = "Country name")]
-        public string CountryId { get; set; } = default!;
-
-        [Display(Name = "Country name")]
-        public Country Country { get; set; } = default!;
-
-        [Display(Name = "District")]
-        public string? DistrictId { get; set; } = default!;
-
-        [Display(Name = "District")]
-        public District? District { get; set; } = default!;
     }
 
     public enum ClaimType

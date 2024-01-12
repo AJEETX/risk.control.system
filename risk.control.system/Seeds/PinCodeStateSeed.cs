@@ -27,7 +27,7 @@ namespace risk.control.system.Seeds
             var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
             foreach (var state in states)
             {
-                var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, CountryId = country.CountryId };
+                var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country };
                 var stateAdded = await context.State.AddAsync(recordState);
 
                 var districts = state.GroupBy(g => g.District);
@@ -35,7 +35,7 @@ namespace risk.control.system.Seeds
                 var pinCodeList = new List<PinCode> { };
                 foreach (var district in districts)
                 {
-                    var districtDetail = new District { Code = district.Key, Name = district.Key, StateId = stateAdded.Entity.StateId, CountryId = country.CountryId };
+                    var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country };
                     var districtAdded = await context.District.AddAsync(districtDetail);
                     foreach (var pinCode in district)
                     {
@@ -45,9 +45,9 @@ namespace risk.control.system.Seeds
                             Code = pinCode.Code,
                             Longitude = pinCode.Longitude,
                             Latitude = pinCode.Latitude,
-                            DistrictId = districtAdded.Entity.DistrictId,
-                            StateId = stateAdded.Entity.StateId,
-                            CountryId = country.CountryId,
+                            District = districtAdded.Entity,
+                            State = stateAdded.Entity,
+                            Country = country,
                         };
                         pinCodeList.Add(pincodeState);
                     }
@@ -60,36 +60,43 @@ namespace risk.control.system.Seeds
         {
             var pincodes = await CsvRead_India();
 
-            // add the states with pincodes
-            var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
-            foreach (var state in states)
+            try
             {
-                var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, CountryId = country.CountryId };
-                var stateAdded = await context.State.AddAsync(recordState);
-
-                var districts = state.GroupBy(g => g.District);
-
-                var pinCodeList = new List<PinCode> { };
-                foreach (var district in districts)
+                // add the states with pincodes
+                var states = pincodes.GroupBy(g => new { g.StateName, g.StateCode });
+                foreach (var state in states)
                 {
-                    var districtDetail = new District { Code = district.Key, Name = district.Key, StateId = stateAdded.Entity.StateId, CountryId = country.CountryId };
-                    var districtAdded = await context.District.AddAsync(districtDetail);
-                    foreach (var pinCode in district)
+                    var recordState = new State { Code = state.Key.StateCode, Name = state.Key.StateName, Country = country };
+                    var stateAdded = await context.State.AddAsync(recordState);
+
+                    var districts = state.GroupBy(g => g.District);
+
+                    var pinCodeList = new List<PinCode> { };
+                    foreach (var district in districts)
                     {
-                        var pincodeState = new PinCode
+                        var districtDetail = new District { Code = district.Key, Name = district.Key, State = stateAdded.Entity, Country = country };
+                        var districtAdded = await context.District.AddAsync(districtDetail);
+                        foreach (var pinCode in district)
                         {
-                            Name = pinCode.Name,
-                            Code = pinCode.Code,
-                            Longitude = pinCode.Longitude,
-                            Latitude = pinCode.Latitude,
-                            DistrictId = districtAdded.Entity.DistrictId,
-                            StateId = stateAdded.Entity.StateId,
-                            CountryId = country.CountryId,
-                        };
-                        pinCodeList.Add(pincodeState);
+                            var pincodeState = new PinCode
+                            {
+                                Name = pinCode.Name,
+                                Code = pinCode.Code,
+                                Longitude = pinCode.Longitude,
+                                Latitude = pinCode.Latitude,
+                                District = districtAdded.Entity,
+                                State = stateAdded.Entity,
+                                Country = country,
+                            };
+                            pinCodeList.Add(pincodeState);
+                        }
                     }
+                    await context.PinCode.AddRangeAsync(pinCodeList);
                 }
-                await context.PinCode.AddRangeAsync(pinCodeList);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 

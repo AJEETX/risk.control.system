@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers
 
         // GET: InvestigationServiceTypes/Details/5
         [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.InvestigationServiceType == null)
             {
@@ -105,7 +105,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, InvestigationServiceType investigationServiceType)
+        public async Task<IActionResult> Edit(long id, InvestigationServiceType investigationServiceType)
         {
             if (id != investigationServiceType.InvestigationServiceTypeId)
             {
@@ -144,7 +144,7 @@ namespace risk.control.system.Controllers
 
         // GET: InvestigationServiceTypes/Delete/5
         [Breadcrumb("Delete Service Type")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.InvestigationServiceType == null)
             {
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers
         // POST: InvestigationServiceTypes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.InvestigationServiceType == null)
             {
@@ -188,7 +188,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool InvestigationServiceTypeExists(string id)
+        private bool InvestigationServiceTypeExists(long id)
         {
             return (_context.InvestigationServiceType?.Any(e => e.InvestigationServiceTypeId == id)).GetValueOrDefault();
         }

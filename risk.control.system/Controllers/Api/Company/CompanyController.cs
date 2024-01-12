@@ -53,7 +53,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("CompanyUsers")]
-        public async Task<IActionResult> CompanyUsers(string id)
+        public async Task<IActionResult> CompanyUsers(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var adminUser = _context.ApplicationUser.FirstOrDefault(c => c.Email == userEmail);
@@ -223,7 +223,7 @@ namespace risk.control.system.Controllers.Api.Company
         }
 
         [HttpGet("AllServices")]
-        public async Task<IActionResult> AllServices(string id)
+        public async Task<IActionResult> AllServices(long id)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);

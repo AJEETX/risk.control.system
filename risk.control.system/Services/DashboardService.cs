@@ -207,22 +207,22 @@ namespace risk.control.system.Services
                 {
                     foreach (var CaseLocation in claimsCase.CaseLocations)
                     {
-                        if (!string.IsNullOrEmpty(CaseLocation.VendorId))
+                        if (CaseLocation.VendorId.HasValue)
                         {
                             if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                     CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
                                     )
                             {
-                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId, out countOfCases))
+                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId.Value.ToString(), out countOfCases))
                                 {
-                                    vendorCaseCount.Add(CaseLocation.VendorId, 1);
+                                    vendorCaseCount.Add(CaseLocation.VendorId.Value.ToString(), 1);
                                 }
                                 else
                                 {
-                                    int currentCount = vendorCaseCount[CaseLocation.VendorId];
+                                    int currentCount = vendorCaseCount[CaseLocation.VendorId.Value.ToString()];
                                     ++currentCount;
-                                    vendorCaseCount[CaseLocation.VendorId] = currentCount;
+                                    vendorCaseCount[CaseLocation.VendorId.Value.ToString()] = currentCount;
                                 }
                             }
                         }
@@ -236,7 +236,7 @@ namespace risk.control.system.Services
             {
                 foreach (var vendorCase in vendorCaseCount)
                 {
-                    if (vendorCase.Key == existingVendor.VendorId)
+                    if (vendorCase.Key == existingVendor.VendorId.ToString())
                     {
                         vendorWithCaseCounts.Add(existingVendor.Name, vendorCase.Value);
                     }
@@ -293,7 +293,7 @@ namespace risk.control.system.Services
                     {
                         foreach (var CaseLocation in claimsCase.CaseLocations)
                         {
-                            if (!string.IsNullOrEmpty(CaseLocation.VendorId) && CaseLocation.AssignedAgentUserEmail.Trim().ToLower() == vendorNonAdminUser.Email.Trim().ToLower())
+                            if (CaseLocation.VendorId.HasValue && CaseLocation.AssignedAgentUserEmail.Trim().ToLower() == vendorNonAdminUser.Email.Trim().ToLower())
                             {
                                 if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                         CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId

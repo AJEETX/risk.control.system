@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers
 
         // GET: CaseEnabler/Details/5
         [Breadcrumb("Details ")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(int id)
         {
             if (id == null || _context.CaseEnabler == null)
             {
@@ -77,7 +77,7 @@ namespace risk.control.system.Controllers
 
         // GET: CaseEnabler/Edit/5
         [Breadcrumb("Edit Reason To Verify ")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.CaseEnabler == null)
             {
@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, CaseEnabler caseEnabler)
+        public async Task<IActionResult> Edit(long id, CaseEnabler caseEnabler)
         {
             if (id != caseEnabler.CaseEnablerId)
             {
@@ -132,7 +132,7 @@ namespace risk.control.system.Controllers
 
         // GET: CaseEnabler/Delete/5
         [Breadcrumb("Delete Reason To Verify ")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.CaseEnabler == null)
             {
@@ -171,7 +171,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CaseEnablerExists(string id)
+        private bool CaseEnablerExists(long id)
         {
             return (_context.CaseEnabler?.Any(e => e.CaseEnablerId == id)).GetValueOrDefault();
         }

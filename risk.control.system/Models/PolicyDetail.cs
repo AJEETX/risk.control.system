@@ -7,23 +7,23 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string PolicyDetailId { get; set; } = Guid.NewGuid().ToString();
+        public long PolicyDetailId { get; set; }
 
         [Required]
         [Display(Name = "Insurer name")]
-        public string? ClientCompanyId { get; set; }
+        public long? ClientCompanyId { get; set; }
 
         [Display(Name = "Insurer name")]
         public ClientCompany? ClientCompany { get; set; }
 
         [Display(Name = "Line of Business")]
-        public string? LineOfBusinessId { get; set; } = default!;
+        public long? LineOfBusinessId { get; set; } = default!;
 
         [Display(Name = "Line of Business")]
         public LineOfBusiness? LineOfBusiness { get; set; } = default!;
 
         [Display(Name = "Investigation type")]
-        public string? InvestigationServiceTypeId { get; set; } = default!;
+        public long? InvestigationServiceTypeId { get; set; } = default!;
 
         [Display(Name = "Investigation type")]
         public InvestigationServiceType? InvestigationServiceType { get; set; } = default!;
@@ -55,12 +55,12 @@ namespace risk.control.system.Models
 
         [Required]
         [Display(Name = "Budget centre")]
-        public string CostCentreId { get; set; }
+        public long CostCentreId { get; set; }
 
         [Display(Name = "Budget centre")]
         public CostCentre? CostCentre { get; set; }
 
-        public string? CaseEnablerId { get; set; }
+        public long? CaseEnablerId { get; set; }
 
         [Display(Name = "Reason To Verify")]
         public CaseEnabler? CaseEnabler { get; set; }

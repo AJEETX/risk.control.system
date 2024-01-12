@@ -10,18 +10,18 @@ namespace risk.control.system.Models.ViewModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string UserName { get; set; }
-        public string? PinCodeId { get; set; }
+        public long? PinCodeId { get; set; }
         public string? PinCode { get; set; }
-        public string? StateId { get; set; }
+        public long? StateId { get; set; }
         public string? State { get; set; }
-        public string? DistrictId { get; set; }
+        public long? DistrictId { get; set; }
         public string? District { get; set; }
         public string? Country { get; set; }
-        public string? CountryId { get; set; }
+        public long? CountryId { get; set; }
         public string Email { get; set; }
-        public string VendorId { get; set; }
+        public long VendorId { get; set; }
         public string VendorName { get; set; }
-        public string CompanyId { get; set; }
+        public long CompanyId { get; set; }
         public string CompanyName { get; set; }
         public string PhoneNumber { get; set; }
         public string Addressline { get; set; }
@@ -40,6 +40,7 @@ namespace risk.control.system.Models.ViewModel
     {
         [Display(Name = "Agency name")]
         public Vendor Vendor { get; set; }
+
         public List<UsersViewModel> Users { get; set; } = new();
     }
 
@@ -47,6 +48,7 @@ namespace risk.control.system.Models.ViewModel
     {
         [Display(Name = "Insurer name")]
         public ClientCompany Company { get; set; }
+
         public List<UsersViewModel> Users { get; set; } = new();
     }
 }

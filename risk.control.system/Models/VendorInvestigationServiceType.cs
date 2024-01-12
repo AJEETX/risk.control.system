@@ -7,31 +7,31 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VendorInvestigationServiceTypeId { get; set; } = Guid.NewGuid().ToString();
+        public long VendorInvestigationServiceTypeId { get; set; }
 
         [Display(Name = "Investigation service type")]
-        public string InvestigationServiceTypeId { get; set; } = default!;
+        public long InvestigationServiceTypeId { get; set; } = default!;
 
         [Display(Name = "Investigation service type")]
         public InvestigationServiceType InvestigationServiceType { get; set; } = default!;
 
         [Display(Name = "Line of business")]
-        public string? LineOfBusinessId { get; set; } = default!;
+        public long? LineOfBusinessId { get; set; } = default!;
 
         public LineOfBusiness? LineOfBusiness { get; set; } = default!;
 
         [Display(Name = "Country name")]
-        public string? CountryId { get; set; } = default!;
+        public long? CountryId { get; set; } = default!;
 
         public Country? Country { get; set; } = default!;
 
         [Display(Name = "State")]
-        public string? StateId { get; set; } = default!;
+        public long? StateId { get; set; } = default!;
 
         public State? State { get; set; } = default!;
 
         [Display(Name = "District")]
-        public string? DistrictId { get; set; } = default!;
+        public long? DistrictId { get; set; } = default!;
 
         public District? District { get; set; } = default!;
 
@@ -40,12 +40,12 @@ namespace risk.control.system.Models
 
         [NotMapped]
         [Display(Name = "Choose Multiple Pincodes")]
-        public List<string> SelectedMultiPincodeId { get; set; } = new List<string> { }!;
+        public List<long> SelectedMultiPincodeId { get; set; } = new List<long> { }!;
 
         [Display(Name = "Serviced pincodes")]
         public List<ServicedPinCode> PincodeServices { get; set; } = default!;
 
-        public string VendorId { get; set; }
+        public long VendorId { get; set; }
         public Vendor Vendor { get; set; }
         public bool Deleted { get; set; } = false;
     }

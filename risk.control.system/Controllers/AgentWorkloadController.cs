@@ -130,7 +130,7 @@ namespace risk.control.system.Controllers
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => c.AssignedAgentUserEmail == email && !string.IsNullOrWhiteSpace(c.VendorId)
+                    item.CaseLocations = item.CaseLocations.Where(c => c.AssignedAgentUserEmail == email && c.VendorId.HasValue
                         && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {

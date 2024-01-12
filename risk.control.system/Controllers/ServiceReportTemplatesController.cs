@@ -37,7 +37,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ServiceReportTemplates/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.ServiceReportTemplate == null)
             {
@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers
             var lob = _context.LineOfBusiness.FirstOrDefault(l => l.LineOfBusinessId == serviceReportTemplate.LineOfBusinessId);
             var svc = _context.InvestigationServiceType
                 .Include(b => b.LineOfBusiness)
-                .Where(l => l.LineOfBusinessId == serviceReportTemplate.LineOfBusinessId);
+                .Where(l => l.LineOfBusinessId == serviceReportTemplate.LineOfBusinessId.Value);
             ViewData["InvestigationServiceTypeId"] = new SelectList(svc, "InvestigationServiceTypeId", "Name", serviceReportTemplate.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", serviceReportTemplate.LineOfBusinessId);
             ViewData["ReportTemplateId"] = new SelectList(_context.ReportTemplate, "ReportTemplateId", "Name", serviceReportTemplate.ReportTemplateId);
@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("ServiceReportTemplateId,Name,ClientCompanyId,LineOfBusinessId,InvestigationServiceTypeId,ReportTemplateId,Created,Updated,UpdatedBy")] ServiceReportTemplate serviceReportTemplate)
+        public async Task<IActionResult> Edit(long id, [Bind("ServiceReportTemplateId,Name,ClientCompanyId,LineOfBusinessId,InvestigationServiceTypeId,ReportTemplateId,Created,Updated,UpdatedBy")] ServiceReportTemplate serviceReportTemplate)
         {
             if (id != serviceReportTemplate.ServiceReportTemplateId)
             {
@@ -167,7 +167,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ServiceReportTemplates/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.ServiceReportTemplate == null)
             {
@@ -190,7 +190,7 @@ namespace risk.control.system.Controllers
         // POST: ServiceReportTemplates/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.ServiceReportTemplate == null)
             {
@@ -206,7 +206,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ServiceReportTemplateExists(string id)
+        private bool ServiceReportTemplateExists(long id)
         {
             return (_context.ServiceReportTemplate?.Any(e => e.ServiceReportTemplateId == id)).GetValueOrDefault();
         }

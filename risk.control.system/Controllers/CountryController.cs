@@ -36,14 +36,13 @@ namespace risk.control.system.Controllers
 
             var applicationDbContextResult = await applicationDbContext.ToListAsync();
             return View(applicationDbContextResult);
-
         }
 
         // GET: RiskCaseStatus/Details/5
         [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.Country == null)
+            if (id == 0 || _context.Country == null)
             {
                 toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
@@ -80,9 +79,9 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseStatus/Edit/5
         [Breadcrumb("Edit Country")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
-            if (id == null || _context.Country == null)
+            if (id == 0 || _context.Country == null)
             {
                 toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
@@ -102,7 +101,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Country country)
+        public async Task<IActionResult> Edit(long id, Country country)
         {
             if (id != country.CountryId)
             {
@@ -139,9 +138,9 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseStatus/Delete/5
         [Breadcrumb("Delete Country")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
-            if (id == null || _context.Country == null)
+            if (id == 0 || _context.Country == null)
             {
                 toastNotification.AddErrorToastMessage("country not found!");
                 return NotFound();
@@ -161,7 +160,7 @@ namespace risk.control.system.Controllers
         // POST: RiskCaseStatus/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.Country == null)
             {
@@ -181,7 +180,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CountryExists(string id)
+        private bool CountryExists(long id)
         {
             return (_context.Country?.Any(e => e.CountryId == id)).GetValueOrDefault();
         }

@@ -7,10 +7,12 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string CaseEnablerId { get; set; } = Guid.NewGuid().ToString();
+        public long CaseEnablerId { get; set; }
+
         [Display(Name = "Case enabler name")]
         [Required]
         public string Name { get; set; } = default!;
+
         [Display(Name = "Case enabler code")]
         [Required]
         public string Code { get; set; } = default!;

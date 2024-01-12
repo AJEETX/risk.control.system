@@ -3,15 +3,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace risk.control.system.Models
 {
-    public class BankDetail :BaseEntity
+    public class BankDetail : BaseEntity
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string BankDetailId { get; set; } = Guid.NewGuid().ToString();
+        public long BankDetailId { get; set; }
+
         [Display(Name = "Bank Name")]
         public string Name { get; set; } = default!;
-        [Display(Name ="Bank Account Number")]
+
+        [Display(Name = "Bank Account Number")]
         public string AccountNumber { get; set; } = default!;
+
         public string IFSCCode { get; set; } = default!;
     }
 }

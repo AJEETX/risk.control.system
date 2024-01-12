@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: DocumentIdReports/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.DocumentIdReport == null)
             {
@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("DocumentIdReportId,DocumentIdImagePath,DocumentIdImage,DocumentIdImageValid,DocumentIdImageType,DocumentIdImageData,DocumentIdImageLocationUrl,DocumentIdImageLocationAddress,DocumentIdImageLongLat,DocumentIdImageLongLatTime,DocumentIdReportType,Created,Updated,UpdatedBy")] DocumentIdReport documentIdReport)
+        public async Task<IActionResult> Edit(long id, [Bind("DocumentIdReportId,DocumentIdImagePath,DocumentIdImage,DocumentIdImageValid,DocumentIdImageType,DocumentIdImageData,DocumentIdImageLocationUrl,DocumentIdImageLocationAddress,DocumentIdImageLongLat,DocumentIdImageLongLatTime,DocumentIdReportType,Created,Updated,UpdatedBy")] DocumentIdReport documentIdReport)
         {
             if (id != documentIdReport.DocumentIdReportId)
             {
@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: DocumentIdReports/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.DocumentIdReport == null)
             {
@@ -172,7 +172,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DocumentIdReportExists(string id)
+        private bool DocumentIdReportExists(long id)
         {
             return (_context.DocumentIdReport?.Any(e => e.DocumentIdReportId == id)).GetValueOrDefault();
         }

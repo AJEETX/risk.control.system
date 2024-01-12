@@ -7,10 +7,12 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string CostCentreId { get; set; } = Guid.NewGuid().ToString();
+        public long CostCentreId { get; set; }
+
         [Display(Name = "CostCentre name")]
         [Required]
         public string Name { get; set; } = default!;
+
         [Display(Name = "CostCentre code")]
         [Required]
         public string Code { get; set; } = default!;

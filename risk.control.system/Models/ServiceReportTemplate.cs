@@ -7,30 +7,30 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ServiceReportTemplateId { get; set; } = Guid.NewGuid().ToString();
+        public long ServiceReportTemplateId { get; set; }
 
         public string Name { get; set; }
 
         [Display(Name = "Insurer name")]
-        public string? ClientCompanyId { get; set; }
+        public long? ClientCompanyId { get; set; }
 
         [Display(Name = "Insurer name")]
         public virtual ClientCompany? ClientCompany { get; set; }
 
         [Display(Name = "Line of Business")]
-        public string? LineOfBusinessId { get; set; }
+        public long? LineOfBusinessId { get; set; }
 
         [Display(Name = "Line of Business")]
         public virtual LineOfBusiness? LineOfBusiness { get; set; }
 
         [Display(Name = "Service type")]
-        public string? InvestigationServiceTypeId { get; set; }
+        public long? InvestigationServiceTypeId { get; set; }
 
         [Display(Name = "Service type")]
         public virtual InvestigationServiceType? InvestigationServiceType { get; set; }
 
         [Display(Name = "Report type")]
-        public string? ReportTemplateId { get; set; }
+        public long? ReportTemplateId { get; set; }
 
         public ReportTemplate? ReportTemplate { get; set; }
     }
@@ -39,27 +39,27 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ReportTemplateId { get; set; } = Guid.NewGuid().ToString();
+        public long ReportTemplateId { get; set; }
 
         public string? Name { get; set; }
 
         [Display(Name = "Insurer name")]
-        public string? ClientCompanyId { get; set; }
+        public long? ClientCompanyId { get; set; }
 
         [Display(Name = "Insurer name")]
         public virtual ClientCompany? ClientCompany { get; set; }
 
-        public string? DigitalIdReportId { get; set; }
+        public long? DigitalIdReportId { get; set; }
 
         [Display(Name = "Digital Id report")]
-        public DigitalIdReport? DigitalIdReport { get; set; }
+        public virtual DigitalIdReport? DigitalIdReport { get; set; }
 
-        public string? DocumentIdReportId { get; set; }
+        public long? DocumentIdReportId { get; set; }
 
         [Display(Name = "Document Id report")]
-        public DocumentIdReport? DocumentIdReport { get; set; }
+        public virtual DocumentIdReport? DocumentIdReport { get; set; }
 
-        public string? ReportQuestionaireId { get; set; }
+        public long? ReportQuestionaireId { get; set; }
 
         [Display(Name = "Questionaire")]
         public ReportQuestionaire? ReportQuestionaire { get; set; }
@@ -69,10 +69,10 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ReportQuestionaireId { get; set; } = Guid.NewGuid().ToString();
+        public long ReportQuestionaireId { get; set; }
 
         [Display(Name = "Insurer name")]
-        public string? ClientCompanyId { get; set; }
+        public long? ClientCompanyId { get; set; }
 
         [Display(Name = "Insurer name")]
         public virtual ClientCompany? ClientCompany { get; set; }

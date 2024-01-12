@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers
             var model = new VendorUserRolesViewModel
             {
                 UserId = userId,
-                VendorId = user.VendorId,
+                VendorId = user.VendorId.Value,
                 UserName = user.UserName,
                 VendorUserRoleViewModel = userRoles
             };

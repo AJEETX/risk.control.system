@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> CaseAllocatedToVendor(string selectedcase, string claimId, long caseLocationId)
+        public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string claimId, long caseLocationId)
         {
             var userEmail = HttpContext.User?.Identity?.Name;
 

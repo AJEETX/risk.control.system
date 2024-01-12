@@ -7,17 +7,20 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string StateId { get; set; } = Guid.NewGuid().ToString();
+        public long StateId { get; set; }
+
         [Display(Name = "State name")]
         public string Name { get; set; } = default!;
+
         [Display(Name = "State code")]
         [Required]
         public string Code { get; set; } = default!;
+
         [Required]
         [Display(Name = "Country name")]
-        public string CountryId { get; set; } = default!;
+        public long CountryId { get; set; } = default!;
+
         [Display(Name = "Country name")]
         public Country Country { get; set; } = default!;
     }
-
 }

@@ -42,36 +42,8 @@ namespace risk.control.system.Controllers
             UserList = new List<UsersViewModel>();
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            //var users = await userManager.Users
-            //    .Include(u => u.Country)
-            //    .Include(u => u.State)
-            //    .Include(u => u.District)
-            //    .Include(u => u.PinCode).ToListAsync();
-
-            //foreach (Models.ApplicationUser user in users)
-            //{
-            //    var thisViewModel = new UsersViewModel();
-            //    thisViewModel.UserId = user.Id.ToString();
-            //    thisViewModel.Email = user?.Email;
-            //    thisViewModel.UserName = user?.UserName;
-            //    thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
-            //    thisViewModel.FirstName = user.FirstName;
-            //    thisViewModel.LastName = user.LastName;
-            //    thisViewModel.Country = user.Country.Name;
-            //    thisViewModel.CountryId = user.CountryId;
-            //    thisViewModel.StateId = user.StateId;
-            //    thisViewModel.State = user.State.Name;
-            //    thisViewModel.District = user.District.Name;
-            //    thisViewModel.DistrictId = user.DistrictId;
-            //    thisViewModel.PinCode = user.PinCode.Code;
-            //    thisViewModel.PinCodeId = user.PinCode.PinCodeId;
-            //    thisViewModel.Addressline = user.Addressline;
-            //    thisViewModel.Active = user.Active;
-            //    thisViewModel.Roles = await GetUserRoles(user);
-            //    UserList.Add(thisViewModel);
-            //}
             return View();
         }
 

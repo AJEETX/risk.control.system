@@ -18,7 +18,7 @@ namespace risk.control.system.Models
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string VendorInvoiceId { get; set; } = Guid.NewGuid().ToString();
+        public long VendorInvoiceId { get; set; }
 
         [Display(Name = "Invoice Number")]
         [Required]
@@ -33,12 +33,12 @@ namespace risk.control.system.Models
         public DateTime DueDate { get; set; } = DateTime.UtcNow.AddMonths(1);
 
         [Display(Name = "Agency")]
-        public string? VendorId { get; set; }
+        public long? VendorId { get; set; }
 
         public Vendor? Vendor { get; set; }
 
         [Display(Name = "Insurer name")]
-        public string? ClientCompanyId { get; set; }
+        public long? ClientCompanyId { get; set; }
 
         [Display(Name = "Insurer name")]
         public virtual ClientCompany? ClientCompany { get; set; }
@@ -55,9 +55,8 @@ namespace risk.control.system.Models
         [Display(Name = "Grand Total")]
         public decimal GrandTotal { get; set; }
 
-        public string? ClaimReportId { get; set; }
+        public long? ClaimReportId { get; set; }
         public virtual ClaimReport? Report { get; set; }
-        public string? InvestigationServiceTypeId { get; set; }
         public virtual InvestigationServiceType? InvestigationServiceType { get; set; }
         public string? ClaimId { get; set; }
     }

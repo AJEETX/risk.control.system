@@ -35,9 +35,9 @@ namespace risk.control.system.Controllers
 
         // GET: District/Details/5
         [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.District == null)
+            if (id == 0 || _context.District == null)
             {
                 toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
@@ -86,9 +86,9 @@ namespace risk.control.system.Controllers
 
         // GET: District/Edit/5
         [Breadcrumb("Edit District")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
-            if (id == null || _context.District == null)
+            if (id == 0 || _context.District == null)
             {
                 toastNotification.AddErrorToastMessage("district not found!");
                 return NotFound();
@@ -110,7 +110,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, District district)
+        public async Task<IActionResult> Edit(long id, District district)
         {
             if (id != district.DistrictId)
             {
@@ -147,7 +147,7 @@ namespace risk.control.system.Controllers
 
         // GET: District/Delete/5
         [Breadcrumb("Delete")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.District == null)
             {
@@ -171,7 +171,7 @@ namespace risk.control.system.Controllers
         // POST: District/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.District == null)
             {
@@ -191,7 +191,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DistrictExists(string id)
+        private bool DistrictExists(long id)
         {
             return (_context.District?.Any(e => e.DistrictId == id)).GetValueOrDefault();
         }

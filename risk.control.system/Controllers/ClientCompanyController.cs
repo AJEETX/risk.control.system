@@ -89,7 +89,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanies/Delete/5
         [Breadcrumb("Delete ")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.ClientCompany == null)
             {
@@ -114,7 +114,7 @@ namespace risk.control.system.Controllers
         // POST: ClientCompanies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.ClientCompany == null)
             {
@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanies/Details/5
         [Breadcrumb(" Profile")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.ClientCompany == null)
             {
@@ -164,7 +164,7 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanies/Edit/5
         [Breadcrumb(title: "Edit ")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.ClientCompany == null)
             {
@@ -179,7 +179,7 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var country = _context.Country.Where(c => c.CountryId == clientCompany.CountryId);
+            var country = _context.Country;
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
@@ -199,7 +199,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClientCompany clientCompany)
         {
-            if (clientCompany is null || string.IsNullOrWhiteSpace(clientCompany.ClientCompanyId))
+            if (clientCompany is null || clientCompany.ClientCompanyId == 0)
             {
                 toastNotification.AddErrorToastMessage("client company not found!");
                 return RedirectToAction("Index");
@@ -340,21 +340,8 @@ namespace risk.control.system.Controllers
 
         [Breadcrumb("Empanelled Agency(s)")]
         [HttpGet]
-        public async Task<IActionResult> EmpanelledVendors(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> EmpanelledVendors(long id)
         {
-            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
-            if (searchString != null)
-            {
-                currentPage = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-
-            ViewBag.CurrentFilter = searchString;
-
             var applicationDbContext = _context.Vendor
                 .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
                 .Include(v => v.Country)
@@ -368,52 +355,9 @@ namespace risk.control.system.Controllers
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
-
                 .AsQueryable();
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                applicationDbContext = applicationDbContext.Where(a =>
-                    a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Addressline.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.BankAccountNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.BankName.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Branch.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.City.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Email.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.IFSCCode.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.District.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.LineOfBusiness.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.InvestigationServiceType.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.PincodeServices.Any(p => p.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Code.ToLower().Contains(searchString.Trim().ToLower())));
-            }
 
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-
-                case "code_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
-                    break;
-
-                default:
-                    applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-            }
-            int pageNumber = (currentPage ?? 1);
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-
-            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var applicationDbContextResult = await applicationDbContext.ToListAsync();
             ViewBag.CompanyId = id;
 
             return View(applicationDbContextResult);
@@ -421,28 +365,8 @@ namespace risk.control.system.Controllers
 
         [Breadcrumb("Available Agency(s)")]
         [HttpGet]
-        public async Task<IActionResult> AvailableVendors(string id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> AvailableVendors(long id)
         {
-            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
-            if (searchString != null)
-            {
-                currentPage = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-
-            ViewBag.CurrentFilter = searchString;
-
-            //var vendorUsers = _context.VendorApplicationUser.Include(u => u.Vendor).Where(u => u.Vendor.ClientCompanyId == id).ToList();
-            //List<string> userVendorids = new List<string>();
-            //if (vendorUsers is not null && vendorUsers.Count > 0)
-            //{
-            //    userVendorids = vendorUsers.Select(u => u.VendorId).ToList();
-            //}
-
             var applicationDbContext = _context.Vendor
                 .Where(v => !v.Clients.Any(c => c.ClientCompanyId == id)
                 //&& userVendorids.Contains(v.VendorId)
@@ -458,66 +382,23 @@ namespace risk.control.system.Controllers
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
-
                 .AsQueryable();
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                applicationDbContext = applicationDbContext.Where(a =>
-                    a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Addressline.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.BankAccountNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.BankName.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Branch.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.City.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Email.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.IFSCCode.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.District.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.LineOfBusiness.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.InvestigationServiceType.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.VendorInvestigationServiceTypes.Any(v => v.PincodeServices.Any(p => p.Name.Contains(searchString.Trim().ToLower()) || v.Price.ToString().Contains(searchString.Trim().ToLower())) ||
-                    a.PhoneNumber.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.Code.ToLower().Contains(searchString.Trim().ToLower())));
-            }
 
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-
-                case "code_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
-                    break;
-
-                default:
-                    applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-            }
-            int pageNumber = (currentPage ?? 1);
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-
-            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var applicationDbContextResult = await applicationDbContext.ToListAsync();
             ViewBag.CompanyId = id;
             return View(applicationDbContextResult);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AvailableVendors(string id, List<string> vendors)
+        public async Task<IActionResult> AvailableVendors(long id, List<string> vendors)
         {
             if (vendors is not null && vendors.Count > 0)
             {
                 var company = await _context.ClientCompany.FindAsync(id);
                 if (company != null)
                 {
-                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
+                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId.ToString()))
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
                     .Include(v => v.State)
@@ -558,7 +439,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EmpanelledVendors(string id, List<string> vendors)
+        public async Task<IActionResult> EmpanelledVendors(long id, List<string> vendors)
         {
             if (vendors is not null && vendors.Count() > 0)
             {
@@ -566,7 +447,7 @@ namespace risk.control.system.Controllers
 
                 if (company != null)
                 {
-                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId))
+                    var empanelledVendors = _context.Vendor.Where(v => vendors.Contains(v.VendorId.ToString()))
                     .Where(v => v.Clients.Any(c => c.ClientCompanyId == id))
                     .Include(v => v.Country)
                     .Include(v => v.PinCode)
@@ -612,7 +493,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Agency Detail")]
-        public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl)
+        public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl)
         {
             if (id == null || _context.Vendor == null)
             {
@@ -645,7 +526,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        private bool ClientCompanyExists(string id)
+        private bool ClientCompanyExists(long id)
         {
             return (_context.ClientCompany?.Any(e => e.ClientCompanyId == id)).GetValueOrDefault();
         }

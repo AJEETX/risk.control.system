@@ -47,11 +47,11 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetStatesByCountryId")]
-        public async Task<IActionResult> GetStatesByCountryId(string countryId)
+        public async Task<IActionResult> GetStatesByCountryId(long countryId)
         {
-            string cId;
+            long cId;
             var states = new List<State>();
-            if (!string.IsNullOrEmpty(countryId))
+            if (countryId > 0) { }
             {
                 cId = countryId;
                 states = await context.State.Where(s => s.CountryId.Equals(cId)).OrderBy(s => s.Code).ToListAsync();
@@ -60,11 +60,11 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetDistrictByStateId")]
-        public async Task<IActionResult> GetDistrictByStateId(string stateId)
+        public async Task<IActionResult> GetDistrictByStateId(long stateId)
         {
-            string sId;
+            long sId;
             var districts = new List<District>();
-            if (!string.IsNullOrEmpty(stateId))
+            if (stateId > 0)
             {
                 sId = stateId;
                 districts = await context.District.Where(s => s.State.StateId.Equals(sId)).OrderBy(s => s.Code).ToListAsync();
@@ -73,11 +73,11 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetPinCodesByDistrictId")]
-        public async Task<IActionResult> GetPinCodesByDistrictId(string districtId)
+        public async Task<IActionResult> GetPinCodesByDistrictId(long districtId)
         {
-            string sId;
+            long sId;
             var pincodes = new List<PinCode>();
-            if (!string.IsNullOrEmpty(districtId))
+            if (districtId > 0)
             {
                 sId = districtId;
                 pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).OrderBy(s => s.Code).ToListAsync();
@@ -86,13 +86,13 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetPincodesByDistrictIdWithoutPreviousSelected")]
-        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelected(string districtId, string caseId)
+        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelected(long districtId, string caseId)
         {
-            string sId;
+            long sId;
             var pincodes = new List<PinCode>();
             var remaingPincodes = new List<PinCode>();
 
-            if (!string.IsNullOrEmpty(districtId))
+            if (districtId > 0)
             {
                 sId = districtId;
                 pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).OrderBy(s => s.Code).ToListAsync();
@@ -117,13 +117,13 @@ namespace risk.control.system.Controllers.Api
         }
 
         [HttpGet("GetPincodesByDistrictIdWithoutPreviousSelectedService")]
-        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(string districtId, string vendorId, string lobId, string serviceId)
+        public async Task<IActionResult> GetPincodesByDistrictIdWithoutPreviousSelectedService(long districtId, long vendorId, long lobId, long serviceId)
         {
-            string sId;
+            long sId;
             var pincodes = new List<PinCode>();
             var remaingPincodes = new List<PinCode>();
 
-            if (!string.IsNullOrEmpty(districtId))
+            if (districtId > 0)
             {
                 sId = districtId;
                 pincodes = await context.PinCode.Where(s => s.District.DistrictId.Equals(sId)).ToListAsync();

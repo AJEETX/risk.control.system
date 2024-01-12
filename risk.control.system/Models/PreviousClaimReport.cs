@@ -7,6 +7,6 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string PreviousClaimReportId { get; set; } = Guid.NewGuid().ToString();
+        public long PreviousClaimReportId { get; set; }
     }
 }

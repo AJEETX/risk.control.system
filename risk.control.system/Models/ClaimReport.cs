@@ -5,7 +5,7 @@ namespace risk.control.system.Models
 {
     public class ClaimReportBase : BaseEntity
     {
-        public string? VendorId { get; set; }
+        public long? VendorId { get; set; }
         public Vendor? Vendor { get; set; }
 
         public DigitalIdReport? DigitalIdReport { get; set; } = new DigitalIdReport();
@@ -28,7 +28,6 @@ namespace risk.control.system.Models
 
         public long CaseLocationId { get; set; }
         public CaseLocation CaseLocation { get; set; }
-        public string? ServiceReportTemplateId { get; set; }
         public virtual ServiceReportTemplate? ServiceReportTemplate { get; set; }
     }
 
@@ -36,7 +35,7 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ClaimReportId { get; set; } = Guid.NewGuid().ToString();
+        public long ClaimReportId { get; set; }
     }
 
     public enum SupervisorRemarkType

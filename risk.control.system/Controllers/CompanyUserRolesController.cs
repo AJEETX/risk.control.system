@@ -64,7 +64,7 @@ namespace risk.control.system.Controllers
             var model = new CompanyUserRolesViewModel
             {
                 UserId = userId,
-                CompanyId = user.ClientCompanyId,
+                CompanyId = user.ClientCompanyId.Value,
                 UserName = user.UserName,
                 CompanyUserRoleViewModel = userRoles
             };

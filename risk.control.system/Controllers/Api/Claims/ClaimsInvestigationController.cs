@@ -507,7 +507,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 {
                     if (item.IsReady2Assign)
                     {
-                        item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                        item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                         && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId ||
                         (item.IsReviewCase && item.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId))?.ToList();
                         if (item.CaseLocations.Any())
@@ -634,7 +634,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 {
                     if (item.IsReady2Assign)
                     {
-                        item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                        item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                         && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId ||
                         (item.IsReviewCase && item.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId))?.ToList();
                         if (item.CaseLocations.Any())
@@ -857,7 +857,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             foreach (var item in applicationDbContext)
             {
-                item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                     && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
                         (item.IsReviewCase && item.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                     )?.ToList();
@@ -966,7 +966,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             foreach (var item in applicationDbContext)
             {
-                item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                     && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
                         (item.IsReviewCase && item.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                     )?.ToList();
@@ -1082,7 +1082,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                     && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
@@ -1096,7 +1096,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                         && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
@@ -1212,7 +1212,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                     && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
@@ -1226,7 +1226,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    item.CaseLocations = item.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+                    item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                         && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
@@ -1882,7 +1882,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetPolicyDetail")]
-        public async Task<IActionResult> GetPolicyDetail(string id)
+        public async Task<IActionResult> GetPolicyDetail(long id)
         {
             var policy = await _context.PolicyDetail
                 .Include(p => p.LineOfBusiness)

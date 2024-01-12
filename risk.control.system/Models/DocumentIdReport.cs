@@ -7,10 +7,10 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string DocumentIdReportId { get; set; } = Guid.NewGuid().ToString();
+        public long DocumentIdReportId { get; set; }
 
         [Display(Name = "Insurer name")]
-        public string? ClientCompanyId { get; set; }
+        public long? ClientCompanyId { get; set; }
 
         [Display(Name = "Insurer name")]
         public virtual ClientCompany? ClientCompany { get; set; }

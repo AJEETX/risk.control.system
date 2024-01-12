@@ -41,7 +41,7 @@ namespace risk.control.system.Controllers
 
         // GET: VendorService/Details/5
         [Breadcrumb(" Details")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
             {
@@ -72,12 +72,12 @@ namespace risk.control.system.Controllers
 
         // GET: VendorService/Create
         [Breadcrumb(" Add")]
-        public IActionResult Create(string id)
+        public IActionResult Create(long id)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<string>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+            var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
 
             var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
             var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
@@ -126,7 +126,7 @@ namespace risk.control.system.Controllers
 
         // GET: VendorService/Edit/5
         [Breadcrumb(" Edit")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
             {
@@ -149,7 +149,7 @@ namespace risk.control.system.Controllers
                 .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
                 "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
-            var country = _context.Country.Where(c => c.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(c => c.Name);
+            var country = _context.Country.OrderBy(c => c.Name);
             var states = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorInvestigationServiceType.StateId).OrderBy(d => d.Name);
 
@@ -181,7 +181,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string VendorInvestigationServiceTypeId, VendorInvestigationServiceType vendorInvestigationServiceType)
+        public async Task<IActionResult> Edit(long VendorInvestigationServiceTypeId, VendorInvestigationServiceType vendorInvestigationServiceType)
         {
             if (VendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
             {
@@ -239,7 +239,7 @@ namespace risk.control.system.Controllers
 
         // GET: VendorService/Delete/5
         [Breadcrumb(" Delete")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
             {
@@ -290,7 +290,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
         }
 
-        private bool VendorInvestigationServiceTypeExists(string id)
+        private bool VendorInvestigationServiceTypeExists(long id)
         {
             return (_context.VendorInvestigationServiceType?.Any(e => e.VendorInvestigationServiceTypeId == id)).GetValueOrDefault();
         }

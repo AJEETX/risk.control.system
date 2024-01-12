@@ -75,7 +75,7 @@ namespace risk.control.system.Controllers
             }
             vendorApplicationUser.Vendor = vendor;
 
-            var country = _context.Country.Where(c => c.CountryId == vendorApplicationUser.CountryId);
+            var country = _context.Country.OrderBy(o => o.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);

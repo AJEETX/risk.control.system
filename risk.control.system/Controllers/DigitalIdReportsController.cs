@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: DigitalIdReports/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.DigitalIdReport == null)
             {
@@ -100,7 +100,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("DigitalIdReportId,DigitalIdImagePath,DigitalIdImage,DigitalIdImageData,DigitalIdImageLocationUrl,DigitalIdImageLocationAddress,DigitalIdImageMatchConfidence,DigitalIdImageLongLat,DigitalIdImageLongLatTime,ReportType,Created,Updated,UpdatedBy")] DigitalIdReport digitalIdReport)
+        public async Task<IActionResult> Edit(long id, [Bind("DigitalIdReportId,DigitalIdImagePath,DigitalIdImage,DigitalIdImageData,DigitalIdImageLocationUrl,DigitalIdImageLocationAddress,DigitalIdImageMatchConfidence,DigitalIdImageLongLat,DigitalIdImageLongLatTime,ReportType,Created,Updated,UpdatedBy")] DigitalIdReport digitalIdReport)
         {
             if (id != digitalIdReport.DigitalIdReportId)
             {
@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: DigitalIdReports/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.DigitalIdReport == null)
             {
@@ -172,7 +172,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DigitalIdReportExists(string id)
+        private bool DigitalIdReportExists(long id)
         {
             return (_context.DigitalIdReport?.Any(e => e.DigitalIdReportId == id)).GetValueOrDefault();
         }

@@ -34,7 +34,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Questionaire/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.ReportQuestionaire == null)
             {
@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("ReportQuestionaireId,Question,Answer,Type,Optional,Question1,Question2,Question3,Question4,Created,Updated,UpdatedBy")] ReportQuestionaire reportQuestionaire)
+        public async Task<IActionResult> Edit(long id, [Bind("ReportQuestionaireId,Question,Answer,Type,Optional,Question1,Question2,Question3,Question4,Created,Updated,UpdatedBy")] ReportQuestionaire reportQuestionaire)
         {
             if (id != reportQuestionaire.ReportQuestionaireId)
             {
@@ -135,7 +135,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Questionaire/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.ReportQuestionaire == null)
             {
@@ -155,7 +155,7 @@ namespace risk.control.system.Controllers
         // POST: Questionaire/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.ReportQuestionaire == null)
             {
@@ -171,7 +171,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ReportQuestionaireExists(string id)
+        private bool ReportQuestionaireExists(long id)
         {
             return (_context.ReportQuestionaire?.Any(e => e.ReportQuestionaireId == id)).GetValueOrDefault();
         }

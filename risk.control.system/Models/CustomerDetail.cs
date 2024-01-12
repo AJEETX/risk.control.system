@@ -30,25 +30,25 @@ namespace risk.control.system.Models
         public string Addressline { get; set; }
 
         [Display(Name = "PinCode name")]
-        public string? PinCodeId { get; set; } = default!;
+        public long? PinCodeId { get; set; } = default!;
 
         [Display(Name = "PinCode name")]
         public PinCode? PinCode { get; set; } = default!;
 
         [Display(Name = "State name")]
-        public string? StateId { get; set; } = default!;
+        public long? StateId { get; set; } = default!;
 
         [Display(Name = "State name")]
         public State? State { get; set; } = default!;
 
         [Display(Name = "Country name")]
-        public string? CountryId { get; set; } = default!;
+        public long? CountryId { get; set; } = default!;
 
         [Display(Name = "Country name")]
         public Country? Country { get; set; } = default!;
 
         [Display(Name = "District")]
-        public string? DistrictId { get; set; } = default!;
+        public long? DistrictId { get; set; } = default!;
 
         [Display(Name = "District")]
         public District? District { get; set; } = default!;

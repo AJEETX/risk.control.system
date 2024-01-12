@@ -97,7 +97,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
             }
-            var country = _context.Country.Where(c => c.CountryId == clientCompany.CountryId);
+            var country = _context.Country.OrderBy(o => o.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompany.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompany.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompany.DistrictId).OrderBy(d => d.Name);
@@ -116,7 +116,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClientCompany clientCompany)
         {
-            if (string.IsNullOrWhiteSpace(clientCompany.ClientCompanyId))
+            if (clientCompany.ClientCompanyId < 1)
             {
                 toastNotification.AddErrorToastMessage("client company not found!");
                 return NotFound();
@@ -311,7 +311,7 @@ namespace risk.control.system.Controllers
             }
             clientCompanyApplicationUser.ClientCompany = clientCompany;
 
-            var country = _context.Country.Where(c => c.CountryId == clientCompanyApplicationUser.CountryId);
+            var country = _context.Country.OrderBy(o => o.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
@@ -448,7 +448,7 @@ namespace risk.control.system.Controllers
 
                 if (company != null)
                 {
-                    var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId));
+                    var vendors2Empanel = _context.Vendor.AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
                     company.EmpanelledVendors.AddRange(vendors2Empanel.ToList());
 
                     company.Updated = DateTime.UtcNow;
@@ -497,7 +497,7 @@ namespace risk.control.system.Controllers
 
                 if (company != null)
                 {
-                    var empanelledVendors2Depanel = _context.Vendor.Include(v => v.Clients).AsNoTracking().Where(v => vendors.Contains(v.VendorId));
+                    var empanelledVendors2Depanel = _context.Vendor.Include(v => v.Clients).AsNoTracking().Where(v => vendors.Contains(v.VendorId.ToString()));
                     foreach (var empanelledVendor2Depanel in empanelledVendors2Depanel)
                     {
                         var empanelled = company.EmpanelledVendors.FirstOrDefault(v => v.VendorId == empanelledVendor2Depanel.VendorId);
@@ -532,7 +532,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Agency Detail", FromAction = "AvailableVendors")]
-        public async Task<IActionResult> VendorDetail(string id, string backurl)
+        public async Task<IActionResult> VendorDetail(long id, string backurl)
         {
             if (id == null || _context.Vendor == null)
             {
@@ -566,7 +566,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Agency Detail", FromAction = "EmpanelledVendors")]
-        public async Task<IActionResult> VendorDetails(string id, string backurl)
+        public async Task<IActionResult> VendorDetails(long id, string backurl)
         {
             if (id == null || _context.Vendor == null)
             {
@@ -634,7 +634,7 @@ namespace risk.control.system.Controllers
             var model = new CompanyUserRolesViewModel
             {
                 UserId = userId,
-                CompanyId = user.ClientCompanyId,
+                CompanyId = user.ClientCompanyId.Value,
                 UserName = user.UserName,
                 CompanyUserRoleViewModel = userRoles
             };

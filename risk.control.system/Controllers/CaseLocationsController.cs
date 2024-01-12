@@ -212,7 +212,7 @@ namespace risk.control.system.Controllers
                 .Include(v => v.District)
                 .First(v => v.CaseLocationId == id);
 
-            var country = _context.Country.Where(c => c.CountryId == caseLocation.CountryId);
+            var country = _context.Country.OrderBy(o => o.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == caseLocation.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == caseLocation.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == caseLocation.DistrictId).OrderBy(d => d.Name);

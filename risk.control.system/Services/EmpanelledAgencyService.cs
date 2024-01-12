@@ -93,7 +93,7 @@ namespace risk.control.system.Services
 
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
-            var caseLocations = claimsInvestigation.CaseLocations.Where(c => string.IsNullOrWhiteSpace(c.VendorId)
+            var caseLocations = claimsInvestigation.CaseLocations.Where(c => !c.VendorId.HasValue
             && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId).ToList();
 
             claimsInvestigation.CaseLocations = caseLocations;
@@ -135,7 +135,7 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var caseLocations = claimsInvestigation.CaseLocations.Where(c =>
-            (string.IsNullOrWhiteSpace(c.VendorId) && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId) ||
+            ((!c.VendorId.HasValue) && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId) ||
             (claimsInvestigation.IsReviewCase && claimsInvestigation.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
             ).ToList();
 
@@ -181,7 +181,7 @@ namespace risk.control.system.Services
             var claimsCases = _context.ClaimsInvestigation
                 .Include(c => c.Vendors)
                 .Include(c => c.CaseLocations.Where(c =>
-                !string.IsNullOrWhiteSpace(c.VendorId) &&
+                c.VendorId.HasValue &&
                 (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
@@ -196,22 +196,22 @@ namespace risk.control.system.Services
                 {
                     foreach (var CaseLocation in claimsCase.CaseLocations)
                     {
-                        if (!string.IsNullOrEmpty(CaseLocation.VendorId))
+                        if (CaseLocation.VendorId.HasValue)
                         {
                             if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                     CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
                                     )
                             {
-                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId, out countOfCases))
+                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId.ToString(), out countOfCases))
                                 {
-                                    vendorCaseCount.Add(CaseLocation.VendorId, 1);
+                                    vendorCaseCount.Add(CaseLocation.VendorId.ToString(), 1);
                                 }
                                 else
                                 {
-                                    int currentCount = vendorCaseCount[CaseLocation.VendorId];
+                                    int currentCount = vendorCaseCount[CaseLocation.VendorId.ToString()];
                                     ++currentCount;
-                                    vendorCaseCount[CaseLocation.VendorId] = currentCount;
+                                    vendorCaseCount[CaseLocation.VendorId.ToString()] = currentCount;
                                 }
                             }
                         }
@@ -223,8 +223,8 @@ namespace risk.control.system.Services
 
             foreach (var existingVendor in existingVendors)
             {
-                var vendorCase = vendorCaseCount.FirstOrDefault(v => v.Key == existingVendor.VendorId);
-                if (vendorCase.Key == existingVendor.VendorId)
+                var vendorCase = vendorCaseCount.FirstOrDefault(v => v.Key == existingVendor.VendorId.ToString());
+                if (vendorCase.Key == existingVendor.VendorId.ToString())
                 {
                     vendorWithCaseCounts.Add(new VendorCaseModel
                     {
@@ -278,7 +278,7 @@ namespace risk.control.system.Services
 
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.REASSIGNED_TO_ASSIGNER);
-            var caseLocations = claimsInvestigation.CaseLocations.Where(c => !string.IsNullOrWhiteSpace(c.VendorId)
+            var caseLocations = claimsInvestigation.CaseLocations.Where(c => c.VendorId.HasValue
             && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId).ToList();
 
             claimsInvestigation.CaseLocations = caseLocations;

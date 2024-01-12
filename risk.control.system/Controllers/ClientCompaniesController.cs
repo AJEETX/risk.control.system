@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -27,9 +29,9 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
-            if (id == null || _context.ClientCompany == null)
+            if (id == 0l)
             {
                 return NotFound();
             }
@@ -79,9 +81,9 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
-            if (id == null || _context.ClientCompany == null)
+            if (id == 0)
             {
                 return NotFound();
             }
@@ -103,7 +105,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("ClientCompanyId,Name,Code,Description,PhoneNumber,Email,Branch,Addressline,StateId,CountryId,PinCodeId,DistrictId,BankName,BankAccountNumber,IFSCCode,AgreementDate,ActivatedDate,Status,DocumentUrl,DocumentImage,Created,Updated,UpdatedBy")] ClientCompany clientCompany)
+        public async Task<IActionResult> Edit(long id, [Bind("ClientCompanyId,Name,Code,Description,PhoneNumber,Email,Branch,Addressline,StateId,CountryId,PinCodeId,DistrictId,BankName,BankAccountNumber,IFSCCode,AgreementDate,ActivatedDate,Status,DocumentUrl,DocumentImage,Created,Updated,UpdatedBy")] ClientCompany clientCompany)
         {
             if (id != clientCompany.ClientCompanyId)
             {
@@ -138,7 +140,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.ClientCompany == null)
             {
@@ -173,14 +175,14 @@ namespace risk.control.system.Controllers
             {
                 _context.ClientCompany.Remove(clientCompany);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClientCompanyExists(string id)
+        private bool ClientCompanyExists(long id)
         {
-          return (_context.ClientCompany?.Any(e => e.ClientCompanyId == id)).GetValueOrDefault();
+            return (_context.ClientCompany?.Any(e => e.ClientCompanyId == id)).GetValueOrDefault();
         }
     }
 }

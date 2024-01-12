@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(AgencyController.Index), "Agency");
             }
 
-            var country = _context.Country.Where(c => c.CountryId == vendor.CountryId);
+            var country = _context.Country;
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Vendor vendor)
         {
-            if (vendor == null || string.IsNullOrWhiteSpace(vendor.VendorId))
+            if (vendor == null || vendor.VendorId == 0)
             {
                 toastNotification.AddErrorToastMessage("agency not found!");
                 return RedirectToAction(nameof(AgencyController.Index), "Agency");
@@ -279,7 +279,7 @@ namespace risk.control.system.Controllers
             }
             vendorApplicationUser.Vendor = vendor;
 
-            var country = _context.Country.Where(c => c.CountryId == vendorApplicationUser.CountryId);
+            var country = _context.Country.OrderBy(o => o.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
@@ -435,7 +435,7 @@ namespace risk.control.system.Controllers
             var model = new VendorUserRolesViewModel
             {
                 UserId = userId,
-                VendorId = user.VendorId,
+                VendorId = user.VendorId.Value,
                 UserName = user.UserName,
                 VendorUserRoleViewModel = userRoles
             };
@@ -481,7 +481,7 @@ namespace risk.control.system.Controllers
 
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<string>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+            var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
             return View(model);
         }
 
@@ -525,7 +525,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Edit Service", FromAction = "Service")]
-        public async Task<IActionResult> EditService(string id)
+        public async Task<IActionResult> EditService(long id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
             {
@@ -548,7 +548,7 @@ namespace risk.control.system.Controllers
                 .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
                 "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
 
-            var country = _context.Country.Where(c => c.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(c => c.Name);
+            var country = _context.Country.OrderBy(o => o.Name);
             var states = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorInvestigationServiceType.StateId).OrderBy(d => d.Name);
 
@@ -575,7 +575,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditService(string vendorInvestigationServiceTypeId, VendorInvestigationServiceType vendorInvestigationServiceType)
+        public async Task<IActionResult> EditService(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType vendorInvestigationServiceType)
         {
             if (vendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
             {
@@ -634,7 +634,7 @@ namespace risk.control.system.Controllers
 
         // GET: VendorService/Delete/5
         [Breadcrumb("Delete Service", FromAction = "Service")]
-        public async Task<IActionResult> DeleteService(string id)
+        public async Task<IActionResult> DeleteService(long id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
             {
@@ -681,7 +681,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Services", FromAction = "Service")]
-        public async Task<IActionResult> ServiceDetail(string id)
+        public async Task<IActionResult> ServiceDetail(long id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
             {
@@ -711,7 +711,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        private bool VendorInvestigationServiceTypeExists(string id)
+        private bool VendorInvestigationServiceTypeExists(long id)
         {
             return (_context.VendorInvestigationServiceType?.Any(e => e.VendorInvestigationServiceTypeId == id)).GetValueOrDefault();
         }
@@ -740,7 +740,7 @@ namespace risk.control.system.Controllers
             return new List<string>(await userManager.GetRolesAsync(user));
         }
 
-        private bool VendorExists(string id)
+        private bool VendorExists(long id)
         {
             return (_context.Vendor?.Any(e => e.VendorId == id)).GetValueOrDefault();
         }

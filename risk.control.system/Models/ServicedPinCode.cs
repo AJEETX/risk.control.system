@@ -7,12 +7,14 @@ namespace risk.control.system.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string ServicedPinCodeId { get; set; } = Guid.NewGuid().ToString();
+        public long ServicedPinCodeId { get; set; }
+
         public string Name { get; set; } = default!;
         public string Pincode { get; set; } = default!;
-        [Display(Name = "Vendor services")]
-        public string VendorInvestigationServiceTypeId { get; set; } = default!;
-        public VendorInvestigationServiceType VendorInvestigationServiceType { get; set; } = default!;
 
+        [Display(Name = "Vendor services")]
+        public long VendorInvestigationServiceTypeId { get; set; } = default!;
+
+        public VendorInvestigationServiceType VendorInvestigationServiceType { get; set; } = default!;
     }
 }

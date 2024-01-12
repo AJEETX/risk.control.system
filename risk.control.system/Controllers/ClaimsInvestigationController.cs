@@ -368,7 +368,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb(title: " Agency detail", FromAction = "Draft")]
-        public async Task<IActionResult> VendorDetail(string companyId, string id, string backurl, string selectedcase)
+        public async Task<IActionResult> VendorDetail(string companyId, long id, string backurl, string selectedcase)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))
@@ -376,7 +376,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            if (id == null || companyId is null || selectedcase is null)
+            if (id == 0 || companyId is null || selectedcase is null)
             {
                 toastNotification.AddErrorToastMessage("id null!");
                 return RedirectToAction(nameof(Index));

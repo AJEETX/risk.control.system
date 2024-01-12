@@ -39,16 +39,16 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var countryId = _context.Country.FirstOrDefault().CountryId;
-            var stateId = _context.State.Include(s => s.Country).FirstOrDefault(s => s.Country.CountryId == countryId).StateId;
-            var districtId = _context.District.Include(d => d.State).FirstOrDefault(d => d.StateId == stateId).DistrictId;
-            var pinCodeId = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.DistrictId == districtId).PinCodeId;
+            var country = _context.Country.FirstOrDefault();
+            var state = _context.State.Include(s => s.Country).FirstOrDefault(s => s.Country.CountryId == country.CountryId);
+            var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.StateId == state.StateId);
+            var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.DistrictId == district.DistrictId);
             var random = new Random();
             claimsInvestigation.CustomerDetail = new CustomerDetail
             {
                 Addressline = random.Next(100, 999) + " GOOD STREET",
                 ContactNumber = random.NextInt64(5555555555, 9999999999),
-                CountryId = countryId,
+                Country = country,
                 CustomerDateOfBirth = DateTime.Now.AddYears(-random.Next(25, 77)).AddDays(20),
                 CustomerEducation = Education.PROFESSIONAL,
                 CustomerIncome = Income.UPPER_INCOME,
@@ -56,15 +56,15 @@ namespace risk.control.system.Controllers
                 CustomerOccupation = Occupation.SELF_EMPLOYED,
                 CustomerType = CustomerType.HNI,
                 Description = "DODGY PERSON",
-                StateId = stateId,
-                DistrictId = districtId,
-                PinCodeId = pinCodeId,
+                State = state,
+                District = district,
+                PinCode = pinCode,
                 Gender = Gender.MALE,
             };
 
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == countryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == stateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == districtId).OrderBy(d => d.Name);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
 
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", claimsInvestigation.CustomerDetail.CountryId);
             ViewData["DistrictId"] = new SelectList(districts.OrderBy(d => d.Code), "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
@@ -112,7 +112,7 @@ namespace risk.control.system.Controllers
             ViewData["InvestigationCaseStatusId"] = new SelectList(_context.InvestigationCaseStatus, "InvestigationCaseStatusId", "Name", claimsInvestigation.InvestigationCaseStatusId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", claimsInvestigation.PolicyDetail.LineOfBusinessId);
 
-            var country = _context.Country.Where(c => c.CountryId == claimsInvestigation.CustomerDetail.CountryId);
+            var country = _context.Country.OrderBy(o => o.Name);
             var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == claimsInvestigation.CustomerDetail.CountryId).OrderBy(d => d.Name);
             var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == claimsInvestigation.CustomerDetail.StateId).OrderBy(d => d.Name);
             var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == claimsInvestigation.CustomerDetail.DistrictId).OrderBy(d => d.Name);
@@ -121,7 +121,6 @@ namespace risk.control.system.Controllers
             ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", claimsInvestigation.CustomerDetail.StateId);
             ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", claimsInvestigation.CustomerDetail.DistrictId);
             ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", claimsInvestigation.CustomerDetail.PinCodeId);
-
 
             return View(claimsInvestigation);
         }

@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseTypes/Details/5
         [Breadcrumb("Details")]
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.LineOfBusiness == null)
             {
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, LineOfBusiness lineOfBusiness)
+        public async Task<IActionResult> Edit(long id, LineOfBusiness lineOfBusiness)
         {
             if (id != lineOfBusiness.LineOfBusinessId)
             {
@@ -136,7 +136,7 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseTypes/Delete/5
         [Breadcrumb("Delete Line of Business")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.LineOfBusiness == null)
             {
@@ -179,7 +179,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool lineOfBusinessTypeExists(string id)
+        private bool lineOfBusinessTypeExists(long id)
         {
             return (_context.LineOfBusiness?.Any(e => e.LineOfBusinessId == id)).GetValueOrDefault();
         }

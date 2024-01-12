@@ -25,9 +25,9 @@ namespace risk.control.system.Services
 
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
 
-        Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId);
+        Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId);
 
-        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, string vendorId, string claimsInvestigationId);
+        Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId);
 
         Task<ClaimsInvestigation> SubmitToVendorSupervisor(string userEmail, long caseLocationId, string claimsInvestigationId, string remarks, string? answer1, string? answer2, string? answer3, string? answer4);
 
@@ -197,13 +197,13 @@ namespace risk.control.system.Services
             var claimsCases = _context.ClaimsInvestigation
                 .Include(c => c.Vendors)
                 .Include(c => c.CaseLocations.Where(c =>
-                !string.IsNullOrWhiteSpace(c.VendorId) &&
+                c.VendorId.HasValue &&
                 (c.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                     c.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId)
                 ));
 
-            var vendorCaseCount = new Dictionary<string, int>();
+            var vendorCaseCount = new Dictionary<long, int>();
 
             int countOfCases = 0;
             foreach (var claimsCase in claimsCases)
@@ -212,22 +212,22 @@ namespace risk.control.system.Services
                 {
                     foreach (var CaseLocation in claimsCase.CaseLocations)
                     {
-                        if (!string.IsNullOrEmpty(CaseLocation.VendorId))
+                        if (CaseLocation.VendorId.HasValue)
                         {
                             if (CaseLocation.InvestigationCaseSubStatusId == allocatedStatus.InvestigationCaseSubStatusId ||
                                     CaseLocation.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId ||
                                     CaseLocation.InvestigationCaseSubStatusId == submitted2SuperStatus.InvestigationCaseSubStatusId
                                     )
                             {
-                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId, out countOfCases))
+                                if (!vendorCaseCount.TryGetValue(CaseLocation.VendorId.Value, out countOfCases))
                                 {
-                                    vendorCaseCount.Add(CaseLocation.VendorId, 1);
+                                    vendorCaseCount.Add(CaseLocation.VendorId.Value, 1);
                                 }
                                 else
                                 {
-                                    int currentCount = vendorCaseCount[CaseLocation.VendorId];
+                                    int currentCount = vendorCaseCount[CaseLocation.VendorId.Value];
                                     ++currentCount;
-                                    vendorCaseCount[CaseLocation.VendorId] = currentCount;
+                                    vendorCaseCount[CaseLocation.VendorId.Value] = currentCount;
                                 }
                             }
                         }
@@ -716,7 +716,7 @@ namespace risk.control.system.Services
             _context.SaveChanges();
         }
 
-        public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, string vendorId, long caseLocationId)
+        public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
@@ -785,7 +785,7 @@ namespace risk.control.system.Services
             return null;
         }
 
-        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, string vendorId, string claimsInvestigationId)
+        public async Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId)
         {
             var supervisor = await GetSupervisor(vendorId);
 
@@ -863,7 +863,7 @@ namespace risk.control.system.Services
         {
             var agent = _context.VendorApplicationUser.FirstOrDefault(a => a.Email.Trim().ToLower() == userEmail.ToLower());
 
-            var supervisor = await GetSupervisor(agent.VendorId);
+            var supervisor = await GetSupervisor(agent.VendorId.Value);
 
             var claim = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
@@ -1073,7 +1073,7 @@ namespace risk.control.system.Services
             return null!;
         }
 
-        private async Task<VendorApplicationUser> GetSupervisor(string vendorId)
+        private async Task<VendorApplicationUser> GetSupervisor(long vendorId)
         {
             var vendorNonAdminUsers = _context.VendorApplicationUser.Where(u =>
             u.VendorId == vendorId && !u.IsVendorAdmin);

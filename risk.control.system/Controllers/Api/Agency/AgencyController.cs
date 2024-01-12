@@ -139,7 +139,7 @@ namespace risk.control.system.Controllers.Api.Agency
         }
 
         [HttpGet("GetCompanyAgencyUser")]
-        public async Task<IActionResult> GetCompanyAgencyUser(string id)
+        public async Task<IActionResult> GetCompanyAgencyUser(long id)
         {
             var vendor = _context.Vendor
                 .Include(c => c.VendorApplicationUser)
