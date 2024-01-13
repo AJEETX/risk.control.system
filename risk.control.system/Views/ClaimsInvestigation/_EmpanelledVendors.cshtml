@@ -1,0 +1,148 @@
+﻿@model ClaimsInvestigationVendorsModel
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-secondary">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-tasks"></i> Empanelled Agencies</h3>
+            </div>
+            <div class="card-body">
+                <form id="radioButtons" method="post" asp-controller="ClaimsInvestigationPost" asp-action="CaseAllocatedToVendor" enctype="multipart/form-data">
+                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                    <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
+                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th>
+
+                                </th>
+                                <th>
+                                    Document
+                                </th>
+
+                                <th>
+                                    Agency Name
+                                </th>
+
+                                <th>
+                                    Phone #
+                                </th>
+                                <th>
+                                    Email
+                                </th>
+                                <th>
+                                    Address
+                                </th>
+                                <th>
+                                    District
+                                </th>
+                                <th>
+                                    State
+                                </th>
+
+                                <th>
+                                    Load
+                                </th>
+                                <th>
+                                    <span class="badge badge-success">Service = <span class="badge badge-light">Pincodes</span></span>
+                                </th>
+                                <th sortable="false"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Vendors)
+                            {
+                                var vendorId = item.Vendor.VendorId;
+                                <tr>
+                                    <td>
+                                        <input id="@item.Vendor.VendorId" name="selectedcase" class="selected-case" type="radio" value="@item.Vendor.VendorId" />
+                                    </td>
+                                    <td>
+                                        @if (item?.Vendor.DocumentUrl is not null)
+                                        {
+                                            <img id="profileImage" class="form-Image" src="@item?.Vendor.DocumentUrl">
+                                        }
+                                        else
+                                        {
+                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                        }
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Vendor.Name)
+                                        <br />
+                                        <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="rating" vendorId="@vendorId" />
+                                        <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="rating" vendorId="@vendorId" />
+                                        <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="rating" vendorId="@vendorId" />
+                                        <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="rating" vendorId="@vendorId" />
+                                        <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="rating" vendorId="@vendorId" />
+                                        <span class="badge badge-light">
+                                            (@item.Vendor.RateCount)
+                                        </span>
+                                        @if (item.Vendor.RateCount != null && item.Vendor.RateCount > 0)
+                                        {
+                                            decimal a = @item.Vendor.RateTotal.Value / @item.Vendor.RateCount.Value;
+                                            <span class="avr"> @a</span>
+                                        }
+                                        <br />
+                                        <span class="badge badge-light">
+                                            <span class="result"></span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Vendor.PhoneNumber)
+                                    </td>
+                                    <td>
+                                        <a href="#"> @Html.DisplayFor(modelItem => item.Vendor.Email)</a>
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Vendor.Addressline)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Vendor.District.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Vendor.State.Name)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.CaseCount)
+                                    </td>
+                                    <td>
+                                        @foreach (var service in item.Vendor.VendorInvestigationServiceTypes)
+                                        {
+                                            <span class="badge badge-light">
+                                                @service.LineOfBusiness.Name - @service.InvestigationServiceType.Name
+                                                @foreach (var pincode in service.PincodeServices)
+                                                {
+                                                    <span class="badge badge-info">@pincode.Pincode</span>
+                                                }
+                                            </span>
+
+                                            <br />
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <a class="btn btn-xs btn-info" asp-action="VendorDetail" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId"
+                                           asp-route-backurl="EmpanelledVendors" asp-route-id="@item.Vendor.VendorId" asp-route-CompanyId="@ViewBag.CompanyId">
+                                            <i class="fa fa-search"></i> @Applicationsettings.DETAILS
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a asp-controller="ClaimsInvestigation" asp-action="Assigner" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+
+                            <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                                <i class="fas fa-external-link-alt" aria-hidden="true"></i> ALLOCATE
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
