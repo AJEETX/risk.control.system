@@ -25,9 +25,10 @@
                             @{
                                 foreach (var item in Model.Location?.PreviousClaimReports)
                                 {
-                                    <partial name="_AgencyReviewReports" model="@item" />
+                                    <a href="@Url.Action("PreviousReports", new { id = item.PreviousClaimReportId })" class="btn btn-primary"><i class="fas fa-newspaper"></i> Previous Report</a>
                                 }
                             }
+                            
                         </div>
                     </div>
                    
@@ -46,7 +47,7 @@
                             <div class="=row">
                                 <div class="col-md-12 float-right">
                                     <a asp-controller="ClaimsInvestigation" class="btn btn-default" asp-action="Assessor">
-                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back &nbsp;
+                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back 
                                     </a>
                                     <button id="review-case" type="submit" class="btn btn-danger">
                                         <i class="fas fa-sync" aria-hidden="true"></i> Review

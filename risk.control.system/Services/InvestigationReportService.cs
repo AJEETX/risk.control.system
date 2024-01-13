@@ -16,6 +16,8 @@ namespace risk.control.system.Services
         Task<ClaimTransactionModel> GetClaimDetails(string id);
 
         Task<ClaimsInvestigation> GetAssignDetails(string id);
+
+        PreviousClaimReport GetPreviousReport(long id);
     }
 
     public class InvestigationReportService : IInvestigationReportService
@@ -272,6 +274,18 @@ namespace risk.control.system.Services
                 claimCase.ClaimReport.AssessorRemarks = null;
             }
             return (new ClaimsInvestigationVendorsModel { Location = claimCase, ClaimsInvestigation = claimsInvestigation });
+        }
+
+        public PreviousClaimReport GetPreviousReport(long id)
+        {
+            var report = _context.PreviousClaimReport
+                .Include(r=>r.Vendor)
+                .Include(r=>r.CaseLocation)
+                .Include(r=>r.DigitalIdReport)
+                .Include(r=>r.DocumentIdReport)
+                .Include(r=>r.ReportQuestionaire)
+                .FirstOrDefault(r => r.PreviousClaimReportId == id);
+            return report;
         }
     }
 }

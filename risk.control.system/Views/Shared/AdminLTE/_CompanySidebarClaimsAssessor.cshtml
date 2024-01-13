@@ -6,7 +6,10 @@
     if (User.IsInRole(AppRoles.Assessor.ToString()))
     {
         <li class="nav-item">
-            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assessor" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assessor") @Url.MakeActiveClass("ClaimsInvestigation","GetInvestigateReport")">
+            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assessor" class="actual-link nav-link 
+                @Url.MakeActiveClass("ClaimsInvestigation","Assessor")
+                    @Url.MakeActiveClass("ClaimsInvestigation","PreviousReports")
+            @Url.MakeActiveClass("ClaimsInvestigation","GetInvestigateReport")">
                 <i class="fas fa-glasses nav-icon"></i>
                 <p>
                     <span class="badge badge-danger">ASSESS</span>

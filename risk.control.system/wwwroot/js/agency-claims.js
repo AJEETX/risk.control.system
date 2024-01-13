@@ -50,7 +50,6 @@
             {
                 "data": "id", "name": "Id", "bVisible": false
             },
-            { "data": "policyNum", "bSortable": false },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -59,6 +58,7 @@
                     return img;
                 }
             },
+            { "data": "policyNum", "bSortable": false },
             {
                 "data": "amount"
             },

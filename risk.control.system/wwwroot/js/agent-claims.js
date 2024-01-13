@@ -51,7 +51,6 @@ $(document).ready(function () {
             {
                 "data": "id", "name": "Id", "bVisible": false
             },
-            { "data": "policyNum", "bSortable": false },
             {
                 "sDefaultContent": "",
                 "bSortable": false,
@@ -60,6 +59,7 @@ $(document).ready(function () {
                     return img;
                 }
             },
+            { "data": "policyNum", "bSortable": false },
             {
                 "data": "amount"
             },

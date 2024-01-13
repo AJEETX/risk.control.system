@@ -63,7 +63,6 @@
                 "data": "id", "name": "Id", "bVisible": false
             },
 
-            { "data": "policyNum", "bSortable": false },
 
             {
                 "sDefaultContent": "",
@@ -73,6 +72,7 @@
                     return img;
                 }
             },
+            { "data": "policyNum", "bSortable": false },
             {
                 "data": "amount"
             },

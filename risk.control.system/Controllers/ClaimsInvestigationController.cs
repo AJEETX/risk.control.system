@@ -196,6 +196,26 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [Breadcrumb(title: "Previous Reports", FromAction = "GetInvestigateReport")]
+        public IActionResult PreviousReports(long id)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == 0)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var model = investigationReportService.GetPreviousReport(id);
+
+            return View(model);
+        }
+
         [Breadcrumb(title: "Report", FromAction = "Approved")]
         public async Task<IActionResult> GetApprovedReport(string selectedcase)
         {
