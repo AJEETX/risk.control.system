@@ -11,6 +11,7 @@ using risk.control.system.Models.ViewModel;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
+using System.Globalization;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
@@ -109,6 +110,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new ClaimsInvesgationResponse
                     {
                         Id = a.ClaimsInvestigationId,
+                        PolicyId = a.PolicyDetail.ContractNumber,
+                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
                         SelectedToAssign = false,
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
@@ -358,7 +361,8 @@ namespace risk.control.system.Controllers.Api.Claims
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-
+            var allocateToVendorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
 
@@ -395,45 +399,43 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
                 var response = claimsAssigned
-                    .Select(a => new
+                    .Select(a => new ClaimsInvesgationResponse
                     {
                         Id = a.ClaimsInvestigationId,
+                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
+                        PolicyId = a.PolicyDetail.ContractNumber,
                         SelectedToAssign = false,
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
-                        Document = a.PolicyDetail?.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
-                        Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
-                        Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
+                        Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        Document = a.PolicyDetail?.DocumentImage != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail?.DocumentImage)) : "/img/no-policy.jpg",
+                        Customer = a.CustomerDetail?.ProfilePicture != null ?
+                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail?.ProfilePicture)) : "/img/user.png",
+                        Name = a.CustomerDetail?.CustomerName != null ?
+                        a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>",
                         Policy = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.LineOfBusiness.Name + "</span>"),
                         Status = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseStatus.Name + "</span>"),
-                        Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
+                        SubStatus = string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>"),
+                        Ready2Assign = a.IsReady2Assign,
                         ServiceType = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail?.ClaimType.GetEnumDisplayName() + "</span>"),
                         Service = string.Join("", "<span class='badge badge-light'>" + a.PolicyDetail.InvestigationServiceType.Name + "</span>"),
                         Location = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        string.Join("", "<span class='badge badge-light'>" + a.InvestigationCaseSubStatus.Name + "</span>") :
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
-                        PolicyNum = a.PolicyDetail.ContractNumber,
+                        Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
+                        PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
                                       "/img/user.png",
                         BeneficiaryName = a.CaseLocations.Count == 0 ?
-                        "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
+                        "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
-                        Address = LocationDetail.GetAddress(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations.FirstOrDefault()),
-                        Description = a.PolicyDetail.CauseOfLoss,
-                        Price = a.PolicyDetail.SumAssuredValue,
-                        Type = a.PolicyDetail.ClaimType?.GetEnumDisplayName(),
-                        Bed = a.CustomerDetail.CustomerIncome.GetEnumDisplayName(),
-                        Bath = a.CustomerDetail.ContactNumber,
-                        Size = a.CustomerDetail.Description,
-                        Lat = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            a.CustomerDetail.PinCode.Latitude : a.CaseLocations.FirstOrDefault().PinCode.Latitude,
-                        Long = a.PolicyDetail.ClaimType == ClaimType.HEALTH ?
-                            a.CustomerDetail.PinCode.Longitude : a.CaseLocations.FirstOrDefault().PinCode.Longitude
-                    })?
+                        TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
+                    })?.OrderByDescending(o => o.TimeElapsed)
                     .ToList();
 
                 return Ok(response);
@@ -662,6 +664,8 @@ namespace risk.control.system.Controllers.Api.Claims
                     {
                         Id = a.ClaimsInvestigationId,
                         SelectedToAssign = false,
+                        PolicyId = a.PolicyDetail.ContractNumber,
+                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
@@ -855,6 +859,8 @@ namespace risk.control.system.Controllers.Api.Claims
             .Select(a => new ClaimsInvesgationResponse
             {
                 Id = a.ClaimsInvestigationId,
+                PolicyId = a.PolicyDetail.ContractNumber,
+                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
                 SelectedToAssign = false,
                 Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
@@ -1043,6 +1049,8 @@ namespace risk.control.system.Controllers.Api.Claims
             .Select(a => new ClaimsInvesgationResponse
             {
                 Id = a.ClaimsInvestigationId,
+                PolicyId = a.PolicyDetail.ContractNumber,
+                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
                 SelectedToAssign = false,
                 Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
@@ -1316,6 +1324,8 @@ namespace risk.control.system.Controllers.Api.Claims
             .Select(a => new ClaimsInvesgationResponse
             {
                 Id = a.ClaimsInvestigationId,
+                PolicyId = a.PolicyDetail.ContractNumber,
+                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
                 SelectedToAssign = false,
                 Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :

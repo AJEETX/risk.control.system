@@ -20,8 +20,10 @@
         public string timePending { get; set; }
         public bool Withdrawable { get; set; }
         public string PolicyNum { get; set; }
+        public string? PolicyId { get; set; }
         public string BeneficiaryPhoto { get; set; }
         public string BeneficiaryName { get; set; }
+        public string Amount { get; set; }
         public string? Agency { get; set; }
         public double TimeElapsed { get; set; }
         public string? Company { get; set; }

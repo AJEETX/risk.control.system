@@ -7,6 +7,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
+using System.Globalization;
 using System.Security.Claims;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
@@ -100,6 +101,8 @@ namespace risk.control.system.Controllers.Api.Claims
                    {
                        Id = a.ClaimsInvestigationId,
                        SelectedToAssign = false,
+                       PolicyId = a.PolicyDetail.ContractNumber,
+                       Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
@@ -350,6 +353,8 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new ClaimsInvesgationResponse
                    {
                        Id = a.ClaimsInvestigationId,
+                       PolicyId = a.PolicyDetail.ContractNumber,
+                       Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        Company = a.PolicyDetail.ClientCompany.Name,
                        Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        SelectedToAssign = false,
@@ -567,6 +572,8 @@ namespace risk.control.system.Controllers.Api.Claims
                    .Select(a => new ClaimsInvesgationResponse
                    {
                        Id = a.ClaimsInvestigationId,
+                       PolicyId = a.PolicyDetail.ContractNumber,
+                       Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                        SelectedToAssign = false,
                        Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        Company = a.PolicyDetail.ClientCompany.Name,

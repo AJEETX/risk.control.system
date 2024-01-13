@@ -1035,3 +1035,9 @@ label.account {
         label.account a:hover {
             text-decoration: none;
         }
+table.dataTable thead tr {
+    background-color: whitesmoke;
+}
+table#customerTable thead tr {
+    background-color: whitesmoke;
+}
