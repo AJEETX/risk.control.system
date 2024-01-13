@@ -25,5 +25,35 @@ namespace risk.control.system.Helpers
             }
             return string.Join("", "<span class='badge badge-light'>now</span>");
         }
+
+        public static string GetPolicyNum(this ClaimsInvestigation a)
+        {
+            var location = a.CaseLocations?.FirstOrDefault(c => c.ClaimsInvestigationId == a.ClaimsInvestigationId);
+            if (location is not null)
+            {
+                var isReview = location.PreviousClaimReports.Count > 0;
+                if (isReview)
+                {
+                    return string.Join("", a.PolicyDetail?.ContractNumber + "<i class='fa fa-asterisk asterik-style' title='REVIEW CASE'></i>");
+                }
+            }
+            return string.Join("", a.PolicyDetail?.ContractNumber + "<i class=\"fa fa-asterisk asterik-style-none\"></i>");
+        }
+
+        public static string GetPincode(ClaimType? claimType, CustomerDetail cdetail, CaseLocation location)
+        {
+            if (claimType == ClaimType.HEALTH)
+            {
+                if (cdetail is null)
+                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
+                return string.Join("", "<span class='badge badge-light'>" + cdetail.PinCode.Code + "</span>");
+            }
+            else
+            {
+                if (location is null)
+                    return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
+                return string.Join("", "<span class='badge badge-light'>" + location.PinCode.Code + "</span>");
+            }
+        }
     }
 }

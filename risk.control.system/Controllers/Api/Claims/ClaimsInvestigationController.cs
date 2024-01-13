@@ -1,7 +1,4 @@
 ﻿using System.Security.Claims;
-using System.Net;
-
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +9,7 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
-using static risk.control.system.Helpers.Permissions;
-
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using System.Collections.Generic;
-using Highsoft.Web.Mvc.Charts;
 using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api.Claims
@@ -41,42 +33,12 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetActive")]
         public async Task<IActionResult> GetActive()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            if (clientCompany == null)
-            {
-            }
-            else
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == clientCompany.ClientCompanyId);
-            }
+            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == clientCompany.ClientCompanyId);
+
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -170,7 +132,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
                         Withdrawable = a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId ? true : false,
-                        PolicyNum = a.PolicyDetail.ContractNumber,
+                        PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
                                       "/img/user.png",
@@ -187,46 +149,11 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetActiveMap")]
         public async Task<IActionResult> GetActiveMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                 .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var clientCompany = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
-            if (clientCompany == null)
-            {
-            }
-            else
-            {
-                applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == clientCompany.ClientCompanyId);
-            }
+            applicationDbContext = applicationDbContext.Where(i => i.PolicyDetail.ClientCompanyId == clientCompany.ClientCompanyId);
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -419,36 +346,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetAssign")]
         public IActionResult GetAssign()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -546,36 +444,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetAssignMap")]
         public IActionResult GetAssignMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -673,36 +542,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetIncomplete")]
         public async Task<IActionResult> GetIncomplete()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-.Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Updated);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
 
@@ -775,36 +615,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetAssigner")]
         public IActionResult GetAssigner()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -867,7 +678,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                         Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                         timePending = a.GetTimePending(),
-                        PolicyNum = a.PolicyDetail.ContractNumber,
+                        PolicyNum = a.GetPolicyNum(),
                         BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
                                       "/img/user.png",
@@ -884,36 +695,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetAssignerMap")]
         public IActionResult GetAssignerMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -1003,36 +785,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetAssessor")]
         public IActionResult GetAssessor()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -1116,7 +869,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                 timePending = a.GetTimePending(),
-                PolicyNum = a.PolicyDetail.ContractNumber,
+                PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
                                       "/img/user.png",
@@ -1133,36 +886,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetAssessorMap")]
         public IActionResult GetAssessorMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -1275,36 +999,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetApproved")]
         public IActionResult GetApproved()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.FINISHED);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -1362,7 +1057,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                 timePending = a.GetTimePending(),
-                PolicyNum = a.PolicyDetail.ContractNumber,
+                PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
                                       "/img/user.png",
@@ -1378,36 +1073,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetApprovedMap")]
         public IActionResult GetApprovedMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i =>
                i.Name == CONSTANTS.CASE_STATUS.FINISHED);
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
@@ -1494,36 +1160,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetReview")]
         public IActionResult GetReview()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.ClientCompany)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CaseEnabler)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.CostCentre)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.Country)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.District)
-                .Include(c => c.InvestigationCaseStatus)
-                .Include(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.InvestigationServiceType)
-                .Include(c => c.PolicyDetail)
-                .ThenInclude(c => c.LineOfBusiness)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.PinCode)
-                .Include(c => c.CustomerDetail)
-                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
             var createdStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR);
@@ -1593,36 +1230,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetToInvestigate")]
         public async Task<IActionResult> GetToInvestigate()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var assignedToAssignerStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -1691,39 +1299,9 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetReport")]
         public async Task<IActionResult> GetReport()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-                .Where(c => !c.Deleted &&
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
-                c.CaseLocations.All(c => c.ClaimReport != null)).OrderByDescending(c => c.Created);
+                c.CaseLocations.All(c => c.ClaimReport != null));
             var user = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
@@ -1755,7 +1333,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         string.Join("", a.CaseLocations.Select(c => "<span class='badge badge-light'>" + c.InvestigationCaseSubStatus.Name + "</span> ")),
                 Created = string.Join("", "<span class='badge badge-light'>" + a.Created.ToString("dd-MM-yyyy") + "</span>"),
                 timePending = a.GetTimePending(),
-                PolicyNum = a.PolicyDetail.ContractNumber,
+                PolicyNum = a.GetPolicyNum(),
                 BeneficiaryPhoto = a.CaseLocations.Count != 0 && a.CaseLocations.FirstOrDefault().ProfilePicture != null ?
                                        string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CaseLocations.FirstOrDefault().ProfilePicture)) :
                                       "/img/user.png",
@@ -1773,38 +1351,9 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetReportMap")]
         public async Task<IActionResult> GetReportMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted &&
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims().Where(c =>
                 c.CustomerDetail != null && c.CaseLocations.Count > 0 &&
-                c.CaseLocations.All(c => c.ClaimReport != null)).OrderByDescending(c => c.Created);
+                c.CaseLocations.All(c => c.ClaimReport != null));
             var user = HttpContext.User.Identity.Name;
 
             var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == user);
@@ -2234,6 +1783,44 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
             return Ok();
+        }
+
+        private IQueryable<ClaimsInvestigation> GetClaims()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.Vendor)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(l => l.PreviousClaimReports)
+                .Where(c => !c.Deleted);
+            return applicationDbContext;
         }
     }
 }
