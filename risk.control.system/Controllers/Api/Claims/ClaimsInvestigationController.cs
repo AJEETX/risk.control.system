@@ -110,9 +110,11 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new ClaimsInvesgationResponse
                     {
                         Id = a.ClaimsInvestigationId,
+                        CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
+                        BeneficiaryFullName = a.CaseLocations.Count == 0 ? "" : a.CaseLocations.FirstOrDefault().BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
-                        SelectedToAssign = false,
+                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                        AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
@@ -402,9 +404,9 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new ClaimsInvesgationResponse
                     {
                         Id = a.ClaimsInvestigationId,
-                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        SelectedToAssign = false,
+                        AssignedToAgency = a.AssignedToAgency,
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
@@ -578,7 +580,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         .Select(a => new
                         {
                             Id = a.ClaimsInvestigationId,
-                            SelectedToAssign = false,
+                            SelectedToAssign = a.AssignedToAgency,
                             Document = a.PolicyDetail.DocumentImage != null ?
                             string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) :
                             "/img/no-policy.jpg",
@@ -663,9 +665,9 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new ClaimsInvesgationResponse
                     {
                         Id = a.ClaimsInvestigationId,
-                        SelectedToAssign = false,
+                        AssignedToAgency = a.AssignedToAgency,
                         PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
+                        Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
@@ -860,8 +862,8 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
-                SelectedToAssign = false,
+                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                AssignedToAgency = a.AssignedToAgency,
                 Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
@@ -1050,8 +1052,8 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
-                SelectedToAssign = false,
+                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                AssignedToAgency = a.AssignedToAgency,
                 Pincode = GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                 Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                 Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
@@ -1210,7 +1212,7 @@ namespace risk.control.system.Controllers.Api.Claims
         .Select(a => new
         {
             Id = a.ClaimsInvestigationId,
-            SelectedToAssign = false,
+            SelectedToAssign = a.AssignedToAgency,
             Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
             Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
             Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -1279,7 +1281,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 .Select(a => new
                 {
                     Id = a.ClaimsInvestigationId,
-                    SelectedToAssign = false,
+                    SelectedToAssign = a.AssignedToAgency,
                     Document = a.PolicyDetail.DocumentImage != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.PolicyDetail.DocumentImage)) : "/img/no-policy.jpg",
                     Customer = a.CustomerDetail?.ProfilePicture != null ? string.Format("data:image/*;base64,{0}", Convert.ToBase64String(a.CustomerDetail.ProfilePicture)) : "/img/user.png",
                     Name = a.CustomerDetail?.CustomerName != null ? a.CustomerDetail?.CustomerName : "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/user.png\" /> </span>",
@@ -1325,8 +1327,8 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 Id = a.ClaimsInvestigationId,
                 PolicyId = a.PolicyDetail.ContractNumber,
-                        Amount = String.Format(new CultureInfo("hi-IN"),"{0:C}", a.PolicyDetail.SumAssuredValue),
-                SelectedToAssign = false,
+                Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
+                AssignedToAgency = a.AssignedToAgency,
                 Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
                         string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
                         string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),

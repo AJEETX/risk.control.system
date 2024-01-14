@@ -39,6 +39,8 @@ namespace risk.control.system.Models
         [NotMapped]
         public bool SelectedToAssign { get; set; }
 
+        public bool AssignedToAgency { get; set; } = false;
+
         public string? CurrentUserEmail { get; set; }
         public List<CaseLocation>? CaseLocations { get; set; }
         public List<ClaimNote>? ClaimNotes { get; set; } = new();

@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240112055805_optimizeing")]
-    partial class optimizeing
+    [Migration("20240114010458__assign_")]
+    partial class _assign_
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -156,16 +156,12 @@ namespace risk.control.system.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("VendorId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("VendorId1")
+                    b.Property<long>("VendorId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("AgencyRatingId");
 
-                    b.HasIndex("VendorId1");
+                    b.HasIndex("VendorId");
 
                     b.ToTable("Ratings");
                 });
@@ -645,20 +641,17 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DigitalIdReportId")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("DigitalIdReportId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("DocumentIdReportId")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("DocumentIdReportId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("ReportQuestionaireId")
                         .HasColumnType("INTEGER");
 
                     b.Property<long?>("ServiceReportTemplateId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("ServiceReportTemplateId1")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("SupervisorEmail")
                         .HasColumnType("TEXT");
@@ -692,7 +685,7 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("ReportQuestionaireId");
 
-                    b.HasIndex("ServiceReportTemplateId1");
+                    b.HasIndex("ServiceReportTemplateId");
 
                     b.HasIndex("VendorId");
 
@@ -704,6 +697,9 @@ namespace risk.control.system.Migrations
                     b.Property<string>("ClaimsInvestigationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("AssignedToAgency")
+                        .HasColumnType("INTEGER");
 
                     b.Property<long?>("ClientCompanyId")
                         .HasColumnType("INTEGER");
@@ -717,10 +713,7 @@ namespace risk.control.system.Migrations
                     b.Property<string>("CurrentUserEmail")
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("CustomerDetailId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CustomerDetailId1")
+                    b.Property<string>("CustomerDetailId")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Deleted")
@@ -754,7 +747,7 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("ClientCompanyId");
 
-                    b.HasIndex("CustomerDetailId1");
+                    b.HasIndex("CustomerDetailId");
 
                     b.HasIndex("InvestigationCaseStatusId");
 
@@ -1113,9 +1106,9 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.DigitalIdReport", b =>
                 {
-                    b.Property<string>("DigitalIdReportId")
+                    b.Property<long>("DigitalIdReportId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<long?>("ClientCompanyId")
                         .HasColumnType("INTEGER");
@@ -1203,9 +1196,9 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.DocumentIdReport", b =>
                 {
-                    b.Property<string>("DocumentIdReportId")
+                    b.Property<long>("DocumentIdReportId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<long?>("ClientCompanyId")
                         .HasColumnType("INTEGER");
@@ -1455,16 +1448,10 @@ namespace risk.control.system.Migrations
                     b.Property<string>("InvestigationCaseStatusId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("InvestigationServiceTypeId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("InvestigationServiceTypeId1")
+                    b.Property<long?>("InvestigationServiceTypeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LineOfBusinessId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("LineOfBusinessId1")
+                    b.Property<long?>("LineOfBusinessId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
@@ -1481,9 +1468,9 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("InvestigationCaseStatusId");
 
-                    b.HasIndex("InvestigationServiceTypeId1");
+                    b.HasIndex("InvestigationServiceTypeId");
 
-                    b.HasIndex("LineOfBusinessId1");
+                    b.HasIndex("LineOfBusinessId");
 
                     b.ToTable("InvestigationCase");
                 });
@@ -2060,20 +2047,17 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DigitalIdReportId")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("DigitalIdReportId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("DocumentIdReportId")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("DocumentIdReportId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<long>("ReportQuestionaireId")
                         .HasColumnType("INTEGER");
 
                     b.Property<long?>("ServiceReportTemplateId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("ServiceReportTemplateId1")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("SupervisorEmail")
                         .HasColumnType("TEXT");
@@ -2106,7 +2090,7 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("ReportQuestionaireId");
 
-                    b.HasIndex("ServiceReportTemplateId1");
+                    b.HasIndex("ServiceReportTemplateId");
 
                     b.HasIndex("VendorId");
 
@@ -2186,19 +2170,16 @@ namespace risk.control.system.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DigitalIdReportId")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("DigitalIdReportId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("DocumentIdReportId")
-                        .HasColumnType("TEXT");
+                    b.Property<long?>("DocumentIdReportId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ReportQuestionaireId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("ReportQuestionaireId1")
+                    b.Property<long?>("ReportQuestionaireId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("Updated")
@@ -2215,7 +2196,7 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("DocumentIdReportId");
 
-                    b.HasIndex("ReportQuestionaireId1");
+                    b.HasIndex("ReportQuestionaireId");
 
                     b.ToTable("ReportTemplate");
                 });
@@ -2302,9 +2283,9 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ServiceReportTemplate", b =>
                 {
-                    b.Property<string>("ServiceReportTemplateId")
+                    b.Property<long>("ServiceReportTemplateId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<long?>("ClientCompanyId")
                         .HasColumnType("INTEGER");
@@ -2346,9 +2327,9 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.ServicedPinCode", b =>
                 {
-                    b.Property<string>("ServicedPinCodeId")
+                    b.Property<long>("ServicedPinCodeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("TEXT");
@@ -2367,9 +2348,8 @@ namespace risk.control.system.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("VendorInvestigationServiceTypeId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<long>("VendorInvestigationServiceTypeId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ServicedPinCodeId");
 
@@ -2613,9 +2593,9 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.VendorInvestigationServiceType", b =>
                 {
-                    b.Property<string>("VendorInvestigationServiceTypeId")
+                    b.Property<long>("VendorInvestigationServiceTypeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<long?>("CountryId")
                         .HasColumnType("INTEGER");
@@ -2669,9 +2649,9 @@ namespace risk.control.system.Migrations
 
             modelBuilder.Entity("risk.control.system.Models.VendorInvoice", b =>
                 {
-                    b.Property<string>("VendorInvoiceId")
+                    b.Property<long>("VendorInvoiceId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ClaimId")
                         .HasColumnType("TEXT");
@@ -2691,10 +2671,7 @@ namespace risk.control.system.Migrations
                     b.Property<decimal>("GrandTotal")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("InvestigationServiceTypeId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("InvestigationServiceTypeId1")
+                    b.Property<long?>("InvestigationServiceTypeId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("InvoiceDate")
@@ -2729,73 +2706,11 @@ namespace risk.control.system.Migrations
 
                     b.HasIndex("ClientCompanyId");
 
-                    b.HasIndex("InvestigationServiceTypeId1");
+                    b.HasIndex("InvestigationServiceTypeId");
 
                     b.HasIndex("VendorId");
 
                     b.ToTable("VendorInvoice");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.VerificationLocation", b =>
-                {
-                    b.Property<string>("VerificationLocationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Addressline")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClaimsInvestigationId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CountryId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("CountryId1")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DistrictId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("DistrictId1")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("PinCodeId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("PinCodeId1")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("StateId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("StateId1")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("VerificationLocationId");
-
-                    b.HasIndex("ClaimsInvestigationId");
-
-                    b.HasIndex("CountryId1");
-
-                    b.HasIndex("DistrictId1");
-
-                    b.HasIndex("PinCodeId1");
-
-                    b.HasIndex("StateId1");
-
-                    b.ToTable("VerificationLocation");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.VerifyPinCode", b =>
@@ -3162,7 +3077,9 @@ namespace risk.control.system.Migrations
                 {
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany("ratings")
-                        .HasForeignKey("VendorId1");
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Vendor");
                 });
@@ -3302,7 +3219,7 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.ServiceReportTemplate", "ServiceReportTemplate")
                         .WithMany()
-                        .HasForeignKey("ServiceReportTemplateId1");
+                        .HasForeignKey("ServiceReportTemplateId");
 
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany()
@@ -3329,7 +3246,7 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.CustomerDetail", "CustomerDetail")
                         .WithMany()
-                        .HasForeignKey("CustomerDetailId1");
+                        .HasForeignKey("CustomerDetailId");
 
                     b.HasOne("risk.control.system.Models.InvestigationCaseStatus", "InvestigationCaseStatus")
                         .WithMany()
@@ -3497,11 +3414,11 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.InvestigationServiceType", "InvestigationServiceType")
                         .WithMany()
-                        .HasForeignKey("InvestigationServiceTypeId1");
+                        .HasForeignKey("InvestigationServiceTypeId");
 
                     b.HasOne("risk.control.system.Models.LineOfBusiness", "LineOfBusiness")
                         .WithMany()
-                        .HasForeignKey("LineOfBusinessId1");
+                        .HasForeignKey("LineOfBusinessId");
 
                     b.Navigation("InvestigationCaseStatus");
 
@@ -3675,7 +3592,7 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.ServiceReportTemplate", "ServiceReportTemplate")
                         .WithMany()
-                        .HasForeignKey("ServiceReportTemplateId1");
+                        .HasForeignKey("ServiceReportTemplateId");
 
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany()
@@ -3719,7 +3636,7 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.ReportQuestionaire", "ReportQuestionaire")
                         .WithMany()
-                        .HasForeignKey("ReportQuestionaireId1");
+                        .HasForeignKey("ReportQuestionaireId");
 
                     b.Navigation("ClientCompany");
 
@@ -3887,7 +3804,7 @@ namespace risk.control.system.Migrations
 
                     b.HasOne("risk.control.system.Models.InvestigationServiceType", "InvestigationServiceType")
                         .WithMany()
-                        .HasForeignKey("InvestigationServiceTypeId1");
+                        .HasForeignKey("InvestigationServiceTypeId");
 
                     b.HasOne("risk.control.system.Models.Vendor", "Vendor")
                         .WithMany()
@@ -3900,43 +3817,6 @@ namespace risk.control.system.Migrations
                     b.Navigation("Report");
 
                     b.Navigation("Vendor");
-                });
-
-            modelBuilder.Entity("risk.control.system.Models.VerificationLocation", b =>
-                {
-                    b.HasOne("risk.control.system.Models.ClaimsInvestigation", "ClaimsInvestigation")
-                        .WithMany()
-                        .HasForeignKey("ClaimsInvestigationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("risk.control.system.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("risk.control.system.Models.District", "District")
-                        .WithMany()
-                        .HasForeignKey("DistrictId1");
-
-                    b.HasOne("risk.control.system.Models.PinCode", "PinCode")
-                        .WithMany()
-                        .HasForeignKey("PinCodeId1");
-
-                    b.HasOne("risk.control.system.Models.State", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId1");
-
-                    b.Navigation("ClaimsInvestigation");
-
-                    b.Navigation("Country");
-
-                    b.Navigation("District");
-
-                    b.Navigation("PinCode");
-
-                    b.Navigation("State");
                 });
 
             modelBuilder.Entity("risk.control.system.Models.VerifyPinCode", b =>

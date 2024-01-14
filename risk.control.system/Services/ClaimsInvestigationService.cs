@@ -603,6 +603,7 @@ namespace risk.control.system.Services
                     claimsInvestigation.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + "( " + currentUser.Email + ")";
                     claimsInvestigation.CurrentUserEmail = userEmail;
                     claimsInvestigation.CurrentClaimOwner = currentOwner;
+                    claimsInvestigation.AssignedToAgency = true;
                     claimsInvestigation.InvestigationCaseStatusId = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.INPROGRESS).InvestigationCaseStatusId;
                     claimsInvestigation.InvestigationCaseSubStatusId = assigned.InvestigationCaseSubStatusId;
                     foreach (var caseLocation in claimsInvestigation.CaseLocations)
@@ -745,6 +746,7 @@ namespace risk.control.system.Services
                 var claimsCaseToAllocateToVendor = _context.ClaimsInvestigation
                     .Include(c => c.PolicyDetail)
                     .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
+                claimsCaseToAllocateToVendor.AssignedToAgency = true;
                 claimsCaseToAllocateToVendor.Updated = DateTime.UtcNow;
                 claimsCaseToAllocateToVendor.UpdatedBy = currentUser.FirstName + " " + currentUser.LastName + " (" + currentUser.Email + ")";
                 claimsCaseToAllocateToVendor.CurrentUserEmail = userEmail;

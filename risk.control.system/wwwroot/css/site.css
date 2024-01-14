@@ -147,7 +147,7 @@ table {
 }
 
 .content-wrapper-main {
-    padding: 20px;
+    padding: 10px;
     min-height: 530.031px;
     background: white !important;
 }
@@ -480,7 +480,7 @@ textarea {
 
 .input-group-prepend {
     display: block;
-    width: 4rem;
+    width: 3rem;
 }
 
 .input-validation-error {
