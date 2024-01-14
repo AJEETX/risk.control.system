@@ -11,7 +11,7 @@ $.validator.setDefaults({
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Create",
+                    text: "Add",
                     btnClass: 'btn-success',
                     action: function () {
                         form.submit();

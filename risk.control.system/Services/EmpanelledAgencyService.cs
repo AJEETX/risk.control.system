@@ -9,7 +9,7 @@ namespace risk.control.system.Services
 {
     public interface IEmpanelledAgencyService
     {
-        Task<(ClaimsInvestigation, CaseLocation, List<VendorCaseModel>)> GetEmpanelledVendors(string selectedcase);
+        Task<ClaimsInvestigationVendorsModel> GetEmpanelledVendors(string selectedcase);
 
         Task<ClaimsInvestigation> GetAllocateToVendor(string selectedcase);
 
@@ -100,7 +100,7 @@ namespace risk.control.system.Services
             return claimsInvestigation;
         }
 
-        public async Task<(ClaimsInvestigation, CaseLocation, List<VendorCaseModel>)> GetEmpanelledVendors(string selectedcase)
+        public async Task<ClaimsInvestigationVendorsModel> GetEmpanelledVendors(string selectedcase)
         {
             var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
                 i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
@@ -137,7 +137,7 @@ namespace risk.control.system.Services
             var caseLocations = claimsInvestigation.CaseLocations.Where(c =>
             ((!c.VendorId.HasValue) && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId) ||
             (claimsInvestigation.IsReviewCase && claimsInvestigation.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
-            ).ToList();
+            )?.ToList();
 
             claimsInvestigation.CaseLocations = caseLocations;
 
@@ -168,8 +168,12 @@ namespace risk.control.system.Services
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.InvestigationServiceType)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
+                .ThenInclude(v => v.PincodeServices)?
                 .ToListAsync();
+            if (claimsInvestigation.IsReviewCase)
+            {
+                existingVendors = existingVendors.Where(v => v.VendorId != claimCase.VendorId)?.ToList();
+            }
 
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
@@ -242,7 +246,7 @@ namespace risk.control.system.Services
                 }
             }
 
-            return (claimsInvestigation, claimCase, vendorWithCaseCounts);
+            return new ClaimsInvestigationVendorsModel { Location = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation };
         }
 
         public async Task<ClaimsInvestigation> GetReAllocateToVendor(string selectedcase)

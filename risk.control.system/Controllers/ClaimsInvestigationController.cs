@@ -119,13 +119,9 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Assigner));
             }
 
-            var (claimsInvestigation, claimCase, vendorWithCaseCounts) = await empanelledAgencyService.GetEmpanelledVendors(selectedcase);
+            var model = await empanelledAgencyService.GetEmpanelledVendors(selectedcase);
 
-            ViewBag.CompanyId = claimCase.ClaimsInvestigation.PolicyDetail.ClientCompanyId;
-
-            ViewBag.Selectedcase = selectedcase;
-
-            return View(new ClaimsInvestigationVendorsModel { Location = claimCase, Vendors = vendorWithCaseCounts, ClaimsInvestigation = claimsInvestigation });
+            return View(model);
         }
 
         [HttpGet]
