@@ -1041,3 +1041,12 @@ table.dataTable thead tr {
 table#customerTable thead tr {
     background-color: whitesmoke;
 }
+img.table-profile-image {
+    border-radius: 50%;
+    height: 2.5rem;
+    width: 2.5rem;
+}
+img.doc-profile-image {
+    height: 2.5rem;
+    width: 2.5rem;
+}
