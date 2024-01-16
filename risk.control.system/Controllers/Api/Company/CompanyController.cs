@@ -49,7 +49,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name
                 });
 
-            return Ok(result.ToArray());
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("CompanyUsers")]
@@ -74,6 +74,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(c => c.ClientCompanyId == id);
 
             var users = company.CompanyApplicationUser
+                .OrderBy(u => new { u.FirstName, u.LastName })
                 .Where(u => !u.Deleted)
                 .AsQueryable();
             var result =
@@ -95,7 +96,7 @@ namespace risk.control.system.Controllers.Api.Company
                 });
             await Task.Delay(1000);
 
-            return Ok(result.ToArray());
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("AllUsers")]
@@ -117,6 +118,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             var users = company.CompanyApplicationUser
                 .Where(u => !u.Deleted)
+                .OrderBy(u => new { u.FirstName, u.LastName })
                 .AsQueryable();
             var result =
                 users.Select(u =>
@@ -137,7 +139,7 @@ namespace risk.control.system.Controllers.Api.Company
                 });
             await Task.Delay(1000);
 
-            return Ok(result.ToArray());
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("GetEmpanelledVendors")]
@@ -157,7 +159,9 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var result =
-                company.EmpanelledVendors.Where(v => !v.Deleted).Select(u =>
+                company.EmpanelledVendors.Where(v => !v.Deleted)
+                .OrderBy(u => u.Name)
+                .Select(u =>
                 new
                 {
                     Id = u.VendorId,
@@ -172,7 +176,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name
                 });
 
-            return Ok(result.ToArray());
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("GetAvailableVendors")]
@@ -202,6 +206,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
                 .Where(v => !v.Deleted)
+                .OrderBy(u => u.Name)
                 .AsQueryable();
 
             var result =
@@ -219,7 +224,7 @@ namespace risk.control.system.Controllers.Api.Company
                     State = u.State.Name,
                     Country = u.Country.Name
                 });
-            return Ok(result);
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("AllServices")]
@@ -245,23 +250,25 @@ namespace risk.control.system.Controllers.Api.Company
                 .ThenInclude(i => i.PincodeServices)
                 .FirstOrDefault(a => a.VendorId == id);
 
-            var result = vendor.VendorInvestigationServiceTypes.Select(s => new
-            {
-                VendorId = s.VendorId,
-                Id = s.VendorInvestigationServiceTypeId,
-                CaseType = s.LineOfBusiness.Name,
-                ServiceType = s.InvestigationServiceType.Name,
-                District = s.District.Name,
-                State = s.State.Name,
-                Country = s.Country.Name,
-                Pincodes = s.PincodeServices.Count == 0 ?
+            var result = vendor.VendorInvestigationServiceTypes?
+                .OrderBy(s => s.InvestigationServiceType.Name)?
+                .Select(s => new
+                {
+                    VendorId = s.VendorId,
+                    Id = s.VendorInvestigationServiceTypeId,
+                    CaseType = s.LineOfBusiness.Name,
+                    ServiceType = s.InvestigationServiceType.Name,
+                    District = s.District.Name,
+                    State = s.State.Name,
+                    Country = s.Country.Name,
+                    Pincodes = s.PincodeServices.Count == 0 ?
                     "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                      string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
-                Rate = s.Price,
-                UpdatedBy = s.UpdatedBy,
-            });
+                    Rate = s.Price,
+                    UpdatedBy = s.UpdatedBy,
+                });
 
-            return Ok(result);
+            return Ok(result?.ToArray());
         }
 
         private async Task<List<string>> GetUserRoles(ClientCompanyApplicationUser user)

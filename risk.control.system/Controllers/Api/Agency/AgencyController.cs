@@ -44,9 +44,11 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(u => u.PinCode)
                 .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
 
-            var users = vendor.VendorApplicationUser.Where(u => !u.Deleted).AsQueryable();
+            var users = vendor.VendorApplicationUser.Where(u => !u.Deleted)
+                .OrderBy(u => new { u.FirstName, u.LastName })
+                .AsQueryable();
             var result =
-                users.Select(u =>
+                users?.Select(u =>
                 new
                 {
                     Id = u.Id,
@@ -63,7 +65,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Roles = string.Join(",", GetUserRoles(u).Result)
                 });
 
-            return Ok(result.ToArray());
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("AllAgencies")]
@@ -75,10 +77,10 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .Where(v => !v.Deleted)
+                .Where(v => !v.Deleted).OrderBy(a => a.Name)
                 .ToListAsync();
             var result =
-                agencies.Select(u =>
+                agencies?.Select(u =>
                 new
                 {
                     Id = u.VendorId,
@@ -93,7 +95,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Country = u.Country.Name
                 });
 
-            return Ok(result.ToArray());
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("AllServices")]
@@ -119,23 +121,25 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(i => i.PincodeServices)
                 .FirstOrDefault(a => a.VendorId == vendorUser.VendorId && !a.Deleted);
 
-            var result = vendor.VendorInvestigationServiceTypes.Select(s => new
-            {
-                VendorId = s.VendorId,
-                Id = s.VendorInvestigationServiceTypeId,
-                CaseType = s.LineOfBusiness.Name,
-                ServiceType = s.InvestigationServiceType.Name,
-                District = s.District.Name,
-                State = s.State.Name,
-                Country = s.Country.Name,
-                Pincodes = s.PincodeServices.Count == 0 ?
+            var result = vendor.VendorInvestigationServiceTypes?
+                .OrderBy(s => s.InvestigationServiceType.Name)?
+                .Select(s => new
+                {
+                    VendorId = s.VendorId,
+                    Id = s.VendorInvestigationServiceTypeId,
+                    CaseType = s.LineOfBusiness.Name,
+                    ServiceType = s.InvestigationServiceType.Name,
+                    District = s.District.Name,
+                    State = s.State.Name,
+                    Country = s.Country.Name,
+                    Pincodes = s.PincodeServices.Count == 0 ?
                     "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                      string.Join("", s.PincodeServices.Select(c => "<span class='badge badge-light'>" + c.Pincode + "</span> ")),
-                Rate = s.Price,
-                UpdatedBy = s.UpdatedBy,
-            });
+                    Rate = s.Price,
+                    UpdatedBy = s.UpdatedBy,
+                });
 
-            return Ok(result);
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("GetCompanyAgencyUser")]
@@ -152,9 +156,11 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(u => u.PinCode)
                 .FirstOrDefault(c => c.VendorId == id && !c.Deleted);
 
-            var users = vendor.VendorApplicationUser.AsQueryable();
+            var users = vendor.VendorApplicationUser?
+                .OrderBy(u => new { u.FirstName, u.LastName })
+                .AsQueryable();
             var result =
-                users.Select(u =>
+                users?.Select(u =>
                 new
                 {
                     Id = u.Id,
@@ -171,7 +177,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Roles = string.Join(",", GetUserRoles(u).Result)
                 });
 
-            return Ok(result.ToArray());
+            return Ok(result?.ToArray());
         }
 
         [HttpGet("GetAgentLoad")]
@@ -193,7 +199,9 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(u => u.Country)
                 .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
 
-            var users = vendor.VendorApplicationUser.AsQueryable();
+            var users = vendor.VendorApplicationUser
+                .OrderBy(u => new { u.FirstName, u.LastName })
+                .AsQueryable();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
 
             foreach (var user in users)
@@ -222,23 +230,24 @@ namespace risk.control.system.Controllers.Api.Agency
                     }
                 }
             }
-            var agentWithLoad = agents.Select(u => new
-            {
-                Id = u.AgencyUser.Id,
-                Photo = u.AgencyUser.ProfilePictureUrl,
-                Email = "<a href=''>" + u.AgencyUser.Email + "</a>",
-                Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
-                Phone = u.AgencyUser.PhoneNumber,
-                Addressline = u.AgencyUser.Addressline,
-                District = u.AgencyUser.District.Name,
-                State = u.AgencyUser.State.Name,
-                Country = u.AgencyUser.Country.Name,
-                Pincode = u.AgencyUser.PinCode.Code,
-                Active = u.AgencyUser.Active,
-                Roles = string.Join(",", GetUserRoles(u.AgencyUser).Result),
-                Count = u.CurrentCaseCount
-            });
-            return Ok(agentWithLoad);
+            var agentWithLoad = agents?
+                .Select(u => new
+                {
+                    Id = u.AgencyUser.Id,
+                    Photo = u.AgencyUser.ProfilePictureUrl,
+                    Email = "<a href=''>" + u.AgencyUser.Email + "</a>",
+                    Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
+                    Phone = u.AgencyUser.PhoneNumber,
+                    Addressline = u.AgencyUser.Addressline,
+                    District = u.AgencyUser.District.Name,
+                    State = u.AgencyUser.State.Name,
+                    Country = u.AgencyUser.Country.Name,
+                    Pincode = u.AgencyUser.PinCode.Code,
+                    Active = u.AgencyUser.Active,
+                    Roles = string.Join(",", GetUserRoles(u.AgencyUser).Result),
+                    Count = u.CurrentCaseCount
+                });
+            return Ok(agentWithLoad?.ToArray());
         }
 
         private async Task<List<string>> GetUserRoles(VendorApplicationUser user)
