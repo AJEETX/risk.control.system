@@ -44,9 +44,9 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(u => u.PinCode)
                 .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
 
-            var users = vendor.VendorApplicationUser.Where(u => !u.Deleted)
-                .OrderBy(u => new { u.FirstName, u.LastName })
-                .AsQueryable();
+            var users = vendor.VendorApplicationUser.Where(u => !u.Deleted)?
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName);
             var result =
                 users?.Select(u =>
                 new
@@ -64,6 +64,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Pincode = u.PinCode.Code,
                     Roles = string.Join(",", GetUserRoles(u).Result)
                 });
+            await Task.Delay(1000);
 
             return Ok(result?.ToArray());
         }
@@ -71,16 +72,17 @@ namespace risk.control.system.Controllers.Api.Agency
         [HttpGet("AllAgencies")]
         public async Task<IActionResult> AllAgencies()
         {
-            var agencies = await _context.Vendor
+            var agencies = _context.Vendor
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .Where(v => !v.Deleted).OrderBy(a => a.Name)
-                .ToListAsync();
+                .Where(v => !v.Deleted)
+                ?.OrderBy(a => a.Name);
             var result =
-                agencies?.Select(u =>
+                agencies
+                ?.Select(u =>
                 new
                 {
                     Id = u.VendorId,
@@ -95,6 +97,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Country = u.Country.Name
                 });
 
+            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -139,6 +142,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     UpdatedBy = s.UpdatedBy,
                 });
 
+            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -157,7 +161,8 @@ namespace risk.control.system.Controllers.Api.Agency
                 .FirstOrDefault(c => c.VendorId == id && !c.Deleted);
 
             var users = vendor.VendorApplicationUser?
-                .OrderBy(u => new { u.FirstName, u.LastName })
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName)
                 .AsQueryable();
             var result =
                 users?.Select(u =>
@@ -177,6 +182,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Roles = string.Join(",", GetUserRoles(u).Result)
                 });
 
+            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -199,8 +205,9 @@ namespace risk.control.system.Controllers.Api.Agency
                 .ThenInclude(u => u.Country)
                 .FirstOrDefault(c => c.VendorId == vendorUser.VendorId);
 
-            var users = vendor.VendorApplicationUser
-                .OrderBy(u => new { u.FirstName, u.LastName })
+            var users = vendor.VendorApplicationUser?
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName)
                 .AsQueryable();
             var result = dashboardService.CalculateAgentCaseStatus(userEmail);
 
@@ -247,6 +254,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Roles = string.Join(",", GetUserRoles(u.AgencyUser).Result),
                     Count = u.CurrentCaseCount
                 });
+            await Task.Delay(1000);
             return Ok(agentWithLoad?.ToArray());
         }
 
@@ -258,7 +266,7 @@ namespace risk.control.system.Controllers.Api.Agency
 
             foreach (var role in roles)
             {
-                var decoratedRole = "<span class=\"badge badge-danger\">" + role + "</span>";
+                var decoratedRole = "<span class=\"badge badge-light\">" + role + "</span>";
                 decoratedRoles.Add(decoratedRole);
             }
             return decoratedRoles;

@@ -27,12 +27,11 @@ namespace risk.control.system.Controllers.Api.Company
         [HttpGet("AllCompanies")]
         public async Task<IActionResult> AllCompanies()
         {
-            var companies = await _context.ClientCompany
+            var companies = _context.ClientCompany
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
                 .Include(v => v.District)
-                .Include(v => v.State)
-                .ToListAsync();
+                .Include(v => v.State).OrderBy(o => o.Name);
             var result =
                 companies.Select(u =>
                 new
@@ -49,6 +48,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name
                 });
 
+            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -118,10 +118,11 @@ namespace risk.control.system.Controllers.Api.Company
 
             var users = company.CompanyApplicationUser
                 .Where(u => !u.Deleted)
-                .OrderBy(u => new { u.FirstName, u.LastName })
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName)
                 .AsQueryable();
             var result =
-                users.Select(u =>
+                users?.Select(u =>
                 new
                 {
                     Id = u.Id,
@@ -136,10 +137,9 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name,
                     Roles = string.Join(",", GetUserRoles(u).Result),
                     Pincode = u.PinCode.Code,
-                });
+                })?.ToArray();
             await Task.Delay(1000);
-
-            return Ok(result?.ToArray());
+            return Ok(result);
         }
 
         [HttpGet("GetEmpanelledVendors")]
@@ -159,7 +159,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
             var result =
-                company.EmpanelledVendors.Where(v => !v.Deleted)
+                company.EmpanelledVendors?.Where(v => !v.Deleted)
                 .OrderBy(u => u.Name)
                 .Select(u =>
                 new
@@ -176,6 +176,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name
                 });
 
+            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -210,7 +211,7 @@ namespace risk.control.system.Controllers.Api.Company
                 .AsQueryable();
 
             var result =
-                availableVendors.Select(u =>
+                availableVendors?.Select(u =>
                 new
                 {
                     Id = u.VendorId,
@@ -224,6 +225,7 @@ namespace risk.control.system.Controllers.Api.Company
                     State = u.State.Name,
                     Country = u.Country.Name
                 });
+            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -268,6 +270,7 @@ namespace risk.control.system.Controllers.Api.Company
                     UpdatedBy = s.UpdatedBy,
                 });
 
+            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -279,7 +282,7 @@ namespace risk.control.system.Controllers.Api.Company
 
             foreach (var role in roles)
             {
-                var decoratedRole = "<span class=\"badge badge-danger\">" + role + "</span>";
+                var decoratedRole = "<span class=\"badge badge-light\">" + role + "</span>";
                 decoratedRoles.Add(decoratedRole);
             }
             return decoratedRoles;

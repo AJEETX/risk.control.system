@@ -147,6 +147,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
                     })?
                     .ToList();
+            await Task.Delay(1000);
 
             return Ok(response);
         }
@@ -349,7 +350,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetAssign")]
-        public IActionResult GetAssign()
+        public async Task<IActionResult> GetAssign()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -439,6 +440,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
                     })?
                     .ToList();
+                await Task.Delay(1000);
 
                 return Ok(response);
             }
@@ -617,7 +619,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetAssigner")]
-        public IActionResult GetAssigner()
+        public async Task<IActionResult> GetAssigner()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -694,6 +696,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
                     })
                     ?.ToList();
+            await Task.Delay(1000);
 
             return Ok(response);
         }
@@ -789,7 +792,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetAssessor")]
-        public IActionResult GetAssessor()
+        public async Task<IActionResult> GetAssessor()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -886,6 +889,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
                 TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
             })?.ToList();
+            await Task.Delay(1000);
 
             return Ok(response);
         }
@@ -1004,7 +1008,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetApproved")]
-        public IActionResult GetApproved()
+        public async Task<IActionResult> GetApproved()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var finishedStatus = _context.InvestigationCaseStatus.FirstOrDefault(i =>
@@ -1076,6 +1080,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
             })?.ToList();
 
+            await Task.Delay(1000);
             return Ok(response);
         }
 
@@ -1167,7 +1172,7 @@ namespace risk.control.system.Controllers.Api.Claims
         }
 
         [HttpGet("GetReview")]
-        public IActionResult GetReview()
+        public async Task<IActionResult> GetReview()
         {
             IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
 
@@ -1232,6 +1237,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
         })
         ?.ToList();
+            await Task.Delay(1000);
 
             return Ok(response);
         }
@@ -1354,6 +1360,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
             })?.ToList();
+            await Task.Delay(1000);
 
             return Ok(response);
         }

@@ -36,7 +36,9 @@ namespace risk.control.system.Controllers.Api
                     .Include(a => a.State)
                     .Include(a => a.Country)
                     .Include(a => a.PinCode)
-                                .Where(u => !u.Deleted)?
+                        .Where(u => !u.Deleted)?
+                        .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName)
                                 .ToList();
                 var result =
                     users.Select(u =>
@@ -69,7 +71,7 @@ namespace risk.control.system.Controllers.Api
 
             foreach (var role in roles)
             {
-                var decoratedRole = "<span class=\"badge badge-danger\">" + role + "</span>";
+                var decoratedRole = "<span class=\"badge badge-light\">" + role + "</span>";
                 decoratedRoles.Add(decoratedRole);
             }
             return decoratedRoles;
