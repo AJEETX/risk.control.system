@@ -78,8 +78,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Include(v => v.District)
                 .Include(v => v.State)
                 .Include(v => v.VendorInvestigationServiceTypes)
-                .Where(v => !v.Deleted)
-                ?.OrderBy(a => a.Name);
+                .Where(v => !v.Deleted);
             var result =
                 agencies
                 ?.Select(u =>
@@ -95,7 +94,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     District = u.District.Name,
                     State = u.State.Name,
                     Country = u.Country.Name
-                });
+                })
+                ?.OrderBy(a => a.Name);
 
             await Task.Delay(1000);
             return Ok(result?.ToArray());

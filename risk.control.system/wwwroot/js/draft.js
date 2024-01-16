@@ -40,6 +40,7 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
+        order: [[13, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -51,7 +52,7 @@
             /* Name of the keys from
             data file source */
             {
-                "sDefaultContent": "",
+                "sDefaultContent": "<i class='fa fa-file-alt'></i>",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';

@@ -4,6 +4,7 @@
             url: '/api/Agency/AllAgencies',
             dataSrc: ''
         },
+        order: [[2, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,

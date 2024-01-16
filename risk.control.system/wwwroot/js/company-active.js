@@ -20,6 +20,7 @@
             url: '/api/ClaimsInvestigation/GetActive',
             dataSrc: ''
         },
+        order: [[12, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
