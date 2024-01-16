@@ -181,13 +181,13 @@
             $.confirm({
                 title: "Confirm Assignment",
                 content: "Are you sure to assign?",
-                icon: 'fas fa-thumbtack',
+                icon: 'fas fa-external-link-alt',
                 columnClass: 'medium',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign",
+                        text: "Assign (auto)",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;

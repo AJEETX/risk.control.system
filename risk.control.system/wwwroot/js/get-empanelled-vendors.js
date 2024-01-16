@@ -31,15 +31,15 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Allocation",
-                content: "Are you sure to allocate?",
+                title: "Confirm Claim Assignment",
+                content: "Are you sure to assign?",
                 columnClass: 'medium',
                 icon: 'fas fa-external-link-alt',
                 type: 'red',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Allocate",
+                        text: "Assign (manual)",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
