@@ -21,7 +21,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img src="' + row.photo + '" class="doc-profile-image" />';
+                    var img = '<img src="' + row.photo + '" class="table-profile-image" />';
                     return img;
                 }
             },
