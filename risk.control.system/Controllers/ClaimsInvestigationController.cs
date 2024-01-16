@@ -78,7 +78,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Allocate(manual)", FromAction = "Index")]
+        [Breadcrumb(" Assign (manual)", FromAction = "Index")]
         public IActionResult Assigner()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Assign", FromAction = "Index")]
+        [Breadcrumb(" Assign (auto)", FromAction = "Index")]
         public IActionResult Draft()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
