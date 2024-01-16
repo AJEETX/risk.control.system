@@ -90,7 +90,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Assign (auto)", FromAction = "Index")]
+        [Breadcrumb(" Assign", FromAction = "Index")]
         public IActionResult Draft()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;

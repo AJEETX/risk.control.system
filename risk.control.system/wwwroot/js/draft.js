@@ -185,7 +185,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign (auto)",
+                        text: "Assign",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
