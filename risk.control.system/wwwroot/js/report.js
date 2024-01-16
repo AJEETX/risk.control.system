@@ -29,7 +29,6 @@
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,

@@ -53,7 +53,7 @@ namespace risk.control.system.Controllers.Api.Claims
                .ThenInclude(c => c.PinCode)
                .Include(c => c.CustomerDetail)
                .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+                .Where(c => !c.Deleted).OrderBy(c => c.Created);
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -302,7 +302,7 @@ namespace risk.control.system.Controllers.Api.Claims
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+                .Where(c => !c.Deleted).OrderBy(c => c.Created);
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -534,7 +534,7 @@ namespace risk.control.system.Controllers.Api.Claims
               .ThenInclude(c => c.PinCode)
               .Include(c => c.CustomerDetail)
               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+                .Where(c => !c.Deleted).OrderBy(c => c.Created);
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
