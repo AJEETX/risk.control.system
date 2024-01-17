@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 using NToastNotify;
 
@@ -10,8 +9,6 @@ using risk.control.system.Models;
 
 using SmartBreadcrumbs.Attributes;
 using SmartBreadcrumbs.Nodes;
-
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace risk.control.system.Controllers
 {

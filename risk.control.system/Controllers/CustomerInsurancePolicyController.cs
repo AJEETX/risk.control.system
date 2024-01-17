@@ -8,7 +8,6 @@ using risk.control.system.Models;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 namespace risk.control.system.Controllers
 {

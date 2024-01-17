@@ -1,22 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
 
 using NToastNotify;
 
-using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
-
-using System.Security.Claims;
-
-using static risk.control.system.Helpers.Permissions;
 
 namespace risk.control.system.Controllers
 {

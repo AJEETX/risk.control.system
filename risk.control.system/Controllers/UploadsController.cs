@@ -1,7 +1,6 @@
 ﻿using CsvHelper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,17 +13,11 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
-using SmartBreadcrumbs.Nodes;
 
 using System.Data;
 using System.Net;
-using System.Runtime.Serialization.Json;
-using System.Security.Claims;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Text;
-using risk.control.system.Helpers;
 
 namespace risk.control.system.Controllers
 {
