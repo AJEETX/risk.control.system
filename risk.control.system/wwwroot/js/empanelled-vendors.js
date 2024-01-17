@@ -38,7 +38,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="doc-profile-image" />';
+                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.document + '" class="doc-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -54,6 +54,9 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
     $('#customerTable input[type="checkbox"].vendors').on('click', function () {
         var checkboxes = $("input[type='checkbox'].vendors");
         var anyChecked = checkIfAnyChecked(checkboxes);

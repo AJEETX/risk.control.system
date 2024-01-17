@@ -59,11 +59,11 @@
                                     <td>
                                         @if (item?.Vendor.DocumentUrl is not null)
                                         {
-                                            <img title="@item.Vendor.Name" id="profileImage" class="form-Image" src="@item?.Vendor.DocumentUrl">
+                                            <img title="@item.Vendor.Name" id="profileImage" class="form-Image" src="@item?.Vendor.DocumentUrl" data-toggle="tooltip" />
                                         }
                                         else
                                         {
-                                            <img title="..." id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                            <img title="..." id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE" data-toggle="tooltip" />
                                         }
                                     </td>
                                     <td>

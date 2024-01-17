@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Highsoft.Web.Mvc.Charts;
+
 using risk.control.system.Models;
 
 namespace risk.control.system.Helpers
@@ -53,6 +55,22 @@ namespace risk.control.system.Helpers
                 if (location is null)
                     return "<span class=\"badge badge-danger\"> <i class=\"fas fa-exclamation-triangle\" ></i>  </span>";
                 return string.Join("", "<span class='badge badge-light'>" + location.PinCode.Code + "</span>");
+            }
+        }
+
+        public static string GetPincodeName(ClaimType? claimType, CustomerDetail cdetail, CaseLocation location)
+        {
+            if (claimType == ClaimType.HEALTH)
+            {
+                if (cdetail is null)
+                    return "...";
+                return cdetail.Addressline + "," + cdetail.District.Name + ", " + cdetail.State.Name + ", " + cdetail.PinCode.Code;
+            }
+            else
+            {
+                if (location is null)
+                    return "...";
+                return location.Addressline + "," + location.District.Name + ", " + location.State.Name + ", " + location.PinCode.Code;
             }
         }
     }

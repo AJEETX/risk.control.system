@@ -39,7 +39,7 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '" class="doc-profile-image" />';
+                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '" class="doc-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -47,7 +47,7 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '" class="table-profile-image" />';
+                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -56,7 +56,7 @@ $(document).ready(function () {
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" />';
+                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -78,6 +78,9 @@ $(document).ready(function () {
             }
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
+    });
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip();
     });
     // Handle click on "Select all" control
     $('#checkall').on('click', function () {

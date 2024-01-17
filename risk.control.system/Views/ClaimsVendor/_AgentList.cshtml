@@ -59,11 +59,11 @@
                                         @if (item?.AgencyUser.ProfilePictureUrl is not null)
                                         {
                                             var title = @item?.AgencyUser.FirstName + ' ' + @item.AgencyUser?.LastName;
-                                            <img id="profileImage" title="@title" class="form-Image table-profile-image" src="@item?.AgencyUser.ProfilePictureUrl">
+                                            <img id="profileImage" title="@title" class="form-Image table-profile-image" src="@item?.AgencyUser.ProfilePictureUrl" data-toggle="tooltip"/>
                                         }
                                         else
                                         {
-                                            <img id="profileImage" title="..." class="form-Image  table-profile-image" src="/img/user.png">
+                                            <img id="profileImage" title="..." class="form-Image  table-profile-image" src="/img/user.png" data-toggle="tooltip" />
                                         }
                                                 </td>
                                                 <td>

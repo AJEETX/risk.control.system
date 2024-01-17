@@ -6,6 +6,7 @@
         public bool AssignedToAgency { get; set; }
         public string? Agent { get; set; }
         public string Pincode { get; set; }
+        public string? PincodeName { get; set; }
         public string Document { get; set; }
         public string Name { get; set; }
         public string? CustomerFullName { get; set; }

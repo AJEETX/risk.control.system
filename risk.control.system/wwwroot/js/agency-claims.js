@@ -53,7 +53,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '" class="doc-profile-image" />';
+                    var img = '<img alt="' + row.policyId + '" title="' + row.policyId + '" src="' + row.document + '" class="doc-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -65,7 +65,7 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '"class="table-profile-image" />';
+                    var img = '<img alt="' + row.name + '" title="' + row.name + '" src="' + row.customer + '"class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
@@ -74,14 +74,19 @@
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" />';
+                    var img = '<img alt="' + row.beneficiaryName + '" title="' + row.beneficiaryName + '" src="' + row.beneficiaryPhoto + '" class="table-profile-image" data-toggle="tooltip"/>';
                     return img;
                 }
             },
             { "data": "beneficiaryName" },
             { "data": "serviceType" },
             { "data": "service" },
-            { "data": "pincode" },
+            {
+                "data": "pincode",
+                "mRender": function (data, type, row) {
+                    return '<span title="' + row.pincodeName + '" data-toggle="tooltip">' + data + '</span>'
+                }
+            },
             { "data": "location" },
             { "data": "created" },
             { "data": "timePending" },
@@ -98,6 +103,9 @@
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
+    $('#customerTable').on('draw.dt', function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
     if ($("input[type='radio'].selected-case:checked").length) {
         $("#allocatedcase").prop('disabled', false);
     }
