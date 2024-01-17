@@ -27,7 +27,11 @@
         }
                             
             <article>
-                <div class="bb-blog-inner">
+        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+        <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+        <input type="hidden" id="claimId" value="@Model.ClaimsInvestigation?.ClaimsInvestigationId" />
+        <div class="bb-blog-inner">
                     <header class="bb-blog-header">
                     <h5 class="bb-blog-title" itemprop="name"><i class="far fa-file-powerpoint"></i> Policy # : @Model.ClaimsInvestigation.PolicyDetail.ContractNumber</h5>
                     </header>
