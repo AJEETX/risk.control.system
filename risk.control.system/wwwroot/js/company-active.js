@@ -20,7 +20,7 @@
             url: '/api/ClaimsInvestigation/GetActive',
             dataSrc: ''
         },
-        order: [[12, 'asc']],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -31,9 +31,6 @@
         columns: [
             /* Name of the keys from
             data file source */
-            {
-                "data": "id", "name": "Id", "bVisible": false
-            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

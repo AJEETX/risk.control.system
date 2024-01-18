@@ -13,6 +13,7 @@ $(document).ready(function () {
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -30,9 +31,6 @@ $(document).ready(function () {
                     var img = '<input class="vendors" name="claims" type="checkbox" id="' + row.id + '"  value="' + row.id + '"  />';
                     return img;
                 }
-            },
-            {
-                "data": "id", "name": "Id", "bVisible": false
             },
             { "data": "policyNum" },
             {

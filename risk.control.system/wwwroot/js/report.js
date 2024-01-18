@@ -29,6 +29,7 @@
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -46,9 +47,6 @@
                     var img = '<input name="selectedcase" class="selected-case" type="radio" id="' + row.id + '"  value="' + row.id + '"  />';
                     return img;
                 }
-            },
-            {
-                "data": "id", "name": "Id", "bVisible": false
             },
             {
                 "sDefaultContent": "",

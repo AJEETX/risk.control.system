@@ -20,6 +20,7 @@
             url: '/api/ClaimsVendor/GetOpen',
             dataSrc: ''
         },
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -30,9 +31,6 @@
         columns: [
             /* Name of the keys from
             data file source */
-            {
-                "data": "id", "name": "Id", "bVisible": false
-            },
             {
                 "sDefaultContent": "",
                 "bSortable": false,

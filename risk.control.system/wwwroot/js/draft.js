@@ -40,7 +40,7 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[13, 'asc']],
+        order: [[12, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -60,10 +60,6 @@
                     return img;
                 }
             },
-            {
-                "data": "id", "name": "Id", "bVisible": false
-            },
-
             {
                 "sDefaultContent": "",
                 "bSortable": false,

@@ -20,6 +20,7 @@
             url: '/api/ClaimsInvestigation/GetApproved',
             dataSrc: ''
         },
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -30,9 +31,6 @@
         columns: [
             /* Name of the keys from
             data file source */
-            {
-                "data": "id", "name": "Id", "bVisible": false
-            },
             { "data": "policyNum", "bSortable": false },
             {
                 "sDefaultContent": "",
@@ -46,7 +44,6 @@
                 "data": "amount"
             },
             {
-
                 "sDefaultContent": "",
                 "bSortable": false,
                 "mRender": function (data, type, row) {
