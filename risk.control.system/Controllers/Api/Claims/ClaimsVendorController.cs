@@ -129,7 +129,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
                        TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
-                   })?.OrderByDescending(o => o.TimeElapsed)
+                   })?
                    .ToList();
 
                 return Ok(response);
@@ -364,7 +364,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
                        TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
-                   })?.OrderByDescending(o => o.TimeElapsed)
+                   })
                     ?.ToList();
 
             return Ok(response);
@@ -584,7 +584,7 @@ namespace risk.control.system.Controllers.Api.Claims
                         "<span class=\"badge badge-danger\"><img class=\"timer-image\" src=\"/img/timer.gif\" /> </span>" :
                         a.CaseLocations.FirstOrDefault().BeneficiaryName,
                        TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
-                   })?.OrderByDescending(o => o.TimeElapsed)
+                   })
                     ?.ToList();
 
             return Ok(response);
