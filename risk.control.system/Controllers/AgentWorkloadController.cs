@@ -24,7 +24,6 @@ namespace risk.control.system.Controllers
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
         private readonly IMailboxService mailboxService;
-        private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext _context;
 
         public AgentWorkloadController(
@@ -32,14 +31,12 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userManager,
             IDashboardService dashboardService,
             IMailboxService mailboxService,
-            IToastNotification toastNotification,
             ApplicationDbContext context)
         {
             this.claimsInvestigationService = claimsInvestigationService;
             this.userManager = userManager;
             this.dashboardService = dashboardService;
             this.mailboxService = mailboxService;
-            this.toastNotification = toastNotification;
             this._context = context;
             UserList = new List<UsersViewModel>();
         }
@@ -49,7 +46,7 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Load");
         }
 
-        [Breadcrumb(" Agency Workload")]
+        [Breadcrumb(" Agency Workload", FromAction = "Index", FromController = typeof(AgencyController))]
         public async Task<IActionResult> Load()
         {
             return View();

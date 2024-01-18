@@ -29,7 +29,7 @@ $(document).ready(function () {
                 return '<input type="checkbox" name="selectedcase[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
-        order: [[10, 'asc']],
+        order: [[11, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,

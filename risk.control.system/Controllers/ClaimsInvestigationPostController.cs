@@ -163,7 +163,7 @@ namespace risk.control.system.Controllers
 
             if (reportUpdateStatus == AssessorRemarkType.OK)
             {
-                notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} report submitted to Company", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} report approved", 3, "green", "far fa-file-powerpoint");
             }
             else
             {

@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] investigation submitted to supervisor successfully !", claim.PolicyDetail.ContractNumber));
+            notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber}  report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
 
             return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
         }
@@ -158,11 +158,11 @@ namespace risk.control.system.Controllers
                 if (success != null)
                 {
                     await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] report submitted to Company successfully !", success.PolicyDetail.ContractNumber));
+            notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
                 else
                 {
-                    toastNotification.AddSuccessToastMessage("Report sent to review successfully");
+            notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
                 }
                 return RedirectToAction(nameof(ClaimsVendorController.ClaimReport), "ClaimsVendor");
             }
@@ -195,11 +195,11 @@ namespace risk.control.system.Controllers
             if (success != null)
             {
                 await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-                toastNotification.AddSuccessToastMessage("report submitted to Company successfully");
+            notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "green", "far fa-file-powerpoint");
             }
             else
             {
-                toastNotification.AddSuccessToastMessage("Report sent to review successfully");
+            notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
             }
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
@@ -218,7 +218,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
 
-            toastNotification.AddSuccessToastMessage("Case withdrawn successfully");
+            notifyService.Custom($"Claim #{model.ClaimsInvestigation.PolicyDetail.ContractNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
 
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
