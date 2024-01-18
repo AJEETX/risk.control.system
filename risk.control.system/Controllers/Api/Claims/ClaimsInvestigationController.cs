@@ -1099,7 +1099,7 @@ namespace risk.control.system.Controllers.Api.Claims
 
             var claimsSubmitted = await applicationDbContext.Where(c => c.PolicyDetail.ClientCompanyId == companyUser.ClientCompanyId &&
                 (c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR
-                ))
+                ))?
                  .ToListAsync();
 
             var response =

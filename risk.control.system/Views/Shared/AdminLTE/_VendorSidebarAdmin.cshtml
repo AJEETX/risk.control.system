@@ -29,14 +29,6 @@
                     </p>
                 </a>
             </li>
-            //<li class="nav-item">
-            //    <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReportReview" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReportReview")">
-            //        <i class="far fa-file-excel nav-icon"></i>
-            //        <p>
-            //            <span class="badge badge-danger">RE ALLOCATE</span>
-            //        </p>
-            //    </a>
-            //</li>
         }
         <li class="nav-item">
             <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")
@@ -54,6 +46,17 @@
                 <i class="fa fa-toggle-on nav-icon"></i>
                 <p>
                     <span class="badge badge-primary">ACTIVE</span>
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="ClaimsVendor" asp-action="Completed" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Completed")
+                                           @Url.MakeActiveClass("ClaimsVendor","CompletedDetail")
+                                                   @Url.MakeActiveClass("ClaimsVendor","ShowInvoice")
+                                                       @Url.MakeActiveClass("ClaimsVendor","PrintInvoice")">
+                <i class="fas fa-print nav-icon"></i>
+                <p>
+                    <span class="badge badge-secondary">COMPLETED</span>
                 </p>
             </a>
         </li>
