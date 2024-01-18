@@ -136,13 +136,13 @@ namespace risk.control.system.Controllers
                         string newFileName = vendor.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
 
                         using var dataStream = new MemoryStream();
                         vendorDocument.CopyTo(dataStream);
                         vendor.DocumentImage = dataStream.ToArray();
                         vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                        vendor.DocumentUrl = "/img/" + newFileName;
+                        vendor.DocumentUrl = "/agency/" + newFileName;
                     }
                     else
                     {
@@ -206,12 +206,12 @@ namespace risk.control.system.Controllers
                 string newFileName = Guid.NewGuid().ToString();
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+                var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 using var dataStream = new MemoryStream();
                 user.ProfileImage.CopyTo(dataStream);
                 user.ProfilePicture = dataStream.ToArray();
-                user.ProfilePictureUrl = "/img/" + newFileName;
+                user.ProfilePictureUrl = "/agency/" + newFileName;
             }
             //DEMO
             user.Password = Applicationsettings.Password;
@@ -317,12 +317,12 @@ namespace risk.control.system.Controllers
                     string newFileName = Guid.NewGuid().ToString();
                     string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                     newFileName += fileExtension;
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                     applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                     using var dataStream = new MemoryStream();
                     applicationUser.ProfileImage.CopyTo(dataStream);
                     applicationUser.ProfilePicture = dataStream.ToArray();
-                    applicationUser.ProfilePictureUrl = "/img/" + newFileName;
+                    applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
                 }
 
                 if (user != null)

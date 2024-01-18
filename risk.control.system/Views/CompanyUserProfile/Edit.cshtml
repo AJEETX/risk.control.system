@@ -29,7 +29,7 @@
                                         }
                                         else
                                         {
-                                            <img id="ProfileImage" class="profile-image" src="/img/user.png">
+                                            <img id="ProfileImage" class="profile-image" src="@Applicationsettings.NO_USER">
                                         }
 
                                         <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />

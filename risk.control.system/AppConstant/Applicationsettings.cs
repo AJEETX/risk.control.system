@@ -7,6 +7,7 @@
         public const string PERMISSION = "Permission";
         public static readonly string ADMIN_MOBILE = "61404723089";
         public static readonly string MOBILE = "61432854196";
+        public static readonly string USER_MOBILE = "61400000000";
         public static readonly string HEXdATA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         public static readonly string ValidIssuer = "icheckify";
         public static readonly string ValidAudience = "canarahdfclife";
@@ -203,6 +204,7 @@
         public const string AGENCY3DOMAIN = "investigate.com";
 
         public const string NO_IMAGE = "/img/no-image.png";
+        public const string NO_USER = "/img/no-user.png";
 
         public static class PORTAL_ADMIN
         {

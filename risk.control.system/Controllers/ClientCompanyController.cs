@@ -70,9 +70,9 @@ namespace risk.control.system.Controllers
                     string newFileName = clientCompany.Email;
                     string fileExtension = Path.GetExtension(companyDocument.FileName);
                     newFileName += fileExtension;
-                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
                     companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                    clientCompany.DocumentUrl = "/img/" + newFileName;
+                    clientCompany.DocumentUrl = "/company/" + newFileName;
 
                     using var dataStream = new MemoryStream();
                     companyDocument.CopyTo(dataStream);
@@ -222,13 +222,13 @@ namespace risk.control.system.Controllers
                         string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(companyDocument.FileName);
                         newFileName += fileExtension;
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
+                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
 
                         using var dataStream = new MemoryStream();
                         companyDocument.CopyTo(dataStream);
                         clientCompany.DocumentImage = dataStream.ToArray();
                         companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                        clientCompany.DocumentUrl = "/img/" + newFileName;
+                        clientCompany.DocumentUrl = "/company/" + newFileName;
                     }
                     else
                     {

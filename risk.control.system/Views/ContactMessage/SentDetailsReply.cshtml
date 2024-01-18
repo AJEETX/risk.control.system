@@ -34,7 +34,7 @@
                             <div class="form-group">
                                 <div class="btn btn-default btn-file">
                                     <i class="fas fa-paperclip"></i> Attachment
-                                    <img class="file-image" id="documentImage" src="/img/user.png">
+                                    <img class="file-image" id="documentImage" src="@Applicationsettings.NO_USER">
                                     <input asp-for="Attachment" type="file" class="form-control" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
                                 </div>
                                 <p class="help-block">Max. 10MB</p>

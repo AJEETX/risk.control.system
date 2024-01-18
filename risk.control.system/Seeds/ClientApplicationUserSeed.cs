@@ -17,7 +17,7 @@ namespace risk.control.system.Seeds
         {
             //Seed client admin
             var company = context.ClientCompany.FirstOrDefault(c => c.Email == clientCompany.Email);
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
 
             string adminEmailwithSuffix = Applicationsettings.ADMIN.CODE + "@" + company.Email;
             var caMailBox = new Mailbox

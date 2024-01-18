@@ -74,7 +74,7 @@
                                         <span class="input-group-label"> Photo:</span>
                                         <div class="input-group mb-3">
                                            
-                                            <img id="ProfileImage" class="form-Image" src="/img/user.png">
+                                            <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_USER">
 
                                             <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
 

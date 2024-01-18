@@ -89,7 +89,7 @@ builder.Services.AddControllersWithViews()
 );
 builder.Services.AddNotyf(config =>
 {
-    config.DurationInSeconds = 5;
+    config.DurationInSeconds = 3;
     config.IsDismissable = true;
     config.Position = NotyfPosition.TopRight;
 });
@@ -104,7 +104,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-order.db"));
+                        options.UseSqlite("Data Source=x-seed.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

@@ -14,7 +14,7 @@ namespace risk.control.system.Seeds
     {
         public static async Task Seed(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, UserManager<VendorApplicationUser> userManager, Vendor vendor)
         {
-            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "user.png");
+            string noUserImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", @Applicationsettings.NO_USER);
 
             string adminEmailwithSuffix = AGENCY_ADMIN.CODE + "@" + vendor.Email;
             //Seed Vendor Admin
@@ -161,7 +161,7 @@ namespace risk.control.system.Seeds
                 PhoneNumberConfirmed = true,
                 Password = Password,
                 Vendor = vendor,
-                PhoneNumber = Applicationsettings.MOBILE,
+                PhoneNumber = Applicationsettings.USER_MOBILE,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
                 IsVendorAdmin = false,
