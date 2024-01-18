@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using System.Web;
 
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -23,6 +25,7 @@ namespace risk.control.system.Controllers
         private readonly IToastNotification toastNotification;
         private readonly IAccountService accountService;
         private readonly ILogger _logger;
+        private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
 
         public AccountController(
@@ -31,6 +34,7 @@ namespace risk.control.system.Controllers
             IToastNotification toastNotification,
             IAccountService accountService,
             ILogger<AccountController> logger,
+            INotyfService notifyService,
             ApplicationDbContext context)
         {
             _userManager = userManager ?? throw new ArgumentNullException();
@@ -39,6 +43,7 @@ namespace risk.control.system.Controllers
             this.accountService = accountService;
             this._context = context;
             _logger = logger;
+            this.notifyService = notifyService;
         }
 
         [TempData]
@@ -91,10 +96,11 @@ namespace risk.control.system.Controllers
                         {
                             return Ok();
                         }
-                        toastNotification.AddSuccessToastMessage("<i class='fas fa-bookmark'></i> Login successful!");
+                        notifyService.Success("Login successful");
                         return RedirectToLocal(returnUrl);
                     }
 
+                    notifyService.Error("Login error");
                     return RedirectToAction("login");
                 }
                 else if (result.IsLockedOut)

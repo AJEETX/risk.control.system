@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,7 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
@@ -28,12 +31,14 @@ namespace risk.control.system.Controllers
         public ClientCompanyController(
             ApplicationDbContext context,
             IWebHostEnvironment webHostEnvironment,
+            INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             UserManager<ClientCompanyApplicationUser> userManager,
             IToastNotification toastNotification)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.notifyService = notifyService;
             this.toastNotification = toastNotification;
             this.roleManager = roleManager;
             this.userManager = userManager;
@@ -80,11 +85,11 @@ namespace risk.control.system.Controllers
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Add(clientCompany);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("Company created successfully!");
+                notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(Index));
             }
-            toastNotification.AddErrorToastMessage("Company not found!");
-            return Problem();
+            notifyService.Custom($"Company not found.", 3, "red", "fas fa-building");
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: ClientCompanies/Delete/5
@@ -127,13 +132,15 @@ namespace risk.control.system.Controllers
                 clientCompany.Updated = DateTime.UtcNow;
                 clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.ClientCompany.Remove(clientCompany);
+                await _context.SaveChangesAsync();
+
+                var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
+
+                notifyService.Custom($"Company deleted successfully.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
-
-            var response = SmsService.SendSingleMessage(clientCompany.PhoneNumber, "Company account deleted. Domain : " + clientCompany.Email);
-
-            toastNotification.AddSuccessToastMessage("client company deleted successfully!");
+            notifyService.Error($"Err Company delete.", 3);
             return RedirectToAction(nameof(Index));
         }
 
@@ -279,7 +286,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("Company edited successfully!");
+                notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(ClientCompanyController.Details), "ClientCompany", new { id = clientCompany.ClientCompanyId });
             }
             toastNotification.AddErrorToastMessage("Error to edit Company!");
@@ -422,7 +429,7 @@ namespace risk.control.system.Controllers
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
-                    toastNotification.AddSuccessToastMessage("Vendor(s) empanel successful!");
+                    notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
                     try
                     {
                         return RedirectToAction("Details", new { id = company.ClientCompanyId });
@@ -470,7 +477,7 @@ namespace risk.control.system.Controllers
                     company.Updated = DateTime.UtcNow;
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     var savedRows = await _context.SaveChangesAsync();
-                    toastNotification.AddSuccessToastMessage("Vendor(s) depanel sucessful!");
+                    notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "fas fa-thumbs-down");
                     try
                     {
                         if (savedRows > 0)

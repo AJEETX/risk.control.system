@@ -9,6 +9,7 @@ using SmartBreadcrumbs.Attributes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using risk.control.system.Services;
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace risk.control.system.Controllers
 {
@@ -19,12 +20,14 @@ namespace risk.control.system.Controllers
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
         private readonly IWebHostEnvironment webHostEnvironment;
 
         public AgencyUserProfileController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
+            INotyfService notifyService,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
@@ -32,6 +35,7 @@ namespace risk.control.system.Controllers
             _context = context;
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.toastNotification = toastNotification;
             this.webHostEnvironment = webHostEnvironment;
@@ -56,6 +60,7 @@ namespace risk.control.system.Controllers
         {
             if (userId == null || _context.VendorApplicationUser == null)
             {
+                notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                 toastNotification.AddErrorToastMessage("agency not found");
                 return NotFound();
             }
@@ -63,14 +68,14 @@ namespace risk.control.system.Controllers
             var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
             if (vendorApplicationUser == null)
             {
-                toastNotification.AddErrorToastMessage("agency not found");
+                notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                 return NotFound();
             }
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
 
             if (vendor == null)
             {
-                toastNotification.AddErrorToastMessage("agency not found");
+                notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
                 return NotFound();
             }
             vendorApplicationUser.Vendor = vendor;
@@ -141,7 +146,7 @@ namespace risk.control.system.Controllers
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
-                        toastNotification.AddSuccessToastMessage("User profile edited successfully!");
+                        notifyService.Custom($"User profile edited successfully.", 3, "green", "fas fa-user");
 
                         var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited. Email : " + user.Email);
 
@@ -162,7 +167,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            toastNotification.AddErrorToastMessage("Error to create edit user!");
+            notifyService.Custom($"Error to create edit user.", 3, "red", "fas fa-user");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
@@ -218,7 +223,7 @@ namespace risk.control.system.Controllers
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
             if (vendorUser != null)
             {
-                toastNotification.AddSuccessToastMessage("password edited successfully!");
+                notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
                 return View();
             }
             toastNotification.AddErrorToastMessage("Error to create Agency user!");

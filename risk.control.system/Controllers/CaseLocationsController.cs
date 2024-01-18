@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +21,17 @@ namespace risk.control.system.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
         private HttpClient client = new HttpClient();
 
-        public CaseLocationsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IToastNotification toastNotification)
+        public CaseLocationsController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
+            INotyfService notifyService,
+            IToastNotification toastNotification)
         {
             _context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.notifyService = notifyService;
             this.toastNotification = toastNotification;
         }
 
@@ -179,7 +185,7 @@ namespace risk.control.system.Controllers
 
                 _context.ClaimsInvestigation.Update(claimsInvestigation);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} added successfully !", caseLocation.BeneficiaryName));
+                notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} added successfully", 3, "green", "fas fa-user-tie");
 
                 return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
             }
@@ -298,7 +304,7 @@ namespace risk.control.system.Controllers
 
                         _context.Update(caseLocation);
                         await _context.SaveChangesAsync();
-                        toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-tie'></i> Beneficiary {0} edited successfully !", caseLocation.BeneficiaryName));
+                        notifyService.Custom($"Beneficiary {caseLocation.BeneficiaryName} edited successfully", 3, "orange", "fas fa-user-tie");
                         return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = caseLocation.ClaimsInvestigationId });
                     }
                 }

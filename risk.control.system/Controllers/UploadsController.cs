@@ -18,6 +18,7 @@ using System.Data;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Text;
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace risk.control.system.Controllers
 {
@@ -31,6 +32,7 @@ namespace risk.control.system.Controllers
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
+        private readonly INotyfService notifyService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
@@ -42,6 +44,7 @@ namespace risk.control.system.Controllers
             IClaimsInvestigationService claimsInvestigationService,
             IMailboxService mailboxService,
             UserManager<ClientCompanyApplicationUser> userManager,
+            INotyfService notifyService,
             IWebHostEnvironment webHostEnvironment,
             RoleManager<ApplicationRole> roleManager,
             IToastNotification toastNotification)
@@ -52,6 +55,7 @@ namespace risk.control.system.Controllers
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
             this.userManager = userManager;
+            this.notifyService = notifyService;
             this.webHostEnvironment = webHostEnvironment;
             this.roleManager = roleManager;
             this.toastNotification = toastNotification;
@@ -122,7 +126,7 @@ namespace risk.control.system.Controllers
                 {
                     await FtpUploadClaims(postedFile);
 
-                    toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Ftp Downloaded Claims ready"));
+                    notifyService.Custom($"Ftp Downloaded Claims ready", 3, "green", "far fa-file-powerpoint");
 
                     return RedirectToAction("Draft", "ClaimsInvestigation");
                 }
@@ -133,7 +137,7 @@ namespace risk.control.system.Controllers
                     {
                         await FileUploadClaims(postedFile);
 
-                        toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> File uploaded Claims ready"));
+                        notifyService.Custom($"File uploaded Claims ready", 3, "green", "far fa-file-powerpoint");
 
                         return RedirectToAction("Draft", "ClaimsInvestigation");
                     }
@@ -144,7 +148,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            toastNotification.AddErrorToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Upload Error. Pls try again"));
+            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
 
             return RedirectToAction("Draft", "ClaimsInvestigation");
         }

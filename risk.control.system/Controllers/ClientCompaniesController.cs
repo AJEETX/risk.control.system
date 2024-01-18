@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,10 +11,14 @@ namespace risk.control.system.Controllers
 {
     public class ClientCompaniesController : Controller
     {
+        private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
 
-        public ClientCompaniesController(ApplicationDbContext context)
+        public ClientCompaniesController(
+            INotyfService notifyService,
+            ApplicationDbContext context)
         {
+            this.notifyService = notifyService;
             _context = context;
         }
 
@@ -65,6 +71,7 @@ namespace risk.control.system.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(clientCompany);
+                notifyService.Custom($"Company created successfully.", 3, "green", "fas fa-building");
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -125,6 +132,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
+                notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "CountryId", clientCompany.CountryId);
@@ -172,6 +180,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
+            notifyService.Custom($"Company deleted successfully.", 3, "orange", "fas fa-building");
             return RedirectToAction(nameof(Index));
         }
 

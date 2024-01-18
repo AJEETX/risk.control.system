@@ -1,5 +1,8 @@
 using System.Reflection;
 
+using AspNetCoreHero.ToastNotification;
+using AspNetCoreHero.ToastNotification.Extensions;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
@@ -84,6 +87,13 @@ builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
+builder.Services.AddNotyf(config =>
+{
+    config.DurationInSeconds = 5;
+    config.IsDismissable = true;
+    config.Position = NotyfPosition.TopRight;
+});
+
 var isProd = builder.Configuration.GetSection("IsProd").Value;
 var prod = bool.Parse(isProd);
 if (prod)
@@ -218,6 +228,7 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseNToastNotify();
+app.UseNotyf();
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path;

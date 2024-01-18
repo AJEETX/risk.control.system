@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 
@@ -17,6 +19,7 @@ namespace risk.control.system.Controllers
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
+        private readonly INotyfService notifyService;
         private readonly IClaimsVendorService vendorService;
         private readonly IMailboxService mailboxService;
         private readonly IToastNotification toastNotification;
@@ -29,6 +32,7 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
             IDashboardService dashboardService,
+            INotyfService notifyService,
             IClaimsVendorService vendorService,
             IMailboxService mailboxService,
             IToastNotification toastNotification,
@@ -37,6 +41,7 @@ namespace risk.control.system.Controllers
             this.claimsInvestigationService = claimsInvestigationService;
             this.userManager = userManager;
             this.dashboardService = dashboardService;
+            this.notifyService = notifyService;
             this.vendorService = vendorService;
             this.mailboxService = mailboxService;
             this.toastNotification = toastNotification;
@@ -51,7 +56,7 @@ namespace risk.control.system.Controllers
         {
             if (string.IsNullOrWhiteSpace(selectedcase) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
             {
-                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be allocate.");
+                notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
                 return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
             }
 
@@ -59,6 +64,7 @@ namespace risk.control.system.Controllers
             if (string.IsNullOrWhiteSpace(userEmail))
             {
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
+                notifyService.Error($"OOPs !!!..Err", 3);
                 return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
             }
             var vendorAgent = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
@@ -67,7 +73,7 @@ namespace risk.control.system.Controllers
 
             await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, caseLocationId);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] tasked to {1} successfully!", claim.PolicyDetail.ContractNumber, vendorAgent.Email));
+            notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
 
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
@@ -93,7 +99,7 @@ namespace risk.control.system.Controllers
 
             await vendorService.PostDocumentId(userEmail, selectedcase);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Uploaded successfully !"));
+            notifyService.Custom($"Uploaded successfully ", 3, "green", "far fa-file-powerpoint");
 
             return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "ClaimsVendor", new { selectedcase = selectedcase, uploaded = true });
         }
@@ -104,7 +110,7 @@ namespace risk.control.system.Controllers
         {
             if (string.IsNullOrWhiteSpace(remarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
             {
-                toastNotification.AddAlertToastMessage("No Agent remarks entered!!!. Please enter remarks.");
+                notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
                 return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
             }
 

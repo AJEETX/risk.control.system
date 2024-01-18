@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
 
+using AspNetCoreHero.ToastNotification.Abstractions;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +20,18 @@ namespace risk.control.system.Controllers
     {
         private readonly IClaimPolicyService claimPolicyService;
         private readonly ApplicationDbContext _context;
+        private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
         private readonly IInvestigationReportService investigationReportService;
 
-        public InsurancePolicyController(IClaimPolicyService claimPolicyService, ApplicationDbContext context, IToastNotification toastNotification, IInvestigationReportService investigationReportService)
+        public InsurancePolicyController(IClaimPolicyService claimPolicyService, ApplicationDbContext context,
+            INotyfService notifyService,
+
+            IToastNotification toastNotification, IInvestigationReportService investigationReportService)
         {
             this.claimPolicyService = claimPolicyService;
             this._context = context;
+            this.notifyService = notifyService;
             this.toastNotification = toastNotification;
             this.investigationReportService = investigationReportService;
         }
@@ -110,7 +117,7 @@ namespace risk.control.system.Controllers
             claimsInvestigation.Deleted = true;
             _context.ClaimsInvestigation.Update(claimsInvestigation);
             await _context.SaveChangesAsync();
-            toastNotification.AddAlertToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim deleted successfully !"));
+            notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
             return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
         }
     }

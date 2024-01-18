@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,7 @@ namespace risk.control.system.Controllers
     {
         public List<UsersViewModel> UserList;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
@@ -28,12 +31,14 @@ namespace risk.control.system.Controllers
         public CompanyUserProfileController(ApplicationDbContext context,
             UserManager<ClientCompanyApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification)
         {
             this._context = context;
             this.signInManager = signInManager;
+            this.notifyService = notifyService;
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
@@ -147,7 +152,7 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
-                            toastNotification.AddSuccessToastMessage("user profile edited successfully!");
+                            notifyService.Custom($"User profile edited successfully.", 3, "green", "fas fa-user");
                             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User edited . Email : " + user.Email);
                             return RedirectToAction(nameof(Index), "Dashboard");
                         }
@@ -224,7 +229,7 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Password Change Success")]
         public IActionResult ChangePasswordConfirmation()
         {
-            toastNotification.AddSuccessToastMessage("password edited successfully!");
+            notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
             return View();
         }
 

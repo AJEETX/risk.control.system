@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,12 +20,16 @@ namespace risk.control.system.Controllers
     public class VendorsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public VendorsController(ApplicationDbContext context, IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
+        public VendorsController(ApplicationDbContext context,
+            INotyfService notifyService,
+            IToastNotification toastNotification, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            this.notifyService = notifyService;
             this.toastNotification = toastNotification;
             this.webHostEnvironment = webHostEnvironment;
         }
@@ -160,11 +166,11 @@ namespace risk.control.system.Controllers
 
                     var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency created. Domain : " + vendor.Email);
 
-                    toastNotification.AddSuccessToastMessage("agency created successfully!");
+                    notifyService.Custom($"Agency created successfully.", 3, "green", "fas fa-building");
                     return RedirectToAction(nameof(Index));
                 }
-                toastNotification.AddErrorToastMessage("Error to create agency!");
-                return Problem();
+                notifyService.Error($"Error to create agency!.", 3);
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception)
             {
@@ -264,10 +270,11 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("agency edited successfully!");
+                notifyService.Custom($"Agency edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = vendorId });
             }
-            return Problem();
+            notifyService.Error($"Err Company delete.", 3);
+            return RedirectToAction(nameof(VendorsController.Details), "Vendors", new { id = vendorId });
         }
 
         // GET: Vendors/Delete/5
@@ -310,10 +317,11 @@ namespace risk.control.system.Controllers
                 vendor.Updated = DateTime.UtcNow;
                 vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.Vendor.Remove(vendor);
+                await _context.SaveChangesAsync();
+                notifyService.Custom($"Agency deleted successfully.", 3, "red", "fas fa-building");
+                return RedirectToAction(nameof(Index));
             }
-
-            await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("agency deleted successfully!");
+            notifyService.Error($"Err Agency delete.", 3);
             return RedirectToAction(nameof(Index));
         }
 

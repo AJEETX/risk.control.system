@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,7 @@ namespace risk.control.system.Controllers
     {
         public List<UsersViewModel> UserList;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly IHttpClientService httpClientService;
@@ -30,12 +33,14 @@ namespace risk.control.system.Controllers
             UserManager<ClientCompanyApplicationUser> userManager,
             IHttpClientService httpClientService,
             SignInManager<ApplicationUser> signInManager,
+            INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification)
         {
             this._context = context;
             this.signInManager = signInManager;
+            this.notifyService = notifyService;
             this.userManager = userManager;
             this.httpClientService = httpClientService;
             this.roleManager = roleManager;
@@ -191,7 +196,7 @@ namespace risk.control.system.Controllers
                     toastNotification.AddErrorToastMessage("Error to edit company profile!");
                     return RedirectToAction(nameof(CompanyController.Index), "Company");
                 }
-                toastNotification.AddSuccessToastMessage("<i class='fas fa-building'></i> Company Profile edited successfully!");
+                notifyService.Custom($"Company edited successfully.", 3, "orange", "fas fa-building");
                 return RedirectToAction(nameof(CompanyController.Index), "Company");
             }
             toastNotification.AddErrorToastMessage("Error to edit company profile!");
@@ -254,18 +259,18 @@ namespace risk.control.system.Controllers
 
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
-                        toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                        notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
                         var response = SmsService.SendSingleMessage(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
                         return RedirectToAction(nameof(CompanyController.User), "Company");
                     }
                 }
                 else
                 {
-                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
+                    notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created . Email : " + user.Email);
                     return RedirectToAction(nameof(CompanyController.User), "Company");
                 }
-                toastNotification.AddSuccessToastMessage("User created successfully!");
+                notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 return RedirectToAction(nameof(CompanyController.User), "Company");
             }
             foreach (IdentityError error in result.Errors)
@@ -390,7 +395,7 @@ namespace risk.control.system.Controllers
 
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
-                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                                    notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                                     var response = SmsService.SendSingleMessage(createdUser.PhoneNumber, "User created and locked. Email : " + createdUser.Email);
                                     return RedirectToAction(nameof(CompanyController.User), "Company");
                                 }
@@ -403,14 +408,12 @@ namespace risk.control.system.Controllers
 
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
-                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> User edited and unlocked successfully!");
+                                    notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
                                     var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created . Email : " + user.Email);
                                     return RedirectToAction(nameof(CompanyController.User), "Company");
                                 }
                             }
                         }
-                        toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
-                        return RedirectToAction(nameof(CompanyController.User), "Company");
                     }
                 }
                 catch (DbUpdateConcurrencyException)
@@ -418,7 +421,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            toastNotification.AddErrorToastMessage("Error to create Company user!");
+            notifyService.Error($"Error to create Company user.", 3);
             return RedirectToAction(nameof(CompanyController.User), "Company");
         }
 
@@ -456,7 +459,7 @@ namespace risk.control.system.Controllers
                         vendor2Empanel.Clients.Add(company);
                     }
 
-                    toastNotification.AddSuccessToastMessage("Agency(s) empanel successful!");
+                    notifyService.Custom($"Agency(s) empanelled.", 3, "green", "fas fa-thumbs-up");
                     try
                     {
                         return RedirectToAction("AvailableVendors");
@@ -505,7 +508,7 @@ namespace risk.control.system.Controllers
                     company.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(company);
                     var savedRows = await _context.SaveChangesAsync();
-                    toastNotification.AddSuccessToastMessage("Agency(s) depanel sucessful!");
+                    notifyService.Custom($"Agency(s) de-panelled.", 3, "red", "fas fa-thumbs-down");
                     try
                     {
                         if (savedRows > 0)
@@ -662,7 +665,7 @@ namespace risk.control.system.Controllers
             await signInManager.RefreshSignInAsync(currentUser);
             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User role edited . Email : " + user.Email);
 
-            toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
+            notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(CompanyController.User));
         }
 

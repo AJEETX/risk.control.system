@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +25,7 @@ namespace risk.control.system.Controllers
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly INotyfService notifyService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
 
@@ -30,6 +33,7 @@ namespace risk.control.system.Controllers
             UserManager<VendorApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
+            INotyfService notifyService,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification)
         {
@@ -37,6 +41,7 @@ namespace risk.control.system.Controllers
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.roleManager = roleManager;
+            this.notifyService = notifyService;
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
         }
@@ -132,13 +137,13 @@ namespace risk.control.system.Controllers
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
                         var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
-                        toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                        notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                     }
                 }
                 else
                 {
                     var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
-                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
+                    notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 }
                 return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = user.VendorId });
             }
@@ -149,7 +154,7 @@ namespace risk.control.system.Controllers
                     ModelState.AddModelError("", error.Description);
             }
             GetCountryStateEdit(user);
-            toastNotification.AddSuccessToastMessage("user created successfully!");
+            notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
             return View(user);
         }
 
@@ -265,7 +270,7 @@ namespace risk.control.system.Controllers
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
                                     var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
-                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User edited and locked successfully!");
+                                    notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                                 }
                             }
                             else
@@ -277,7 +282,7 @@ namespace risk.control.system.Controllers
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
                                     var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> User edited and unlocked successfully!");
+                                    notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
                                 }
                             }
                             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = applicationUser.VendorId });
@@ -367,7 +372,7 @@ namespace risk.control.system.Controllers
             result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
                 Where(x => x.Selected).Select(y => y.RoleName));
 
-            toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
+            notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(VendorUserController.Index), "VendorUser", new { id = model.VendorId });
         }
 
@@ -414,9 +419,12 @@ namespace risk.control.system.Controllers
                 vendorApplicationUser.Updated = DateTime.UtcNow;
                 vendorApplicationUser.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.VendorApplicationUser.Remove(vendorApplicationUser);
+                notifyService.Error($"User deleted successfully.", 3);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
 
-            await _context.SaveChangesAsync();
+            notifyService.Error($"Err User delete. Try again", 3);
             return RedirectToAction(nameof(Index));
         }
 

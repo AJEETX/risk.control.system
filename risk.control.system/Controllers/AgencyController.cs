@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,7 @@ namespace risk.control.system.Controllers
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<VendorApplicationUser> userManager;
+        private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IDashboardService dashboardService;
         private readonly IToastNotification toastNotification;
@@ -28,6 +31,7 @@ namespace risk.control.system.Controllers
 
         public AgencyController(ApplicationDbContext context,
             UserManager<VendorApplicationUser> userManager,
+            INotyfService notifyService,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<ApplicationRole> roleManager,
             IDashboardService dashboardService,
@@ -36,6 +40,7 @@ namespace risk.control.system.Controllers
             _context = context;
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.dashboardService = dashboardService;
             this.toastNotification = toastNotification;
@@ -89,7 +94,7 @@ namespace risk.control.system.Controllers
             var vendor = await _context.Vendor.FindAsync(vendorUser.VendorId);
             if (vendor == null)
             {
-                toastNotification.AddErrorToastMessage("agency not found!");
+                notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Index), "Agency");
             }
 
@@ -115,7 +120,7 @@ namespace risk.control.system.Controllers
         {
             if (vendor == null || vendor.VendorId == 0)
             {
-                toastNotification.AddErrorToastMessage("agency not found!");
+                notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Index), "Agency");
             }
             var userEmail = HttpContext.User?.Identity?.Name;
@@ -166,7 +171,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("agency edited successfully!");
+                notifyService.Custom($"Agency edited successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Index), "Agency");
             }
             return Problem();
@@ -227,7 +232,7 @@ namespace risk.control.system.Controllers
 
                     if (lockUser.Succeeded && lockDate.Succeeded)
                     {
-                        toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User created and locked successfully!");
+                        notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
                         var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
 
                         return RedirectToAction(nameof(AgencyController.User), "Agency");
@@ -235,7 +240,7 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
-                    toastNotification.AddSuccessToastMessage("<i class='fas fa-user-plus'></i> User created successfully!");
+                    notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                     var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
                     return RedirectToAction(nameof(AgencyController.User), "Agency");
                 }
@@ -246,7 +251,7 @@ namespace risk.control.system.Controllers
                     ModelState.AddModelError("", error.Description);
             }
             GetCountryStateEdit(user);
-            toastNotification.AddErrorToastMessage("Error to create user!");
+            notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
             return View(user);
         }
 
@@ -354,7 +359,7 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                toastNotification.AddSuccessToastMessage("<i class='fas fa-user-lock'></i> User edited and locked successfully!");
+                                notifyService.Custom($"User edited and locked.", 3, "orange", "fas fa-user-lock");
                                 var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and locked. Email : " + user.Email);
                                 return RedirectToAction(nameof(AgencyController.User), "Agency");
                             }
@@ -367,12 +372,12 @@ namespace risk.control.system.Controllers
 
                             if (lockUser.Succeeded && lockDate.Succeeded)
                             {
-                                toastNotification.AddSuccessToastMessage("User edited and unlocked successfully!");
+                                notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
                                 var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
                                 return RedirectToAction(nameof(AgencyController.User), "Agency");
                             }
                         }
-                        toastNotification.AddSuccessToastMessage("<i class='fas fa-user-check'></i> Agency user edited successfully!");
+                        notifyService.Custom($"Agency user edited successfully.", 3, "green", "fas fa-user-check");
                         return RedirectToAction(nameof(AgencyController.User), "Agency");
                     }
                     toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
@@ -391,7 +396,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            toastNotification.AddErrorToastMessage("Error to create Agency user!");
+            notifyService.Error($"Error to create Agency user.", 3);
             return RedirectToAction(nameof(AgencyController.User), "Agency");
         }
 
@@ -455,7 +460,7 @@ namespace risk.control.system.Controllers
             await signInManager.RefreshSignInAsync(currentUser);
             var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user role edited. Email : " + user.Email);
 
-            toastNotification.AddSuccessToastMessage("<i class='fas fa-user-cog'></i>  User role(s) updated successfully!");
+            notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(AgencyController.User), "Agency");
         }
 
@@ -504,7 +509,7 @@ namespace risk.control.system.Controllers
                 vendorInvestigationServiceType.VendorId = vendor.VendorId;
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("<i class='fas fa-truck'></i> Service created successfully!");
+                notifyService.Custom($"Service created successfully.", 3, "green", "fas fa-truck");
 
                 return RedirectToAction(nameof(AgencyController.Service), "Agency");
             }
@@ -599,7 +604,7 @@ namespace risk.control.system.Controllers
                         vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                         _context.Update(vendorInvestigationServiceType);
                         await _context.SaveChangesAsync();
-                        toastNotification.AddSuccessToastMessage("<i class='fas fa-truck'></i> Service updated successfully!");
+                        notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
                         return RedirectToAction(nameof(AgencyController.Service), "Agency");
                     }
                 }
@@ -614,8 +619,8 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddErrorToastMessage("Error: service edit!");
-                return BadRequest();
+                notifyService.Error($"Err Service updated.", 3);
+                return RedirectToAction(nameof(AgencyController.Service), "Agency");
             }
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
@@ -669,7 +674,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("service deleted successfully!");
+            notifyService.Error($"Service deleted successfully.", 3);
             return RedirectToAction("Service", "Agency");
         }
 

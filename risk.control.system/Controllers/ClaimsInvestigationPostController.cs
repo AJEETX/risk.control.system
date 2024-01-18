@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +36,7 @@ namespace risk.control.system.Controllers
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly RoleManager<ApplicationRole> roleManager;
+        private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
         private readonly IClaimPolicyService claimPolicyService;
@@ -48,6 +51,8 @@ namespace risk.control.system.Controllers
             UserManager<ClientCompanyApplicationUser> userManager,
             IWebHostEnvironment webHostEnvironment,
             RoleManager<ApplicationRole> roleManager,
+            INotyfService notifyService,
+
             IClaimPolicyService claimPolicyService,
             IToastNotification toastNotification)
         {
@@ -59,6 +64,7 @@ namespace risk.control.system.Controllers
             this.userManager = userManager;
             this.webHostEnvironment = webHostEnvironment;
             this.roleManager = roleManager;
+            this.notifyService = notifyService;
             this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
             this.toastNotification = toastNotification;
@@ -70,7 +76,7 @@ namespace risk.control.system.Controllers
         {
             if (claims == null || claims.Count == 0)
             {
-                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be assigned.");
+                notifyService.Custom($"No case selected!!!. Please select case to be assigned.", 3, "red", "far fa-file-powerpoint");
                 return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
             }
 
@@ -93,14 +99,14 @@ namespace risk.control.system.Controllers
 
                 if (claims.Count == autoAllocatedClaims.Count)
                 {
-                    toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
+                    notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
                 }
 
                 if (claims.Count > autoAllocatedClaims.Count)
                 {
                     if (autoAllocatedClaims.Count > 0)
                     {
-                        toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-allocated !");
+                        notifyService.Custom($"{autoAllocatedClaims.Count}/{claims.Count} claim(s) auto-assigned", 3, "green", "far fa-file-powerpoint");
                     }
 
                     var notAutoAllocated = claims.Except(autoAllocatedClaims)?.ToList();
@@ -109,7 +115,7 @@ namespace risk.control.system.Controllers
 
                     await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, notAutoAllocated);
 
-                    toastNotification.AddWarningToastMessage($"<i class='far fa-file-powerpoint'></i> {notAutoAllocated.Count}/{claims.Count} claim(s) assigned successfully !");
+                    notifyService.Custom($"{notAutoAllocated.Count}/{claims.Count} claim(s) need manual assign", 3, "orange", "far fa-file-powerpoint");
 
                     return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
                 }
@@ -120,7 +126,7 @@ namespace risk.control.system.Controllers
 
                 await mailboxService.NotifyClaimAssignmentToAssigner(HttpContext.User.Identity.Name, claims);
 
-                toastNotification.AddSuccessToastMessage($"<i class='far fa-file-powerpoint'></i> {claims.Count}/{claims.Count} claim(s) assigned successfully !");
+                notifyService.Custom($"{claims.Count}/{claims.Count} claim(s) assigned", 3, "green", "far fa-file-powerpoint");
             }
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
@@ -138,9 +144,7 @@ namespace risk.control.system.Controllers
 
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == selectedcase);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # {0}] submitted to Agency {1} !", policy.PolicyDetail.ContractNumber, vendor.Name));
-
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
+            notifyService.Custom($"Policy #{policy.PolicyDetail.ContractNumber} assigned to {vendor.Name}", 3, "green", "far fa-file-powerpoint");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
         }
@@ -159,11 +163,11 @@ namespace risk.control.system.Controllers
 
             if (reportUpdateStatus == AssessorRemarkType.OK)
             {
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # <i> {0} </i>] report submitted to Company !", claim.PolicyDetail.ContractNumber));
+                notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} report submitted to Company", 3, "green", "far fa-file-powerpoint");
             }
             else
             {
-                toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Claim [Policy # <i> {0} </i> ] investigation reassigned !", claim.PolicyDetail.ContractNumber));
+                notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} reassigned", 3, "red", "far fa-file-powerpoint");
             }
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Assessor), "ClaimsInvestigation");
@@ -218,7 +222,7 @@ namespace risk.control.system.Controllers
 
             var claim = await claimsInvestigationService.CreatePolicy(userEmail, claimsInvestigation, documentFile, profileFile);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Policy # <i><b> {0} </b> </i>  created successfully !", claim.PolicyDetail.ContractNumber));
+            notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} created successfully", 3, "green", "far fa-file-powerpoint");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
         }
@@ -253,7 +257,7 @@ namespace risk.control.system.Controllers
 
             var claim = await claimsInvestigationService.EdiPolicy(userEmail, claimsInvestigation, documentFile);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Policy # <i><b> {0} </b></i>  edited successfully !", claimsInvestigation.PolicyDetail.ContractNumber));
+            notifyService.Custom($"Policy #{claim.PolicyDetail.ContractNumber} edited successfully", 3, "orange", "far fa-file-powerpoint");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
         }
@@ -295,7 +299,7 @@ namespace risk.control.system.Controllers
 
             var claim = await claimsInvestigationService.CreateCustomer(userEmail, claimsInvestigation, documentFile, profileFile, create);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-plus'></i> Customer {0} added successfully !", claimsInvestigation.CustomerDetail.CustomerName));
+            notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} added successfully", 3, "green", "fas fa-user-plus");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
         }
@@ -330,7 +334,7 @@ namespace risk.control.system.Controllers
 
             var claim = await claimsInvestigationService.EditCustomer(userEmail, claimsInvestigation, profileFile);
 
-            toastNotification.AddSuccessToastMessage(string.Format("<i class='fas fa-user-check'></i> Customer {0} edited successfully !", claimsInvestigation.CustomerDetail.CustomerName));
+            notifyService.Custom($"Customer {claim.CustomerDetail.CustomerName} edited successfully", 3, "orange", "fas fa-user-plus");
 
             return RedirectToAction(nameof(ClaimsInvestigationController.Details), "ClaimsInvestigation", new { id = claim.ClaimsInvestigationId });
         }

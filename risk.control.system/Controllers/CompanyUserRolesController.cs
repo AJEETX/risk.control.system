@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using NToastNotify;
@@ -17,13 +19,17 @@ namespace risk.control.system.Controllers
     {
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
 
-        public CompanyUserRolesController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IToastNotification toastNotification,
+        public CompanyUserRolesController(UserManager<ApplicationUser> userManager,
+            INotyfService notifyService,
+            RoleManager<ApplicationRole> roleManager, IToastNotification toastNotification,
             SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
+            this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.toastNotification = toastNotification;
             this.signInManager = signInManager;
@@ -90,7 +96,7 @@ namespace risk.control.system.Controllers
             await signInManager.RefreshSignInAsync(currentUser);
             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User role edited . Email : " + user.Email);
 
-            toastNotification.AddSuccessToastMessage("roles updated successfully!");
+            notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { Id = model.CompanyId });
         }
     }

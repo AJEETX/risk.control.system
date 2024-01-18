@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,7 @@ namespace risk.control.system.Controllers
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
         public List<UsersViewModel> UserList;
         private readonly ApplicationDbContext context;
@@ -29,6 +32,7 @@ namespace risk.control.system.Controllers
             IPasswordHasher<ApplicationUser> passwordHasher,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
+            INotyfService notifyService,
             IToastNotification toastNotification,
             ApplicationDbContext context)
         {
@@ -36,6 +40,7 @@ namespace risk.control.system.Controllers
             this.roleManager = roleManager;
             this.passwordHasher = passwordHasher;
             this.webHostEnvironment = webHostEnvironment;
+            this.notifyService = notifyService;
             this.toastNotification = toastNotification;
             this.context = context;
             UserList = new List<UsersViewModel>();
@@ -76,7 +81,7 @@ namespace risk.control.system.Controllers
 
             if (result.Succeeded)
             {
-                toastNotification.AddSuccessToastMessage("User created successfully!");
+                notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 var response = SmsService.SendSingleMessage(user.PhoneNumber, "User created. Email : " + user.Email);
 
                 return RedirectToAction(nameof(Index));
@@ -136,6 +141,7 @@ namespace risk.control.system.Controllers
                 user.UpdatedBy = HttpContext.User?.Identity?.Name;
                 user.ProfilePictureUrl = null;
                 await context.SaveChangesAsync();
+                notifyService.Error($"Image deleted successfully.", 3);
                 return Ok(new { message = "succes", succeeded = true });
             }
             toastNotification.AddErrorToastMessage("image not found!");
@@ -198,7 +204,7 @@ namespace risk.control.system.Controllers
                         if (result.Succeeded)
                         {
                             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User edited. Email : " + user.Email);
-                            toastNotification.AddSuccessToastMessage("User edited successfully!");
+                            notifyService.Custom($"User edited successfully.", 3, "orange", "fas fa-user-check");
                             return RedirectToAction(nameof(Index));
                         }
                         toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");

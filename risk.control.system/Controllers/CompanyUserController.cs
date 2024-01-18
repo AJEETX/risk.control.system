@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+using AspNetCoreHero.ToastNotification.Notyf;
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +24,7 @@ namespace risk.control.system.Controllers
         public List<UsersViewModel> UserList;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly IPasswordHasher<ClientCompanyApplicationUser> passwordHasher;
+        private readonly INotyfService notifyService;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IToastNotification toastNotification;
@@ -28,6 +32,7 @@ namespace risk.control.system.Controllers
 
         public CompanyUserController(UserManager<ClientCompanyApplicationUser> userManager,
             IPasswordHasher<ClientCompanyApplicationUser> passwordHasher,
+            INotyfService notifyService,
             RoleManager<ApplicationRole> roleManager,
             IWebHostEnvironment webHostEnvironment,
             IToastNotification toastNotification,
@@ -35,6 +40,7 @@ namespace risk.control.system.Controllers
         {
             this.userManager = userManager;
             this.passwordHasher = passwordHasher;
+            this.notifyService = notifyService;
             this.roleManager = roleManager;
             this.webHostEnvironment = webHostEnvironment;
             this.toastNotification = toastNotification;
@@ -214,6 +220,7 @@ namespace risk.control.system.Controllers
             if (result.Succeeded)
             {
                 var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account created. Domain : " + user.Email);
+                notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
 
                 return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = user.ClientCompanyId });
             }
@@ -224,7 +231,7 @@ namespace risk.control.system.Controllers
                     ModelState.AddModelError("", error.Description);
             }
             GetCountryStateEdit(user);
-            toastNotification.AddSuccessToastMessage("user created successfully!");
+            notifyService.Error($"Err User create.", 3);
             return View(user);
         }
 
@@ -330,7 +337,7 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
-                            toastNotification.AddSuccessToastMessage("Company user edited successfully!");
+                            notifyService.Custom($"Company user edited successfully.", 3, "orange", "fas fa-user-check");
                             var response = SmsService.SendSingleMessage(user.PhoneNumber, "Company account edited. Domain : " + user.Email);
 
                             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = applicationUser.ClientCompanyId });
@@ -404,6 +411,7 @@ namespace risk.control.system.Controllers
             }
 
             await _context.SaveChangesAsync();
+            notifyService.Error($"User deleted successfully.", 3);
             return RedirectToAction(nameof(CompanyUserController.Index), "CompanyUser", new { id = clientCompanyApplicationUser.ClientCompanyId });
         }
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,11 +18,15 @@ namespace risk.control.system.Controllers
     public class VendorServiceController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
 
-        public VendorServiceController(ApplicationDbContext context, IToastNotification toastNotification)
+        public VendorServiceController(ApplicationDbContext context,
+            INotyfService notifyService,
+            IToastNotification toastNotification)
         {
             _context = context;
+            this.notifyService = notifyService;
             this.toastNotification = toastNotification;
         }
 
@@ -108,7 +114,7 @@ namespace risk.control.system.Controllers
                 vendorInvestigationServiceType.Created = DateTime.UtcNow;
                 _context.Add(vendorInvestigationServiceType);
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("service created successfully!");
+                notifyService.Custom($"Service created successfully.", 3, "green", "fas fa-truck");
 
                 return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = vendorInvestigationServiceType.VendorId });
             }
@@ -209,7 +215,7 @@ namespace risk.control.system.Controllers
                         vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                         _context.Update(vendorInvestigationServiceType);
                         await _context.SaveChangesAsync();
-                        toastNotification.AddSuccessToastMessage("service updated successfully!");
+                        notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
                         return RedirectToAction(nameof(VendorsController.Service), "Vendors", new { id = vendorInvestigationServiceType.VendorId });
                     }
                 }
@@ -224,7 +230,7 @@ namespace risk.control.system.Controllers
                         throw;
                     }
                 }
-                toastNotification.AddSuccessToastMessage("service edited successfully!");
+                toastNotification.AddErrorToastMessage("Err service edit!");
                 return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
             }
             ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
@@ -280,10 +286,11 @@ namespace risk.control.system.Controllers
                 vendorInvestigationServiceType.Updated = DateTime.UtcNow;
                 vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
                 _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
+                await _context.SaveChangesAsync();
+                notifyService.Custom($"Service deleted successfully.", 3, "red", "fas fa-truck");
+                return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
             }
-
-            await _context.SaveChangesAsync();
-            toastNotification.AddSuccessToastMessage("service deleted successfully!");
+            notifyService.Error($"Err Service delete.", 3);
             return RedirectToAction("Details", "Vendors", new { id = vendorInvestigationServiceType.VendorId });
         }
 
