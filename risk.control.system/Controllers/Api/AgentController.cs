@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Highsoft.Web.Mvc.Charts;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,7 @@ namespace risk.control.system.Controllers.Api
         private static string PanGroup_id = "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e";
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
+        private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -47,11 +49,14 @@ namespace risk.control.system.Controllers.Api
         private ILogger<AgentController> logger;
 
         //test PAN FNLPM8635N
-        public AgentController(ApplicationDbContext context, IHttpClientService httpClientService, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
+        public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
+            UserManager<VendorApplicationUser> userVendorManager,
+            IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService, ILogger<AgentController> logger)
         {
             this._context = context;
             this.httpClientService = httpClientService;
+            this.userVendorManager = userVendorManager;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
@@ -60,8 +65,44 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("ResetUid")]
+        public async Task<IActionResult> ResetUid(string mobile, bool sendSMS = false)
+        {
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+
+            var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
+                u => u.PhoneNumber == mobile);
+
+            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+
+            if (user2Onboard == null || !isAgent)
+            {
+                return BadRequest($"mobile number and/or Agent does not exist");
+            }
+
+            user2Onboard.MobileUId = string.Empty;
+            user2Onboard.SecretPin = string.Empty;
+            _context.VendorApplicationUser.Update(user2Onboard);
+            _context.SaveChanges();
+
+            if (sendSMS)
+            {
+                //SEND SMS
+                string device = "0";
+                long? timestamp = null;
+                bool isMMS = false;
+                string? attachments = null;
+                bool priority = false;
+                string message = $"Uid reset for mobile: {user2Onboard.PhoneNumber}";
+                var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
+            }
+
+            return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
+        }
+
+        [AllowAnonymous]
         [HttpPost("VerifyMobile")]
-        public IActionResult VerifyMobile(VerifyMobileRequest request)
+        public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
         {
             if (request is null || string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
             {
@@ -77,10 +118,12 @@ namespace risk.control.system.Controllers.Api
                 }
             }
 
+            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
             var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
                 u => u.PhoneNumber == request.Mobile);
+            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
 
-            if (user2Onboard == null)
+            if (user2Onboard == null || !isAgent)
             {
                 return BadRequest($"mobile number does not exist");
             }
