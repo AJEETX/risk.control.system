@@ -11,12 +11,18 @@ namespace risk.control.system.Services
     public interface IInboxMailService
     {
         Task<IEnumerable<InboxMessage>> GetInboxMessages(string userEmail);
+
         Task<int> InboxDelete(List<long> messages, long userId);
+
         Task<InboxMessage> GetInboxMessagedetail(long messageId, string userEmail);
+
         Task<OutboxMessage> GetInboxMessagedetailReply(long messageId, string userEmail, string actiontype);
+
         Task<int> InboxDetailsDelete(long id, string userEmail);
+
         Task<bool> SendReplyMessage(OutboxMessage contactMessage, string userEmail, IFormFile? messageDocument);
     }
+
     public class InboxMailService : IInboxMailService
     {
         private readonly JsonSerializerOptions options = new()
@@ -24,16 +30,18 @@ namespace risk.control.system.Services
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
+
         private readonly ApplicationDbContext _context;
 
         public InboxMailService(ApplicationDbContext context)
         {
             this._context = context;
         }
+
         public async Task<IEnumerable<InboxMessage>> GetInboxMessages(string userEmail)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Inbox).FirstOrDefault(c => c.Name == userEmail);
-            return userMailbox.Inbox.OrderByDescending(o => o.SendDate).ToList();
+            return userMailbox.Inbox.OrderBy(o => o.SendDate).ToList();
         }
 
         public async Task<InboxMessage> GetInboxMessagedetail(long messageId, string userEmail)
@@ -59,7 +67,7 @@ namespace risk.control.system.Services
 
             var userMessage = userMailbox.Inbox.FirstOrDefault(c => c.InboxMessageId == messageId);
 
-            var replyRawMessage = "<br />" + "<hr />" + "From: "+userMessage.SenderEmail + "<br />" + "<hr />" + "Sent:" + userMessage.SendDate + "<br />" + "<hr />" + userMessage.RawMessage;
+            var replyRawMessage = "<br />" + "<hr />" + "From: " + userMessage.SenderEmail + "<br />" + "<hr />" + "Sent:" + userMessage.SendDate + "<br />" + "<hr />" + userMessage.RawMessage;
 
             var userReplyMessage = new OutboxMessage
             {
@@ -74,7 +82,6 @@ namespace risk.control.system.Services
                 Message = userMessage.Message,
                 RawMessage = replyRawMessage,
                 Read = false,
-
             };
             return userReplyMessage;
         }

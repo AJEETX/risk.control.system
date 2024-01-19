@@ -11,12 +11,16 @@ namespace risk.control.system.Services
     public interface ISentMailService
     {
         Task<IEnumerable<SentMessage>> GetSentMessages(string userEmail);
-        Task<int> SentDelete(List<long> messages, long userId);
-        Task<SentMessage> GetSentMessagedetail(long messageId, string userEmail);
-        Task<SentMessage> GetSentMessagedetailReply(long messageId, string userEmail, string actiontype);
-        Task<bool> SendReplyMessage(SentMessage contactMessage, string userEmail, IFormFile? messageDocument);
 
+        Task<int> SentDelete(List<long> messages, long userId);
+
+        Task<SentMessage> GetSentMessagedetail(long messageId, string userEmail);
+
+        Task<SentMessage> GetSentMessagedetailReply(long messageId, string userEmail, string actiontype);
+
+        Task<bool> SendReplyMessage(SentMessage contactMessage, string userEmail, IFormFile? messageDocument);
     }
+
     public class SentMailService : ISentMailService
     {
         private readonly JsonSerializerOptions options = new()
@@ -24,12 +28,14 @@ namespace risk.control.system.Services
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
+
         private readonly ApplicationDbContext _context;
 
         public SentMailService(ApplicationDbContext context)
         {
             this._context = context;
         }
+
         public async Task<SentMessage> GetSentMessagedetailReply(long messageId, string userEmail, string actiontype)
         {
             var userMailbox = _context.Mailbox
@@ -53,10 +59,10 @@ namespace risk.control.system.Services
                 Message = userMessage.Message,
                 RawMessage = replyRawMessage,
                 Read = false,
-
             };
             return userReplyMessage;
         }
+
         public async Task<SentMessage> GetSentMessagedetail(long messageId, string userEmail)
         {
             var userMailbox = _context.Mailbox
@@ -67,13 +73,13 @@ namespace risk.control.system.Services
             userMessage.Read = true;
             _context.Mailbox.Update(userMailbox);
             var rows = await _context.SaveChangesAsync();
-            return userMessage ;
+            return userMessage;
         }
 
         public async Task<IEnumerable<SentMessage>> GetSentMessages(string userEmail)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Sent).FirstOrDefault(c => c.Name == userEmail);
-            return userMailbox.Sent.OrderByDescending(o => o.SendDate).ToList();
+            return userMailbox.Sent.OrderBy(o => o.SendDate)?.ToList();
         }
 
         public async Task<int> SentDelete(List<long> messages, long userId)
@@ -109,7 +115,7 @@ namespace risk.control.system.Services
 
             var recepientMailbox = _context.Mailbox.FirstOrDefault(c => c.Name == contactMessage.ReceipientEmail);
             contactMessage.SenderEmail = userEmail;
-            contactMessage.SendDate = DateTime.Now;
+            contactMessage.SendDate = DateTime.UtcNow;
             contactMessage.Read = false;
 
             if (recepientMailbox is not null)
@@ -131,7 +137,7 @@ namespace risk.control.system.Services
                     sentMessage.Extension = extension;
                     sentMessage.AttachmentName = messageDocumentFileName;
                 }
-                sentMessage.SendDate = DateTime.Now;
+                sentMessage.SendDate = DateTime.UtcNow;
                 userMailbox.Sent.Add(sentMessage);
                 _context.Mailbox.Attach(userMailbox);
                 _context.Mailbox.Update(userMailbox);
@@ -149,7 +155,7 @@ namespace risk.control.system.Services
                     inboxMessage.Extension = extension;
                     inboxMessage.AttachmentName = messageDocumentFileName;
                 }
-                inboxMessage.SendDate = DateTime.Now;
+                inboxMessage.SendDate = DateTime.UtcNow;
                 recepientMailbox.Inbox.Add(inboxMessage);
                 _context.Mailbox.Attach(recepientMailbox);
                 _context.Mailbox.Update(recepientMailbox);

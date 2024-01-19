@@ -10,11 +10,14 @@ namespace risk.control.system.Services
     public interface ITrashMailService
     {
         Task<IEnumerable<TrashMessage>> GetTrashMessages(string userEmail);
-        Task<int> TrashDelete(List<long> messages, long userId);
-        Task<TrashMessage> GetTrashMessagedetail(long messageId, string userEmail);
-        Task<int> TrashDetailsDelete(long id, string userEmail);
 
+        Task<int> TrashDelete(List<long> messages, long userId);
+
+        Task<TrashMessage> GetTrashMessagedetail(long messageId, string userEmail);
+
+        Task<int> TrashDetailsDelete(long id, string userEmail);
     }
+
     public class TrashMailService : ITrashMailService
     {
         private readonly JsonSerializerOptions options = new()
@@ -22,6 +25,7 @@ namespace risk.control.system.Services
             ReferenceHandler = ReferenceHandler.IgnoreCycles,
             WriteIndented = true
         };
+
         private readonly ApplicationDbContext _context;
 
         public TrashMailService(ApplicationDbContext Context)
@@ -45,7 +49,7 @@ namespace risk.control.system.Services
         public async Task<IEnumerable<TrashMessage>> GetTrashMessages(string userEmail)
         {
             var userMailbox = _context.Mailbox.Include(m => m.Trash).FirstOrDefault(c => c.Name == userEmail);
-            return userMailbox.Trash.OrderByDescending(o => o.SendDate).ToList();
+            return userMailbox.Trash.OrderBy(o => o.SendDate).ToList();
         }
 
         public async Task<int> TrashDelete(List<long> messages, long userId)

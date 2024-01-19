@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers
             }
             var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
 
-            return View(userMailboxMessages.OrderByDescending(o => o.SendDate));
+            return View(userMailboxMessages);
         }
 
         [Breadcrumb("Inbox", FromAction = "Index")]
@@ -70,7 +70,7 @@ namespace risk.control.system.Controllers
             }
             var userMailboxMessages = await inboxMailService.GetInboxMessages(userEmail);
 
-            return View("Index", userMailboxMessages.OrderByDescending(o => o.SendDate));
+            return View("Index", userMailboxMessages);
         }
 
         [Breadcrumb("Delete", FromAction = "Inbox")]
@@ -186,7 +186,7 @@ namespace risk.control.system.Controllers
             }
             var usertrashMessages = await trashMailService.GetTrashMessages(userEmail);
 
-            return View(usertrashMessages.OrderByDescending(o => o.SendDate).ToList());
+            return View(usertrashMessages);
         }
 
         [Breadcrumb("Delete", FromAction = "Trash")]
@@ -253,7 +253,7 @@ namespace risk.control.system.Controllers
             }
             var userMailboxMessages = await sentMailService.GetSentMessages(userEmail);
 
-            return View(userMailboxMessages.OrderByDescending(o => o.SendDate));
+            return View(userMailboxMessages);
         }
 
         [Breadcrumb("Delete", FromAction = "Sent")]
@@ -386,7 +386,7 @@ namespace risk.control.system.Controllers
             }
             var userMailbox = _context.Mailbox.Include(m => m.Outbox).FirstOrDefault(c => c.Name == applicationUser.Email);
 
-            return View(userMailbox.Outbox.OrderByDescending(o => o.SendDate).ToList());
+            return View(userMailbox.Outbox.OrderBy(o => o.SendDate).ToList());
         }
 
         [Breadcrumb("Delete", FromAction = "Outbox")]
