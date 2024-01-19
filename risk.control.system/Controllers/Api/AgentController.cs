@@ -71,7 +71,7 @@ namespace risk.control.system.Controllers.Api
             var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
 
             var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
-                u => u.PhoneNumber == mobile);
+                u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
 
             var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
 
