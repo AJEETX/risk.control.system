@@ -23,6 +23,7 @@ using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace risk.control.system.Controllers.Api
@@ -167,8 +168,18 @@ namespace risk.control.system.Controllers.Api
             {
                 return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
             }
+
+            var image = Convert.FromBase64String(request.Image);
+            var locationRealImage = ByteArrayToImage(image);
+            MemoryStream stream = new MemoryStream(image);
+            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+            CompressImage.Compressimage(stream, filePath);
+
+            var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
+            var saveImageBase64Image2Verify = Convert.ToBase64String(savedImage);
+
             var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
-            var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = request.Image }, FaceMatchBaseUrl);
+            var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = saveImageBase64Image2Verify }, FaceMatchBaseUrl);
 
             if (faceImageDetail == null)
             {
@@ -624,6 +635,13 @@ namespace risk.control.system.Controllers.Api
             await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
 
             return Ok(new { data });
+        }
+
+        private System.Drawing.Image? ByteArrayToImage(byte[] data)
+        {
+            MemoryStream ms = new MemoryStream(data);
+            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
+            return returnImage;
         }
     }
 }

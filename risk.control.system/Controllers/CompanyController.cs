@@ -138,6 +138,9 @@ namespace risk.control.system.Controllers
                         companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                         clientCompany.DocumentUrl = "/company/" + newFileName;
                         clientCompany.Document = companyDocument;
+                        using var dataStream = new MemoryStream();
+                        companyDocument.CopyTo(dataStream);
+                        clientCompany.DocumentImage = dataStream.ToArray();
                     }
                     else
                     {
@@ -181,9 +184,6 @@ namespace risk.control.system.Controllers
 
                     var pinCode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == clientCompany.PinCodeId);
 
-                    //var pinCodeData = await httpClientService.GetPinCodeLatLng(pinCode.Code);
-                    //pinCode.Latitude = pinCodeData.FirstOrDefault()?.Lat.ToString();
-                    //pinCode.Longitude = pinCodeData.FirstOrDefault()?.Lng.ToString();
                     clientCompany.Updated = DateTime.UtcNow;
                     clientCompany.UpdatedBy = HttpContext.User?.Identity?.Name;
                     _context.ClientCompany.Update(clientCompany);

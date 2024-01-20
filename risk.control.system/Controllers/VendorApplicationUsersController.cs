@@ -114,6 +114,10 @@ namespace risk.control.system.Controllers
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 user.ProfilePictureUrl = "/agency/" + newFileName;
+
+                using var dataStream = new MemoryStream();
+                user.ProfileImage.CopyTo(dataStream);
+                user.ProfilePicture = dataStream.ToArray();
             }
             var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             //DEMO
@@ -232,6 +236,9 @@ namespace risk.control.system.Controllers
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                         applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
+                        using var dataStream = new MemoryStream();
+                        applicationUser.ProfileImage.CopyTo(dataStream);
+                        applicationUser.ProfilePicture = dataStream.ToArray();
                     }
 
                     if (user != null)

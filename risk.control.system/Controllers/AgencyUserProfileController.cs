@@ -116,6 +116,9 @@ namespace risk.control.system.Controllers
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                     applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                     applicationUser.ProfilePictureUrl = "/agency/" + newFileName;
+                    using var dataStream = new MemoryStream();
+                    applicationUser.ProfileImage.CopyTo(dataStream);
+                    applicationUser.ProfilePicture = dataStream.ToArray();
                 }
 
                 if (user != null)

@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +10,6 @@ using risk.control.system.Models.ViewModel;
 
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 using risk.control.system.Services;
-using System.Globalization;
 
 namespace risk.control.system.Controllers.Api.Claims
 {
@@ -404,44 +402,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 }
             }
             return Ok();
-        }
-
-        private IQueryable<ClaimsInvestigation> GetClaims()
-        {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-               .Include(c => c.Vendor)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(l => l.PreviousClaimReports)
-                .Where(c => !c.Deleted);
-            return applicationDbContext.OrderBy(o => o.Created);
         }
     }
 }

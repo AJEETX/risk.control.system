@@ -70,6 +70,9 @@ namespace risk.control.system.Controllers
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "img", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 user.ProfilePictureUrl = "/img/" + newFileName;
+                using var dataStream = new MemoryStream();
+                user.ProfileImage.CopyTo(dataStream);
+                user.ProfilePicture = dataStream.ToArray();
             }
             user.EmailConfirmed = true;
             user.Email = user.Email.Trim().ToLower();
@@ -182,6 +185,7 @@ namespace risk.control.system.Controllers
                         user.ProfileImage = applicationUser?.ProfileImage ?? user.ProfileImage;
                         user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
                         user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                        user.ProfilePicture = applicationUser?.ProfilePicture;
                         user.FirstName = applicationUser?.FirstName;
                         user.LastName = applicationUser?.LastName;
                         if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
