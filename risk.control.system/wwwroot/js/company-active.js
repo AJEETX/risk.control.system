@@ -17,7 +17,7 @@
 
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsInvestigation/GetActive',
+            url: '/api/CompanyActiveClaims/GetActive',
             dataSrc: ''
         },
         order: [[11, 'asc']],
@@ -97,5 +97,5 @@
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-    initMap("/api/ClaimsInvestigation/GetActiveMap");
+    initMap("/api/CompanyActiveClaims/GetActiveMap");
 });

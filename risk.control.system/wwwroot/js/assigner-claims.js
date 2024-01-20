@@ -1,7 +1,7 @@
 $(document).ready(function () {
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsInvestigation/GetAssign',
+            url: '/api/CompanyDraftClaims/GetAssign',
             dataSrc: ''
         },
         columnDefs: [{

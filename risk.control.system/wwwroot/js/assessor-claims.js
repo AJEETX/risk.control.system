@@ -17,7 +17,7 @@ $(document).ready(function () {
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsInvestigation/GetAssessor',
+            url: '/api/CompanyAssessClaims/GetAssessor',
             dataSrc: ''
         },
         columnDefs: [{
@@ -145,5 +145,5 @@ $(document).ready(function () {
         });
     });
 
-    initMap("/api/ClaimsInvestigation/GetAssessorMap");
+    initMap("/api/CompanyAssessClaims/GetAssessorMap");
 });

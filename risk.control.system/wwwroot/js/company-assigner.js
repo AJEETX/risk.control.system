@@ -17,7 +17,7 @@
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsInvestigation/GetAssigner',
+            url: '/api/CompanyAssignClaims/GetAssigner',
             dataSrc: ''
         },
         columnDefs: [{
@@ -154,5 +154,5 @@
         });
     });
 
-    initMap("/api/ClaimsInvestigation/GetAssignerMap");
+    initMap("/api/CompanyAssignClaims/GetAssignerMap");
 });

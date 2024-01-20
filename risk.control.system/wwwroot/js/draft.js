@@ -28,7 +28,7 @@
 
     var table = $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsInvestigation/GetAssign',
+            url: '/api/CompanyDraftClaims/GetAssign',
             dataSrc: ''
         },
         columnDefs: [{
@@ -245,4 +245,4 @@ function Delete(userId, status) {
     });
 }
 
-initMap("/api/ClaimsInvestigation/GetAssignMap");
+initMap("/api/CompanyDraftClaims/GetAssignMap");

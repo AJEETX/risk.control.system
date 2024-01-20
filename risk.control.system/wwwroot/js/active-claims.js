@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/ClaimsInvestigation/GetActive',
+            url: '/api/CompanyActiveClaims/GetActive',
             dataSrc: ''
         },
         fixedHeader: true,
