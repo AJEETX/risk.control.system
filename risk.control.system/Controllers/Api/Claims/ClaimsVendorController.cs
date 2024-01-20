@@ -28,32 +28,7 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetOpen")]
         public async Task<IActionResult> GetOpen()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderBy(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -140,36 +115,8 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetOpenMap")]
         public async Task<IActionResult> GetOpenMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.ClientCompany)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CaseEnabler)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.CostCentre)
-               .Include(c => c.CaseLocations)
-               .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                 .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.Country)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.District)
-               .Include(c => c.InvestigationCaseStatus)
-               .Include(c => c.InvestigationCaseSubStatus)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.InvestigationServiceType)
-               .Include(c => c.PolicyDetail)
-               .ThenInclude(c => c.LineOfBusiness)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.PinCode)
-               .Include(c => c.CustomerDetail)
-               .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail.Value);
@@ -262,32 +209,8 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetNew")]
         public async Task<IActionResult> GetNew()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.ClientCompany)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CaseEnabler)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.Country)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.District)
-              .Include(c => c.InvestigationCaseStatus)
-              .Include(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.InvestigationServiceType)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.LineOfBusiness)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderBy(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -373,36 +296,8 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetNewMap")]
         public async Task<IActionResult> GetNewMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.ClientCompany)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CaseEnabler)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                 .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.Country)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.District)
-              .Include(c => c.InvestigationCaseStatus)
-              .Include(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.InvestigationServiceType)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.LineOfBusiness)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -495,32 +390,8 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetReport")]
         public async Task<IActionResult> GetReport()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.ClientCompany)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CaseEnabler)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.Country)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.District)
-              .Include(c => c.InvestigationCaseStatus)
-              .Include(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.InvestigationServiceType)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.LineOfBusiness)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderBy(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -593,36 +464,8 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetReportMap")]
         public async Task<IActionResult> GetReportMap()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.ClientCompany)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CaseEnabler)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.PinCode)
-                 .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.State)
-                .Include(c => c.CaseLocations)
-                .ThenInclude(c => c.District)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.Country)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.District)
-              .Include(c => c.InvestigationCaseStatus)
-              .Include(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.InvestigationServiceType)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.LineOfBusiness)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderByDescending(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -702,32 +545,8 @@ namespace risk.control.system.Controllers.Api.Claims
         [HttpGet("GetCompleted")]
         public async Task<IActionResult> GetCompleted()
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.ClientCompany)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CaseEnabler)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.CostCentre)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.CaseLocations)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.Country)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.District)
-              .Include(c => c.InvestigationCaseStatus)
-              .Include(c => c.InvestigationCaseSubStatus)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.InvestigationServiceType)
-              .Include(c => c.PolicyDetail)
-              .ThenInclude(c => c.LineOfBusiness)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.PinCode)
-              .Include(c => c.CustomerDetail)
-              .ThenInclude(c => c.State)
-                .Where(c => !c.Deleted).OrderBy(c => c.Created);
+            IQueryable<ClaimsInvestigation> applicationDbContext = GetClaims();
+
             var allocatedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -791,6 +610,44 @@ namespace risk.control.system.Controllers.Api.Claims
                     ?.ToList();
 
             return Ok(response);
+        }
+
+        private IQueryable<ClaimsInvestigation> GetClaims()
+        {
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.ClientCompany)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CaseEnabler)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.CostCentre)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.Country)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.District)
+               .Include(c => c.InvestigationCaseStatus)
+               .Include(c => c.InvestigationCaseSubStatus)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.InvestigationServiceType)
+               .Include(c => c.PolicyDetail)
+               .ThenInclude(c => c.LineOfBusiness)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+               .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.State)
+               .Include(c => c.Vendor)
+               .Include(c => c.CaseLocations)
+               .ThenInclude(l => l.PreviousClaimReports)
+                .Where(c => !c.Deleted);
+            return applicationDbContext.OrderBy(o => o.Created);
         }
     }
 }
