@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using NToastNotify;
+
 using NuGet.Packaging.Signing;
 
 using risk.control.system.AppConstant;
@@ -41,6 +43,7 @@ namespace risk.control.system.Controllers.Api
         private readonly IHttpClientService httpClientService;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
+        private readonly IClaimsVendorService vendorService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -54,6 +57,7 @@ namespace risk.control.system.Controllers.Api
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
             UserManager<VendorApplicationUser> userVendorManager,
             IAgentService agentService,
+            IClaimsVendorService vendorService,
             IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService, ILogger<AgentController> logger)
         {
@@ -61,6 +65,7 @@ namespace risk.control.system.Controllers.Api
             this.httpClientService = httpClientService;
             this.userVendorManager = userVendorManager;
             this.agentService = agentService;
+            this.vendorService = vendorService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
@@ -610,6 +615,24 @@ namespace risk.control.system.Controllers.Api
             var response = await iCheckifyService.GetFaceId(data);
 
             return Ok(response);
+        }
+
+        [HttpGet("face-test")]
+        [AllowAnonymous]
+        public async Task<IActionResult> FaceTest(string email = "agent@verify.com")
+        {
+            var userEmail = _context.VendorApplicationUser.FirstOrDefault(a => a.Email == email);
+
+            var assignedClaims = _context.CaseLocation
+                .Include(c => c.ClaimsInvestigation)
+                .Where(c => c.AssignedAgentUserEmail == email && c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
+
+            //POST FACE IMAGE AND DOCUMENT
+            var faceResult = await vendorService.PostFaceId(userEmail.Email, assignedClaims?.FirstOrDefault()?.ClaimsInvestigationId);
+
+            var documentResult = await vendorService.PostDocumentId(userEmail.Email, assignedClaims?.FirstOrDefault()?.ClaimsInvestigationId);
+
+            return Ok(new { faceResult, documentResult });
         }
 
         [AllowAnonymous]

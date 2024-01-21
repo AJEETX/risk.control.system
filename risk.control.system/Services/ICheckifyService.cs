@@ -76,17 +76,14 @@ namespace risk.control.system.Services
             if (!string.IsNullOrWhiteSpace(data.LocationImage))
             {
                 byte[]? registeredImage = null;
-                this.logger.LogInformation("DIGITAL ID : FACE image {LocationImage} ", data.LocationImage);
 
                 if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
                 {
                     registeredImage = claim.CustomerDetail.ProfilePicture;
-                    this.logger.LogInformation("DIGITAL ID : HEALTH image {registeredImage} ", registeredImage);
                 }
                 if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
                 {
                     registeredImage = claimCase.ProfilePicture;
-                    this.logger.LogInformation("DIGITAL ID : DEATH image {registeredImage} ", registeredImage);
                 }
 
                 string ImageData = string.Empty;
@@ -95,24 +92,22 @@ namespace risk.control.system.Services
                     if (registeredImage != null)
                     {
                         var image = Convert.FromBase64String(data.LocationImage);
-                        //var locationRealImage = ByteArrayToImage(image);
+
+                        var locationRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
-                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                        //claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
-                        //CompressImage.Compressimage(stream, filePath);
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
 
-                        //var savedImage = await File.ReadAllBytesAsync(filePath);
+                        var savedImage = await File.ReadAllBytesAsync(filePath);
 
-                        var savedNewImage = CompressImage.Compress(stream.ToArray());
+                        //var savedImage = CompressImage.Compress(stream.ToArray());
 
-                        var saveImageBase64String = Convert.ToBase64String(savedNewImage);
+                        var saveImageBase64String = Convert.ToBase64String(savedImage);
 
                         claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.UtcNow;
-                        this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
 
                         var base64Image = Convert.ToBase64String(registeredImage);
 
-                        this.logger.LogInformation("DIGITAL ID : HEALTH image {base64Image} ", base64Image);
                         try
                         {
                             var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
@@ -220,13 +215,6 @@ namespace risk.control.system.Services
             };
         }
 
-        private System.Drawing.Image? ByteArrayToImage(byte[] data)
-        {
-            MemoryStream ms = new MemoryStream(data);
-            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
-            return returnImage;
-        }
-
         public async Task<AppiCheckifyResponse> GetDocumentId(DocumentData data)
         {
             var claimCase = _context.CaseLocation
@@ -262,16 +250,19 @@ namespace risk.control.system.Services
             {
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
-                var savedNewImage = CompressImage.Compress(byteimage);
+                var locationRealImage = ByteArrayToImage(byteimage);
+                MemoryStream mstream = new MemoryStream(byteimage);
+                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
+                CompressImage.CompressimageWindows(mstream, mfilePath);
 
-                var base64Image = Convert.ToBase64String(savedNewImage);
+                var savedImage = await File.ReadAllBytesAsync(mfilePath);
+
+                var base64Image = Convert.ToBase64String(byteimage);
                 var inputImage = new MaskImage { Image = base64Image };
-
-                this.logger.LogInformation("DOCUMENT ID : PAN image {ocrImage} ", data.OcrImage);
 
                 var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
 
-                this.logger.LogInformation("DOCUMENT ID : PAN maskedImage image {maskedImage} ", maskedImage);
                 if (maskedImage != null)
                 {
                     try
@@ -340,7 +331,6 @@ namespace risk.control.system.Services
                 }
                 else
                 {
-                    this.logger.LogInformation("DOCUMENT ID : PAN maskedImage image {maskedImage} ", maskedImage);
                     var image = Convert.FromBase64String(data.OcrImage);
                     var savedMaskedImage = CompressImage.Compress(image);
 
@@ -409,6 +399,13 @@ namespace risk.control.system.Services
                 FacePercent = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
                 PanValid = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageValid
             };
+        }
+
+        private System.Drawing.Image? ByteArrayToImage(byte[] data)
+        {
+            MemoryStream ms = new MemoryStream(data);
+            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
+            return returnImage;
         }
     }
 }
