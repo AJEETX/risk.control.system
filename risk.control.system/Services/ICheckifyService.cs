@@ -95,7 +95,9 @@ namespace risk.control.system.Services
 
                         var locationRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                        CompressImage.CompressimageWindows(stream, filePath);
+
                         claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
 
                         var savedImage = await File.ReadAllBytesAsync(filePath);
@@ -252,7 +254,7 @@ namespace risk.control.system.Services
 
                 var locationRealImage = ByteArrayToImage(byteimage);
                 MemoryStream mstream = new MemoryStream(byteimage);
-                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
                 CompressImage.CompressimageWindows(mstream, mfilePath);
 
