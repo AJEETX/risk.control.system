@@ -8,6 +8,7 @@ using risk.control.system.Models.ViewModel;
 using risk.control.system.Controllers.Api;
 using risk.control.system.Data;
 using risk.control.system.AppConstant;
+using System.IO;
 
 namespace risk.control.system.Services
 {
@@ -94,15 +95,17 @@ namespace risk.control.system.Services
                     if (registeredImage != null)
                     {
                         var image = Convert.FromBase64String(data.LocationImage);
-                        var locationRealImage = ByteArrayToImage(image);
+                        //var locationRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
-                        CompressImage.Compressimage(stream, filePath);
+                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                        //claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
+                        //CompressImage.Compressimage(stream, filePath);
 
-                        var savedImage = await File.ReadAllBytesAsync(filePath);
-                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = savedImage;
-                        var saveImageBase64String = Convert.ToBase64String(savedImage);
+                        //var savedImage = await File.ReadAllBytesAsync(filePath);
+
+                        var savedNewImage = CompressImage.Compress(stream.ToArray());
+
+                        var saveImageBase64String = Convert.ToBase64String(savedNewImage);
 
                         claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLongLatTime = DateTime.UtcNow;
                         this.logger.LogInformation("DIGITAL ID : saved image {registeredImage} ", registeredImage);
@@ -113,6 +116,8 @@ namespace risk.control.system.Services
                         try
                         {
                             var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
+
+                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(stream.ToArray());
 
                             claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = faceImageDetail?.Confidence;
                         }
@@ -200,13 +205,13 @@ namespace risk.control.system.Services
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claimCase.CaseLocationId,
-                LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport?.DigitalIdReport?.DigitalIdImagePath) ?
-                Convert.ToBase64String(File.ReadAllBytes(claimCase.ClaimReport?.DigitalIdReport?.DigitalIdImagePath)) :
+                LocationImage = claimCase.ClaimReport?.DigitalIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claimCase.ClaimReport?.DigitalIdReport?.DigitalIdImage) :
                 Convert.ToBase64String(noDataimage),
                 LocationLongLat = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat,
                 LocationTime = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime,
-                OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport?.DocumentIdReport?.DocumentIdImagePath) ?
-                Convert.ToBase64String(File.ReadAllBytes(claimCase.ClaimReport?.DocumentIdReport?.DocumentIdImagePath)) :
+                OcrImage = claimCase.ClaimReport?.DocumentIdReport?.DocumentIdImage != null ?
+                Convert.ToBase64String((claimCase.ClaimReport?.DocumentIdReport?.DocumentIdImage)) :
                 Convert.ToBase64String(noDataimage),
                 OcrLongLat = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat,
                 OcrTime = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLatTime,
@@ -257,15 +262,9 @@ namespace risk.control.system.Services
             {
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
-                var locationRealImage = ByteArrayToImage(byteimage);
-                MemoryStream mstream = new MemoryStream(byteimage);
-                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"loc{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
-                CompressImage.Compressimage(mstream, mfilePath);
+                var savedNewImage = CompressImage.Compress(byteimage);
 
-                var savedImage = await File.ReadAllBytesAsync(mfilePath);
-
-                var base64Image = Convert.ToBase64String(savedImage);
+                var base64Image = Convert.ToBase64String(savedNewImage);
                 var inputImage = new MaskImage { Image = base64Image };
 
                 this.logger.LogInformation("DOCUMENT ID : PAN image {ocrImage} ", data.OcrImage);
@@ -314,12 +313,11 @@ namespace risk.control.system.Services
                         #endregion PAN IMAGE PROCESSING
 
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                        var OcrRealImage = ByteArrayToImage(image);
-                        MemoryStream stream = new MemoryStream(image);
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{maskedImage.DocType}{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
-                        CompressImage.Compressimage(stream, filePath);
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = filePath;
+
+                        var savedMaskedImage = CompressImage.ProcessCompress(image);
+
+                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageType = maskedImage.DocType;
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = maskedImage.DocType + " data: ";
@@ -333,12 +331,10 @@ namespace risk.control.system.Services
                     catch (Exception)
                     {
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                        var OcrRealImage = ByteArrayToImage(image);
-                        MemoryStream stream = new MemoryStream(image);
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{maskedImage.DocType}{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = filePath;
-                        CompressImage.Compressimage(stream, filePath);
+                        var savedMaskedImage = CompressImage.Compress(image);
+
+                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
                     }
                 }
@@ -346,12 +342,10 @@ namespace risk.control.system.Services
                 {
                     this.logger.LogInformation("DOCUMENT ID : PAN maskedImage image {maskedImage} ", maskedImage);
                     var image = Convert.FromBase64String(data.OcrImage);
-                    var OcrRealImage = ByteArrayToImage(image);
-                    MemoryStream stream = new MemoryStream(image);
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"ocr{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{OcrRealImage.ImageType()}");
-                    CompressImage.Compressimage(stream, filePath);
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = filePath;
+                    var savedMaskedImage = CompressImage.Compress(image);
+
+                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "no data: ";
                 }
@@ -402,13 +396,13 @@ namespace risk.control.system.Services
             return new AppiCheckifyResponse
             {
                 BeneficiaryId = claimCase.CaseLocationId,
-                LocationImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.DigitalIdReport?.DigitalIdImagePath) ?
-                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.DigitalIdReport?.DigitalIdImagePath)) :
+                LocationImage = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImage != null ?
+                Convert.ToBase64String(claimCase.ClaimReport.DigitalIdReport?.DigitalIdImage) :
                 Convert.ToBase64String(noDataimage),
                 LocationLongLat = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLat,
                 LocationTime = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime,
-                OcrImage = !string.IsNullOrWhiteSpace(claimCase.ClaimReport.DocumentIdReport?.DocumentIdImagePath) ?
-                Convert.ToBase64String(System.IO.File.ReadAllBytes(claimCase.ClaimReport.DocumentIdReport?.DocumentIdImagePath)) :
+                OcrImage = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImage != null ?
+                Convert.ToBase64String(claimCase.ClaimReport.DocumentIdReport?.DocumentIdImage) :
                 Convert.ToBase64String(noDataimage),
                 OcrLongLat = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat,
                 OcrTime = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLatTime,

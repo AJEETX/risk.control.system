@@ -52,6 +52,7 @@ builder.Services.Configure<FormOptions>(x =>
 });
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAgentService, AgentService>();
 builder.Services.AddScoped<IClaimsInvestigationService, ClaimsInvestigationService>();
 builder.Services.AddScoped<IInvestigationReportService, InvestigationReportService>();
 builder.Services.AddScoped<IClaimsVendorService, ClaimsVendorService>();

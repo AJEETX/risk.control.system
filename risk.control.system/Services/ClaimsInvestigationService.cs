@@ -292,11 +292,13 @@ namespace risk.control.system.Services
                         using var dataStream = new MemoryStream();
                         await claimsInvestigation.PolicyDetail.Document.CopyToAsync(dataStream);
 
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"customer-{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{extension}");
-                        CompressImage.Compressimage(dataStream, filePath);
+                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"customer-{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{extension}");
+                        //CompressImage.Compressimage(dataStream, filePath);
 
-                        var savedImage = await File.ReadAllBytesAsync(filePath);
-                        claimsInvestigation.PolicyDetail.DocumentImage = savedImage;
+                        //var savedImage = await File.ReadAllBytesAsync(filePath);
+
+                        var savedNewImage = CompressImage.Compress(dataStream.ToArray());
+                        claimsInvestigation.PolicyDetail.DocumentImage = savedNewImage;
                     }
 
                     if (create)
@@ -387,7 +389,8 @@ namespace risk.control.system.Services
                             existingPolicy.PolicyDetail.Document = claimDocument;
                             using var dataStream = new MemoryStream();
                             await existingPolicy.PolicyDetail.Document.CopyToAsync(dataStream);
-                            existingPolicy.PolicyDetail.DocumentImage = dataStream.ToArray();
+                            var savedNewImage = CompressImage.Compress(dataStream.ToArray());
+                            existingPolicy.PolicyDetail.DocumentImage = savedNewImage;
                         }
 
                         _context.ClaimsInvestigation.Update(existingPolicy);
@@ -445,21 +448,19 @@ namespace risk.control.system.Services
 
                         if (customerDocument is not null)
                         {
-                            var newFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName) + Guid.NewGuid().ToString();
-                            var fileExtension = Path.GetExtension(customerDocument.FileName);
-                            newFileName += fileExtension;
+                            //var newFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName) + Guid.NewGuid().ToString();
+                            //var fileExtension = Path.GetExtension(customerDocument.FileName);
+                            //newFileName += fileExtension;
                             //var upload = Path.Combine(webHostEnvironment.WebRootPath, "document", newFileName);
                             //customerDocument.CopyTo(new FileStream(upload, FileMode.Create));
 
                             using var dataStream = new MemoryStream();
                             customerDocument.CopyTo(dataStream);
 
-                            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{newFileName}");
-                            CompressImage.Compressimage(dataStream, filePath);
+                            var savedNewImage = CompressImage.Compress(dataStream.ToArray());
 
-                            var savedImage = await File.ReadAllBytesAsync(filePath);
-                            existingPolicy.CustomerDetail.ProfilePicture = savedImage;
-                            existingPolicy.CustomerDetail.ProfilePictureUrl = "/document/" + newFileName;
+                            existingPolicy.CustomerDetail.ProfilePicture = savedNewImage;
+                            //existingPolicy.CustomerDetail.ProfilePictureUrl = "/document/" + newFileName;
                         }
 
                         _context.ClaimsInvestigation.Update(existingPolicy);
@@ -507,13 +508,12 @@ namespace risk.control.system.Services
                         using var dataStream = new MemoryStream();
                         await claimsInvestigation.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
 
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{newFileName}");
-                        CompressImage.Compressimage(dataStream, filePath);
+                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{newFileName}");
+                        //CompressImage.Compressimage(dataStream, filePath);
 
-                        var savedImage = await File.ReadAllBytesAsync(filePath);
-                        claimsInvestigation.CustomerDetail.ProfilePicture = savedImage;
+                        var savedNewImage = CompressImage.Compress(dataStream.ToArray());
 
-                        claimsInvestigation.CustomerDetail.ProfilePictureUrl = "/document/" + $"{newFileName}";
+                        claimsInvestigation.CustomerDetail.ProfilePicture = savedNewImage;
                     }
                     if (create)
                     {

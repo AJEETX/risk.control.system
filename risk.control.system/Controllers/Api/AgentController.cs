@@ -40,24 +40,27 @@ namespace risk.control.system.Controllers.Api
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
+        private readonly IAgentService agentService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IICheckifyService iCheckifyService;
-        private static HttpClient httpClient = new();
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
+
         private ILogger<AgentController> logger;
 
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
             UserManager<VendorApplicationUser> userVendorManager,
+            IAgentService agentService,
             IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
             IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService, ILogger<AgentController> logger)
         {
             this._context = context;
             this.httpClientService = httpClientService;
             this.userVendorManager = userVendorManager;
+            this.agentService = agentService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
@@ -66,36 +69,46 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("Compress")]
+        public async Task<IActionResult> Compress(VerifyIdRequest request)
+        {
+            var image = Convert.FromBase64String(request.Image);
+
+            var savedNewImage = CompressImage.Compress(image, 90);
+
+            using var stream = new MemoryStream(savedNewImage);
+
+            var compressedImage = Convert.ToBase64String(savedNewImage);
+
+            return new JsonResult(compressedImage);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("ProcessImage")]
+        public async Task<IActionResult> ProcessImage(VerifyIdRequest request)
+        {
+            var image = Convert.FromBase64String(request.Image);
+
+            var savedNewImage = CompressImage.ProcessCompress(image, 10, 99);
+
+            using var stream = new MemoryStream(savedNewImage);
+
+            stream.CopyTo(new FileStream(Path.Combine(webHostEnvironment.WebRootPath, "form", "test.jpg"), FileMode.Create));
+
+            var compressedImage = Convert.ToBase64String(savedNewImage);
+
+            return new JsonResult(compressedImage);
+        }
+
+        [AllowAnonymous]
         [HttpPost("ResetUid")]
         public async Task<IActionResult> ResetUid(string mobile, bool sendSMS = false)
         {
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+            var user2Onboard = await agentService.ResetUid(mobile, sendSMS);
 
-            var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
-                u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
-
-            var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
-
-            if (user2Onboard == null || !isAgent)
+            if (user2Onboard == null)
             {
                 return BadRequest($"mobile number and/or Agent does not exist");
-            }
-
-            user2Onboard.MobileUId = string.Empty;
-            user2Onboard.SecretPin = string.Empty;
-            _context.VendorApplicationUser.Update(user2Onboard);
-            _context.SaveChanges();
-
-            if (sendSMS)
-            {
-                //SEND SMS
-                string device = "0";
-                long? timestamp = null;
-                bool isMMS = false;
-                string? attachments = null;
-                bool priority = false;
-                string message = $"Uid reset for mobile: {user2Onboard.PhoneNumber}";
-                var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
             }
 
             return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
@@ -170,13 +183,10 @@ namespace risk.control.system.Controllers.Api
             }
 
             var image = Convert.FromBase64String(request.Image);
-            var locationRealImage = ByteArrayToImage(image);
-            MemoryStream stream = new MemoryStream(image);
-            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-            CompressImage.Compressimage(stream, filePath);
 
-            var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
-            var saveImageBase64Image2Verify = Convert.ToBase64String(savedImage);
+            var savedNewImage = CompressImage.Compress(image);
+
+            var saveImageBase64Image2Verify = Convert.ToBase64String(savedNewImage);
 
             var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
             var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = saveImageBase64Image2Verify }, FaceMatchBaseUrl);
@@ -637,7 +647,7 @@ namespace risk.control.system.Controllers.Api
             return Ok(new { data });
         }
 
-        private System.Drawing.Image? ByteArrayToImage(byte[] data)
+        private Image? ByteArrayToImage(byte[] data)
         {
             MemoryStream ms = new MemoryStream(data);
             System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);

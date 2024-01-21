@@ -156,17 +156,12 @@ namespace risk.control.system.Controllers
                 IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
                 if (customerDocument is not null)
                 {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
-                    var extension = Path.GetExtension(customerDocument.FileName);
-                    messageDocumentFileName += extension;
                     using var dataStream = new MemoryStream();
                     customerDocument.CopyTo(dataStream);
-                    var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{messageDocumentFileName}");
-                    CompressImage.Compressimage(dataStream, filePath);
 
-                    var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
-                    caseLocation.ProfilePicture = savedImage;
-                    caseLocation.ProfilePictureUrl = "/document/" + messageDocumentFileName;
+                    var savedNewImage = CompressImage.Compress(dataStream.ToArray());
+
+                    caseLocation.ProfilePicture = savedNewImage;
                 }
                 caseLocation.ClaimsInvestigationId = claimId;
                 var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
@@ -275,17 +270,11 @@ namespace risk.control.system.Controllers
                         IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
                         if (customerDocument is not null)
                         {
-                            var messageDocumentFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName);
-                            var extension = Path.GetExtension(customerDocument.FileName);
-                            messageDocumentFileName += extension;
                             using var dataStream = new MemoryStream();
                             customerDocument.CopyTo(dataStream);
-                            var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{messageDocumentFileName}");
-                            CompressImage.Compressimage(dataStream, filePath);
 
-                            var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
-                            caseLocation.ProfilePicture = savedImage;
-                            caseLocation.ProfilePictureUrl = "/document/" + messageDocumentFileName;
+                            var savedNewImage = CompressImage.Compress(dataStream.ToArray());
+                            caseLocation.ProfilePicture = savedNewImage;
                         }
                         else
                         {

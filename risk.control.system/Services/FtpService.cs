@@ -441,15 +441,9 @@ namespace risk.control.system.Services
 
                             var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "POLICY.jpg");
 
-                            var image = File.ReadAllBytes(policyImagePath);
+                            var savedNewImage = CompressImage.Compress(File.ReadAllBytes(policyImagePath));
 
-                            using MemoryStream stream = new MemoryStream(image);
-
-                            CompressImage.Compressimage(stream, policyImagePath);
-
-                            var savedImage = await File.ReadAllBytesAsync(policyImagePath);
-
-                            dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedImage)}";
+                            dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedNewImage)}";
                             claim.PolicyDetail = new PolicyDetail
                             {
                                 ContractNumber = rowData[0]?.Trim(),
@@ -463,7 +457,7 @@ namespace risk.control.system.Services
                                 CostCentreId = _context.CostCentre.FirstOrDefault(c => c.Code.ToLower() == rowData[8].Trim().ToLower()).CostCentreId,
                                 LineOfBusinessId = _context.LineOfBusiness.FirstOrDefault(l => l.Code.ToLower() == "claims")?.LineOfBusinessId,
                                 ClientCompanyId = companyUser?.ClientCompanyId,
-                                DocumentImage = savedImage,
+                                DocumentImage = savedNewImage,
                             };
 
                             var pinCode = _context.PinCode
@@ -480,9 +474,8 @@ namespace risk.control.system.Services
 
                             var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "CUSTOMER.jpg");
 
-                            var customerImage = File.ReadAllBytes(customerImagePath);
-
-                            dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
+                            var customerNewImage = CompressImage.Compress(File.ReadAllBytes(customerImagePath));
+                            dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerNewImage)}";
 
                             claim.CustomerDetail = new CustomerDetail
                             {
@@ -500,7 +493,7 @@ namespace risk.control.system.Services
                                 StateId = state.StateId,
                                 DistrictId = district.DistrictId,
                                 Description = rowData[20]?.Trim(),
-                                ProfilePicture = customerImage,
+                                ProfilePicture = customerNewImage,
                             };
                             claim.CustomerDetail.PinCode = pinCode;
                             claim.CustomerDetail.PinCode.Latitude = pinCode.Latitude;
@@ -526,8 +519,9 @@ namespace risk.control.system.Services
 
                             var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "BENEFICIARY.jpg");
 
-                            var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
-                            dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
+                            var beneficiaryNewImage = CompressImage.Compress(File.ReadAllBytes(beneficairyImagePath));
+
+                            dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficiaryNewImage)}";
 
                             var beneficairy = new CaseLocation
                             {
@@ -542,7 +536,7 @@ namespace risk.control.system.Services
                                 StateId = beneState.StateId,
                                 CountryId = beneCountry.CountryId,
                                 InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                ProfilePicture = beneficairyImage,
+                                ProfilePicture = beneficiaryNewImage,
                                 Updated = DateTime.UtcNow,
                                 UpdatedBy = userEmail,
                                 Created = DateTime.UtcNow,
