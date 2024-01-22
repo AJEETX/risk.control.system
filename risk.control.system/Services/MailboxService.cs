@@ -37,16 +37,20 @@ namespace risk.control.system.Services
     {
         private static string BaseUrl = string.Empty;
         private static string AgencyBaseUrl = string.Empty;
+        private string FilePath = string.Empty;
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private static HttpClient client = new HttpClient();
 
-        public MailboxService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, UserManager<ClientCompanyApplicationUser> userManager, UserManager<VendorApplicationUser> userVendorManager)
+        public MailboxService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> userManager, UserManager<VendorApplicationUser> userVendorManager)
         {
             this._context = context;
             this.httpContextAccessor = httpContextAccessor;
+            this.webHostEnvironment = webHostEnvironment;
+            FilePath = Path.Combine(webHostEnvironment.WebRootPath, "Templates", "WelcomeTemplate.html");
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
 
@@ -88,7 +92,6 @@ namespace risk.control.system.Services
                 .Include(i => i.InvestigationCaseSubStatus)
                 .FirstOrDefault(v => v.ClaimsInvestigationId == claimsInvestigationId);
 
-            string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
             StreamReader str = new StreamReader(FilePath);
             string MailText = str.ReadToEnd();
             str.Close();
@@ -172,7 +175,6 @@ namespace risk.control.system.Services
                 .Include(i => i.InvestigationCaseSubStatus)
                 .Where(v => claims.Contains(v.ClaimsInvestigationId));
 
-            string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
             StreamReader str = new StreamReader(FilePath);
             string MailText = str.ReadToEnd();
             str.Close();
@@ -274,7 +276,6 @@ namespace risk.control.system.Services
 
                 string claimsUrl = $"{BaseUrl + claimId}";
 
-                string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
                 StreamReader str = new StreamReader(FilePath);
                 string MailText = str.ReadToEnd();
                 str.Close();
@@ -339,7 +340,6 @@ namespace risk.control.system.Services
 
             string claimsUrl = $"{AgencyBaseUrl + claimId}";
 
-            string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
             StreamReader str = new StreamReader(FilePath);
             string MailText = str.ReadToEnd();
             str.Close();
@@ -515,7 +515,6 @@ namespace risk.control.system.Services
 
                 string claimsUrl = $"{BaseUrl + claimId}";
 
-                string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
                 StreamReader str = new StreamReader(FilePath);
                 string MailText = str.ReadToEnd();
                 str.Close();
@@ -587,7 +586,6 @@ namespace risk.control.system.Services
 
                 string claimsUrl = $"{BaseUrl + claimId}";
 
-                string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
                 StreamReader str = new StreamReader(FilePath);
                 string MailText = str.ReadToEnd();
                 str.Close();
@@ -663,7 +661,6 @@ namespace risk.control.system.Services
                 }
             }
             string claimsUrl = $"{AgencyBaseUrl + claimId}";
-            string FilePath = Directory.GetCurrentDirectory() + "\\Templates\\WelcomeTemplate.html";
             StreamReader str = new StreamReader(FilePath);
             string MailText = str.ReadToEnd();
             str.Close();

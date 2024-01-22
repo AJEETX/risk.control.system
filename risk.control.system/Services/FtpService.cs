@@ -24,7 +24,7 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension);
+        Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension, string content);
 
         Task DownloadFtp(string userEmail);
     }
@@ -369,7 +369,7 @@ namespace risk.control.system.Services
             return data;
         }
 
-        public async Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension)
+        public async Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension, string content)
         {
             using var archive = ZipFile.OpenRead(filePath);
 
@@ -383,9 +383,9 @@ namespace risk.control.system.Services
 
             string fileNameWithData = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, "CLAIMS.csv");
 
-            var fileNames = Directory.EnumerateFiles(fileNameWithData);
+            //var fileNames = Directory.EnumerateFiles(fileNameWithData);
 
-            string csvData = await System.IO.File.ReadAllTextAsync(fileNameWithData);
+            string csvData = content;
 
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));

@@ -19,6 +19,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Text;
 using AspNetCoreHero.ToastNotification.Abstractions;
+using System.IO.Compression;
 
 namespace risk.control.system.Controllers
 {
@@ -167,19 +168,33 @@ namespace risk.control.system.Controllers
                 {
                     Directory.CreateDirectory(docPath);
                 }
-                string fileName = Path.GetTempFileName();
+                string fileName = postedFile.FileName;
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(postedFile.FileName);
                 fileNameWithoutExtension += DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss");
 
                 string filePath = Path.Combine(path, fileName);
 
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                using FileStream fs = new FileStream(filePath, FileMode.Create);
+                postedFile.CopyTo(fs);
+                string strClaimsData = string.Empty;
+                using (var stream = postedFile.OpenReadStream())
+                using (var archive = new ZipArchive(stream))
                 {
-                    postedFile.CopyTo(stream);
+                    var innerFile = archive.Entries.FirstOrDefault(e => e.FullName.EndsWith(".csv"));
+
+                    using (var ss = innerFile.Open())
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        ss.CopyTo(memoryStream);
+                        var bytes = memoryStream.ToArray();
+
+                        strClaimsData = Encoding.UTF8.GetString(bytes);
+                    }
                 }
+
                 var userEmail = HttpContext.User.Identity.Name;
 
-                await ftpService.UploadFile(userEmail, filePath, docPath, fileNameWithoutExtension);
+                await ftpService.UploadFile(userEmail, filePath, docPath, fileNameWithoutExtension, strClaimsData);
 
                 await SaveUpload(postedFile, filePath, "File upload", userEmail);
 
