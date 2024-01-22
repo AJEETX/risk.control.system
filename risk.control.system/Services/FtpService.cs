@@ -441,7 +441,8 @@ namespace risk.control.system.Services
 
                             var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "POLICY.jpg");
 
-                            var savedNewImage = CompressImage.Compress(File.ReadAllBytes(policyImagePath));
+                            var savedNewImage = (File.ReadAllBytes(policyImagePath));
+                            //var savedNewImage = CompressImage.Compress(File.ReadAllBytes(policyImagePath));
 
                             dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedNewImage)}";
                             claim.PolicyDetail = new PolicyDetail
@@ -474,7 +475,8 @@ namespace risk.control.system.Services
 
                             var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "CUSTOMER.jpg");
 
-                            var customerNewImage = CompressImage.Compress(File.ReadAllBytes(customerImagePath));
+                            var customerNewImage = (File.ReadAllBytes(customerImagePath));
+                            //var customerNewImage = CompressImage.Compress(File.ReadAllBytes(customerImagePath));
                             dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerNewImage)}";
 
                             claim.CustomerDetail = new CustomerDetail
@@ -519,7 +521,8 @@ namespace risk.control.system.Services
 
                             var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "BENEFICIARY.jpg");
 
-                            var beneficiaryNewImage = CompressImage.Compress(File.ReadAllBytes(beneficairyImagePath));
+                            var beneficiaryNewImage = (File.ReadAllBytes(beneficairyImagePath));
+                            //var beneficiaryNewImage = CompressImage.Compress(File.ReadAllBytes(beneficairyImagePath));
 
                             dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficiaryNewImage)}";
 

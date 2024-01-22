@@ -93,14 +93,13 @@ namespace risk.control.system.Services
                     {
                         var image = Convert.FromBase64String(data.LocationImage);
 
-                        var locationRealImage = ByteArrayToImage(image);
                         MemoryStream stream = new MemoryStream(image);
                         string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
                         if (!Directory.Exists(path))
                         {
                             Directory.CreateDirectory(path);
                         }
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
+                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
                         CompressImage.CompressimageWindows(stream, filePath);
 
                         claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
@@ -257,21 +256,19 @@ namespace risk.control.system.Services
             {
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
-                var locationRealImage = ByteArrayToImage(byteimage);
-                MemoryStream mstream = new MemoryStream(byteimage);
+                MemoryStream stream = new MemoryStream(byteimage);
                 string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
                 if (!Directory.Exists(path))
                 {
                     Directory.CreateDirectory(path);
                 }
-                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{locationRealImage.ImageType()}");
-                CompressImage.CompressimageWindows(mstream, mfilePath);
+                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                CompressImage.CompressimageWindows(stream, mfilePath);
 
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
 
-                //var savedImage = CompressImage.Compress(stream.ToArray());
-
                 var savedImage = await File.ReadAllBytesAsync(mfilePath);
+                //var savedImage = CompressImage.Compress(stream.ToArray());
 
                 var base64Image = Convert.ToBase64String(byteimage);
                 var inputImage = new MaskImage { Image = base64Image };
@@ -414,13 +411,6 @@ namespace risk.control.system.Services
                 FacePercent = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
                 PanValid = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageValid
             };
-        }
-
-        private System.Drawing.Image? ByteArrayToImage(byte[] data)
-        {
-            MemoryStream ms = new MemoryStream(data);
-            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
-            return returnImage;
         }
     }
 }

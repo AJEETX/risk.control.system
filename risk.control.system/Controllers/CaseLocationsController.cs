@@ -154,15 +154,11 @@ namespace risk.control.system.Controllers
                 caseLocation.InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId;
 
                 IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
-                if (customerDocument is not null)
-                {
-                    using var dataStream = new MemoryStream();
-                    customerDocument.CopyTo(dataStream);
 
-                    var savedNewImage = CompressImage.Compress(dataStream.ToArray());
+                using var dataStream = new MemoryStream();
+                customerDocument.CopyTo(dataStream);
+                caseLocation.ProfilePicture = dataStream.ToArray();
 
-                    caseLocation.ProfilePicture = savedNewImage;
-                }
                 caseLocation.ClaimsInvestigationId = claimId;
                 var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
 
@@ -272,9 +268,7 @@ namespace risk.control.system.Controllers
                         {
                             using var dataStream = new MemoryStream();
                             customerDocument.CopyTo(dataStream);
-
-                            var savedNewImage = CompressImage.Compress(dataStream.ToArray());
-                            caseLocation.ProfilePicture = savedNewImage;
+                            caseLocation.ProfilePicture = dataStream.ToArray();
                         }
                         else
                         {

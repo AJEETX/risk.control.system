@@ -286,19 +286,9 @@ namespace risk.control.system.Services
 
                     if (claimDocument is not null)
                     {
-                        var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimDocument.FileName);
-                        var extension = Path.GetExtension(claimDocument.FileName);
-                        claimsInvestigation.PolicyDetail.Document = claimDocument;
                         using var dataStream = new MemoryStream();
-                        await claimsInvestigation.PolicyDetail.Document.CopyToAsync(dataStream);
-
-                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"customer-{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.{extension}");
-                        //CompressImage.Compressimage(dataStream, filePath);
-
-                        //var savedImage = await File.ReadAllBytesAsync(filePath);
-
-                        var savedNewImage = CompressImage.Compress(dataStream.ToArray());
-                        claimsInvestigation.PolicyDetail.DocumentImage = savedNewImage;
+                        claimDocument.CopyTo(dataStream);
+                        claimsInvestigation.PolicyDetail.DocumentImage = dataStream.ToArray();
                     }
 
                     if (create)
@@ -306,7 +296,6 @@ namespace risk.control.system.Services
                         if (claimDocument == null && existingPolicy?.PolicyDetail?.DocumentImage != null)
                         {
                             claimsInvestigation.PolicyDetail.DocumentImage = existingPolicy.PolicyDetail.DocumentImage;
-                            claimsInvestigation.PolicyDetail.Document = existingPolicy.PolicyDetail.Document;
                         }
                         claimsInvestigation.Updated = DateTime.UtcNow;
                         claimsInvestigation.UpdatedBy = userEmail;
@@ -338,7 +327,6 @@ namespace risk.control.system.Services
                         if (claimDocument == null && existingPolicy.PolicyDetail?.DocumentImage != null)
                         {
                             claimsInvestigation.PolicyDetail.DocumentImage = existingPolicy.PolicyDetail.DocumentImage;
-                            claimsInvestigation.PolicyDetail.Document = existingPolicy.PolicyDetail.Document;
                         }
                         var addedClaim = _context.PolicyDetail.Update(claimsInvestigation.PolicyDetail);
                         existingPolicy.PolicyDetail = addedClaim.Entity;
@@ -384,13 +372,9 @@ namespace risk.control.system.Services
 
                         if (claimDocument is not null)
                         {
-                            var messageDocumentFileName = Path.GetFileNameWithoutExtension(claimDocument.FileName);
-                            var extension = Path.GetExtension(claimDocument.FileName);
-                            existingPolicy.PolicyDetail.Document = claimDocument;
                             using var dataStream = new MemoryStream();
-                            await existingPolicy.PolicyDetail.Document.CopyToAsync(dataStream);
-                            var savedNewImage = CompressImage.Compress(dataStream.ToArray());
-                            existingPolicy.PolicyDetail.DocumentImage = savedNewImage;
+                            claimDocument.CopyTo(dataStream);
+                            existingPolicy.PolicyDetail.DocumentImage = dataStream.ToArray();
                         }
 
                         _context.ClaimsInvestigation.Update(existingPolicy);
@@ -448,19 +432,9 @@ namespace risk.control.system.Services
 
                         if (customerDocument is not null)
                         {
-                            //var newFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName) + Guid.NewGuid().ToString();
-                            //var fileExtension = Path.GetExtension(customerDocument.FileName);
-                            //newFileName += fileExtension;
-                            //var upload = Path.Combine(webHostEnvironment.WebRootPath, "document", newFileName);
-                            //customerDocument.CopyTo(new FileStream(upload, FileMode.Create));
-
                             using var dataStream = new MemoryStream();
                             customerDocument.CopyTo(dataStream);
-
-                            var savedNewImage = CompressImage.Compress(dataStream.ToArray());
-
-                            existingPolicy.CustomerDetail.ProfilePicture = savedNewImage;
-                            //existingPolicy.CustomerDetail.ProfilePictureUrl = "/document/" + newFileName;
+                            existingPolicy.CustomerDetail.ProfilePicture = dataStream.ToArray();
                         }
 
                         _context.ClaimsInvestigation.Update(existingPolicy);
@@ -501,19 +475,10 @@ namespace risk.control.system.Services
 
                     if (customerDocument is not null)
                     {
-                        var newFileName = Path.GetFileNameWithoutExtension(customerDocument.FileName) + Guid.NewGuid().ToString();
-                        var fileExtension = Path.GetExtension(customerDocument.FileName);
-                        newFileName += fileExtension;
-
                         using var dataStream = new MemoryStream();
-                        await claimsInvestigation.CustomerDetail.ProfileImage.CopyToAsync(dataStream);
+                        customerDocument.CopyTo(dataStream);
 
-                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "document", $"{newFileName}");
-                        //CompressImage.Compressimage(dataStream, filePath);
-
-                        var savedNewImage = CompressImage.Compress(dataStream.ToArray());
-
-                        claimsInvestigation.CustomerDetail.ProfilePicture = savedNewImage;
+                        claimsInvestigation.CustomerDetail.ProfilePicture = dataStream.ToArray();
                     }
                     if (create)
                     {
