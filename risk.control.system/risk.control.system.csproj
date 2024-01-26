@@ -198,6 +198,7 @@
     <Folder Include="wwwroot\download-file\" />
     <Folder Include="wwwroot\fonts\" />
     <Folder Include="wwwroot\company\" />
+    <Folder Include="wwwroot\onboard\" />
     <Folder Include="wwwroot\verify\" />
     <Folder Include="wwwroot\webfonts\" />
     <Folder Include="wwwroot\upload-case\" />

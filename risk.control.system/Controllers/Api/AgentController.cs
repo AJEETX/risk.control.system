@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -205,15 +206,27 @@ namespace risk.control.system.Controllers.Api
 
                 var image = Convert.FromBase64String(request.Image);
 
-                var savedNewImage = CompressImage.Compress(image);
+                //var savedImage = CompressImage.Compress(image);
+                string path = Path.Combine(webHostEnvironment.WebRootPath, "onboard");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
 
-                var saveImageBase64Image2Verify = Convert.ToBase64String(savedNewImage);
+                using MemoryStream stream = new MemoryStream(image);
+
+                var filePath = Path.Combine(path, $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                CompressImage.CompressimageWindows(stream, filePath);
+
+                var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                var saveImageBase64Image2Verify = Convert.ToBase64String(savedImage);
 
                 var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
 
                 var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = saveImageBase64Image2Verify }, FaceMatchBaseUrl);
 
-                if (faceImageDetail == null)
+                if (faceImageDetail == null || faceImageDetail?.Confidence == null)
                 {
                     return BadRequest("face mismatch");
                 }
