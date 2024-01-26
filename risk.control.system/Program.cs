@@ -211,7 +211,7 @@ app.Use(async (context, next) =>
         "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
         "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
         "frame-src 'none';" +
-        "media-src 'self blob: https:';" +
+        "media-src 'self' blob: https:;" +
         "object-src 'none';" +
         "form-action 'self';" +
         "frame-ancestors 'self' https://maps.googleapis.com;" +

@@ -33,6 +33,7 @@ namespace risk.control.system.Controllers
         private readonly IMailboxService mailboxService;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly INotyfService notifyService;
+        private readonly IClaimsVendorService vendorService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly RoleManager<ApplicationRole> roleManager;
         private readonly IToastNotification toastNotification;
@@ -45,6 +46,7 @@ namespace risk.control.system.Controllers
             IMailboxService mailboxService,
             UserManager<ClientCompanyApplicationUser> userManager,
             INotyfService notifyService,
+            IClaimsVendorService vendorService,
             IWebHostEnvironment webHostEnvironment,
             RoleManager<ApplicationRole> roleManager,
             IToastNotification toastNotification)
@@ -56,6 +58,7 @@ namespace risk.control.system.Controllers
             this.mailboxService = mailboxService;
             this.userManager = userManager;
             this.notifyService = notifyService;
+            this.vendorService = vendorService;
             this.webHostEnvironment = webHostEnvironment;
             this.roleManager = roleManager;
             this.toastNotification = toastNotification;
@@ -112,6 +115,62 @@ namespace risk.control.system.Controllers
 
             viewModel.FilesOnFileSystem = await _context.FilesOnFileSystem.Where(f => f.CompanyId == company.ClientCompanyId).ToListAsync();
             return viewModel;
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage)
+        {
+            if (string.IsNullOrWhiteSpace(selectedcase))
+            {
+                notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-portrait");
+                return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
+            }
+
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Custom($"Ftp Downloaded Claims ready", 3, "green", "fas fa-portrait");
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
+            }
+
+            using var ds = new MemoryStream();
+            digitalImage.CopyTo(ds);
+            var imageByte = ds.ToArray();
+            await vendorService.PostFaceId(userEmail, selectedcase, imageByte);
+
+            notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-portrait");
+            return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage)
+        {
+            if (string.IsNullOrWhiteSpace(selectedclaim))
+            {
+                notifyService.Custom($"No claim selected!!!. ", 3, "orange", "fas fa-mobile-alt");
+                return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
+            }
+
+            var userEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                notifyService.Custom($"Ftp Downloaded Claims ready", 3, "green", "fas fa-mobile-alt");
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
+            }
+
+            using var ds = new MemoryStream();
+            panImage.CopyTo(ds);
+            var imageByte = ds.ToArray();
+            await vendorService.PostDocumentId(userEmail, selectedclaim, imageByte);
+
+            notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-mobile-alt");
+            return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);
         }
 
         [HttpPost]

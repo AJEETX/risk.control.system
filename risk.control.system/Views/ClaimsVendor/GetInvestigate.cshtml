@@ -6,12 +6,7 @@
 
 <section class="content pt-2">
     <div class="container-fluid">
-        <form id="create-form" asp-controller="ClaimsVendorPost" asp-action="SubmitReport" method="post">
-            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-            <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
-            <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-            <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-            <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+            
             <div class="row">
                 <div class="col-md-12">
                     <div id="article" class="card card-secondary">
@@ -26,7 +21,6 @@
                 </div>
             </div>
 
-        </form>
     </div>
 
 </section>

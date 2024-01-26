@@ -1,18 +1,19 @@
 ﻿@model ClaimsInvestigationVendorsModel
                                 
 @{
-    if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null && @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
-    {
-        <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-            <div class="card bg-light d-flex flex-fill">
-                <div class="card-header text-muted border-bottom-0">
+    var imageCapturedTime = @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null ? @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+        <div class="card bg-light d-flex flex-fill">
+            <div class="card-header text-muted border-bottom-0">
 
-                    <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span>
-                    <span class="badge badge-light" style="float:right;">
-                        <i class="nav-icon fas fa-clock"></i>
-                        @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
-                    </span>
-                </div>
+                <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify</span>
+                <span class="badge badge-light" style="float:right;">
+                    <i class="nav-icon fas fa-clock"></i>
+                    @imageCapturedTime
+                </span>
+            </div>
+            @if (@Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+            {
                 <div class="card-footer text-center">
                     <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                     @if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
@@ -53,8 +54,16 @@
                             <p class="text-muted text-sm">
                                 <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
                                 <br />
-                                <img class="img-fluid olocationImage" src="@Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
+                                @if (@Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+                                {
+                                    <img class="img-fluid olocationImage" src="@Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl" />
+                                }
+                                else
+                                {
+                                    <img class="img-fluid no-Image" src="@Applicationsettings.NO_MAP" />
+                                }
                             </p>
+
                             <p class="text-muted text-sm">
 
                                 <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
@@ -64,6 +73,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="card-footer">
                     <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
                     <div id="ocr-map">
@@ -72,7 +82,21 @@
                     </div>
                 </div>
 
-            </div>
+            }
+            <form id="upload-pan" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="selectedclaim" name="selectedclaim" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <div class="card-footer">
+
+                    <div class="form-group">
+                        <span class="input-group-label"> Document Id Upload: </span>
+                        <div class="input-group mb-3">
+                            <img class="form-Image" id="pan-Image" src="@Applicationsettings.NO_IMAGE" title="Document Id Image" />
+                            <input accept=".jpg,jpeg,png" type="file" class="form-control" name="panImage" id="panImage" onchange="document.getElementById('pan-Image').src = window.URL.createObjectURL(this.files[0])" />
+                            <button id="UploadPanImageButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="PanUpload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
-    }
+    </div>
 }

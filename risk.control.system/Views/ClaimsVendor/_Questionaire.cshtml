@@ -2,59 +2,82 @@
                                 
 @{
     var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+       
 
-    <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
-        <div class="card bg-light d-flex flex-fill">
-            <div class="card-header text-muted border-bottom-0">
-                <i class="far fa-comment"></i> Questionnaire <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
-            </div>
-            <div class="card-footer text-muted border-bottom-0">
-                <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
-            </div>
-            <div class="card-body">
-                
-                <div class="row">
-                    
-                    <div class="col-12">
-                        <ul class="ml-4 mb-0 fa-ul text-muted">
-                            <li class="form-group">
-                                Ownership of residence ?
-                                <input maxlength="100" name="question1" id="question1" asp-for="Location.ClaimReport.ReportQuestionaire.Answer1" type="text" class="form-control" placeholder="Ownership of residence..." />
-                            </li>
-                            <li class="form-group">
-                                Perceived financial status ?
-                                <input maxlength="100" name="question2" id="question2" asp-for="Location.ClaimReport.ReportQuestionaire.Answer2" type="text" class="form-control" placeholder="Perceived financial status..." />
-                            </li>
-                            <li class="form-group">
-                                Name of neighbour met ?
-                                <input maxlength="100" name="question3" id="question3" asp-for="Location.ClaimReport.ReportQuestionaire.Answer3" type="text" class="form-control" placeholder="Name of neighbour met..." />
-                            </li>
-                            <li class="form-group">
-                                Date when met with neighbour ?
-                                <input maxlength="100" name="question4" id="question4" asp-for="Location.ClaimReport.ReportQuestionaire.Answer4" type="text" class="form-control" placeholder="Date when met with neighbour..." />
-                            </li>
-                            <li class="form-group">
-                                Remarks
-                                <input maxlength="100" name="remarks" id="remarks" asp-for="Location.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
-                            </li>
-                            <li class="form-group">
-                                <input type="checkbox" id="terms_and_conditions" value="1" />
-                                <label class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>
-                            </li>
-                        </ul>
-                    </div>
+        <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
+            <div class="card bg-light d-flex flex-fill">
+                <div class="card-header text-muted border-bottom-0">
+                    <i class="far fa-comment"></i> Questionnaire <span class="badge badge-light">checkify</span> <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> @questionTime </span>
                 </div>
-            </div>
-            <div class="card-footer">
-                <div class="text-right">
-                    <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                    <button disabled id="submit-case" type="submit" class="btn btn-danger">
-                        <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
-                    </button>
+                <div class="card-footer text-muted border-bottom-0">
+                    <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
                 </div>
+
+                 <form id="create-form" asp-controller="ClaimsVendorPost" asp-action="SubmitReport" method="post">
+                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                    <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
+                    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+                    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+                    <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />  
+
+                    @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null || @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+                    {
+                        <div class="card-body">
+
+                            <div class="row">
+
+                                <div class="col-12">
+                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                        <li class="form-group">
+                                            Ownership of residence ?
+                                            <input maxlength="100" name="question1" id="question1" asp-for="Location.ClaimReport.ReportQuestionaire.Answer1" type="text" class="form-control" placeholder="Ownership of residence..." />
+                                        </li>
+                                        <li class="form-group">
+                                            Perceived financial status ?
+                                            <input maxlength="100" name="question2" id="question2" asp-for="Location.ClaimReport.ReportQuestionaire.Answer2" type="text" class="form-control" placeholder="Perceived financial status..." />
+                                        </li>
+                                        <li class="form-group">
+                                            Name of neighbour met ?
+                                            <input maxlength="100" name="question3" id="question3" asp-for="Location.ClaimReport.ReportQuestionaire.Answer3" type="text" class="form-control" placeholder="Name of neighbour met..." />
+                                        </li>
+                                        <li class="form-group">
+                                            Date when met with neighbour ?
+                                            <input maxlength="100" name="question4" id="question4" asp-for="Location.ClaimReport.ReportQuestionaire.Answer4" type="text" class="form-control" placeholder="Date when met with neighbour..." />
+                                        </li>
+                                        <li class="form-group">
+                                            Remarks
+                                            <input maxlength="100" name="remarks" id="remarks" asp-for="Location.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
+                                        </li>
+                                        <li class="form-group">
+                                            <input type="checkbox" id="terms_and_conditions" value="1" />
+                                            <label class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div class="card-footer">
+                            <div class="text-right">
+                                <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+                                <button disabled id="submit-case" type="submit" class="btn btn-danger">
+                                    <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
+                                </button>
+                            </div>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="card-footer">
+                            <i class="fas fa-mobile-alt"></i>  <span class="badge badge-danger">Capture Image</span>
+                        </div>
+                    }
+                </form>
+
             </div>
         </div>
-    </div>
+
 }
 
 @* <div class="row">

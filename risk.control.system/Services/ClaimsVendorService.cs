@@ -28,9 +28,9 @@ namespace risk.control.system.Services
 
         Task<List<VendorUserClaim>> GetAgentLoad(string userEmail);
 
-        Task<AppiCheckifyResponse> PostFaceId(string userEmail, string claimId);
+        Task<AppiCheckifyResponse> PostFaceId(string userEmail, string claimId, byte[]? image = null);
 
-        Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string claimId);
+        Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string claimId, byte[]? image = null);
     }
 
     public class ClaimsVendorService : IClaimsVendorService
@@ -60,11 +60,11 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string claimId)
+        public async Task<AppiCheckifyResponse> PostDocumentId(string userEmail, string claimId, byte[]? image = null)
         {
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "agency", "pan.jpg");
 
-            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+            var noDataimage = image != null ? image : await File.ReadAllBytesAsync(noDataImagefilePath);
 
             var data = new DocumentData
             {
@@ -77,11 +77,11 @@ namespace risk.control.system.Services
             return result;
         }
 
-        public async Task<AppiCheckifyResponse> PostFaceId(string userEmail, string claimId)
+        public async Task<AppiCheckifyResponse> PostFaceId(string userEmail, string claimId, byte[]? image = null)
         {
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "agency", "ajeet.jpg");
 
-            var noDataimage = await File.ReadAllBytesAsync(noDataImagefilePath);
+            var noDataimage = image != null ? image : await File.ReadAllBytesAsync(noDataImagefilePath);
 
             var data = new FaceData
             {
@@ -313,19 +313,10 @@ namespace risk.control.system.Services
             }
             else
             {
-                var latitude = "-37.839542";
-                var longitude = "145.164834";
-                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-                var latLongString = latitude + "," + longitude;
+                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationAddress = "No Address data";
 
-                RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-
-                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \nElevation(sea level):{weatherData.elevation} metres";
+                string weatherCustomData = $"Temperature:....\nWindspeed:... \nElevation(sea level):...";
                 claimCase.ClaimReport.DigitalIdReport.DigitalIdImageData = weatherCustomData;
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DigitalIdReport.DigitalIdImageLocationUrl = url;
             }
 
             if (claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null)
@@ -353,18 +344,9 @@ namespace risk.control.system.Services
             }
             else
             {
-                var latitude = "-37.839542";
-                var longitude = "145.164834";
-                var latLongString = latitude + "," + longitude;
-                var weatherUrl = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,windspeed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m";
-                var weatherData = await httpClient.GetFromJsonAsync<Weather>(weatherUrl);
-                string weatherCustomData = $"Temperature:{weatherData.current.temperature_2m} {weatherData.current_units.temperature_2m}.\nWindspeed:{weatherData.current.windspeed_10m} {weatherData.current_units.windspeed_10m} \nElevation(sea level):{weatherData.elevation} metres";
+                string weatherCustomData = $"Temperature:....\nWindspeed:... \nElevation(sea level):...";
                 claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = weatherCustomData;
-
-                RootObject rootObject = await httpClientService.GetAddress(latitude, longitude);
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = rootObject.display_name ?? "12 Heathcote Drive Forest Hill VIC 3131";
-                var url = $"https://maps.googleapis.com/maps/api/staticmap?center={latLongString}&zoom=14&size=200x200&maptype=roadmap&markers=color:red%7Clabel:S%7C{latLongString}&key={Applicationsettings.GMAPData}";
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationUrl = url;
+                claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLocationAddress = "No Address data";
             }
 
             var model = new ClaimsInvestigationVendorsModel { Location = claimCase, ClaimsInvestigation = claimsInvestigation };

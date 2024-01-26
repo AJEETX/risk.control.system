@@ -1,21 +1,32 @@
 ﻿$(document).ready(function () {
-    $('#postedFile').on("change", function () {
+    $('#digitalImage').on("change", function () {
         var val = $(this).val(),
-            fbtn = $('#UploadFileButton');
+            fbtn = $('#UploadFaceImageButton');
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
 
-    $('#UploadFileButton').click(function () {
-        //If the checkbox is checked.
-        var report = $('#remarks').val();
-        if ($(this).is(':checked') && report != '') {
-            //Enable the submit button.
-            $('#submit-case').attr("disabled", false);
-        } else {
-            //If it is not checked, disable the button.
-            $('#submit-case').attr("disabled", true);
-        }
+    //$('#UploadFaceImageButton').click(function (e) {
+    //    e.preventDefault();
+    //    var formData = new FormData();
+    //    formData.append('digitalImage', $('#digitalImage')[0].files[0]);
+    //    $.ajax({
+    //        type: "POST",
+    //        url: '/Uploads/FaceUpload',
+    //        data: formData,
+    //        processData: false,
+    //        contentType: false,
+    //    });
+    //});
+
+    $('#panImage').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadPanImageButton');
+        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
+
+    //$('#UploadPanImageButton').click(function (e) {
+    //    e.preventDefault();
+    //});
     $('#audio-start').click(function (e) {
         e.preventDefault();
     });
@@ -119,52 +130,51 @@
     });
 });
 
-const startButton = document.getElementById('audio-start');
-const stopButton = document.getElementById('audio-stop');
-const playButton = document.getElementById('audio-play');
-let output = document.getElementById('audio-output');
-let audioRecorder;
-let audioChunks = [];
-navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(stream => {
-        // Initialize the media recorder object
-        audioRecorder = new MediaRecorder(stream);
+//const startButton = document.getElementById('audio-start');
+//const stopButton = document.getElementById('audio-stop');
+//const playButton = document.getElementById('audio-play');
+//let output = document.getElementById('audio-output');
+//let audioRecorder;
+//let audioChunks = [];
+//navigator.mediaDevices.getUserMedia({ audio: true })
+//    .then(stream => {
+//        // Initialize the media recorder object
+//        audioRecorder = new MediaRecorder(stream);
 
-        // dataavailable event is fired when the recording is stopped
-        audioRecorder.addEventListener('dataavailable', e => {
-            audioChunks.push(e.data);
-        });
+//        // dataavailable event is fired when the recording is stopped
+//        audioRecorder.addEventListener('dataavailable', e => {
+//            audioChunks.push(e.data);
+//        });
 
-        // start recording when the start button is clicked
-        startButton.addEventListener('click', (e) => {
-            e.preventDefault();
+//        // start recording when the start button is clicked
+//        startButton.addEventListener('click', (e) => {
+//            e.preventDefault();
 
-            audioChunks = [];
-            audioRecorder.start();
-            output.innerHTML = 'Recording started! Speak now.';
-        });
+//            audioChunks = [];
+//            audioRecorder.start();
+//            output.innerHTML = 'Recording started! Speak now.';
+//        });
 
-        // stop recording when the stop button is clicked
-        stopButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            audioRecorder.stop();
-            output.innerHTML = 'Recording stopped! Click on the play button to play the recorded audio.';
-        });
+//        // stop recording when the stop button is clicked
+//        stopButton.addEventListener('click', (e) => {
+//            e.preventDefault();
+//            audioRecorder.stop();
+//            output.innerHTML = 'Recording stopped! Click on the play button to play the recorded audio.';
+//        });
 
-        // play the recorded audio when the play button is clicked
-        playButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            const blobObj = new Blob(audioChunks, { type: 'audio/webm' });
-            const audioUrl = URL.createObjectURL(blobObj);
-            const audio = new Audio(audioUrl);
-            audio.play();
-            output.innerHTML = 'Playing the recorded audio!';
-        });
-    }).catch(err => {
-        // If the user denies permission to record audio, then display an error.
-        console.log('Error: ' + err);
-    });
-
+//        // play the recorded audio when the play button is clicked
+//        playButton.addEventListener('click', (e) => {
+//            e.preventDefault();
+//            const blobObj = new Blob(audioChunks, { type: 'audio/webm' });
+//            const audioUrl = URL.createObjectURL(blobObj);
+//            const audio = new Audio(audioUrl);
+//            audio.play();
+//            output.innerHTML = 'Playing the recorded audio!';
+//        });
+//    }).catch(err => {
+//        // If the user denies permission to record audio, then display an error.
+//        console.log('Error: ' + err);
+//    });
 
 //const videostartButton = document.getElementById('video-start');
 //const videostopButton = document.getElementById('video-stop');
