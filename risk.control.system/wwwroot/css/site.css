@@ -69,17 +69,27 @@ button.accept-policy {
     z-index: 10000;
     color: red;
     transform: rotate(-60deg);
-    opacity: 0.1;
+    opacity: 0.7;
     height: 50px;
+}
+
+.coming-soon-watermark {
+    border: 4px solid #ebebef;
+    border-radius: 1rem;
+    padding: 10px 0;
+    margin-bottom: 2rem;
 }
 
 .watermark {
-    height: 50px;
+    height: 2rem;
+    opacity: 0.9;
+    z-index:10000;
 }
 
-.brand-link .brand-image{
-    width:3rem;
+.brand-link .brand-image {
+    width: 3rem;
 }
+
 .brand-image {
     opacity: .8
 }
@@ -163,11 +173,13 @@ table {
     width: .7rem;
     border: none;
 }
+
 .main-rating {
     height: 2rem;
     width: 2rem;
     border: none;
 }
+
 a.table-link {
     width: 100px;
 }
@@ -296,9 +308,11 @@ a.table-link {
 .timer-image {
     height: 1rem;
 }
+
 .action-image {
     height: 1.5rem;
 }
+
 .profile-image {
     height: 110px;
     border: .1px ridge #ccc;
@@ -629,6 +643,7 @@ dl.row {
     color: red;
     padding-bottom: 1rem;
 }
+
 .asterik-style-red {
     font-size: .4rem;
     color: red;
@@ -977,6 +992,7 @@ a.CaseReadyToAssign {
 #map-type {
     float: right;
 }
+
 .profile-country {
     height: 1px;
 }
@@ -993,24 +1009,27 @@ a.CaseReadyToAssign {
 #dataTbl tbody {
     overflow-y: auto;
 }
+
 .bookmark-green {
     font-size: 1.1rem;
 }
-.invoice{
-    padding:2rem;
-}
-.sidebar-mini .nav-sidebar, .sidebar-mini .nav-sidebar .nav-link, .sidebar-mini .nav-sidebar > .nav-header
-{
-    overflow:unset;
-}
-.sidebar-mini.sidebar-collapse .main-sidebar, .sidebar-mini.sidebar-collapse .main-sidebar::before{
-    width:5rem;
-}
-textarea.rating-comment{
-    height:100px !important;
-    min-height:50px !important;
+
+.invoice {
+    padding: 2rem;
 }
 
+.sidebar-mini .nav-sidebar, .sidebar-mini .nav-sidebar .nav-link, .sidebar-mini .nav-sidebar > .nav-header {
+    overflow: unset;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar, .sidebar-mini.sidebar-collapse .main-sidebar::before {
+    width: 5rem;
+}
+
+textarea.rating-comment {
+    height: 100px !important;
+    min-height: 50px !important;
+}
 
 label.account {
     padding-top: 20px;
@@ -1035,17 +1054,21 @@ label.account {
         label.account a:hover {
             text-decoration: none;
         }
+
 table.dataTable thead tr {
     background-color: whitesmoke;
 }
+
 table#customerTable thead tr {
     background-color: whitesmoke;
 }
+
 img.table-profile-image {
     border-radius: 50%;
     height: 2.5rem;
     width: 2.5rem;
 }
+
 img.doc-profile-image {
     height: 2.5rem;
     width: 2.5rem;

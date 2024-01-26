@@ -336,9 +336,9 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index));
             }
             //POST FACE IMAGE AND DOCUMENT
-            await vendorService.PostFaceId(userEmail, selectedcase);
+            //await vendorService.PostFaceId(userEmail, selectedcase);
 
-            await vendorService.PostDocumentId(userEmail, selectedcase);
+            //await vendorService.PostDocumentId(userEmail, selectedcase);
 
             var model = await vendorService.GetInvestigate(userEmail, selectedcase, uploaded);
 

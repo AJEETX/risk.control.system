@@ -116,21 +116,20 @@
         public string OcrLongLat { get; set; }
     }
 
-    public class VendorData
+    public class MediaData
     {
-        public byte[]? Image { get; set; }
+        public IFormFile Uri { get; set; }
         public string Name { get; set; }
-        public string Code { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
-        public string Addressline { get; set; }
-        public string State { get; set; }
-        public string Created { get; set; }
+        public string ClaimId { get; set; }
+        public string Type { get; set; }
     }
 
-    public class VendorDataDataTable
+    public class AudioData : MediaData
     {
-        public List<VendorData> data { get; set; }
+    }
+
+    public class VideoData : MediaData
+    {
     }
 
     public class VerifyMobileRequest

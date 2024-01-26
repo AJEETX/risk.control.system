@@ -17,6 +17,10 @@ namespace risk.control.system.Services
         Task<AppiCheckifyResponse> GetFaceId(FaceData data);
 
         Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
+
+        Task GetAudio(AudioData data);
+
+        Task GetVideo(VideoData data);
     }
 
     public class ICheckifyService : IICheckifyService
@@ -411,6 +415,54 @@ namespace risk.control.system.Services
                 FacePercent = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
                 PanValid = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageValid
             };
+        }
+
+        public async Task GetAudio(AudioData data)
+        {
+            var caseLocation = _context.CaseLocation
+                .Include(c => c.ClaimReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            var claimReport = _context.ClaimReport
+                .Include(c => c.ReportQuestionaire)
+                .FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
+
+            using var dataStream = new MemoryStream();
+            data.Uri.CopyTo(dataStream);
+            string audioDirectory = Path.Combine(webHostEnvironment.WebRootPath, "audio");
+            if (!Directory.Exists(audioDirectory))
+            {
+                Directory.CreateDirectory(audioDirectory);
+            }
+            var audioPath = Path.Combine(audioDirectory, $"{Guid.NewGuid()}.mp3");
+            File.WriteAllBytes(audioPath, dataStream.ToArray());
+            claimReport.ReportQuestionaire.Audio = dataStream.ToArray();
+            claimReport.ReportQuestionaire.AudioUrl = audioPath;
+            _context.ClaimReport.Update(claimReport);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task GetVideo(VideoData data)
+        {
+            var caseLocation = _context.CaseLocation
+                .Include(c => c.ClaimReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            var claimReport = _context.ClaimReport
+                .Include(c => c.ReportQuestionaire)
+                .FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
+
+            using var dataStream = new MemoryStream();
+            data.Uri.CopyTo(dataStream);
+            string videoDirectory = Path.Combine(webHostEnvironment.WebRootPath, "video");
+            if (!Directory.Exists(videoDirectory))
+            {
+                Directory.CreateDirectory(videoDirectory);
+            }
+            var videoPath = Path.Combine(videoDirectory, $"{Guid.NewGuid()}.mp4");
+            File.WriteAllBytes(videoPath, dataStream.ToArray());
+            claimReport.ReportQuestionaire.Video = dataStream.ToArray();
+            claimReport.ReportQuestionaire.VideoUrl = videoPath;
+            _context.ClaimReport.Update(claimReport);
+            await _context.SaveChangesAsync();
         }
     }
 }
