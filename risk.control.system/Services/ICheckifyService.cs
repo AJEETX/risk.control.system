@@ -90,20 +90,20 @@ namespace risk.control.system.Services
                     {
                         var image = Convert.FromBase64String(data.LocationImage);
 
-                        using MemoryStream stream = new MemoryStream(image);
-                        string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                        CompressImage.CompressimageWindows(stream, filePath);
+                        //using MemoryStream stream = new MemoryStream(image);
+                        //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
+                        //if (!Directory.Exists(path))
+                        //{
+                        //    Directory.CreateDirectory(path);
+                        //}
+                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                        //CompressImage.CompressimageWindows(stream, filePath);
 
-                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
+                        //claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
 
-                        var savedImage = await File.ReadAllBytesAsync(filePath);
+                        //var savedImage = await File.ReadAllBytesAsync(filePath);
 
-                        //var savedImage = CompressImage.Compress(stream.ToArray());
+                        var savedImage = ImageCompression.Converter(image);
 
                         var saveImageBase64String = Convert.ToBase64String(savedImage);
 
@@ -115,7 +115,7 @@ namespace risk.control.system.Services
                         {
                             var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
 
-                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(stream.ToArray());
+                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(image);
 
                             claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = faceImageDetail?.Confidence;
                         }
@@ -253,19 +253,19 @@ namespace risk.control.system.Services
             {
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
-                MemoryStream stream = new MemoryStream(byteimage);
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                CompressImage.CompressimageWindows(stream, mfilePath);
+                //MemoryStream stream = new MemoryStream(byteimage);
+                //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
+                //if (!Directory.Exists(path))
+                //{
+                //    Directory.CreateDirectory(path);
+                //}
+                //var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                //CompressImage.CompressimageWindows(stream, mfilePath);
 
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
+                //claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
 
-                var savedImage = await File.ReadAllBytesAsync(mfilePath);
-                //var savedImage = CompressImage.Compress(stream.ToArray());
+                //var savedImage = await File.ReadAllBytesAsync(mfilePath);
+                var savedImage = ImageCompression.Converter(byteimage);
 
                 var base64Image = Convert.ToBase64String(savedImage);
                 var inputImage = new MaskImage { Image = base64Image };
@@ -331,9 +331,8 @@ namespace risk.control.system.Services
                     catch (Exception)
                     {
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                        var savedMaskedImage = CompressImage.Compress(image);
 
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
 
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
                     }
@@ -341,9 +340,8 @@ namespace risk.control.system.Services
                 else
                 {
                     var image = Convert.FromBase64String(data.OcrImage);
-                    var savedMaskedImage = CompressImage.Compress(image);
 
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
 
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "no data: ";
