@@ -19,6 +19,56 @@ namespace risk.control.system.Helpers
 {
     public static class CompressImage
     {
+        public static byte[] CompressimageWindowsStream(Stream srcImgStream)
+        {
+            try
+            {
+                // Convert stream to image
+                //using var image = System.Drawing.Image.FromStream(srcImgStream);
+
+                float maxHeight = 900.0f;
+                float maxWidth = 900.0f;
+                int newWidth;
+                int newHeight;
+
+                var originalBMP = new Bitmap(srcImgStream);
+                int originalWidth = originalBMP.Width;
+                int originalHeight = originalBMP.Height;
+
+                if (originalWidth > maxWidth || originalHeight > maxHeight)
+                {
+                    // To preserve the aspect ratio
+                    float ratioX = (float)maxWidth / (float)originalWidth;
+                    float ratioY = (float)maxHeight / (float)originalHeight;
+                    float ratio = Math.Min(ratioX, ratioY);
+                    newWidth = (int)(originalWidth * ratio);
+                    newHeight = (int)(originalHeight * ratio);
+                }
+                else
+                {
+                    newWidth = (int)originalWidth;
+                    newHeight = (int)originalHeight;
+                }
+
+                var bitmap = new Bitmap(originalBMP, newWidth, newHeight);
+                var imgGraph = Graphics.FromImage(bitmap);
+
+                imgGraph.SmoothingMode = SmoothingMode.Default;
+                imgGraph.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                imgGraph.DrawImage(originalBMP, 0, 0, newWidth, newHeight);
+                using var ms = new MemoryStream();
+                bitmap.Save(ms, ImageFormat.Png);
+                bitmap.Dispose();
+                imgGraph.Dispose();
+                originalBMP.Dispose();
+                return ms.ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public static void CompressimageWindows(Stream srcImgStream, string targetPath)
         {
             try

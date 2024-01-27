@@ -20,8 +20,7 @@
                     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
                     <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />  
 
-                    @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null || @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
-                    {
+                    
                         <div class="card-body">
 
                             <div class="row">
@@ -60,19 +59,23 @@
                         <div class="card-footer">
                             <div class="text-right">
                                 <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
-                                <button disabled id="submit-case" type="submit" class="btn btn-danger">
-                                    <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
-                                </button>
+                                @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+                                {
+                                    <button disabled id="submit-case" type="submit" class="btn btn-danger">
+                                        <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
+                                    </button>
+                                }
+                                else
+                        {
+                            <button disabled id="incomplete-case" type="submit" class="btn btn-danger">
+                                <i class="fa fa-binoculars" aria-hidden="true"></i> Submit
+                            </button>
+                        }
+
                             </div>
                         </div>
 
-                    }
-                    else
-                    {
-                        <div class="card-footer">
-                            <i class="fas fa-mobile-alt"></i>  <span class="badge badge-danger">Capture Image</span>
-                        </div>
-                    }
+                    
                 </form>
 
             </div>

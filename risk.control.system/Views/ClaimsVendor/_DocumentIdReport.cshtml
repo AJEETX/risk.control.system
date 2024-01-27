@@ -12,8 +12,7 @@
                     @imageCapturedTime
                 </span>
             </div>
-            @if (@Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
-            {
+            
                 <div class="card-footer text-center">
                     <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
                     @if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
@@ -73,7 +72,8 @@
                         </div>
                     </div>
                 </div>
-
+            @if (@Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+            {
                 <div class="card-footer">
                     <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
                     <div id="ocr-map">
@@ -84,6 +84,8 @@
 
             }
             <form id="upload-pan" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="documentIdLatitude" name="documentIdLatitude" />
+                <input type="hidden" id="documentIdLongitude" name="documentIdLongitude" />
                 <input type="hidden" id="selectedclaim" name="selectedclaim" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                 <div class="card-footer">
 

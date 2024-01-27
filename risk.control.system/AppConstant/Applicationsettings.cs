@@ -26,6 +26,8 @@
         public static readonly string FTP_SITE_LOG = "holosync";
         public static readonly string FTP_SITE_DATA = "C0##ect10n";
 
+        public static readonly string IP_SITE = "http://ip-api.com/json/";
+
         //LOGIN
         public const string WEBSITE_LOGIN = "Log in: iCheckify";
 

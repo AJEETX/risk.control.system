@@ -13,8 +13,7 @@
                     @imageCapturedTime
                 </span>
             </div>
-            @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
-            {
+            
                 <div class="card-footer text-center">
                     <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
                     @if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
@@ -73,7 +72,8 @@
                         </div>
                     </div>
                 </div>
-
+            @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
+            {
                 <div class="card-footer">
                     <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
                     <div id="face-map">
@@ -83,7 +83,9 @@
                 </div>
 
             }
-            <form id="upload-face" method="post" enctype="multipart/form-data">
+            <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="digitalIdLatitude" name="digitalIdLatitude" />
+                <input type="hidden" id="digitalIdLongitude" name="digitalIdLongitude" />
                 <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                 <div class="card-footer">
 
@@ -92,7 +94,7 @@
                         <div class="input-group mb-3">
                             <img class="form-Image" id="face-Image" src="@Applicationsettings.NO_USER" title="Digital Id Image" />
                             <input accept=".jpg,jpeg,png" type="file" class="form-control" name="digitalImage" id="digitalImage" onchange="document.getElementById('face-Image').src = window.URL.createObjectURL(this.files[0])" />
-                            <button id="UploadFaceImageButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FaceUpload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                            <button id="UploadFaceImageButton" disabled type="submit" class="btn btn-info" ><i class="nav-icon fa fa-upload"></i> Upload</button>
                         </div>
                     </div>
                 </div>

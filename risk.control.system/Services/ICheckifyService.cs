@@ -27,22 +27,15 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
-        private readonly IClaimsInvestigationService claimsInvestigationService;
-        private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
 
-        private ILogger<AgentController> logger;
-
         //test PAN FNLPM8635N
-        public ICheckifyService(ApplicationDbContext context, IHttpClientService httpClientService, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment, ILogger<AgentController> logger)
+        public ICheckifyService(ApplicationDbContext context, IHttpClientService httpClientService, IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
             this.httpClientService = httpClientService;
-            this.claimsInvestigationService = claimsInvestigationService;
-            this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
-            this.logger = logger;
         }
 
         public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
@@ -97,7 +90,7 @@ namespace risk.control.system.Services
                     {
                         var image = Convert.FromBase64String(data.LocationImage);
 
-                        MemoryStream stream = new MemoryStream(image);
+                        using MemoryStream stream = new MemoryStream(image);
                         string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
                         if (!Directory.Exists(path))
                         {

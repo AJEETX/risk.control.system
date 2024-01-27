@@ -119,7 +119,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage)
+        public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
             {
@@ -135,11 +135,10 @@ namespace risk.control.system.Controllers
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
                 return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
             }
-
             using var ds = new MemoryStream();
             digitalImage.CopyTo(ds);
             var imageByte = ds.ToArray();
-            await vendorService.PostFaceId(userEmail, selectedcase, imageByte);
+            await vendorService.PostFaceId(userEmail, selectedcase, digitalIdLatitude, digitalIdLongitude, imageByte);
 
             notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-portrait");
             return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedcase);
@@ -147,7 +146,7 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage)
+        public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude)
         {
             if (string.IsNullOrWhiteSpace(selectedclaim))
             {
@@ -167,7 +166,7 @@ namespace risk.control.system.Controllers
             using var ds = new MemoryStream();
             panImage.CopyTo(ds);
             var imageByte = ds.ToArray();
-            await vendorService.PostDocumentId(userEmail, selectedclaim, imageByte);
+            await vendorService.PostDocumentId(userEmail, selectedclaim, documentIdLatitude, documentIdLongitude, imageByte);
 
             notifyService.Custom($"Digital Id Image Uploaded", 3, "green", "fas fa-mobile-alt");
             return Redirect("/ClaimsVendor/GetInvestigate?selectedcase=" + selectedclaim);

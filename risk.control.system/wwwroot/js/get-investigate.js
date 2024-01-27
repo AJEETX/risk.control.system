@@ -1,21 +1,51 @@
 ﻿$(document).ready(function () {
+    let askConfirmation = false;
     $('#digitalImage').on("change", function () {
         var val = $(this).val(),
             fbtn = $('#UploadFaceImageButton');
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success);
+    } else {
+        alert("There is Some Problem on your current browser to get Geo Location!");
+    }
 
+    function success(position) {
+        var coordinates = position.coords;
+        $('#digitalIdLatitude').val(coordinates.latitude);
+        $('#digitalIdLongitude').val(coordinates.longitude);
+
+        $('#documentIdLatitude').val(coordinates.latitude);
+        $('#documentIdLongitude').val(coordinates.longitude);
+    }
     //$('#UploadFaceImageButton').click(function (e) {
     //    e.preventDefault();
-    //    var formData = new FormData();
-    //    formData.append('digitalImage', $('#digitalImage')[0].files[0]);
-    //    $.ajax({
-    //        type: "POST",
-    //        url: '/Uploads/FaceUpload',
-    //        data: formData,
-    //        processData: false,
-    //        contentType: false,
-    //    });
+    //    //if (!askConfirmation) {
+    //    //    $.confirm({
+    //    //        title: "Confirm Digital Id upload",
+    //    //        content: "Are you sure?",
+    //    //        icon: 'fas fa-portrait',
+    //    //        columnClass: 'medium',
+    //    //        type: 'red',
+    //    //        closeIcon: true,
+    //    //        buttons: {
+    //    //            confirm: {
+    //    //                text: "Submit",
+    //    //                btnClass: 'btn-danger',
+    //    //                action: function () {
+    //    //                    askConfirmation = true;
+    //    //                    $('#upload-face').submit();
+    //    //                }
+    //    //            },
+    //    //            cancel: {
+    //    //                text: "Cancel",
+    //    //                btnClass: 'btn-default'
+    //    //            }
+    //    //        }
+    //    //    });
+    //    //}
+
     //});
 
     $('#panImage').on("change", function () {
@@ -27,24 +57,7 @@
     //$('#UploadPanImageButton').click(function (e) {
     //    e.preventDefault();
     //});
-    $('#audio-start').click(function (e) {
-        e.preventDefault();
-    });
-    $('#audio-stop').click(function (e) {
-        e.preventDefault();
-    });
-    $('#audio-play').click(function (e) {
-        e.preventDefault();
-    });
-    $('#video-play').click(function (e) {
-        e.preventDefault();
-    });
-    $('#video-stop').click(function (e) {
-        e.preventDefault();
-    });
-    $('#video-play').click(function (e) {
-        e.preventDefault();
-    });
+
     $('#terms_and_conditions').click(function () {
         //If the checkbox is checked.
         var report = $('#remarks').val();
@@ -77,7 +90,6 @@
             $('#submit-case').attr("disabled", true);
         }
     })
-    let askConfirmation = false;
     $('#create-form').on('submit', function (e) {
         var report = $('#remarks').val();
 

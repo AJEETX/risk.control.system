@@ -75,38 +75,6 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpPost("Compress")]
-        public async Task<IActionResult> Compress(VerifyIdRequest request)
-        {
-            var image = Convert.FromBase64String(request.Image);
-
-            var savedNewImage = CompressImage.Compress(image, 90);
-
-            using var stream = new MemoryStream(savedNewImage);
-
-            var compressedImage = Convert.ToBase64String(savedNewImage);
-
-            return new JsonResult(compressedImage);
-        }
-
-        [AllowAnonymous]
-        [HttpPost("ProcessImage")]
-        public async Task<IActionResult> ProcessImage(VerifyIdRequest request)
-        {
-            var image = Convert.FromBase64String(request.Image);
-
-            var savedNewImage = CompressImage.ProcessCompress(image, 10, 99);
-
-            using var stream = new MemoryStream(savedNewImage);
-
-            stream.CopyTo(new FileStream(Path.Combine(webHostEnvironment.WebRootPath, "form", "test.jpg"), FileMode.Create));
-
-            var compressedImage = Convert.ToBase64String(savedNewImage);
-
-            return new JsonResult(compressedImage);
-        }
-
-        [AllowAnonymous]
         [HttpPost("ResetUid")]
         public async Task<IActionResult> ResetUid(string mobile, bool sendSMS = false)
         {
@@ -659,23 +627,6 @@ namespace risk.control.system.Controllers.Api
             return Ok(response);
         }
 
-        [HttpGet("face-test")]
-        [AllowAnonymous]
-        public async Task<IActionResult> FaceTest(string email = "agent@verify.com")
-        {
-            var userEmail = _context.VendorApplicationUser.FirstOrDefault(a => a.Email == email);
-
-            var assignedClaims = _context.CaseLocation
-                .Include(c => c.ClaimsInvestigation)
-                .Where(c => c.AssignedAgentUserEmail == email && c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            //POST FACE IMAGE AND DOCUMENT
-            var faceResult = await vendorService.PostFaceId(userEmail.Email, assignedClaims?.FirstOrDefault()?.ClaimsInvestigationId);
-
-            var documentResult = await vendorService.PostDocumentId(userEmail.Email, assignedClaims?.FirstOrDefault()?.ClaimsInvestigationId);
-
-            return Ok(new { faceResult, documentResult });
-        }
 
         [AllowAnonymous]
         [RequestSizeLimit(100_000_000)]
