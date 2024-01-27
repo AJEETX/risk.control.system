@@ -142,51 +142,55 @@
     });
 });
 
-//const startButton = document.getElementById('audio-start');
-//const stopButton = document.getElementById('audio-stop');
-//const playButton = document.getElementById('audio-play');
-//let output = document.getElementById('audio-output');
-//let audioRecorder;
-//let audioChunks = [];
-//navigator.mediaDevices.getUserMedia({ audio: true })
-//    .then(stream => {
-//        // Initialize the media recorder object
-//        audioRecorder = new MediaRecorder(stream);
+var nodes = document.getElementById("audio-video").getElementsByTagName('*');
+for (var i = 0; i < nodes.length; i++) {
+    nodes[i].disabled = true;
+}
+const startButton = document.getElementById('audio-start');
+const stopButton = document.getElementById('audio-stop');
+const playButton = document.getElementById('audio-play');
+let output = document.getElementById('audio-output');
+let audioRecorder;
+let audioChunks = [];
+navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+        // Initialize the media recorder object
+        audioRecorder = new MediaRecorder(stream);
 
-//        // dataavailable event is fired when the recording is stopped
-//        audioRecorder.addEventListener('dataavailable', e => {
-//            audioChunks.push(e.data);
-//        });
+        // dataavailable event is fired when the recording is stopped
+        audioRecorder.addEventListener('dataavailable', e => {
+            audioChunks.push(e.data);
+        });
 
-//        // start recording when the start button is clicked
-//        startButton.addEventListener('click', (e) => {
-//            e.preventDefault();
+        // start recording when the start button is clicked
+        startButton.addEventListener('click', (e) => {
+            e.preventDefault();
 
-//            audioChunks = [];
-//            audioRecorder.start();
-//            output.innerHTML = 'Recording started! Speak now.';
-//        });
+            audioChunks = [];
+            audioRecorder.start();
+            output.innerHTML = 'Recording started! Speak now.';
+        });
 
-//        // stop recording when the stop button is clicked
-//        stopButton.addEventListener('click', (e) => {
-//            e.preventDefault();
-//            audioRecorder.stop();
-//            output.innerHTML = 'Recording stopped! Click on the play button to play the recorded audio.';
-//        });
+        // stop recording when the stop button is clicked
+        stopButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            audioRecorder.stop();
+            output.innerHTML = 'Recording stopped! Click on the play button to play the recorded audio.';
+        });
 
-//        // play the recorded audio when the play button is clicked
-//        playButton.addEventListener('click', (e) => {
-//            e.preventDefault();
-//            const blobObj = new Blob(audioChunks, { type: 'audio/webm' });
-//            const audioUrl = URL.createObjectURL(blobObj);
-//            const audio = new Audio(audioUrl);
-//            audio.play();
-//            output.innerHTML = 'Playing the recorded audio!';
-//        });
-//    }).catch(err => {
-//        // If the user denies permission to record audio, then display an error.
-//        console.log('Error: ' + err);
-//    });
+        // play the recorded audio when the play button is clicked
+        playButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const blobObj = new Blob(audioChunks, { type: 'audio/webm' });
+            const audioUrl = URL.createObjectURL(blobObj);
+            const audio = new Audio(audioUrl);
+            audio.play();
+            output.innerHTML = 'Playing the recorded audio!';
+        });
+    }).catch(err => {
+        // If the user denies permission to record audio, then display an error.
+        console.log('Error: ' + err);
+    });
 
 //const videostartButton = document.getElementById('video-start');
 //const videostopButton = document.getElementById('video-stop');

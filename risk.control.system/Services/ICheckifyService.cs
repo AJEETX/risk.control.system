@@ -267,7 +267,7 @@ namespace risk.control.system.Services
                 var savedImage = await File.ReadAllBytesAsync(mfilePath);
                 //var savedImage = CompressImage.Compress(stream.ToArray());
 
-                var base64Image = Convert.ToBase64String(byteimage);
+                var base64Image = Convert.ToBase64String(savedImage);
                 var inputImage = new MaskImage { Image = base64Image };
 
                 var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
