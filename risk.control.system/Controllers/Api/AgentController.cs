@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -74,98 +75,80 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpPost("Compress")]
-        public async Task<IActionResult> Compress(VerifyIdRequest request)
-        {
-            var image = Convert.FromBase64String(request.Image);
-
-            var savedNewImage = CompressImage.Compress(image, 90);
-
-            using var stream = new MemoryStream(savedNewImage);
-
-            var compressedImage = Convert.ToBase64String(savedNewImage);
-
-            return new JsonResult(compressedImage);
-        }
-
-        [AllowAnonymous]
-        [HttpPost("ProcessImage")]
-        public async Task<IActionResult> ProcessImage(VerifyIdRequest request)
-        {
-            var image = Convert.FromBase64String(request.Image);
-
-            var savedNewImage = CompressImage.ProcessCompress(image, 10, 99);
-
-            using var stream = new MemoryStream(savedNewImage);
-
-            stream.CopyTo(new FileStream(Path.Combine(webHostEnvironment.WebRootPath, "form", "test.jpg"), FileMode.Create));
-
-            var compressedImage = Convert.ToBase64String(savedNewImage);
-
-            return new JsonResult(compressedImage);
-        }
-
-        [AllowAnonymous]
         [HttpPost("ResetUid")]
         public async Task<IActionResult> ResetUid(string mobile, bool sendSMS = false)
         {
-            var user2Onboard = await agentService.ResetUid(mobile, sendSMS);
+            try
+            {
+                var user2Onboard = await agentService.ResetUid(mobile, sendSMS);
 
-            if (user2Onboard == null)
+                if (user2Onboard == null)
+                {
+                    return BadRequest($"mobile number and/or Agent does not exist");
+                }
+
+                return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
+            }
+            catch (Exception)
             {
                 return BadRequest($"mobile number and/or Agent does not exist");
             }
-
-            return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
         }
 
         [AllowAnonymous]
         [HttpPost("VerifyMobile")]
         public async Task<IActionResult> VerifyMobile(VerifyMobileRequest request)
         {
-            if (request is null || string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
+            try
             {
-                return BadRequest($"{nameof(request.Mobile)} {request.Uid} and/or {nameof(request.Mobile)} {request.Uid} invalid");
-            }
-            if (request.CheckUid)
-            {
-                var mobileUidExist = _context.VendorApplicationUser.Any(
-                                v => v.MobileUId == request.Uid);
-                if (mobileUidExist)
+                if (request is null || string.IsNullOrWhiteSpace(request.Mobile) || request.Mobile.Length < 11 || string.IsNullOrWhiteSpace(request.Uid) || request.Uid.Length < 5)
                 {
-                    return BadRequest($"{nameof(request.Uid)} {request.Uid} exists");
+                    return BadRequest($"{nameof(request.Mobile)} {request.Uid} and/or {nameof(request.Mobile)} {request.Uid} invalid");
                 }
-            }
-
-            var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
-            var user2Onboards = _context.VendorApplicationUser.Where(
-                u => u.PhoneNumber == request.Mobile);
-            foreach (var user2Onboard in user2Onboards)
-            {
-                var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
-
-                if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId))
+                if (request.CheckUid)
                 {
-                    user2Onboard.MobileUId = request.Uid;
-                    user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
-                    _context.VendorApplicationUser.Update(user2Onboard);
-                    _context.SaveChanges();
-                    if (request.SendSMS)
+                    var mobileUidExist = _context.VendorApplicationUser.Any(
+                                    v => v.MobileUId == request.Uid);
+                    if (mobileUidExist)
                     {
-                        //SEND SMS
-                        string device = "0";
-                        long? timestamp = null;
-                        bool isMMS = false;
-                        string? attachments = null;
-                        bool priority = false;
-                        string message = $"Pin : {user2Onboard.SecretPin}";
-                        var response = SMS.API.SendSingleMessage("+" + request.Mobile, message, device, timestamp, isMMS, attachments, priority);
+                        return BadRequest($"{nameof(request.Uid)} {request.Uid} exists");
                     }
-
-                    return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
                 }
+
+                var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
+                var user2Onboards = _context.VendorApplicationUser.Where(
+                    u => u.PhoneNumber == request.Mobile);
+                foreach (var user2Onboard in user2Onboards)
+                {
+                    var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+
+                    if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId))
+                    {
+                        user2Onboard.MobileUId = request.Uid;
+                        user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
+                        _context.VendorApplicationUser.Update(user2Onboard);
+                        _context.SaveChanges();
+                        if (request.SendSMS)
+                        {
+                            //SEND SMS
+                            string device = "0";
+                            long? timestamp = null;
+                            bool isMMS = false;
+                            string? attachments = null;
+                            bool priority = false;
+                            string message = $"Pin : {user2Onboard.SecretPin}";
+                            var response = SMS.API.SendSingleMessage("+" + request.Mobile, message, device, timestamp, isMMS, attachments, priority);
+                        }
+
+                        return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
+                    }
+                }
+                return BadRequest($"Err");
             }
-            return BadRequest($"Err");
+            catch (Exception)
+            {
+                return BadRequest($"mobile number and/or Agent does not exist");
+            }
         }
 
         [AllowAnonymous]
@@ -173,34 +156,54 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("VerifyId")]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
         {
-            if (request is null || string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
+            try
             {
-                return BadRequest();
-            }
-            var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
-            if (mobileUidExist == null)
-            {
-                return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
-            }
-            if (!request.VerifyId)
-            {
+                if (request is null || string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
+                {
+                    return BadRequest();
+                }
+                var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
+                if (mobileUidExist == null)
+                {
+                    return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
+                }
+                if (!request.VerifyId)
+                {
+                    return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+                }
+
+                var image = Convert.FromBase64String(request.Image);
+
+                var savedImage = ImageCompression.Converter(image);
+                //string path = Path.Combine(webHostEnvironment.WebRootPath, "onboard");
+                //if (!Directory.Exists(path))
+                //{
+                //    Directory.CreateDirectory(path);
+                //}
+
+                //using MemoryStream stream = new MemoryStream(image);
+
+                //var filePath = Path.Combine(path, $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                //CompressImage.CompressimageWindows(stream, filePath);
+
+                //var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                var saveImageBase64Image2Verify = Convert.ToBase64String(savedImage);
+
+                var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
+
+                var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = saveImageBase64Image2Verify }, FaceMatchBaseUrl);
+
+                if (faceImageDetail == null || faceImageDetail?.Confidence == null)
+                {
+                    return BadRequest("face mismatch");
+                }
                 return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
             }
-
-            var image = Convert.FromBase64String(request.Image);
-
-            var savedNewImage = CompressImage.Compress(image);
-
-            var saveImageBase64Image2Verify = Convert.ToBase64String(savedNewImage);
-
-            var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
-            var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = saveImageBase64String, Dest = saveImageBase64Image2Verify }, FaceMatchBaseUrl);
-
-            if (faceImageDetail == null)
+            catch (Exception)
             {
                 return BadRequest("face mismatch");
             }
-            return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
         }
 
         [AllowAnonymous]
@@ -208,41 +211,48 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("VerifyDocument")]
         public async Task<IActionResult> VerifyDocument(VerifyDocumentRequest request)
         {
-            if (request is null || string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
+            try
             {
-                return BadRequest();
-            }
-            var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
-            if (mobileUidExist == null)
-            {
-                return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
-            }
-            if (!request.VerifyPan)
-            {
-                return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
-            }
-            if (request.Type.ToUpper() != "PAN")
-            {
-                return BadRequest("incorrect document");
-            }
-            //VERIFY PAN
-            var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
-            var maskedImage = await httpClientService.GetMaskedImage(new MaskImage { Image = request.Image }, FaceMatchBaseUrl);
-            if (maskedImage == null || maskedImage.DocType.ToUpper() != "PAN")
-            {
-                return BadRequest("document issue");
-            }
+                if (request is null || string.IsNullOrWhiteSpace(request.Uid) || string.IsNullOrWhiteSpace(request.Image))
+                {
+                    return BadRequest();
+                }
+                var mobileUidExist = _context.VendorApplicationUser.FirstOrDefault(v => v.MobileUId == request.Uid);
+                if (mobileUidExist == null)
+                {
+                    return BadRequest($"{nameof(request.Uid)} {request.Uid} not exists");
+                }
+                if (!request.VerifyPan)
+                {
+                    return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+                }
+                if (request.Type.ToUpper() != "PAN")
+                {
+                    return BadRequest("incorrect document");
+                }
+                //VERIFY PAN
+                var saveImageBase64String = Convert.ToBase64String(mobileUidExist.ProfilePicture);
+                var maskedImage = await httpClientService.GetMaskedImage(new MaskImage { Image = request.Image }, FaceMatchBaseUrl);
+                if (maskedImage == null || maskedImage.DocType.ToUpper() != "PAN")
+                {
+                    return BadRequest("document issue");
+                }
 
-            var body = await httpClientService.VerifyPan(maskedImage.DocumentId, PanIdfyUrl, RapidAPIKey, PanTask_id, PanGroup_id);
+                var body = await httpClientService.VerifyPan(maskedImage.DocumentId, PanIdfyUrl, RapidAPIKey, PanTask_id, PanGroup_id);
 
-            if (body != null && body?.status == "completed" &&
-                body?.result != null &&
-                body.result?.source_output != null
-                && body.result?.source_output?.status == "id_found")
-            {
-                return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+                if (body != null && body?.status == "completed" &&
+                    body?.result != null &&
+                    body.result?.source_output != null
+                    && body.result?.source_output?.status == "id_found")
+                {
+                    return Ok(new { Email = mobileUidExist.Email, Pin = mobileUidExist.SecretPin });
+                }
+                return BadRequest("document verify issue");
             }
-            return BadRequest("document verify issue");
+            catch (Exception)
+            {
+                return BadRequest("document verify issue");
+            }
         }
 
         [AllowAnonymous]
@@ -617,24 +627,6 @@ namespace risk.control.system.Controllers.Api
             return Ok(response);
         }
 
-        [HttpGet("face-test")]
-        [AllowAnonymous]
-        public async Task<IActionResult> FaceTest(string email = "agent@verify.com")
-        {
-            var userEmail = _context.VendorApplicationUser.FirstOrDefault(a => a.Email == email);
-
-            var assignedClaims = _context.CaseLocation
-                .Include(c => c.ClaimsInvestigation)
-                .Where(c => c.AssignedAgentUserEmail == email && c.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
-            //POST FACE IMAGE AND DOCUMENT
-            var faceResult = await vendorService.PostFaceId(userEmail.Email, assignedClaims?.FirstOrDefault()?.ClaimsInvestigationId);
-
-            var documentResult = await vendorService.PostDocumentId(userEmail.Email, assignedClaims?.FirstOrDefault()?.ClaimsInvestigationId);
-
-            return Ok(new { faceResult, documentResult });
-        }
-
         [AllowAnonymous]
         [RequestSizeLimit(100_000_000)]
         [HttpPost("documentid")]
@@ -655,6 +647,34 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("audio")]
+        public async Task<IActionResult> Audio(AudioData data)
+        {
+            if (data == null)
+            {
+                return BadRequest();
+            }
+
+            await iCheckifyService.GetAudio(data);
+
+            return Ok(data.Name);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("video")]
+        public async Task<IActionResult> Video(VideoData data)
+        {
+            if (data == null)
+            {
+                return BadRequest();
+            }
+
+            await iCheckifyService.GetVideo(data);
+
+            return Ok(data.Name);
+        }
+
+        [AllowAnonymous]
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {
@@ -663,18 +683,14 @@ namespace risk.control.system.Controllers.Api
                 throw new ArgumentNullException("Argument(s) can't be null");
             }
 
-            await claimsInvestigationService.SubmitToVendorSupervisor(data.Email, data.BeneficiaryId, data.ClaimId, data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
+            await claimsInvestigationService.SubmitToVendorSupervisor(
+                data.Email, data.BeneficiaryId,
+                data.ClaimId,
+                data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
 
             await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
 
             return Ok(new { data });
-        }
-
-        private Image? ByteArrayToImage(byte[] data)
-        {
-            MemoryStream ms = new MemoryStream(data);
-            System.Drawing.Image returnImage = System.Drawing.Image.FromStream(ms);
-            return returnImage;
         }
     }
 }

@@ -11,8 +11,8 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240114010458__assign_")]
-    partial class _assign_
+    [Migration("20240125210137__init_record_media")]
+    partial class _init_record_media
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -2118,6 +2118,12 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Answer4")
                         .HasColumnType("TEXT");
 
+                    b.Property<byte[]>("Audio")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AudioUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<long?>("ClientCompanyId")
                         .HasColumnType("INTEGER");
 
@@ -2149,6 +2155,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Video")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("VideoUrl")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ReportQuestionaireId");

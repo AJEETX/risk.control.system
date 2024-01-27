@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace risk.control.system.Migrations
 {
     /// <inheritdoc />
-    public partial class _assign_ : Migration
+    public partial class _init_record_media : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -720,6 +720,10 @@ namespace risk.control.system.Migrations
                     Answer3 = table.Column<string>(type: "TEXT", nullable: true),
                     Question4 = table.Column<string>(type: "TEXT", nullable: true),
                     Answer4 = table.Column<string>(type: "TEXT", nullable: true),
+                    Audio = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    AudioUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    Video = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    VideoUrl = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Updated = table.Column<DateTime>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true)

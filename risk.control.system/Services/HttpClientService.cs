@@ -7,6 +7,7 @@ using Azure;
 
 using Newtonsoft.Json;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Controllers.Api;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -24,6 +25,8 @@ namespace risk.control.system.Services
         Task<PanVerifyResponse?> VerifyPan(string pan, string panUrl, string rapidAPIKey, string task_id, string group_id);
 
         Task<RootObject> GetAddress(string lat, string lon);
+
+        Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress);
     }
 
     public class HttpClientService : IHttpClientService
@@ -132,6 +135,36 @@ namespace risk.control.system.Services
             DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(RootObject));
             RootObject rootObject = (RootObject)ser.ReadObject(new MemoryStream(jsonData));
             return rootObject;
+        }
+
+        public async Task<LocationDetails_IpApi> GetAddressFromIp(string ipAddress)
+        {
+            var Ip_Api_Url = $"{Applicationsettings.IP_SITE}{ipAddress}"; // 206.189.139.232 - This is a sample IP address. You can pass yours if you want to test
+
+            // Use HttpClient to get the details from the Json response
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Accept.Clear();
+                httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                // Pass API address to get the Geolocation details
+                httpClient.BaseAddress = new Uri(Ip_Api_Url);
+                HttpResponseMessage httpResponse = httpClient.GetAsync(Ip_Api_Url).GetAwaiter().GetResult();
+                // If API is success and receive the response, then get the location details
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var geolocationInfo = await httpResponse.Content.ReadFromJsonAsync<LocationDetails_IpApi>();
+                    if (geolocationInfo != null)
+                    {
+                        Console.WriteLine("Country: " + geolocationInfo.country);
+                        Console.WriteLine("Region: " + geolocationInfo.regionName);
+                        Console.WriteLine("City: " + geolocationInfo.city);
+                        Console.WriteLine("Zip: " + geolocationInfo.zip);
+                        //Console.ReadKey();
+                        return geolocationInfo;
+                    }
+                }
+            }
+            return null;
         }
     }
 }

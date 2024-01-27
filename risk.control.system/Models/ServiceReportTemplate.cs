@@ -94,5 +94,9 @@ namespace risk.control.system.Models
         public string? Answer3 { get; set; }
         public string? Question4 { get; set; }
         public string? Answer4 { get; set; }
+        public byte[]? Audio { get; set; }
+        public string? AudioUrl { get; set; }
+        public byte[]? Video { get; set; }
+        public string? VideoUrl { get; set; }
     }
 }

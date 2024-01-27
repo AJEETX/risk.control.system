@@ -78,31 +78,6 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> PostAgentData(string selectedcase)
-        {
-            if (string.IsNullOrWhiteSpace(selectedcase))
-            {
-                toastNotification.AddAlertToastMessage("No case selected!!!. Please select case to be investigate.");
-                return RedirectToAction(nameof(Index));
-            }
-
-            var userEmail = HttpContext.User?.Identity?.Name;
-
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                toastNotification.AddAlertToastMessage("OOPs !!!..");
-                return RedirectToAction(nameof(Index));
-            }
-            //POST FACE IMAGE AND DOCUMENT
-            await vendorService.PostFaceId(userEmail, selectedcase);
-
-            await vendorService.PostDocumentId(userEmail, selectedcase);
-
-            notifyService.Custom($"Uploaded successfully ", 3, "green", "far fa-file-powerpoint");
-
-            return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "ClaimsVendor", new { selectedcase = selectedcase, uploaded = true });
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

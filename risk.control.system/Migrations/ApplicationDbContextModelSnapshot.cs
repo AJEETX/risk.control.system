@@ -2115,6 +2115,12 @@ namespace risk.control.system.Migrations
                     b.Property<string>("Answer4")
                         .HasColumnType("TEXT");
 
+                    b.Property<byte[]>("Audio")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AudioUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<long?>("ClientCompanyId")
                         .HasColumnType("INTEGER");
 
@@ -2146,6 +2152,12 @@ namespace risk.control.system.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UpdatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Video")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("VideoUrl")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ReportQuestionaireId");

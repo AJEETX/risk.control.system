@@ -1,0 +1,104 @@
+﻿@model ClaimsInvestigationVendorsModel
+
+@{
+    var imageCapturedTime = @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null ? @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
+
+    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+        <div class="card bg-light d-flex flex-fill">
+            <div class="card-header text-muted border-bottom-0">
+
+                <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span>
+                <span class="badge badge-light" style="float:right;">
+                    <i class="nav-icon fas fa-clock"></i>
+                    @imageCapturedTime
+                </span>
+            </div>
+            
+                <div class="card-footer text-center">
+                    <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
+                    @if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                    {
+                        <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
+                    }
+                    else
+                    {
+                        <i style='color:green;' class='fas fa-check-circle'></i>
+                    }
+                </div>
+                <div class="card-body pt-0">
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="text-muted text-sm">
+                                <span class="badge badge-light"><i class="far fa-image"></i> Digital Image</span>:
+                                <br />
+                                @{
+                                    if (Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImage != null)
+                                    {
+                                        <img title="digital image" id="agentLocationPicture" class="img-fluid face-Image" src="data:image/*;base64,@(Convert.ToBase64String(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImage))">
+                                    }
+                                    else
+                                    {
+                                        <img title="digital image" id="agentLocationPicture" alt="face image" class="img-fluid no-Image" src="/img/no-photo.png">
+                                    }
+                                }
+                            </p>
+                            <p class="text-muted text-sm">
+
+                                <span class="badge badge-light"><i class="fas fa-info"></i> Location Info</span>
+                                <br />
+                                <label class="ocr-data img-fluid"> @Model?.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageData</label>
+
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted text-sm">
+                                <span class="badge badge-light"><i class="fas fa-map-pin"></i> Location visited</span>
+                                <br />
+                                @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
+                                {
+                                    <img class="img-fluid locationImage" src="@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl" />
+                                }
+                                else
+                                {
+                                    <img class="img-fluid no-Image" src="@Applicationsettings.NO_MAP" />
+                                }
+                            </p>
+                            <p class="text-muted text-sm">
+
+                                <span class="badge badge-light"><i class="fas fa-map-marker-alt"></i> Address visited</span>
+                                <br />
+                                <label class="img-fluid ocr-data"> @Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationAddress</label>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
+            {
+                <div class="card-footer">
+                    <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
+                    <div id="face-map">
+                    </div>
+                    <div id="face-msg">
+                    </div>
+                </div>
+
+            }
+            <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="digitalIdLatitude" name="digitalIdLatitude" />
+                <input type="hidden" id="digitalIdLongitude" name="digitalIdLongitude" />
+                <input type="hidden" id="selectedcase" name="selectedcase" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                <div class="card-footer">
+
+                    <div class="form-group">
+                        <span class="input-group-label"> Upload Digital Id : </span>
+                        <div class="input-group mb-3">
+                            <img class="form-Image" id="face-Image" src="@Applicationsettings.NO_USER" title="Digital Id Image" />
+                            <input accept=".jpg,jpeg,png" type="file" class="form-control" name="digitalImage" id="digitalImage" onchange="document.getElementById('face-Image').src = window.URL.createObjectURL(this.files[0])" />
+                            <button id="UploadFaceImageButton" disabled type="submit" class="btn btn-info" ><i class="nav-icon fa fa-upload"></i> Upload</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}

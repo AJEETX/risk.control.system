@@ -17,28 +17,25 @@ namespace risk.control.system.Services
         Task<AppiCheckifyResponse> GetFaceId(FaceData data);
 
         Task<AppiCheckifyResponse> GetDocumentId(DocumentData data);
+
+        Task GetAudio(AudioData data);
+
+        Task GetVideo(VideoData data);
     }
 
     public class ICheckifyService : IICheckifyService
     {
         private readonly ApplicationDbContext _context;
         private readonly IHttpClientService httpClientService;
-        private readonly IClaimsInvestigationService claimsInvestigationService;
-        private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
         private static HttpClient httpClient = new();
 
-        private ILogger<AgentController> logger;
-
         //test PAN FNLPM8635N
-        public ICheckifyService(ApplicationDbContext context, IHttpClientService httpClientService, IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService, IWebHostEnvironment webHostEnvironment, ILogger<AgentController> logger)
+        public ICheckifyService(ApplicationDbContext context, IHttpClientService httpClientService, IWebHostEnvironment webHostEnvironment)
         {
             this._context = context;
             this.httpClientService = httpClientService;
-            this.claimsInvestigationService = claimsInvestigationService;
-            this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
-            this.logger = logger;
         }
 
         public async Task<AppiCheckifyResponse> GetFaceId(FaceData data)
@@ -93,20 +90,20 @@ namespace risk.control.system.Services
                     {
                         var image = Convert.FromBase64String(data.LocationImage);
 
-                        MemoryStream stream = new MemoryStream(image);
-                        string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                        CompressImage.CompressimageWindows(stream, filePath);
+                        //using MemoryStream stream = new MemoryStream(image);
+                        //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
+                        //if (!Directory.Exists(path))
+                        //{
+                        //    Directory.CreateDirectory(path);
+                        //}
+                        //var filePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                        //CompressImage.CompressimageWindows(stream, filePath);
 
-                        claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
+                        //claimCase.ClaimReport.DigitalIdReport.DigitalIdImagePath = filePath;
 
-                        var savedImage = await File.ReadAllBytesAsync(filePath);
+                        //var savedImage = await File.ReadAllBytesAsync(filePath);
 
-                        //var savedImage = CompressImage.Compress(stream.ToArray());
+                        var savedImage = ImageCompression.Converter(image);
 
                         var saveImageBase64String = Convert.ToBase64String(savedImage);
 
@@ -118,7 +115,7 @@ namespace risk.control.system.Services
                         {
                             var faceImageDetail = await httpClientService.GetFaceMatch(new MatchImage { Source = base64Image, Dest = saveImageBase64String }, company.ApiBaseUrl);
 
-                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(stream.ToArray());
+                            claimCase.ClaimReport.DigitalIdReport.DigitalIdImage = CompressImage.ProcessCompress(image);
 
                             claimCase.ClaimReport.DigitalIdReport.DigitalIdImageMatchConfidence = faceImageDetail?.Confidence;
                         }
@@ -256,21 +253,21 @@ namespace risk.control.system.Services
             {
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
-                MemoryStream stream = new MemoryStream(byteimage);
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                CompressImage.CompressimageWindows(stream, mfilePath);
+                //MemoryStream stream = new MemoryStream(byteimage);
+                //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
+                //if (!Directory.Exists(path))
+                //{
+                //    Directory.CreateDirectory(path);
+                //}
+                //var mfilePath = Path.Combine(webHostEnvironment.WebRootPath, "verify", $"pan{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                //CompressImage.CompressimageWindows(stream, mfilePath);
 
-                claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
+                //claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
 
-                var savedImage = await File.ReadAllBytesAsync(mfilePath);
-                //var savedImage = CompressImage.Compress(stream.ToArray());
+                //var savedImage = await File.ReadAllBytesAsync(mfilePath);
+                var savedImage = ImageCompression.Converter(byteimage);
 
-                var base64Image = Convert.ToBase64String(byteimage);
+                var base64Image = Convert.ToBase64String(savedImage);
                 var inputImage = new MaskImage { Image = base64Image };
 
                 var maskedImage = await httpClientService.GetMaskedImage(inputImage, company.ApiBaseUrl);
@@ -334,9 +331,8 @@ namespace risk.control.system.Services
                     catch (Exception)
                     {
                         var image = Convert.FromBase64String(maskedImage.MaskedImage);
-                        var savedMaskedImage = CompressImage.Compress(image);
 
-                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+                        claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
 
                         claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
                     }
@@ -344,9 +340,8 @@ namespace risk.control.system.Services
                 else
                 {
                     var image = Convert.FromBase64String(data.OcrImage);
-                    var savedMaskedImage = CompressImage.Compress(image);
 
-                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = savedMaskedImage;
+                    claimCase.ClaimReport.DocumentIdReport.DocumentIdImage = image;
 
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageLongLatTime = DateTime.UtcNow;
                     claimCase.ClaimReport.DocumentIdReport.DocumentIdImageData = "no data: ";
@@ -411,6 +406,54 @@ namespace risk.control.system.Services
                 FacePercent = claimCase.ClaimReport.DigitalIdReport?.DigitalIdImageMatchConfidence,
                 PanValid = claimCase.ClaimReport.DocumentIdReport?.DocumentIdImageValid
             };
+        }
+
+        public async Task GetAudio(AudioData data)
+        {
+            var caseLocation = _context.CaseLocation
+                .Include(c => c.ClaimReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            var claimReport = _context.ClaimReport
+                .Include(c => c.ReportQuestionaire)
+                .FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
+
+            using var dataStream = new MemoryStream();
+            data.Uri.CopyTo(dataStream);
+            string audioDirectory = Path.Combine(webHostEnvironment.WebRootPath, "audio");
+            if (!Directory.Exists(audioDirectory))
+            {
+                Directory.CreateDirectory(audioDirectory);
+            }
+            var audioPath = Path.Combine(audioDirectory, $"{Guid.NewGuid()}.mp3");
+            File.WriteAllBytes(audioPath, dataStream.ToArray());
+            claimReport.ReportQuestionaire.Audio = dataStream.ToArray();
+            claimReport.ReportQuestionaire.AudioUrl = audioPath;
+            _context.ClaimReport.Update(claimReport);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task GetVideo(VideoData data)
+        {
+            var caseLocation = _context.CaseLocation
+                .Include(c => c.ClaimReport)
+                .FirstOrDefault(c => c.ClaimsInvestigationId == data.ClaimId);
+            var claimReport = _context.ClaimReport
+                .Include(c => c.ReportQuestionaire)
+                .FirstOrDefault(c => c.ClaimReportId == caseLocation.ClaimReport.ClaimReportId);
+
+            using var dataStream = new MemoryStream();
+            data.Uri.CopyTo(dataStream);
+            string videoDirectory = Path.Combine(webHostEnvironment.WebRootPath, "video");
+            if (!Directory.Exists(videoDirectory))
+            {
+                Directory.CreateDirectory(videoDirectory);
+            }
+            var videoPath = Path.Combine(videoDirectory, $"{Guid.NewGuid()}.mp4");
+            File.WriteAllBytes(videoPath, dataStream.ToArray());
+            claimReport.ReportQuestionaire.Video = dataStream.ToArray();
+            claimReport.ReportQuestionaire.VideoUrl = videoPath;
+            _context.ClaimReport.Update(claimReport);
+            await _context.SaveChangesAsync();
         }
     }
 }

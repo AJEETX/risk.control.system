@@ -46,9 +46,9 @@ builder.Services.AddCors(opt =>
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
-    x.MultipartBodyLengthLimit = 5000000; // In case of multipart
-    x.ValueLengthLimit = 5000000; //not recommended value
-    x.MemoryBufferThreshold = 5000000;
+    x.MultipartBodyLengthLimit = 15000000; // In case of multipart
+    x.ValueLengthLimit = 15000000; //not recommended value
+    x.MemoryBufferThreshold = 15000000;
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -105,7 +105,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-compress.db"));
+                        options.UseSqlite("Data Source=x-onnboard.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -211,6 +211,7 @@ app.Use(async (context, next) =>
         "font-src  'self'  https://fonts.gstatic.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; " +
         "img-src 'self'  data: blob: https://maps.gstatic.com https://maps.googleapis.com https://hostedscan.com https://highcharts.com https://export.highcharts.com; " +
         "frame-src 'none';" +
+        "media-src 'self' blob: https:;" +
         "object-src 'none';" +
         "form-action 'self';" +
         "frame-ancestors 'self' https://maps.googleapis.com;" +
