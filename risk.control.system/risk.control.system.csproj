@@ -128,10 +128,6 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Update="wwwroot\lib\bootstrap\LICENSE">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
     <Content Update="wwwroot\lib\jquery-validation-unobtrusive\.bower.json">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -161,10 +157,6 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Update="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Update="wwwroot\lib\jquery-validation\LICENSE.md">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
@@ -202,7 +194,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\Shared\AdminLTE\Company\" />
     <Folder Include="wwwroot\download-case\" />
     <Folder Include="wwwroot\download-file\" />
     <Folder Include="wwwroot\fonts\" />

@@ -1,17 +1,17 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - icheckify-dev
+name: Build and deploy ASP.Net Core app to Azure Web App - icheckify-demo
 
 on:
   push:
     branches:
-      - icheckify-dev
+      - icheckify-demo
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
@@ -52,15 +52,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_338C0941F2BE455BAFC4F1E7207A11F9 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5BA401D3078A40918934B0BD6E81DE95 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_585ADDFDED24434BAE49B7CEE07E9188 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_8441B8701A0349AD971C9E2E0AEDCBE3 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_240A03870BB948108D34F943CDD4BF9C }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_98582EB1005A4AC2838A4464A69BB60B }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'icheckify-dev'
+          app-name: 'icheckify-demo'
           slot-name: 'Production'
           package: .
           
