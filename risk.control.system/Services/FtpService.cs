@@ -16,6 +16,7 @@ using System.Data;
 using System.IO.Compression;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -24,7 +25,7 @@ namespace risk.control.system.Services
 {
     public interface IFtpService
     {
-        Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension);
+        Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension, IFormFile postedFile);
 
         Task DownloadFtp(string userEmail);
     }
@@ -97,14 +98,23 @@ namespace risk.control.system.Services
 
                 using var archive = ZipFile.OpenRead(filePath);
 
-                string zipFilePath = Path.Combine(docPath, fileNameWithoutExtension);
+                var innerFile = archive.Entries.FirstOrDefault(e => e.FullName.EndsWith(".csv"));
 
-                ZipFile.ExtractToDirectory(filePath, zipFilePath, true);
+                using var ss = innerFile.Open();
+                using var memoryStream = new MemoryStream();
+                ss.CopyTo(memoryStream);
+                var bytes = memoryStream.ToArray();
 
-                var dirNames = Directory.EnumerateDirectories(zipFilePath);
-                var fileNames = Directory.EnumerateFiles(dirNames.FirstOrDefault());
+                var strClaimsData = Encoding.UTF8.GetString(bytes);
 
-                string csvData = await System.IO.File.ReadAllTextAsync(fileNames.First());
+                //string zipFilePath = Path.Combine(docPath, fileNameWithoutExtension);
+
+                //ZipFile.ExtractToDirectory(filePath, zipFilePath, true);
+
+                //var dirNames = Directory.EnumerateDirectories(zipFilePath);
+                //var fileNames = Directory.EnumerateFiles(dirNames.FirstOrDefault());
+
+                string csvData = strClaimsData;
 
                 var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
                 var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
@@ -160,9 +170,13 @@ namespace risk.control.system.Services
 
                                     var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
 
-                                    var policyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "POLICY.jpg");
-
-                                    var image = System.IO.File.ReadAllBytes(policyImagePath);
+                                    //var policyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "POLICY.jpg");
+                                    var policyImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/policy.jpg"));
+                                    //var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, "", rowData[0].Trim(), "POLICY.jpg");
+                                    using var pImage = policyImage.Open();
+                                    using var ps = new MemoryStream();
+                                    pImage.CopyTo(ps);
+                                    var image = ps.ToArray();
                                     dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(image)}";
                                     claim.PolicyDetail = new PolicyDetail
                                     {
@@ -192,11 +206,17 @@ namespace risk.control.system.Services
 
                                     var country = _context.Country.FirstOrDefault(c => c.CountryId == pinCode.Country.CountryId);
 
-                                    var customerImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "CUSTOMER.jpg");
+                                    //var customerImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "CUSTOMER.jpg");
+                                    var customerImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/customer.jpg"));
 
-                                    var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+                                    using var cImage = customerImage.Open();
+                                    using var cs = new MemoryStream();
+                                    cImage.CopyTo(cs);
 
-                                    dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerImage)}";
+                                    var customerNewImage = cs.ToArray();
+                                    //var customerImage = System.IO.File.ReadAllBytes(customerImagePath);
+
+                                    dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerNewImage)}";
 
                                     claim.CustomerDetail = new CustomerDetail
                                     {
@@ -214,7 +234,7 @@ namespace risk.control.system.Services
                                         StateId = state.StateId,
                                         DistrictId = district.DistrictId,
                                         Description = rowData[20]?.Trim(),
-                                        ProfilePicture = customerImage
+                                        ProfilePicture = customerNewImage
                                     };
 
                                     claim.CustomerDetail.PinCode = pinCode;
@@ -239,10 +259,15 @@ namespace risk.control.system.Services
 
                                     var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
-                                    var beneficairyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "BENEFICIARY.jpg");
+                                    //var beneficairyImagePath = Path.Combine(dirNames.FirstOrDefault(), rowData[0].Trim(), "BENEFICIARY.jpg");
+                                    var beneficiaryImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/beneficiary.jpg"));
 
-                                    var beneficairyImage = System.IO.File.ReadAllBytes(beneficairyImagePath);
-                                    dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficairyImage)}";
+                                    using var bImage = beneficiaryImage.Open();
+                                    using var bs = new MemoryStream();
+                                    bImage.CopyTo(bs);
+
+                                    var beneficiaryNewImage = bs.ToArray();
+                                    dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficiaryNewImage)}";
 
                                     var beneficairy = new CaseLocation
                                     {
@@ -257,7 +282,7 @@ namespace risk.control.system.Services
                                         StateId = beneState.StateId,
                                         CountryId = beneCountry.CountryId,
                                         InvestigationCaseSubStatusId = subStatus.InvestigationCaseSubStatusId,
-                                        ProfilePicture = beneficairyImage
+                                        ProfilePicture = beneficiaryNewImage
                                     };
                                     beneficairy.PinCode = benePinCode;
                                     beneficairy.PinCode.Latitude = benePinCode.Latitude;
@@ -304,8 +329,8 @@ namespace risk.control.system.Services
                 {
                     CreatedOn = DateTime.UtcNow,
                     FileType = "application/x-zip-compressed",
-                    Extension = "zip",
-                    Name = fileName,
+                    Extension = Path.GetExtension(filePath),
+                    Name = Path.GetFileNameWithoutExtension(filePath),
                     Description = "Ftp Download",
                     FilePath = filePath,
                     UploadedBy = userEmail,
@@ -369,23 +394,39 @@ namespace risk.control.system.Services
             return data;
         }
 
-        public async Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension)
+        public async Task UploadFile(string userEmail, string filePath, string docPath, string fileNameWithoutExtension, IFormFile postedFile)
         {
-            using var archive = ZipFile.OpenRead(filePath);
+            string strClaimsData = string.Empty;
+            using var stream = postedFile.OpenReadStream();
+            using var archive = new ZipArchive(stream);
+            var innerFile = archive.Entries.FirstOrDefault(e => e.FullName.EndsWith(".csv"));
 
-            string zipFilePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension);
+            using var ss = innerFile.Open();
+            using var memoryStream = new MemoryStream();
+            ss.CopyTo(memoryStream);
+            var bytes = memoryStream.ToArray();
 
-            ZipFile.ExtractToDirectory(filePath, zipFilePath, true);
+            strClaimsData = Encoding.UTF8.GetString(bytes);
 
-            var dirNames = Directory.EnumerateDirectories(zipFilePath);
-            var fileNameWithPath = dirNames.FirstOrDefault();
-            string fileName = Path.GetFileName(fileNameWithPath);
+            //var policyImages = archive.Entries.Where(e => e.Name.Equals("policy.jpg", StringComparison.CurrentCultureIgnoreCase))?.ToList();
+            //var customerImages = archive.Entries.Where(e => e.Name.Equals("customer.jpg", StringComparison.CurrentCultureIgnoreCase))?.ToList();
+            //var beneficiaryImages = archive.Entries.Where(e => e.Name.Equals("beneficiary.jpg", StringComparison.CurrentCultureIgnoreCase))?.ToList();
+            //var pi = policyImages.First().FullName;
+            //using var archive = ZipFile.OpenRead(filePath);
 
-            string fileNameWithData = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, "CLAIMS.csv");
+            //string zipFilePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension);
 
-            var fileNames = Directory.EnumerateFiles(fileNameWithData);
+            //ZipFile.ExtractToDirectory(filePath, zipFilePath, true);
 
-            string csvData = await System.IO.File.ReadAllTextAsync(fileNameWithData);
+            //var dirNames = Directory.EnumerateDirectories(zipFilePath);
+            //var fileNameWithPath = dirNames.FirstOrDefault();
+            //string fileName = Path.GetFileName(fileNameWithPath);
+
+            //string fileNameWithData = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, "CLAIMS.csv");
+
+            //var fileNames = Directory.EnumerateFiles(fileNameWithData);
+
+            string csvData = Encoding.UTF8.GetString(bytes);
 
             var status = _context.InvestigationCaseStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.INITIATED));
             var subStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i => i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.CREATED_BY_CREATOR));
@@ -439,9 +480,12 @@ namespace risk.control.system.Services
 
                             var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
 
-                            var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "POLICY.jpg");
-
-                            var savedNewImage = (File.ReadAllBytes(policyImagePath));
+                            var policyImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/policy.jpg"));
+                            //var policyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, "", rowData[0].Trim(), "POLICY.jpg");
+                            using var pImage = policyImage.Open();
+                            using var ps = new MemoryStream();
+                            pImage.CopyTo(ps);
+                            var savedNewImage = ps.ToArray();
                             //var savedNewImage = CompressImage.Compress(File.ReadAllBytes(policyImagePath));
 
                             dt.Rows[dt.Rows.Count - 1][9] = $"{Convert.ToBase64String(savedNewImage)}";
@@ -473,9 +517,14 @@ namespace risk.control.system.Services
 
                             var country = _context.Country.FirstOrDefault(c => c.CountryId == pinCode.Country.CountryId);
 
-                            var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "CUSTOMER.jpg");
+                            //var customerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, "", rowData[0].Trim(), "CUSTOMER.jpg");
+                            var customerImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/customer.jpg"));
 
-                            var customerNewImage = (File.ReadAllBytes(customerImagePath));
+                            using var cImage = customerImage.Open();
+                            using var cs = new MemoryStream();
+                            cImage.CopyTo(cs);
+
+                            var customerNewImage = cs.ToArray();
                             //var customerNewImage = CompressImage.Compress(File.ReadAllBytes(customerImagePath));
                             dt.Rows[dt.Rows.Count - 1][21] = $"{Convert.ToBase64String(customerNewImage)}";
 
@@ -519,10 +568,18 @@ namespace risk.control.system.Services
 
                             var relation = _context.BeneficiaryRelation.FirstOrDefault(b => b.Code.ToLower() == rowData[23].Trim().ToLower());
 
-                            var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, fileName, rowData[0].Trim(), "BENEFICIARY.jpg");
+                            //var beneficairyImagePath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case", fileNameWithoutExtension, "", rowData[0].Trim(), "BENEFICIARY.jpg");
 
-                            var beneficiaryNewImage = (File.ReadAllBytes(beneficairyImagePath));
+                            //var beneficiaryNewImage = (File.ReadAllBytes(beneficairyImagePath));
                             //var beneficiaryNewImage = CompressImage.Compress(File.ReadAllBytes(beneficairyImagePath));
+
+                            var beneficiaryImage = archive.Entries.FirstOrDefault(p => p.FullName.ToLower().EndsWith(rowData[0]?.Trim().ToLower() + "/beneficiary.jpg"));
+
+                            using var bImage = beneficiaryImage.Open();
+                            using var bs = new MemoryStream();
+                            bImage.CopyTo(bs);
+
+                            var beneficiaryNewImage = bs.ToArray();
 
                             dt.Rows[dt.Rows.Count - 1][29] = $"{Convert.ToBase64String(beneficiaryNewImage)}";
 

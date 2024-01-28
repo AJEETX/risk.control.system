@@ -237,7 +237,7 @@ namespace risk.control.system.Controllers
                 }
                 var userEmail = HttpContext.User.Identity.Name;
 
-                await ftpService.UploadFile(userEmail, filePath, docPath, fileNameWithoutExtension);
+                await ftpService.UploadFile(userEmail, filePath, docPath, fileNameWithoutExtension, postedFile);
 
                 await SaveUpload(postedFile, filePath, "File upload", userEmail);
 
@@ -253,7 +253,7 @@ namespace risk.control.system.Controllers
         {
             try
             {
-                string folder = Path.Combine(webHostEnvironment.WebRootPath, "document");
+                string folder = Path.Combine(webHostEnvironment.WebRootPath, "upload-ftp");
                 if (!Directory.Exists(folder))
                 {
                     Directory.CreateDirectory(folder);
