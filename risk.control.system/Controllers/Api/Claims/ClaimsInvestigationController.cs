@@ -139,6 +139,7 @@ namespace risk.control.system.Controllers.Api.Claims
             string mapUrl = "https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             string imageAddress = string.Empty;
             string faceLat = string.Empty, faceLng = string.Empty;
+            string ocrLatitude = string.Empty, ocrLongitude = string.Empty;
             if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLat))
             {
                 var longLat = beneficiary.ClaimReport.DigitalIdReport.DigitalIdImageLongLat.IndexOf("/");
@@ -152,7 +153,6 @@ namespace risk.control.system.Controllers.Api.Claims
 
             string ocrUrl = $"https://maps.googleapis.com/maps/api/staticmap?center=32.661839,-97.263680&zoom=14&size=150x200&maptype=roadmap&markers=color:red%7Clabel:S%7C32.661839,-97.263680&key={Applicationsettings.GMAPData}";
             string ocrAddress = string.Empty;
-            string ocrLatitude = string.Empty, ocrLongitude = string.Empty;
             if (!string.IsNullOrWhiteSpace(beneficiary.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLat))
             {
                 var ocrlongLat = beneficiary.ClaimReport.DocumentIdReport.DocumentIdImageLongLat.IndexOf("/");
@@ -179,8 +179,18 @@ namespace risk.control.system.Controllers.Api.Claims
                 string.Format("data:image/*;base64,{0}", Convert.ToBase64String(noDataimage)),
                 OcrLatLong = ocrUrl,
                 OcrAddress = ocrAddress,
-                FacePosition = new { Lat = decimal.Parse(faceLat), Lng = decimal.Parse(faceLng) },
-                OcrPosition = new { Lat = decimal.Parse(ocrLatitude), Lng = decimal.Parse(ocrLongitude) }
+                FacePosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(faceLat) ? decimal.Parse("-37.00") : decimal.Parse(faceLat),
+                    Lng = string.IsNullOrWhiteSpace(faceLng) ? decimal.Parse("140.00") : decimal.Parse(faceLng)
+                },
+                OcrPosition =
+                new
+                {
+                    Lat = string.IsNullOrWhiteSpace(ocrLatitude) ? decimal.Parse("-37.0000") : decimal.Parse(ocrLatitude),
+                    Lng = string.IsNullOrWhiteSpace(ocrLongitude) ? decimal.Parse("140.00") : decimal.Parse(ocrLongitude)
+                }
             };
 
             return Ok(data);
