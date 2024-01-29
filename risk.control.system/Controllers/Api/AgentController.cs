@@ -174,19 +174,19 @@ namespace risk.control.system.Controllers.Api
 
                 var image = Convert.FromBase64String(request.Image);
 
-                var savedImage = ImageCompression.ConverterSkia(image);
-                //string path = Path.Combine(webHostEnvironment.WebRootPath, "onboard");
-                //if (!Directory.Exists(path))
-                //{
-                //    Directory.CreateDirectory(path);
-                //}
+                //var savedImage = ImageCompression.ConverterSkia(image);
+                string path = Path.Combine(webHostEnvironment.WebRootPath, "onboard");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
 
-                //using MemoryStream stream = new MemoryStream(image);
+                using MemoryStream stream = new MemoryStream(image);
 
-                //var filePath = Path.Combine(path, $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
-                //CompressImage.CompressimageWindows(stream, filePath);
+                var filePath = Path.Combine(path, $"face{DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss")}.jpg");
+                CompressImage.CompressimageWindows(stream, filePath);
 
-                //var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
+                var savedImage = await System.IO.File.ReadAllBytesAsync(filePath);
 
                 var saveImageBase64Image2Verify = Convert.ToBase64String(savedImage);
 

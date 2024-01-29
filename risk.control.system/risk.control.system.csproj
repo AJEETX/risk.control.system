@@ -178,6 +178,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="onboard\" />
     <Folder Include="wwwroot\download-case\" />
     <Folder Include="wwwroot\download-file\" />
     <Folder Include="wwwroot\download-ftp\" />

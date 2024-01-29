@@ -55,9 +55,9 @@ namespace risk.control.system.Helpers
         //    }
         //}
 
-        public static byte[] ConverterSkia(byte[] imageBytes, int maxquality = 90)
+        public static byte[] ConverterSkia(byte[] imageBytes, int maxquality = 100)
         {
-            if (imageBytes.Length > 500 * 1024)
+            if (imageBytes.Length > 1 * 1024)
             {
                 var stream = new MemoryStream(imageBytes);
                 using var skData = SKData.Create(stream);
@@ -69,7 +69,7 @@ namespace risk.control.system.Helpers
                 using var destinationImage = SKBitmap.Decode(codec, nearest);
                 using var resizedImage = destinationImage.Resize(new SKImageInfo(Width, Height), SKFilterQuality.High);
 
-                var format = SKEncodedImageFormat.Png;
+                var format = SKEncodedImageFormat.Jpeg;
                 using var outputImage = SKImage.FromBitmap(resizedImage);
                 using var data = outputImage.Encode(format, maxquality);
                 using var outputStream = GetOutputStream("skiasharp");
@@ -87,12 +87,7 @@ namespace risk.control.system.Helpers
 
         private static Stream GetOutputStream(string name)
         {
-            return File.Open($"images/output_{name}.png", FileMode.OpenOrCreate);
-        }
-
-        private static Stream GetStream()
-        {
-            return File.OpenRead("images/input.jpeg");
+            return File.Open($"onboard/output_{name}.jpeg", FileMode.OpenOrCreate);
         }
     }
 }
