@@ -220,24 +220,14 @@ namespace risk.control.system.Controllers
                 {
                     Directory.CreateDirectory(path);
                 }
-                string docPath = Path.Combine(webHostEnvironment.WebRootPath, "upload-case");
-                if (!Directory.Exists(docPath))
-                {
-                    Directory.CreateDirectory(docPath);
-                }
-                string fileName = Path.GetTempFileName();
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(postedFile.FileName);
-                fileNameWithoutExtension += DateTime.UtcNow.ToString("dd-MMM-yyyy-HH-mm-ss");
 
-                string filePath = Path.Combine(path, fileName);
+                string filePath = Path.Combine(path, Path.GetFileName(postedFile.FileName));
 
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                {
-                    postedFile.CopyTo(stream);
-                }
+                using FileStream stream = new FileStream(filePath, FileMode.Create);
+                postedFile.CopyTo(stream);
                 var userEmail = HttpContext.User.Identity.Name;
 
-                await ftpService.UploadFile(userEmail, filePath, docPath, fileNameWithoutExtension, postedFile);
+                await ftpService.UploadFile(userEmail, filePath, postedFile);
 
                 await SaveUpload(postedFile, filePath, "File upload", userEmail);
 
@@ -259,12 +249,10 @@ namespace risk.control.system.Controllers
                     Directory.CreateDirectory(folder);
                 }
 
-                string fileName = Path.GetFileName(postedFile.FileName);
+                string fileName = Path.GetTempFileName();
                 string filePath = Path.Combine(folder, fileName);
-                using (FileStream stream = new FileStream(filePath, FileMode.Create))
-                {
-                    postedFile.CopyTo(stream);
-                }
+                using FileStream stream = new FileStream(filePath, FileMode.Create);
+                await postedFile.CopyToAsync(stream);
                 var wc = new WebClient
                 {
                     Credentials = new NetworkCredential(Applicationsettings.FTP_SITE_LOG, Applicationsettings.FTP_SITE_DATA),
