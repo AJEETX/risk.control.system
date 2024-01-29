@@ -188,6 +188,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\download-case\" />
     <Folder Include="wwwroot\download-file\" />
+    <Folder Include="wwwroot\download-ftp\" />
     <Folder Include="wwwroot\fonts\" />
     <Folder Include="wwwroot\company\" />
     <Folder Include="wwwroot\onboard\" />
