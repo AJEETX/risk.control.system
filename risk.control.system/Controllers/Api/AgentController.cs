@@ -174,7 +174,7 @@ namespace risk.control.system.Controllers.Api
 
                 var image = Convert.FromBase64String(request.Image);
 
-                var savedImage = ImageCompression.Converter(image);
+                var savedImage = ImageCompression.ConverterSkia(image);
                 //string path = Path.Combine(webHostEnvironment.WebRootPath, "onboard");
                 //if (!Directory.Exists(path))
                 //{

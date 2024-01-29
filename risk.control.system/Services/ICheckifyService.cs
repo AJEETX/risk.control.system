@@ -103,7 +103,7 @@ namespace risk.control.system.Services
 
                         //var savedImage = await File.ReadAllBytesAsync(filePath);
 
-                        var savedImage = ImageCompression.Converter(image);
+                        var savedImage = ImageCompression.ConverterSkia(image);
 
                         var saveImageBase64String = Convert.ToBase64String(savedImage);
 
@@ -265,7 +265,7 @@ namespace risk.control.system.Services
                 //claimCase.ClaimReport.DocumentIdReport.DocumentIdImagePath = mfilePath;
 
                 //var savedImage = await File.ReadAllBytesAsync(mfilePath);
-                var savedImage = ImageCompression.Converter(byteimage);
+                var savedImage = ImageCompression.ConverterSkia(byteimage);
 
                 var base64Image = Convert.ToBase64String(savedImage);
                 var inputImage = new MaskImage { Image = base64Image };
