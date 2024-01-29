@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
@@ -328,7 +329,7 @@ namespace risk.control.system.Services
                 var fileModel = new FileOnFileSystemModel
                 {
                     CreatedOn = DateTime.UtcNow,
-                    FileType = "application/x-zip-compressed",
+                    FileType = GetMimeTypeForFileExtension(filePath),
                     Extension = Path.GetExtension(filePath),
                     Name = Path.GetFileNameWithoutExtension(filePath),
                     Description = "Ftp Download",
@@ -353,7 +354,21 @@ namespace risk.control.system.Services
             }
         }
 
-        private List<string> GetFtpData()
+        private static string GetMimeTypeForFileExtension(string filePath)
+        {
+            const string DefaultContentType = "application/x-zip-compressed";
+
+            var provider = new FileExtensionContentTypeProvider();
+
+            if (!provider.TryGetContentType(filePath, out string contentType))
+            {
+                contentType = DefaultContentType;
+            }
+
+            return contentType;
+        }
+
+        private static List<string> GetFtpData()
         {
             var request = WebRequest.Create(Applicationsettings.FTP_SITE);
             request.Method = WebRequestMethods.Ftp.ListDirectory;
@@ -363,20 +378,16 @@ namespace risk.control.system.Services
 
             using (var response = request.GetResponse())
             {
-                using (var stream = response.GetResponseStream())
+                using var stream = response.GetResponseStream();
+                using var reader = new StreamReader(stream, true);
+                while (!reader.EndOfStream)
                 {
-                    using (var reader = new StreamReader(stream, true))
-                    {
-                        while (!reader.EndOfStream)
-                        {
-                            var file = reader.ReadLine();
-                            //Make sure you only get the filename and not the whole path.
-                            file = file.Substring(file.LastIndexOf('/') + 1);
-                            //The root folder will also be added, this can of course be ignored.
-                            if (!file.StartsWith("."))
-                                files.Add(file);
-                        }
-                    }
+                    var file = reader.ReadLine();
+                    //Make sure you only get the filename and not the whole path.
+                    file = file.Substring(file.LastIndexOf('/') + 1);
+                    //The root folder will also be added, this can of course be ignored.
+                    if (!file.StartsWith("."))
+                        files.Add(file);
                 }
             }
 
