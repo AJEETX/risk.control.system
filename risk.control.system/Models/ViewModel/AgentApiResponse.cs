@@ -118,10 +118,10 @@
 
     public class MediaData
     {
-        public IFormFile Uri { get; set; }
-        public string Name { get; set; }
-        public string ClaimId { get; set; }
-        public string Type { get; set; }
+        public IFormFile? Uri { get; set; }
+        public string? Name { get; set; }
+        public string? ClaimId { get; set; }
+        public string? Type { get; set; }
     }
 
     public class AudioData : MediaData
