@@ -664,6 +664,7 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("video")]
         public async Task<IActionResult> Video(VideoData data)
         {
+            return Ok(data);
             if (data == null)
             {
                 return BadRequest();
