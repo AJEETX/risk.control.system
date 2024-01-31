@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
-using risk.control.system.Models;
+using risk.control.system.Models.ViewModel;
+using risk.control.system.Services;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -9,24 +11,68 @@ namespace risk.control.system.Controllers.Api
     [ApiController]
     public class NotificationController : ControllerBase
     {
-        [AllowAnonymous]
-        [HttpGet("sms")]
-        public async Task<IActionResult> SendSMS(string mobile = "61432854196", string message = "SMS fom iCheckify team")
+        private readonly INotificationService service;
+
+        public NotificationController(INotificationService service)
         {
-            string device = "0";
-            long? timestamp = null;
-            bool isMMS = false;
-            string logo = "https://icheckify-demo.azurewebsites.net/img/iCheckifyLogo.png";
+            this.service = service;
+        }
 
-            Uri address = new Uri("http://tinyurl.com/api-create.php?url=" + logo);
-            System.Net.WebClient client = new System.Net.WebClient();
-            string tinyUrl = client.DownloadString(address);
+        [AllowAnonymous]
+        [HttpGet("GetClientIp")]
+        public async Task<ActionResult> GetClientIp(CancellationToken ct)
+        {
+            try
+            {
+                var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                var ipAddressWithoutPort = ipAddress?.Split(':')[0];
 
-            string? attachments = $"<a href='{logo}'>team</a>";
-            var finalMessage = $"{message} Date: {DateTime.UtcNow.ToString("dd-MMM-yyyy HH:mm")} {logo}";
-            bool priority = true;
-            var response = SMS.API.SendSingleMessage("+" + mobile, finalMessage, device, timestamp, isMMS, null, priority);
-            return Ok(response);
+                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct);
+
+                var response = new
+                {
+                    IpAddress = ipAddressWithoutPort,
+                    Country = ipApiResponse?.country,
+                    Region = ipApiResponse?.regionName,
+                    City = ipApiResponse?.city,
+                    District = ipApiResponse?.district,
+                    PostCode = ipApiResponse?.zip,
+                    Longitude = ipApiResponse?.lon.GetValueOrDefault(),
+                    Latitude = ipApiResponse?.lat.GetValueOrDefault(),
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("schedule")]
+        public async Task<IActionResult> Schedule(ClientSchedulingMessage message)
+        {
+            string baseUrl = HttpContext.Request.GetDisplayUrl().Replace(HttpContext.Request.Path, "");
+            message.BaseUrl = baseUrl;
+            var claim = await service.SendVerifySchedule(message);
+            if (claim == null)
+            {
+                return BadRequest();
+            }
+            return Ok(claim);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("ConfirmSchedule")]
+        public async Task<IActionResult> ConfirmSchedule(string id, string confirm = "N")
+        {
+            var claim = await service.ReplyVerifySchedule(id, confirm);
+            if (claim == null)
+            {
+                return BadRequest();
+            }
+            return Ok(claim);
         }
 
         [AllowAnonymous]

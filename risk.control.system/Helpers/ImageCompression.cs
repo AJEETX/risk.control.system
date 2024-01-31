@@ -1,6 +1,4 @@
-﻿//using ImageMagick;
-
-using SkiaSharp;
+﻿using SkiaSharp;
 
 namespace risk.control.system.Helpers
 {
@@ -8,52 +6,6 @@ namespace risk.control.system.Helpers
     {
         private static int Width = 800;
         private static int Height = 600;
-
-        //public static byte[] Converter(byte[] imageBytes, int maxquality = 100)
-        //{
-        //    try
-        //    {
-        //        if (imageBytes.Length > 500 * 1024)
-        //        {
-        //            byte[] optimizedImageBytes = OptimizeImage(imageBytes, maxquality * 1024);
-        //            return optimizedImageBytes;
-        //        }
-        //        return imageBytes;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception("Erro durante a compressão da imagem: " + e.Message);
-        //    }
-        //}
-
-        //private static byte[] OptimizeImage(byte[] imageBytes, long maxSizeBytes)
-        //{
-        //    try
-        //    {
-        //        using var imageStream = new MemoryStream(imageBytes);
-        //        using MagickImage image = new MagickImage(imageStream);
-        //        image.Resize(new MagickGeometry(800, 600));
-
-        //        int desiredQuality = 85;
-
-        //        while (true)
-        //        {
-        //            byte[] tempBytes = image.ToByteArray(MagickFormat.Jpg);
-
-        //            if (tempBytes.Length <= maxSizeBytes || desiredQuality < 5)
-        //            {
-        //                return tempBytes;
-        //            }
-
-        //            desiredQuality -= 5;
-        //            image.Quality = desiredQuality;
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
 
         public static byte[] ConverterSkia(byte[] imageBytes, int maxquality = 100)
         {
@@ -72,22 +24,65 @@ namespace risk.control.system.Helpers
                 var format = SKEncodedImageFormat.Jpeg;
                 using var outputImage = SKImage.FromBitmap(resizedImage);
                 using var data = outputImage.Encode(format, maxquality);
-                using var outputStream = GetOutputStream("skiasharp");
-                data.SaveTo(outputStream);
 
-                using var ms = new MemoryStream();
-                outputStream.CopyTo(ms);
-                var bytes = ms.ToArray();
-                outputStream.Close();
-                stream.Close();
-                return bytes;
+                using var memoryStream = new MemoryStream();
+                data.SaveTo(memoryStream);
+                return memoryStream.ToArray();
+
+                //using var outputStream = GetOutputStream("skiasharp");
+                //data.SaveTo(outputStream);
+
+                //using var ms = new MemoryStream();
+                //outputStream.CopyTo(ms);
+                //var bytes = ms.ToArray();
+                //outputStream.Close();
+                //stream.Close();
+                //return bytes;
             }
             return imageBytes;
         }
 
-        private static Stream GetOutputStream(string name)
+        public static byte[] ConverterSkiaResize(byte[] imageBytes, int maxquality = 100)
         {
-            return File.Open($"onboard/output_{name}.jpeg", FileMode.OpenOrCreate);
+            var resizeFactor = 0.5f;
+            var bitmap = SKBitmap.Decode(imageBytes);
+            var toBitmap = new SKBitmap((int)Math.Round(bitmap.Width * resizeFactor), (int)Math.Round(bitmap.Height * resizeFactor), bitmap.ColorType, bitmap.AlphaType);
+
+            var canvas = new SKCanvas(toBitmap);
+            // Draw a bitmap rescaled
+            canvas.SetMatrix(SKMatrix.MakeScale(resizeFactor, resizeFactor));
+            canvas.DrawBitmap(bitmap, 0, 0);
+            canvas.ResetMatrix();
+
+            var font = SKTypeface.FromFamilyName("Arial");
+            var brush = new SKPaint
+            {
+                Typeface = font,
+                TextSize = 45.0f,
+                IsAntialias = true,
+                Color = new SKColor(255, 255, 255, 255)
+            };
+            canvas.DrawText("iCheckified!", bitmap.Width * resizeFactor / 3.0f, bitmap.Height * resizeFactor / 1.05f, brush);
+
+            canvas.Flush();
+
+            var image = SKImage.FromBitmap(toBitmap);
+            var data = image.Encode(SKEncodedImageFormat.Jpeg, maxquality);
+
+            using var memoryStream = new MemoryStream();
+            data.SaveTo(memoryStream);
+
+            using (var stream = new FileStream("output.jpg", FileMode.Create, FileAccess.Write))
+                data.SaveTo(stream);
+
+            data.Dispose();
+            image.Dispose();
+            canvas.Dispose();
+            brush.Dispose();
+            font.Dispose();
+            toBitmap.Dispose();
+            bitmap.Dispose();
+            return memoryStream.ToArray();
         }
     }
 }
