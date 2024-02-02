@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 using risk.control.system.Services;
@@ -21,15 +22,9 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index(string id)
         {
-            var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmAcountRegister.html");
+            string baseUrl = HttpContext.Request.GetDisplayUrl().Replace(HttpContext.Request.Path, "");
 
-            var subject = "Verify Your E-mail Address ";
-            string HtmlBody = "";
-            using (StreamReader stream = System.IO.File.OpenText(path))
-            {
-                HtmlBody = stream.ReadToEnd();
-            }
-            var claim = await notificationService.GetClaim(id);
+            var claim = await notificationService.GetClaim(baseUrl, id);
 
             return View();
         }

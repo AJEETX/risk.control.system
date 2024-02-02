@@ -72,7 +72,7 @@ namespace risk.control.system.Controllers.Api
             {
                 return BadRequest();
             }
-            return Ok(claim);
+            return Redirect("/page/confirm.html");
         }
 
         [AllowAnonymous]

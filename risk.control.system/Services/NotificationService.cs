@@ -1,8 +1,4 @@
-﻿using System.Net.Http;
-using System.Text.Encodings.Web;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -19,7 +15,7 @@ namespace risk.control.system.Services
 
         Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct);
 
-        Task<(ClaimsInvestigation, CaseLocation)> GetClaim(string id);
+        Task<(ClaimsInvestigation, CaseLocation, string)> GetClaim(string baseUrl, string id);
     }
 
     public class NotificationService : INotificationService
@@ -51,30 +47,10 @@ namespace risk.control.system.Services
                 .Include(c => c.ClaimMessages)
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
-            .ThenInclude(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId);
             var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var beneficiary = context.CaseLocation
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.PinCode)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
-                .Include(c => c.District)
-                .Include(c => c.Country)
-                .Include(c => c.State)
-                .Include(c => c.Vendor)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
-                .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == message.ClaimId
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
 
@@ -112,7 +88,6 @@ namespace risk.control.system.Services
 
             var verifyMessage = agentMessage;
             verifyMessage += "                                                       ";
-            verifyMessage += "                                                                  ";
             verifyMessage += $"                                                       Click  (Yes){yesTinyUrl} ";
             verifyMessage += "---------------------------------------";
             verifyMessage += "                                                       ";
@@ -133,14 +108,15 @@ namespace risk.control.system.Services
             address = new Uri("http://tinyurl.com/api-create.php?url=" + confirmPage);
             var confirmTinyUrl = client.DownloadString(address);
 
-            var callbackUrl = message.BaseUrl + "";
-            string confirmPageUrl = "                                                                      or ";
-            confirmPageUrl += $"                                                                      (CONFIRM){confirmTinyUrl}";
-            confirmPageUrl += "                                                                      ";
-            string finalMessage = verifyMessage + "                                                                     " + confirmPageUrl + "                                                                                  Thanks                      ";
+            string? callbackUrl = message.BaseUrl + "";
+            //string confirmPageUrl = "                                                                      or ";
+            //confirmPageUrl += $"                                                                      (CONFIRM){confirmTinyUrl}";
+            string confirmPageUrl = "                                                                      ";
+            string finalMessage = verifyMessage;
+            finalMessage += "                                                                               ";
+            finalMessage += "Thanks";
             finalMessage += "                                                                               ";
             finalMessage += logo;
-            finalMessage += $"SMS Sent date: {DateTime.UtcNow.ToString("dd-MMM-yyyy HH:mm")}                                                       ";
             string messageBody = string.Format(HtmlBody,
                 subject,
                 string.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
@@ -173,30 +149,10 @@ namespace risk.control.system.Services
             var claim = context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .Include(c => c.CustomerDetail)
-            .ThenInclude(c => c.PinCode)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id);
             var assignedToAgentStatus = context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var beneficiary = context.CaseLocation
-                .Include(c => c.ClaimsInvestigation)
-                .Include(c => c.PinCode)
-                .Include(c => c.BeneficiaryRelation)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ReportQuestionaire)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.DocumentIdReport)
-                .Include(c => c.District)
-                .Include(c => c.Country)
-                .Include(c => c.State)
-                .Include(c => c.Vendor)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DigitalIdReport)
-                .Include(c => c.ClaimReport)
-                .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.DocumentIdReport)
-                .Include(c => c.ClaimReport)
-                    .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
 
@@ -223,9 +179,16 @@ namespace risk.control.system.Services
             long? timestamp = null;
             bool isMMS = false;
 
-            string agentMessage = $"Dear {claim.CurrentClaimOwner},         {recepientName} has replied  {confirm} to your Visit schedule:";
+            string agentMessage = $"Dear {claim.CurrentClaimOwner},";
+            agentMessage += $"                              ";
+            agentMessage += $"{recepientName} has replied  {confirm} to your Visit schedule for claim Policy :{claim.PolicyDetail.ContractNumber}";
+            agentMessage += "                              ";
 
-            var finalMessage = $"{agentMessage} Dated: {DateTime.UtcNow.ToString("dd-MMM-yyyy HH:mm")} {logo}";
+            var finalMessage = $"{agentMessage}";
+            finalMessage += "                               ";
+            finalMessage += $"Dated: {DateTime.UtcNow.ToString("dd-MMM-yyyy HH:mm")}";
+            finalMessage += "                               ";
+            finalMessage += $"{logo}";
             bool priority = true;
 
             var agent = context.VendorApplicationUser.FirstOrDefault(u => u.Email == claim.CurrentClaimOwner);
@@ -246,7 +209,7 @@ namespace risk.control.system.Services
             return claim;
         }
 
-        public async Task<(ClaimsInvestigation, CaseLocation)> GetClaim(string id)
+        public async Task<(ClaimsInvestigation, CaseLocation, string)> GetClaim(string baseUrl, string id)
         {
             var claim = context.ClaimsInvestigation
              .Include(c => c.ClaimMessages)
@@ -278,7 +241,50 @@ namespace risk.control.system.Services
                     .ThenInclude(c => c.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefault(c => c.ClaimsInvestigationId == id
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
-            return (claim, beneficiary);
+
+            string mobile = string.Empty;
+            string recepientName = string.Empty;
+            if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
+            {
+                mobile = claim.CustomerDetail.ContactNumber.ToString();
+                recepientName = claim.CustomerDetail.CustomerName;
+            }
+            else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
+            {
+                mobile = beneficiary.BeneficiaryContactNumber.ToString();
+                recepientName = beneficiary.BeneficiaryName;
+            }
+
+            var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmAcountRegister.html");
+
+            var subject = "Verify Your E-mail Address ";
+            string HtmlBody = "";
+            using (StreamReader stream = File.OpenText(path))
+            {
+                HtmlBody = stream.ReadToEnd();
+            }
+
+            string fullUrl = $"{baseUrl}/api/notification/ConfirmSchedule?id={id}&confirm=";
+            string yesUrl = $"{fullUrl}Y";
+            string noUrl = $"{fullUrl}N";
+
+            var address = new Uri("http://tinyurl.com/api-create.php?url=" + yesUrl);
+            var yesTinyUrl = client.DownloadString(address);
+
+            address = new Uri("http://tinyurl.com/api-create.php?url=" + noUrl);
+            var noTinyUrl = client.DownloadString(address);
+
+            string messageBody = string.Format(HtmlBody,
+                subject,
+                string.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
+                recepientName,
+                recepientName,
+                "#",
+                yesTinyUrl,
+                noTinyUrl
+                );
+
+            return (claim, beneficiary, messageBody);
         }
     }
 }
