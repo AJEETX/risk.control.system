@@ -15,7 +15,7 @@ namespace risk.control.system.Services
 
         Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct);
 
-        Task<(ClaimsInvestigation, CaseLocation, string)> GetClaim(string baseUrl, string id);
+        Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
     }
 
     public class NotificationService : INotificationService
@@ -77,22 +77,22 @@ namespace risk.control.system.Services
             string yesUrl = $"{baseUrl}Y";
             string noUrl = $"{baseUrl}N";
 
-            var address = new Uri("http://tinyurl.com/api-create.php?url=" + yesUrl);
-            var yesTinyUrl = client.DownloadString(address);
+            //var address = new Uri("http://tinyurl.com/api-create.php?url=" + yesUrl);
+            //var yesTinyUrl = client.DownloadString(address);
 
-            address = new Uri("http://tinyurl.com/api-create.php?url=" + noUrl);
-            var noTinyUrl = client.DownloadString(address);
+            //address = new Uri("http://tinyurl.com/api-create.php?url=" + noUrl);
+            //var noTinyUrl = client.DownloadString(address);
             string agentMessage = $"Dear {recepientName}";
             agentMessage += "                       ";
             agentMessage += $"  {claim.CurrentClaimOwner} visit you on Date: {message.Time} for the claim policy {claim.PolicyDetail.ContractNumber}.            ";
 
             var verifyMessage = agentMessage;
             verifyMessage += "                                                       ";
-            verifyMessage += $"                                                       Click  (Yes){yesTinyUrl} ";
-            verifyMessage += "---------------------------------------";
-            verifyMessage += "                                                       ";
-            verifyMessage += $"                                                       or  (No){noTinyUrl}";
-            verifyMessage += "                                                       ";
+            //verifyMessage += $"                                                       Click  (Yes){yesTinyUrl} ";
+            //verifyMessage += "---------------------------------------";
+            //verifyMessage += "                                                       ";
+            //verifyMessage += $"                                                       or  (No){noTinyUrl}";
+            //verifyMessage += "                                                       ";
             bool priority = true;
 
             var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmSchedule.html");
@@ -105,30 +105,35 @@ namespace risk.control.system.Services
             }
 
             var confirmPage = $"{message.BaseUrl + "/Confirm?id=" + message.ClaimId}";
-            address = new Uri("http://tinyurl.com/api-create.php?url=" + confirmPage);
+            var address = new Uri("http://tinyurl.com/api-create.php?url=" + confirmPage);
             var confirmTinyUrl = client.DownloadString(address);
 
             string? callbackUrl = message.BaseUrl + "";
-            //string confirmPageUrl = "                                                                      or ";
-            //confirmPageUrl += $"                                                                      (CONFIRM){confirmTinyUrl}";
-            string confirmPageUrl = "                                                                      ";
+            string confirmPageUrl = "                                                                      Click to ";
+            confirmPageUrl += $"                                                                      (CONFIRM){confirmTinyUrl}";
+            confirmPageUrl += "                                                                      ";
             string finalMessage = verifyMessage;
             finalMessage += "                                                                               ";
+            finalMessage += confirmPageUrl;
             finalMessage += "Thanks";
             finalMessage += "                                                                               ";
             finalMessage += logo;
-            string messageBody = string.Format(HtmlBody,
-                subject,
-                string.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
-                recepientName,
-                recepientName,
-                confirmPageUrl,
-                yesTinyUrl,
-                noTinyUrl
-                );
+            //string messageBody = string.Format(HtmlBody,
+            //    subject,
+            //    string.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
+            //    recepientName,
+            //    recepientName,
+            //    confirmPageUrl,
+            //    yesTinyUrl,
+            //    noTinyUrl
+            //    );
 
             var response = SMS.API.SendSingleMessage("+" + mobile, finalMessage, device, timestamp, isMMS, null, priority);
-
+            var meetingTime = DateTime.Now.AddDays(1);
+            if (DateTime.TryParse(message.Time, out DateTime date))
+            {
+                meetingTime = date;
+            }
             var scheduleMessage = new ClaimMessage
             {
                 Message = finalMessage,
@@ -136,7 +141,7 @@ namespace risk.control.system.Services
                 RecepicientEmail = recepientName,
                 SenderEmail = claim.CurrentClaimOwner,
                 UpdatedBy = claim.CurrentClaimOwner,
-                Updated = DateTime.UtcNow
+                Updated = meetingTime
             };
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
@@ -209,7 +214,7 @@ namespace risk.control.system.Services
             return claim;
         }
 
-        public async Task<(ClaimsInvestigation, CaseLocation, string)> GetClaim(string baseUrl, string id)
+        public async Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id)
         {
             var claim = context.ClaimsInvestigation
              .Include(c => c.ClaimMessages)
@@ -255,14 +260,14 @@ namespace risk.control.system.Services
                 recepientName = beneficiary.BeneficiaryName;
             }
 
-            var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmAcountRegister.html");
+            //var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmAcountRegister.html");
 
-            var subject = "Verify Your E-mail Address ";
-            string HtmlBody = "";
-            using (StreamReader stream = File.OpenText(path))
-            {
-                HtmlBody = stream.ReadToEnd();
-            }
+            //var subject = "Verify Your E-mail Address ";
+            //string HtmlBody = "";
+            //using (StreamReader stream = File.OpenText(path))
+            //{
+            //    HtmlBody = stream.ReadToEnd();
+            //}
 
             string fullUrl = $"{baseUrl}/api/notification/ConfirmSchedule?id={id}&confirm=";
             string yesUrl = $"{fullUrl}Y";
@@ -274,17 +279,21 @@ namespace risk.control.system.Services
             address = new Uri("http://tinyurl.com/api-create.php?url=" + noUrl);
             var noTinyUrl = client.DownloadString(address);
 
-            string messageBody = string.Format(HtmlBody,
-                subject,
-                string.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
-                recepientName,
-                recepientName,
-                "#",
-                yesTinyUrl,
-                noTinyUrl
-                );
+            var agent = context.VendorApplicationUser.FirstOrDefault(u => u.Email == claim.CurrentClaimOwner);
 
-            return (claim, beneficiary, messageBody);
+            //string messageBody = string.Format(HtmlBody,
+            //    subject,
+            //    string.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
+            //    recepientName,
+            //    recepientName,
+            //    "#",
+            //    yesTinyUrl,
+            //    noTinyUrl
+            //    );
+            var scheduleMessage = context.ClaimMessage
+                .Where(m => m.ClaimsInvestigationId == id)?
+                .OrderByDescending(m => m.Created)?.FirstOrDefault();
+            return (scheduleMessage, yesUrl, noUrl);
         }
     }
 }

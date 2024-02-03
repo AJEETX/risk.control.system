@@ -22,11 +22,14 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index(string id)
         {
-            string baseUrl = HttpContext.Request.GetDisplayUrl().Replace(HttpContext.Request.Path, "");
+            var currentUrl = HttpContext.Request.GetDisplayUrl();
+            string tempUrl = currentUrl.Replace(HttpContext.Request.Path, "");
+            int index = tempUrl.IndexOf("?");
+            string baseUrl = tempUrl.Substring(0, index);
 
-            var claim = await notificationService.GetClaim(baseUrl, id);
+            var claimMessage = await notificationService.GetClaim(baseUrl, id);
 
-            return View();
+            return View(claimMessage);
         }
     }
 }
