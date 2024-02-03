@@ -1,53 +1,88 @@
-﻿using ImageMagick;
+﻿using SkiaSharp;
 
 namespace risk.control.system.Helpers
 {
     public static class ImageCompression
     {
-        public static byte[] Converter(byte[] imageBytes, int maxquality = 100)
+        private static int Width = 800;
+        private static int Height = 600;
+
+        public static byte[] ConverterSkia(byte[] imageBytes, int maxquality = 100)
         {
-            try
+            if (imageBytes.Length > 1 * 1024)
             {
-                if (imageBytes.Length > 500 * 1024)
-                {
-                    byte[] optimizedImageBytes = OptimizeImage(imageBytes, maxquality * 1024);
-                    return optimizedImageBytes;
-                }
-                return imageBytes;
+                var stream = new MemoryStream(imageBytes);
+                using var skData = SKData.Create(stream);
+                using var codec = SKCodec.Create(skData);
+
+                var supportedScale = codec.GetScaledDimensions((float)Width / codec.Info.Width);
+
+                var nearest = new SKImageInfo(supportedScale.Width, supportedScale.Height);
+                using var destinationImage = SKBitmap.Decode(codec, nearest);
+                using var resizedImage = destinationImage.Resize(new SKImageInfo(Width, Height), SKFilterQuality.High);
+
+                var format = SKEncodedImageFormat.Jpeg;
+                using var outputImage = SKImage.FromBitmap(resizedImage);
+                using var data = outputImage.Encode(format, maxquality);
+
+                using var memoryStream = new MemoryStream();
+                data.SaveTo(memoryStream);
+                return memoryStream.ToArray();
+
+                //using var outputStream = GetOutputStream("skiasharp");
+                //data.SaveTo(outputStream);
+
+                //using var ms = new MemoryStream();
+                //outputStream.CopyTo(ms);
+                //var bytes = ms.ToArray();
+                //outputStream.Close();
+                //stream.Close();
+                //return bytes;
             }
-            catch (Exception e)
-            {
-                throw new Exception("Erro durante a compressão da imagem: " + e.Message);
-            }
+            return imageBytes;
         }
 
-        private static byte[] OptimizeImage(byte[] imageBytes, long maxSizeBytes)
+        public static byte[] ConverterSkiaResize(byte[] imageBytes, int maxquality = 100)
         {
-            try
+            var resizeFactor = 0.5f;
+            var bitmap = SKBitmap.Decode(imageBytes);
+            var toBitmap = new SKBitmap((int)Math.Round(bitmap.Width * resizeFactor), (int)Math.Round(bitmap.Height * resizeFactor), bitmap.ColorType, bitmap.AlphaType);
+
+            var canvas = new SKCanvas(toBitmap);
+            // Draw a bitmap rescaled
+            canvas.SetMatrix(SKMatrix.MakeScale(resizeFactor, resizeFactor));
+            canvas.DrawBitmap(bitmap, 0, 0);
+            canvas.ResetMatrix();
+
+            var font = SKTypeface.FromFamilyName("Arial");
+            var brush = new SKPaint
             {
-                using var imageStream = new MemoryStream(imageBytes);
-                using MagickImage image = new MagickImage(imageStream);
-                image.Resize(new MagickGeometry(800, 600));
+                Typeface = font,
+                TextSize = 45.0f,
+                IsAntialias = true,
+                Color = new SKColor(255, 255, 255, 255)
+            };
+            canvas.DrawText("iCheckified!", bitmap.Width * resizeFactor / 3.0f, bitmap.Height * resizeFactor / 1.05f, brush);
 
-                int desiredQuality = 85;
+            canvas.Flush();
 
-                while (true)
-                {
-                    byte[] tempBytes = image.ToByteArray(MagickFormat.Jpg);
+            var image = SKImage.FromBitmap(toBitmap);
+            var data = image.Encode(SKEncodedImageFormat.Jpeg, maxquality);
 
-                    if (tempBytes.Length <= maxSizeBytes || desiredQuality < 5)
-                    {
-                        return tempBytes;
-                    }
+            using var memoryStream = new MemoryStream();
+            data.SaveTo(memoryStream);
 
-                    desiredQuality -= 5;
-                    image.Quality = desiredQuality;
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
+            using (var stream = new FileStream("output.jpg", FileMode.Create, FileAccess.Write))
+                data.SaveTo(stream);
+
+            data.Dispose();
+            image.Dispose();
+            canvas.Dispose();
+            brush.Dispose();
+            font.Dispose();
+            toBitmap.Dispose();
+            bitmap.Dispose();
+            return memoryStream.ToArray();
         }
     }
 }

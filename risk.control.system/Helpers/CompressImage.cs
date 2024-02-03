@@ -150,22 +150,22 @@ namespace risk.control.system.Helpers
             return null;
         }
 
-        public static byte[] Compress(byte[] imageByte, int quality = 99)
-        {
-            using var stream = new MemoryStream(imageByte);
-            using var image = SixLabors.ImageSharp.Image.Load(stream);
+        //public static byte[] Compress(byte[] imageByte, int quality = 99)
+        //{
+        //    using var stream = new MemoryStream(imageByte);
+        //    using var image = SixLabors.ImageSharp.Image.Load(stream);
 
-            var encoder = new JpegEncoder
-            {
-                Quality = quality, // Adjust this value for desired compression quality
-            };
-            using MemoryStream streamOut = new MemoryStream();
+        //    var encoder = new JpegEncoder
+        //    {
+        //        Quality = quality, // Adjust this value for desired compression quality
+        //    };
+        //    using MemoryStream streamOut = new MemoryStream();
 
-            image.Save(streamOut, encoder);
+        //    image.Save(streamOut, encoder);
 
-            var imageOutByte = streamOut.ToArray();
-            return imageOutByte;
-        }
+        //    var imageOutByte = streamOut.ToArray();
+        //    return imageOutByte;
+        //}
 
         public static byte[] ProcessCompress(byte[] imageByte, float cornerRadius = 10, int quality = 99)
         {

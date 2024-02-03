@@ -24,7 +24,7 @@
 
             // Send a MMS message using the Device ID 1.
             string attachments = "https://example.com/images/footer-logo.png,https://example.com/downloads/sms-gateway/images/section/create-chat-bot.png";
-            Dictionary<string, object> message2 = SMS.API.SendSingleMessage(mobile, message, "0", null, true, attachments);
+            Dictionary<string, object> message2 = SMS.API.SendSingleMessage(mobile, message, "0", null, true, attachments, true);
 
             // Send a message using the SIM in slot 1 of Device ID 1 (Represented as "1|0").
             // SIM slot is an index so the index of the first SIM is 0 and the index of the second SIM is 1.
