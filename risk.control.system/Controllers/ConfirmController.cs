@@ -37,9 +37,17 @@ namespace risk.control.system.Controllers
         public async Task<IActionResult> SendSms2Customer(string claimId, string name)
         {
             var currentUser = HttpContext.User.Identity.Name;
-            notificationService.SendSms2Customer(currentUser, claimId, name);
-            return Ok(new { message = "Message Sent: Success" });
-            //SmsService.SendSingleMessage(customerDetailId, name,true);
+            var customerName = notificationService.SendSms2Customer(currentUser, claimId, name);
+            return Ok(new { message = "Message Sent: Success", customerName = customerName });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> SendSms2Beneficiary(string claimId, string name)
+        {
+            var currentUser = HttpContext.User.Identity.Name;
+            var customerName = notificationService.SendSms2Beneficiary(currentUser, claimId, name);
+            return Ok(new { message = "Message Sent: Success", customerName = customerName });
         }
     }
 }

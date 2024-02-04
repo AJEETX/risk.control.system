@@ -611,7 +611,7 @@ $(document).ready(function () {
                 type: 'green',
                 icon: 'fa fa-user-plus',
                 content: '' +
-                    '<form id="cust-sms" method="post" action="Confirm/SendSms2Customer?claimId="' + claimId + ' class="formName">' +
+                    '<form method="post" action="Confirm/SendSms2Customer?claimId="' + claimId + ' class="formName">' +
                     '<div class="form-group">' +
                     '<hr>' +
                     '<label>Enter message</label>' +
@@ -628,18 +628,17 @@ $(document).ready(function () {
                                 $.alert('Enter message!!!');
                                 return false;
                             }
-                            $.alert('Sms message: ' + name);
+                            //$.alert('Sms message: ' + name);
 
                             ready = true;
-                            var formData = $('#cust-sms');
                             var self = this;
                             return $.ajax({
                                 url: '/Confirm/SendSms2Customer?claimId=' + claimId + '&name=' + name,
                                 method: 'get'
                             }).done(function (response) {
-                                self.setContent('Description: ' + response.description);
-                                self.setContentAppend('<br>Version: ' + response.version);
-                                self.setTitle(response.name);
+                                self.setContent('Status: ' + response.message);
+                                self.setContentAppend('<br>Sent to: ' + response.customerName);
+                                self.setTitle(response.message);
                             }).fail(function () {
                                 self.setContent('Something went wrong.');
                             });
@@ -666,17 +665,18 @@ $(document).ready(function () {
     })
 
     $('#beneficiary-comments').click(function () {
+        var claimId = $('#claimId').val();
         $.confirm({
-            title: 'Beneficiary Note!!!',
+            title: 'SMS Beneficiary !!!',
             icon: 'fas fa-user-tie',
             closeIcon: true,
             type: 'green',
             content: '' +
-                '<form action="" class="formName">' +
+                '<form method="post" action="Confirm/SendSms2Beneficiary?claimId="' + claimId + ' class="formName">' +
                 '<div class="form-group">' +
                 '<hr>' +
-                '<label>Enter note about Beneficiary</label>' +
-                '<input type="text" placeholder="Enter note" class="name form-control" required />' +
+                '<label>Enter message</label>' +
+                '<input type="text" placeholder="Enter message" class="name form-control" required />' +
                 '</div>' +
                 '</form>',
             buttons: {
@@ -686,10 +686,20 @@ $(document).ready(function () {
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('Provide Beneficiary note!!!');
+                            $.alert('Provide message!!!');
                             return false;
                         }
-                        $.alert('Beneficiary note is ' + name);
+                        var self = this;
+                        return $.ajax({
+                            url: '/Confirm/SendSms2Beneficiary?claimId=' + claimId + '&name=' + name,
+                            method: 'get'
+                        }).done(function (response) {
+                            self.setContent('Status: ' + response.message);
+                            self.setContentAppend('<br>Sent to: ' + response.customerName);
+                            self.setTitle(response.message);
+                        }).fail(function () {
+                            self.setContent('Something went wrong.');
+                        });
                     }
                 },
                 cancel: function () {
