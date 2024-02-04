@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +9,10 @@ namespace risk.control.system.Controllers
     public class ConfirmController : Controller
     {
         private readonly INotificationService notificationService;
-        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public ConfirmController(INotificationService notificationService, IWebHostEnvironment webHostEnvironment)
+        public ConfirmController(INotificationService notificationService)
         {
             this.notificationService = notificationService;
-            this.webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
@@ -38,6 +35,8 @@ namespace risk.control.system.Controllers
         {
             var currentUser = HttpContext.User.Identity.Name;
             var customerName = notificationService.SendSms2Customer(currentUser, claimId, name);
+
+            await Task.Delay(4000);
             return Ok(new { message = "Message Sent: Success", customerName = customerName });
         }
 
@@ -47,6 +46,7 @@ namespace risk.control.system.Controllers
         {
             var currentUser = HttpContext.User.Identity.Name;
             var customerName = notificationService.SendSms2Beneficiary(currentUser, claimId, name);
+            await Task.Delay(4000);
             return Ok(new { message = "Message Sent: Success", customerName = customerName });
         }
     }
