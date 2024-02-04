@@ -23,7 +23,9 @@ namespace risk.control.system.Services
 
         Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
-        void SendSms2Customer(string currentUser, string claimId, string sms);
+        string SendSms2Customer(string currentUser, string claimId, string sms);
+
+        string SendSms2Beneficiary(string currentUser, string claimId, string sms);
     }
 
     public class NotificationService : INotificationService
@@ -304,7 +306,7 @@ namespace risk.control.system.Services
             return (scheduleMessage, yesUrl, noUrl);
         }
 
-        public void SendSms2Customer(string currentUser, string claimId, string sms)
+        public string SendSms2Customer(string currentUser, string claimId, string sms)
         {
             var claim = context.ClaimsInvestigation
             .Include(c => c.ClaimMessages)
@@ -322,6 +324,8 @@ namespace risk.control.system.Services
             message += "                                         ";
             message += $"{user.FirstName} {user.LastName}";
             message += "                                         ";
+            message += $"Message content:";
+            message += "                                         ";
             message += $"{sms}";
             message += "                                         ";
             message += $"{logo}";
@@ -337,7 +341,49 @@ namespace risk.control.system.Services
             };
             claim.ClaimMessages.Add(scheduleMessage);
             context.SaveChanges();
-            var response = SMS.API.SendSingleMessage("+" + claim.CustomerDetail.ContactNumber, message, "0", null, false, null, true);
+            var response = SMS.API.SendSingleMessage("+" + mobile, message, "0", null, false, null, true);
+            return claim.CustomerDetail.CustomerName;
+        }
+
+        public string SendSms2Beneficiary(string currentUser, string claimId, string sms)
+        {
+            var beneficiary = context.CaseLocation
+               .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var mobile = beneficiary.BeneficiaryContactNumber.ToString();
+            var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
+
+            var message = $"Dear {beneficiary.BeneficiaryName}";
+            message += "                                         ";
+            message += $"Message from:";
+            message += "                                         ";
+            message += $"{user.FirstName} {user.LastName}";
+            message += "                                         ";
+            message += $"Message content:";
+            message += "                                         ";
+            message += $"{sms}";
+            message += "                                         ";
+            message += $"{logo}";
+
+            var scheduleMessage = new ClaimMessage
+            {
+                Message = message,
+                ClaimsInvestigationId = claimId,
+                RecepicientEmail = beneficiary.BeneficiaryName,
+                SenderEmail = user.Email,
+                UpdatedBy = user.Email,
+                Updated = DateTime.UtcNow
+            };
+            var claim = context.ClaimsInvestigation
+            .Include(c => c.ClaimMessages)
+            .Include(c => c.PolicyDetail)
+            .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+            .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+            claim.ClaimMessages.Add(scheduleMessage);
+            context.SaveChanges();
+            var response = SMS.API.SendSingleMessage("+" + mobile, message, "0", null, false, null, true);
+            return beneficiary.BeneficiaryName;
         }
     }
 }

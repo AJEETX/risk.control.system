@@ -603,15 +603,15 @@ $(document).ready(function () {
     var ready = false;
     $('#customer-comments').click(function (e) {
         var claimId = $('#claimId').val();
-        e.preventDefault();
         if (!ready) {
+            e.preventDefault();
             $.confirm({
                 title: 'SMS Customer !!!',
                 closeIcon: true,
                 type: 'green',
                 icon: 'fa fa-user-plus',
                 content: '' +
-                    '<form id="cust-sms" method="post" action="Confirm/SendSms2Customer?claimId="' + claimId + ' class="formName">' +
+                    '<form method="post" action="Confirm/SendSms2Customer?claimId="' + claimId + ' class="formName">' +
                     '<div class="form-group">' +
                     '<hr>' +
                     '<label>Enter message</label>' +
@@ -628,10 +628,20 @@ $(document).ready(function () {
                                 $.alert('Enter message!!!');
                                 return false;
                             }
-                            $.alert('Sms message: ' + name);
+                            //$.alert('Sms message: ' + name);
+
                             ready = true;
-                            var form = $('#cust-sms');
-                            form.submit();
+                            var self = this;
+                            return $.ajax({
+                                url: '/Confirm/SendSms2Customer?claimId=' + claimId + '&name=' + name,
+                                method: 'get'
+                            }).done(function (response) {
+                                self.setContent('Status: ' + response.message);
+                                self.setContentAppend('<br>Sent to: ' + response.customerName);
+                                self.setTitle(response.message);
+                            }).fail(function () {
+                                self.setContent('Something went wrong.');
+                            });
                         }
                     },
                     cancel: function () {
@@ -644,7 +654,7 @@ $(document).ready(function () {
                     this.$content.find('form').on('submit', function (e) {
                         // if the user submits the form by pressing enter in the field.
                         e.preventDefault();
-                        //jc.$$formSubmit.trigger('click'); // reference the button and click it
+                        jc.$$formSubmit.trigger('click'); // reference the button and click it
 
                         //var form = $('#cust-sms');
                         //form.submit();
@@ -652,51 +662,61 @@ $(document).ready(function () {
                 }
             });
         }
-        
-})
+    })
 
-$('#beneficiary-comments').click(function () {
-    $.confirm({
-        title: 'Beneficiary Note!!!',
-        icon: 'fas fa-user-tie',
-        closeIcon: true,
-        type: 'green',
-        content: '' +
-            '<form action="" class="formName">' +
-            '<div class="form-group">' +
-            '<hr>' +
-            '<label>Enter note about Beneficiary</label>' +
-            '<input type="text" placeholder="Enter note" class="name form-control" required />' +
-            '</div>' +
-            '</form>',
-        buttons: {
-            formSubmit: {
-                text: 'Add Note',
-                btnClass: 'btn-green',
-                action: function () {
-                    var name = this.$content.find('.name').val();
-                    if (!name) {
-                        $.alert('Provide Beneficiary note!!!');
-                        return false;
+    $('#beneficiary-comments').click(function () {
+        var claimId = $('#claimId').val();
+        $.confirm({
+            title: 'SMS Beneficiary !!!',
+            icon: 'fas fa-user-tie',
+            closeIcon: true,
+            type: 'green',
+            content: '' +
+                '<form method="post" action="Confirm/SendSms2Beneficiary?claimId="' + claimId + ' class="formName">' +
+                '<div class="form-group">' +
+                '<hr>' +
+                '<label>Enter message</label>' +
+                '<input type="text" placeholder="Enter message" class="name form-control" required />' +
+                '</div>' +
+                '</form>',
+            buttons: {
+                formSubmit: {
+                    text: 'Add Note',
+                    btnClass: 'btn-green',
+                    action: function () {
+                        var name = this.$content.find('.name').val();
+                        if (!name) {
+                            $.alert('Provide message!!!');
+                            return false;
+                        }
+                        var self = this;
+                        return $.ajax({
+                            url: '/Confirm/SendSms2Beneficiary?claimId=' + claimId + '&name=' + name,
+                            method: 'get'
+                        }).done(function (response) {
+                            self.setContent('Status: ' + response.message);
+                            self.setContentAppend('<br>Sent to: ' + response.customerName);
+                            self.setTitle(response.message);
+                        }).fail(function () {
+                            self.setContent('Something went wrong.');
+                        });
                     }
-                    $.alert('Beneficiary note is ' + name);
-                }
+                },
+                cancel: function () {
+                    //close
+                },
             },
-            cancel: function () {
-                //close
-            },
-        },
-        onContentReady: function () {
-            // bind to events
-            var jc = this;
-            this.$content.find('form').on('submit', function (e) {
-                // if the user submits the form by pressing enter in the field.
-                e.preventDefault();
-                jc.$$formSubmit.trigger('click'); // reference the button and click it
-            });
-        }
-    });
-})
+            onContentReady: function () {
+                // bind to events
+                var jc = this;
+                this.$content.find('form').on('submit', function (e) {
+                    // if the user submits the form by pressing enter in the field.
+                    e.preventDefault();
+                    jc.$$formSubmit.trigger('click'); // reference the button and click it
+                });
+            }
+        });
+    })
 });
 
 function checkIfAllChecked(elements) {
