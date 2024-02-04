@@ -31,5 +31,14 @@ namespace risk.control.system.Controllers
 
             return View(claimMessage);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SendSms2Customer(string claimId, string name)
+        {
+            var currentUser = HttpContext.User.Identity.Name;
+            notificationService.SendSms2Customer(currentUser, claimId, name);
+            return Ok(new { message = "Message Sent: Success" });
+            //SmsService.SendSingleMessage(customerDetailId, name,true);
+        }
     }
 }

@@ -639,7 +639,7 @@ dl.row {
     }
 
 .asterik-style {
-    font-size: .4rem;
+    font-size: .4rem !important;
     color: red;
     padding-bottom: 1rem;
 }

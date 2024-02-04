@@ -600,92 +600,103 @@ $(document).ready(function () {
             }
         });
     })
-
-    $('#customer-comments').click(function () {
-        $.confirm({
-            title: 'Customer Note!!!',
-            closeIcon: true,
-            type: 'green',
-            icon: 'fa fa-user-plus',
-            content: '' +
-                '<form action="" class="formName">' +
-                '<div class="form-group">' +
-                '<hr>' +
-                '<label>Enter note on Customer</label>' +
-                '<input type="text" placeholder="Enter note" class="name form-control" required />' +
-                '</div>' +
-                '</form>',
-            buttons: {
-                formSubmit: {
-                    text: 'Add Note',
-                    btnClass: 'btn-green',
-                    action: function () {
-                        var name = this.$content.find('.name').val();
-                        if (!name) {
-                            $.alert('Provide Customer note!!!');
-                            return false;
+    var ready = false;
+    $('#customer-comments').click(function (e) {
+        var claimId = $('#claimId').val();
+        e.preventDefault();
+        if (!ready) {
+            $.confirm({
+                title: 'SMS Customer !!!',
+                closeIcon: true,
+                type: 'green',
+                icon: 'fa fa-user-plus',
+                content: '' +
+                    '<form id="cust-sms" method="post" action="Confirm/SendSms2Customer?claimId="' + claimId + ' class="formName">' +
+                    '<div class="form-group">' +
+                    '<hr>' +
+                    '<label>Enter message</label>' +
+                    '<input type="text" placeholder="Enter message" class="name form-control" required />' +
+                    '</div>' +
+                    '</form>',
+                buttons: {
+                    formSubmit: {
+                        text: 'Send SMS',
+                        btnClass: 'btn-green',
+                        action: function () {
+                            var name = this.$content.find('.name').val();
+                            if (!name) {
+                                $.alert('Enter message!!!');
+                                return false;
+                            }
+                            $.alert('Sms message: ' + name);
+                            ready = true;
+                            var form = $('#cust-sms');
+                            form.submit();
                         }
-                        $.alert('Customer note is ' + name);
-                    }
+                    },
+                    cancel: function () {
+                        //close
+                    },
                 },
-                cancel: function () {
-                    //close
-                },
-            },
-            onContentReady: function () {
-                // bind to events
-                var jc = this;
-                this.$content.find('form').on('submit', function (e) {
-                    // if the user submits the form by pressing enter in the field.
-                    e.preventDefault();
-                    jc.$$formSubmit.trigger('click'); // reference the button and click it
-                });
-            }
-        });
-    })
+                onContentReady: function () {
+                    // bind to events
+                    var jc = this;
+                    this.$content.find('form').on('submit', function (e) {
+                        // if the user submits the form by pressing enter in the field.
+                        e.preventDefault();
+                        //jc.$$formSubmit.trigger('click'); // reference the button and click it
 
-    $('#beneficiary-comments').click(function () {
-        $.confirm({
-            title: 'Beneficiary Note!!!',
-            icon: 'fas fa-user-tie',
-            closeIcon: true,
-            type: 'green',
-            content: '' +
-                '<form action="" class="formName">' +
-                '<div class="form-group">' +
-                '<hr>' +
-                '<label>Enter note about Beneficiary</label>' +
-                '<input type="text" placeholder="Enter note" class="name form-control" required />' +
-                '</div>' +
-                '</form>',
-            buttons: {
-                formSubmit: {
-                    text: 'Add Note',
-                    btnClass: 'btn-green',
-                    action: function () {
-                        var name = this.$content.find('.name').val();
-                        if (!name) {
-                            $.alert('Provide Beneficiary note!!!');
-                            return false;
-                        }
-                        $.alert('Beneficiary note is ' + name);
+                        //var form = $('#cust-sms');
+                        //form.submit();
+                    });
+                }
+            });
+        }
+        
+})
+
+$('#beneficiary-comments').click(function () {
+    $.confirm({
+        title: 'Beneficiary Note!!!',
+        icon: 'fas fa-user-tie',
+        closeIcon: true,
+        type: 'green',
+        content: '' +
+            '<form action="" class="formName">' +
+            '<div class="form-group">' +
+            '<hr>' +
+            '<label>Enter note about Beneficiary</label>' +
+            '<input type="text" placeholder="Enter note" class="name form-control" required />' +
+            '</div>' +
+            '</form>',
+        buttons: {
+            formSubmit: {
+                text: 'Add Note',
+                btnClass: 'btn-green',
+                action: function () {
+                    var name = this.$content.find('.name').val();
+                    if (!name) {
+                        $.alert('Provide Beneficiary note!!!');
+                        return false;
                     }
-                },
-                cancel: function () {
-                    //close
-                },
+                    $.alert('Beneficiary note is ' + name);
+                }
             },
-            onContentReady: function () {
-                // bind to events
-                var jc = this;
-                this.$content.find('form').on('submit', function (e) {
-                    // if the user submits the form by pressing enter in the field.
-                    e.preventDefault();
-                    jc.$$formSubmit.trigger('click'); // reference the button and click it
-                });
-            }
-        });
-    })
+            cancel: function () {
+                //close
+            },
+        },
+        onContentReady: function () {
+            // bind to events
+            var jc = this;
+            this.$content.find('form').on('submit', function (e) {
+                // if the user submits the form by pressing enter in the field.
+                e.preventDefault();
+                jc.$$formSubmit.trigger('click'); // reference the button and click it
+            });
+        }
+    });
+})
 });
 
 function checkIfAllChecked(elements) {
