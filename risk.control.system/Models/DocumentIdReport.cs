@@ -34,7 +34,7 @@ namespace risk.control.system.Models
         public string? DocumentIdImageLocationAddress { get; set; }
 
         public string? DocumentIdImageLongLat { get; set; }
-        public DateTime? DocumentIdImageLongLatTime { get; set; } = DateTime.UtcNow;
+        public DateTime? DocumentIdImageLongLatTime { get; set; }
         public DocumentIdReportType DocumentIdReportType { get; set; } = DocumentIdReportType.PAN;
     }
 

@@ -1,9 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+
+using Microsoft.EntityFrameworkCore;
+
+using NuGet.Packaging.Signing;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
+
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Services
 {
@@ -16,6 +22,8 @@ namespace risk.control.system.Services
         Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct);
 
         Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
+
+        void SendSms2Customer(string currentUser, string claimId, string sms);
     }
 
     public class NotificationService : INotificationService
@@ -294,6 +302,42 @@ namespace risk.control.system.Services
                 .Where(m => m.ClaimsInvestigationId == id)?
                 .OrderByDescending(m => m.Created)?.FirstOrDefault();
             return (scheduleMessage, yesUrl, noUrl);
+        }
+
+        public void SendSms2Customer(string currentUser, string claimId, string sms)
+        {
+            var claim = context.ClaimsInvestigation
+            .Include(c => c.ClaimMessages)
+            .Include(c => c.PolicyDetail)
+            .Include(c => c.CustomerDetail)
+               .ThenInclude(c => c.PinCode)
+            .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
+
+            var mobile = claim.CustomerDetail.ContactNumber.ToString();
+            var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
+
+            var message = $"Dear {claim.CustomerDetail.CustomerName}";
+            message += "                                         ";
+            message += $"Message from:";
+            message += "                                         ";
+            message += $"{user.FirstName} {user.LastName}";
+            message += "                                         ";
+            message += $"{sms}";
+            message += "                                         ";
+            message += $"{logo}";
+
+            var scheduleMessage = new ClaimMessage
+            {
+                Message = message,
+                ClaimsInvestigationId = claimId,
+                RecepicientEmail = claim.CurrentClaimOwner,
+                SenderEmail = user.Email,
+                UpdatedBy = user.Email,
+                Updated = DateTime.UtcNow
+            };
+            claim.ClaimMessages.Add(scheduleMessage);
+            context.SaveChanges();
+            var response = SMS.API.SendSingleMessage("+" + claim.CustomerDetail.ContactNumber, message, "0", null, false, null, true);
         }
     }
 }

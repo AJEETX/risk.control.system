@@ -33,7 +33,7 @@ namespace risk.control.system.Models
         public string? DigitalIdImageMatchConfidence { get; set; } = string.Empty;
 
         public string? DigitalIdImageLongLat { get; set; }
-        public DateTime? DigitalIdImageLongLatTime { get; set; } = DateTime.UtcNow;
+        public DateTime? DigitalIdImageLongLatTime { get; set; }
         public DigitalIdReportType ReportType { get; set; } = DigitalIdReportType.SINGLE_FACE;
     }
 
