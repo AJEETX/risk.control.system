@@ -319,15 +319,15 @@ namespace risk.control.system.Services
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
 
             var message = $"Dear {claim.CustomerDetail.CustomerName}";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"Message from:";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"{user.FirstName} {user.LastName}";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"Message content:";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"{sms}";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"{logo}";
 
             var scheduleMessage = new ClaimMessage
@@ -354,15 +354,15 @@ namespace risk.control.system.Services
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
 
             var message = $"Dear {beneficiary.BeneficiaryName}";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"Message from:";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"{user.FirstName} {user.LastName}";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"Message content:";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"{sms}";
-            message += "                                         ";
+            message += "                                                                                ";
             message += $"{logo}";
 
             var scheduleMessage = new ClaimMessage

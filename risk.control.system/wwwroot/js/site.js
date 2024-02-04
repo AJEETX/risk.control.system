@@ -622,25 +622,40 @@ $(document).ready(function () {
                     formSubmit: {
                         text: 'Send SMS',
                         btnClass: 'btn-green',
-                        action: function () {
+                        action: function (e) {
                             var name = this.$content.find('.name').val();
                             if (!name) {
                                 $.alert('Enter message!!!');
                                 return false;
                             }
-                            //$.alert('Sms message: ' + name);
-
-                            ready = true;
-                            var self = this;
                             return $.ajax({
                                 url: '/Confirm/SendSms2Customer?claimId=' + claimId + '&name=' + name,
                                 method: 'get'
                             }).done(function (response) {
-                                self.setContent('Status: ' + response.message);
-                                self.setContentAppend('<br>Sent to: ' + response.customerName);
-                                self.setTitle(response.message);
+                                $.confirm({
+                                    title: 'Message Status',
+                                    content: 'Your message was sent.',
+                                    autoClose: 'logoutUser|5000',
+                                    buttons: {
+                                        logoutUser: {
+                                            text: 'ok',
+                                            action: function () {
+                                                $.alert('The messge was sent');
+                                            }
+                                        },
+                                        cancel: function () {
+                                            $.alert('canceled');
+                                        }
+                                    }
+                                })
+                                
                             }).fail(function () {
-                                self.setContent('Something went wrong.');
+                                $.alert({
+                                    title: 'Message Status!',
+                                    content: 'Status: failed',
+                                });
+                            }).always(function () {
+                                location.reload();
                             });
                         }
                     },
@@ -681,12 +696,12 @@ $(document).ready(function () {
                 '</form>',
             buttons: {
                 formSubmit: {
-                    text: 'Add Note',
+                    text: 'Send SMS',
                     btnClass: 'btn-green',
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('Provide message!!!');
+                            $.alert('Enter message!!!');
                             return false;
                         }
                         var self = this;
@@ -694,11 +709,15 @@ $(document).ready(function () {
                             url: '/Confirm/SendSms2Beneficiary?claimId=' + claimId + '&name=' + name,
                             method: 'get'
                         }).done(function (response) {
-                            self.setContent('Status: ' + response.message);
-                            self.setContentAppend('<br>Sent to: ' + response.customerName);
-                            self.setTitle(response.message);
+                            $.alert({
+                                title: 'Message Status!',
+                                content: 'Status: ' + response.message,
+                            });
+                            
                         }).fail(function () {
                             self.setContent('Something went wrong.');
+                        }).always(function () {
+                            location.reload();
                         });
                     }
                 },
