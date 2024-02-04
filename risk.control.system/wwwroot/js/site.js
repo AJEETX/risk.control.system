@@ -603,80 +603,64 @@ $(document).ready(function () {
     var ready = false;
     $('#customer-comments').click(function (e) {
         var claimId = $('#claimId').val();
-        if (!ready) {
-            e.preventDefault();
-            $.confirm({
-                title: 'SMS Customer !!!',
-                closeIcon: true,
-                type: 'green',
-                icon: 'fa fa-user-plus',
-                content: '' +
-                    '<form method="post" action="Confirm/SendSms2Customer?claimId="' + claimId + ' class="formName">' +
-                    '<div class="form-group">' +
-                    '<hr>' +
-                    '<label>Enter message</label>' +
-                    '<input type="text" placeholder="Enter message" class="name form-control" required />' +
-                    '</div>' +
-                    '</form>',
-                buttons: {
-                    formSubmit: {
-                        text: 'Send SMS',
-                        btnClass: 'btn-green',
-                        action: function (e) {
-                            var name = this.$content.find('.name').val();
-                            if (!name) {
-                                $.alert('Enter message!!!');
-                                return false;
-                            }
-                            return $.ajax({
-                                url: '/Confirm/SendSms2Customer?claimId=' + claimId + '&name=' + name,
-                                method: 'get'
-                            }).done(function (response) {
-                                $.confirm({
-                                    title: 'Message Status',
-                                    content: 'Your message was sent.',
-                                    autoClose: 'logoutUser|5000',
-                                    buttons: {
-                                        logoutUser: {
-                                            text: 'ok',
-                                            action: function () {
-                                                $.alert('The messge was sent');
-                                            }
-                                        },
-                                        cancel: function () {
-                                            $.alert('canceled');
-                                        }
-                                    }
-                                })
-                                
-                            }).fail(function () {
-                                $.alert({
-                                    title: 'Message Status!',
-                                    content: 'Status: failed',
-                                });
-                            }).always(function () {
-                                location.reload();
-                            });
+        $.confirm({
+            title: 'SMS Customer !!!',
+            closeIcon: true,
+            type: 'green',
+            icon: 'fa fa-user-plus',
+            content: '' +
+                '<form method="post" action="Confirm/SendSms2Customer?claimId="' + claimId + ' class="formName">' +
+                '<div class="form-group">' +
+                '<hr>' +
+                '<label>Enter message</label>' +
+                '<input type="text" placeholder="Enter message" class="name form-control" required />' +
+                '</div>' +
+                '</form>',
+            buttons: {
+                formSubmit: {
+                    text: 'Send SMS',
+                    btnClass: 'btn-green',
+                    action: function (e) {
+                        var name = this.$content.find('.name').val();
+                        if (!name) {
+                            $.alert('Enter message!!!');
+                            return false;
                         }
-                    },
-                    cancel: function () {
-                        //close
-                    },
+                        return $.ajax({
+                            url: '/Confirm/SendSms2Customer?claimId=' + claimId + '&name=' + name,
+                            method: 'get'
+                        }).done(function (response) {
+                            $.alert({
+                                title: 'Message Status!',
+                                content: 'Status: ' + response.message,
+                            });
+                        }).fail(function () {
+                            $.alert({
+                                title: 'Message Status!',
+                                content: 'Status: failed',
+                            });
+                        }).always(function () {
+                            location.reload();
+                        });
+                    }
                 },
-                onContentReady: function () {
-                    // bind to events
-                    var jc = this;
-                    this.$content.find('form').on('submit', function (e) {
-                        // if the user submits the form by pressing enter in the field.
-                        e.preventDefault();
-                        jc.$$formSubmit.trigger('click'); // reference the button and click it
+                cancel: function () {
+                    //close
+                },
+            },
+            onContentReady: function () {
+                // bind to events
+                var jc = this;
+                this.$content.find('form').on('submit', function (e) {
+                    // if the user submits the form by pressing enter in the field.
+                    e.preventDefault();
+                    jc.$$formSubmit.trigger('click'); // reference the button and click it
 
-                        //var form = $('#cust-sms');
-                        //form.submit();
-                    });
-                }
-            });
-        }
+                    //var form = $('#cust-sms');
+                    //form.submit();
+                });
+            }
+        });
     })
 
     $('#beneficiary-comments').click(function () {
@@ -713,7 +697,6 @@ $(document).ready(function () {
                                 title: 'Message Status!',
                                 content: 'Status: ' + response.message,
                             });
-                            
                         }).fail(function () {
                             self.setContent('Something went wrong.');
                         }).always(function () {
