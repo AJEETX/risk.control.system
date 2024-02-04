@@ -3,28 +3,28 @@
     <article>
     
         <div class="bb-blog-inner">
-            <header class="bb-blog-header">
-                <h5 class="bb-blog-title" itemprop="name"><i class="fas fa-user-shield"></i> Agent Investigation</h5>
-            </header>
-            <div class="card card-solid">
-                <div class="progress">
-                    <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
-                    <div class="progress-bar" role="progressbar" style="width:49%;background-color:green;">
-                        investigation report
-                    </div>
-                    <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                    <div class="progress-bar" role="progressbar" style="width:50%;background-color:red">
-                        agent remarks
-                    </div>
-                    <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+        <div class="card card-danger">
+            <div class="card-header">
+                <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" data-widget="chat-pane-toggle">
+                    <i class="fas fa-user-shield"></i>
+                </button>
+                <h3 class="card-title">Agent report # : @Model.Location.ClaimReport.AgentEmail </h3>
+
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
                 </div>
-                <div class="card-body pb-0">
-                    <div class="row">
+            </div>
+
+            <div class="card-body pb-0">
+                <div class="row">
                     <partial name="_DigitalIdReport" model="@Model" />
                     <partial name="_DocumentIdReport" model="@Model" />
                     <partial name="_Questionaire" model="@Model" />
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </article>
