@@ -603,8 +603,8 @@ $(document).ready(function () {
     var ready = false;
     $('#customer-comments').click(function (e) {
         var claimId = $('#claimId').val();
-        e.preventDefault();
         if (!ready) {
+            e.preventDefault();
             $.confirm({
                 title: 'SMS Customer !!!',
                 closeIcon: true,
@@ -629,9 +629,20 @@ $(document).ready(function () {
                                 return false;
                             }
                             $.alert('Sms message: ' + name);
+
                             ready = true;
-                            var form = $('#cust-sms');
-                            form.submit();
+                            var formData = $('#cust-sms');
+                            var self = this;
+                            return $.ajax({
+                                url: '/Confirm/SendSms2Customer?claimId=' + claimId + '&name=' + name,
+                                method: 'get'
+                            }).done(function (response) {
+                                self.setContent('Description: ' + response.description);
+                                self.setContentAppend('<br>Version: ' + response.version);
+                                self.setTitle(response.name);
+                            }).fail(function () {
+                                self.setContent('Something went wrong.');
+                            });
                         }
                     },
                     cancel: function () {
@@ -644,7 +655,7 @@ $(document).ready(function () {
                     this.$content.find('form').on('submit', function (e) {
                         // if the user submits the form by pressing enter in the field.
                         e.preventDefault();
-                        //jc.$$formSubmit.trigger('click'); // reference the button and click it
+                        jc.$$formSubmit.trigger('click'); // reference the button and click it
 
                         //var form = $('#cust-sms');
                         //form.submit();
@@ -652,51 +663,50 @@ $(document).ready(function () {
                 }
             });
         }
-        
-})
+    })
 
-$('#beneficiary-comments').click(function () {
-    $.confirm({
-        title: 'Beneficiary Note!!!',
-        icon: 'fas fa-user-tie',
-        closeIcon: true,
-        type: 'green',
-        content: '' +
-            '<form action="" class="formName">' +
-            '<div class="form-group">' +
-            '<hr>' +
-            '<label>Enter note about Beneficiary</label>' +
-            '<input type="text" placeholder="Enter note" class="name form-control" required />' +
-            '</div>' +
-            '</form>',
-        buttons: {
-            formSubmit: {
-                text: 'Add Note',
-                btnClass: 'btn-green',
-                action: function () {
-                    var name = this.$content.find('.name').val();
-                    if (!name) {
-                        $.alert('Provide Beneficiary note!!!');
-                        return false;
+    $('#beneficiary-comments').click(function () {
+        $.confirm({
+            title: 'Beneficiary Note!!!',
+            icon: 'fas fa-user-tie',
+            closeIcon: true,
+            type: 'green',
+            content: '' +
+                '<form action="" class="formName">' +
+                '<div class="form-group">' +
+                '<hr>' +
+                '<label>Enter note about Beneficiary</label>' +
+                '<input type="text" placeholder="Enter note" class="name form-control" required />' +
+                '</div>' +
+                '</form>',
+            buttons: {
+                formSubmit: {
+                    text: 'Add Note',
+                    btnClass: 'btn-green',
+                    action: function () {
+                        var name = this.$content.find('.name').val();
+                        if (!name) {
+                            $.alert('Provide Beneficiary note!!!');
+                            return false;
+                        }
+                        $.alert('Beneficiary note is ' + name);
                     }
-                    $.alert('Beneficiary note is ' + name);
-                }
+                },
+                cancel: function () {
+                    //close
+                },
             },
-            cancel: function () {
-                //close
-            },
-        },
-        onContentReady: function () {
-            // bind to events
-            var jc = this;
-            this.$content.find('form').on('submit', function (e) {
-                // if the user submits the form by pressing enter in the field.
-                e.preventDefault();
-                jc.$$formSubmit.trigger('click'); // reference the button and click it
-            });
-        }
-    });
-})
+            onContentReady: function () {
+                // bind to events
+                var jc = this;
+                this.$content.find('form').on('submit', function (e) {
+                    // if the user submits the form by pressing enter in the field.
+                    e.preventDefault();
+                    jc.$$formSubmit.trigger('click'); // reference the button and click it
+                });
+            }
+        });
+    })
 });
 
 function checkIfAllChecked(elements) {

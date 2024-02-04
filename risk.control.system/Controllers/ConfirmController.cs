@@ -32,7 +32,8 @@ namespace risk.control.system.Controllers
             return View(claimMessage);
         }
 
-        [HttpPost]
+        [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> SendSms2Customer(string claimId, string name)
         {
             var currentUser = HttpContext.User.Identity.Name;

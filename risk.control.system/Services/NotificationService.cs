@@ -318,7 +318,7 @@ namespace risk.control.system.Services
 
             var message = $"Dear {claim.CustomerDetail.CustomerName}";
             message += "                                         ";
-            message += $"Message from:";
+            message += $"Message from:                              ";
             message += "                                         ";
             message += $"{user.FirstName} {user.LastName}";
             message += "                                         ";
