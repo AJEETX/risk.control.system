@@ -1,15 +1,9 @@
-﻿using System.Reflection;
-
-using Microsoft.EntityFrameworkCore;
-
-using NuGet.Packaging.Signing;
+﻿using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
-
-using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Services
 {
@@ -105,14 +99,14 @@ namespace risk.control.system.Services
             //verifyMessage += "                                                       ";
             bool priority = true;
 
-            var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmSchedule.html");
+            //var path = Path.Combine(webHostEnvironment.WebRootPath, "form", "ConfirmSchedule.html");
 
-            var subject = "Verify Your E-mail Address ";
-            string HtmlBody = "";
-            using (StreamReader stream = File.OpenText(path))
-            {
-                HtmlBody = stream.ReadToEnd();
-            }
+            //var subject = "Verify Your E-mail Address ";
+            //string HtmlBody = "";
+            //using (StreamReader stream = File.OpenText(path))
+            //{
+            //    HtmlBody = stream.ReadToEnd();
+            //}
 
             var confirmPage = $"{message.BaseUrl + "/Confirm?id=" + message.ClaimId}";
             var address = new Uri("http://tinyurl.com/api-create.php?url=" + confirmPage);
