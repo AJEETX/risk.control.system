@@ -21,7 +21,6 @@
                         </div>
                         <div class="card-body">
                             <partial name="_PolicyDetails" model="@Model" />
-                            <partial name="_Chat" model="@Model" />
                             <partial name="_AgencyReport" model="@Model" />
                             @{
                                 foreach (var item in Model.Location?.PreviousClaimReports)

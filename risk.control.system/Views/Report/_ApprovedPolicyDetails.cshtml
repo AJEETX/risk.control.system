@@ -248,7 +248,6 @@
         }
 
         </div>
-        <partial name="_Chat" model="@Model.ClaimsInvestigation" />
 
         <header class="bb-blog-header">
         <h5 class="bb-blog-title" itemprop="name"><i class="fas fa-print nav-icon"></i> Agency Report: <span class="badge badge-light">@Model.Location.Vendor.Email</span> </h5>
@@ -415,7 +414,9 @@
                             <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
                         </div>
                         <div class="card-body">
+                            <partial name="_Chat" model="@Model.ClaimsInvestigation" />
                             <div class="row coming-soon-watermark">
+
                                 <div class="col-md-4 coming-soon-view">
                                     <img class="watermark" src="~/img/coming-soon.jpg" />
                                 </div>
