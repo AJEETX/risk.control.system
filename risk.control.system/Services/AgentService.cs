@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -44,6 +43,9 @@ namespace risk.control.system.Services
 
             var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(
                 u => u.PhoneNumber == mobile && !string.IsNullOrWhiteSpace(u.MobileUId));
+
+            if (user2Onboard == null)
+                return null!;
 
             var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
             if (!isAgent)

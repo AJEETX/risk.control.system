@@ -1,23 +1,9 @@
-﻿using System.Drawing;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Net.Mail;
-using System.Text;
-using System.Text.RegularExpressions;
-
-using Highsoft.Web.Mvc.Charts;
+﻿using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using NToastNotify;
-
-using NuGet.Packaging.Signing;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -25,9 +11,6 @@ using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
-
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace risk.control.system.Controllers.Api
 {
@@ -44,7 +27,6 @@ namespace risk.control.system.Controllers.Api
         private readonly IHttpClientService httpClientService;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
         private readonly IAgentService agentService;
-        private readonly IClaimsVendorService vendorService;
         private readonly IClaimsInvestigationService claimsInvestigationService;
         private readonly IMailboxService mailboxService;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -52,26 +34,21 @@ namespace risk.control.system.Controllers.Api
         private static string FaceMatchBaseUrl = "https://2j2sgigd3l.execute-api.ap-southeast-2.amazonaws.com/Development/icheckify";
         private static Random randomNumber = new Random();
 
-        private ILogger<AgentController> logger;
-
         //test PAN FNLPM8635N
         public AgentController(ApplicationDbContext context, IHttpClientService httpClientService,
             UserManager<VendorApplicationUser> userVendorManager,
             IAgentService agentService,
-            IClaimsVendorService vendorService,
             IClaimsInvestigationService claimsInvestigationService, IMailboxService mailboxService,
-            IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService, ILogger<AgentController> logger)
+            IWebHostEnvironment webHostEnvironment, IICheckifyService iCheckifyService)
         {
             this._context = context;
             this.httpClientService = httpClientService;
             this.userVendorManager = userVendorManager;
             this.agentService = agentService;
-            this.vendorService = vendorService;
             this.claimsInvestigationService = claimsInvestigationService;
             this.mailboxService = mailboxService;
             this.webHostEnvironment = webHostEnvironment;
             this.iCheckifyService = iCheckifyService;
-            this.logger = logger;
         }
 
         [AllowAnonymous]
@@ -84,7 +61,7 @@ namespace risk.control.system.Controllers.Api
 
                 if (user2Onboard == null)
                 {
-                    return BadRequest($"mobile number and/or Agent does not exist");
+                    return BadRequest($"Agent does not exist");
                 }
 
                 return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
