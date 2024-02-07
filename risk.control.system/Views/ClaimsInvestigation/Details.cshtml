@@ -81,35 +81,42 @@
                         <div class="card-body">
                             <article>
                                 <div class="bb-blog-inner">
-                                    <header class="bb-blog-header">
-                                        <h5 class="bb-blog-title" itemprop="name">Policy # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</h5>
-                                    </header>
-                                    <div class="container d-flex justify-content-center align-items-center">
-
-                                        <div class="progresses">
-
-                                            <div class="steps">
-                                                <span> <i class="far fa-file-powerpoint"></i></span>
+                                    <div class="card card-light expand-card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
+                                            <div class="card-tools">
+                                                <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light"></span>
+                                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
                                             </div>
-
-                                            <span class="@customerLineColor"></span>
-
-                                            <div class="@customerProgressColor">
-                                                <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
-                                            </div>
+                                        </div>
 
 
-                                            <span class="@beneficiaryLineColor"></span>
+                                        <div class="container d-flex justify-content-center align-items-center">
 
-                                            <div class="@benficiaryProgressColor">
-                                                <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                                            <div class="progresses">
+
+                                                <div class="steps">
+                                                    <span> <i class="far fa-file-powerpoint"></i></span>
+                                                </div>
+
+                                                <span class="@customerLineColor"></span>
+
+                                                <div class="@customerProgressColor">
+                                                    <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
+                                                </div>
+
+
+                                                <span class="@beneficiaryLineColor"></span>
+
+                                                <div class="@benficiaryProgressColor">
+                                                    <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                                                </div>
+
                                             </div>
 
                                         </div>
-
-                                    </div>
-                                    <div class="card card-solid">
-                                        
                                         <div class="card-body pb-0">
                                             <div class="row">
                                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
