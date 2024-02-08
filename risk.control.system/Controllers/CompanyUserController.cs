@@ -200,6 +200,11 @@ namespace risk.control.system.Controllers
                 string newFileName = userFullEmail;
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
+                string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                 using var dataStream = new MemoryStream();
@@ -302,6 +307,11 @@ namespace risk.control.system.Controllers
                         string newFileName = user.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
+                        string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                         using var dataStream = new MemoryStream();

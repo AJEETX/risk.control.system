@@ -650,7 +650,7 @@ dl.row {
 }
 
 .asterik-style-none {
-    font-size: .4rem;
+    font-size: .4rem !important;
     color: #e9ecef;
     padding-bottom: 1rem;
 }

@@ -147,6 +147,11 @@ namespace risk.control.system.Controllers
                         string newFileName = vendor.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
+                        string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                         vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
                         vendor.DocumentUrl = "/agency/" + newFileName;
@@ -233,6 +238,11 @@ namespace risk.control.system.Controllers
                         string newFileName = Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(vendorDocument.FileName);
                         newFileName += fileExtension;
+                        string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
 
                         using var dataStream = new MemoryStream();

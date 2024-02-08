@@ -113,6 +113,11 @@ namespace risk.control.system.Controllers
                     string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
                     string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                     newFileName += fileExtension;
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                    }
                     var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                     applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                     applicationUser.ProfilePictureUrl = "/agency/" + newFileName;

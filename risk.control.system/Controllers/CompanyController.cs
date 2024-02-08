@@ -134,6 +134,11 @@ namespace risk.control.system.Controllers
                         string newFileName = clientCompany.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(companyDocument.FileName);
                         newFileName += fileExtension;
+                        string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
                         companyDocument.CopyTo(new FileStream(upload, FileMode.Create));
                         clientCompany.DocumentUrl = "/company/" + newFileName;
@@ -230,6 +235,11 @@ namespace risk.control.system.Controllers
                 string newFileName = userFullEmail;
                 string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
                 newFileName += fileExtension;
+                string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
 
@@ -353,6 +363,11 @@ namespace risk.control.system.Controllers
                         string newFileName = applicationUser.Email + Guid.NewGuid().ToString();
                         string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
                         newFileName += fileExtension;
+                        string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
                         var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
                         applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
                         applicationUser.ProfilePictureUrl = "/company/" + newFileName;
