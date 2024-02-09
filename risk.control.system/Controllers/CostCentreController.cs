@@ -10,7 +10,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Cost Centre")]
+    [Breadcrumb("Admin Settings ")]
     public class CostCentreController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,7 +23,13 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index()
+        {
+            return RedirectToAction("Profile");
+        }
+
+        [Breadcrumb("Budget Centre")]
+        public async Task<IActionResult> Profile()
         {
             return _context.CostCentre != null ?
                         View(await _context.CostCentre.ToListAsync()) :
@@ -50,7 +56,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre/Create
-        [Breadcrumb("Add Cost Centre")]
+        [Breadcrumb("Add ", FromAction = "Profile")]
         public IActionResult Create()
         {
             return View();
@@ -76,7 +82,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre/Edit/5
-        [Breadcrumb("Edit Cost Centre")]
+        [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.CostCentre == null)
@@ -131,7 +137,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre/Delete/5
-        [Breadcrumb("Delete  Cost Centre")]
+        [Breadcrumb("Delete ", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.CostCentre == null)

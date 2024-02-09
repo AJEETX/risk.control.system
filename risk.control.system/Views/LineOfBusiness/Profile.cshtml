@@ -1,0 +1,90 @@
+﻿@model IEnumerable<risk.control.system.Models.LineOfBusiness>
+
+@{
+    ViewData["Title"] = @Applicationsettings.LINE_OF_BUSINESS;
+}
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h5 class="card-title"><i class="fas fa-business-time"></i>  @Applicationsettings.LINE_OF_BUSINESS</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card card-light">
+                                    <a class="btn btn-success" as-controller="LineOfbusiness" asp-action="Create"> <i class="fas fa-business-time"></i> Add  New </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 d-flex align-items-stretch flex-column">
+                                <div class="card card-light bg-light d-flex flex-fill">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fas fa-business-time"></i> <span class="badge badge-light"> Line of businesses</span></h3>
+                                        <div class="card-tools">
+                                            <span data-toggle="tooltip" title="@Applicationsettings.LINE_OF_BUSINESS" class="badge badge-light"><i class="fas fa-business-time"></i></span>
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body pt-0">
+                                        
+                                         <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                Name
+                                            </th>
+                                            <th scope="col">
+                                                @Html.DisplayNameFor(model => model.Code)
+                                            </th>
+                                            <th scope="col">
+                                                Investigation Service Types
+                                            </th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            var masterData = item.MasterData ? "none" : "";
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayFor(modelItem => item.Code)
+                                                </td>
+                                                <td>
+                                                    @foreach (var InvestigationServiceType in item.InvestigationServiceTypes)
+                                                    {
+                                                        <span class="badge badge-light">@InvestigationServiceType.Name</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    
+                                                    <a class="btn btn-xs btn-warning" style="pointer-events:@masterData" asp-action="Edit" asp-route-id="@item.LineOfBusinessId">
+                                                        <i class="fas fa-pen"></i>  @Applicationsettings.EDIT
+                                                    </a> &nbsp;
+                                                    <a class="btn btn-xs btn-danger" style="pointer-events:@masterData" asp-action="Delete" asp-route-id="@item.LineOfBusinessId">
+                                                        <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

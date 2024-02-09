@@ -10,7 +10,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Line Of Business")]
+    [Breadcrumb("Admin Settings ")]
     public class LineOfBusinessController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,6 +24,11 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseTypes
         public async Task<IActionResult> Index()
+        {
+            return RedirectToAction("Profile");
+        }
+        [Breadcrumb("Line Of Business")]
+        public async Task<IActionResult> Profile()
         {
             return _context.LineOfBusiness != null ?
                         View(await _context.LineOfBusiness.Include(l => l.InvestigationServiceTypes).ToListAsync()) :
@@ -52,7 +57,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes/Create
-        [Breadcrumb("Add Line of Business")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             return View();
@@ -75,7 +80,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes/Edit/5
-        [Breadcrumb("Edit Line of Business")]
+        [Breadcrumb("Edit", FromAction = "Profile")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.LineOfBusiness == null)
@@ -135,7 +140,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseTypes/Delete/5
-        [Breadcrumb("Delete Line of Business")]
+        [Breadcrumb("Delete", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.LineOfBusiness == null)

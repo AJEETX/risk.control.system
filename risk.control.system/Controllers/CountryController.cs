@@ -10,7 +10,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Country")]
+    [Breadcrumb("General Setup")]
     public class CountryController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,12 +25,17 @@ namespace risk.control.system.Controllers
         // GET: RiskCaseStatus
         public async Task<IActionResult> Index()
         {
+            return RedirectToAction("Profile");
+        }
+
+         [Breadcrumb("Country")]
+        public async Task<IActionResult> Profile()
+        {
             var applicationDbContext = _context.Country.AsQueryable();
 
             var applicationDbContextResult = await applicationDbContext.ToListAsync();
             return View(applicationDbContextResult);
         }
-
         // GET: RiskCaseStatus/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
@@ -52,7 +57,7 @@ namespace risk.control.system.Controllers
             return View(country);
         }
 
-        [Breadcrumb("Add Country")]
+        [Breadcrumb("Add New", FromAction ="Profile")]
         public IActionResult Create()
         {
             return View();
@@ -71,7 +76,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Edit/5
-        [Breadcrumb("Edit Country")]
+        [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == 0 || _context.Country == null)
@@ -130,7 +135,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Delete/5
-        [Breadcrumb("Delete Country")]
+        [Breadcrumb("Delete ", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == 0 || _context.Country == null)

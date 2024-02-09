@@ -11,7 +11,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("District")]
+    [Breadcrumb("General Setup")]
     public class DistrictController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,13 +24,17 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.District.Include(d => d.Country).Include(d => d.State).AsQueryable();
+            return RedirectToAction("Profile");
+        }
 
-            var applicationDbContextResult = await applicationDbContext.ToListAsync();
+        [Breadcrumb("District")]
+        public async Task<IActionResult> Profile()
+        {
+            var applicationDbContext = await _context.District.Include(d => d.Country).Include(d => d.State).ToListAsync();
 
-            return View(applicationDbContextResult);
+            return View(applicationDbContext);
         }
 
         // GET: District/Details/5
@@ -57,7 +61,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District/Create
-        [Breadcrumb("Add District")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -85,7 +89,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District/Edit/5
-        [Breadcrumb("Edit District")]
+        [Breadcrumb("Edit", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == 0 || _context.District == null)
@@ -146,7 +150,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: District/Delete/5
-        [Breadcrumb("Delete")]
+        [Breadcrumb("Delete", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.District == null)

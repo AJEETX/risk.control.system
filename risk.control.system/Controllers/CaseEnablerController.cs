@@ -10,7 +10,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Reason To Verify ")]
+    [Breadcrumb("Admin Settings ")]
     public class CaseEnablerController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,8 +22,13 @@ namespace risk.control.system.Controllers
             this.toastNotification = toastNotification;
         }
 
-        // GET: CaseEnabler
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index()
+        {
+            return RedirectToAction("Profile");
+        }
+
+        [Breadcrumb("Reason To Verify ")]
+        public async Task<IActionResult> Profile()
         {
             return _context.CaseEnabler != null ?
                         View(await _context.CaseEnabler.ToListAsync()) :
@@ -50,7 +55,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseEnabler/Create
-        [Breadcrumb("Add Reason To Verify ")]
+        [Breadcrumb("Add  New", FromAction = "Profile")]
         public IActionResult Create()
         {
             return View();
@@ -76,7 +81,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseEnabler/Edit/5
-        [Breadcrumb("Edit Reason To Verify ")]
+        [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.CaseEnabler == null)
@@ -131,7 +136,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CaseEnabler/Delete/5
-        [Breadcrumb("Delete Reason To Verify ")]
+        [Breadcrumb("Delete ", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.CaseEnabler == null)

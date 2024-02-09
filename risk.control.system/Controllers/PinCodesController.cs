@@ -11,7 +11,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Pincode")]
+    [Breadcrumb("General Setup")]
     public class PinCodesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,6 +25,12 @@ namespace risk.control.system.Controllers
 
         // GET: PinCodes
         public async Task<IActionResult> Index()
+        {
+            return RedirectToAction("Profile");
+        }
+
+        [Breadcrumb("Pincode")]
+        public async Task<IActionResult> Profile()
         {
             var applicationDbContext = _context.PinCode.
                 Include(p => p.Country)
@@ -62,7 +68,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Create
-        [Breadcrumb("Add Pincode")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -86,7 +92,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Edit/5
-        [Breadcrumb("Edit Pincode")]
+        [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.PinCode == null)
@@ -142,7 +148,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: PinCodes/Delete/5
-        [Breadcrumb("Delete Pincode")]
+        [Breadcrumb("Delete ", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.PinCode == null)

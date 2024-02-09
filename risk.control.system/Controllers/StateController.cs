@@ -11,7 +11,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("State")]
+    [Breadcrumb("General Setup")]
     public class StateController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,61 +24,17 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index()
         {
-            ViewBag.CountrySortParm = String.IsNullOrEmpty(sortOrder) ? "country_desc" : "";
-            ViewBag.StateSortParm = sortOrder == "State" ? "state_desc" : "State";
-            if (searchString != null)
-            {
-                currentPage = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-
-            ViewBag.CurrentFilter = searchString;
-            var states = _context.State.Include(s => s.Country).AsQueryable();
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                states = states.Where(s =>
-                 s.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                 s.Country.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                 s.Code.ToLower().Contains(searchString.Trim().ToLower())
-                 );
-            }
-
-            switch (sortOrder)
-            {
-                case "country_desc":
-                    states = states.OrderByDescending(s => s.Country.Name);
-                    break;
-
-                case "state_desc":
-                    states = states.OrderBy(s => s.Name);
-                    break;
-
-                default:
-                    states = states.OrderBy(s => s.Name);
-                    break;
-            }
-            int pageNumber = (currentPage ?? 1);
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(states.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(states.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(states.Count(), pageSize));
-
-            var statesResult = await states.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            return _context.State != null ?
-                        View(statesResult) :
-                        Problem("Entity set 'ApplicationDbContext.State'  is null.");
+            return RedirectToAction("Profile");
         }
-
+        [Breadcrumb("State")]
+        public async Task<IActionResult> Profile()
+        {
+            var statesResult = await _context.State.Include(s => s.Country).ToListAsync();
+            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+            return View(statesResult);
+        }
         // GET: RiskCaseStatus/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
@@ -100,7 +56,7 @@ namespace risk.control.system.Controllers
             return View(state);
         }
 
-        [Breadcrumb("Add State")]
+        [Breadcrumb("Add New", FromAction ="Profile")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -120,7 +76,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Edit/5
-        [Breadcrumb("Edit State")]
+        [Breadcrumb("Edit", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.State == null)
@@ -183,7 +139,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: RiskCaseStatus/Delete/5
-        [Breadcrumb("Delete State")]
+        [Breadcrumb("Delete", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.State == null)

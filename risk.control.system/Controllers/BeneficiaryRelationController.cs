@@ -10,7 +10,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Beneficairy Relation ")]
+    [Breadcrumb("Admin Settings ")]
     public class BeneficiaryRelationController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -23,7 +23,13 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation
-        public async Task<IActionResult> Index(string SearchString)
+        public async Task<IActionResult> Index()
+        {
+            return RedirectToAction("Profile");
+        }
+
+        [Breadcrumb("Beneficairy Relation ")]
+        public async Task<IActionResult> Profile()
         {
             return _context.BeneficiaryRelation != null ?
                         View(await _context.BeneficiaryRelation.ToListAsync()) :
@@ -50,7 +56,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Create
-        [Breadcrumb("Add Beneficairy Relation ")]
+        [Breadcrumb("Add  New", FromAction = "Profile")]
         public IActionResult Create()
         {
             return View();
@@ -76,7 +82,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Edit/5
-        [Breadcrumb("Edit Beneficairy Relation")]
+        [Breadcrumb("Edit ", FromAction = "Profile")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)
@@ -131,7 +137,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: BeneficiaryRelation/Delete/5
-        [Breadcrumb("Delete Beneficairy Relation")]
+        [Breadcrumb("Delete", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.BeneficiaryRelation == null)

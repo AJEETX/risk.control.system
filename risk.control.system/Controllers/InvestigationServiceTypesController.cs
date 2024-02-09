@@ -11,7 +11,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Service Types")]
+    [Breadcrumb("Admin Settings ")]
     public class InvestigationServiceTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,10 +26,15 @@ namespace risk.control.system.Controllers
         // GET: InvestigationServiceTypes
         public async Task<IActionResult> Index()
         {
+            return RedirectToAction("Profile");
+        }
+
+    [Breadcrumb("Type Of Service ")]
+        public async Task<IActionResult> Profile()
+        {
             var applicationDbContext = _context.InvestigationServiceType.Include(i => i.LineOfBusiness);
             return View(await applicationDbContext.ToListAsync());
         }
-
         // GET: InvestigationServiceTypes/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
@@ -52,7 +57,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationServiceTypes/Create
-        [Breadcrumb("Add Service Type")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
@@ -81,7 +86,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationServiceTypes/Edit/5
-        [Breadcrumb("Edit Service Type")]
+        [Breadcrumb("Edit", FromAction = "Profile")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.InvestigationServiceType == null)
@@ -143,7 +148,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: InvestigationServiceTypes/Delete/5
-        [Breadcrumb("Delete Service Type")]
+        [Breadcrumb("Delete", FromAction = "Profile")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.InvestigationServiceType == null)
