@@ -18,7 +18,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Company ")]
+    [Breadcrumb("Companies ")]
     public class ClientCompanyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -45,7 +45,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Create
-        [Breadcrumb("Create")]
+        [Breadcrumb("Add New")]
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Details/5
-        [Breadcrumb(" Profile")]
+        [Breadcrumb("Company Profile")]
         public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.ClientCompany == null)
@@ -175,7 +175,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Edit/5
-        [Breadcrumb(title: "Edit ")]
+        [Breadcrumb(title: "Edit ", FromAction = "Details")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == 0 || _context.ClientCompany == null)
@@ -304,53 +304,16 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index()
         {
-            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.CodeSortParm = string.IsNullOrEmpty(sortOrder) ? "code_desc" : "";
-            if (searchString != null)
-            {
-                currentPage = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
+            var applicationDbContext = _context.ClientCompany
+                .Include(c => c.Country)
+                .Include(c => c.PinCode)
+                .Include(c => c.State)
+                .Include(c => c.State)
+                .AsQueryable();
 
-            ViewBag.CurrentFilter = searchString;
-
-            var applicationDbContext = _context.ClientCompany.Include(c => c.Country).Include(c => c.PinCode).Include(c => c.State).AsQueryable();
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                applicationDbContext = applicationDbContext.Where(a =>
-                a.Name.ToLower().Contains(searchString.Trim().ToLower()) ||
-                a.Code.ToLower().Contains(searchString.Trim().ToLower()));
-            }
-
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-
-                case "code_desc":
-                    applicationDbContext = applicationDbContext.OrderByDescending(s => s.Code);
-                    break;
-
-                default:
-                    applicationDbContext.OrderByDescending(s => s.Name);
-                    break;
-            }
-            int pageNumber = (currentPage ?? 1);
-            ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.PageNumber = pageNumber;
-            ViewBag.PageSize = pageSize;
-            ViewBag.ShowPrevious = pageNumber > 1;
-            ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-            ViewBag.ShowFirst = pageNumber != 1;
-            ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-
-            var applicationDbContextResult = await applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            var applicationDbContextResult = await applicationDbContext.ToListAsync();
 
             return View(applicationDbContextResult);
         }

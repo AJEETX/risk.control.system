@@ -18,7 +18,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Company User", FromController = typeof(ClientCompanyController))]
+    [Breadcrumb("Company User", FromAction = "Details", FromController = typeof(ClientCompanyController))]
     public class CompanyUserController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -48,29 +48,9 @@ namespace risk.control.system.Controllers
             UserList = new List<UsersViewModel>();
         }
 
-        public async Task<IActionResult> Index(long id, string sortOrder, string currentFilter, string searchString, int? currentPage, int pageSize = 10)
+        public async Task<IActionResult> Index(long id)
         {
-            ViewBag.EmailSortParm = string.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
-            ViewBag.NameSortParm = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.PincodeSortParm = string.IsNullOrEmpty(sortOrder) ? "pincode_desc" : "";
-            if (searchString != null)
-            {
-                currentPage = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-            ViewBag.CurrentFilter = searchString;
-
-            var company = _context.ClientCompany
-                .Include(c => c.CompanyApplicationUser)
-                .FirstOrDefault(c => c.ClientCompanyId == id);
-
-            var applicationDbContext = company.CompanyApplicationUser
-                .AsQueryable();
-
-            applicationDbContext = applicationDbContext
+            var companyUsers = _context.ClientCompanyApplicationUser
                 .Include(c => c.Country)
                 .Include(c => c.State)
                 .Include(c => c.District)
@@ -78,79 +58,40 @@ namespace risk.control.system.Controllers
                 .Include(c => c.ClientCompany)
                 .Where(u => u.ClientCompanyId == id);
 
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == id);
+            foreach (var user in companyUsers)
+            {
+                var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
+                var state = _context.State.FirstOrDefault(c => c.StateId == user.StateId);
+                var district = _context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
+                var pinCode = _context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
+
+                var thisViewModel = new UsersViewModel();
+                thisViewModel.UserId = user.Id.ToString();
+                thisViewModel.Email = user?.Email;
+                thisViewModel.UserName = user?.UserName;
+                thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
+                thisViewModel.FirstName = user.FirstName;
+                thisViewModel.LastName = user.LastName;
+                thisViewModel.Addressline = user.Addressline;
+                thisViewModel.PhoneNumber = user.PhoneNumber;
+                thisViewModel.Country = country.Name;
+                thisViewModel.CountryId = user.CountryId;
+                thisViewModel.StateId = user.StateId;
+                thisViewModel.State = state.Name;
+                thisViewModel.PinCode = pinCode.Name + "-" + pinCode.Code;
+                thisViewModel.PinCodeId = pinCode.PinCodeId;
+                thisViewModel.CompanyName = user.ClientCompany.Name;
+                thisViewModel.CompanyId = user.ClientCompanyId.Value;
+                thisViewModel.ProfileImageInByte = user.ProfilePicture;
+                thisViewModel.Roles = await GetUserRoles(user);
+                UserList.Add(thisViewModel);
+            }
             var model = new CompanyUsersViewModel
             {
                 Company = company,
+                Users = UserList
             };
-
-            //if (applicationDbContext.Any())
-            {
-                if (!string.IsNullOrEmpty(searchString))
-                {
-                    applicationDbContext = applicationDbContext.Where(a =>
-                    a.FirstName.ToLower().Contains(searchString.Trim().ToLower()) ||
-                    a.LastName.ToLower().Contains(searchString.Trim().ToLower()));
-                }
-
-                switch (sortOrder)
-                {
-                    case "name_desc":
-                        applicationDbContext = applicationDbContext.OrderByDescending(s => new { s.FirstName, s.LastName });
-                        break;
-
-                    case "email_desc":
-                        applicationDbContext = applicationDbContext.OrderByDescending(s => s.Email);
-                        break;
-
-                    case "pincode_desc":
-                        applicationDbContext = applicationDbContext.OrderByDescending(s => s.PinCode.Code);
-                        break;
-
-                    default:
-                        applicationDbContext.OrderByDescending(s => s.Email);
-                        break;
-                }
-                int pageNumber = (currentPage ?? 1);
-                ViewBag.TotalPages = (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-                ViewBag.PageNumber = pageNumber;
-                ViewBag.PageSize = pageSize;
-                ViewBag.ShowPrevious = pageNumber > 1;
-                ViewBag.ShowNext = pageNumber < (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-                ViewBag.ShowFirst = pageNumber != 1;
-                ViewBag.ShowLast = pageNumber != (int)Math.Ceiling(decimal.Divide(applicationDbContext.Count(), pageSize));
-
-                var users = applicationDbContext.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-                var tempusers = userManager.Users.Where(c => c.ClientCompanyId == id);
-                foreach (var user in users)
-                {
-                    var country = _context.Country.FirstOrDefault(c => c.CountryId == user.CountryId);
-                    var state = _context.State.FirstOrDefault(c => c.StateId == user.StateId);
-                    var district = _context.District.FirstOrDefault(c => c.DistrictId == user.DistrictId);
-                    var pinCode = _context.PinCode.FirstOrDefault(c => c.PinCodeId == user.PinCodeId);
-
-                    var thisViewModel = new UsersViewModel();
-                    thisViewModel.UserId = user.Id.ToString();
-                    thisViewModel.Email = user?.Email;
-                    thisViewModel.UserName = user?.UserName;
-                    thisViewModel.ProfileImage = user?.ProfilePictureUrl ?? Applicationsettings.NO_IMAGE;
-                    thisViewModel.FirstName = user.FirstName;
-                    thisViewModel.LastName = user.LastName;
-                    thisViewModel.Addressline = user.Addressline;
-                    thisViewModel.PhoneNumber = user.PhoneNumber;
-                    thisViewModel.Country = country.Name;
-                    thisViewModel.CountryId = user.CountryId;
-                    thisViewModel.StateId = user.StateId;
-                    thisViewModel.State = state.Name;
-                    thisViewModel.PinCode = pinCode.Name + "-" + pinCode.Code;
-                    thisViewModel.PinCodeId = pinCode.PinCodeId;
-                    thisViewModel.CompanyName = company.Name;
-                    thisViewModel.CompanyId = user.ClientCompanyId.Value;
-                    thisViewModel.ProfileImageInByte = user.ProfilePicture;
-                    thisViewModel.Roles = await GetUserRoles(user);
-                    UserList.Add(thisViewModel);
-                }
-                model.Users = UserList;
-            }
             return View(model);
         }
 
@@ -178,7 +119,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanyApplicationUser/Create
-        [Breadcrumb("Add User", FromController = typeof(ClientCompanyController))]
+        [Breadcrumb("Add New", FromAction = "Index")]
         public IActionResult Create(long id)
         {
             var company = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == id);
@@ -249,7 +190,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanyApplicationUser/Edit/5
-        [Breadcrumb("Edit User", FromController = typeof(ClientCompanyController))]
+        [Breadcrumb("Edit ")]
         public async Task<IActionResult> Edit(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
