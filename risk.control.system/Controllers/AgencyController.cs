@@ -54,17 +54,18 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-        [Breadcrumb("Manage Agency ", FromAction = "Index")]
+        [Breadcrumb("Agency Profile ", FromAction = "Index")]
         public async Task<IActionResult> Profile()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
 
             var vendor = await _context.Vendor
+                .Include(v => v.ratings)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
-                .Include(v => v.District)
                 .Include(v => v.State)
+                .Include(v => v.District)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
                 .Include(v => v.VendorInvestigationServiceTypes)

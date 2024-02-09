@@ -1,5 +1,17 @@
 ﻿var apiKey = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
 
+
+$(function () {
+
+    $("#agency-rating").each(function () {
+        var av = $(this).find("span.avr").text();
+
+        if (av != "" || av != null) {
+            var img = $(this).find("img[id='" + parseInt(av) + "']");
+            img.attr("src", "/images/FilledStar.jpeg").prevAll("img.main-rating").attr("src", "/images/FilledStar.jpeg");
+        }
+    });
+});
 function GetLoc() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(success);
@@ -13,7 +25,7 @@ async function success(position) {
         "../images/beachflag.png";
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     // The location of Uluru
-    var element = document.getElementById("pop-face-map");
+    var element = document.getElementById("company-map");
     var bounds = new google.maps.LatLngBounds();
 
     // The map, centered at branch
@@ -77,3 +89,4 @@ async function success(position) {
 }
 
 GetLoc();
+

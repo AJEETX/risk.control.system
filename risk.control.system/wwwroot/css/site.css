@@ -227,7 +227,12 @@ a.table-link {
     position: relative;
     overflow: hidden;
 }
-
+#company-map {
+    width: auto;
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+}
 #agentOcrPicture {
     cursor: pointer;
 }
@@ -639,7 +644,7 @@ dl.row {
     }
 
 .asterik-style {
-    font-size: .4rem !important;
+    font-size: .5rem !important;
     color: red;
     padding-bottom: 1rem;
 }
