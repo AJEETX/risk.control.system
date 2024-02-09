@@ -7,6 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\download-case\**" />
+    <Compile Remove="wwwroot\download-file\**" />
+    <Compile Remove="wwwroot\upload-case\**" />
+    <Content Remove="wwwroot\download-case\**" />
+    <Content Remove="wwwroot\download-file\**" />
+    <Content Remove="wwwroot\upload-case\**" />
+    <EmbeddedResource Remove="wwwroot\download-case\**" />
+    <EmbeddedResource Remove="wwwroot\download-file\**" />
+    <EmbeddedResource Remove="wwwroot\upload-case\**" />
+    <None Remove="wwwroot\download-case\**" />
+    <None Remove="wwwroot\download-file\**" />
+    <None Remove="wwwroot\upload-case\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
     <PackageReference Include="CsvHelper" Version="30.1.0" />
     <PackageReference Include="Highsoft.Highcharts" Version="11.2.0" />
@@ -172,8 +187,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="onboard\" />
-    <Folder Include="wwwroot\download-case\" />
-    <Folder Include="wwwroot\download-file\" />
     <Folder Include="wwwroot\download-ftp\" />
     <Folder Include="wwwroot\fonts\" />
     <Folder Include="wwwroot\company\" />
@@ -181,7 +194,6 @@
     <Folder Include="wwwroot\upload-ftp\" />
     <Folder Include="wwwroot\verify\" />
     <Folder Include="wwwroot\webfonts\" />
-    <Folder Include="wwwroot\upload-case\" />
     <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\report\" />
   </ItemGroup>
