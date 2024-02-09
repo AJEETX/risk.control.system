@@ -5,209 +5,192 @@
 }
 
 <section class="content pt-2">
+    <input type="hidden" id="Latitude" asp-for="@Model.PinCode.Latitude" />
+    <input type="hidden" id="Longitude" asp-for="@Model.PinCode.Longitude" />
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
                 <div class="card card-secondary">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-building"></i> Agency Detail</h3>
+                        <h3 class="card-title"><i class="fas fa-building"></i> Agency Profile</h3>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <dl class="row">
-                                    <dt class="col-sm-5">
-                                        Domain
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        <a href=""> @Html.DisplayFor(model => model.Email)</a>
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Name)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Code)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Code)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Description)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Description)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.PhoneNumber)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.PhoneNumber)
-                                    </dd>
+                        <article>
+                            <div class="bb-blog-inner">
+                                <div class="card card-light expand-card">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Agency Detail</span></h3>
 
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Branch)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Branch)
-                                    </dd>
-                                </dl>
-                                <div class="col-md-4">
-                                    Rate the agency
-                                </div>
-                                <div class="col-md-6" id="agency-rating">
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="main-rating" vendorId="@Model.VendorId" />
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="main-rating" vendorId="@Model.VendorId" />
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="main-rating" vendorId="@Model.VendorId" />
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="main-rating" vendorId="@Model.VendorId" />
-                                    <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="main-rating" vendorId="@Model.VendorId" />
-                                    
-                                    <span id="rating-result">
-                                        <span class="badge badge-light">
-                                            (@Model.RateCount)
-                                        </span>
-                                        @if (Model.RateCount != null && Model.RateCount > 0)
-                                        {
-                                            decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
-                                            <span class="avr"> @a</span>
-                                        }
-                                        
-                                    </span>
-                                    <div class="badge badge-light">
-                                        <span id="rating-result-data" class="result"></span>
+                                        <div class="card-tools">
+                                            <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light"><i class="fas fa-building"></i></span>
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                                @* <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <span class="input-group-label"> Enter comments:</span>
-                                            <div class="input-group mb-3">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="Description"><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+
+                                    <div class="card-body pb-0">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                                                <div class="card bg-light d-flex flex-fill">
+                                                    <div class="card-header text-muted border-bottom-0">
+                                                        <i class="fas fa-building"></i> Agency Details
+                                                    </div>
+                                                    <div class="card-body pt-0">
+                                                        <div class="row">
+                                                            <div class="col-7">
+                                                                <p class="text-muted text-sm">
+                                                                    <b>Agency Domain: </b>  <i class="fa fa-globe"></i>  <a href="#">@Model.Email</a>
+                                                                </p>
+                                                                <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-building"></i>
+                                                                        </span>
+                                                                        Agency Name: <i class="fa fa-business-time"></i> @Model.Name
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-code"></i>
+                                                                        </span>
+                                                                        Agency Code:  <i class="fas fa-code"></i> </i>@Model.Code
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-tools"></i>
+                                                                        </span>
+                                                                        Branch : <i class="fas fa-landmark"></i> @Model.Description
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-phone"></i>
+                                                                        </span>
+                                                                        Phone #: <i class="fas fa-phone"></i> @Model.PhoneNumber
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="far fa-building"></i>
+                                                                        </span>
+                                                                        Branch: <i class="far fa-building"></i> @Model.Branch
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-landmark"></i>
+                                                                        </span>
+                                                                        Bank Name: <i class="fas fa-landmark"></i> @Model.BankName
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fab fa-btc"></i>
+                                                                        </span>
+                                                                        Bank Account #: <i class="fab fa-btc"></i> @Model.BankAccountNumber
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-rupee-sign"></i>
+                                                                        </span>
+                                                                        IFSC Code: <i class="fas fa-rupee-sign"></i> @Model.IFSCCode
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-calendar-check"></i>
+                                                                        </span>
+                                                                        Active Date:  <i class="fas fa-calendar-check"></i>  @Model.ActivatedDate?.ToString("dd-MMM-yyyy")
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-calendar-check"></i>
+                                                                        </span>
+                                                                        Agreement Date:  <i class="fas fa-calendar-check"></i>  @Model.AgreementDate?.ToString("dd-MMM-yyyy")
+                                                                    </li>
+                                                                    <li class="small">
+                                                                        <span class="fa-li">
+                                                                            <i class="fas fa-home"></i>
+                                                                        </span>
+                                                                        Address:  @Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code
+                                                                    </li>
+
+
+                                                                </ul>
+                                                            </div>
+                                                            <div class="col-5 text-center">
+                                                                <p class="text-muted text-sm">
+                                                                    <i class="fa fa-star"></i>  <b>Rating: </b>
+                                                                </p>
+
+                                                                <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                                    <li class="small">
+                                                                        <div class="col-md-12" id="agency-rating">
+                                                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="1" class="main-rating" vendorId="@Model.VendorId" />
+                                                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="2" class="main-rating" vendorId="@Model.VendorId" />
+                                                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="3" class="main-rating" vendorId="@Model.VendorId" />
+                                                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="4" class="main-rating" vendorId="@Model.VendorId" />
+                                                                            <img src="~/images/StarFade.gif" alt="Star Rating" align="middle" id="5" class="main-rating" vendorId="@Model.VendorId" />
+
+                                                                            <span id="rating-result">
+                                                                                <span class="badge badge-light">
+                                                                                    (@Model.RateCount)
+                                                                                </span>
+                                                                                @if (Model.RateCount != null && Model.RateCount > 0)
+                                                                                {
+                                                                                    decimal a = @Model.RateTotal.Value / @Model.RateCount.Value;
+                                                                                    <span class="avr"> @a</span>
+                                                                                }
+
+                                                                            </span>
+                                                                            <div class="badge badge-light">
+                                                                                <span id="rating-result-data" class="result"></span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </li>
+
+                                                                    <li class="small">
+                                                                        @if (Model?.DocumentUrl is not null)
+                                                                        {
+                                                                            <img id="documentImage" class="img-fluid" src="@Model?.DocumentUrl">
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <img id="documentImage" alt="user-avatar"
+                                                                                 class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                                        }
+                                                                    </li>
+
+                                                                </ul>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <input name="Comment" id="Comment" required class="rating-comment" type="text" placeholder="enter comment" maxlength="20" />
-                                                <div class="input-group-supend">
-                                                    <span class="input-group-text btn btn-success" id="btn-rating-comment"><i class="fa fa-star-alt"></i> Submit </span>
+                                            </div>
+
+                                            <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
+                                                <div class="card bg-light d-flex flex-fill">
+                                                    <div class="card-header text-muted border-bottom-0">
+                                                        <i class="fas fa-map-marked-alt"></i> Map View
+                                                    </div>
+                                                    <div class="card-body pt-0">
+
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+
+                                                                <div id="maps">
+                                                                </div>
+                                                                <div id="company-map"></div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                </div> *@
-                                
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <dl class="row">
-                                    <dt class="col-sm-5">
-                                        Document
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @if (Model?.DocumentUrl is not null)
-                                        {
-                                            <img id="documentImage" class="form-Image" src="@Model?.DocumentUrl">
-                                        }
-                                        else
-                                        {
-                                            <img id="documentImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
-                                        }
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Addressline)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Addressline)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.District)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.District.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.State)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.State.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.Country)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.Country.Name)
-                                    </dd>
-                                    <dt class="col-sm-5">
-                                        @Html.DisplayNameFor(model => model.PinCode)
-                                    </dt>
-                                    <dd class="col-sm-5">
-                                        @Html.DisplayFor(model => model.PinCode.Name)
-
-
-                                </dl>
-                            </div>
-                            
-                            <div class="col-md-12">
-                                <div class="card-body">
-
-                                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Line of business
-                                                </th>
-                                                <th>
-                                                    Service type
-                                                </th>
-                                                <th>
-                                                    Price
-                                                </th>
-                                                <th>
-                                                    District
-                                                </th>
-                                                <th>
-                                                    State
-                                                </th>
-                                                <th>
-                                                    Pincodes
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var item in Model.VendorInvestigationServiceTypes)
-                                            {
-                                                <tr>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Price)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.District.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.State.Name)
-                                                    </td>
-                                                    <td>
-                                                        @foreach (var pin in item.PincodeServices)
-                                                        {
-                                                            <span>
-                                                                @pin.Pincode
-                                                            </span>
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
                                 </div>
-                            </div>
-                        </div>
+                            </div> <!-- class bb-blog-inner -->
+
+                        </article>
+
                         <div class="row">
                             <div class="col-md-12 text-right">
                                 <a asp-controller="ClaimsInvestigation" asp-action="EmpanelledVendors" asp-route-selectedcase="@ViewBag.Selectedcase" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
@@ -222,8 +205,10 @@
     </div>
 </section>
 
-@section Scripts    {
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/companies.js"></script>
 
-    <script type="text/javascript" src="~/js/vendor-detail.js">
-    </script>
 }

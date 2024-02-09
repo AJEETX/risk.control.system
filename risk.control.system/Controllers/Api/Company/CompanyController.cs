@@ -70,11 +70,12 @@ namespace risk.control.system.Controllers.Api.Company
                 .FirstOrDefault(c => c.ClientCompanyId == id);
 
             var users = company.CompanyApplicationUser
-                .OrderBy(u => new { u.FirstName, u.LastName })
-                .Where(u => !u.Deleted)
+                .Where(u => !u.Deleted)?
+                .OrderBy(u => u.FirstName)
+                .ThenBy(u => u.LastName)
                 .AsQueryable();
             var result =
-                users.Select(u =>
+                users?.Select(u =>
                 new
                 {
                     Id = u.Id,
@@ -89,10 +90,9 @@ namespace risk.control.system.Controllers.Api.Company
                     Country = u.Country.Name,
                     Roles = string.Join(",", GetUserRoles(u).Result),
                     Pincode = u.PinCode.Code,
-                });
+                })?.ToArray();
             await Task.Delay(1000);
-
-            return Ok(result?.ToArray());
+            return Ok(result);
         }
 
         [HttpGet("AllUsers")]
