@@ -43,8 +43,9 @@ namespace risk.control.system.Controllers
         {
             ViewData["vendorId"] = id;
             var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage, RouteValues = new { id = id } };
+            var agencyPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies") { Parent = agencysPage };
+            var agencyPage2 = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencyPage, RouteValues = new { id = id } };
+            var editPage = new MvcBreadcrumbNode("Index", "VendorUser", $"Manage Users") { Parent = agencyPage2, RouteValues = new { id = id } };
             ViewData["BreadcrumbNode"] = editPage;
 
             return View();

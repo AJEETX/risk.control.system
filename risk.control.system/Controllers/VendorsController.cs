@@ -101,7 +101,7 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
-        [Breadcrumb("Manage Service", FromAction = "Agencies")]
+        [Breadcrumb("Manage Service", FromAction = "Details")]
         public async Task<IActionResult> Service(string id)
         {
             if (id == null || _context.Vendor == null)
@@ -183,7 +183,7 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [Breadcrumb(" Edit Agency", FromAction = "Agencies")]
+        [Breadcrumb(" Edit Agency", FromAction = "Details")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.Vendor == null)

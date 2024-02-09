@@ -43,7 +43,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Details/5
-        [Breadcrumb(" Details")]
+        [Breadcrumb(" Manage Service", FromAction = "Details", FromController = typeof(VendorsController))]
         public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.VendorInvestigationServiceType == null)
@@ -65,16 +65,16 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-            ViewData["BreadcrumbNode"] = editPage;
+            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
+            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            //ViewData["BreadcrumbNode"] = editPage;
 
             return View(vendorInvestigationServiceType);
         }
 
         // GET: VendorService/Create
-        [Breadcrumb(" Add")]
+        [Breadcrumb(" Add", FromAction = "Details")]
         public IActionResult Create(long id)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == id);
@@ -82,11 +82,11 @@ namespace risk.control.system.Controllers
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
             var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = id } };
-            var createPage = new MvcBreadcrumbNode("Create", "VendorService", $"Add Service") { Parent = editPage, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = createPage;
+            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
+            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = id } };
+            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = id } };
+            //var createPage = new MvcBreadcrumbNode("Create", "VendorService", $"Add Service") { Parent = editPage, RouteValues = new { id = id } };
+            //ViewData["BreadcrumbNode"] = createPage;
             return View(model);
         }
 
@@ -128,7 +128,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Edit/5
-        [Breadcrumb(" Edit")]
+        [Breadcrumb(" Edit", FromAction = "Details")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == 0 || _context.VendorInvestigationServiceType == null)
@@ -170,11 +170,11 @@ namespace risk.control.system.Controllers
             var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
             services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
 
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = services.VendorId } };
-            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = services.VendorId } };
-            var createPage = new MvcBreadcrumbNode("Edit", "VendorService", $"Edit Service") { Parent = editPage, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = createPage;
+            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
+            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = services.VendorId } };
+            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = services.VendorId } };
+            //var createPage = new MvcBreadcrumbNode("Edit", "VendorService", $"Edit Service") { Parent = editPage, RouteValues = new { id = id } };
+            //ViewData["BreadcrumbNode"] = createPage;
 
             return View(services);
         }
@@ -241,7 +241,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: VendorService/Delete/5
-        [Breadcrumb(" Delete")]
+        [Breadcrumb(" Delete", FromAction = "Details")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == 0 || _context.VendorInvestigationServiceType == null)
@@ -262,11 +262,11 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
-            var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-            var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
-            var createPage = new MvcBreadcrumbNode("Delete", "VendorService", $"Delete Service") { Parent = editPage, RouteValues = new { id = id } };
-            ViewData["BreadcrumbNode"] = createPage;
+            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Manage Agency(s)");
+            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Manage Agency") { Parent = agencysPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Manage Services") { Parent = agencyPage, RouteValues = new { id = vendorInvestigationServiceType.VendorId } };
+            //var createPage = new MvcBreadcrumbNode("Delete", "VendorService", $"Delete Service") { Parent = editPage, RouteValues = new { id = id } };
+            //ViewData["BreadcrumbNode"] = createPage;
 
             return View(vendorInvestigationServiceType);
         }
