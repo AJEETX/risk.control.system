@@ -4,8 +4,8 @@ BeneficiaryDateOfBirthId.max = new Date().toISOString().split("T")[0];
 $.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Beneficary Edit",
-            content: "Are you sure?",
+            title: "Confirm  Edit",
+            content: "Are you sure to edit?",
             icon: 'fas fa-user-tie',
             columnClass: 'medium',
             type: 'orange',

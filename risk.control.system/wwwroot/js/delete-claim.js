@@ -5,7 +5,7 @@ $(document).ready(function () {
             e.preventDefault();
             $.confirm({
                 title: "Confirm DELETE",
-                content: "Are you sure?",
+                content: "Are you sure to delete?",
                 icon: 'fas fa-trash',
                 columnClass: 'medium',
                 closeIcon: true,

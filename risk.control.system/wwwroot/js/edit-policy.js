@@ -2,8 +2,8 @@ $("#contractnum").focus();
 $.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Policy Edit",
-            content: "Are you sure?",
+            title: "Confirm Edit",
+            content: "Are you sure to edit?",
             columnClass: 'medium',
             icon: 'fas fa-pen-alt',
             type: 'orange',

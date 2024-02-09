@@ -2,7 +2,7 @@
     submitHandler: function (form) {
         $.confirm({
             title: "Confirm Edit",
-            content: "Are you sure to edit user role?",
+            content: "Are you sure to edit ?",
             icon: 'fas fa-user-plus',
             columnClass: 'medium',
             type: 'orange',
@@ -11,7 +11,7 @@
 
             buttons: {
                 confirm: {
-                    text: "Edit user role",
+                    text: "Edit ",
                     btnClass: 'btn-warning',
                     action: function () {
                         askConfirmation = false;

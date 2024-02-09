@@ -27,6 +27,7 @@ namespace risk.control.system.Controllers
         {
             return RedirectToAction("Profile");
         }
+
         [Breadcrumb("Line Of Business")]
         public async Task<IActionResult> Profile()
         {
@@ -81,7 +82,7 @@ namespace risk.control.system.Controllers
 
         // GET: RiskCaseTypes/Edit/5
         [Breadcrumb("Edit", FromAction = "Profile")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.LineOfBusiness == null)
             {
@@ -163,7 +164,7 @@ namespace risk.control.system.Controllers
         // POST: RiskCaseTypes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.LineOfBusiness == null)
             {

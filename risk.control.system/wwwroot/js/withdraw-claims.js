@@ -5,14 +5,14 @@
             e.preventDefault();
             $.confirm({
                 title: "Confirm Withdrawl",
-                content: "Are you sure?",
+                content: "Are you sure to withdraw?",
                 columnClass: 'medium',
                 icon: 'fa fa-window-close',
                 closeIcon: true,
                 type: 'red',
                 buttons: {
                     confirm: {
-                        text: " Withdraw",
+                        text: " Withdraw ",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;

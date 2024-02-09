@@ -4,14 +4,14 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Create",
+                title: "Confirm  Add New",
                 columnClass: 'medium',
-                content: "Are you sure to create?",
+                content: "Are you sure to add?",
                 type: 'green',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Create",
+                        text: " Add New",
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = false;

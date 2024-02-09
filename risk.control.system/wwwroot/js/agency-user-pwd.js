@@ -5,7 +5,7 @@
             e.preventDefault();
             $.confirm({
                 title: "Confirm Edit",
-                content: "Are you sure to edit password?",
+                content: "Are you sure to edit ?",
                 icon: 'fa fa-key',
                 columnClass: 'medium',
                 type: 'orange',
@@ -13,7 +13,7 @@
                 typeAnimated: true,
                 buttons: {
                     confirm: {
-                        text: "Edit password",
+                        text: "Edit ",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;

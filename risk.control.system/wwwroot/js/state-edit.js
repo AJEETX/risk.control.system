@@ -12,7 +12,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Edit item",
+                        text: "Edit ",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;

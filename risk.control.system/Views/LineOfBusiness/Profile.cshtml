@@ -36,14 +36,12 @@
                                          <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
-                                            <th scope="col">
+                                            <th>
                                                 Name
                                             </th>
-                                            <th scope="col">
-                                                @Html.DisplayNameFor(model => model.Code)
-                                            </th>
-                                            <th scope="col">
-                                                Investigation Service Types
+                                            
+                                            <th>
+                                                Services
                                             </th>
                                             <th scope="col"></th>
                                         </tr>
@@ -56,13 +54,11 @@
                                                 <td>
                                                     @Html.DisplayFor(modelItem => item.Name)
                                                 </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Code)
-                                                </td>
+                                                
                                                 <td>
                                                     @foreach (var InvestigationServiceType in item.InvestigationServiceTypes)
                                                     {
-                                                        <span class="badge badge-light">@InvestigationServiceType.Name</span>
+                                                        <span class="badge badge-light">@InvestigationServiceType.Name</span> 
                                                     }
                                                 </td>
                                                 <td>

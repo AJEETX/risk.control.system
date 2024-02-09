@@ -74,10 +74,11 @@ namespace risk.control.system.Controllers
             }
 
             var vendor = await _context.Vendor
+                .Include(v => v.ratings)
                 .Include(v => v.Country)
                 .Include(v => v.PinCode)
-                .Include(v => v.District)
                 .Include(v => v.State)
+                .Include(v => v.District)
                 .Include(v => v.VendorInvestigationServiceTypes)
                 .ThenInclude(v => v.PincodeServices)
                 .Include(v => v.VendorInvestigationServiceTypes)
@@ -101,8 +102,16 @@ namespace risk.control.system.Controllers
             return View(vendor);
         }
 
+        [Breadcrumb(" Manage Users", FromAction = "Details")]
+        public IActionResult Users(string id)
+        {
+            ViewData["vendorId"] = id;
+
+            return View();
+        }
+
         [Breadcrumb("Manage Service", FromAction = "Details")]
-        public async Task<IActionResult> Service(string id)
+        public IActionResult Service(string id)
         {
             if (id == null || _context.Vendor == null)
             {
@@ -110,11 +119,6 @@ namespace risk.control.system.Controllers
                 return NotFound();
             }
             ViewData["vendorId"] = id;
-            //var agencysPage = new MvcBreadcrumbNode("Index", "Vendors", "Agencies");
-            //var agencyPage = new MvcBreadcrumbNode("Details", "Vendors", "Agency") { Parent = agencysPage, RouteValues = new { id = id } };
-            //var editPage = new MvcBreadcrumbNode("Service", "Vendors", $"Services") { Parent = agencyPage, RouteValues = new { id = id } };
-            //ViewData["BreadcrumbNode"] = editPage;
-
             return View();
         }
 

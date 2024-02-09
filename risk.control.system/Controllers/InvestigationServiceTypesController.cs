@@ -29,12 +29,13 @@ namespace risk.control.system.Controllers
             return RedirectToAction("Profile");
         }
 
-    [Breadcrumb("Type Of Service ")]
+        [Breadcrumb("Type Of Service ")]
         public async Task<IActionResult> Profile()
         {
             var applicationDbContext = _context.InvestigationServiceType.Include(i => i.LineOfBusiness);
             return View(await applicationDbContext.ToListAsync());
         }
+
         // GET: InvestigationServiceTypes/Details/5
         [Breadcrumb("Details")]
         public async Task<IActionResult> Details(long id)
@@ -87,9 +88,9 @@ namespace risk.control.system.Controllers
 
         // GET: InvestigationServiceTypes/Edit/5
         [Breadcrumb("Edit", FromAction = "Profile")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
-            if (id == null || _context.InvestigationServiceType == null)
+            if (id < 1 || _context.InvestigationServiceType == null)
             {
                 toastNotification.AddErrorToastMessage("service type not found!");
                 return NotFound();

@@ -1,15 +1,15 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm User Creation",
+            title: "Confirm Add New",
             columnClass: 'medium',
-            content: "Are you sure?",
+            content: "Are you sure to add ?",
             icon: 'fas fa-user-plus',
             type: 'green',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Add",
+                    text: "Add New",
                     btnClass: 'btn-success',
                     action: function () {
                         form.submit();

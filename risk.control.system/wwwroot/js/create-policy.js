@@ -4,15 +4,15 @@ $(document).ready(function () {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Set To Ready",
-                content: "Are you sure?",
+                title: "Confirm Add New",
+                content: "Are you sure to add ?",
                 columnClass: 'medium',
                 icon: 'fas fa-thumbtack',
                 closeIcon: true,
                 type: 'red',
                 buttons: {
                     confirm: {
-                        text: "Set Ready To Assign",
+                        text: "Add New",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;

@@ -6,13 +6,13 @@
             $.confirm({
                 title: "Confirm Edit",
                 columnClass: 'small',
-                content: "Are you sure to edit user role?",
+                content: "Are you sure to edit?",
                 icon: 'fas fa-user-plus',
                 type: 'orange',
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Edit user role",
+                        text: "Edit ",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;

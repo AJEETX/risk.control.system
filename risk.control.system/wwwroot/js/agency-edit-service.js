@@ -1,8 +1,8 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Service Edit",
-            content: "Are you sure?",
+            title: "Confirm Edit",
+            content: "Are you sure to edit?",
             icon: 'fas fa-truck',
             columnClass: 'medium',
             type: 'orange',
