@@ -20,20 +20,24 @@
                         <div class="card-body">
                             <partial name="_PolicyDetails" model="@data" />
 
+                            
+                        </div>
+                        <div class="card-footer">
+
                             <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="ClaimsVendorPost">
                                 <div class="row">
-                                <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                                <div class="col-md-12">
+                                    <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                                    <div class="col-md-12">
                                         <div class="form-group">
                                             Withdrawl Remarks
-                                            <input id="remarks" asp-for="@Model.ClaimsInvestigation.PolicyDetail.Comments" class="form-control" required/>
+                                            <input id="remarks" asp-for="@Model.ClaimsInvestigation.PolicyDetail.Comments" class="form-control" required />
                                             <span asp-validation-for="@Model.ClaimsInvestigation.PolicyDetail.Comments" class="text-danger"></span>
                                         </div>
-                                </div>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                            <a asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                        <a asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                                         <button id="submit-case" disabled type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
                                     </div>
                                 </div>
