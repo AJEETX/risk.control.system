@@ -1,4 +1,6 @@
 ﻿$(document).ready(function () {
+    $('a#back-button').attr("href", "/Dashboard/Index");
+    $('a#create-agency-service').attr("href", "/Agency/CreateService");
     $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/AllServices',

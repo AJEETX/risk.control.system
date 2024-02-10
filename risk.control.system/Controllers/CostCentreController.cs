@@ -56,7 +56,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: CostCentre/Create
-        [Breadcrumb("Add ", FromAction = "Profile")]
+        [Breadcrumb("Add New", FromAction = "Profile")]
         public IActionResult Create()
         {
             return View();
