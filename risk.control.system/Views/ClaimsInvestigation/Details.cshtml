@@ -220,13 +220,14 @@
                                     </div>
                                 </div> <!-- class bb-blog-inner -->
                             </article>
-                            <div class="row">
-                                <div class="col-md-12 text-right">
-
-                                    <form id="create-form">
-                                        <a asp-action="Draft" class="btn btn-default"> Go to Assign <i class="fas fa-arrow-right"></i></a> &nbsp;&nbsp;&nbsp;
-                                        <a asp-action="Active" class="btn btn-default"> Go to Active <i class="fas fa-arrow-right"></i></a> &nbsp;&nbsp;&nbsp;
-                                    </form>
+                            <div class="card-footer">
+                                <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-input">
+                                            <a asp-action="Draft" class="btn btn-warning"><span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign List <i class="fas fa-arrow-right"></i></a>
+                                            <a asp-action="Active" class="btn btn-primary"><span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Active List <i class="fas fa-arrow-right"></i></a>
+                                    </div>
+                                </div>
                                 </div>
                             </div>
                         </div>

@@ -86,7 +86,7 @@
             
                         <div class="card-footer">
                             <div class="text-right">
-                                <a asp-action="Agent" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
+                                <a asp-action="Agent" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> &nbsp;
                                 @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null && @Model.Location?.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
                                 {
                                     <button disabled id="submit-case" type="submit" class="btn btn-danger">

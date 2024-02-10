@@ -77,7 +77,7 @@
                                         <div class="card-header">
                                             <h3 class="card-title">Claim: <span class="badge badge-light"><i class="far fa-file-powerpoint"></i>  @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber</span></h3>
                                             <div class="card-tools">
-                                                <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light"></span>
+                                                <span data-toggle="tooltip" title="Claim # : @Model.ClaimsInvestigation?.PolicyDetail?.ContractNumber" class="badge badge-light"> <i class="far fa-file-powerpoint"></i> </span>
                                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
@@ -373,12 +373,14 @@
                                     <partial name="_TimelineReport" model="@Model" />
                                 </div> <!-- class bb-blog-inner -->
                             </article>
-                            <div class="row">
-                                <div class="col-md-12 text-right">
+                            <div class="card-footer">
+                                <div class="row">
+                                <div class="col-md-12">
 
                                     <form id="create-form">
-                                        <a asp-action="Active" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                        <a asp-action="Active" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                                     </form>
+                                </div>
                                 </div>
                             </div>
                         </div>
