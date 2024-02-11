@@ -13,7 +13,7 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div id="article" class="card card-secondary">
                         <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-pen-alt"></i> Create New</h3>
+                            <h3 class="card-title"><i class="fas fa-pen-alt"></i> @Applicationsettings.EDIT </h3>
                         </div>
                         <input type="hidden" asp-for="ClaimsInvestigationId" value="@Model.ClaimsInvestigationId" />
                         <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
@@ -268,7 +268,7 @@
                                                                 @Applicationsettings.CANCEL
                                                             </a>
                                                             <button type="submit" class="btn btn-warning">
-                                                                <i class="fas fa-user-plus"></i> Edit Customer
+                                                                <i class="fas fa-user-plus"></i> @Applicationsettings.EDIT  Customer
                                                             </button>
 
                                                         </div>

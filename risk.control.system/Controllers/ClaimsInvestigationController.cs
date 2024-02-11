@@ -291,7 +291,7 @@ namespace risk.control.system.Controllers
             return View(invoice);
         }
 
-        [Breadcrumb("Details", FromAction = "CreatePolicy", FromController = typeof(InsurancePolicyController))]
+        [Breadcrumb("Details", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> Details(string id)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;

@@ -3,16 +3,14 @@
     <article>
     
         <div class="bb-blog-inner">
-        <div class="card card-light">
+        <div class="card card-primary">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.Location.ClaimReport.AgentEmail </span> </h3>
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
+                </div>
             </div>
-            <div class="card-tools">
-                <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
+            
             <div class="card-body pb-0">
                 <div class="row">
                     <partial name="_DigitalIdReport" model="@Model" />

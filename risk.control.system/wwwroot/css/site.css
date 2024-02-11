@@ -102,6 +102,10 @@ button.accept-policy {
     width: 33%;
     background-color: green;
 }
+.orange-progress-bar {
+    width: 33%;
+    background-color: orange;
+}
 
 .cust-progress-bar {
     width: 33%;
@@ -117,6 +121,10 @@ button.accept-policy {
 .grey-progress-bar {
     width: 34%;
     background-color: lightgray;
+}
+.darkgrey-progress-bar {
+    width: 34%;
+    background-color: darkgray;
 }
 
 .footer {
@@ -896,6 +904,8 @@ main {
     display: flex;
     align-items: center;
     width: 100%;
+    margin:1rem 0;
+    padding:1rem 0;
 }
 
 .line {
@@ -928,6 +938,17 @@ main {
     border-radius: 50%;
 }
 
+.steps-edit {
+    display: flex;
+    background-color: #ffc107;
+    color: #000;
+    font-size: 14px;
+    width: 80px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
 .steps2 {
     display: flex;
     background-color: grey;

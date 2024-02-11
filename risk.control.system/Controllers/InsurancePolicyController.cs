@@ -36,7 +36,7 @@ namespace risk.control.system.Controllers
             this.investigationReportService = investigationReportService;
         }
 
-        [Breadcrumb(title: " Add New", FromAction = "Index", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Add Policy", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public IActionResult CreatePolicy()
         {
             var userEmail = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb(title: " Edit Policy", FromAction = "CreatePolicy")]
+        [Breadcrumb(title: " Edit Policy", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> EditPolicy(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
@@ -83,7 +83,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClaimsInvestigation/Delete/5
-        [Breadcrumb(title: " Delete", FromAction = "Draft", FromController = typeof(ClaimsInvestigationController))]
+        [Breadcrumb(title: " Delete", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)
