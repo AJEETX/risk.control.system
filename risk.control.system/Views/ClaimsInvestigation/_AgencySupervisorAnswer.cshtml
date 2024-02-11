@@ -1,11 +1,18 @@
 ﻿@model ClaimsInvestigationVendorsModel
 
 <div class="col-12 d-flex align-items-stretch flex-column">
-    <div class="card bg-light d-flex flex-fill">
-        <div class="card-header text-muted border-bottom-0">
+    <div class="card card-light">
+        <div class="card-header">
             <i class="fas fa-user-edit"></i> Supervisor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
         </div>
+        <div class="progress">
+            <i class="far fa-bookmark bookmark-green"></i>
+            <div class="progress-bar" role="progressbar" style="width:100%;background-color:#343a40;">
+                supervisor
+            </div>
+            <i class="far fa-bookmark bookmark-green"></i>
 
+        </div>
         <div class="card-body pt-0">
             <div class="row">
                 <div class="col-12">
