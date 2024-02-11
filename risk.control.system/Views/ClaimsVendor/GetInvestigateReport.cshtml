@@ -19,17 +19,17 @@
                             <h3 class="card-title"><i class="far fa-file-archive"></i> Agent Report</h3>
                         </div>
                         <div class="card-body">
-                                <partial name="_PolicyDetails" model="@Model" />
-                                <partial name="_AgentReport" model="@Model" />
-                                <partial name="_SupervisorRemarks" model="@Model" />
-                            </div>
+                            <partial name="_PolicyDetails" model="@Model" />
+                            <partial name="_AgentReport" model="@Model" />
+                            <partial name="_SupervisorRemarks" model="@Model" />
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </section>
-@section Scripts    {
+@section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

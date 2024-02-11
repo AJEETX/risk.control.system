@@ -1,17 +1,33 @@
 ﻿@model ClaimsInvestigationVendorsModel
 <article>
     <div class="bb-blog-inner">
-        <div class="card card-primary">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.Location.ClaimReport.AgentEmail </span> </h3>
+        <div class="card card-light">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.Location.ClaimReport.AgentEmail </span> </h3>
 
-            <div class="card-tools">
-                <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
             </div>
-        </div>
+            <div class="progress">
+                <i class="far fa-bookmark bookmark-green"></i>
+                <div class="progress-bar" role="progressbar" style="width:33%;background-color:orange">
+                    digital-id
+                </div>
+                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+                <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:orange">
+                    document-id
+                </div>
+                <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
+
+                <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:orange">
+                    questionaire
+                </div>
+                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+            </div>
             <div class="card-body pb-0">
 
                 <div class="row">
@@ -22,9 +38,11 @@
                                 <div class="card bg-light d-flex flex-fill">
                                     <div class="card-header text-muted border-bottom-0">
 
-                                        <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span> 
-                                        <span class="badge badge-light" style="float:right;"><i class="nav-icon fas fa-clock"></i> 
-                                            @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+                                        <i class="fas fa-portrait"></i> Digital <span class="badge badge-light">checkify</span>
+                                        <span class="badge badge-light" style="float:right;">
+                                            <i class="nav-icon fas fa-clock"></i>
+                                            @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt")
+                                        </span>
                                     </div>
                                     <div class="card-footer text-center">
                                         <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
@@ -88,9 +106,9 @@
                                 </div>
                             </div>
                         }
-                        if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageData != null && 
-                            @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null && 
-                            @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
+                        if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageData != null &&
+                        @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null &&
+                        @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
                         {
 
                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -163,7 +181,7 @@
                         }
                     }
                     @{
-                        var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? 
+                        var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ?
                         @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
                     }
                     <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
@@ -197,8 +215,8 @@
                                             <i class="fas fa-file-video"></i> <span class="input-group-label"> Video: </span>
                                             <div class="input-group mb-3">
                                                 <button disabled id="video-play" class="btn btn-secondary btn-sm"> <i class="fas fa-play-circle"></i> Play </button>
-                                            <audio asp-for="Location.ClaimReport.ReportQuestionaire.Video" class="form-control" placeholder="Record video." />
-                                            <div id="video-output"> </div>
+                                                <audio asp-for="Location.ClaimReport.ReportQuestionaire.Video" class="form-control" placeholder="Record video." />
+                                                <div id="video-output"> </div>
                                             </div>
                                         </div>
                                     </div>
