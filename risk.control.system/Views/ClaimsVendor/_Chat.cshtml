@@ -1,49 +1,71 @@
 ﻿@model ClaimsInvestigationVendorsModel
-                                
-@{
-    var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card direct-chat direct-chat-warning collapsed-card">
-                <div class="card-header">
-                    <h3 class="card-title">Mobile Message</h3>
-                    <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Contacts" data-widget="chat-pane-toggle">
-                        <i class="fas fa-comments"></i>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card direct-chat direct-chat-warning collapsed-card">
+            <div class="card-header">
+                <h3 class="card-title">Mobile Message</h3>
+                <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Contacts" data-widget="chat-pane-toggle">
+                    <i class="fas fa-comments"></i>
+                </button>
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Mobile Messages" class="badge badge-light"><i class="fas fa-comments"></i></span>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
                     </button>
-                    <div class="card-tools">
-                        <span data-toggle="tooltip" title="Mobile Messages" class="badge badge-light"><i class="fas fa-comments"></i></span>
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="direct-chat-messages">
-                        <div class="direct-chat-msg">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name float-left">Agent Pierce</span>
-                                <span class="direct-chat-timestamp float-right">23 Feb 2:00 pm</span>
-                            </div>
-                            <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="message user image">
-                            <div class="direct-chat-text">
-                                I want to visit you on 12 Mar-2024!
-                            </div>
-                        </div>
-                        <div class="direct-chat-msg right">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.CustomerDetail.CustomerName</span>
-                                <span class="direct-chat-timestamp float-left">23 Feb 2:05 pm</span>
-                            </div>
-                            <img class="direct-chat-img" src="/img/agency-admin.jpeg" alt="message user image">
-                            <div class="direct-chat-text">
-                                Yes, I shall meet You on 12 March 2024.!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
             </div>
+            <div class="card-body">
+                <div class="direct-chat-messages">
+                    <div class="direct-chat-msg">
+                        <div class="direct-chat-infos clearfix">
+                            <span class="direct-chat-name float-left">Agent Pierce</span>
+                            <span class="direct-chat-timestamp float-right">23 Feb 2:00 pm</span>
+                        </div>
+                        <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="message user image">
+                        <div class="direct-chat-text">
+                            I want to visit you on 12 Mar-2024!
+                        </div>
+                    </div>
+                    <div class="direct-chat-msg right">
+                        <div class="direct-chat-infos clearfix">
+                            <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.CustomerDetail.CustomerName</span>
+                            <span class="direct-chat-timestamp float-left">23 Feb 2:05 pm</span>
+                        </div>
+                        <img class="direct-chat-img" src="/img/agency-admin.jpeg" alt="message user image">
+                        <div class="direct-chat-text">
+                            Yes, I shall meet You on 12 March 2024.!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+</div>
 
-}
+@* @{
+    foreach (var message in Model.ClaimsInvestigation.ClaimMessages)
+    {
+        <div class="direct-chat-msg">
+            <div class="direct-chat-infos clearfix">
+                <span class="direct-chat-name float-left">@message.SenderEmail</span>
+                <span class="direct-chat-timestamp float-right">@message.Created.ToString("dd MMM ")</span>
+            </div>
+            <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="sender image">
+            <div class="direct-chat-text">
+                @message.Message
+            </div>
+        </div>
+        <div class="direct-chat-msg right">
+            <div class="direct-chat-infos clearfix">
+                <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.CustomerDetail.CustomerName</span>
+                <span class="direct-chat-timestamp float-left">23 Feb 2:05 pm</span>
+            </div>
+            <img class="direct-chat-img" src="/img/agency-admin.jpeg" alt="recepient image">
+            <div class="direct-chat-text">
+                Yes, I shall meet You on 12 March 2024.!
+            </div>
+        </div>
+    }
+} *@

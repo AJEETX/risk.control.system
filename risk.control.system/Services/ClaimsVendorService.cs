@@ -372,6 +372,7 @@ namespace risk.control.system.Services
         public async Task<ClaimsInvestigationVendorsModel> GetInvestigateReport(string userEmail, string selectedcase)
         {
             var claimsInvestigation = _context.ClaimsInvestigation
+              .Include(c => c.ClaimMessages)
               .Include(c => c.PolicyDetail)
               .ThenInclude(c => c.ClientCompany)
               .Include(c => c.PolicyDetail)

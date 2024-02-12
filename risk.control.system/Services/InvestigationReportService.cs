@@ -215,6 +215,7 @@ namespace risk.control.system.Services
         public ClaimsInvestigationVendorsModel GetInvestigateReport(string currentUserEmail, string selectedcase)
         {
             var claimsInvestigation = _context.ClaimsInvestigation
+                .Include(c => c.ClaimMessages)
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
