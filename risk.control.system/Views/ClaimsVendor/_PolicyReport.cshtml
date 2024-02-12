@@ -1,8 +1,25 @@
 ﻿@model ClaimsInvestigationVendorsModel
-                                
-    <article>
-    
-        <div class="bb-blog-inner">
+@{
+    string digitalIdColor = "grey";
+    if(Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+    {
+        digitalIdColor = "darkorange";
+    }
+    string documentIdColor = "grey";
+    if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null)
+    {
+        documentIdColor = "darkorange";
+    }
+    string questionaire = "grey";
+    if (Model.Location.ClaimReport.AgentRemarks != null)
+    {
+        questionaire = "darkorange";
+    }
+
+}
+<article>
+
+    <div class="bb-blog-inner">
         <div class="card card-light">
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.Location.ClaimReport.AgentEmail </span> </h3>
@@ -12,16 +29,16 @@
             </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:33%;background-color:green;">
+                <div class="progress-bar" role="progressbar" style="width:33%;background-color:@digitalIdColor;">
                     digital-id
                 </div>
                 <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
-                <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:green">
+                <div class="progress-bar" role="progressbar" style="width:32.33%;background-color:@documentIdColor">
                     document-id
                 </div>
                 <i class="far fa-caret-square-right" style="font-size:1.1rem;"></i>
 
-                <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:green">
+                <div class="progress-bar" role="progressbar" style="width:33.34%;background-color:@questionaire">
                     questionaire
                 </div>
                 <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
@@ -35,4 +52,4 @@
             </div>
         </div>
     </div>
-    </article>
+</article>

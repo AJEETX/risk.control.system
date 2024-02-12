@@ -60,15 +60,18 @@ namespace risk.control.system.Services
 
             string mobile = string.Empty;
             string recepientName = string.Empty;
+            string recepientPhone = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 mobile = claim.CustomerDetail.ContactNumber.ToString();
                 recepientName = claim.CustomerDetail.CustomerName;
+                recepientPhone = claim.CustomerDetail.ContactNumber.ToString();
             }
             else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
             {
                 mobile = beneficiary.BeneficiaryContactNumber.ToString();
                 recepientName = beneficiary.BeneficiaryName;
+                recepientPhone = beneficiary.BeneficiaryContactNumber.ToString();
             }
 
             string device = "0";
@@ -138,6 +141,9 @@ namespace risk.control.system.Services
             {
                 meetingTime = date;
             }
+
+            var senderDetail = context.ApplicationUser.FirstOrDefault(u => u.Email == claim.CurrentClaimOwner);
+
             var scheduleMessage = new ClaimMessage
             {
                 Message = finalMessage,
@@ -145,10 +151,13 @@ namespace risk.control.system.Services
                 RecepicientEmail = recepientName,
                 SenderEmail = claim.CurrentClaimOwner,
                 UpdatedBy = claim.CurrentClaimOwner,
-                Updated = meetingTime
+                Updated = DateTime.UtcNow,
+                ScheduleTime = meetingTime,
+                SenderPhone = senderDetail.PhoneNumber,
+                RecepicientPhone = recepientPhone
             };
             claim.ClaimMessages.Add(scheduleMessage);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
 
             return claim;
         }
@@ -166,13 +175,16 @@ namespace risk.control.system.Services
                 && c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
 
             string recepientName = string.Empty;
+            string recepientPhone = string.Empty;
             if (claim.PolicyDetail.ClaimType == ClaimType.HEALTH)
             {
                 recepientName = claim.CustomerDetail.CustomerName;
+                recepientPhone = claim.CustomerDetail.ContactNumber.ToString();
             }
             else if (claim.PolicyDetail.ClaimType == ClaimType.DEATH)
             {
                 recepientName = beneficiary.BeneficiaryName;
+                recepientPhone = beneficiary.BeneficiaryContactNumber.ToString();
             }
 
             if (confirm.ToUpper() == "Y")
@@ -200,6 +212,7 @@ namespace risk.control.system.Services
             finalMessage += $"{logo}";
             bool priority = true;
 
+            var previousMessage = context.ClaimMessage.FirstOrDefault(u => u.ClaimsInvestigationId == claim.ClaimsInvestigationId);
             var agent = context.VendorApplicationUser.FirstOrDefault(u => u.Email == claim.CurrentClaimOwner);
 
             var response = SMS.API.SendSingleMessage("+" + agent.PhoneNumber, finalMessage, device, timestamp, isMMS, null, priority);
@@ -211,10 +224,14 @@ namespace risk.control.system.Services
                 RecepicientEmail = claim.CurrentClaimOwner,
                 SenderEmail = recepientName,
                 UpdatedBy = recepientName,
-                Updated = DateTime.UtcNow
+                Updated = DateTime.UtcNow,
+                ScheduleTime = previousMessage.ScheduleTime,
+                SenderPhone = recepientPhone,
+                RecepicientPhone = agent.PhoneNumber,
+                PreviousClaimMessageId = previousMessage.PreviousClaimMessageId
             };
             claim.ClaimMessages.Add(scheduleMessage);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return claim;
         }
 

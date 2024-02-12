@@ -3,7 +3,7 @@
 <div class="col-12 d-flex align-items-stretch flex-column">
     <div class="card card-light">
         <div class="card-header">
-            <i class="fas fa-user-edit"></i> Supervisor <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+            <i class="fas fa-user-edit"></i> Supervisor: <span class="badge badge-light"> @Model?.Location.ClaimReport?.SupervisorEmail</span> <span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.SupervisorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
         </div>
         <div class="progress">
             <i class="far fa-bookmark bookmark-green"></i>
@@ -16,7 +16,6 @@
         <div class="card-body pt-0">
             <div class="row">
                 <div class="col-12">
-                    <h4 class="lead"><span class="badge badge-light"> @Model?.Location.ClaimReport?.SupervisorEmail</span></h4>
                     <p class="text-muted text-sm">
 
                         <span>Supervisor comments: </span>

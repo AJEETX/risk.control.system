@@ -10,8 +10,12 @@ namespace risk.control.system.Models
         public long ClaimMessageId { get; set; }
 
         public string? SenderEmail { get; set; }
+        public string? SenderPhone { get; set; }
         public string? RecepicientEmail { get; set; }
+        public string? RecepicientPhone { get; set; }
+        public DateTime? ScheduleTime { get; set; }
         public string? Message { get; set; }
         public string? ClaimsInvestigationId { get; set; }
+        public long? PreviousClaimMessageId { get; set; }
     }
 }
