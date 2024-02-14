@@ -18,6 +18,36 @@
                         <div class="card-header">
                             <h3 class="card-title"><i class="far fa-file-powerpoint"></i> @Applicationsettings.EDIT  Policy</h3>
                         </div>
+                        @{
+                            bool policyExist = true;
+                            bool customerExist = false;
+                            bool beneficiaryExist = false;
+
+                            string customerProgressColor = "steps2";
+                            string customerLineColor = "line";
+                            if (Model.PolicyDetail?.ContractNumber != null)
+                            {
+                                customerLineColor = "line0";
+                            }
+                            if (@customerExist)
+                            {
+                                customerProgressColor = "steps";
+                                customerLineColor = "line1";
+                            }
+                            string benficiaryProgressColor = "steps3";
+                            string beneficiaryLineColor = "line";
+
+                            if (@customerExist)
+                            {
+                                benficiaryProgressColor = "steps2";
+                                beneficiaryLineColor = "line0";
+                            }
+                            if (@customerExist && @beneficiaryExist)
+                            {
+                                benficiaryProgressColor = "steps";
+                                beneficiaryLineColor = "line1";
+                            }
+                        }
                         <div class="container d-flex justify-content-center align-items-center">
                             <div class="progresses">
                                 <div class="steps-edit">
@@ -26,13 +56,13 @@
 
                                 <span class="line"></span>
 
-                                <div class="steps2">
+                                <div class="steps3">
                                     <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
                                 </div>
 
                                 <span class="line"></span>
 
-                                <div class="steps2">
+                                <div class="steps3">
                                     <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
                                 </div>
                             </div>

@@ -4,7 +4,7 @@
     <div class="col-md-12">
         <div class="card direct-chat direct-chat-warning collapsed-card">
             <div class="card-header">
-                <h3 class="card-title">Mobile Message</h3>
+                <h3 class="card-title">Mobile SMS</h3>
                 <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Contacts" data-widget="chat-pane-toggle">
                     <i class="fas fa-comments"></i>
                 </button>
@@ -17,55 +17,64 @@
             </div>
             <div class="card-body">
                 <div class="direct-chat-messages">
-                    <div class="direct-chat-msg">
-                        <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-left">Agent Pierce</span>
-                            <span class="direct-chat-timestamp float-right">23 Feb 2:00 pm</span>
+                    @if (Model.ClaimsInvestigation.ClaimMessages.Count > 0 )
+                    {
+                        for (var i =0; i< Model.ClaimsInvestigation.ClaimMessages.Count;i++)
+                        {
+                            if(i % 2 == 0)
+                            {
+                                <div class="direct-chat-msg">
+                                    <div class="direct-chat-infos clearfix">
+                                        <span class="direct-chat-name float-left">@Model.ClaimsInvestigation.ClaimMessages[i].SenderPhone</span>
+                                        <span class="direct-chat-timestamp float-right">@Model.ClaimsInvestigation.ClaimMessages[i].Created.ToString("dd MMM hh:mm")</span>
+                                    </div>
+                                    <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="sender image">
+                                    <div class="direct-chat-text">
+                                        @Model.ClaimsInvestigation.ClaimMessages[i].Message
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="direct-chat-msg right">
+                                    <div class="direct-chat-infos clearfix">
+                                        <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.ClaimMessages[i].RecepicientEmail</span>
+                                        <span class="direct-chat-timestamp float-left">@Model.ClaimsInvestigation.ClaimMessages[i].Created.ToString("dd MMM hh:mm")</span>
+                                    </div>
+                                    <img class="direct-chat-img" src="/img/agency-admin.jpeg" alt="recepient image">
+                                    <div class="direct-chat-text">
+                                        @Model.ClaimsInvestigation.ClaimMessages[i].Message
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <div class="direct-chat-msg">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name float-left">Agent Pierce</span>
+                                <span class="direct-chat-timestamp float-right">23 Feb 2:00 pm</span>
+                            </div>
+                            <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="message user image">
+                            <div class="direct-chat-text">
+                                I want to visit you on 12 Mar-2024!
+                            </div>
                         </div>
-                        <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="message user image">
-                        <div class="direct-chat-text">
-                            I want to visit you on 12 Mar-2024!
+                        <div class="direct-chat-msg right">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.CustomerDetail.CustomerName</span>
+                                <span class="direct-chat-timestamp float-left">23 Feb 2:05 pm</span>
+                            </div>
+                            <img class="direct-chat-img" src="/img/agency-admin.jpeg" alt="message user image">
+                            <div class="direct-chat-text">
+                                Yes, I shall meet You on 12 March 2024.!
+                            </div>
                         </div>
-                    </div>
-                    <div class="direct-chat-msg right">
-                        <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.CustomerDetail.CustomerName</span>
-                            <span class="direct-chat-timestamp float-left">23 Feb 2:05 pm</span>
-                        </div>
-                        <img class="direct-chat-img" src="/img/agency-admin.jpeg" alt="message user image">
-                        <div class="direct-chat-text">
-                            Yes, I shall meet You on 12 March 2024.!
-                        </div>
-                    </div>
+                    }
+                    
                 </div>
             </div>
-
         </div>
     </div>
 </div>
-
-@* @{
-    foreach (var message in Model.ClaimsInvestigation.ClaimMessages)
-    {
-        <div class="direct-chat-msg">
-            <div class="direct-chat-infos clearfix">
-                <span class="direct-chat-name float-left">@message.SenderEmail</span>
-                <span class="direct-chat-timestamp float-right">@message.Created.ToString("dd MMM ")</span>
-            </div>
-            <img class="direct-chat-img" src="/img/company-admin.jpeg" alt="sender image">
-            <div class="direct-chat-text">
-                @message.Message
-            </div>
-        </div>
-        <div class="direct-chat-msg right">
-            <div class="direct-chat-infos clearfix">
-                <span class="direct-chat-name float-right">@Model.ClaimsInvestigation.CustomerDetail.CustomerName</span>
-                <span class="direct-chat-timestamp float-left">23 Feb 2:05 pm</span>
-            </div>
-            <img class="direct-chat-img" src="/img/agency-admin.jpeg" alt="recepient image">
-            <div class="direct-chat-text">
-                Yes, I shall meet You on 12 March 2024.!
-            </div>
-        </div>
-    }
-} *@
