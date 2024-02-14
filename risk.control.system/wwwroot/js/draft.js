@@ -2,14 +2,18 @@
     $('#postedFile').on("change", function () {
         var val = $(this).val(),
             fbtn = $('#UploadFileButton');
-        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+        var uploadType = $('#uploadtype').val();
+        val && uploadType ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
 
-    $('#postedFtp').on("change", function () {
+
+    $('#uploadtype').on("change", function () {
         var val = $(this).val(),
-            fbtn = $('#UploadFtpButton');
-        val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+            fbtn = $('#UploadFileButton');
+        var uploadType = $('#postedFile').val();
+        val && uploadType ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
+
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {
@@ -205,6 +209,25 @@
                     }
                 }
             });
+        }
+    });
+
+    $('#UploadFileButton').on('click', function (event) {
+        $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+
+        $(this).attr('disabled', 'disabled');
+        $(this).html("<i class='fa fa-upload'></i> Uploading .....");
+
+        
+        $('#upload-claims').submit();
+        var nodes = document.getElementById("process-file").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
         }
     });
 });

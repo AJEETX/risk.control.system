@@ -1,4 +1,6 @@
-﻿using CsvHelper;
+﻿using AspNetCoreHero.ToastNotification.Abstractions;
+
+using CsvHelper;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
@@ -7,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 using risk.control.system.Data;
+using risk.control.system.Models;
 using risk.control.system.Services;
 
 using SmartBreadcrumbs.Attributes;
@@ -18,11 +21,15 @@ namespace risk.control.system.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IToastNotification toastNotification;
         private readonly IEmpanelledAgencyService empanelledAgencyService;
+        private readonly IFtpService ftpService;
+        private readonly INotyfService notifyService;
         private readonly IInvestigationReportService investigationReportService;
         private readonly IClaimPolicyService claimPolicyService;
 
         public ClaimsInvestigationController(ApplicationDbContext context,
             IEmpanelledAgencyService empanelledAgencyService,
+            IFtpService ftpService,
+            INotyfService notifyService,
             IInvestigationReportService investigationReportService,
             IClaimPolicyService claimPolicyService,
             IToastNotification toastNotification)
@@ -30,6 +37,8 @@ namespace risk.control.system.Controllers
             _context = context;
             this.claimPolicyService = claimPolicyService;
             this.empanelledAgencyService = empanelledAgencyService;
+            this.ftpService = ftpService;
+            this.notifyService = notifyService;
             this.investigationReportService = investigationReportService;
             this.toastNotification = toastNotification;
         }
@@ -92,6 +101,46 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
             return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Draft(IFormFile postedFile, string uploadtype)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+            if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
+            {
+                UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
+
+                if (uploadType == UploadType.FTP)
+                {
+                    await ftpService.DownloadFtpFile(userEmail, postedFile);
+
+                    notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
+
+                    return RedirectToAction("Draft", "ClaimsInvestigation");
+                }
+
+                if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
+                {
+                    try
+                    {
+                        await ftpService.UploadFile(userEmail, postedFile);
+
+                        notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+
+                        return RedirectToAction("Draft", "ClaimsInvestigation");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+
+            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+
+            return RedirectToAction("Draft", "ClaimsInvestigation");
         }
 
         [HttpGet]
