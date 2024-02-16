@@ -23,7 +23,7 @@ $(document).ready(function () {
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
+        var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
@@ -40,7 +40,7 @@ $(document).ready(function () {
         $('html').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
+        var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
@@ -61,7 +61,7 @@ $(document).ready(function () {
         $('html a *, html button *').css('pointer-events', 'none')
 
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
+        var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
