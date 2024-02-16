@@ -104,9 +104,7 @@
 
                         </div>
                         <div class="card-body pb-0">
-                            <div class="submit-progress hidden">
-                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                            </div>
+                            
                             <div class="row">
                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                     <div class="card bg-light d-flex flex-fill">
@@ -120,6 +118,9 @@
                                             </div>
                                         </div>
                                         <div class="card-body pt-0">
+                                            <div class="submit-progress hidden">
+                                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-7">
                                                     <h2 class="lead"><b>@Model.ClaimsInvestigation?.PolicyDetail.ContractNumber</b></h2>
@@ -202,7 +203,7 @@
                                                     if (Model.ClaimsInvestigation != null)
                                                     {
                                                         <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
-                                                        <a class="btn btn-warning" asp-controller="InsurancePolicy" asp-action="EditPolicy" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
+                                                        <a id="edit-policy" class="btn btn-warning" asp-controller="InsurancePolicy" asp-action="EditPolicy" asp-route-id="@Model.ClaimsInvestigation.ClaimsInvestigationId"><i class="far fa-file-powerpoint"></i>  Edit Policy</a>
                                                     }
                                                     else
                                                     {
@@ -222,8 +223,8 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-input">
-                                        <a asp-action="Draft" class="btn btn-warning"><span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign List <i class="fas fa-arrow-right"></i></a>
-                                        <a asp-action="Active" class="btn btn-primary"><span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Active List <i class="fas fa-arrow-right"></i></a>
+                                        <a id="back" asp-action="Draft" class="btn btn-warning"><span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign List <i class="fas fa-arrow-right"></i></a>
+                                        <a id="back-button" asp-action="Active" class="btn btn-primary"><span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Active List <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>
                             </div>

@@ -7,6 +7,9 @@
 <section class="content pt-2">
     <div class="container-fluid">
         <partial name="_VendorClaimsPolicy" model="@Model" />
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
         <partial name="_AgentList" model="@Model" />
     </div>
 </section>

@@ -1,118 +1,119 @@
 ﻿@model ClaimsInvestigationVendorAgentModel
 
 <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-list"></i>  @Applicationsettings.AGENTS</h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
-                            <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                            <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
-                            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                <thead>
-                                    <tr>
-                                        <th>
+    <div class="col-md-12">
+        <div class="card card-secondary">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-list"></i>  @Applicationsettings.AGENTS</h3>
+            </div>
+            <div class="card-body">
+                
+                <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
+                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+                    <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
+                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th>
 
-                                        </th>
-                                        <th>
-                                            Agent Photo
-                                        </th>
-                                        <th>
-                                            Agent Name
-                                        </th>
-                                        <th>
-                                            Phone #
-                                        </th>
-                                        <th>
-                                            Email
-                                        </th>
-                                        <th>
-                                            Address
-                                        </th>
-                                        <th>
-                                            District
-                                        </th>
-                                        <th>
-                                            State
-                                        </th>
-                                        <th>
-                                            Country
-                                        </th>
-                                        <th>
-                                            Pincode
-                                        </th>
-                                        <th>
-                                            Current Claims
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                                </th>
+                                <th>
+                                    Agent Photo
+                                </th>
+                                <th>
+                                    Agent Name
+                                </th>
+                                <th>
+                                    Phone #
+                                </th>
+                                <th>
+                                    Email
+                                </th>
+                                <th>
+                                    Address
+                                </th>
+                                <th>
+                                    District
+                                </th>
+                                <th>
+                                    State
+                                </th>
+                                <th>
+                                    Country
+                                </th>
+                                <th>
+                                    Pincode
+                                </th>
+                                <th>
+                                    Current Claims
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             @foreach (var item in Model.VendorUserClaims)
                             {
-                                            <tr>
-                                                <td>
-                                                    <input id="@item.AgencyUser.Id" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" />
-                                                </td>
-                                                <td>
+                                <tr>
+                                    <td>
+                                        <input id="@item.AgencyUser.Id" name="selectedcase" class="selected-case" type="radio" value="@item.AgencyUser.Id" />
+                                    </td>
+                                    <td>
                                         @if (item?.AgencyUser.ProfilePictureUrl is not null)
                                         {
                                             var title = @item?.AgencyUser.FirstName + ' ' + @item.AgencyUser?.LastName;
-                                            <img id="profileImage" title="@title" class="form-Image table-profile-image" src="@item?.AgencyUser.ProfilePictureUrl" data-toggle="tooltip"/>
+                                            <img id="profileImage" title="@title" class="form-Image table-profile-image" src="@item?.AgencyUser.ProfilePictureUrl" data-toggle="tooltip" />
                                         }
                                         else
                                         {
                                             <img id="profileImage" title="..." class="form-Image  table-profile-image" src="@Applicationsettings.NO_USER" data-toggle="tooltip" />
                                         }
-                                                </td>
-                                                <td>
+                                    </td>
+                                    <td>
                                         @item.AgencyUser.FirstName @item.AgencyUser.LastName
-                                                </td>
+                                    </td>
 
-                                                <td>
+                                    <td>
                                         @Html.DisplayFor(modelItem => item.AgencyUser.PhoneNumber)
-                                                </td>
-                                                <td>
-                                                    <a href="#">  @Html.DisplayFor(modelItem => item.AgencyUser.Email)</a>
-                                                </td>
-                                                <td>
+                                    </td>
+                                    <td>
+                                        <a href="#">  @Html.DisplayFor(modelItem => item.AgencyUser.Email)</a>
+                                    </td>
+                                    <td>
                                         @Html.DisplayFor(modelItem => item.AgencyUser.Addressline)
-                                                </td>
-                                                <td>
+                                    </td>
+                                    <td>
                                         @Html.DisplayFor(modelItem => item.AgencyUser.District.Name)
-                                                </td>
-                                                <td>
+                                    </td>
+                                    <td>
                                         @Html.DisplayFor(modelItem => item.AgencyUser.State.Name)
-                                                </td>
-                                                <td>
+                                    </td>
+                                    <td>
                                         @Html.DisplayFor(modelItem => item.AgencyUser.Country.Name)
-                                                </td>
-                                                <td>
+                                    </td>
+                                    <td>
                                         @Html.DisplayFor(modelItem => item.AgencyUser.PinCode.Code)
-                                                </td>
-                                                <td>
+                                    </td>
+                                    <td>
                                         @Html.DisplayFor(modelItem => item.CurrentCaseCount)
-                                                </td>
-                                            </tr>
+                                    </td>
+                                </tr>
                             }
-                                </tbody>
+                        </tbody>
 
-                            </table>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a> 
+                    </table>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
 
 
-                                    <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
-                                        <i class="fas fa-external-link-alt" aria-hidden="true"></i> ALLOCATE
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                        <br />
-                        <br />
+                            <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
+                                <i class="fas fa-external-link-alt" aria-hidden="true"></i> ALLOCATE
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </form>
+                <br />
+                <br />
             </div>
         </div>
+    </div>
+</div>

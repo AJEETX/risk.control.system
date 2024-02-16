@@ -5,7 +5,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-secondary">
+                <div id="fullpage" class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Allocate</h3>
                         <h3 id="view-type" class="card-title">
@@ -14,6 +14,9 @@
                         </h3>
                     </div>
                     <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
                         <form id="radioButtons" asp-action="SelectVendorAgent" method="get" enctype="multipart/form-data">
                             <div class="col-md-12">
                                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">

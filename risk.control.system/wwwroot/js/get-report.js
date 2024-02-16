@@ -62,6 +62,20 @@ $(document).ready(function () {
                         action: function () {
                             askConfirmation = true;
                             $('#create-form').submit();
+
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#approve-case').attr('disabled', 'disabled');
+                            $('#approve-case').html("<i class='far fa-thumbs-up' aria-hidden='true'></i> Approve .....");
+
+                            var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
                         }
                     },
                     cancel: {

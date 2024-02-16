@@ -39,7 +39,6 @@ a {
 html {
     font-size: 13px;
     position: relative;
-    visibility: hidden;
 }
 
 @media (min-width: 768px) {
@@ -1131,7 +1130,8 @@ img.doc-profile-image {
 
 .submit-progress-bg {
     background-color: lightgray;
-    opacity: .8;
+    opacity: .5;
+    cursor:none;
 }
 .col-5{
     margin-top:.6rem;

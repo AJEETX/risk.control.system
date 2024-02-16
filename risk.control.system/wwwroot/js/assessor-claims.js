@@ -93,6 +93,25 @@ $(document).ready(function () {
         error: function (xhr, status, error) { alert('err ' + error) }
     });
 
+
+    $('#allocatedcase').on('click', function (event) {
+        $("body").addClass("submit-progress-bg");
+
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+
+        $('#allocatedcase').attr('disabled', 'disabled');
+        $('#allocatedcase').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign(manual) .....");
+
+        $('#checkboxes').submit();
+
+        var nodes = document.getElementById("checkboxes").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+
+    });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });

@@ -1,4 +1,23 @@
 ﻿$(document).ready(function () {
+
+    $('#allocatedcase').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        
+        $('#allocatedcase').html("<i class='far fa-file-archive' aria-hidden='true'></i> Agent Report...");
+        $('html *').css('cursor', 'not-allowed');
+        $('html a *, html button *').attr('disabled', 'disabled');
+        $('html a *, html button *').css('pointer-events', 'none')
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {

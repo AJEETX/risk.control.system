@@ -260,7 +260,7 @@
                                 <div class="col-md-12 text-right">
 
                                     <form id="create-form" asp-controller="InsurancePolicy" asp-action="Delete">
-                                        <a asp-controller="claimsInvestigation" asp-action="Draft" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                        <a id="back" asp-controller="claimsInvestigation" asp-action="Draft" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                                         <input type="hidden" asp-for="ClaimsInvestigation.ClaimsInvestigationId" />
                                         <input type="submit" value="Delete" class="btn btn-danger" />
                                     </form>

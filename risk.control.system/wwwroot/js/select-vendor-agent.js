@@ -16,7 +16,21 @@
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
+
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#allocate-case').attr('disabled', 'disabled');
+                            $('#allocate-case').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign (manual)...");
+
                             $('#radioButtons').submit();
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
                         }
                     },
                     cancel: {

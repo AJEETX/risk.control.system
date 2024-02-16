@@ -16,6 +16,9 @@
                             <h3 class="card-title"><i class="fas fa-truck"></i> Add @Applicationsettings.SERVICE</h3>
                         </div>
                         <div class="card-body">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <input type="hidden" asp-for="VendorId" class="control-label" />
                             <input type="hidden" asp-for="VendorId" class="form-control" value="@Model.Vendor.VendorId" />
@@ -115,7 +118,7 @@
                                            
                                         </div>
                                         <div class="form-group text-right">
-                                            <a asp-controller="Agency" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                                        <a id="back" asp-controller="Agency" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                                 <i class="fa fa-window-close"></i>
                                                 @Applicationsettings.CANCEL
                                             </a>

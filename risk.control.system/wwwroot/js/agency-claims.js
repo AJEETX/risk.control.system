@@ -1,4 +1,25 @@
 ﻿$(document).ready(function () {
+
+
+    $('#allocatedcase').on('click', function (event) {
+        $("body").addClass("submit-progress-bg");
+
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#allocatedcase').attr('disabled', 'disabled');
+        $('#allocatedcase').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign(manual) .....");
+
+        $('#radioButtons').submit();
+        var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+
+    });
+
+
+
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {

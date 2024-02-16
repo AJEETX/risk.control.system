@@ -21,6 +21,9 @@
                         </div>
                         <div class="card-body">
                             <partial name="_PolicyDetails" model="@Model" />
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <partial name="_AgencyReport" model="@Model" />
                             @{
                                 foreach (var item in Model.Location?.PreviousClaimReports)
@@ -44,9 +47,10 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            
                             <div class="=row">
                                 <div class="col-md-12 float-right">
-                                    <a asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
+                                    <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
                                         <i class="fas fa-arrow-left" aria-hidden="true"></i> Back 
                                     </a>
                                     <button id="review-case" type="submit" class="btn btn-danger">

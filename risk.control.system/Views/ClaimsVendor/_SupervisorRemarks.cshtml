@@ -81,10 +81,10 @@
                             </div>
                             <div class="card-footer">
                                 <div class="text-right">
-                                    <a asp-controller="ClaimsVendor" class="btn btn-outline-secondary" asp-action="ClaimReport">
+                                    <a id="back" asp-controller="ClaimsVendor" class="btn btn-outline-secondary" asp-action="ClaimReport">
                                         <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
                                     </a>
-                                    <a asp-controller="ClaimsVendor" asp-action="ReSelectVendorAgent" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
+                                    <a id="reselect-case" asp-controller="ClaimsVendor" asp-action="ReSelectVendorAgent" asp-route-selectedcase="@Model.ClaimsInvestigation.ClaimsInvestigationId" class="btn btn-danger">
                                         <i class="fas fa-sync" aria-hidden="true"></i> Review
                                     </a>
                                     <button disabled id="allocate-case" type="submit" class="btn btn-success">

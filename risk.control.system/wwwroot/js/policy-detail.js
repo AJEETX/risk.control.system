@@ -1,4 +1,84 @@
 $(document).ready(function () {
+    $('#edit-policy').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#edit-policy').attr('disabled', 'disabled');
+        $('#edit-policy').html("<i class='far fa-file-powerpoint' aria-hidden='true'></i> Edit  Policy .....");
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+    $('#add-customer').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#add-customer').attr('disabled', 'disabled');
+        $('#add-customer').html("<i class='fa fa-user-plus' aria-hidden='true'></i> Add Customer...");
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+    $('#edit-customer').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#edit-customer').attr('disabled', 'disabled');
+        $('#edit-customer').html("<i class='fa fa-user-plus' aria-hidden='true'></i> Edit Customer...");
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+    $('#add-beneficiary').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#add-beneficiary').attr('disabled', 'disabled');
+        $('#add-beneficiary').html("<i class='fas fa-user-tie' aria-hidden='true'></i> Add Beneficiary...");
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+    $('#edit-beneficiary').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#edit-beneficiary').attr('disabled', 'disabled');
+        $('#edit-beneficiary').html("<i class='fas fa-user-tie' aria-hidden='true'></i> Edit Beneficiary...");
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
     var askConfirmation = true;
     $('#create-form').submit(function (e) {
         if (askConfirmation) {
@@ -28,7 +108,6 @@ $(document).ready(function () {
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }
-
                         }
                     },
                     cancel: {

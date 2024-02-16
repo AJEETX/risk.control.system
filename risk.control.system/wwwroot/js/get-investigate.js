@@ -19,34 +19,26 @@
         $('#documentIdLatitude').val(coordinates.latitude);
         $('#documentIdLongitude').val(coordinates.longitude);
     }
-    //$('#UploadFaceImageButton').click(function (e) {
-    //    e.preventDefault();
-    //    //if (!askConfirmation) {
-    //    //    $.confirm({
-    //    //        title: "Confirm Digital Id upload",
-    //    //        content: "Are you sure?",
-    //    //        icon: 'fas fa-portrait',
-    //    //        columnClass: 'medium',
-    //    //        type: 'red',
-    //    //        closeIcon: true,
-    //    //        buttons: {
-    //    //            confirm: {
-    //    //                text: "Submit",
-    //    //                btnClass: 'btn-danger',
-    //    //                action: function () {
-    //    //                    askConfirmation = true;
-    //    //                    $('#upload-face').submit();
-    //    //                }
-    //    //            },
-    //    //            cancel: {
-    //    //                text: "Cancel",
-    //    //                btnClass: 'btn-default'
-    //    //            }
-    //    //        }
-    //    //    });
-    //    //}
+    $('#UploadFaceImageButton').click(function (e) {
 
-    //});
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('body').attr('disabled', 'disabled');
+        $(this).html("<i class='fa fa-upload'></i> Uploading photo .....");
+
+        $('#upload-face').submit();
+        $('html *').css('cursor', 'not-allowed');
+        $('html a *, html button *').css('pointer-events', 'none');
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
 
     $('#panImage').on("change", function () {
         var val = $(this).val(),
@@ -54,9 +46,25 @@
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
 
-    //$('#UploadPanImageButton').click(function (e) {
-    //    e.preventDefault();
-    //});
+    $('#UploadPanImageButton').click(function (e) {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $(this).attr('disabled', 'disabled');
+        $(this).html("<i class='fa fa-upload'></i> Uploading PAN.....");
+
+        $('#upload-pan').submit();
+        $('html *').css('cursor', 'not-allowed');
+        $('html a *, html button *').css('pointer-events', 'none')
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
 
     $('#terms_and_conditions').click(function () {
         //If the checkbox is checked.
@@ -129,7 +137,26 @@
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = true;
+
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+
+                            $(this).attr('disabled', 'disabled');
+                            $(this).html("<i class='fa fa-upload'></i> Uploading .....");
+
                             $('#create-form').submit();
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').attr('disabled', 'disabled');
+                            $('html a *, html button *').css('pointer-events', 'none')
+
+                            var nodes = document.getElementById("body").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
                         }
                     },
                     cancel: {
@@ -142,55 +169,55 @@
     });
 });
 
-var nodes = document.getElementById("audio-video").getElementsByTagName('*');
-for (var i = 0; i < nodes.length; i++) {
-    nodes[i].disabled = true;
-}
-const startButton = document.getElementById('audio-start');
-const stopButton = document.getElementById('audio-stop');
-const playButton = document.getElementById('audio-play');
-let output = document.getElementById('audio-output');
-let audioRecorder;
-let audioChunks = [];
-navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(stream => {
-        // Initialize the media recorder object
-        audioRecorder = new MediaRecorder(stream);
+//var nodes = document.getElementById("audio-video").getElementsByTagName('*');
+//for (var i = 0; i < nodes.length; i++) {
+//    nodes[i].disabled = true;
+//}
+//const startButton = document.getElementById('audio-start');
+//const stopButton = document.getElementById('audio-stop');
+//const playButton = document.getElementById('audio-play');
+//let output = document.getElementById('audio-output');
+//let audioRecorder;
+//let audioChunks = [];
+//navigator.mediaDevices.getUserMedia({ audio: true })
+//    .then(stream => {
+//        // Initialize the media recorder object
+//        audioRecorder = new MediaRecorder(stream);
 
-        // dataavailable event is fired when the recording is stopped
-        audioRecorder.addEventListener('dataavailable', e => {
-            audioChunks.push(e.data);
-        });
+//        // dataavailable event is fired when the recording is stopped
+//        audioRecorder.addEventListener('dataavailable', e => {
+//            audioChunks.push(e.data);
+//        });
 
-        // start recording when the start button is clicked
-        startButton.addEventListener('click', (e) => {
-            e.preventDefault();
+//        // start recording when the start button is clicked
+//        startButton.addEventListener('click', (e) => {
+//            e.preventDefault();
 
-            audioChunks = [];
-            audioRecorder.start();
-            output.innerHTML = 'Recording started! Speak now.';
-        });
+//            audioChunks = [];
+//            audioRecorder.start();
+//            output.innerHTML = 'Recording started! Speak now.';
+//        });
 
-        // stop recording when the stop button is clicked
-        stopButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            audioRecorder.stop();
-            output.innerHTML = 'Recording stopped! Click on the play button to play the recorded audio.';
-        });
+//        // stop recording when the stop button is clicked
+//        stopButton.addEventListener('click', (e) => {
+//            e.preventDefault();
+//            audioRecorder.stop();
+//            output.innerHTML = 'Recording stopped! Click on the play button to play the recorded audio.';
+//        });
 
-        // play the recorded audio when the play button is clicked
-        playButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            const blobObj = new Blob(audioChunks, { type: 'audio/webm' });
-            const audioUrl = URL.createObjectURL(blobObj);
-            const audio = new Audio(audioUrl);
-            audio.play();
-            output.innerHTML = 'Playing the recorded audio!';
-        });
-    }).catch(err => {
-        // If the user denies permission to record audio, then display an error.
-        console.log('Error: ' + err);
-    });
+//        // play the recorded audio when the play button is clicked
+//        playButton.addEventListener('click', (e) => {
+//            e.preventDefault();
+//            const blobObj = new Blob(audioChunks, { type: 'audio/webm' });
+//            const audioUrl = URL.createObjectURL(blobObj);
+//            const audio = new Audio(audioUrl);
+//            audio.play();
+//            output.innerHTML = 'Playing the recorded audio!';
+//        });
+//    }).catch(err => {
+//        // If the user denies permission to record audio, then display an error.
+//        console.log('Error: ' + err);
+//    });
 
 //const videostartButton = document.getElementById('video-start');
 //const videostopButton = document.getElementById('video-stop');

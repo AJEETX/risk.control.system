@@ -46,7 +46,7 @@
     <form asp-action="Delete">
         <input type="hidden" asp-for="InvestigationId" />
             <div class="form-group">
-                <a asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel </a> &nbsp;
+            <a id="back" asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> Cancel </a> &nbsp;
                 <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
             </div>
     </form>

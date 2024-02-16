@@ -241,6 +241,10 @@
 
         
         $('#upload-claims').submit();
+        $('html *').css('cursor', 'not-allowed');
+        $('html a *, html button *').attr('disabled', 'disabled');
+        $('html a *, html button *').css('pointer-events', 'none')
+
         var nodes = document.getElementById("fullpage").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
