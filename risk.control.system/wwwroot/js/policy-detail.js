@@ -15,7 +15,20 @@ $(document).ready(function () {
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
-                            $('#create-form').submit();
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('.card-footer a').attr('disabled', 'disabled');
+                            $('.card-footer a').html("<i class='fas fa-sync' aria-hidden='true'></i> .......");
+
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+
                         }
                     },
                     cancel: {

@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card card-secondary">
+                <div id="fullpage" class="card card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Assign <span class="badge badge-light">manual</span></h3>
                         <h3 id="view-type" class="card-title">
@@ -15,6 +15,9 @@
                         </h3>
                     </div>
                     <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
                         <form id="radioButtons" asp-action="EmpanelledVendors" method="get" enctype="multipart/form-data">
                             <div class="col-md-12">
 

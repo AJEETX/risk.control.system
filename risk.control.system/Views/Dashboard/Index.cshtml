@@ -21,7 +21,10 @@
                 <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h3>
             </div>
             <div class="card-body">
-                @if(!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()))
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                @if (!userRole.Value.Contains(AppRoles.PortalAdmin.ToString()))
                 {
                     <div class="row">
                         <div class="col-lg-3 col-6">
@@ -81,62 +84,62 @@
                         </div>
 
                     </div>
-               
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card card-light">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Bar Chart</h3>
-                            </div>
-                            <div class="card-body">
-                                <div id="container-claim" class="container-claim">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card card-light">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Bar Chart</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="container-claim" class="container-claim">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card card-light">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
-                            </div>
-                            <div class="card-body">
-                                <div id="container-claim-pie" class="container-claim">
+                        <div class="col-md-6">
+                            <div class="card card-light">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Claims Pie Chart</h3>
                                 </div>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card card-light">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Turn Around Time </h3>
-                            </div>
-                            <div class="card-body">
-                                <div id="container-claim-tat" class="container-claim">
+                                <div class="card-body">
+                                    <div id="container-claim-pie" class="container-claim">
+                                    </div>
                                 </div>
-                            </div>
-                            
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card card-light">
-                            <div class="card-header">
-                                <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Month-wise Claims</h3>
-                            </div>
-                            <div class="card-body">
-                                <div id="container-monthly-claim" class="container-claim">
-                                </div>
+
                             </div>
                         </div>
                     </div>
-                    
-                </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card card-light">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Turn Around Time </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="container-claim-tat" class="container-claim">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card card-light">
+                                <div class="card-header">
+                                    <h3 class="card-title"><i class="fas fa-tachometer-alt"></i> Month-wise Claims</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div id="container-monthly-claim" class="container-claim">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 }
 
                 @{
-                    if (userRole !=null && (userRole.Value.Contains(AppRoles.PortalAdmin.ToString())
+                    if (userRole != null && (userRole.Value.Contains(AppRoles.PortalAdmin.ToString())
                     || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
                     || userRole.Value.Contains(AppRoles.Assigner.ToString())
                     || userRole.Value.Contains(AppRoles.AgencyAdmin.ToString())))
@@ -157,7 +160,7 @@
                         </div>
                     }
                 }
-                
+
             </div>
         </div>
     </div>

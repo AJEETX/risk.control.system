@@ -12,7 +12,20 @@ $.validator.setDefaults({
                     text: "Edit",
                     btnClass: 'btn-orange',
                     action: function () {
+                        $("body").addClass("submit-progress-bg");
+                        // Wrap in setTimeout so the UI
+                        // can update the spinners
+                        setTimeout(function () {
+                            $(".submit-progress").removeClass("hidden");
+                        }, 1);
+                        $('#create-cust').attr('disabled', 'disabled');
+                        $('#create-cust').html("<i class='fas fa-user-plus' aria-hidden='true'></i> Edit Customer .....");
+
                         form.submit();
+                        var nodes = document.getElementById("article").getElementsByTagName('*');
+                        for (var i = 0; i < nodes.length; i++) {
+                            nodes[i].disabled = true;
+                        }
                     }
                 },
                 cancel: {

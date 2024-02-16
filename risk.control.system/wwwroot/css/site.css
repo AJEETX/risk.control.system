@@ -39,6 +39,7 @@ a {
 html {
     font-size: 13px;
     position: relative;
+    visibility: hidden;
 }
 
 @media (min-width: 768px) {
@@ -265,6 +266,7 @@ a.table-link {
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
+    margin-top:5px;
 }
 
 .text-muted {
@@ -903,7 +905,7 @@ main {
 .progresses {
     display: flex;
     align-items: center;
-    width: 100%;
+    width: 90%;
     margin:1rem 0;
     padding:1rem 0;
 }
@@ -1107,11 +1109,10 @@ img.doc-profile-image {
     padding-top: 2.5em;
     /* The following rules are the
     ones most likely to change */
-    width: 20em;
+    width: 15em;
     /* Set 'margin-left' to a negative number
     that is 1/2 of 'width' */
-    margin-left: -10em;
-    padding-left: 2.1em;
+    padding-left: 5em;
     background-color: black;
     color: white;
     -webkit-border-radius: 0.4em;
@@ -1131,4 +1132,7 @@ img.doc-profile-image {
 .submit-progress-bg {
     background-color: lightgray;
     opacity: .8;
+}
+.col-5{
+    margin-top:.6rem;
 }

@@ -132,27 +132,21 @@
         }
     });
 
-    // Handle form submission event
-    $('#checkboxes').on('submit', function (e) {
-        var form = this;
+    $('#allocatedcase').on('click', function (event) {
+        $("body").addClass("submit-progress-bg");
+         
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#allocatedcase').attr('disabled', 'disabled');
+        $('#allocatedcase').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign(manual) .....");
 
-        // Iterate over all checkboxes in the table
-        table.$('input[type="checkbox"]').each(function () {
-            // If checkbox doesn't exist in DOM
-            if (!$.contains(document, this)) {
-                // If checkbox is checked
-                if (this.checked) {
-                    // Create a hidden element
-                    $(form).append(
-                        $('<input>')
-                            .attr('type', 'hidden')
-                            .attr('name', this.name)
-                            .val(this.value)
-                    );
-                }
-            }
-        });
+        $('#radioButtons').submit();
+        var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+
     });
-
     initMap("/api/CompanyAssignClaims/GetAssignerMap");
 });

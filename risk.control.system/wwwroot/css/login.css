@@ -351,3 +351,34 @@ img.logo {
 .login-logo {
     height: 40px;
 }
+.submit-progress {
+    position: fixed;
+    height: 10em;
+    padding-top: 2.5em;
+    /* The following rules are the
+    ones most likely to change */
+    width: 15em;
+    /* Set 'margin-left' to a negative number
+    that is 1/2 of 'width' */
+    padding-left: 5em;
+
+    background-color: black;
+    color: white;
+    -webkit-border-radius: 0.4em;
+    -moz-border-radius: 0.4em;
+    border-radius: 0.4em;
+    box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    -webkit-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    -moz-box-shadow: 0.4em 0.4em rgba(0,0,0,0.6);
+    z-index: 999;
+}
+
+
+    .submit-progress.hidden {
+        display: none;
+    }
+
+.submit-progress-bg {
+    background-color: lightgray;
+    opacity: .8;
+}

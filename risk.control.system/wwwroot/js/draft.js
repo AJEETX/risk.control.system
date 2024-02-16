@@ -1,9 +1,10 @@
 ﻿$(document).ready(function () {
+
     $('#postedFile').on("change", function () {
         var val = $(this).val(),
             fbtn = $('#UploadFileButton');
         var uploadType = $('#uploadtype').val();
-        val && uploadType ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+        val.endsWith('.zip') && (uploadType == "0" || uploadType == "1") ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
 
 
@@ -11,7 +12,7 @@
         var val = $(this).val(),
             fbtn = $('#UploadFileButton');
         var uploadType = $('#postedFile').val();
-        val && uploadType ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+        (val == "0" || val == "1") && uploadType.endsWith('.zip') ? fbtn.removeAttr("disabled") : fbtn.attr('disabled', 'disabled');
     });
 
     $('#view-type a').on('click', function () {
@@ -200,7 +201,22 @@
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
+
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#managevendors').attr('disabled', 'disabled');
+                            $('#managevendors').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign .....");
+                            
                             $('#checkboxes').submit();
+                            var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                            
                         }
                     },
                     cancel: {
@@ -225,12 +241,28 @@
 
         
         $('#upload-claims').submit();
-        var nodes = document.getElementById("process-file").getElementsByTagName('*');
+        var nodes = document.getElementById("fullpage").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
     });
 });
+
+
+function progressBar() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+}
+
+
+
+
+
 function Delete(userId, status) {
     $.confirm({
         title: 'Change Status!',

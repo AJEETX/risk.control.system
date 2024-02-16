@@ -12,7 +12,21 @@ $.validator.setDefaults({
                     text: " Add New",
                     btnClass: 'btn-success',
                     action: function () {
+
+                        $("body").addClass("submit-progress-bg");
+                        // Wrap in setTimeout so the UI
+                        // can update the spinners
+                        setTimeout(function () {
+                            $(".submit-progress").removeClass("hidden");
+                        }, 1);
+                        $('#create-policy').attr('disabled', 'disabled');
+                        $('#create-policy').html("<i class='far fa-file-powerpoint' aria-hidden='true'></i> Add Policy .....");
+
                         form.submit();
+                        var nodes = document.getElementById("article").getElementsByTagName('*');
+                        for (var i = 0; i < nodes.length; i++) {
+                            nodes[i].disabled = true;
+                        }
                     }
                 },
                 cancel: {

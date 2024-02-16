@@ -36,6 +36,9 @@
                             </div>
                         </div>
                         <div class="card-body pt-0">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -210,7 +213,7 @@
                                     <i class="fa fa-window-close"></i>
                                     @Applicationsettings.CANCEL
                                 </a>
-                                <button type="submit" class="btn btn-warning">
+                                <button id="create-bene" type="submit" class="btn btn-warning">
                                     <i class="fas fa-user-tie"></i> @Applicationsettings.EDIT  Beneficiary
                                 </button>
                             </div>
