@@ -80,10 +80,10 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.assignedToAgency) {
-                        buttons += '<a onclick="getdetails()"  href="Detail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                        buttons += '<a onclick="showdetails()"  href="Detail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     }
                     else {
-                        buttons += '<a onclick="getdetails()"  href="Details?Id=' + row.id + '" class="active-claims btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
+                        buttons += '<a onclick="showedit()"  href="Details?Id=' + row.id + '" class="active-claims btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
                     }
 
                     //if (row.withdrawable) {
@@ -103,4 +103,35 @@
 
     initMap("/api/CompanyActiveClaims/GetActiveMap");
 });
+
+function showdetails() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-info').attr('disabled', 'disabled');
+    $('a.btn.btn-info').html("<i class='fa fa-search'></i> Detail...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
+function showedit() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-warning').attr('disabled', 'disabled');
+    $('a.btn.btn-warning').html("<i class='fas fa-pencil-alt'></i> Edit...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
 

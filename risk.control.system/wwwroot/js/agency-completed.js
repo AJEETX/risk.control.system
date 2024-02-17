@@ -78,7 +78,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a onclick="showdetails()" href="/ClaimsVendor/CompletedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
-                    buttons += '<a onclick="showpdf()" href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>&nbsp;'
+                    buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>&nbsp;'
                     return buttons;
                 }
             }
@@ -91,21 +91,6 @@
     initMap("/api/ClaimsVendor/GetReportMap");
 });
 
-function showpdf() {
-    $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
-    $('a.btn.btn-danger').attr('disabled', 'disabled');
-    $('a.btn.btn-danger').html("<i class='fas fa-undo'></i> PDF...");
-
-    var nodes = document.getElementById("body").getElementsByTagName('*');
-    for (var i = 0; i < nodes.length; i++) {
-        nodes[i].disabled = true;
-    }
-}
 
 function showdetails() {
     $("body").addClass("submit-progress-bg");
