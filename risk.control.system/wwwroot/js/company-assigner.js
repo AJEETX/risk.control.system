@@ -94,7 +94,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    buttons += '<a onclick="show()" href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
                     return buttons;
                 }
             }
@@ -134,7 +134,7 @@
 
     $('#allocatedcase').on('click', function (event) {
         $("body").addClass("submit-progress-bg");
-         
+
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
@@ -142,11 +142,26 @@
         $('#allocatedcase').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign(manual) .....");
 
         $('#radioButtons').submit();
-        var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+        var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
-
     });
     initMap("/api/CompanyAssignClaims/GetAssignerMap");
 });
+
+function show() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-info').attr('disabled', 'disabled');
+    $('a.btn.btn-info').html("<i class='fa fa-search'></i> Detail...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}

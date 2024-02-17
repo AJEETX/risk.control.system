@@ -14,7 +14,8 @@ $(document).ready(function () {
         }, 1);
 
         $('#login').attr('disabled', 'disabled');
-        $('#login').html(" Login");
+        $('#login').css('color', 'lightgrey');
+        $('#login').html('<span class="fa fa-key" aria-hidden="true"></span> Login');
 
         $('#login-form').submit();
         $('html *').css('cursor', 'not-allowed');
