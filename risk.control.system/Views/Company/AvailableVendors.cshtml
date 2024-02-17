@@ -11,6 +11,9 @@
                         <h3 class="card-title"><i class="fas fa-hand-pointer"></i> Available Agencies</h3>
                     </div>
                     <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
                         <form id="checkboxes" asp-action="AvailableVendors" method="post" asp-route-id="@ViewBag.CompanyId" enctype="multipart/form-data">
                             <input type="hidden" id="@ViewBag.CompanyId" />
                             <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">

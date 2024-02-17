@@ -1,19 +1,49 @@
 ﻿var apiKey = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
-
-
 $(function () {
-
-    $('#edit-company').on('click', function () {
+    $('.btn.btn-warning').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#edit-company').attr('disabled', 'disabled');
-        $('#edit-company').html("<i class='far fa-file-powerpoint' aria-hidden='true'></i> Add Policy .....");
+        $('.btn.btn-warning').attr('disabled', 'disabled');
+        $('.btn.btn-warning').html("<i class='fas fa-building' aria-hidden='true'></i> Profile...");
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+    $('.btn.btn-success.fa-user-friends').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('.btn.btn-success').attr('disabled', 'disabled');
+        $('.btn.btn-success').html("<i class='fas fa-user-friends' aria-hidden='true'></i> User...");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+
+    $('.btn.btn-success').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('.btn.btn-success').attr('disabled', 'disabled');
+        $('.btn.btn-success').html("<i class='fas fa-user-friends' aria-hidden='true'></i> User...");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
@@ -105,5 +135,36 @@ async function success(position) {
     map.setCenter(bounds.getCenter());
 }
 
+function showedit() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-warning').attr('disabled', 'disabled');
+    $('a.btn.btn-warning').html("<i class='fas fa-building'></i> Edit Agency...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
+
+function showdetails() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-info').attr('disabled', 'disabled');
+    $('a.btn.btn-info').html("<i class='fas fa-building'></i> Detail...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
 GetLoc();
 

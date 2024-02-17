@@ -28,6 +28,9 @@
                             </div>
 
                             <div class="card-body pb-0">
+                                <div class="submit-progress hidden">
+                                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                                </div>
                                 <div class="row">
                                     <div class="col-12 col-sm-6 d-flex align-items-stretch flex-column">
                                         <div class="card bg-light d-flex flex-fill">
@@ -198,78 +201,78 @@
                                 </div>
                             </div>
                             <div class="card-body pb-0">
-                            <div class="row">
-                                <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
 
-                                    <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Line of business
-                                                </th>
-                                                <th>
-                                                    Service type
-                                                </th>
-                                                <th>
-                                                    Price
-                                                </th>
-                                                <th>
-                                                    District
-                                                </th>
-                                                <th>
-                                                    State
-                                                </th>
-                                                <th>
-                                                    Pincodes
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var item in Model.VendorInvestigationServiceTypes)
-                                            {
+                                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                                            <thead>
                                                 <tr>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.Price)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.District.Name)
-                                                    </td>
-                                                    <td>
-                                                        @Html.DisplayFor(modelItem => item.State.Name)
-                                                    </td>
-                                                    <td>
-                                                        @foreach (var pin in item.PincodeServices)
-                                                        {
-                                                            <span>
-                                                                @pin.Pincode
-                                                            </span>
-                                                        }
-                                                    </td>
+                                                    <th>
+                                                        Line of business
+                                                    </th>
+                                                    <th>
+                                                        Service type
+                                                    </th>
+                                                    <th>
+                                                        Price
+                                                    </th>
+                                                    <th>
+                                                        District
+                                                    </th>
+                                                    <th>
+                                                        State
+                                                    </th>
+                                                    <th>
+                                                        Pincodes
+                                                    </th>
                                                 </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var item in Model.VendorInvestigationServiceTypes)
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.InvestigationServiceType.Name)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.Price)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.District.Name)
+                                                        </td>
+                                                        <td>
+                                                            @Html.DisplayFor(modelItem => item.State.Name)
+                                                        </td>
+                                                        <td>
+                                                            @foreach (var pin in item.PincodeServices)
+                                                            {
+                                                                <span>
+                                                                    @pin.Pincode
+                                                                </span>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
 
-                                </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <div class="row">
-                        <div class="col-md-12">
+                            <div class="col-md-12">
                                 <div class="form-group">
-                                    <a asp-controller="Vendors" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                            <a asp-controller="Vendors" asp-action="Edit" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-building'></i> @Applicationsettings.PROFILE</a>
-                                <a asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-friends"></i>  @Applicationsettings.USER</a>
-                            <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE</a>
-                        </div>
+                                    <a id="back" asp-controller="Vendors" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                    <a asp-controller="Vendors" asp-action="Edit" asp-route-id="@Model.VendorId" class="btn btn-warning"><i class='fas fa-building'></i> @Applicationsettings.PROFILE</a>
+                                    <a asp-controller="Vendors" asp-action="Users" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-user-friends"></i>  @Applicationsettings.USER</a>
+                                    <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.VendorId" class="btn btn-success"><i class="fas fa-truck"></i>  @Applicationsettings.SERVICE</a>
+                                </div>
                             </div>
                         </div>
                     </div>

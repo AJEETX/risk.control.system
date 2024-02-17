@@ -1,6 +1,27 @@
 ﻿$(document).ready(function () {
     $('a#back-button').attr("href", "/Dashboard/Index");
-    $('a#create-agency-service').attr("href", "/Agency/CreateService");
+    $('a#back').attr("href", "/Dashboard/Index");
+    $('a.create-agency-service').attr("href", "/Agency/CreateService");
+
+
+    $('a.create-agency-service').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('a.create-agency-service').attr('disabled', 'disabled');
+        $('a.create-agency-service').html("<i class='fas fa-truck' aria-hidden='true'></i> Add New...");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+
+
     $("#customerTable").DataTable({
         ajax: {
             url: '/api/Agency/AllServices',

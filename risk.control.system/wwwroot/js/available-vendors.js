@@ -123,5 +123,19 @@
                 }
             });
         }
+
+        //$("body").addClass("submit-progress-bg");
+        //// Wrap in setTimeout so the UI
+        //// can update the spinners
+        //setTimeout(function () {
+        //    $(".submit-progress").removeClass("hidden");
+        //}, 1);
+        //$('#manage-vendors').attr('disabled', 'disabled');
+        //$('#manage-vendors').html("<i class='fas fa-handshake' aria-hidden='true'></i> Empanel Agency(s)...");
+
+        //var nodes = document.getElementById("checkboxes").getElementsByTagName('*');
+        //for (var i = 0; i < nodes.length; i++) {
+        //    nodes[i].disabled = true;
+        //}
     });
 });
