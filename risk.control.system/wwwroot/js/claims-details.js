@@ -47,7 +47,21 @@
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;
+
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#submit-case').attr('disabled', 'disabled');
+                            $('#submit-case').html("<i class='fas fa-undo' aria-hidden='true'></i> Withdraw...");
+
                             $('#create-form').submit();
+                            var nodes = document.getElementById("body").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
                         }
                     },
                     cancel: {

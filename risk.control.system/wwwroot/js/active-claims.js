@@ -45,7 +45,7 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="ClaimsInvestigation/Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a onlick="showdetails()" show href="ClaimsInvestigation/Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     return buttons;
                 }
             }
@@ -56,3 +56,19 @@ $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
 });
+
+function showdetails() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-info').attr('disabled', 'disabled');
+    $('a.btn.btn-info').html("<i class='fas fa-building'></i> Detail...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}

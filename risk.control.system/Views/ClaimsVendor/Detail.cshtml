@@ -18,8 +18,12 @@
                             ClaimsInvestigation = Model.ClaimsInvestigation,
                         };
                         <div class="card-body">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <partial name="_PolicyDetails" model="@data" />
                         </div>
+                        
                         <div class="card-footer">
 
                             <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="ClaimsVendorPost">
@@ -35,7 +39,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                        <a id="back" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                                         <button id="submit-case" disabled type="submit" class="btn btn-danger"><i class="fas fa-undo"></i> Withdraw</button>
                                     </div>
                                 </div>

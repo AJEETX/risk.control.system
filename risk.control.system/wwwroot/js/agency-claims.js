@@ -114,7 +114,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a onclick="getdetails()" href="/ClaimsVendor/Detail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> Withdraw</a>'
+                    buttons += '<a onclick="showdetails()" href="/ClaimsVendor/Detail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> Withdraw</a>'
                     return buttons;
                 }
             }
@@ -177,3 +177,19 @@
 
     initMap("/api/ClaimsVendor/GetNewMap");
 });
+
+function showdetails() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-danger').attr('disabled', 'disabled');
+    $('a.btn.btn-danger').html("<i class='fas fa-undo'></i> Withdraw...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
