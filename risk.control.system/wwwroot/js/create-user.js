@@ -16,6 +16,10 @@ $(document).ready(function () {
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = false;
+
+                            getdetail();
+
+
                             $('#create-form').submit();
                         }
                     },

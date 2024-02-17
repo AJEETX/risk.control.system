@@ -1,6 +1,7 @@
 ﻿$(document).ready(function () {
     $('a#back-button').attr("href", "/Dashboard/Index");
-    $('a#create-agency-service').attr("href", "/Company/CreateUser");
+    $('a#back').attr("href", "/Dashboard/Index");
+    $('a.create-user').attr("href", "/Company/CreateUser");
 
     $("#customerTable").DataTable({
         ajax: {
@@ -57,8 +58,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="/Company/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a href="/Company/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
+                    buttons += '<a onclick="show()" href="/Company/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a onclick="show()" href="/Company/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
                     return buttons;
                 }
             }
@@ -68,4 +69,38 @@
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
+
+
+    $('a.create-user').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('a.create-user').attr('disabled', 'disabled');
+        $('a.create-user').html("<i class='fas fa-user-friends'></i> Add User .....");
+
+        var nodes = document.getElementById("article").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
 });
+
+function show() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.create-user').attr('disabled', 'disabled');
+    $('a.create-user').html("<i class='fas fa-user-friends'></i> Add User .....");
+
+    var nodes = document.getElementById("article").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}

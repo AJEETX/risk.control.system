@@ -351,6 +351,7 @@ img.logo {
 .login-logo {
     height: 40px;
 }
+
 .submit-progress {
     position: fixed;
     height: 10em;
@@ -361,7 +362,6 @@ img.logo {
     /* Set 'margin-left' to a negative number
     that is 1/2 of 'width' */
     padding-left: 5em;
-
     background-color: black;
     color: white;
     -webkit-border-radius: 0.4em;
@@ -373,12 +373,11 @@ img.logo {
     z-index: 999;
 }
 
-
-    .submit-progress.hidden {
-        display: none;
-    }
-
 .submit-progress-bg {
     background-color: lightgray;
     opacity: .8;
+}
+
+.submit-progress.hidden {
+    display: none;
 }

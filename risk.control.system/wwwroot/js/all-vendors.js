@@ -1,7 +1,8 @@
 ﻿$(document).ready(function () {
 
-    $('a#create-agency-user').attr("href", "/Vendors/Create");
+    $('a.create-agency-user').attr("href", "/Vendors/Create");
     $('a#back-button').attr("href", "/Dashboard/Index");
+    $('a#back').attr("href", "/Dashboard/Index");
 
     $("#customerTable").DataTable({
         ajax: {
@@ -43,8 +44,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="/Vendors/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
-                    buttons += '<a href="/Vendors/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a onclick="getdetails()" href="/Vendors/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    buttons += '<a onclick="getdetails()" href="/Vendors/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
                     //buttons += '<a href="Vendors/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
                     return buttons;
                 }
@@ -54,5 +55,21 @@
     });
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    $('a.create-agency-user').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('a.create-agency-user').attr('disabled', 'disabled');
+        $('a.create-agency-user').html("<i class='fas fa-user-friends'></i> Add User .....");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
     });
 });

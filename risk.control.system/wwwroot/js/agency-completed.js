@@ -77,8 +77,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="/ClaimsVendor/CompletedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
-                    buttons += '<a href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>&nbsp;'
+                    buttons += '<a onclick="getdetails()" href="/ClaimsVendor/CompletedDetail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a onclick="getdetails()" href="/Report/PrintPdfReport?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="far fa-file-pdf"></i> PDF</a>&nbsp;'
                     return buttons;
                 }
             }

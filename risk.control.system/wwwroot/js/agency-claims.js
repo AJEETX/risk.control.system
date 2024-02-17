@@ -114,7 +114,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="/ClaimsVendor/Detail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> Withdraw</a>'
+                    buttons += '<a onclick="getdetails()" href="/ClaimsVendor/Detail?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-undo"></i></i> Withdraw</a>'
                     return buttons;
                 }
             }

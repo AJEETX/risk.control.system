@@ -1136,3 +1136,9 @@ img.doc-profile-image {
 .col-5{
     margin-top:.6rem;
 }
+
+@media only screen and (max-width: 768px) {
+    .submit-progress {
+        left: 25%;
+    }
+}

@@ -10,7 +10,6 @@ var showOcrMap = false;
 const image =
     "../images/beachflag.png";
 $(document).ready(function () {
-
     $('#back').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -18,7 +17,7 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        
+
         $('#back').html("<i class='fas fa-arrow-left' aria-hidden='true'></i> Back...");
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
@@ -47,26 +46,39 @@ $(document).ready(function () {
     });
 
     $('.nav-item a.actual-link').on('click', function (e) {
-
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#create-policy').attr('disabled', 'disabled');
-        $('#create-policy').html("<i class='far fa-file-powerpoint' aria-hidden='true'></i> Add Policy .....");
+
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
         $('html a *, html button *').css('pointer-events', 'none')
-
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
     })
+    function getdetails() {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
 
+        $('html *').css('cursor', 'not-allowed');
+        $('html a *, html button *').attr('disabled', 'disabled');
+        $('html a *, html button *').css('pointer-events', 'none')
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    }
 
     document.getElementsByTagName("html")[0].style.visibility = "visible";
 

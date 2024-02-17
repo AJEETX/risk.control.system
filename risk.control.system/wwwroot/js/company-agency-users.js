@@ -1,6 +1,6 @@
 ﻿$(document).ready(function () {
     var vendor = $('#vendorId').val();
-    $('a#create-agency-user').attr("href", "/Vendors/CreateUser?id=" + vendor + "");
+    $('a,create-agency-user').attr("href", "/Vendors/CreateUser?id=" + vendor + "");
     $('a#back-button').attr("href", "/Vendors/Details/" + vendor + "");
 
     $("#customerTable").DataTable({

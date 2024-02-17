@@ -6,6 +6,9 @@
                 <h3 class="card-title"><i class="fas fa-tasks"></i> Empanelled Agencies</h3>
             </div>
             <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
                 <form id="radioButtons" method="post" asp-controller="ClaimsInvestigationPost" asp-action="CaseAllocatedToVendor" enctype="multipart/form-data">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
@@ -133,7 +136,7 @@
                     </table>
                     <div class="row">
                         <div class="col-md-12">
-                            <a asp-controller="ClaimsInvestigation" asp-action="Assigner" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+                            <a id="back" asp-controller="ClaimsInvestigation" asp-action="Assigner" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
 
                             <button disabled="disabled" id="allocate-case" type="submit" class="btn btn-danger">
                                 <i class="fas fa-external-link-alt" aria-hidden="true"></i> Assign (manual)

@@ -1,22 +1,5 @@
 ﻿$(document).ready(function () {
 
-    $('a.active-claims').on('click', function (e) {
-        var form = this;
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-
-        $('a.active-claims').attr('disabled', 'disabled');
-        $('a.active-claims').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Detail .....");
-
-        var nodes = document.getElementById("fullpage").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {
@@ -97,10 +80,10 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.assignedToAgency) {
-                        buttons += '<a  href="Detail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                        buttons += '<a onclick="getdetails()"  href="Detail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     }
                     else {
-                        buttons += '<a href="Details?Id=' + row.id + '" class="active-claims btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
+                        buttons += '<a onclick="getdetails()"  href="Details?Id=' + row.id + '" class="active-claims btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
                     }
 
                     //if (row.withdrawable) {
@@ -120,3 +103,4 @@
 
     initMap("/api/CompanyActiveClaims/GetActiveMap");
 });
+

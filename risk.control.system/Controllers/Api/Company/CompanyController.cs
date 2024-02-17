@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 
@@ -33,7 +34,7 @@ namespace risk.control.system.Controllers.Api.Company
                 new
                 {
                     Id = u.ClientCompanyId,
-                    Document = u.DocumentUrl,
+                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
                     Domain = "<a href=''>" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
@@ -82,7 +83,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
-                    Photo = u.ProfilePictureUrl,
+                    Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                     Active = u.Active,
                     Addressline = u.Addressline,
                     District = u.District.Name,
@@ -125,7 +126,7 @@ namespace risk.control.system.Controllers.Api.Company
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
-                    Photo = u.ProfilePictureUrl,
+                    Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? Applicationsettings.NO_USER : u.ProfilePictureUrl,
                     Active = u.Active,
                     Addressline = u.Addressline,
                     District = u.District.Name,
@@ -161,7 +162,7 @@ namespace risk.control.system.Controllers.Api.Company
                 new
                 {
                     Id = u.VendorId,
-                    Document = u.DocumentUrl,
+                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
                     Domain = "<a href=''>" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
@@ -211,7 +212,7 @@ namespace risk.control.system.Controllers.Api.Company
                 new
                 {
                     Id = u.VendorId,
-                    Document = u.DocumentUrl,
+                    Document = string.IsNullOrWhiteSpace(u.DocumentUrl) ? Applicationsettings.NO_IMAGE : u.DocumentUrl,
                     Domain = "<a href=''>" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,

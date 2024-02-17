@@ -34,9 +34,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="/VendorService/Details?id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
-                    buttons += '<a href="/VendorService/Edit?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a href="/VendorService/Delete?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                    buttons += '<a onclick="getdetails()" href="/VendorService/Details?id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    buttons += '<a onclick="getdetails()" href="/VendorService/Edit?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a onclick="getdetails()" href="/VendorService/Delete?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     return buttons;
                 }
             }
