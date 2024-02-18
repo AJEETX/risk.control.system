@@ -22,8 +22,8 @@
                         int currentAgeinYrs = 0;
                         int currentBAgeinYrs = 0;
                         bool policyExist = true;
-                        bool customerExist = false;
-                        bool beneficiaryExist = false;
+                        bool customerExist = Model.ClaimsInvestigation.CustomerDetail != null;
+                        bool beneficiaryExist = Model.Location != null;
                         string customerProgressbarMessage = "add customer";
                         string beneficiaryProgressbarMessage = "beneficiary";
                         if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail !=null)

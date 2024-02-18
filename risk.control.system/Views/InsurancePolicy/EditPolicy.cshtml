@@ -20,8 +20,8 @@
                         </div>
                         @{
                             bool policyExist = true;
-                            bool customerExist = false;
-                            bool beneficiaryExist = false;
+                            bool customerExist = Model.CustomerDetail != null;
+                            bool beneficiaryExist = Model.CaseLocations?.Any() == true;
 
                             string customerProgressColor = "steps2";
                             string customerLineColor = "line";
@@ -32,7 +32,7 @@
                             if (@customerExist)
                             {
                                 customerProgressColor = "steps";
-                                customerLineColor = "line1";
+                                customerLineColor = "line0";
                             }
                             string benficiaryProgressColor = "steps3";
                             string beneficiaryLineColor = "line";
@@ -50,21 +50,24 @@
                         }
                         <div class="container d-flex justify-content-center align-items-center">
                             <div class="progresses">
+
                                 <div class="steps-edit">
                                     <span> <i class="far fa-file-powerpoint"></i></span>
                                 </div>
 
                                 <span class="line"></span>
 
-                                <div class="steps3">
+                                <div class="steps2">
                                     <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
                                 </div>
 
+
                                 <span class="line"></span>
 
-                                <div class="steps3">
+                                <div class="steps2">
                                     <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
                                 </div>
+
                             </div>
                         </div>
                         <div class="card-body pt-0">

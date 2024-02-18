@@ -65,6 +65,7 @@ namespace risk.control.system.Controllers
 
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
+                .Include(c => c.CustomerDetail)
                 .FirstOrDefaultAsync(i => i.ClaimsInvestigationId == id);
 
             if (claimsInvestigation == null)
