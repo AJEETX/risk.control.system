@@ -1142,3 +1142,6 @@ img.doc-profile-image {
         left: 25%;
     }
 }
+.toggle.btn{
+    min-width:100px !important;
+}
