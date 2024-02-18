@@ -195,32 +195,8 @@
                             <div class="card-body">
                                 <partial name="_Chat" model="@Model" />
 
-                                <div class="row coming-soon-watermark">
-                                    <div class="col-md-1 coming-soon-view">
-                                        <div class="form-group">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <i class="fas fa-file-audio"></i> <span class="input-group-label"> Audio: </span>
-                                            <div class="input-group mb-3">
-                                                <button disabled id="audio-play" class="btn btn-secondary btn-sm"> <i class="fas fa-play"></i> Play </button>
-                                                <audio asp-for="Location.ClaimReport.ReportQuestionaire.Audio" class="form-control" placeholder="Record audio." />
-                                                <div id="audio-output"> </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <i class="fas fa-file-video"></i> <span class="input-group-label"> Video: </span>
-                                            <div class="input-group mb-3">
-                                                <button disabled id="video-play" class="btn btn-secondary btn-sm"> <i class="fas fa-play-circle"></i> Play </button>
-                                                <audio asp-for="Location.ClaimReport.ReportQuestionaire.Video" class="form-control" placeholder="Record video." />
-                                                <div id="video-output"> </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                @* <partial name="_MediaDetails" model="@Model.ClaimsInvestigation" />*@
+
                                 <div class="row">
                                     <div class="col-6">
                                         <p class="text-muted text-sm">

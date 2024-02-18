@@ -14,10 +14,13 @@
                         <h3 class="card-title"><i class="fas fa-tools"></i>  Type of Service</h3>
                     </div>
                     <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
                         <div class="row">
                             <div class="col-6">
                                 <div class="card card-light">
-                                    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                    <a id="back-button" asp-controller="Dashboard" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                                 </div>
                             </div>
                             <div class="col-6">
@@ -85,7 +88,7 @@
                                         <div class="row">
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                                <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
                                                 <a class="btn btn-success" asp-controller="InvestigationServiceTypes" asp-action="Create"><i class="fas fa-tools"></i> Add New</a>
 
                                             </div>

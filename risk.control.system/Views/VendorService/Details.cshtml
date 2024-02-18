@@ -12,6 +12,9 @@
                         <h3 class="card-title"><i class="fas fa-truck"></i> Manage Service</h3>
                     </div>
                     <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <dl class="row">
@@ -93,7 +96,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12 text-right">
-                                <a asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                                <a id="back" asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                     <i class="fa fa-window-close"></i>
                                     @Applicationsettings.CANCEL
                                 </a>

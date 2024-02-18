@@ -461,28 +461,8 @@
                                 </div>
                                 <div class="card-body">
                                     <partial name="_Chat" model="@Model.ClaimsInvestigation" />
-                                    <div class="row coming-soon-watermark">
-
-                                        <div class="col-md-4 coming-soon-view">
-                                            <img class="watermark" src="~/img/coming-soon.jpg" />
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <span><i class="fas fa-file-audio"></i></span>
-                                                <button disabled id="audio-play" class="btn btn-secondary btn-sm"> <i class="fas fa-play"></i> Audio </button>
-                                                <audio asp-for="Location.ClaimReport.ReportQuestionaire.Audio" class="form-control" placeholder="Record audio." />
-                                                <div id="audio-output"> </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <span><i class="fas fa-file-video"></i></span>
-                                                <button disabled id="video-play" class="btn btn-secondary btn-sm"> <i class="fas fa-play-circle"></i> Video </button>
-                                                <audio asp-for="Location.ClaimReport.ReportQuestionaire.Video" class="form-control" placeholder="Record video." />
-                                                <div id="video-output"> </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    @* <partial name="_MediaDetails" model="@Model.ClaimsInvestigation" />*@
+                                    
                                     <div class="row">
                                         <div class="col-6">
                                             <p class="text-muted text-sm">

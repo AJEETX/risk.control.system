@@ -16,7 +16,7 @@ $(function () {
         }
     });
 
-    $('.btn.btn-success.fa-user-friends').on('click', function () {
+    $('.btn.btn-success').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
@@ -33,15 +33,15 @@ $(function () {
     });
 
 
-    $('.btn.btn-success').on('click', function () {
+    $('.btn.btn-danger').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('.btn.btn-success').attr('disabled', 'disabled');
-        $('.btn.btn-success').html("<i class='fas fa-user-friends' aria-hidden='true'></i> User...");
+        $('.btn.btn-danger').attr('disabled', 'disabled');
+        $('.btn.btn-danger').html("<i class='fas fa-truck' aria-hidden='true'></i> Service...");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
