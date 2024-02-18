@@ -1,4 +1,22 @@
 ﻿$(function () {
+
+    $('.btn.btn-info').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('.btn.btn-info').attr('disabled', 'disabled');
+        $('.btn.btn-info').html("<i class='fas fa-building' aria-hidden='true'></i> Detail...");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+
     $("img.rating").mouseover(function () {
         giveRating($(this), "FilledStar.jpeg");
         $(this).css("cursor", "pointer");
