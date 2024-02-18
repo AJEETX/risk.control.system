@@ -20,8 +20,6 @@
         }
     });
 
-
-
     $("#customerTable").DataTable({
         ajax: {
             url: '/api/Company/AllServices?id=' + $('#vendorId').val(),

@@ -54,8 +54,8 @@ $(document).ready(function () {
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a href="/UserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
+                    buttons += '<a onclick="showedit()" href="/User/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-user-minus"></i> Edit</a>&nbsp;'
+                    buttons += '<a onclick="showroles()" href="/UserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-user-plus"></i> Roles</a>'
                     return buttons;
                 }
             }
@@ -66,3 +66,34 @@ $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
 });
+
+function showroles() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-info').attr('disabled', 'disabled');
+    $('a.btn.btn-info').html("<i class='fas fa-user-plus'></i> Roles...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
+function showedit() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-warning').attr('disabled', 'disabled');
+    $('a.btn.btn-warning').html("<i class='fas fa-user-friends'></i> Edit...");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}

@@ -14,6 +14,9 @@
                             <h3 class="card-title"><i class="fas fa-plus"></i> Create @Applicationsettings.CLIENT_COMPANY</h3>
                         </div>
                     <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
                         <div class="row">
                             <div class="col-md-3">
                             </div>
@@ -45,7 +48,7 @@
                         </div>
                     </div>
 
-                        <form asp-action="Create" enctype="multipart/form-data">
+                    <form id="create-form" asp-action="Create" enctype="multipart/form-data">
                         <input type="hidden" asp-for="Email" id="mailAddress" name="mailAddress" />
                         <input type="hidden" asp-for="Email" id="domainAddress" name="domainAddress" />
                         <div class="card-body">
@@ -168,7 +171,7 @@
                                             @Applicationsettings.CANCEL
                                         </a>
                                         <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-plus"></i> Create
+                                            <i class="fas fa-plus"></i> Add
                                         </button>
                                     </div>
                                     </>
