@@ -74,7 +74,7 @@ function checkUserEmail() {
     var name = $('#emailAddress').val();
     var emailSuffix = $('#emailSuffix').val();
     if (name) {
-        $.get(url, { input: name + '@@' + emailSuffix }, function (data) {
+        $.get(url, { input: name + '@' + emailSuffix }, function (data) {
             if (data == 0) { //available
                 $('#mailAddress').val($('#emailAddress').val());
                 $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> Available</span>");
@@ -83,14 +83,14 @@ function checkUserEmail() {
                 //$('#result').fadeOut('slow'); // 1.5 seconds
                 $("#emailAddress").css('background-color', '');
                 $("#emailAddress").css('border-color', '#ccc');
-                $('#create-agency').prop('disabled', false);
+                $('#create-user').prop('disabled', false);
             }
             else if (data == 1) {//domain exists
                 $("#result").html("<span style='color:red;padding-top:.5rem;display:inline !important'><i class='fa fa-times-circle' style='color:red;'></i> Email exists </span>");
                 $('#result').css('padding', '.5rem')
                 $('#result').css('display', 'inline')
                 $("#emailAddress").css('border-color', '#e97878');
-                $('#create-agency').prop('disabled', 'true !important');
+                $('#create-user').prop('disabled', 'true !important');
             }
             else if (data = null || data == undefined) {
             }

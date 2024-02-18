@@ -29,8 +29,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text" id="emailid"><i class="fas fa-at"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                                         </div>
-                                        <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" value="" onblur="CheckIfEmailValid();" 
-                                        required placeholder="Enter User Email prefix" maxlength="20" onkeydown='return alphaOnly(event);' autocomplete="off">
+                                        <input type="text" asp-for="Email" id="emailAddress" class="form-control email-address" value="" onblur="CheckIfEmailValid();"
+                                               required placeholder="Enter User Email prefix" onclick="this.select();" maxlength="20" onkeydown='return alphaOnly(event);' autocomplete="off">
                                         <div class="input-group-append">
                                             <span class="input-group-text" id="Email">@@@email</span>
                                         </div>
@@ -207,7 +207,7 @@
                                             
                                             </div>
                                             <span class="checkbox">
-                                                <input asp-for="Active" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
+                                                <input asp-for="Active" type="checkbox" data-toggle="toggle" data-on="<i class='fa fa-play'></i> Active " data-off="<i class='fa fa-pause'></i> Inactive" data-onstyle="success" data-offstyle="danger">
 
                                             </span>
                                         </div>

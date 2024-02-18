@@ -417,7 +417,7 @@ namespace risk.control.system.Controllers
                 Where(x => x.Selected).Select(y => y.RoleName));
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
-            return RedirectToAction(nameof(User), "Vendors", new { id = model.VendorId });
+            return RedirectToAction("Users", "Vendors", new { id = model.VendorId });
         }
 
         [Breadcrumb("Manage Service", FromAction = "Details")]

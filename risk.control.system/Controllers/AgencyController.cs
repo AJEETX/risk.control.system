@@ -206,7 +206,6 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix)
         {
-            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             if (user.ProfileImage != null && user.ProfileImage.Length > 0)
             {
                 string newFileName = Guid.NewGuid().ToString();
@@ -219,11 +218,13 @@ namespace risk.control.system.Controllers
                 }
                 var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
                 user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                user.ProfilePictureUrl = "/agency/" + newFileName;
+
                 using var dataStream = new MemoryStream();
                 user.ProfileImage.CopyTo(dataStream);
                 user.ProfilePicture = dataStream.ToArray();
-                user.ProfilePictureUrl = "/agency/" + newFileName;
             }
+            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
             //DEMO
             user.Password = Applicationsettings.Password;
             user.Email = userFullEmail;
