@@ -80,7 +80,7 @@ function checkUserEmail() {
     if (name) {
         $('#result').fadeOut(1000); // 1.5 seconds
         $('#result').fadeOut('slow'); // 1.5 seconds
-        $.get(url, { input: name + '@@' + emailSuffix }, function (data) {
+        $.get(url, { input: name + '@' + emailSuffix }, function (data) {
             if (data == 0) { //available
                 $('#mailAddress').val($('#emailAddress').val());
                 $("#result").html("<span style='color:green;padding-top:.5rem;'> <i class='fas fa-check' style='color:#298807'></i> </span>");

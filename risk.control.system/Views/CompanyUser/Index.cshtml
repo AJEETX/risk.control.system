@@ -29,6 +29,9 @@
                         <h3 class="card-title"><i class="fas fa-building"></i>  <i> @Model.Company.Name</i> <i class="fas fa-user-plus"></i> Users</h3>
                         </div>
                     <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
                         <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
@@ -50,7 +53,7 @@
                             </thead>
 
                         </table>
-                        <a asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.Company.ClientCompanyId" class="btn btn-default">
+                        <a id="back" asp-controller="ClientCompany" asp-action="Details" asp-route-id="@Model.Company.ClientCompanyId" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i>
                             Back
                         </a>
