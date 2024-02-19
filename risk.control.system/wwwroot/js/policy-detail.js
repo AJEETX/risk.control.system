@@ -1,4 +1,36 @@
 $(document).ready(function () {
+    $('.btn.btn-warning').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('.btn.btn-warning').attr('disabled', 'disabled');
+        $('.btn.btn-warning').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign List <i class='fas fa-arrow-right'></i>");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+    $('.btn.btn-primary').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('.btn.btn-primary').attr('disabled', 'disabled');
+        $('.btn.btn-primary').html("<i class='fa fa-toggle-on' aria-hidden='true'></i> Assign List <i class='fas fa-arrow-right'></i>");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
     $('#edit-policy').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

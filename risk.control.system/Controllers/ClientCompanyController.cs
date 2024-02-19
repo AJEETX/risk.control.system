@@ -124,14 +124,14 @@ namespace risk.control.system.Controllers
         // POST: ClientCompanies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
+        public async Task<IActionResult> DeleteConfirmed(long ClientCompanyId)
         {
             if (_context.ClientCompany == null)
             {
                 toastNotification.AddErrorToastMessage("client company not found!");
                 return Problem("Entity set 'ApplicationDbContext.ClientCompany'  is null.");
             }
-            var clientCompany = await _context.ClientCompany.FindAsync(id);
+            var clientCompany = await _context.ClientCompany.FindAsync(ClientCompanyId);
             if (clientCompany != null)
             {
                 clientCompany.Updated = DateTime.UtcNow;
