@@ -154,10 +154,12 @@ namespace risk.control.system.Controllers
                 caseLocation.InvestigationCaseSubStatusId = createdStatus.InvestigationCaseSubStatusId;
 
                 IFormFile? customerDocument = Request.Form?.Files?.FirstOrDefault();
-
-                using var dataStream = new MemoryStream();
-                customerDocument.CopyTo(dataStream);
-                caseLocation.ProfilePicture = dataStream.ToArray();
+                if (customerDocument != null)
+                {
+                    using var dataStream = new MemoryStream();
+                    customerDocument.CopyTo(dataStream);
+                    caseLocation.ProfilePicture = dataStream.ToArray();
+                }
 
                 caseLocation.ClaimsInvestigationId = claimId;
                 var pincode = _context.PinCode.FirstOrDefault(p => p.PinCodeId == caseLocation.PinCodeId);
