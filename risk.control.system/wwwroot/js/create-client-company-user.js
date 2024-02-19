@@ -75,8 +75,8 @@ function alphaOnly(event) {
 
 function checkUserEmail() {
     var url = "/Account/CheckUserEmail";
-    var name = $('#emailAddress').val();
-    var emailSuffix = $('#emailSuffix').val();
+    var name = $('#emailAddress').val().toLowerCase();
+    var emailSuffix = $('#emailSuffix').val().toLowerCase();
     if (name) {
         $('#result').fadeOut(1000); // 1.5 seconds
         $('#result').fadeOut('slow'); // 1.5 seconds
@@ -126,3 +126,5 @@ function CheckIfEmailValid() {
     $('#result').fadeIn(1000); // 1.5 seconds
     $('#result').fadeIn('slow'); // 1.5 seconds
 }
+
+$('#emailAddress').focus();

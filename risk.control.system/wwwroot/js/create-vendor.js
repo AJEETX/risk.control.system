@@ -71,8 +71,8 @@ function alphaOnly(event) {
 
 function checkUserEmail() {
     var url = "/Account/CheckUserEmail";
-    var name = $('#emailAddress').val();
-    var emailSuffix = $('#emailSuffix').val();
+    var name = $('#emailAddress').val().toLowerCase();
+    var emailSuffix = $('#emailSuffix').val().toLowerCase();
     if (name) {
         $.get(url, { input: name + '@' + emailSuffix }, function (data) {
             if (data == 0) { //available
@@ -113,3 +113,5 @@ function CheckIfEmailValid() {
         $("#check-email").css('cursor', 'not-allowed');
     }
 }
+
+$('#emailAddress').focus();

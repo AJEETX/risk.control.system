@@ -88,8 +88,8 @@ $("input#emailAddress").on({
 
 function checkDomain() {
     var url = "/Account/CheckUserName";
-    var name = $('#emailAddress').val();
-    var domain = $('#domain').val();
+    var name = $('#emailAddress').val().toLowerCase();
+    var domain = $('#domain').val().toLowerCase();
     if (name) {
         $('#result').fadeOut(1000); // 1.5 seconds
         $('#result').fadeOut('slow'); // 1.5 seconds
@@ -142,3 +142,4 @@ function CheckIfEmailValid() {
     $('#result').fadeIn(1000); // 1.5 seconds
     $('#result').fadeIn('slow'); // 1.5 seconds
 }
+$('#emailAddress').focus();

@@ -27,7 +27,7 @@
                                             <span class="input-group-text" id="emailid"><i class="fa fa-globe"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                         </div>
                                         <input asp-for="Email" id="emailAddress" class="form-control email-address" type="text" value="" onblur="CheckIfEmailValid();" required
-                                               placeholder="alphabets only [maximum 10 characters]" maxlength="10" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="off">
+                                               placeholder="domain name" maxlength="10" onkeydown='return alphaOnly(event);' onClick="this.select();" autocomplete="off">
                                         <div class="input-group-append">
                                             <select id="domain" name="domain" asp-for="DomainName" required class="form-control" asp-items="Html.GetEnumSelectList<Domain>()">
                                             </select>

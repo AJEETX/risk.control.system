@@ -1145,3 +1145,6 @@ img.doc-profile-image {
 .toggle.btn{
     min-width:100px !important;
 }
+input[type="text"] #emailAddress{
+    text-transform:lowercase;
+}

@@ -88,8 +88,8 @@ function alphaOnly(event) {
 
 function checkDomain() {
     var url = "/Account/CheckUserName";
-    var name = $('#emailAddress').val();
-    var domain = $('#domain').val();
+    var name = $('#emailAddress').val().toLowerCase();
+    var domain = $('#domain').val().toLowerCase();
     if (name) {
         $('#result').fadeOut(1000); // 1.5 seconds
         $('#result').fadeOut('slow'); // 1.5 seconds
@@ -126,7 +126,7 @@ function checkDomain() {
 function CheckIfEmailValid() {
     $('#result').fadeOut(1000); // 1.5 seconds
     $('#result').fadeOut('slow'); // 1.5 seconds
-    var name = $('#emailAddress').val();
+    var name = $('#emailAddress').val().toLowerCase();
     if (name && name.length > 4) {
         $('#check-email').prop('disabled', false);
         $("#check-email").css('color', 'white');
@@ -142,3 +142,5 @@ function CheckIfEmailValid() {
     $('#result').fadeIn(1000); // 1.5 seconds
     $('#result').fadeIn('slow'); // 1.5 seconds
 }
+
+$('#emailAddress').focus();
