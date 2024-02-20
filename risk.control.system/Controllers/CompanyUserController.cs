@@ -18,7 +18,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Company User", FromAction = "Details", FromController = typeof(ClientCompanyController))]
+    [Breadcrumb(" User", FromAction = "Details", FromController = typeof(ClientCompanyController))]
     public class CompanyUserController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -161,6 +161,7 @@ namespace risk.control.system.Controllers
             user.Mailbox = new Mailbox { Name = userFullEmail };
             user.Updated = DateTime.UtcNow;
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
+            user.Id = 0;
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
 
             if (result.Succeeded)

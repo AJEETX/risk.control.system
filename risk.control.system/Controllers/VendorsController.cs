@@ -337,7 +337,7 @@ namespace risk.control.system.Controllers
                                     notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
                                 }
                             }
-                            return RedirectToAction(nameof(Index), "Users", new { id = applicationUser.VendorId });
+                            return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
                         }
                     }
                 }

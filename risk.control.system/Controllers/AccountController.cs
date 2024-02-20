@@ -74,34 +74,36 @@ namespace risk.control.system.Controllers
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByEmailAsync(model.Email);
-
-                    var roles = await _userManager.GetRolesAsync(user);
-                    if (roles != null && roles.Count > 0)
+                    if (user.Active)
                     {
-                        var claims = new List<Claim> {
+                        var roles = await _userManager.GetRolesAsync(user);
+                        if (roles != null && roles.Count > 0)
+                        {
+                            var claims = new List<Claim> {
                             new Claim(ClaimTypes.NameIdentifier, model.Email) ,
                             new Claim(ClaimTypes.Name, model.Email)
                             };
-                        var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                        ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
+                            var userIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                            ClaimsPrincipal principal = new ClaimsPrincipal(userIdentity);
 
-                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                            new AuthenticationProperties
+                            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                                new AuthenticationProperties
+                                {
+                                    IsPersistent = false,
+                                    AllowRefresh = true,
+                                    ExpiresUtc = DateTime.UtcNow.AddMinutes(5)
+                                });
+                            if (model.Mobile)
                             {
-                                IsPersistent = false,
-                                AllowRefresh = true,
-                                ExpiresUtc = DateTime.UtcNow.AddMinutes(5)
-                            });
-                        if (model.Mobile)
-                        {
-                            return Ok();
+                                return Ok();
+                            }
+                            notifyService.Success("Login successful");
+                            return RedirectToLocal(returnUrl);
                         }
-                        notifyService.Success("Login successful");
-                        return RedirectToLocal(returnUrl);
                     }
-
-                    notifyService.Error("Login error");
-                    return RedirectToAction("login");
+                    _logger.LogWarning("User account locked out.");
+                    model.Error = "User account locked out.";
+                    return RedirectToAction("login", model);
                 }
                 else if (result.IsLockedOut)
                 {
