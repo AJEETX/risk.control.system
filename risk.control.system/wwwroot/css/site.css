@@ -83,7 +83,7 @@ button.accept-policy {
 .watermark {
     height: 2rem;
     opacity: 0.9;
-    z-index:10000;
+    z-index: 10000;
 }
 
 .brand-link .brand-image {
@@ -102,6 +102,7 @@ button.accept-policy {
     width: 33%;
     background-color: green;
 }
+
 .orange-progress-bar {
     width: 33%;
     background-color: orange;
@@ -122,6 +123,7 @@ button.accept-policy {
     width: 34%;
     background-color: lightgray;
 }
+
 .darkgrey-progress-bar {
     width: 34%;
     background-color: darkgray;
@@ -235,12 +237,14 @@ a.table-link {
     position: relative;
     overflow: hidden;
 }
+
 #company-map {
     width: auto;
     height: 250px;
     position: relative;
     overflow: hidden;
 }
+
 #agentOcrPicture {
     cursor: pointer;
 }
@@ -265,7 +269,7 @@ a.table-link {
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
-    margin-top:5px;
+    margin-top: 5px;
 }
 
 .text-muted {
@@ -905,8 +909,8 @@ main {
     display: flex;
     align-items: center;
     width: 90%;
-    margin:1rem 0;
-    padding:1rem 0;
+    margin: 1rem 0;
+    padding: 1rem 0;
 }
 
 .line {
@@ -950,6 +954,7 @@ main {
     justify-content: center;
     border-radius: 50%;
 }
+
 .steps2 {
     display: flex;
     background-color: grey;
@@ -1123,18 +1128,18 @@ img.doc-profile-image {
     z-index: 999;
 }
 
-
-.submit-progress.hidden{
-    display:none;
-}
+    .submit-progress.hidden {
+        display: none;
+    }
 
 .submit-progress-bg {
     background-color: lightgray;
     opacity: .5;
-    cursor:none;
+    cursor: pointer;
 }
-.col-5{
-    margin-top:.6rem;
+
+.col-5 {
+    margin-top: .6rem;
 }
 
 @media only screen and (max-width: 768px) {
@@ -1142,9 +1147,15 @@ img.doc-profile-image {
         left: 25%;
     }
 }
-.toggle.btn{
-    min-width:100px !important;
+
+.toggle.btn {
+    min-width: 100px !important;
 }
-input[type="text"] #emailAddress{
-    text-transform:lowercase;
+
+input[type="text"] #emailAddress {
+    text-transform: lowercase;
+}
+.profile-user-img{
+    border:1px solid #ccc !important;
+    object-fit:cover;
 }
