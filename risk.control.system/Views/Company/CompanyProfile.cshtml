@@ -17,7 +17,6 @@
                         <div class="submit-progress hidden">
                             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                         </div>
-                        <article>
                             <div class="card card-light expand-card">
                                 <div class="card-header">
                                     <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Edit</span></h3>
@@ -196,20 +195,19 @@
 
                             <div class="card-footer">
                                 <div class="row">
-                            <div class="col-md-12">
-                                    <div class="form-group">
-                                        <a  asp-controller="Dashboard" asp-action="Index" id="back-button" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                        <a id="edit-company" asp-controller="Company" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit</a>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <a asp-controller="Dashboard" asp-action="Index" id="back-button" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                            <a id="edit-company" asp-controller="Company" asp-action="Edit" class="btn btn-warning"><i class='fas fa-building'></i> Edit</a>
+                                        </div>
                                     </div>
-                            </div>
                                 </div>
                             </div>
-                    </article>
                     </div>
 
-                    </div>
                 </div>
             </div>
+        </div>
     </div>
 </section>
 

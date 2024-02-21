@@ -1,4 +1,21 @@
 ﻿$(document).ready(function () {
+
+    $('.btn.btn-success').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('.btn.btn-success').attr('disabled', 'disabled');
+        $('.btn.btn-success').html("<i class='fas fa-user-friends' aria-hidden='true'></i> Add User...");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
     var id = $('#companyId').val();
     $("#customerTable").DataTable({
         ajax: {

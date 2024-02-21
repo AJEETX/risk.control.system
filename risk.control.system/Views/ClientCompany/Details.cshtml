@@ -17,196 +17,193 @@
                         <div class="submit-progress hidden">
                             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                         </div>
-                        <article>
-                            <div class="bb-blog-inner">
-                                <div class="card card-light expand-card">
-                                    <div class="card-header">
-                                        <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Edit</span></h3>
+                        <div class="card card-light expand-card">
+                            <div class="card-header">
+                                <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Edit</span></h3>
 
-                                        <div class="card-tools">
-                                            <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light"><i class="fas fa-building"></i></span>
-                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
+                                <div class="card-tools">
+                                    <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light"><i class="fas fa-building"></i></span>
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="card-body pb-0">
+                                <div class="row">
+                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                        <div class="card bg-light d-flex flex-fill">
+                                            <div class="card-footer text-muted border-bottom-0">
+                                                <i class="fas fa-building"></i> Company Details
+                                            </div>
+                                            <div class="card-body pt-0">
+                                                <div class="row">
+                                                    <div class="col-7">
+                                                        <p class="text-muted text-sm">
+                                                            <i class="fa fa-globe"></i>  <a href="#">@Model.Email</a>
+                                                        </p>
+                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-building"></i>
+                                                                </span>
+                                                                Company Name: <i class="fas fa-building"></i> @Model.Name
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-code"></i>
+                                                                </span>
+                                                                Company Code:  <i class="fas fa-code"></i> </i>@Model.Code
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-tools"></i>
+                                                                </span>
+                                                                Branch : <i class="fas fa-tools"></i> @Model.Description
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-phone"></i>
+                                                                </span>
+                                                                Phone #: <i class="fas fa-phone"></i> @Model.PhoneNumber
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="far fa-building"></i>
+                                                                </span>
+                                                                Branch: <i class="far fa-building"></i> @Model.Branch
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-home"></i>
+                                                                </span>
+                                                                Address:  @Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code
+                                                            </li>
+
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-5 text-center">
+                                                        <p class="text-muted text-sm">
+
+                                                        </p>
+                                                        <p class="text-muted text-sm">
+                                                            @if (Model?.DocumentUrl is not null)
+                                                            {
+                                                                <img id="documentImage" class="img-fluid" src="@Model?.DocumentUrl">
+                                                            }
+                                                            else
+                                                            {
+                                                                <img id="documentImage" alt="user-avatar"
+                                                                     class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                            }
+                                                        </p>
+
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <div class="card-body pb-0">
-                                        <div class="row">
-                                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                                <div class="card bg-light d-flex flex-fill">
-                                                    <div class="card-footer text-muted border-bottom-0">
-                                                        <i class="fas fa-building"></i> Company Details
-                                                    </div>
-                                                    <div class="card-body pt-0">
-                                                        <div class="row">
-                                                            <div class="col-7">
-                                                                <p class="text-muted text-sm">
-                                                                    <i class="fa fa-globe"></i>  <a href="#">@Model.Email</a>
-                                                                </p>
-                                                                <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-building"></i>
-                                                                        </span>
-                                                                        Company Name: <i class="fas fa-building"></i> @Model.Name
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-code"></i>
-                                                                        </span>
-                                                                        Company Code:  <i class="fas fa-code"></i> </i>@Model.Code
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-tools"></i>
-                                                                        </span>
-                                                                        Branch : <i class="fas fa-tools"></i> @Model.Description
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-phone"></i>
-                                                                        </span>
-                                                                        Phone #: <i class="fas fa-phone"></i> @Model.PhoneNumber
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="far fa-building"></i>
-                                                                        </span>
-                                                                        Branch: <i class="far fa-building"></i> @Model.Branch
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-home"></i>
-                                                                        </span>
-                                                                        Address:  @Model.Addressline @Model.District.Name @Model.State.Name @Model.PinCode.Code
-                                                                    </li>
-
-                                                                </ul>
-                                                            </div>
-                                                            <div class="col-5 text-center">
-                                                                <p class="text-muted text-sm">
-
-                                                                </p>
-                                                                <p class="text-muted text-sm">
-                                                                    @if (Model?.DocumentUrl is not null)
-                                                                    {
-                                                                        <img id="documentImage" class="img-fluid" src="@Model?.DocumentUrl">
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <img id="documentImage" alt="user-avatar"
-                                                                             class="img-fluid form-Image" src="@Applicationsettings.NO_IMAGE">
-                                                                    }
-                                                                </p>
-
-                                                            </div>
-                                                        </div>
+                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                        <div class="card bg-light d-flex flex-fill">
+                                            <div class="card-footer">
+                                                <i class="fas fa-sitemap"></i> APIs Details
+                                            </div>
+                                            <div class="card-body pt-0">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <p class="text-muted text-sm">
+                                                            <i class="fas fa-code-branch"></i> <b> External URl : </b>
+                                                        </p>
+                                                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-project-diagram"></i>
+                                                                </span>
+                                                                <b>API endpoint: </b>  <i class="fas fa-project-diagram"></i>  <a href="#">  @Model.PanIdfyUrl</a>
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-key"></i>
+                                                                </span>
+                                                                Api Key: <i class="fas fa-key"></i> <a href="#">  @Model.RapidAPIKey</a>
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-code"></i>
+                                                                </span>
+                                                                Api TaskId:  <i class="fas fa-code"></i> </i> <a href="#">  @Model.RapidAPITaskId</a>
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-landmark"></i>
+                                                                </span>
+                                                                Api GroupId : <i class="fas fa-landmark"></i> <a href="#">  @Model.RapidAPIGroupId</a>
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-phone"></i>
+                                                                </span>
+                                                                <a href="#">  @Model.RapidAPIPanRemainCount</a> Remaining count: <i class="fas fa-phone"></i>
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="far fa-paper-plane"></i>
+                                                                </span>
+                                                                @Html.DisplayFor(model => model.AutoAllocation) Auto-Allocation: <i class="far fa-paper-plane"></i>
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-business-time"></i>
+                                                                </span>
+                                                                <a href="#">  @Html.DisplayFor(model => model.VerifyOcr)</a> Verify Pan: <i class="fas fa-business-time"></i>
+                                                            </li>
+                                                            <li class="small">
+                                                                <span class="fa-li">
+                                                                    <i class="fas fa-comments"></i>
+                                                                </span>
+                                                                @Html.DisplayFor(model => model.SendSMS) Enable SMS:  <i class="fas fa-comments"></i> </i>
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                                <div class="card bg-light d-flex flex-fill">
-                                                    <div class="card-footer">
-                                                        <i class="fas fa-sitemap"></i> APIs Details
-                                                    </div>
-                                                    <div class="card-body pt-0">
-                                                        <div class="row">
-                                                            <div class="col-12">
-                                                                <p class="text-muted text-sm">
-                                                                    <i class="fas fa-code-branch"></i> <b> External URl : </b>
-                                                                </p>
-                                                                <ul class="ml-4 mb-0 fa-ul text-muted">
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-project-diagram"></i>
-                                                                        </span>
-                                                                        <b>API endpoint: </b>  <i class="fas fa-project-diagram"></i>  <a href="#">  @Model.PanIdfyUrl</a>
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-key"></i>
-                                                                        </span>
-                                                                        Api Key: <i class="fas fa-key"></i> <a href="#">  @Model.RapidAPIKey</a>
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-code"></i>
-                                                                        </span>
-                                                                        Api TaskId:  <i class="fas fa-code"></i> </i> <a href="#">  @Model.RapidAPITaskId</a>
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-landmark"></i>
-                                                                        </span>
-                                                                        Api GroupId : <i class="fas fa-landmark"></i> <a href="#">  @Model.RapidAPIGroupId</a>
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-phone"></i>
-                                                                        </span>
-                                                                        <a href="#">  @Model.RapidAPIPanRemainCount</a> Remaining count: <i class="fas fa-phone"></i>
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="far fa-paper-plane"></i>
-                                                                        </span>
-                                                                        @Html.DisplayFor(model => model.AutoAllocation) Auto-Allocation: <i class="far fa-paper-plane"></i>
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-business-time"></i>
-                                                                        </span>
-                                                                        <a href="#">  @Html.DisplayFor(model => model.VerifyOcr)</a> Verify Pan: <i class="fas fa-business-time"></i>
-                                                                    </li>
-                                                                    <li class="small">
-                                                                        <span class="fa-li">
-                                                                            <i class="fas fa-comments"></i>
-                                                                        </span>
-                                                                        @Html.DisplayFor(model => model.SendSMS) Enable SMS:  <i class="fas fa-comments"></i> </i>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
+                                        <div class="card bg-light d-flex flex-fill">
+                                            <div class="card-footer text-muted border-bottom-0">
+                                                <i class="fas fa-map-marked-alt"></i> Map View
                                             </div>
-                                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-                                                <div class="card bg-light d-flex flex-fill">
-                                                    <div class="card-footer text-muted border-bottom-0">
-                                                        <i class="fas fa-map-marked-alt"></i> Map View
-                                                    </div>
-                                                    <div class="card-body pt-0">
+                                            <div class="card-body pt-0">
 
-                                                        <div class="row">
-                                                            <div class="col-md-12">
+                                                <div class="row">
+                                                    <div class="col-md-12">
 
-                                                                <div id="maps">
-                                                                </div>
-                                                                <div id="company-map"></div>
-
-                                                            </div>
+                                                        <div id="maps">
                                                         </div>
+                                                        <div id="company-map"></div>
+
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div> <!-- class bb-blog-inner -->
+                            </div>
+                        </div>
+                        <div class="card-footer">
 
-                            
-                        </article>
                         <div class="row">
-                            <div class="col-md-12 text-right">
-                                <a asp-controller="ClientCompany" asp-action="Index" class="btn btn-default">
+                            <div class="col-md-12">
+                                <a id="back" asp-controller="ClientCompany" asp-action="Index" class="btn btn-outline-secondary">
                                     <i class="fas fa-arrow-left"></i>
                                     Back
                                 </a>
-                                <a asp-controller="ClientCompany" asp-action="Edit" asp-route-id="@Model.ClientCompanyId" class="btn btn-warning"><i class='fas fa-pen'></i> @Applicationsettings.PROFILE</a>
+                                    <a asp-controller="ClientCompany" asp-action="Edit" asp-route-id="@Model.ClientCompanyId" class="btn btn-warning"><i class='fas fa-building'></i> @Applicationsettings.PROFILE</a>
                                 <a asp-controller="CompanyUser" asp-action="Index" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-plus"></i>  @Applicationsettings.USER</a>
                                 @*<a asp-controller="ClientCompany" asp-action="EmpanelledVendors" asp-route-id="@Model.ClientCompanyId" class="btn btn-success"><i class="fas fa-user-secret"></i>  @Applicationsettings.VENDOR</a>*@
                             </div>
+                        </div>
                         </div>
                     </div>
 
