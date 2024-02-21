@@ -77,8 +77,8 @@
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('a.create-user').attr('disabled', 'disabled');
-        $('a.create-user').html("<i class='fas fa-user-friends'></i> Add New .....");
+        $(this).attr('disabled', 'disabled');
+        $(this).html("<i class='fas fa-user-friends'></i> Add New .....");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -94,8 +94,8 @@ function showedit() {
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-user-friends'></i> Edit User .....");
+    $(this).attr('disabled', 'disabled');
+    $(this).html("<i class='fas fa-user-friends'></i> Edit...");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

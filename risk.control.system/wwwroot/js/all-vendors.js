@@ -65,7 +65,6 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('a.create-agency-user').attr('disabled', 'disabled');
-        $('a.create-agency-user').html("<i class='fas fa-user-friends'></i> Add User .....");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

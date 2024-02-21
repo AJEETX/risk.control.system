@@ -18,7 +18,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#back').html("<i class='fas fa-arrow-left' aria-hidden='true'></i> Back...");
+        $('#back').attr('disabled', 'disabled');
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
 
@@ -35,8 +35,9 @@ $(document).ready(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('#back-button').html("<i class='fas fa-arrow-left' aria-hidden='true'></i> Back.....");
+        $('#back-button').attr('disabled', 'disabled');
         $('html').css('cursor', 'not-allowed');
+
         $('html a *, html button *').attr('disabled', 'disabled');
 
         var nodes = document.getElementById("section").getElementsByTagName('*');

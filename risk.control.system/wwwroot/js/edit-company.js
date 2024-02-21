@@ -19,8 +19,8 @@
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('#create-bene').attr('disabled', 'disabled');
-                        $('#create-bene').html("<i class='fas fa-user-tie' aria-hidden='true'></i> Edit Beneficiary...");
+                        $('.btn.btn-warning').attr('disabled', 'disabled');
+                        $('.btn.btn-warning').html("<i class='fas fa-user-tie' aria-hidden='true'></i> Edit ");
 
                         form.submit();
                         var nodes = document.getElementById("article").getElementsByTagName('*');
