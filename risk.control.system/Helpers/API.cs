@@ -9,8 +9,8 @@ namespace SMS
 {
     internal static class API
     {
-        private static readonly string Server = "https://app.droidsend.com";
-        private static readonly string DROID = "6f9233f2b9a44a07992c98c9b34ea160e9131768";
+        private static readonly string Server = "https://smsgateway.eskooly.com";
+        private static readonly string DROID = "82304b516a520efeac4520a2fa880c9236d44914";
 
         public enum Option
         {
@@ -42,8 +42,7 @@ namespace SMS
                 { "key", DROID },
                 { "devices", device },
                 { "type", isMMS ? "mms" : "sms" },
-                { "attachments", attachments },
-                { "prioritize", prioritize ? 1 : 0 }
+                { "attachments", attachments }
             };
 
             return GetObjects(GetResponse($"{Server}/services/send.php", values)["messages"])[0];
