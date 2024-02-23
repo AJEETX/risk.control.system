@@ -12,7 +12,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('a.create-agency-service').attr('disabled', 'disabled');
-        $('a.create-agency-service').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add New");
+        $('a.create-agency-service').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Service");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -51,9 +51,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a onclick="showdetails()" href="/VendorService/Details?id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
-                    buttons += '<a onclick="showedit()" href="/VendorService/Edit?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a onclick="getdetails()" href="/VendorService/Delete?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                    buttons += '<a id=details' + row.id + '  onclick="showdetails(' + row.id + ')" href="/VendorService/Details?id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')" href="/VendorService/Edit?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/VendorService/Delete?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     return buttons;
                 }
             }
@@ -62,45 +62,48 @@
     });
 });
 
-function showdetails() {
+function showdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Detail");
+    $('a.btn').attr('disabled', 'disabled');
+    var detailbtn = $('a#details' + id + '.btn.btn-xs.btn-info')
+    detailbtn.html("<i class='fas fa-spinner'></i> Detail");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
 }
-function showedit() {
+function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit Agency");
+    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning');
+    $('a.btn').attr('disabled', 'disabled');
+    editbtn.html("<i class='fas fa-spinner'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
 }
-function getdetails() {
+function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-danger').attr('disabled', 'disabled');
-    $('a.btn.btn-danger').html("<i class='fas fa-spinner'></i> Delete");
+    $('a.btn').attr('disabled', 'disabled');
+    var _delete = $('a#delete' + id + '.btn.btn-xs.btn-danger');
+    _delete.html("<i class='fas fa-spinner'></i> Delete");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

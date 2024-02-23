@@ -58,8 +58,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a onclick="showedit()" href="/Company/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a onclick="showroles()" href="/Company/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
+                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')" href="/Company/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=role' + row.id + ' onclick="showroles(' + row.id + ')" href="/Company/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Role</a>'
                     return buttons;
                 }
             }
@@ -87,15 +87,16 @@
     });
 });
 
-function showedit() {
+function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $(this).attr('disabled', 'disabled');
-    $(this).html("<i class='fas fa-spinner'></i> Edit");
+    var editbtn = $('a#edit' + id +'.btn.btn-xs.btn-warning')
+    $('.btn.btn-xs.btn-warning').attr('disabled', 'disabled');
+    editbtn.html("<i class='fas fa-spinner'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -103,15 +104,16 @@ function showedit() {
     }
 }
 
-function showroles() {
+function showroles(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Edit Role");
+    var rolebtn = $('a#role' + id +'.btn.btn-xs.btn-info')
+    $('a.btn.btn-xs.btn-info').attr('disabled', 'disabled');
+    rolebtn.html("<i class='fas fa-spinner'></i> Role");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

@@ -8,7 +8,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('.btn.btn-info').attr('disabled', 'disabled');
-        $('.btn.btn-info').html("<i class='fas fa-spinner' aria-hidden='true'></i> Detail");
+        $(this).html("<i class='fas fa-spinner' aria-hidden='true'></i> Details");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

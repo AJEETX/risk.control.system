@@ -69,8 +69,8 @@ $(document).ready(function () {
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
-                            $('#approve-case').attr('disabled', 'disabled');
-                            $('#approve-case').html("<i class='fas fa-spinner' aria-hidden='true'></i> Approve");
+                            $('button#approve-case.btn.btn-success').attr('disabled', 'disabled');
+                            $('button#approve-case.btn.btn-success').html("<i class='fas fa-spinner' aria-hidden='true'></i> Approve");
 
                             var nodes = document.getElementById("fullpage").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {

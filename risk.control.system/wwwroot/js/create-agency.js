@@ -1,7 +1,7 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Add New",
+            title: "Confirm Add Agency",
             content: "Are you sure to add?",
             columnClass: 'medium',
             icon: 'fas fa-building',
@@ -9,7 +9,7 @@
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Add New",
+                    text: "Add Agency",
                     btnClass: 'btn-success',
                     action: function () {
                         askConfirmation = false;

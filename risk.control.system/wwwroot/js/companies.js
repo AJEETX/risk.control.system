@@ -1,14 +1,48 @@
 ﻿var apiKey = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
 $(function () {
-    $('.btn.btn-warning').on('click', function () {
+
+    $('a#edit-profile.btn.btn-warning').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('.btn.btn-warning').attr('disabled', 'disabled');
-        $('.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Profile");
+        $('.btn').attr('disabled', 'disabled');
+        $('a#edit-profile.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Profile");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+    $('#edit-company.btn.btn-warning').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('.btn').attr('disabled', 'disabled');
+        $('#edit-company.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Company");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+
+    $('a#editagency.btn.btn-warning').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('.btn').attr('disabled', 'disabled');
+        $('a#editagency.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Agency");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -23,7 +57,7 @@ $(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('.btn.btn-success').attr('disabled', 'disabled');
+        $('.btn').attr('disabled', 'disabled');
         $('.btn.btn-success').html("<i class='fas fa-spinner' aria-hidden='true'></i> User");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
@@ -40,7 +74,7 @@ $(function () {
         setTimeout(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
-        $('.btn.btn-danger').attr('disabled', 'disabled');
+        $('.btn').attr('disabled', 'disabled');
         $('.btn.btn-danger').html("<i class='fas fa-spinner' aria-hidden='true'></i> Service");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
@@ -143,7 +177,7 @@ function showedit() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit Agency");
+    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -159,7 +193,7 @@ function showdetails() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Detail");
+    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Roles");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

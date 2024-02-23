@@ -1,7 +1,7 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Edit",
+            title: "Confirm Edit Role",
             content: "Are you sure to edit?",
             icon: 'fas fa-user-plus',
             columnClass: 'medium',
@@ -9,7 +9,7 @@
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Edit Role",
                     btnClass: 'btn-warning',
                     action: function () {
                         askConfirmation = false;

@@ -1,7 +1,7 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Edit",
+            title: "Confirm Edit Role",
             columnClass: 'medium',
             content: "Are you sure to edit?",
             icon: 'fas fa-user-plus',
@@ -11,7 +11,7 @@
 
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Edit Role",
                     btnClass: 'btn-warning',
                     action: function () {
                         askConfirmation = false;
@@ -21,8 +21,8 @@
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('.btn.btn-warning').attr('disabled', 'disabled');
-                        $('.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Role");
+                        $('.btn').attr('disabled', 'disabled');
+                        $('button#editrole.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Role");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

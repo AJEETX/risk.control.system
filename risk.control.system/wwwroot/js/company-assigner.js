@@ -94,7 +94,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a onclick="show()" href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    buttons += '<a id=details' + row.id + ' onclick="show(' + row.id + ')" href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
                     return buttons;
                 }
             }
@@ -150,15 +150,15 @@
     initMap("/api/CompanyAssignClaims/GetAssignerMap");
 });
 
-function show() {
+function show(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Detail");
+    $('a.btn').attr('disabled', 'disabled');
+    $('a#'+ id +'.btn.btn-info').html("<i class='fas fa-spinner'></i> Details");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

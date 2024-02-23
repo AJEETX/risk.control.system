@@ -1,7 +1,7 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm  Edit",
+            title: "Confirm  Edit Company",
             content: "Are you sure to edit?",
             icon: 'fas fa-building',
             columnClass: 'medium',
@@ -9,7 +9,7 @@
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Edit Company",
                     btnClass: 'btn-warning',
                     action: function () {
 
@@ -20,7 +20,7 @@
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('.btn.btn-warning').attr('disabled', 'disabled');
-                        $('.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit ");
+                        $('#edit-company.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Company");
 
                         form.submit();
                         var nodes = document.getElementById("article").getElementsByTagName('*');

@@ -1,7 +1,7 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Edit",
+            title: "Confirm Edit User",
             content: "Are you sure to edit?",
             columnClass: 'medium',
             icon: 'fas fa-user-plus',
@@ -9,7 +9,7 @@
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Edit User",
                     btnClass: 'btn-warning',
                     action: function () {
                         $("body").addClass("submit-progress-bg");

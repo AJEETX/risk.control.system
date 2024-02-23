@@ -82,7 +82,7 @@ namespace risk.control.system.Controllers
             return View(clientCompany);
         }
 
-        [Breadcrumb("Edit")]
+        [Breadcrumb("Edit Company")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;

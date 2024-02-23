@@ -1,7 +1,7 @@
 ﻿$.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Add New",
+            title: "Confirm Add User",
             columnClass: 'medium',
             content: "Are you sure to add ?",
             icon: 'fas fa-user-plus',
@@ -9,7 +9,7 @@
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Add New",
+                    text: "Add User",
                     btnClass: 'btn-success',
                     action: function () {
                         $("body").addClass("submit-progress-bg");
@@ -20,6 +20,9 @@
                         }, 1);
                         $('#create-user').attr('disabled', 'disabled');
                         $('#create-user').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add User");
+                        $('button#create-agency').attr('disabled', 'disabled');
+                        $('button#create-agency').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add User");
+
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

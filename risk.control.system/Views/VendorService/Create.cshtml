@@ -61,7 +61,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text" for="Price"> <i class="fas fa-rupee-sign"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                                 </div>
-                                                <input asp-for="Price" class="form-control" type="number" placeholder="Enter Service Price" value="" required/>
+                                                <input asp-for="Price" class="form-control" type="number" placeholder="Enter Service Price" value="" min="99" required/>
                                                 <span asp-validation-for="Price" class="text-danger"></span>
                                             </div>
                                         </div>

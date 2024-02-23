@@ -4,7 +4,7 @@
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Edit",
+                title: "Confirm Edit Agency",
                 content: "Are you sure to edit?",
                 icon: 'fas fa-building',
                 columnClass: 'medium',
@@ -13,7 +13,7 @@
                 typeAnimated: true,
                 buttons: {
                     confirm: {
-                        text: "Edit",
+                        text: "Edit Agency",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = false;

@@ -20,7 +20,7 @@ $(document).ready(function () {
         if (askConfirmation) {
             e.preventDefault();
             $.confirm({
-                title: "Confirm Add New Policy",
+                title: "Confirm Add Policy",
                 content: "Are you sure to add ?",
                 columnClass: 'medium',
                 icon: 'fas fa-thumbtack',
@@ -28,7 +28,7 @@ $(document).ready(function () {
                 type: 'red',
                 buttons: {
                     confirm: {
-                        text: "Add New",
+                        text: "Add Policy",
                         btnClass: 'btn-danger',
                         action: function () {
                             askConfirmation = false;

@@ -98,7 +98,7 @@
                             <div class="col-md-12 text-right">
                                 <form asp-action="Delete">
                                     <input type="hidden" asp-for="VendorInvestigationServiceTypeId" name="id" />
-                                    <a id="back" asp-controller="Vendors" asp-action="details" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
+                                    <a id="back" asp-controller="Vendors" asp-action="Service" asp-route-id="@Model.Vendor.VendorId" class="btn btn-secondary">
                                         <i class="fa fa-window-close"></i>
                                         @Applicationsettings.CANCEL
                                     </a> &nbsp;

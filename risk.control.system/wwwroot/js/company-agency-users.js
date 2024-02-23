@@ -13,7 +13,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('a.create-agency-user').attr('disabled', 'disabled');
-        $('a.create-agency-user').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add New");
+        $('a.create-agency-user').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add User");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -77,8 +77,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a onclick="showedit()" href="/Vendors/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a onclick="showroles()" href="/Vendors/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
+                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')" href="/Vendors/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=role' + row.id + ' onclick="showroles(' + row.id + ')" href="/Vendors/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Role</a>'
                     return buttons;
                 }
             }
@@ -87,15 +87,17 @@
     });
 });
 
-function showedit() {
+function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit User");
+    $('a.btn').attr('disabled', 'disabled');
+    var editbtn = $('a#edit' + id + '.btn.btn-xs.btn-warning')
+
+    editbtn.html("<i class='fas fa-spinner'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -103,15 +105,16 @@ function showedit() {
     }
 }
 
-function showroles() {
+function showroles(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Edit Role");
+    $('a.btn').attr('disabled', 'disabled');
+    var rolebtn = $('a#role' + id +'.btn.btn-xs.btn-info')
+    rolebtn.html("<i class='fas fa-spinner'></i> Role");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

@@ -86,7 +86,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: Vendors/Edit/5
-        [Breadcrumb("Edit ", FromAction = "Profile")]
+        [Breadcrumb("Edit Agency", FromAction = "Profile")]
         public async Task<IActionResult> Edit()
         {
             var userEmail = HttpContext.User?.Identity?.Name;

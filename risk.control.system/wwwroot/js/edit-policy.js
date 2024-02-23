@@ -2,15 +2,15 @@ $("#contractnum").focus();
 $.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Edit",
+            title: "Confirm Edit Policy",
             content: "Are you sure to edit?",
             columnClass: 'medium',
-            icon: 'fas fa-pen-alt',
+            icon: 'far fa-file-powerpoint',
             type: 'orange',
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Edit",
+                    text: "Edit Policy",
                     btnClass: 'btn-warning',
                     action: function () {
                         $("body").addClass("submit-progress-bg");

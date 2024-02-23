@@ -1,7 +1,7 @@
 $.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Add New",
+            title: "Confirm Add Policy",
             content: "Are you sure to add?",
             icon: 'far fa-file-powerpoint',
             columnClass: 'medium',
@@ -9,7 +9,7 @@ $.validator.setDefaults({
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: " Add New",
+                    text: " Add Policy",
                     btnClass: 'btn-success',
                     action: function () {
 

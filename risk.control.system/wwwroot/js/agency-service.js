@@ -12,7 +12,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('a.create-agency-service').attr('disabled', 'disabled');
-        $('a.create-agency-service').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add New");
+        $('a.create-agency-service').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Service");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -54,8 +54,8 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     //buttons += '<a href="/Agency/ServiceDetail?id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
-                    buttons += '<a onclick="showedit()" href="/Agency/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a onclick="getdetails()" href="/Agency/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
+                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')" href="/Agency/EditService?id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=delete' + row.id + ' onclick="getdetails(' + row.id + ')" href="/Agency/DeleteService?id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i> Delete</a>'
                     return buttons;
                 }
             }
@@ -64,30 +64,30 @@
     });
 });
 
-function showedit() {
+function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit Agency");
+    $('a.btn').attr('disabled', 'disabled');
+    $('a#edit'+ id +'.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
 }
-function getdetails() {
+function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn.btn-danger').attr('disabled', 'disabled');
-    $('a.btn.btn-danger').html("<i class='fas fa-spinner'></i> Delete");
+    $('a.btn').attr('disabled', 'disabled');
+    $('a#delete' + id +'.btn.btn-danger').html("<i class='fas fa-spinner'></i> Delete");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

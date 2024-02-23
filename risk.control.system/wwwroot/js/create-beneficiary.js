@@ -4,7 +4,7 @@ BeneficiaryDateOfBirthId.max = new Date().toISOString().split("T")[0];
 $.validator.setDefaults({
     submitHandler: function (form) {
         $.confirm({
-            title: "Confirm Add New",
+            title: "Confirm Add Beneficiary",
             content: "Are you sure to add?",
             icon: 'fas fa-user-tie',
             columnClass: 'medium',
@@ -12,7 +12,7 @@ $.validator.setDefaults({
             closeIcon: true,
             buttons: {
                 confirm: {
-                    text: "Add New",
+                    text: "Add Beneficiary",
                     btnClass: 'btn-success',
                     action: function () {
                         $("body").addClass("submit-progress-bg");
