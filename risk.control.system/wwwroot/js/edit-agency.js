@@ -20,7 +20,7 @@ $.validator.setDefaults({
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#create-agency').attr('disabled', 'disabled');
-                        $('#create-agency').html("<i class='fas fa-building' aria-hidden='true'></i> Edit Agency...");
+                        $('#create-agency').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Agency");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

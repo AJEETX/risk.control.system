@@ -7,7 +7,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#create-policy').attr('disabled', 'disabled');
-        $('#create-policy').html("<i class='far fa-file-powerpoint' aria-hidden='true'></i> Add Policy .....");
+        $('#create-policy').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Policy");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

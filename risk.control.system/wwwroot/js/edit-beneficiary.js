@@ -22,7 +22,7 @@ $.validator.setDefaults({
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#create-bene').attr('disabled', 'disabled');
-                        $('#create-bene').html("<i class='fas fa-user-tie' aria-hidden='true'></i> Edit Beneficiary...");
+                        $('#create-bene').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Beneficiary");
 
                         form.submit();
                         var nodes = document.getElementById("article").getElementsByTagName('*');

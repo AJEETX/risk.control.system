@@ -8,7 +8,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('.btn.btn-info').attr('disabled', 'disabled');
-        $('.btn.btn-info').html("<i class='fas fa-building' aria-hidden='true'></i> Detail...");
+        $('.btn.btn-info').html("<i class='fas fa-spinner' aria-hidden='true'></i> Detail");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -69,7 +69,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign (manual)...");
+                            $('#allocate-case').html("<i class='fas fa-spinner' aria-hidden='true'></i> Assign (manual)");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');

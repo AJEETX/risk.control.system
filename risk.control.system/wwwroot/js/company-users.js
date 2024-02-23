@@ -78,7 +78,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $(this).attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-user-friends'></i> Add New .....");
+        $(this).html("<i class='fas fa-spinner'></i> Add User");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -95,7 +95,7 @@ function showedit() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $(this).attr('disabled', 'disabled');
-    $(this).html("<i class='fas fa-user-friends'></i> Edit...");
+    $(this).html("<i class='fas fa-spinner'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -111,7 +111,7 @@ function showroles() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fas fa-user-plus'></i> Edit Role .....");
+    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Edit Role");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

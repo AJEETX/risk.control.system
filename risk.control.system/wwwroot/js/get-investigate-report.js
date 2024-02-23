@@ -48,7 +48,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='far fa-file-alt' aria-hidden='true'></i> Submit .....");
+                            $('#allocate-case').html("<i class='fas fa-spinner' aria-hidden='true'></i> Submit");
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;

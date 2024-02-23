@@ -20,7 +20,7 @@
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('.btn.btn-success').attr('disabled', 'disabled');
-                        $('.btn.btn-success').html("<i class='fas fa-plus' aria-hidden='true'></i> Add ...");
+                        $('.btn.btn-success').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Company");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

@@ -65,6 +65,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('a.create-agency-user').attr('disabled', 'disabled');
+        $('a.create-agency-user').html("<i class='fas fa-spinner'></i> Add Agency");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -80,7 +81,7 @@ function showedit() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-building'></i> Edit Agency...");
+    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit Agency");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -96,7 +97,7 @@ function showdetails() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fas fa-building'></i> Detail...");
+    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Detail");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

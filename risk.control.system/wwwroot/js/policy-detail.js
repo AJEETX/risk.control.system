@@ -1,36 +1,4 @@
 $(document).ready(function () {
-    $('.btn.btn-warning').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $('.btn.btn-warning').attr('disabled', 'disabled');
-        $('.btn.btn-warning').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign List <i class='fas fa-arrow-right'></i>");
-
-        var nodes = document.getElementById("body").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
-
-    $('.btn.btn-primary').on('click', function () {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $('.btn.btn-primary').attr('disabled', 'disabled');
-        $('.btn.btn-primary').html("<i class='fa fa-toggle-on' aria-hidden='true'></i> Assign List <i class='fas fa-arrow-right'></i>");
-
-        var nodes = document.getElementById("body").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    });
-
     $('#edit-policy').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -39,7 +7,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#edit-policy').attr('disabled', 'disabled');
-        $('#edit-policy').html("<i class='far fa-file-powerpoint' aria-hidden='true'></i> Edit  Policy .....");
+        $('#edit-policy').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit  Policy");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -47,7 +15,7 @@ $(document).ready(function () {
         }
     });
 
-    $('#add-customer').on('click', function () {
+    $('a#add-customer').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
@@ -55,7 +23,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#add-customer').attr('disabled', 'disabled');
-        $('#add-customer').html("<i class='fa fa-user-plus' aria-hidden='true'></i> Add Customer...");
+        $('#add-customer').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Customer");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -71,7 +39,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#edit-customer').attr('disabled', 'disabled');
-        $('#edit-customer').html("<i class='fa fa-user-plus' aria-hidden='true'></i> Edit Customer...");
+        $('#edit-customer').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Customer");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -87,7 +55,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#add-beneficiary').attr('disabled', 'disabled');
-        $('#add-beneficiary').html("<i class='fas fa-user-tie' aria-hidden='true'></i> Add Beneficiary...");
+        $('#add-beneficiary').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Beneficiary");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -103,13 +71,29 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#edit-beneficiary').attr('disabled', 'disabled');
-        $('#edit-beneficiary').html("<i class='fas fa-user-tie' aria-hidden='true'></i> Edit Beneficiary...");
+        $('#edit-beneficiary').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Beneficiary");
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
     });
+
+    //$('.btn.btn-warning').on('click', function () {
+    //    $("body").addClass("submit-progress-bg");
+    //    // Wrap in setTimeout so the UI
+    //    // can update the spinners
+    //    setTimeout(function () {
+    //        $(".submit-progress").removeClass("hidden");
+    //    }, 1);
+    //    $('.btn.btn-warning').attr('disabled', 'disabled');
+    //    $('.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Assign List <i class='fas fa-arrow-right'></i>");
+
+    //    var nodes = document.getElementById("body").getElementsByTagName('*');
+    //    for (var i = 0; i < nodes.length; i++) {
+    //        nodes[i].disabled = true;
+    //    }
+    //});
 
     var askConfirmation = true;
     $('#create-form').submit(function (e) {

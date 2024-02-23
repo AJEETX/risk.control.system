@@ -21,7 +21,7 @@ $.validator.setDefaults({
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#create-pincode').attr('disabled', 'disabled');
-                        $('#create-pincode').html("<i class='fas fa-truck' aria-hidden='true'></i> Add Service...");
+                        $('#create-pincode').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Service");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

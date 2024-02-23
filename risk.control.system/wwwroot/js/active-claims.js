@@ -65,7 +65,7 @@ function showdetails() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fa fa-search'></i> Detail...");
+    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Detail");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

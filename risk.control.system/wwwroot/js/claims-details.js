@@ -55,7 +55,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#submit-case').attr('disabled', 'disabled');
-                            $('#submit-case').html("<i class='fas fa-undo' aria-hidden='true'></i> Withdraw...");
+                            $('#submit-case').html("<i class='fas fa-spinner' aria-hidden='true'></i> Withdraw");
 
                             $('#create-form').submit();
                             var nodes = document.getElementById("body").getElementsByTagName('*');

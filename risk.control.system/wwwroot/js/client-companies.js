@@ -38,9 +38,9 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a onclick="showdetails()" href="/ClientCompany/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
-                    buttons += '<a onclick="showedit()"  href="/ClientCompany/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a href="/ClientCompany/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
+                    buttons += '<a id=detail' + row.id + ' onclick="showdetails(' + row.id + ')" href="/ClientCompany/Details?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
+                    buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')"  href="/ClientCompany/Edit?Id=' + row.id + '"  class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a id=delete' + row.id + ' onclick="showdetails(' + row.id + ')" href="/ClientCompany/Delete?Id=' + row.id + '"  class="btn btn-xs btn-danger"><i class="fas fa-trash"></i></i> Delete</a>'
                     return buttons;
                 }
             }
@@ -52,7 +52,7 @@
     });
 });
 
-function getdetails() {
+function getdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
@@ -60,14 +60,14 @@ function getdetails() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-danger').attr('disabled', 'disabled');
-    $('a.btn.btn-danger').html("<i class='fa fa-trash'></i> Delete...");
+    $('a.btn.btn-danger').html("<i class='fas fa-spinner'></i> Delete");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
 }
-function showdetails() {
+function showdetails(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
@@ -75,14 +75,15 @@ function showdetails() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fa fa-search'></i> Detail...");
+    var btn = this;
+    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Detail");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
 }
-function showedit() {
+function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
@@ -90,7 +91,7 @@ function showedit() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-building'></i> Edit...");
+    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

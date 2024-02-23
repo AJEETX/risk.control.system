@@ -8,7 +8,7 @@ $(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('.btn.btn-warning').attr('disabled', 'disabled');
-        $('.btn.btn-warning').html("<i class='fas fa-building' aria-hidden='true'></i> Profile...");
+        $('.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Profile");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -24,7 +24,7 @@ $(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('.btn.btn-success').attr('disabled', 'disabled');
-        $('.btn.btn-success').html("<i class='fas fa-user-friends' aria-hidden='true'></i> User...");
+        $('.btn.btn-success').html("<i class='fas fa-spinner' aria-hidden='true'></i> User");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -41,7 +41,7 @@ $(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('.btn.btn-danger').attr('disabled', 'disabled');
-        $('.btn.btn-danger').html("<i class='fas fa-truck' aria-hidden='true'></i> Service...");
+        $('.btn.btn-danger').html("<i class='fas fa-spinner' aria-hidden='true'></i> Service");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -143,7 +143,7 @@ function showedit() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-building'></i> Edit Agency...");
+    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit Agency");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -159,7 +159,7 @@ function showdetails() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-info').attr('disabled', 'disabled');
-    $('a.btn.btn-info').html("<i class='fas fa-building'></i> Detail...");
+    $('a.btn.btn-info').html("<i class='fas fa-spinner'></i> Detail");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

@@ -23,7 +23,7 @@ $(document).ready(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#create-user').attr('disabled', 'disabled');
-                            $('#create-user').html("<i class='fa fa-trash' aria-hidden='true'></i> Delete...");
+                            $('#create-user').html("<i class='fas fa-spinner' aria-hidden='true'></i> Delete");
 
                             $('#create-form').submit();
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');

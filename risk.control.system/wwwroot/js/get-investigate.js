@@ -28,7 +28,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('body').attr('disabled', 'disabled');
-        $(this).html("<i class='fa fa-upload'></i> Uploading photo .....");
+        $(this).html("<i class='fas fa-spinner'></i> Upload photo");
 
         $('#upload-face').submit();
         $('html *').css('cursor', 'not-allowed');
@@ -54,7 +54,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $(this).attr('disabled', 'disabled');
-        $(this).html("<i class='fa fa-upload'></i> Uploading PAN.....");
+        $(this).html("<i class='fas fa-spinner'></i> Upload PAN");
 
         $('#upload-pan').submit();
         $('html *').css('cursor', 'not-allowed');
@@ -146,7 +146,7 @@
                             }, 1);
 
                             $(this).attr('disabled', 'disabled');
-                            $(this).html("<i class='fa fa-upload'></i> Uploading .....");
+                            $(this).html("<i class='fas fa-spinner'></i> Submit");
 
                             $('#create-form').submit();
                             $('html *').css('cursor', 'not-allowed');

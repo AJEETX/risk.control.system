@@ -24,7 +24,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign (manual)...");
+                            $('#allocate-case').html("<i class='fas fa-spinner' aria-hidden='true'></i> Allocate");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');

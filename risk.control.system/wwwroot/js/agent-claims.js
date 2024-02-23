@@ -8,7 +8,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
 
-        $('#allocatedcase').html("<i class='fa fa-binoculars' aria-hidden='true'></i> Investigate...");
+        $('#allocatedcase').html("<i class='fas fa-spinner' aria-hidden='true'></i> Investigate");
 
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');

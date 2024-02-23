@@ -102,7 +102,7 @@ $(document).ready(function () {
         }, 1);
 
         $('#allocatedcase').attr('disabled', 'disabled');
-        $('#allocatedcase').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign(manual) .....");
+        $('#allocatedcase').html("<i class='fas fa-spinner' aria-hidden='true'></i> Assess");
 
         $('#checkboxes').submit();
 

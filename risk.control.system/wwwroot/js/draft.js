@@ -209,7 +209,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#managevendors').attr('disabled', 'disabled');
-                            $('#managevendors').html("<i class='fas fa-external-link-alt' aria-hidden='true'></i> Assign .....");
+                            $('#managevendors').html("<i class='fas fa-spinner' aria-hidden='true'></i> Assign");
                             
                             $('#checkboxes').submit();
                             var nodes = document.getElementById("fullpage").getElementsByTagName('*');
@@ -237,7 +237,7 @@
     }, 1);
 
         $(this).attr('disabled', 'disabled');
-        $(this).html("<i class='fa fa-upload'></i> Uploading .....");
+        $(this).html("<i class='fas fa-spinner'></i> Upload");
 
         
         $('#upload-claims').submit();
@@ -260,7 +260,7 @@ function showedit() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-pencil-alt'></i> Edit...");
+    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -275,7 +275,7 @@ function getdetails() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-danger').attr('disabled', 'disabled');
-    $('a.btn.btn-danger').html("<i class='fa fa-trash'></i> Delete...");
+    $('a.btn.btn-danger').html("<i class='fas fa-spinner'></i> Delete");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

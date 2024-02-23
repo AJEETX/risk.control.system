@@ -19,7 +19,7 @@
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#create-user').attr('disabled', 'disabled');
-                        $('#create-user').html("<i class='fas fa-plus' aria-hidden='true'></i> Add ");
+                        $('#create-user').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit User");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

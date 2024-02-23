@@ -8,7 +8,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('.btn.btn-success').attr('disabled', 'disabled');
-        $('.btn.btn-success').html("<i class='fas fa-user-friends' aria-hidden='true'></i> Add User...");
+        $('.btn.btn-success').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add User");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -72,7 +72,7 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a href="/CompanyUser/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
+                    buttons += '<a onclick="showedit()" href="/CompanyUser/Edit?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
                     buttons += '<a href="/CompanyUserRoles/Index?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Roles</a>'
                     return buttons;
                 }
@@ -84,3 +84,19 @@
         $('[data-toggle="tooltip"]').tooltip();
     });
 });
+
+function showedit() {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn.btn-warning').attr('disabled', 'disabled');
+    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
