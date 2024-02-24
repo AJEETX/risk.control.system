@@ -22,7 +22,7 @@ $.validator.setDefaults({
                         $('#create-cust').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Customer");
 
                         form.submit();
-                        var nodes = document.getElementById("article").getElementsByTagName('*');
+                        var nodes = document.getElementById("create-form").getElementsByTagName('*');
                         for (var i = 0; i < nodes.length; i++) {
                             nodes[i].disabled = true;
                         }

@@ -10,6 +10,25 @@ var showOcrMap = false;
 const image =
     "../images/beachflag.png";
 $(document).ready(function () {
+
+    $('.accent-secondary a.dropdown-item').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+
+        $('#back').attr('disabled', 'disabled');
+        $('html *').css('cursor', 'not-allowed');
+        $('html a *, html button *').attr('disabled', 'disabled');
+
+        var nodes = document.getElementById("section").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
     $('#back').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
