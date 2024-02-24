@@ -82,6 +82,7 @@
         }
     });
 
+    let askConfirmation = false;
     // Handle form submission event
     $('#checkboxes').on('submit', function (e) {
         var form = this;
@@ -105,7 +106,6 @@
 
         var checkboxes = $("input[type='checkbox'].vendors");
         var anyChecked = checkIfAnyChecked(checkboxes);
-
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
@@ -123,19 +123,48 @@
                 }
             });
         }
+        else if (anyChecked && !askConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Agency Empanel",
+                content: "Are you sure?",
+                icon: 'fas fa-handshake',
+                columnClass: 'medium',
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Submit",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askConfirmation = true;
+                            $("body").addClass("submit-progress-bg");
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
 
-        //$("body").addClass("submit-progress-bg");
-        //// Wrap in setTimeout so the UI
-        //// can update the spinners
-        //setTimeout(function () {
-        //    $(".submit-progress").removeClass("hidden");
-        //}, 1);
-        //$('#manage-vendors').attr('disabled', 'disabled');
-        //$('#manage-vendors').html("<i class='fas fa-handshake' aria-hidden='true'></i> Empanel Agency(s)...");
+                            $(this).attr('disabled', 'disabled');
+                            $(this).html("<i class='fas fa-spinner'></i> Submit");
 
-        //var nodes = document.getElementById("checkboxes").getElementsByTagName('*');
-        //for (var i = 0; i < nodes.length; i++) {
-        //    nodes[i].disabled = true;
-        //}
+                            $('#checkboxes').submit();
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').attr('disabled', 'disabled');
+                            $('html a *, html button *').css('pointer-events', 'none')
+                            $('#manage-vendors').attr('disabled', 'disabled');
+                            $('#manage-vendors').html("<i class='fas fa-handshake' aria-hidden='true'></i> Empanel");
+
+                            var nodes = document.getElementById("body").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
+        }
     });
 });

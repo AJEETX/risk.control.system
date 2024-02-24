@@ -87,6 +87,7 @@
     });
 
     // Handle form submission event
+    let askConfirmation = false;
     $('#checkboxes').on('submit', function (e) {
         var form = this;
 
@@ -113,7 +114,7 @@
         if (!anyChecked) {
             e.preventDefault();
             $.alert({
-                title: "Agency Depanelment !!!",
+                title: "Depanel Agency !!!",
                 content: "Please select agency to depanel?",
                 icon: 'fas fa-exclamation-triangle',
                 columnClass: 'medium',
@@ -123,6 +124,49 @@
                     cancel: {
                         text: "SELECT",
                         btnClass: 'btn-danger'
+                    }
+                }
+            });
+        }
+        else if (anyChecked && !askConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Agency Depanel",
+                content: "Are you sure?",
+                icon: 'fas fa-hand-pointer',
+                columnClass: 'medium',
+                type: 'red',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Submit",
+                        btnClass: 'btn-danger',
+                        action: function () {
+                            askConfirmation = true;
+                            $("body").addClass("submit-progress-bg");
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+
+                            $(this).attr('disabled', 'disabled');
+                            $(this).html("<i class='fas fa-spinner'></i> Submit");
+
+                            $('#checkboxes').submit();
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').attr('disabled', 'disabled');
+                            $('html a *, html button *').css('pointer-events', 'none')
+                            $('#manage-vendors').attr('disabled', 'disabled');
+                            $('#manage-vendors').html("<i class='fas fa-hand-pointer' aria-hidden='true'></i> Empanel");
+
+                            var nodes = document.getElementById("body").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
                     }
                 }
             });

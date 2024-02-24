@@ -12,7 +12,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>icheckify: login</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <meta name="probely-verification" content="93cf265b-0271-4833-bcfc-ab2f04e9bf9d" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="~/css/login.css">
     <link rel="stylesheet" href="~/css/all.min.css">
@@ -29,18 +28,18 @@
         <input type="checkbox" id="flip">
         <div class="cover">
             <div class="front">
-                <img src="~/agency/bgs.jpg" alt="verify">
-                <div class="text">
+                <img src="~/images/front.gif" alt="verify">
+                @* <div class="text">
                     <span class="text-2">Simple verification process</span>
-                </div>
+                </div> *@
             </div>
-            <div class="back">
-                <img class="backImg" src="~/agency/bgs.jpg" alt="verify">
+            @* <div class="back">
+                <img class="backImg" src="~/images/investigation.png" alt="verify">
                 <div class="text">
                     <span class="text-1">Complete miles of journey <br> with one step</span>
                     <span class="text-2">Let's get started</span>
                 </div>
-            </div>
+            </div> *@
         </div>
         <div class="forms">
             <a href="https://hostedscan.com"><img id="hostedscan" src="https://hostedscan.com/hostedscan-badge-light.svg" alt="HostedScan | An automated vulnerability scanner" /></a>
@@ -48,9 +47,7 @@
             <div class="form-content">
                 <div class="login-form">
                     <img class="login-logo" src="/img/iCheckifyLogo.png" />™️
-                    <div id="watermark">
-                       - DEMO -
-                    </div>
+                    
                     <div class="title">Login</div>
                     @Html.AntiForgeryToken()
                     <form id="login-form" asp-route-returnurl="@ViewData["ReturnUrl"]" asp-controller="account" asp-action="login" method="post">
