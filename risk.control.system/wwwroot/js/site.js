@@ -100,8 +100,6 @@ $(document).ready(function () {
         }
     }
 
-    document.getElementsByTagName("html")[0].style.visibility = "visible";
-
     $('#datatable thead th').css('background-color', '#e9ecef')
     var datatable = $('#datatable').dataTable({
         processing: true,

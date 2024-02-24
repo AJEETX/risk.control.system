@@ -1148,3 +1148,27 @@ img.doc-profile-image {
 input[type="text"] #emailAddress{
     text-transform:lowercase;
 }
+a.btn{
+    min-width:8rem;
+}
+a.btn.btn-xs {
+    min-width: 5rem;
+}
+button.btn {
+    min-width: 8rem;
+}
+button.btn.btn-sm {
+    min-width: 3rem;
+}
+    a.btn.btn-sm {
+        min-width: 3rem;
+    }
+    button.btn.btn-tool {
+        min-width: 1rem;
+    }
+    a#back{
+        min-width:6rem;
+    }
+a#back-button {
+    min-width: 6rem;
+}

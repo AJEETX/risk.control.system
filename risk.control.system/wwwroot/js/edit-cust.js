@@ -10,7 +10,7 @@ $.validator.setDefaults({
             buttons: {
                 confirm: {
                     text: "Edit Customer",
-                    btnClass: 'btn-orange',
+                    btnClass: 'btn-warning',
                     action: function () {
                         $("body").addClass("submit-progress-bg");
                         // Wrap in setTimeout so the UI
