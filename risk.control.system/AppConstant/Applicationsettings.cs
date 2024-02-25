@@ -169,6 +169,12 @@
         //public const string CURRENT_DISTRICT = "Forest Hill";
         //public const string CURRENT_STATE = "VIC";
 
+        public const string INSURER = "Insurer life";
+        public const string INSURERCODE = "ini";
+        public const string INSURERDOMAIN = "insurer.com";
+        public const string INSURERLOGO = "/img/insurer.jpg";
+        public const string INSURER_CREATOR = "creator@" + INSURERDOMAIN;
+
         public const string CANARA = "canara hsbc life";
         public const string CANARACODE = "chl";
         public const string CANARADOMAIN = "canarahsbclife.com";

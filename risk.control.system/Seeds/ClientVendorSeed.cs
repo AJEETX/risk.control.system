@@ -106,14 +106,117 @@ namespace risk.control.system.Seeds
             var companyState = context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == companyDistrict.State.StateId);
             var country = context.Country.FirstOrDefault(s => s.CountryId == companyState.Country.CountryId) ?? default!;
 
+            ////CREATE COMPANY1
+
+            //var canara = new ClientCompany
+            //{
+            //    Name = Applicationsettings.CANARA,
+            //    Addressline = "34 Lasiandra Avenue ",
+            //    Branch = "FOREST HILL CHASE",
+            //    Code = Applicationsettings.CANARACODE,
+            //    ActivatedDate = DateTime.Now,
+            //    AgreementDate = DateTime.Now,
+            //    BankName = "NAB",
+            //    BankAccountNumber = "1234567",
+            //    IFSCCode = "IFSC100",
+            //    Country = country,
+            //    District = companyDistrict,
+            //    State = companyState,
+            //    PinCode = companyPinCode,
+            //    Description = "CORPORATE OFFICE ",
+            //    Email = Applicationsettings.CANARADOMAIN,
+            //    DocumentUrl = Applicationsettings.CANARALOGO,
+            //    PhoneNumber = "9988004739",
+            //    EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            //};
+
+            //var canaraCompany = await context.ClientCompany.AddAsync(canara);
+
+            ////CREATE COMPANY2
+
+            //var hdfc = new ClientCompany
+            //{
+            //    Name = Applicationsettings.HDFC,
+            //    Addressline = "34 Lasiandra Avenue ",
+            //    Branch = "FOREST HILL CHASE",
+            //    Code = Applicationsettings.HDFCCODE,
+            //    ActivatedDate = DateTime.Now,
+            //    AgreementDate = DateTime.Now,
+            //    BankName = "NAB",
+            //    BankAccountNumber = "1234567",
+            //    IFSCCode = "IFSC100",
+            //    Country = country,
+            //    District = companyDistrict,
+            //    State = companyState,
+            //    PinCode = companyPinCode,
+            //    Description = "CORPORATE OFFICE ",
+            //    Email = Applicationsettings.HDFCDOMAIN,
+            //    DocumentUrl = Applicationsettings.HDFCLOGO,
+            //    PhoneNumber = "9988004739",
+            //    EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            //};
+
+            //var hdfcCompany = await context.ClientCompany.AddAsync(hdfc);
+
+            ////CREATE COMPANY3
+
+            //var bajaj = new ClientCompany
+            //{
+            //    Name = Applicationsettings.BAJAJ,
+            //    Addressline = "34 Lasiandra Avenue ",
+            //    Branch = "FOREST HILL CHASE",
+            //    Code = Applicationsettings.BAJAJ_CODE,
+            //    ActivatedDate = DateTime.Now,
+            //    AgreementDate = DateTime.Now,
+            //    BankName = "NAB",
+            //    BankAccountNumber = "1234567",
+            //    IFSCCode = "IFSC100",
+            //    Country = country,
+            //    District = companyDistrict,
+            //    State = companyState,
+            //    PinCode = companyPinCode,
+            //    Description = "CORPORATE OFFICE ",
+            //    Email = Applicationsettings.BAJAJ_DOMAIN,
+            //    DocumentUrl = Applicationsettings.BAJAJ_LOGO,
+            //    PhoneNumber = "9988004739",
+            //    EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            //};
+
+            //var bajajCompany = await context.ClientCompany.AddAsync(bajaj);
+
+            ////CREATE COMPANY4
+            //var tata = new ClientCompany
+            //{
+            //    Name = Applicationsettings.TATA,
+            //    Addressline = "34 Lasiandra Avenue ",
+            //    Branch = "FOREST HILL CHASE",
+            //    Code = Applicationsettings.TATA_CODE,
+            //    ActivatedDate = DateTime.Now,
+            //    AgreementDate = DateTime.Now,
+            //    BankName = "NAB",
+            //    BankAccountNumber = "1234567",
+            //    IFSCCode = "IFSC100",
+            //    Country = country,
+            //    District = companyDistrict,
+            //    State = companyState,
+            //    PinCode = companyPinCode,
+            //    Description = "CORPORATE OFFICE ",
+            //    Email = Applicationsettings.TATA_DOMAIN,
+            //    DocumentUrl = Applicationsettings.TATA_LOGO,
+            //    PhoneNumber = "9988004739",
+            //    EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            //};
+
+            //var tataCompany = await context.ClientCompany.AddAsync(tata);
+
             //CREATE COMPANY1
 
-            var canara = new ClientCompany
+            var insurer = new ClientCompany
             {
-                Name = Applicationsettings.CANARA,
+                Name = Applicationsettings.INSURER,
                 Addressline = "34 Lasiandra Avenue ",
                 Branch = "FOREST HILL CHASE",
-                Code = Applicationsettings.CANARACODE,
+                Code = Applicationsettings.INSURERCODE,
                 ActivatedDate = DateTime.Now,
                 AgreementDate = DateTime.Now,
                 BankName = "NAB",
@@ -124,92 +227,17 @@ namespace risk.control.system.Seeds
                 State = companyState,
                 PinCode = companyPinCode,
                 Description = "CORPORATE OFFICE ",
-                Email = Applicationsettings.CANARADOMAIN,
-                DocumentUrl = Applicationsettings.CANARALOGO,
+                Email = Applicationsettings.INSURERDOMAIN,
+                DocumentUrl = Applicationsettings.INSURERLOGO,
                 PhoneNumber = "9988004739",
                 EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
             };
 
-            var canaraCompany = await context.ClientCompany.AddAsync(canara);
+            var insurerCompany = await context.ClientCompany.AddAsync(insurer);
 
-            //CREATE COMPANY2
-
-            var hdfc = new ClientCompany
-            {
-                Name = Applicationsettings.HDFC,
-                Addressline = "34 Lasiandra Avenue ",
-                Branch = "FOREST HILL CHASE",
-                Code = Applicationsettings.HDFCCODE,
-                ActivatedDate = DateTime.Now,
-                AgreementDate = DateTime.Now,
-                BankName = "NAB",
-                BankAccountNumber = "1234567",
-                IFSCCode = "IFSC100",
-                Country = country,
-                District = companyDistrict,
-                State = companyState,
-                PinCode = companyPinCode,
-                Description = "CORPORATE OFFICE ",
-                Email = Applicationsettings.HDFCDOMAIN,
-                DocumentUrl = Applicationsettings.HDFCLOGO,
-                PhoneNumber = "9988004739",
-                EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
+            var companyIds = new List<ClientCompany> { insurerCompany.Entity
+                //, hdfcCompany.Entity, bajajCompany.Entity, tataCompany.Entity
             };
-
-            var hdfcCompany = await context.ClientCompany.AddAsync(hdfc);
-
-            //CREATE COMPANY3
-
-            var bajaj = new ClientCompany
-            {
-                Name = Applicationsettings.BAJAJ,
-                Addressline = "34 Lasiandra Avenue ",
-                Branch = "FOREST HILL CHASE",
-                Code = Applicationsettings.BAJAJ_CODE,
-                ActivatedDate = DateTime.Now,
-                AgreementDate = DateTime.Now,
-                BankName = "NAB",
-                BankAccountNumber = "1234567",
-                IFSCCode = "IFSC100",
-                Country = country,
-                District = companyDistrict,
-                State = companyState,
-                PinCode = companyPinCode,
-                Description = "CORPORATE OFFICE ",
-                Email = Applicationsettings.BAJAJ_DOMAIN,
-                DocumentUrl = Applicationsettings.BAJAJ_LOGO,
-                PhoneNumber = "9988004739",
-                EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
-            };
-
-            var bajajCompany = await context.ClientCompany.AddAsync(bajaj);
-
-            //CREATE COMPANY4
-            var tata = new ClientCompany
-            {
-                Name = Applicationsettings.TATA,
-                Addressline = "34 Lasiandra Avenue ",
-                Branch = "FOREST HILL CHASE",
-                Code = Applicationsettings.TATA_CODE,
-                ActivatedDate = DateTime.Now,
-                AgreementDate = DateTime.Now,
-                BankName = "NAB",
-                BankAccountNumber = "1234567",
-                IFSCCode = "IFSC100",
-                Country = country,
-                District = companyDistrict,
-                State = companyState,
-                PinCode = companyPinCode,
-                Description = "CORPORATE OFFICE ",
-                Email = Applicationsettings.TATA_DOMAIN,
-                DocumentUrl = Applicationsettings.TATA_LOGO,
-                PhoneNumber = "9988004739",
-                EmpanelledVendors = new List<Vendor> { checker, verify, investigate }
-            };
-
-            var tataCompany = await context.ClientCompany.AddAsync(tata);
-
-            var companyIds = new List<ClientCompany> { canaraCompany.Entity, hdfcCompany.Entity, bajajCompany.Entity, tataCompany.Entity };
 
             var checkerServices = new List<VendorInvestigationServiceType>
             {
@@ -346,21 +374,25 @@ namespace risk.control.system.Seeds
             verify.VendorInvestigationServiceTypes = verifyServices;
             investigate.VendorInvestigationServiceTypes = investigateServices;
 
-            checker.Clients.Add(canaraCompany.Entity);
-            verify.Clients.Add(canaraCompany.Entity);
-            investigate.Clients.Add(canaraCompany.Entity);
+            //checker.Clients.Add(canaraCompany.Entity);
+            //verify.Clients.Add(canaraCompany.Entity);
+            //investigate.Clients.Add(canaraCompany.Entity);
 
-            checker.Clients.Add(hdfcCompany.Entity);
-            verify.Clients.Add(hdfcCompany.Entity);
-            investigate.Clients.Add(hdfcCompany.Entity);
+            //checker.Clients.Add(hdfcCompany.Entity);
+            //verify.Clients.Add(hdfcCompany.Entity);
+            //investigate.Clients.Add(hdfcCompany.Entity);
 
-            checker.Clients.Add(bajajCompany.Entity);
-            verify.Clients.Add(bajajCompany.Entity);
-            investigate.Clients.Add(bajajCompany.Entity);
+            //checker.Clients.Add(bajajCompany.Entity);
+            //verify.Clients.Add(bajajCompany.Entity);
+            //investigate.Clients.Add(bajajCompany.Entity);
 
-            checker.Clients.Add(tataCompany.Entity);
-            verify.Clients.Add(tataCompany.Entity);
-            investigate.Clients.Add(tataCompany.Entity);
+            //checker.Clients.Add(tataCompany.Entity);
+            //verify.Clients.Add(tataCompany.Entity);
+            //investigate.Clients.Add(tataCompany.Entity);
+
+            checker.Clients.Add(insurerCompany.Entity);
+            verify.Clients.Add(insurerCompany.Entity);
+            investigate.Clients.Add(insurerCompany.Entity);
 
             await context.SaveChangesAsync(null, false);
             return (vendors, companyIds);

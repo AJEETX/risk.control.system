@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,15 +15,21 @@ namespace risk.control.system.Controllers.Api.Agency
     [ApiController]
     public class AgencyController : ControllerBase
     {
+        private readonly string noUserImagefilePath = string.Empty;
+        private readonly string noDataImagefilePath = string.Empty;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<VendorApplicationUser> userManager;
         private readonly IDashboardService dashboardService;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public AgencyController(ApplicationDbContext context, UserManager<VendorApplicationUser> userManager, IDashboardService dashboardService)
+        public AgencyController(ApplicationDbContext context, UserManager<VendorApplicationUser> userManager, IWebHostEnvironment webHostEnvironment, IDashboardService dashboardService)
         {
             this.userManager = userManager;
             this.dashboardService = dashboardService;
+            this.webHostEnvironment = webHostEnvironment;
             _context = context;
+            noUserImagefilePath = "/img/no-user.png";
+            noDataImagefilePath = "/img/no-image.png";
         }
 
         [HttpGet("AllUsers")]
@@ -53,7 +60,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
-                    Photo = u.ProfilePictureUrl,
+                    Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? noUserImagefilePath : u.ProfilePictureUrl,
                     Active = u.Active,
                     Addressline = u.Addressline,
                     District = u.District.Name,
@@ -83,7 +90,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 new
                 {
                     Id = u.VendorId,
-                    Document = u.DocumentUrl,
+                    Document = string.IsNullOrEmpty(u.DocumentUrl) ? noDataImagefilePath : u.DocumentUrl,
                     Domain = "<a href=''>" + u.Email + "</a>",
                     Name = u.Name,
                     Code = u.Code,
@@ -162,6 +169,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .OrderBy(u => u.FirstName)
                 .ThenBy(u => u.LastName)
                 .AsQueryable();
+
             var result =
                 users?.Select(u =>
                 new
@@ -170,7 +178,7 @@ namespace risk.control.system.Controllers.Api.Agency
                     Name = u.FirstName + " " + u.LastName,
                     Email = "<a href=''>" + u.Email + "</a>",
                     Phone = u.PhoneNumber,
-                    Photo = u.ProfilePictureUrl,
+                    Photo = string.IsNullOrWhiteSpace(u.ProfilePictureUrl) ? noUserImagefilePath : u.ProfilePictureUrl,
                     Addressline = u.Addressline,
                     Active = u.Active,
                     District = u.District.Name,
@@ -239,7 +247,7 @@ namespace risk.control.system.Controllers.Api.Agency
                 .Select(u => new
                 {
                     Id = u.AgencyUser.Id,
-                    Photo = u.AgencyUser.ProfilePictureUrl,
+                    Photo = string.IsNullOrWhiteSpace(u.AgencyUser.ProfilePictureUrl) ? noUserImagefilePath : u.AgencyUser.ProfilePictureUrl,
                     Email = "<a href=''>" + u.AgencyUser.Email + "</a>",
                     Name = u.AgencyUser.FirstName + " " + u.AgencyUser.LastName,
                     Phone = u.AgencyUser.PhoneNumber,

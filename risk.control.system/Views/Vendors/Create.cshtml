@@ -91,7 +91,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="PhoneNumber" class="form-control" required maxlength="14" value="" placeholder="Phone # with country code"
+                                            <input type="text" asp-for="PhoneNumber" class="form-control" required maxlength="14" value="61432854196" placeholder="61432854196"
                                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
@@ -236,7 +236,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline"><i class="fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Address line" required maxlength="20" />
+                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Address line" required maxlength="20" value="99 Great Avenue" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -249,7 +249,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Description"><i class="fas fa-pencil-alt"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Description" class="form-control" value="" placeholder="Remarks" required maxlength="30" />
+                                            <input type="text" asp-for="Description" class="form-control" value="Add new Agency" placeholder="Remarks" required maxlength="30"  />
                                             <span asp-validation-for="Description" class="text-danger"></span>
                                         </div>
                                     </div>

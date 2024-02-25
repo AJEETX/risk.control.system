@@ -63,11 +63,11 @@
     }
     if (@customerExist)
     {
-        customerProgressColor = "orange";
+        customerProgressColor = "green";
     }
     if (@customerExist && @beneficiaryExist)
     {
-        benficiaryProgressColor = "orange";
+        benficiaryProgressColor = "green";
     }
     if (@customerExist && !@beneficiaryExist)
     {
@@ -87,7 +87,7 @@
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
                     <div class="progress-bar" role="progressbar" style="width:100%;background-color:@customerProgressColor">
-                        <i class="fa fa-user-plus" style="color:black;"></i>
+                        <i class="fa fa-user-plus"></i>
                     </div>
                 </div>
                 <div class="card-body pt-0">
@@ -253,7 +253,7 @@
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
                     <div class="progress-bar" role="progressbar" style="width:100%;background-color:@benficiaryProgressColor">
-                        <i class="fas fa-user-tie" style="color:black;"></i>
+                        <i class="fas fa-user-tie"></i>
                     </div>
                 </div>
                 <div class="card-body pt-0">

@@ -21,9 +21,7 @@
                         </div>
                         <div class="card-body">
                             <partial name="_PolicyDetails" model="@Model" />
-                            <div class="submit-progress hidden">
-                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                            </div>
+                            
                             <partial name="_AgencyReport" model="@Model" />
                             @{
                                 foreach (var item in Model.Location?.PreviousClaimReports)
@@ -40,6 +38,9 @@
                             <h3 class="card-title"><i class="fas fa-user-check"></i> Assessor Remarks</h3>
                         </div>
                         <div class="card-body">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <div class="=row">
                                 <div class="col-md-12">
                                     <input maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control" required />

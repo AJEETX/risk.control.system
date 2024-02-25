@@ -61,7 +61,6 @@ $(document).ready(function () {
                         btnClass: 'btn-success',
                         action: function () {
                             askConfirmation = true;
-                            $('#create-form').submit();
 
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
@@ -69,10 +68,12 @@ $(document).ready(function () {
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
+                            $('#create-form').submit();
+
                             $('button#approve-case.btn.btn-success').attr('disabled', 'disabled');
                             $('button#approve-case.btn.btn-success').html("<i class='fas fa-spinner' aria-hidden='true'></i> Approve");
 
-                            var nodes = document.getElementById("fullpage").getElementsByTagName('*');
+                            var nodes = document.getElementById("create-form").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }
@@ -101,7 +102,21 @@ $(document).ready(function () {
                         action: function () {
                             askConfirmation = true;
                             review = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
                             $('#create-form').submit();
+
+                            $('button#review-case.btn.btn-danger').attr('disabled', 'disabled');
+                            $('button#review-case.btn.btn-danger').html("<i class='fas fa-spinner' aria-hidden='true'></i> Review");
+
+                            var nodes = document.getElementById("create-form").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
                         }
                     },
                     cancel: {
