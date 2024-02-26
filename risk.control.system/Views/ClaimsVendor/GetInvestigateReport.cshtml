@@ -19,12 +19,13 @@
                             <h3 class="card-title"><i class="far fa-file-archive"></i> Agent Report</h3>
                         </div>
                         <div class="card-body">
-                            <partial name="_PolicyDetails" model="@Model" />
-                            
-                            <partial name="_AgentReport" model="@Model" />
                             <div class="submit-progress hidden">
                                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                             </div>
+                            <partial name="_PolicyDetails" model="@Model" />
+                            
+                            <partial name="_AgentReport" model="@Model" />
+                            
                             <partial name="_SupervisorRemarks" model="@Model" />
                         </div>
                     </div>

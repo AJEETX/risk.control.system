@@ -1,4 +1,23 @@
 ﻿$(document).ready(function () {
+    $('#reselect-case').click(function (e) {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('body').attr('disabled', 'disabled');
+        $(this).html("<i class='fas fa-spinner'></i> Upload photo");
+
+        $('html *').css('cursor', 'not-allowed');
+        $('html a *, html button *').css('pointer-events', 'none');
+
+        var nodes = document.getElementById("section").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
     let askConfirmation = false;
     $('#create-form').on('submit', function (e) {
         var report = $('#supervisorRemarks').val();
@@ -40,7 +59,6 @@
                         action: function () {
                             askConfirmation = true;
 
-                            $('#create-form').submit();
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
                             // can update the spinners
@@ -49,6 +67,9 @@
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
                             $('#allocate-case').html("<i class='fas fa-spinner' aria-hidden='true'></i> Submit");
+
+                            $('#create-form').submit();
+
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;

@@ -20,7 +20,6 @@
         $('#documentIdLongitude').val(coordinates.longitude);
     }
     $('#UploadFaceImageButton').click(function (e) {
-
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners
@@ -148,11 +147,11 @@
                             $(this).attr('disabled', 'disabled');
                             $(this).html("<i class='fas fa-spinner'></i> Submit");
 
-                            $('#create-form').submit();
                             $('html *').css('cursor', 'not-allowed');
                             $('html a *, html button *').attr('disabled', 'disabled');
                             $('html a *, html button *').css('pointer-events', 'none')
                             $('#submit-case').html("<i class='fas fa-spinner'></i> Submit")
+                            $('#create-form').submit();
 
                             var nodes = document.getElementById("body").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
