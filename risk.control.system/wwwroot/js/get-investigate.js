@@ -144,12 +144,6 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $(this).attr('disabled', 'disabled');
-                            $(this).html("<i class='fas fa-spinner'></i> Submit");
-
-                            $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').attr('disabled', 'disabled');
-                            $('html a *, html button *').css('pointer-events', 'none')
                             $('#submit-case').html("<i class='fas fa-spinner'></i> Submit")
                             $('#create-form').submit();
 
