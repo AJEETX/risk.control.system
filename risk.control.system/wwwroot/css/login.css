@@ -62,7 +62,7 @@ div .error-message {
     left: 0;
     height: 100%;
     width: 100%;
-    background:white;
+    background: white;
 }
 
 .cover .back {
@@ -90,8 +90,7 @@ div .error-message {
 .container .cover img {
     position: absolute;
     width: 100%;
-    height:100%;
-    object-fit: cover;
+    height: 100%;
     z-index: 10;
 }
 

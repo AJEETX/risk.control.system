@@ -1,57 +1,61 @@
 ﻿@model ClaimTransactionModel
-<div class="card card-solid">
-    <div class="card-body pb-0">
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
-        <div class="row">
-            <div class="col-12 d-flex align-items-stretch flex-column">
-                <div class="card bg-light d-flex flex-fill">
-                    <div class="card-header text-muted border-bottom-0">
-                        <i class="fas fa-money-check-alt"></i> Billing Info<span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+<div class="row">
+    <div class="col-12 d-flex align-items-stretch flex-column">
+        <div class="card bg-light d-flex flex-fill">
+            <div class="card-header text-muted border-bottom-0">
+                <i class="fas fa-money-check-alt"></i> Billing Info<span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
+            </div>
+            <div class="progress">
+                <i class="far fa-bookmark bookmark-green"></i>
+                <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                    Invoice
+                </div>
+                <i class="far fa-bookmark bookmark-green"></i>
+
+            </div>
+            <div class="card-body pt-0">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <div class="row">
+                    <div class="col-7">
+                        <h2 class="lead"><b>Insurance Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name</h2>
+                        <p class="text-muted text-sm">
+                            <b>Claim Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
+                        </p>
+                        <ul class="ml-4 mb-0 fa-ul text-muted">
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-tools"></i>
+                                </span>
+                                Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
+                            </li>
+
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-sun"></i>
+                                </span>
+                                Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
+                            </li>
+                            <li class="small">
+                                <span class="fa-li">
+                                    <i class="fas fa-sun"></i>
+                                </span>
+                                Total Amount Rs: @Model.VendorInvoice.GrandTotal;
+                            </li>
+
+                        </ul>
                     </div>
-                    <div class="card-body pt-0">
-                        <div class="row">
-                            <div class="col-7">
-                                <h2 class="lead"><b>Insurance Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.LineOfBusiness.Name</h2>
-                                <p class="text-muted text-sm">
-                                    <b>Claim Type: </b>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
-                                </p>
-                                <ul class="ml-4 mb-0 fa-ul text-muted">
-                                    <li class="small">
-                                        <span class="fa-li">
-                                            <i class="fas fa-tools"></i>
-                                        </span>
-                                        Service: @Model.ClaimsInvestigation?.PolicyDetail.InvestigationServiceType.Name
-                                    </li>
-                                                                        
-                                    <li class="small">
-                                        <span class="fa-li">
-                                            <i class="fas fa-sun"></i>
-                                        </span>
-                                        Reason: @Model.ClaimsInvestigation?.PolicyDetail.CaseEnabler.Name;
-                                    </li>
-                                    <li class="small">
-                                        <span class="fa-li">
-                                            <i class="fas fa-sun"></i>
-                                        </span>
-                                        Total Amount Rs: @Model.VendorInvoice.GrandTotal;
-                                    </li>
-                                                                       
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="text-right">
-                            <a id="back" asp-controller="Report" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                            <a asp-controller="Report" asp-action="ShowInvoice" class="btn btn-primary" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
-                                <i class="fa fa-print"> Print Invoice</i>
-                            </a>
-                        </div>
-                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="text-right">
+                    <a id="back" asp-controller="Report" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                    <a asp-controller="Report" asp-action="ShowInvoice" class="btn btn-primary" asp-route-id="@Model.VendorInvoice.VendorInvoiceId">
+                        <i class="fa fa-print"> Print Invoice</i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</div> <!-- class bb-blog-inner -->
+</div>
