@@ -13,6 +13,7 @@
                 return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
             }
         }],
+        order: [[1, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -151,7 +152,7 @@
                             $('html a *, html button *').attr('disabled', 'disabled');
                             $('html a *, html button *').css('pointer-events', 'none')
                             $('#manage-vendors').attr('disabled', 'disabled');
-                            $('#manage-vendors').html("<i class='fas fa-handshake' aria-hidden='true'></i> Empanel");
+                            $('#manage-vendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Empanel");
 
                             var nodes = document.getElementById("body").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
