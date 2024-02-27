@@ -20,7 +20,7 @@ $.validator.setDefaults({
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#create-policy').attr('disabled', 'disabled');
-                        $('#create-policy').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Policy");
+                        $('#create-policy').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Policy");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

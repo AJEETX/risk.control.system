@@ -24,7 +24,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-spinner' aria-hidden='true'></i> Allocate");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Allocate");
 
                             $('#radioButtons').submit();
                             var nodes = document.getElementById("article").getElementsByTagName('*');

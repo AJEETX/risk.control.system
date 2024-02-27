@@ -15,7 +15,7 @@ $(document).ready(function () {
 
         $('#login').attr('disabled', 'disabled');
         $('#login').css('color', 'lightgrey');
-        $('#login').html('<span class="fas fa-spinner" aria-hidden="true"></span> Login');
+        $('#login').html('<span class="fas fa-sync fa-spin" aria-hidden="true"></span> Login');
 
         $('#login-form').submit();
         $('html *').css('cursor', 'not-allowed');

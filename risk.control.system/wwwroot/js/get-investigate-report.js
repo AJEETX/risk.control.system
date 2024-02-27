@@ -7,7 +7,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('body').attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-spinner'></i> Upload photo");
+        $(this).html("<i class='fas fa-sync fa-spin'></i> Upload photo");
 
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').css('pointer-events', 'none');
@@ -66,7 +66,7 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
                             $('#allocate-case').attr('disabled', 'disabled');
-                            $('#allocate-case').html("<i class='fas fa-spinner' aria-hidden='true'></i> Submit");
+                            $('#allocate-case').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Submit");
 
                             $('#create-form').submit();
 

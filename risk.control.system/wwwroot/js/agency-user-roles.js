@@ -22,7 +22,7 @@
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('.btn').attr('disabled', 'disabled');
-                        $('button#editrole.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Role");
+                        $('button#editrole.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Role");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

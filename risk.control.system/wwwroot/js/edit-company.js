@@ -20,7 +20,7 @@
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('.btn.btn-warning').attr('disabled', 'disabled');
-                        $('#edit-company.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Company");
+                        $('#edit-company.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Company");
 
                         form.submit();
                         var nodes = document.getElementById("article").getElementsByTagName('*');

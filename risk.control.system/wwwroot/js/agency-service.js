@@ -12,7 +12,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('a.create-agency-service').attr('disabled', 'disabled');
-        $('a.create-agency-service').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add Service");
+        $('a.create-agency-service').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add Service");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -72,7 +72,7 @@ function showedit(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn').attr('disabled', 'disabled');
-    $('a#edit'+ id +'.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit");
+    $('a#edit'+ id +'.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -87,7 +87,7 @@ function getdetails(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn').attr('disabled', 'disabled');
-    $('a#delete' + id +'.btn.btn-danger').html("<i class='fas fa-spinner'></i> Delete");
+    $('a#delete' + id +'.btn.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

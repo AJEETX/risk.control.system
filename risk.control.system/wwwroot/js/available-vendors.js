@@ -144,7 +144,7 @@
                             }, 1);
 
                             $(this).attr('disabled', 'disabled');
-                            $(this).html("<i class='fas fa-spinner'></i> Submit");
+                            $(this).html("<i class='fas fa-sync fa-spin'></i> Submit");
 
                             $('#checkboxes').submit();
                             $('html *').css('cursor', 'not-allowed');

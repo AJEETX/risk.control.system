@@ -19,7 +19,7 @@
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('.btn.btn-warning').attr('disabled', 'disabled');
-                        $('button#editservice.btn.btn-warning').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Service");
+                        $('button#editservice.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Service");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

@@ -8,7 +8,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('.btn.btn-success').attr('disabled', 'disabled');
-        $('.btn.btn-success').html("<i class='fas fa-spinner' aria-hidden='true'></i> Add User");
+        $('.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Add User");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -93,7 +93,7 @@ function showedit() {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn.btn-warning').attr('disabled', 'disabled');
-    $('a.btn.btn-warning').html("<i class='fas fa-spinner'></i> Edit");
+    $('a.btn.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

@@ -139,7 +139,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#allocatedcase').attr('disabled', 'disabled');
-        $('#allocatedcase').html("<i class='fas fa-spinner' aria-hidden='true'></i> Assign(manual)");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign(manual)");
 
         $('#radioButtons').submit();
         var nodes = document.getElementById("body").getElementsByTagName('*');
@@ -159,7 +159,7 @@ function showdata(id) {
     }, 1);
     $('a.btn').attr('disabled', 'disabled');
     var detailbtn = $('a#details' + id + '.btn.btn-xs.btn-info')
-    detailbtn.html("<i class='fas fa-spinner'></i> Details");
+    detailbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

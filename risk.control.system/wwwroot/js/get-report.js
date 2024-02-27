@@ -71,7 +71,7 @@ $(document).ready(function () {
                             $('#create-form').submit();
 
                             $('button#approve-case.btn.btn-success').attr('disabled', 'disabled');
-                            $('button#approve-case.btn.btn-success').html("<i class='fas fa-spinner' aria-hidden='true'></i> Approve");
+                            $('button#approve-case.btn.btn-success').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Approve");
 
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
@@ -111,7 +111,7 @@ $(document).ready(function () {
                             $('#create-form').submit();
 
                             $('button#review-case.btn.btn-danger').attr('disabled', 'disabled');
-                            $('button#review-case.btn.btn-danger').html("<i class='fas fa-spinner' aria-hidden='true'></i> Review");
+                            $('button#review-case.btn.btn-danger').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Review");
 
                             var nodes = document.getElementById("create-form").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {

@@ -19,7 +19,7 @@ $.validator.setDefaults({
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
                         $('#create-cust').attr('disabled', 'disabled');
-                        $('#create-cust').html("<i class='fas fa-spinner' aria-hidden='true'></i> Edit Customer");
+                        $('#create-cust').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit Customer");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');
