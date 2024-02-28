@@ -66,12 +66,15 @@ $(document).ready(function () {
     });
 
     $('.nav-item a.actual-link').on('click', function (e) {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
+
+        if (!window.matchMedia("(max-width: 767px)").matches) {
+            $("body").addClass("submit-progress-bg");
+            // Wrap in setTimeout so the UI
+            // can update the spinners
+            setTimeout(function () {
+                $(".submit-progress").removeClass("hidden");
+            }, 1);
+        }
 
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
