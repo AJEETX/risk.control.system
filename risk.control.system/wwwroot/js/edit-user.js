@@ -18,8 +18,8 @@ $.validator.setDefaults({
                         setTimeout(function () {
                             $(".submit-progress").removeClass("hidden");
                         }, 1);
-                        $('.btn btn-warning').attr('disabled', 'disabled');
-                        $('.btn btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
+                        $('#btnSubmit').attr('disabled', 'disabled');
+                        $('#btnSubmit').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Edit User");
 
                         form.submit();
                         var nodes = document.getElementById("create-form").getElementsByTagName('*');

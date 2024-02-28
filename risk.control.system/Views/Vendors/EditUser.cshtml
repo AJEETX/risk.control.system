@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
     var email = Model.Vendor.Email;
-    Layout = "/Views/Shared/AdminLTE/_FormLayout.cshtml";
 }   
 <section class="content pt-2">
     <div class="container-fluid ">
@@ -186,7 +185,7 @@
                                             <i class="fa fa-window-close"></i>
                                             @Applicationsettings.CANCEL
                                         </a>
-                                        <button type="submit" class="btn btn-warning">
+                                        <button id="btnSubmit" type="submit" class="btn btn-warning">
                                             <i class="fas fa-user-plus"></i> Edit User
                                         </button>
                                     </div>
