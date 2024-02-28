@@ -79,21 +79,37 @@ $(document).ready(function () {
         }
     });
 
-    //$('.btn.btn-warning').on('click', function () {
-    //    $("body").addClass("submit-progress-bg");
-    //    // Wrap in setTimeout so the UI
-    //    // can update the spinners
-    //    setTimeout(function () {
-    //        $(".submit-progress").removeClass("hidden");
-    //    }, 1);
-    //    $('.btn.btn-warning').attr('disabled', 'disabled');
-    //    $('.btn.btn-warning').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign List <i class='fas fa-arrow-right'></i>");
+    $('#assign-list').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#assign-list').attr('disabled', 'disabled');
+        $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
 
-    //    var nodes = document.getElementById("body").getElementsByTagName('*');
-    //    for (var i = 0; i < nodes.length; i++) {
-    //        nodes[i].disabled = true;
-    //    }
-    //});
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+
+    $('#active-list').on('click', function () {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+        $('#active-list').attr('disabled', 'disabled');
+        $('#active-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Active");
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
 
     var askConfirmation = true;
     $('#create-form').submit(function (e) {

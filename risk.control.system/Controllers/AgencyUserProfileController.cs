@@ -180,7 +180,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb("Changed Password ")]
+        [Breadcrumb("Change Password ")]
         public IActionResult ChangePassword()
         {
             var userEmail = HttpContext.User?.Identity?.Name;
