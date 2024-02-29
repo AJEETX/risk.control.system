@@ -169,7 +169,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Detail")]
+        [Breadcrumb(" Detail", FromAction = "Completed")]
         public async Task<IActionResult> CompletedDetail(string id)
         {
             if (id == null || _context.ClaimsInvestigation == null)

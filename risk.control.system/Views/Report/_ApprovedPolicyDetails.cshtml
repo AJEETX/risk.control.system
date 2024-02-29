@@ -361,14 +361,24 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card-footer">
-                                        <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
+                                </div>
+                                <div class="card border-secondary direct-chat direct-chat-warning collapsed-card">
+                                    <div class="card-header">
+                                        <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                                        <div class="card-tools">
+                                            <span data-toggle="tooltip" title="Map Location" class="badge badge-light"><i class="fas fa-film"></i></span>
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
                                         <div id="face-map">
                                         </div>
                                         <div id="face-msg">
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         }
@@ -435,14 +445,25 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card-footer">
-                                        <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
+                                    
+                                </div>
+                                <div class="card border-secondary direct-chat direct-chat-warning collapsed-card">
+                                    <div class="card-header">
+                                        <i class="fas fa-film"></i> <h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                                        <div class="card-tools">
+                                            <span data-toggle="tooltip" title="Map Location" class="badge badge-light"><i class="fas fa-film"></i></span>
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
                                         <div id="ocr-map">
                                         </div>
                                         <div id="ocr-msg">
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         }
@@ -460,7 +481,6 @@
                                     <i class="fas fa-user-shield"></i>  Agent:<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
                                 </div>
                                 <div class="card-body">
-                                    <partial name="_Chat" model="@Model.ClaimsInvestigation" />
                                     @* <partial name="_MediaDetails" model="@Model.ClaimsInvestigation" />*@
                                     
                                     <div class="row">
@@ -553,6 +573,8 @@
                                     </div>
                                 </div>
                             </div>
+                            <partial name="_Chat" model="@Model.ClaimsInvestigation" />
+
                         </div>
                     }
 
