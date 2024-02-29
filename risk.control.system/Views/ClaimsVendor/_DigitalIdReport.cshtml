@@ -75,18 +75,8 @@
                     </div>
                 </div>
             </div>
-            @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
-            {
+            
 
-                <div class="card-footer">
-                    <span class="badge badge-light"><i class="fas fa-film"></i> Map Location</span>:<span class="badge badge-light">Expected and visited</span>
-                    <div id="face-map">
-                    </div>
-                    <div id="face-msg">
-                    </div>
-                </div>
-
-            }
             <form id="upload-face" asp-controller="Uploads" asp-action="FaceUpload" method="post" enctype="multipart/form-data">
                 <input type="hidden" id="digitalIdLatitude" name="digitalIdLatitude" />
                 <input type="hidden" id="digitalIdLongitude" name="digitalIdLongitude" />
@@ -104,5 +94,26 @@
                 </div>
             </form>
         </div>
+        @if (@Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
+        {
+            <div class="card border-secondary direct-chat direct-chat-warning collapsed-card">
+                <div class="card-header">
+                <i class="fas fa-film"></i><h3 class="card-title">Map<span class="badge badge-light">Expected and visited</span></h3>
+
+                <div class="card-tools">
+                    <span data-toggle="tooltip" title="Map Location" class="badge badge-light"><i class="fas fa-film"></i></span>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="face-map">
+                </div>
+                <div id="face-msg">
+                </div>
+            </div>
+        </div>
+        }
     </div>
 }

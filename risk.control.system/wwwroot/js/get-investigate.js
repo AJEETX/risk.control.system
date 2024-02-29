@@ -144,7 +144,8 @@
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
 
-                            $('#submit-case').html("<i class='fas fa-sync fa-spin'></i> Submit")
+                            $('#submit-case').attr('disabled', 'disabled');
+                            $('#submit-case').html("<i class='fas fa-sync fa-spin'></i> Submit");
                             $('#create-form').submit();
 
                             var nodes = document.getElementById("body").getElementsByTagName('*');

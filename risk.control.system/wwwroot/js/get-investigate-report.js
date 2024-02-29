@@ -7,7 +7,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('body').attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin'></i> Upload photo");
+        $(this).html("<i class='fas fa-sync fa-spin'></i> Review");
 
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').css('pointer-events', 'none');
