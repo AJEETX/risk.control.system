@@ -11,12 +11,13 @@
                     <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
                 </h3>
             </div>
-            <div class="card-body">
+            <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
+                <div class="card-body">
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
-                    <div class="col-md-12">
+                    <div class="table-responsive mailbox-messages">
+
                         <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                 <thead>
                                     <tr>
@@ -41,22 +42,27 @@
                                     </tr>
                                 </thead>
                             </table>
-                            <div class="row">
-                                <div class="col-md-12">
-
-                                    <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                                    <span class="badge badge-light"> <i class="fas fa-glasses" aria-hidden="true"></i> </span>
-                                        Assess
-                                    </button>
-                                </div>
-                            </div>
+                            
                     </div>
-                </form>
                 <div id="maps" class="col-md-12">
                     <div id="map"></div>
                     
                 </div>
             </div>
+            <div class="card-footer">
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                                <span class="badge badge-light"> <i class="fas fa-glasses" aria-hidden="true"></i> </span>
+                                Assess
+                            </button>
+                        </div>
+                    </div>
+            </div>
+            </form>
+
+
         </div>
     </div>
 </section>

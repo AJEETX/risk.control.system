@@ -6,9 +6,9 @@
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-list"></i>  @Applicationsettings.AGENTS</h3>
             </div>
-            <div class="card-body">
-                
                 <form id="radioButtons" method="post" asp-controller="ClaimsVendorPost" asp-action="AllocateToVendorAgent" enctype="multipart/form-data">
+            <div class="card-body">
+                    <div class="table-responsive mailbox-messages">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.CaseLocation.CaseLocationId" />
                     <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
@@ -100,6 +100,10 @@
                         </tbody>
 
                     </table>
+
+                    </div>
+                </div>
+            <div class="card-footer">
                     <div class="row">
                         <div class="col-md-12">
                             <a asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
@@ -110,10 +114,8 @@
                             </button>
                         </div>
                     </div>
-                </form>
-                <br />
-                <br />
             </div>
+            </form>
         </div>
     </div>
 </div>

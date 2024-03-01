@@ -26,27 +26,68 @@
                             <div class="row">
 
                                 <div class="col-12">
+
+                            <div class="form-group">
+                                <span class="input-group-label"> Ownership of residence ?</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="Location.ClaimReport.ReportQuestionaire.Answer1"><i class="nav-icon fas fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <select name="question1" id="question1" required asp-for="Location.ClaimReport.ReportQuestionaire.Answer1" class="form-control" asp-items="Html.GetEnumSelectList<DwellType>()">
+                                        <option value="">--- SELECT ---</option>
+                                    </select>
+                                    <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer1" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <span class="input-group-label"> Perceived financial status ?</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="Location.ClaimReport.ReportQuestionaire.Answer2"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <select name="question2" id="question2" required asp-for="Location.ClaimReport.ReportQuestionaire.Answer2" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
+                                        <option value="">--- SELECT---</option>
+                                    </select>
+                                    <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer2" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <span class="input-group-label"> Name of neighbour met ?</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="Location.ClaimReport.ReportQuestionaire.Answer3"><i class="fas fa-user-check"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input id="ContractNumber" required name="question3" id="question3" asp-for="Location.ClaimReport.ReportQuestionaire.Answer3" class="form-control" type="text" placeholder="Neighbour name" maxlength="20" />
+                                    <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer3" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <span class="input-group-label"> Date met with neighbour ?:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="Location.ClaimReport.ReportQuestionaire.Answer4"><i class="nav-icon far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    @{
+                                        var maxDate = @DateTime.Now.ToString("dd-MM-yyyy");
+                                    }
+                                    <input required asp-for="Location.ClaimReport.ReportQuestionaire.Answer4" name="question4" id="question4" class="form-control date-width" min="2000-01-01" max="@maxDate" type="date" />
+                                    <span asp-validation-for="Location.ClaimReport.ReportQuestionaire.Answer4" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <span class="input-group-label"> Remarks :</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input required name="remarks" id="remarks" asp-for="Location.ClaimReport.AgentRemarks" class="form-control" type="text" placeholder="Remarks" maxlength="100" />
+                                    <span asp-validation-for="Location.ClaimReport.AgentRemarks" class="text-danger"></span>
+                                </div>
+                            </div>
+
                                     <ul class="ml-4 mb-0 fa-ul text-muted">
-                                        <li class="form-group">
-                                            Ownership of residence ?
-                                            <input maxlength="100" name="question1" id="question1" asp-for="Location.ClaimReport.ReportQuestionaire.Answer1" type="text" class="form-control" placeholder="Ownership of residence..." />
-                                        </li>
-                                        <li class="form-group">
-                                            Perceived financial status ?
-                                            <input maxlength="100" name="question2" id="question2" asp-for="Location.ClaimReport.ReportQuestionaire.Answer2" type="text" class="form-control" placeholder="Perceived financial status..." />
-                                        </li>
-                                        <li class="form-group">
-                                            Name of neighbour met ?
-                                            <input maxlength="100" name="question3" id="question3" asp-for="Location.ClaimReport.ReportQuestionaire.Answer3" type="text" class="form-control" placeholder="Name of neighbour met..." />
-                                        </li>
-                                        <li class="form-group">
-                                            Date when met with neighbour ?
-                                            <input maxlength="100" name="question4" id="question4" asp-for="Location.ClaimReport.ReportQuestionaire.Answer4" type="text" class="form-control" placeholder="Date when met with neighbour..." />
-                                        </li>
-                                        <li class="form-group">
-                                            Remarks
-                                            <input maxlength="100" name="remarks" id="remarks" asp-for="Location.ClaimReport.AgentRemarks" type="text" class="form-control" placeholder="Enter remarks..." />
-                                        </li>
+                                       
                                         <li class="form-group">
                                             <input type="checkbox" id="terms_and_conditions" value="1" />
                                             <label class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>

@@ -14,12 +14,12 @@
                             <a href="#" id="list-type" style="display:none;" class="input-group-label"> <i class="fas fa-server"></i> List</a>
                         </h3>
                     </div>
-                    <div class="card-body">
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                        </div>
-                        <form id="checkboxes" asp-action="GetInvestigate" method="get" enctype="multipart/form-data">
-                            <div class="col-md-12">
+                    <form id="checkboxes" asp-action="GetInvestigate" method="get" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
+                            <div class="table-responsive mailbox-messages">
                                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
                                         <tr>
@@ -42,30 +42,35 @@
                                             </th>
                                         </tr>
                                     </thead>
-                                    
+
 
                                 </table>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                                            <span class="badge badge-light"> <i class="fa fa-binoculars" aria-hidden="true"></i> </span>
-                                            @Applicationsettings.SELECT_CASE_INVESTIGATE
-                                        </button>
-                                    </div>
+
+                            </div>
+                            <div id="maps" class="col-md-12">
+                                <div id="map"></div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                                        <span class="badge badge-light"> <i class="fa fa-binoculars" aria-hidden="true"></i> </span>
+                                        @Applicationsettings.SELECT_CASE_INVESTIGATE
+                                    </button>
                                 </div>
                             </div>
-                        </form>
-                        <div id="maps" class="col-md-12">
-                            <div id="map"></div>
                         </div>
-                    </div>
+                    </form>
+
+
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-@section Scripts    {
+@section Scripts {
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="~/js/all.js"></script>
     <script src="~/js/map-list.js">

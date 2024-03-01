@@ -13,12 +13,12 @@
                             <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
                         </h3>
                     </div>
-                    <div class="card-body">
+                    <form id="radioButtons" asp-action="SelectVendorAgent" method="get" enctype="multipart/form-data">
+                        <div class="card-body">
                         <div class="submit-progress hidden">
                             <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                         </div>
-                        <form id="radioButtons" asp-action="SelectVendorAgent" method="get" enctype="multipart/form-data">
-                            <div class="col-md-12">
+                            <div class="table-responsive mailbox-messages">
                                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                         <thead>
                                             <tr>
@@ -43,23 +43,29 @@
                                             </tr>
                                         </thead>
                                     </table>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-
-                                                <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                                            <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>
-                                                        Allocate
-                                                </button>
-                                        </div>
-                                    </div>
+                                    
                             </div>
-                        </form>
                         <div id="maps" class="col-md-12">
                             <div id="map"></div>
                             
                         </div>
                     </div>
+                    <div class="card-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+                                    <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                                        <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>
+                                        Allocate
+                                    </button>
+                                </div>
+                            </div>
+                    </div>
+                    </form>
+
+
+
                 </div>
             </div>
         </div>

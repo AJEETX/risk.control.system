@@ -169,4 +169,11 @@ namespace risk.control.system.Models
         [Display(Name = "Non-HNI")]
         NONHNI,
     }
+    public enum DwellType
+    {
+        MORTGAGED,
+        OWNED,
+        RENTED,
+        SHARED
+    }
 }

@@ -3,10 +3,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using Microsoft.OpenApi.Extensions;
 
 using NToastNotify;
 
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -78,7 +80,6 @@ namespace risk.control.system.Controllers
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId)
@@ -99,6 +100,17 @@ namespace risk.control.system.Controllers
 
             //END : POST FACE IMAGE AND DOCUMENT
 
+            if (!string.IsNullOrWhiteSpace(question1))
+            {
+                DwellType question1Enum = (DwellType)Enum.Parse(typeof(DwellType), question1, true);
+                question1 = question1Enum.GetEnumDisplayName();
+            }
+
+            if (!string.IsNullOrWhiteSpace(question2))
+            {
+                Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
+                question2 = question2Enum.GetEnumDisplayName();
+            }
             var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks, question1, question2, question3, question4);
 
             await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
@@ -133,11 +145,11 @@ namespace risk.control.system.Controllers
                 if (success != null)
                 {
                     await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-            notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
+                    notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report submitted to Company", 3, "green", "far fa-file-powerpoint");
                 }
                 else
                 {
-            notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
+                    notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
                 }
                 return RedirectToAction(nameof(ClaimsVendorController.ClaimReport), "ClaimsVendor");
             }
@@ -170,11 +182,11 @@ namespace risk.control.system.Controllers
             if (success != null)
             {
                 await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-            notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "green", "far fa-file-powerpoint");
+                notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "green", "far fa-file-powerpoint");
             }
             else
             {
-            notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
+                notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
             }
             return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
