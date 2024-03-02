@@ -18,7 +18,7 @@
 }
 <article>
     <div class="bb-blog-inner">
-        <div class="card card-light">
+        <div class="card card-light border-secondary">
 
             <div class="card-header">
                 <h3 class="card-title"><i class="fas fa-user-shield"></i> Report: <span class="badge badge-light"> @Model.Location.ClaimReport.AgentEmail </span> </h3>
@@ -44,6 +44,7 @@
                 <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
             </div>
             <div class="card-body pb-0">
+
                 <div class="row">
                     <partial name="_DigitalIdReport" model="@Model" />
                     <partial name="_DocumentIdReport" model="@Model" />

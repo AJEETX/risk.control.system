@@ -15,7 +15,7 @@
                     <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
                     <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
                     <input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
-                    <div id="article" class="card border-secondary  card-secondary">
+                    <div id="article" class="card border-secondary card-secondary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-newspaper"></i> Report</h3>
                         </div>
@@ -33,7 +33,7 @@
                         </div>
                     </div>
                    
-                    <div class="card card-secondary">
+                    <div class="card border-secondary card-secondary">
                         
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-user-check"></i> Assessor Remarks</h3>
@@ -42,15 +42,15 @@
                             <div class="submit-progress hidden">
                                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                             </div>
-                            <div class="=row">
+                            <div class="row">
                                 <div class="col-md-12">
                                     <input maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control" required />
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-footer">
                             
-                            <div class="=row">
+                            <div class="row">
                                 <div class="col-md-12 float-right">
                                     <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
                                         <i class="fas fa-arrow-left" aria-hidden="true"></i> Back 
