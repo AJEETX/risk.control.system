@@ -274,7 +274,7 @@
 
                 <div class="card card-light">
                     <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-print nav-icon"></i> Agency Report: <span class="badge badge-light">@Model.Location.Vendor.Email</span> </h3>
+                        <h3 class="card-title"><i class="fas fa-print nav-icon"></i> Agency: <span class="badge badge-light">@Model.Location.Vendor.Email</span> </h3>
                         <div class="card-tools">
                             <span data-toggle="tooltip" title="Agent report # : @Model.Location.ClaimReport.AgentEmail" class="badge badge-light"><i class="fas fa-user-shield"></i></span>
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -315,9 +315,8 @@
                                                     digital-id
                                                 </div>
                                                 
-                                                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
                                             </div>
-                                            <div class="card-body pt-0">
+                                            <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-6">
                                                         <p class="text-muted text-sm">
@@ -407,9 +406,8 @@
                                                     document-id
                                                 </div>
 
-                                                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
                                             </div>
-                                            <div class="card-body pt-0">
+                                            <div class="card-body">
                                                 <div class="row">
                                                     <div class="col-6">
                                                         <p class="text-muted text-sm">
@@ -474,7 +472,6 @@
 
                             @if (!string.IsNullOrWhiteSpace(Model.Location.ClaimReport?.AgentRemarks))
                             {
-
                                 var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
                                 <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
@@ -490,8 +487,6 @@
                                             <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
                                                 questionaaire
                                             </div>
-
-                                            <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
                                         </div>
                                         <div class="card-body">
 
@@ -609,8 +604,6 @@
                                         <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
                                             supervisor
                                         </div>
-                                        <i class="far fa-bookmark bookmark-green"></i>
-
                                     </div>
                                     <div class="card-body pt-0">
                                         <div class="row">
@@ -652,7 +645,6 @@
                                 <div class="progress-bar" role="progressbar" style="width:100%;background-color:darkgreen">
                                     assessor
                                 </div>
-                                <i class="far fa-bookmark bookmark-green"></i>
 
                             </div>
                             <div class="card-body pt-0">
