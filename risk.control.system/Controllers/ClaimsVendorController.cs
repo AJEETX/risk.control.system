@@ -81,7 +81,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb("Allocate")]
+        [Breadcrumb("Agents", FromAction = "Allocate")]
         public async Task<IActionResult> SelectVendorAgent(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
@@ -145,15 +145,18 @@ namespace risk.control.system.Controllers
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var activePage = new MvcBreadcrumbNode("Open", "ClaimsVendor", "Claims");
-            var newPage = new MvcBreadcrumbNode("Index", "ClaimsVendor", "Allocate") { Parent = activePage };
-            ViewData["BreadcrumbNode"] = newPage;
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             if (userRole.Value.Contains(AppRoles.Agent.ToString()))
             {
-                return View("Agent");
+                return RedirectToAction("Agent");
             }
+            return RedirectToAction("Allocate");
+        }
+
+        [Breadcrumb(" Allocate")]
+        public ActionResult Allocate()
+        {
             return View();
         }
 
@@ -320,7 +323,7 @@ namespace risk.control.system.Controllers
             return View(invoice);
         }
 
-        [Breadcrumb("Agent Report", FromAction = "Agent")]
+        [Breadcrumb("Submit", FromAction = "Agent")]
         public async Task<IActionResult> GetInvestigate(string selectedcase, bool uploaded = false)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))
@@ -366,7 +369,7 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb("Agent Report")]
+        [Breadcrumb("Submit", FromAction= "ClaimReport")]
         public async Task<IActionResult> GetInvestigateReport(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))

@@ -10,7 +10,7 @@ namespace risk.control.system.Models
         public string CustomerDetailId { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
-        [Display(Name = "Customer name")]
+        [Display(Name = "Name")]
         public string CustomerName { get; set; }
 
         [Required]
@@ -21,7 +21,7 @@ namespace risk.control.system.Models
         public Gender? Gender { get; set; }
 
         [Required]
-        [Display(Name = "Customer contact number")]
+        [Display(Name = "Contact number")]
         [DataType(DataType.PhoneNumber)]
         public long ContactNumber { get; set; }
 
@@ -29,22 +29,22 @@ namespace risk.control.system.Models
         [Display(Name = "Address line")]
         public string Addressline { get; set; }
 
-        [Display(Name = "PinCode name")]
+        [Display(Name = "PinCode")]
         public long? PinCodeId { get; set; } = default!;
 
-        [Display(Name = "PinCode name")]
+        [Display(Name = "PinCode")]
         public PinCode? PinCode { get; set; } = default!;
 
-        [Display(Name = "State name")]
+        [Display(Name = "State")]
         public long? StateId { get; set; } = default!;
 
-        [Display(Name = "State name")]
+        [Display(Name = "State")]
         public State? State { get; set; } = default!;
 
-        [Display(Name = "Country name")]
+        [Display(Name = "Country")]
         public long? CountryId { get; set; } = default!;
 
-        [Display(Name = "Country name")]
+        [Display(Name = "Country")]
         public Country? Country { get; set; } = default!;
 
         [Display(Name = "District")]
@@ -58,15 +58,15 @@ namespace risk.control.system.Models
         public CustomerType? CustomerType { get; set; }
 
         [Required]
-        [Display(Name = "Customer income")]
+        [Display(Name = "Income")]
         public Income? CustomerIncome { get; set; }
 
         [Required]
-        [Display(Name = "Customer occupation")]
+        [Display(Name = "Occupation")]
         public Occupation? CustomerOccupation { get; set; }
 
         [Required]
-        [Display(Name = "Customer education")]
+        [Display(Name = "Education")]
         public Education? CustomerEducation { get; set; }
 
         [FileExtensions(Extensions = "jpg,jpeg,png")]

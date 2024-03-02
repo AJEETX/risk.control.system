@@ -10,7 +10,6 @@ var showOcrMap = false;
 const image =
     "/images/beachflag.png";
 $(document).ready(function () {
-
     $('#password').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
@@ -44,7 +43,6 @@ $(document).ready(function () {
             nodes[i].disabled = true;
         }
     });
-
 
     $('#back').on('click', function () {
         $("body").addClass("submit-progress-bg");
@@ -80,7 +78,6 @@ $(document).ready(function () {
     });
 
     $('.nav-item a.actual-link').on('click', function (e) {
-
         if (!window.matchMedia("(max-width: 767px)").matches) {
             $("body").addClass("submit-progress-bg");
             // Wrap in setTimeout so the UI
@@ -516,10 +513,10 @@ $(document).ready(function () {
             title: "Policy details",
             closeIcon: true,
             columnClass: 'medium',
-            type: 'green',
+            type: 'blue',
             buttons: {
                 confirm: {
-                    text: "Ok",
+                    text: "Close",
                     btnClass: 'btn-secondary',
                     action: function () {
                         askConfirmation = false;
@@ -546,27 +543,27 @@ $(document).ready(function () {
                         self.setContentAppend('<div class="row">');
                         self.setContentAppend('<b> Claim Type: </b>' + response.claimType);
                         self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b> Insured Amount</b>: <i class="fas fa-rupee-sign"></i> ' + response.sumAssuredValue);
+                        self.setContentAppend('<b><i class="fas fa-rupee-sign"></i> Insured Amount</b>:  ' + response.sumAssuredValue);
                         self.setContentAppend('</p');
                         self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b> Policy Issue Date</b>: <i class="far fa-clock"></i> ' + response.contractIssueDate);
+                        self.setContentAppend('<b><i class="far fa-clock"></i> Policy Issue Date</b>:  ' + response.contractIssueDate);
                         self.setContentAppend('</p');
                         self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b> Incident Date</b>: <i class="far fa-clock"></i> ' + response.dateOfIncident);
+                        self.setContentAppend('<b><i class="fas fa-clock"></i>  Incident Date</b>: ' + response.dateOfIncident);
                         self.setContentAppend('</p');
                         self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b> Service Type</b>: <i class="	fas fa-tools"></i> ' + response.investigationServiceType);
+                        self.setContentAppend('<b><i class="fas fa-tools"></i> Service Type</b>:  ' + response.investigationServiceType);
                         self.setContentAppend('</p');
                         self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b> Reason to verify</b>: <i class="fas fa-bolt"></i> ' + response.caseEnabler);
+                        self.setContentAppend('<b> <i class="fas fa-bolt"></i> Reason to verify</b>: ' + response.caseEnabler);
                         self.setContentAppend('</p');
                         self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b> Cause of Incidence</b>: <i class="far fa-check-circle"></i> ' + response.causeOfLoss);
+                        self.setContentAppend('<b><i class="far fa-check-circle"></i> Cause of Incidence</b>:  ' + response.causeOfLoss);
                         self.setContentAppend('</p');
                         self.setContentAppend('<br><p class="fa-li">');
-                        self.setContentAppend('<b> Budget Centre</b>: <i class="far fa-check-circle"></i> ' + response.costCentre);
+                        self.setContentAppend('<b><i class="fas fa-money-check-alt"></i> Budget Centre</b>:  ' + response.costCentre);
                         self.setContentAppend('</p');
-                        self.setContentAppend('<br><b> Policy Doc</b>:');
+                        self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Policy Document</b>:');
                         self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.document + '" /> ');
                         self.setContentAppend('</p');
                         self.setContentAppend('</div>');
@@ -589,10 +586,10 @@ $(document).ready(function () {
             icon: 'fa fa-user-plus',
             closeIcon: true,
             columnClass: 'medium',
-            type: 'green',
+            type: 'orange',
             buttons: {
                 confirm: {
-                    text: "Ok",
+                    text: "Close",
                     btnClass: 'btn-secondary',
                     action: function () {
                         askConfirmation = false;
@@ -608,14 +605,15 @@ $(document).ready(function () {
                 }).done(function (response) {
                     self.setContent('<hr>');
                     self.setContentAppend('<header>');
-                    self.setContentAppend('<b>Customer Name</b>: ' + response.customerName);
+                    self.setContentAppend('<b><i class="fa fa-user-plus"></i>Customer Name</b>: ' + response.customerName);
                     self.setContentAppend('</header>');
-                    self.setContentAppend('<br><b>Date of birth</b> : ' + response.dateOfBirth);
-                    self.setContentAppend('<br><b>Occupation</b> : ' + response.occupation);
-                    self.setContentAppend('<br><b>Income</b> : ' + response.income);
-                    self.setContentAppend('<br><b>Education</b> : ' + response.education);
-                    self.setContentAppend('<br><b>Address</b> : ' + response.address);
-                    self.setContentAppend('<br><b>Phone</b> : ' + response.contactNumber);
+                    self.setContentAppend('<br><b><i class="far fa-clock"></i> Date of birth</b> : ' + response.dateOfBirth);
+                    self.setContentAppend('<br><b><i class="fas fa-tools"></i> Occupation</b> : ' + response.occupation);
+                    self.setContentAppend('<br><b><i class="fas fa-rupee-sign"></i> Income</b> : ' + response.income);
+                    self.setContentAppend('<br><b><i class="fas fa-user-graduate"></i> Education</b> : ' + response.education);
+                    self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b> : ' + response.address);
+                    self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b> : ' + response.contactNumber);
+                    self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Customer Image</b>:');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.customer + '" />');
                     self.setTitle('Customer detail');
                 }).fail(function () {
@@ -635,7 +633,7 @@ $(document).ready(function () {
             type: 'green',
             buttons: {
                 confirm: {
-                    text: "Ok",
+                    text: "Close",
                     btnClass: 'btn-secondary',
                     action: function () {
                         askConfirmation = false;
@@ -651,12 +649,13 @@ $(document).ready(function () {
                 }).done(function (response) {
                     self.setContent('<header>');
                     self.setContentAppend('<hr>');
-                    self.setContentAppend('<b>Beneficiary Name</b>: ' + response.beneficiaryName);
+                    self.setContentAppend('<b><i class="fas fa-user-tie"></i> Beneficiary Name</b>: ' + response.beneficiaryName);
                     self.setContentAppend('</header>');
-                    self.setContentAppend('<br><b>Relation</b> : ' + response.beneficiaryRelation);
-                    self.setContentAppend('<br><b>Phone</b>: ' + response.contactNumber);
-                    self.setContentAppend('<br><b>Income</b>: ' + response.income);
-                    self.setContentAppend('<br><b>Address</b>: ' + response.address);
+                    self.setContentAppend('<br><b><i class="fas fa-user-tag"></i>  Relation</b> : ' + response.beneficiaryRelation);
+                    self.setContentAppend('<br><b><i class="fas fa-lg fa-phone"></i> Phone</b>: ' + response.contactNumber);
+                    self.setContentAppend('<br><b><i class="fas fa-rupee-sign"></i> Income</b>: ' + response.income);
+                    self.setContentAppend('<br><b><i class="fas fa-home"></i> Address</b>: ' + response.address);
+                    self.setContentAppend('<br><b><i class="far fa-id-badge"></i> Beneficiary Image</b>:');
                     self.setContentAppend('<br><img id="agentLocationPicture" class="img-fluid investigation-actual-image" src="' + response.beneficiary + '" /> ');
                 }).fail(function () {
                     self.setContent('Something went wrong.');

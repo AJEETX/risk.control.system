@@ -100,7 +100,7 @@
         public const string SUBMIT_CASE_INVESTIGATE = "Submit";
         public const string SUBMIT_CASE_TO_COMPANY = "Submit to company";
         public const string SELECT_CASE_TO_ASSIGN_TO_AGENT = "Assign to agent";
-        public const string AGENTS = "Agents list";
+        public const string AGENTS = "Agents";
         public const string SELECT_CASE_TO_START = "Select Claim case to Verify";
         public const string AVAILABLE_VENDORS = "Available Agency";
         public const string DEPANEL_VENDORS = "Go to Depanel Agency";
