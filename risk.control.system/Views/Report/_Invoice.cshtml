@@ -1,6 +1,6 @@
 ﻿@model ClaimTransactionModel
-<div class="row">
-    <div class="col-12 d-flex align-items-stretch flex-column">
+<article>
+    <div class="bb-blog-inner">
         <div class="card bg-light d-flex flex-fill">
             <div class="card-header text-muted border-bottom-0">
                 <i class="fas fa-money-check-alt"></i> Billing Info<span style="float:right;"><i class="nav-icon fas fa-clock"></i> @Model.Location.ClaimReport?.AssessorRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt")</span>
@@ -58,4 +58,4 @@
             </div>
         </div>
     </div>
-</div>
+</article>

@@ -1,4 +1,6 @@
 ﻿@model ClaimTransactionModel
+<article>
+    <div class="bb-blog-inner">
 <div class="card card-light expand-card">
     <div class="card-header">
         <h3 class="card-title">Timeline : <span class="badge badge-light"><i class="fas fa-clock"></i>  @Model.TimeTaken</span></h3>
@@ -9,14 +11,7 @@
             </button>
         </div>
     </div>
-    <div class="progress">
-        <i class="far fa-bookmark bookmark-green"></i>
-        <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
-            timeline
-        </div>
-        <i class="far fa-bookmark bookmark-green"></i>
-
-    </div>
+    
     <div class="card-body pb-0">
         <div class="row">
             <div class="col-12 d-flex align-items-stretch flex-column">
@@ -48,3 +43,5 @@
         </div>
     </div>
 </div>
+    </div> <!-- class bb-blog-inner -->
+</article>

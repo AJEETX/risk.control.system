@@ -3,7 +3,11 @@
 @{
     var questionTime = @Model.Location.ClaimReport.AgentRemarksUpdated != null ? @Model.Location.ClaimReport.AgentRemarksUpdated.Value.ToString("dd-MMM-yy hh:mm tt") : null;
        
-
+    string questionaire = "grey";
+    if (Model.Location.ClaimReport.AgentRemarks != null)
+    {
+        questionaire = "green";
+    }
         <div class="col-12 col-sm-4 d-flex align-items-stretch flex-column">
             <div class="card bg-light d-flex flex-fill">
                 <div class="card-header text-muted border-bottom-0">
@@ -12,7 +16,13 @@
                 <div class="card-footer text-muted border-bottom-0">
                     <i class="fas fa-user-shield"></i>  Agent :<span class="badge badge-light">  @Model.Location.ClaimReport.AgentEmail </span>
                 </div>
-
+            <div class="progress">
+                <i class="far fa-bookmark bookmark-green"></i>
+                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@questionaire;">
+                    questionaire
+                </div>
+                <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
+            </div>
                  <form id="create-form" asp-controller="ClaimsVendorPost" asp-action="SubmitReport" method="post">
                     <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
                     <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
