@@ -96,23 +96,6 @@ $(document).ready(function () {
             nodes[i].disabled = true;
         }
     })
-    function getdetails() {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-
-        $('html *').css('cursor', 'not-allowed');
-        $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a *, html button *').css('pointer-events', 'none')
-
-        var nodes = document.getElementById("body").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
-        }
-    }
 
     $('#datatable thead th').css('background-color', '#e9ecef')
     var datatable = $('#datatable').dataTable({
@@ -867,19 +850,19 @@ async function initPopMap(_position, title) {
 function loadState(obj, showDefaultOption = true) {
     var value = obj.value;
     $.get("/api/MasterData/GetStatesByCountryId", { countryId: value }, function (data) {
-        PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", showDefaultOption);
+        PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", showDefaultOption);
     });
 }
 function loadDistrict(obj, showDefaultOption = true) {
     var value = obj.value;
     $.get("/api/MasterData/GetDistrictByStateId", { stateId: value }, function (data) {
-        PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option>--- SELECT ---</option>", "<option>--- SELECT ---</option>", showDefaultOption);
+        PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", showDefaultOption);
     });
 }
 function loadPinCode(obj, showDefaultOption = true) {
     var value = obj.value;
     $.get("/api/MasterData/GetPinCodesByDistrictId", { districtId: value }, function (data) {
-        PopulatePinCodeDropDown("#PinCodeId", data, "<option>--- SELECT ---</option>", showDefaultOption);
+        PopulatePinCodeDropDown("#PinCodeId", data, "<option value=''>--- SELECT ---</option>", showDefaultOption);
     });
 }
 
