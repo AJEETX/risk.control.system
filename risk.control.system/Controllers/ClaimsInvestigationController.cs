@@ -360,8 +360,28 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
-        [Breadcrumb(title: " Detail", FromAction = "Active")]
+        [Breadcrumb(title: " Detail", FromAction = "Assigner")]
         public async Task<IActionResult> Detail(string id)
+        {
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            if (id == null)
+            {
+                toastNotification.AddAlertToastMessage("NOT FOUND !!!..");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var model = await claimPolicyService.GetClaimDetail(id);
+
+            return View(model);
+        }
+
+        [Breadcrumb(title: " Detail", FromAction = "Active")]
+        public async Task<IActionResult> ActiveDetail(string id)
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(currentUserEmail))
