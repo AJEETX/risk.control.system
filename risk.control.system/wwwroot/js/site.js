@@ -849,21 +849,49 @@ async function initPopMap(_position, title) {
 
 function loadState(obj, showDefaultOption = true) {
     var value = obj.value;
-    $.get("/api/MasterData/GetStatesByCountryId", { countryId: value }, function (data) {
-        PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", showDefaultOption);
-    });
+    if (value == '') {
+        $("#StateId").empty();
+        $("#DistrictId").empty();
+        $("#PinCodeId").empty();
+
+        $("#StateId").append("<option value=''>--- SELECT ---</option>");
+        $("#DistrictId").append("<option value=''>--- SELECT ---</option>");
+        $("#PinCodeId").append("<option value=''>--- SELECT ---</option>");
+    }
+    else {
+        $.get("/api/MasterData/GetStatesByCountryId", { countryId: value }, function (data) {
+            PopulateStateDropDown("#PinCodeId", "#DistrictId", "#StateId", data, "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", showDefaultOption);
+        });
+    }
+    
 }
 function loadDistrict(obj, showDefaultOption = true) {
     var value = obj.value;
-    $.get("/api/MasterData/GetDistrictByStateId", { stateId: value }, function (data) {
-        PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", showDefaultOption);
-    });
+    if (value == '') {
+        $("#DistrictId").empty();
+        $("#PinCodeId").empty();
+
+        $("#DistrictId").append("<option value=''>--- SELECT ---</option>");
+        $("#PinCodeId").append("<option value=''>--- SELECT ---</option>");
+    }
+    else {
+        $.get("/api/MasterData/GetDistrictByStateId", { stateId: value }, function (data) {
+            PopulateDistrictDropDown("#PinCodeId", "#DistrictId", data, "<option value=''>--- SELECT ---</option>", "<option value=''>--- SELECT ---</option>", showDefaultOption);
+        });
+    }
 }
 function loadPinCode(obj, showDefaultOption = true) {
     var value = obj.value;
-    $.get("/api/MasterData/GetPinCodesByDistrictId", { districtId: value }, function (data) {
-        PopulatePinCodeDropDown("#PinCodeId", data, "<option value=''>--- SELECT ---</option>", showDefaultOption);
-    });
+    if (value == '') {
+        $("#PinCodeId").empty();
+
+        $("#PinCodeId").append("<option value=''>--- SELECT ---</option>");
+    }
+    else {
+        $.get("/api/MasterData/GetPinCodesByDistrictId", { districtId: value }, function (data) {
+            PopulatePinCodeDropDown("#PinCodeId", data, "<option value=''>--- SELECT ---</option>", showDefaultOption);
+        });
+    }
 }
 
 function enableSubmitButton(obj, showDefaultOption = true) {
