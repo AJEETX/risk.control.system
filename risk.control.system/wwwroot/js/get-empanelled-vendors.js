@@ -1,6 +1,6 @@
 ﻿$(function () {
 
-    $('.btn.btn-info').on('click', function () {
+    $('#empanelled.btn.btn-info').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI
         // can update the spinners

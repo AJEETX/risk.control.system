@@ -27,10 +27,12 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('body').attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin'></i> Upload photo");
+        $(this).html("<i class='fas fa-sync fa-spin'></i> Uploading");
 
         $('#upload-face').submit();
         $('html *').css('cursor', 'not-allowed');
+        $('#back').attr('disabled', 'disabled');
+
         $('html a *, html button *').css('pointer-events', 'none');
 
         var nodes = document.getElementById("article").getElementsByTagName('*');
@@ -53,9 +55,11 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $(this).attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin'></i> Upload PAN");
+        $(this).html("<i class='fas fa-sync fa-spin'></i> Uploading");
 
         $('#upload-pan').submit();
+        $('#back').attr('disabled', 'disabled');
+
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').css('pointer-events', 'none')
 
