@@ -14,7 +14,7 @@
         borderColor = "";
 
     }
-    else if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @documentIdColor == "green")
+    else if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false && @documentIdColor == "green")
     {
         borderColor = "border-danger";
     }
