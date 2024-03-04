@@ -7,24 +7,23 @@
         @Model.Location?.ClaimReport?.DigitalIdReport?.DigitalIdImageLocationUrl != null)
     {
         string digitalIdColor = "grey";
-        if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+        var borderColor = "";
+        if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
         {
+            digitalIdColor = "grey";
+            borderColor = "";
+        }
+        else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+        {
+            digitalIdColor = "orange";
+            borderColor = "border-danger";
+        }
+        else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+        {
+            borderColor = "border-success";
             digitalIdColor = "green";
         }
 
-        var borderColor = "";
-        if (@digitalIdColor == "grey")
-        {
-            borderColor = "";
-        }
-        else if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @digitalIdColor == "green")
-        {
-            borderColor = "border-danger";
-        }
-        else
-        {
-            borderColor = "border-success";
-        }
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
             <div class="card bg-light d-flex flex-fill @borderColor">
                 <div class="card-header text-muted border-bottom-0">
@@ -46,7 +45,7 @@
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
-                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:green">
+                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor">
                         digital-id
                     </div>
                 </div>

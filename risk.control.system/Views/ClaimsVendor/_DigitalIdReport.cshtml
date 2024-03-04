@@ -3,25 +3,23 @@
 @{
     var imageCapturedTime = @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null ? @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
     string digitalIdColor = "grey";
-    if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
-    {
-        digitalIdColor = "green";
-    }
-
     var borderColor = "";
-    if (@digitalIdColor == "grey")
+    if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
     {
+        digitalIdColor = "grey";
         borderColor = "";
-
     }
-    else if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @digitalIdColor == "green")
+    else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
     {
+        digitalIdColor = "orange";
         borderColor = "border-danger";
     }
-    else
+    else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
     {
         borderColor = "border-success";
+        digitalIdColor = "green";
     }
+    
 
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
         <div class="card bg-light d-flex flex-fill @borderColor">
@@ -39,11 +37,11 @@
 
             <div class="card-footer text-center">
                 <span class="badge badge-light"><i class="fas fa-portrait"></i> Match :  </span>
-                @if (@digitalIdColor == "grey")
+                @if (@Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
                 {
                     <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
                 }
-                else if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @digitalIdColor == "green")
+                else if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                 {
                     <i style='color:orangered;' class='fa fa-times' aria-hidden='true'></i>
                 }

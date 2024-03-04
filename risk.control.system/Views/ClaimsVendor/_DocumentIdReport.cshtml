@@ -4,24 +4,21 @@
     var imageCapturedTime = @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null ? @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime.Value.ToString("dd-MMM-yy hh:mm tt") : null;
 
     string documentIdColor = "grey";
-    if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null)
+    var borderColor = "";
+    if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat == null)
+    {
+
+    }
+    else if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
+    Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid != null && Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid == true))
     {
         documentIdColor = "green";
-    }
-
-    var borderColor = "";
-    if (@documentIdColor == "grey")
-    {
-        borderColor = "";
-
-    }
-    else if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false && @documentIdColor == "green")
-    {
-        borderColor = "border-danger";
+        borderColor = "border-success";
     }
     else
     {
-        borderColor = "border-success";
+        documentIdColor = "orange";
+        borderColor = "border-danger";
     }
 
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -41,7 +38,7 @@
                 {
                     <i style='color:grey;' class='fa fa-times' aria-hidden='true'></i>
                 }
-                else if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false && @documentIdColor == "green")
+                else if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false)
                 {
                     <i style='color:green;' class='fas fa-check-circle'></i>
                 }

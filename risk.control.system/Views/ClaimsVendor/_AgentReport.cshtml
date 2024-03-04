@@ -21,46 +21,23 @@
                 <div class="row">
                     @{
                         string digitalIdColor = "grey";
-                        if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null)
+                        var borderColor = "";
+                        if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime == null)
                         {
+                            digitalIdColor = "grey";
+                            borderColor = "";
+                        }
+                        else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                        {
+                            digitalIdColor = "orange";
+                            borderColor = "border-danger";
+                        }
+                        else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
+                        {
+                            borderColor = "border-success";
                             digitalIdColor = "green";
                         }
 
-                        var borderColor = "";
-                        if (@digitalIdColor == "grey")
-                        {
-                            borderColor = "";
-
-                        }
-                        else if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @digitalIdColor == "green")
-                        {
-                            borderColor = "border-danger";
-                        }
-                        else
-                        {
-                            borderColor = "border-success";
-                        }
-
-                        string documentIdColor = "grey";
-                        if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null)
-                        {
-                            documentIdColor = "green";
-                        }
-
-                        var documentIdBorderColor = "";
-                        if (@documentIdColor == "grey")
-                        {
-                            documentIdBorderColor = "";
-
-                        }
-                        else if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @documentIdColor == "green")
-                        {
-                            documentIdBorderColor = "border-danger";
-                        }
-                        else
-                        {
-                            documentIdBorderColor = "border-success";
-                        }
                         if (@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageData != null && @Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageLongLatTime != null)
                         {
                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -86,7 +63,7 @@
                                     </div>
                                     <div class="progress">
                                         <i class="far fa-bookmark bookmark-green"></i>
-                                        <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                        <div class="progress-bar" role="progressbar" style="width:100%;background-color:@digitalIdColor;">
                                             digital-id
                                         </div>
                                     </div>
@@ -156,7 +133,23 @@
                         @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null &&
                         @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
                         {
+                            string documentIdColor = "grey";
+                            var documentIdBorderColor = "";
+                            if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat == null)
+                            {
 
+                            }
+                            else if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
+                            Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid != null && Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid == true))
+                            {
+                                documentIdColor = "green";
+                                documentIdBorderColor = "border-success";
+                            }
+                            else
+                            {
+                                documentIdColor = "orange";
+                                documentIdBorderColor = "border-danger";
+                            }
                             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
                                 <div class="card bg-light d-flex flex-fill @documentIdBorderColor">
                                     <div class="card-header text-muted border-bottom-0">
@@ -176,7 +169,7 @@
                                     </div>
                                     <div class="progress">
                                         <i class="far fa-bookmark bookmark-green"></i>
-                                        <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
+                                        <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor;">
                                             document-id
                                         </div>
                                     </div>

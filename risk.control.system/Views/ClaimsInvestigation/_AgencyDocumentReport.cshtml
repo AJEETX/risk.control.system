@@ -7,25 +7,23 @@
                        @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLocationUrl != null)
     {
         string documentIdColor = "grey";
-        if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null)
+        var borderColor = "";
+        if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat == null)
+        {
+            
+        }
+        else if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null && (
+            Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid != null && Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid == true))
         {
             documentIdColor = "green";
-        }
-
-        var borderColor = "";
-        if (@documentIdColor == "grey")
-        {
-            borderColor = "";
-
-        }
-        else if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageValid.Value ?? false && @documentIdColor == "green")
-        {
-            borderColor = "border-danger";
-        }
-        else
-        {
             borderColor = "border-success";
         }
+        else 
+        {
+            documentIdColor = "orange";
+            borderColor = "border-danger";
+        }
+        
         <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
             <div class="card bg-light d-flex flex-fill @borderColor">
                 <div class="card-header text-muted border-bottom-0">
@@ -51,8 +49,8 @@
                 </div>
                 <div class="progress">
                     <i class="far fa-bookmark bookmark-green"></i>
-                    
-                    <div class="progress-bar" role="progressbar" style="width:32100%;background-color:green">
+
+                    <div class="progress-bar" role="progressbar" style="width:100%;background-color:@documentIdColor">
                         document-id
                     </div>
                 </div>
