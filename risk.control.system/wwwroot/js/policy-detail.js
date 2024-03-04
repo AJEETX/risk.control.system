@@ -87,7 +87,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#assign-list').attr('disabled', 'disabled');
-        $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Back");
+        $('#assign-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
@@ -103,7 +103,7 @@ $(document).ready(function () {
             $(".submit-progress").removeClass("hidden");
         }, 1);
         $('#active-list').attr('disabled', 'disabled');
-        $('#active-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Back");
+        $('#active-list').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Active");
 
         var nodes = document.getElementById("body").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {

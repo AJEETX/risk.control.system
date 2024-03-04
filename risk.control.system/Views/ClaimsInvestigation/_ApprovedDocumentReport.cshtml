@@ -2,8 +2,28 @@
 
 @if (@Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageData != null && @Model.Location.ClaimReport?.DocumentIdReport?.DocumentIdImageLongLatTime != null)
 {
+    string documentIdColor = "grey";
+    if (Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageLongLat != null)
+    {
+        documentIdColor = "green";
+    }
+
+    var borderColor = "";
+    if (@documentIdColor == "grey")
+    {
+        borderColor = "";
+
+    }
+    else if (string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence) && @documentIdColor == "green")
+    {
+        borderColor = "border-danger";
+    }
+    else
+    {
+        borderColor = "border-success";
+    }
     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
-        <div class="card bg-light d-flex flex-fill">
+        <div class="card bg-light d-flex flex-fill @borderColor">
             <div class="card-header text-muted border-bottom-0">
 
                 <i class="fas fa-mobile-alt"></i> Document <span class="badge badge-light">checkify </span>
