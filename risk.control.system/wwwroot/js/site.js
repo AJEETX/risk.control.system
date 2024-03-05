@@ -918,11 +918,17 @@ let investigationServiceObj;
 
 function loadInvestigationServices(obj) {
     var value = obj.value;
-    lobObj = value;
-    localStorage.setItem('lobId', value);
-    $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
-        PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
-    });
+    if (value == '') {
+        $('#InvestigationServiceTypeId').empty();
+        $('#InvestigationServiceTypeId').append("<option value=''>--- SELECT ---</option>");
+    }
+    else {
+        lobObj = value;
+        localStorage.setItem('lobId', value);
+        $.get("/api/MasterData/GetInvestigationServicesByLineOfBusinessId", { LineOfBusinessId: value }, function (data) {
+            PopulateInvestigationServices("#InvestigationServiceTypeId", data, "<option>--- SELECT ---</option>");
+        });
+    }
 }
 
 function setInvestigationServices(obj) {
