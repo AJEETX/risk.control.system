@@ -1172,3 +1172,6 @@ button.btn.btn-sm {
 a#back-button {
     min-width: 5rem;
 }
+.ziplink {
+    color: #007bff !important;
+}

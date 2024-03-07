@@ -5,7 +5,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div id="fullpage" class="card border-secondary  card-secondary">
+                <div id="fullpage" class="card border-secondary card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Assign </h3>
                         <h3 id="view-type" class="card-title">
@@ -13,59 +13,72 @@
                             <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
                         </h3>
                     </div>
-                    <div class="card-body">
+                    <article>
+                        <div class="bb-blog-inner">
+                            <div class="card card-light collapsed-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        Upload File: <span class="badge badge-light"><i class="fa fa-file-alt"></i> </span><span class="download-file badge badge-light">
+                                            <a class="ziplink" href="~/headers/single.zip">
+                                                <i class="nav-icon fa fa-download"></i> sample file (1 claim)
+                                            </a>
+                                        </span>
+                                        <span class="download-file badge badge-light">
+                                            <a class="ziplink" href="~/headers/multi-pincode.zip">
+                                                <i class="nav-icon fa fa-download"></i> sample file (6 claims)
+                                            </a>
+                                        </span>
+                                    </h3>
+                                    <div class="card-tools">
+                                        <span data-toggle="tooltip" title="Upload File" class="badge badge-light">  </span>
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    
 
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <span class="download-file badge badge-light">
-                                    <a href="~/headers/single.zip">
-                                        <i class="nav-icon fa fa-download"></i> sample file (1 claim)
-                                    </a>
-                                </span>
-                                <span class="download-file badge badge-light">
-                                    <a href="~/headers/multi-pincode.zip">
-                                        <i class="nav-icon fa fa-download"></i> sample file (6 claims)
-                                    </a>
-                                </span>
-                            </div>
-                        </div>
-
-                        <form id="upload-claims" method="post" enctype="multipart/form-data">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Upload Type:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    <form id="upload-claims" method="post" enctype="multipart/form-data">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <span class="input-group-label"> Upload Type:</span>
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text"><i class="fa fa-file-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        </div>
+                                                        <select name="uploadtype" id="uploadtype" required class="form-control" asp-items="Html.GetEnumSelectList<UploadType>()">
+                                                            <option value="">--- SELECT---</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <select name="uploadtype" id="uploadtype" required class="form-control" asp-items="Html.GetEnumSelectList<UploadType>()">
-                                                <option value="">--- SELECT---</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Perform Upload: </span>
-                                        <div class="input-group mb-3">
-                                            <img class="form-Image" id="ftpImage" src="/img/upload.png">
-                                            <input accept=".zip" type="file" class="form-control" name="postedFile" id="postedFile" />
-                                            <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FileUpload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <span class="input-group-label"> Perform Upload: </span>
+                                                    <div class="input-group mb-3">
+                                                        <img class="form-Image" id="ftpImage" src="/img/upload.png">
+                                                        <input accept=".zip" type="file" class="form-control" name="postedFile" id="postedFile" />
+                                                        <button id="UploadFileButton" disabled type="submit" class="btn btn-info" asp-controller="Uploads" asp-action="FileUpload"><i class="nav-icon fa fa-upload"></i> Upload</button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </form>
+
                                 </div>
                             </div>
-                        </form>
-                        
-                    </div>
+                        </div>
+                    </article>
+
                     <form id="checkboxes" asp-action="Assign" asp-controller="ClaimsInvestigationPost" method="post" enctype="multipart/form-data">
 
                         <div class="card-body ">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
 
                             <div class="table-responsive mailbox-messages">
 
@@ -96,24 +109,24 @@
                                     </thead>
                                     <tbody></tbody>
                                 </table>
-                                
+
                             </div>
-                        <div id="maps" class="col-md-12">
-                            <div id="map"></div>
+                            <div id="maps" class="col-md-12">
+                                <div id="map"></div>
 
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-
-                                <button id="managevendors" type="submit" class="btn btn-warning">
-                                    <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign
-                                </button>
                             </div>
                         </div>
-                    </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+                                    <button id="managevendors" type="submit" class="btn btn-warning">
+                                        <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
 
                 </div>
