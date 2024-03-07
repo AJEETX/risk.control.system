@@ -18,7 +18,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Companies ")]
+    [Breadcrumb("Admin Settings ")]
     public class ClientCompanyController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -98,7 +98,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Delete/5
-        [Breadcrumb("Delete ")]
+        [Breadcrumb("Delete ", FromAction = "Companies")]
         public async Task<IActionResult> Delete(long id)
         {
             if (id == null || _context.ClientCompany == null)
@@ -150,7 +150,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Details/5
-        [Breadcrumb("Company Profile")]
+        [Breadcrumb("Company Detail", FromAction = "Companies")]
         public async Task<IActionResult> Details(long id)
         {
             if (id == null || _context.ClientCompany == null)
@@ -305,6 +305,12 @@ namespace risk.control.system.Controllers
 
         // GET: ClientCompanies
         public async Task<IActionResult> Index()
+        {
+            return RedirectToAction("Companies");
+        }
+
+        [Breadcrumb("Companies")]
+        public async Task<IActionResult> Companies()
         {
             var applicationDbContext = _context.ClientCompany
                 .Include(c => c.Country)

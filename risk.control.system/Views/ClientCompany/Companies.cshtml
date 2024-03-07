@@ -1,0 +1,68 @@
+﻿@model IEnumerable<risk.control.system.Models.ClientCompany>
+
+@{
+    ViewData["Title"] = @Applicationsettings.CLIENT_COMPANY;
+}
+
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card border-secondary card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="far fa-building"></i> Companies</h3>
+                     </div>
+                    <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
+                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Id
+                                    </th>
+                                    <th>
+                                        Document
+                                    </th>
+                                    <th>
+                                        Domain
+                                    </th>
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        Code
+                                    </th>
+                                    <th>
+                                        Phone
+                                    </th>
+
+                                    <th>
+                                        Address
+                                    </th>
+                                    <th>
+                                        District
+                                    </th>
+                                    <th>
+                                        State
+                                    </th>
+                                    <th>
+                                        Country
+                                    </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts    {
+    <script src="~/js/client-companies.js">
+
+    </script>
+}

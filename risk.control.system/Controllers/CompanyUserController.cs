@@ -18,7 +18,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb(" User", FromAction = "Details", FromController = typeof(ClientCompanyController))]
+    [Breadcrumb(" Users", FromAction = "Details", FromController = typeof(ClientCompanyController))]
     public class CompanyUserController : Controller
     {
         public List<UsersViewModel> UserList;

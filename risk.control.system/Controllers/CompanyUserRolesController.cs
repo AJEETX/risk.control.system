@@ -14,7 +14,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Company User Roles")]
+    [Breadcrumb(" Edit Role", FromAction = "Details", FromController = typeof(CompanyUserController))]
     public class CompanyUserRolesController : Controller
     {
         private readonly SignInManager<ApplicationUser> signInManager;
