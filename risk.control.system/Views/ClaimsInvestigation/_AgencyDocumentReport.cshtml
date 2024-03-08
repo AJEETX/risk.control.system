@@ -20,7 +20,7 @@
         }
         else 
         {
-            documentIdColor = "orange";
+            documentIdColor = "#dc3545!important";
             borderColor = "border-danger";
         }
         
@@ -36,9 +36,7 @@
                 </div>
                 <div class="card-footer text-center">
                     <span class="badge badge-light"><i class="far fa-image"></i> Valid : </span>
-                    @if (@Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageValid != null &&
-            @Model.Location.ClaimReport.DocumentIdReport.DocumentIdImageValid.HasValue
-            && @Model.Location.ClaimReport.DocumentIdReport.DocumentIdImageValid.HasValue != null)
+                    @if (@Model.Location.ClaimReport.DocumentIdReport?.DocumentIdImageValid != null && @Model.Location.ClaimReport.DocumentIdReport.DocumentIdImageValid.Value)
                     {
                         <i style='color:green;' class='fas fa-check-circle'></i>
                     }

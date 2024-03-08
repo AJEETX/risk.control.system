@@ -298,7 +298,7 @@
                                     }
                                     else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
                                     {
-                                        digitalIdColor = "orange";
+                                        digitalIdColor = "#dc3545!important";
                                         borderColor = "border-danger";
                                     }
                                     else if (Model.Location.ClaimReport.DigitalIdReport?.DigitalIdImageLongLatTime != null && !string.IsNullOrWhiteSpace(@Model.Location.ClaimReport?.DigitalIdReport?.DigitalIdImageMatchConfidence))
@@ -412,7 +412,7 @@
                                     }
                                     else
                                     {
-                                        documentIdColor = "orange";
+                                        documentIdColor = "#dc3545!important";
                                         borderColor = "border-danger";
                                     }
                                     <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -635,13 +635,8 @@
                                         </div>
 
                                     </div>
-                                    <div class="progress">
-                                        <i class="far fa-bookmark bookmark-green"></i>
-                                        <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
-                                            supervisor
-                                        </div>
-                                    </div>
-                                    <div class="card-body pt-0">
+                                    
+                                    <div class="card-body">
                                         <div class="row">
                                             <div class="col-12">
                                                 <p class="text-muted text-sm">
@@ -676,14 +671,8 @@
                                 </div>
 
                             </div>
-                            <div class="progress">
-                                <i class="far fa-bookmark bookmark-green"></i>
-                                <div class="progress-bar" role="progressbar" style="width:100%;background-color:darkgreen">
-                                    assessor
-                                </div>
-
-                            </div>
-                            <div class="card-body pt-0">
+                            
+                            <div class="card-body">
                                 <div class="row">
                                     <div class="col-12">
                                         <p class="text-muted text-sm">

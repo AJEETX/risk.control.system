@@ -53,12 +53,12 @@
                     <form id="login-form" asp-route-returnurl="@ViewData["ReturnUrl"]" asp-controller="account" asp-action="login" method="post">
                         <div class="input-boxes">
                             <div class="input-box">
-                                <i class="fas fa-envelope"></i>
-                                <input asp-for=Email id="email" type="email" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
+                                <i class="fas fa-envelope left-padd"></i>
+                                <input asp-for=Email id="email" type="email" class="form-control remarks" placeholder="Enter your email" title="Enter your email" value="@Applicationsettings.INSURER_CREATOR" autocomplete="off" required />
                             </div>
                             <div class="input-box">
-                                <i class="fas fa-lock"></i>
-                                <input asp-for=Password id="password" type="password" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
+                                <i class="fas fa-lock left-padd"></i>
+                                <input asp-for=Password id="password" type="password" class="form-control remarks" placeholder="Enter your password" title="Enter your password" value="@Applicationsettings.TestPassword" autocomplete="off" required />
                             </div>
                             
                             <p class="account">By clicking login, you agree to our <a href="#">Terms & Conditions!</a></p>

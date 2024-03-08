@@ -658,7 +658,7 @@ $(document).ready(function () {
                 '<div class="form-group">' +
                 '<hr>' +
                 '<label>Enter note on Policy</label>' +
-                '<input type="text" placeholder="Enter note" class="name form-control" required />' +
+                '<input type="text" placeholder="Enter note" class="name form-control remarks" required />' +
                 '</div>' +
                 '</form>',
             buttons: {
@@ -681,6 +681,8 @@ $(document).ready(function () {
             onContentReady: function () {
                 // bind to events
                 var jc = this;
+                var input = this.$content.find('.name.form-control.remarks');
+                input.focus();
                 this.$content.find('form').on('submit', function (e) {
                     // if the user submits the form by pressing enter in the field.
                     e.preventDefault();
@@ -702,7 +704,7 @@ $(document).ready(function () {
                 '<div class="form-group">' +
                 '<hr>' +
                 '<label>Enter message</label>' +
-                '<input type="text" placeholder="Enter message" class="name form-control" required />' +
+                '<input type="text" placeholder="Enter message" class="name form-control remarks" required />' +
                 '</div>' +
                 '</form>',
             buttons: {
@@ -740,6 +742,8 @@ $(document).ready(function () {
             onContentReady: function () {
                 // bind to events
                 var jc = this;
+                var input = this.$content.find('.name.form-control.remarks');
+                input.focus();
                 this.$content.find('form').on('submit', function (e) {
                     // if the user submits the form by pressing enter in the field.
                     e.preventDefault();
@@ -764,7 +768,7 @@ $(document).ready(function () {
                 '<div class="form-group">' +
                 '<hr>' +
                 '<label>Enter message</label>' +
-                '<input type="text" placeholder="Enter message" class="name form-control" required />' +
+                '<input type="text" placeholder="Enter message" class="name form-control remarks" required />' +
                 '</div>' +
                 '</form>',
             buttons: {
@@ -798,8 +802,11 @@ $(document).ready(function () {
                 },
             },
             onContentReady: function () {
+
                 // bind to events
                 var jc = this;
+                var input = this.$content.find('.name.form-control.remarks');
+                input.focus();
                 this.$content.find('form').on('submit', function (e) {
                     // if the user submits the form by pressing enter in the field.
                     e.preventDefault();
