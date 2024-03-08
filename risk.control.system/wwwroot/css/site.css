@@ -512,7 +512,7 @@ textarea {
 }
 
 .input-validation-error {
-    border-color: red;
+    border-color: red !important;
 }
 
 .field-validation-error {

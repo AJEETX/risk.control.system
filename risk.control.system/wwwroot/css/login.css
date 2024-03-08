@@ -25,7 +25,7 @@ body {
     padding: 40px 30px;
     box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     perspective: 2700px;
-    border:1px solid #ccc;
+    border: 1px solid #ccc;
 }
 
 .login-form form {
@@ -166,13 +166,14 @@ div .error-message {
     align-items: center;
     height: 50px;
     width: 100%;
-    margin: 10px;
+    margin: 10px 0;
     position: relative;
 }
 
-.left-padd{
+.left-padd {
     margin: 1rem;
 }
+
 .form-content .input-box input {
     height: 100%;
     width: 100%;
@@ -181,14 +182,10 @@ div .error-message {
     font-size: 16px;
     font-weight: 500;
     border: 1px solid rgba(0,0,0,0.2);
-    border-radius:5px;
+    border-radius: 2px;
     transition: all 0.3s ease;
 }
 
-    .form-content .input-box input:focus,
-    .form-content .input-box input:valid {
-        border-color: #6c757d;
-    }
 
 .form-content .input-box i {
     position: absolute;
@@ -385,6 +382,7 @@ img.logo {
 .submit-progress.hidden {
     display: none;
 }
+
 .remarks {
     background-color: lightgoldenrodyellow;
 }
