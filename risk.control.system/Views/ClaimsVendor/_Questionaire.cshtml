@@ -18,7 +18,7 @@
                 </div>
             <div class="progress">
                 <i class="far fa-bookmark bookmark-green"></i>
-                <div class="progress-bar" role="progressbar" style="width:100%;background-color:@questionaire;">
+                <div id="questionaire" class="progress-bar" role="progressbar" style="width:100%;background-color:@questionaire;">
                     questionaire
                 </div>
             </div>
@@ -88,20 +88,20 @@
                                 <span class="input-group-label"> Remarks :</span>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                        <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="fas fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                     </div>
                                     <input required name="remarks" id="remarks" asp-for="Location.ClaimReport.AgentRemarks" class="form-control remarks" type="text" placeholder="Remarks" maxlength="100" />
                                     <span asp-validation-for="Location.ClaimReport.AgentRemarks" class="text-danger"></span>
                                 </div>
                             </div>
 
-                                    <ul class="ml-4 mb-0 fa-ul text-muted">
+                                    <div class="ml-4 mb-0 fa-ul text-muted">
                                        
                                         <li class="form-group">
                                             <input type="checkbox" id="terms_and_conditions" value="1" />
                                             <label class="account" for="terms_and_conditions"> I agree to the <a href="#">Terms & Conditions</a></label>
                                         </li>
-                                    </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>

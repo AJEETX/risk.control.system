@@ -75,9 +75,11 @@
         if ($(this).is(':checked') && report != '') {
             //Enable the submit button.
             $('#submit-case').attr("disabled", false);
+            $('#questionaire').css('background-color', 'green');
         } else {
             //If it is not checked, disable the button.
             $('#submit-case').attr("disabled", true);
+            $('#questionaire').css('background-color', 'grey');
         }
     });
 
@@ -86,9 +88,12 @@
         if ($('#terms_and_conditions').is(':checked') && report != '') {
             //Enable the submit button.
             $('#submit-case').attr("disabled", false);
+            $('#questionaire').css('background-color', 'green');
+
         } else {
             //If it is not checked, disable the button.
             $('#submit-case').attr("disabled", true);
+            $('#questionaire').css('background-color', 'grey');
         }
     })
     $('#remarks').on('blur', function () {
@@ -96,9 +101,12 @@
         if ($('#terms_and_conditions').is(':checked') && report != '') {
             //Enable the submit button.
             $('#submit-case').attr("disabled", false);
+            $('#questionaire').css('background-color', 'green');
         } else {
             //If it is not checked, disable the button.
             $('#submit-case').attr("disabled", true);
+            $('#questionaire').css('background-color', 'grey');
+
         }
     })
     $('#create-form').on('submit', function (e) {
@@ -167,6 +175,8 @@
         }
     });
 });
+
+question4.max = new Date().toISOString().split("T")[0];
 
 //var nodes = document.getElementById("audio-video").getElementsByTagName('*');
 //for (var i = 0; i < nodes.length; i++) {
