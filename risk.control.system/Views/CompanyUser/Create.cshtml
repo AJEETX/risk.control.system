@@ -67,7 +67,7 @@
                                    
                                     <div class="form-group hide-id">
                                         <label asp-for="ClientCompanyId" class="control-label"></label>
-                                        <input asp-for="ClientCompanyId" class="form-control" value="@Model.ClientCompany.ClientCompanyId" />
+                                        <input asp-for="ClientCompanyId" class="form-control remarks" value="@Model.ClientCompany.ClientCompanyId" />
                                         <span asp-validation-for="ClientCompanyId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
@@ -76,7 +76,7 @@
 
                                             <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_USER">
 
-                                            <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                            <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
 
                                         </div>
                                     </div>
@@ -86,7 +86,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="FirstName"><i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="FirstName" class="form-control title-name" value="" required placeholder="First Name" maxlength="20" autocomplete=off>
+                                            <input type="text" asp-for="FirstName" class="form-control remarks title-name" value="" required placeholder="First Name" maxlength="20" autocomplete=off>
                                             <span asp-validation-for="FirstName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -97,7 +97,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="LastName"> <i class="fa fa-user"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="LastName" class="form-control title-name" value="" required placeholder="Last Name" maxlength="20" autocomplete="off">
+                                            <input type="text" asp-for="LastName" class="form-control remarks title-name" value="" required placeholder="Last Name" maxlength="20" autocomplete="off">
                                             <span asp-validation-for="LastName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -108,7 +108,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Password"> <i class="fa fa-key"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="password" asp-for="Password" class="form-control" value="" required placeholder="Password" maxlength="20" autocomplete="off">
+                                            <input type="password" asp-for="Password" class="form-control remarks" value="" required placeholder="Password" maxlength="20" autocomplete="off">
                                             <span asp-validation-for="Password" class="text-danger"></span>
                                         </div>
                                     </div>*@
@@ -119,7 +119,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="PhoneNumber" class="form-control" required maxlength="14" value="" placeholder="Phone # with country code"
+                                            <input type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" value="" placeholder="Phone # with country code"
                                                    oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                         </div>
@@ -132,7 +132,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Comments"> <i class="fa fa-asterisk asterik-style" style="color:#e9ecef;"></i><i class="fas fa-comment"></i> </span>
                                             </div>
-                                            <input type="text" asp-for="Comments" class="form-control" placeholder="Remarks (optional)" maxlength="20" autocomplete="off" />
+                                            <input type="text" asp-for="Comments" class="form-control remarks" placeholder="Remarks (optional)" maxlength="20" autocomplete="off" />
                                         </div>
                                     </div>
                                 </div>
@@ -144,7 +144,7 @@
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>    <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
+                                            </div>    <select asp-for="CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="CountryId" class="text-danger"></span>
@@ -158,7 +158,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
+                                            <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
 
@@ -173,7 +173,7 @@
                                                 <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
 
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
 
@@ -187,7 +187,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="PinCodeId"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId" required>
+                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control remarks" asp-items="ViewBag.PinCodeId" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="PinCodeId" class="text-danger"></span>
@@ -199,7 +199,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="Addressline" class="form-control" placeholder="Enter Address line" required maxlength="20" autocomplete="off" />
+                                            <input type="text" asp-for="Addressline" class="form-control remarks" placeholder="Enter Address line" required maxlength="20" autocomplete="off" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>

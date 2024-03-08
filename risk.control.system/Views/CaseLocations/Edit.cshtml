@@ -53,7 +53,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="BeneficiaryName"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input id="BeneficiaryName" required asp-for="BeneficiaryName" class="form-control" type="text" placeholder="Beneficiary Name" maxlength="20" />
+                                            <input id="BeneficiaryName" required asp-for="BeneficiaryName" class="form-control remarks" type="text" placeholder="Beneficiary Name" maxlength="20" />
                                             <span asp-validation-for="BeneficiaryName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -64,7 +64,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="BeneficiaryDateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input required asp-for="BeneficiaryDateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control" type="date" />
+                                            <input required asp-for="BeneficiaryDateOfBirth" id="BeneficiaryDateOfBirthId" class="form-control remarks" type="date" />
                                             <span asp-validation-for="BeneficiaryDateOfBirth" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -74,7 +74,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="BeneficiaryName"><i class="fas fa-user-tie"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select required asp-for="BeneficiaryRelationId" class="form-control" asp-items="ViewBag.BeneficiaryRelationId">
+                                            <select required asp-for="BeneficiaryRelationId" class="form-control remarks" asp-items="ViewBag.BeneficiaryRelationId">
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="BeneficiaryRelationId" class="text-danger"></span>
@@ -86,7 +86,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="PhoneNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input type="text" asp-for="BeneficiaryContactNumber" class="form-control" required maxlength="14"
+                                            <input type="text" asp-for="BeneficiaryContactNumber" class="form-control remarks" required maxlength="14"
                                                    placeholder="Phone # with country code" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                             <span asp-validation-for="BeneficiaryContactNumber" class="text-danger"></span>
                                         </div>
@@ -97,7 +97,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="BeneficiaryIncome"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select required asp-for="BeneficiaryIncome" class="form-control" asp-items="Html.GetEnumSelectList<Income>()">
+                                            <select required asp-for="BeneficiaryIncome" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="BeneficiaryIncome" class="text-danger"></span>
@@ -118,18 +118,18 @@
                                             }
                                             @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
                                             {
-                                                <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                <input asp-for="ProfileImage" type="file" class="form-control remarks" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
                                             }
                                             else
                                             {
                                                 <i class="fa fa-asterisk asterik-style"></i>
                                                 @if (Model?.ProfilePicture is not null)
                                                 {
-                                                    <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                    <input asp-for="ProfileImage" type="file" class="form-control remarks" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
                                                 }
                                                 else
                                                 {
-                                                    <input asp-for="ProfileImage" type="file" class="form-control" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
+                                                    <input asp-for="ProfileImage" type="file" class="form-control remarks" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
                                                 }
                                             }
                                         </div>
@@ -142,7 +142,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select asp-for="CountryId" class="form-control" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
+                                            <select asp-for="CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="CountryId" class="text-danger"></span>
@@ -156,7 +156,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
+                                            <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
 
@@ -170,7 +170,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
+                                            <select id="DistrictId" asp-for="DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
 
@@ -184,7 +184,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" for="PinCodeId"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId" required>
+                                            <select id="PinCodeId" asp-for="PinCodeId" class="form-control remarks" asp-items="ViewBag.PinCodeId" required>
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="PinCodeId" class="text-danger"></span>
@@ -197,7 +197,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input required type="text" asp-for="Addressline" class="form-control" placeholder="Address" maxlength="20" />
+                                            <input required type="text" asp-for="Addressline" class="form-control remarks" placeholder="Address" maxlength="20" />
                                             <span asp-validation-for="Addressline" class="text-danger"></span>
                                         </div>
                                     </div>

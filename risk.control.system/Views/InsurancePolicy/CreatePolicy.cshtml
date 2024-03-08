@@ -49,7 +49,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="ContractNumber"><i class="far fa-file-powerpoint"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control" type="text" placeholder="Policy #" maxlength="20" value="POLX1001" />
+                                            <input id="ContractNumber" required asp-for="PolicyDetail.ContractNumber" class="form-control remarks" type="text" placeholder="Policy #" maxlength="20" value="POLX1001" />
                                             <span asp-validation-for="PolicyDetail.ContractNumber" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -59,7 +59,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="SumAssuredValue"><i class="fas fa-rupee-sign"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control" type="text" placeholder="Insured Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" value="900001" min="1" maxlength="10" />
+                                            <input required asp-for="PolicyDetail.SumAssuredValue" class="form-control remarks" type="text" placeholder="Insured Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" value="900001" min="1" maxlength="10" />
                                             <span asp-validation-for="PolicyDetail.SumAssuredValue" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -82,7 +82,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select required asp-for="PolicyDetail.ClaimType" class="form-control" asp-items="Html.GetEnumSelectList<ClaimType>()">
+                                            <select required asp-for="PolicyDetail.ClaimType" class="form-control remarks" asp-items="Html.GetEnumSelectList<ClaimType>()">
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="PolicyDetail.ClaimType" class="text-danger"></span>
@@ -94,7 +94,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="InvestigationServiceTypeId"><i class="nav-icon fas fa-tools"></i> <i class="fa fa-asterisk asterik-style"></i> </span>
                                             </div>
-                                            <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control" asp-items="ViewBag.InvestigationServiceTypeId">
+                                            <select id="InvestigationServiceTypeId" required asp-for="PolicyDetail.InvestigationServiceTypeId" class="form-control remarks" asp-items="ViewBag.InvestigationServiceTypeId">
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="PolicyDetail.InvestigationServiceTypeId" class="text-danger"></span>
@@ -110,7 +110,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="DateOfIncident"><i class="nav-icon far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control" type="date" />
+                                            <input required asp-for="PolicyDetail.DateOfIncident" id="dateIncidentId" class="form-control remarks" type="date" />
                                             <span asp-validation-for="PolicyDetail.DateOfIncident" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -124,7 +124,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="CauseOfLoss"><i class="nav-icon far fa-flag"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <input required asp-for="PolicyDetail.CauseOfLoss" class="form-control" type="text" placeholder="Cause Of Incident" maxlength="20" />
+                                            <input required asp-for="PolicyDetail.CauseOfLoss" class="form-control remarks" type="text" placeholder="Cause Of Incident" maxlength="20" />
                                             <span asp-validation-for="PolicyDetail.CauseOfLoss" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -135,7 +135,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="CaseEnablerId"><i class="nav-icon fas fa-puzzle-piece"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select required asp-for="PolicyDetail.CaseEnablerId" class="form-control" asp-items="ViewBag.CaseEnablerId">
+                                            <select required asp-for="PolicyDetail.CaseEnablerId" class="form-control remarks" asp-items="ViewBag.CaseEnablerId">
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="PolicyDetail.CaseEnablerId" class="text-danger"></span>
@@ -148,7 +148,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text" asp-for="CostCentreId"><i class="nav-icon fas fa-money-check-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                             </div>
-                                            <select required asp-for="PolicyDetail.CostCentreId" class="form-control" asp-items="ViewBag.CostCentreId">
+                                            <select required asp-for="PolicyDetail.CostCentreId" class="form-control remarks" asp-items="ViewBag.CostCentreId">
                                                 <option value="">--- SELECT ---</option>
                                             </select>
                                             <span asp-validation-for="PolicyDetail.CostCentreId" class="text-danger"></span>
@@ -159,7 +159,7 @@
                                         <div class="input-group mb-3">
 
                                             <img class="form-Image" id="policyImage" src="/img/no-document.png">
-                                            <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control" id="documentImageInput" onchange="document.getElementById('policyImage').src = window.URL.createObjectURL(this.files[0])" />
+                                            <input accept="image/*" asp-for="PolicyDetail.Document" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('policyImage').src = window.URL.createObjectURL(this.files[0])" />
                                         </div>
                                     </div>
                                 </div>

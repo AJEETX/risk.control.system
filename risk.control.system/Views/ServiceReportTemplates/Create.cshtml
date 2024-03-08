@@ -12,27 +12,27 @@
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompanyId" class="form-control" />
+            <input type="hidden" asp-for="ClientCompanyId" value="@Model.ClientCompanyId" class="form-control remarks" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control remarks" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="LineOfBusinessId" class="control-label"></label>
-                <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
+                <select id="LineOfBusinessId" asp-for="LineOfBusinessId" class="form-control remarks" asp-items="ViewBag.LineOfBusinessId" onchange="loadInvestigationServices(this)">
                     <option>--- SELECT BUSINESS ---</option>
                 </select>
             </div>
             <div class="form-group">
                 <label asp-for="InvestigationServiceTypeId" class="control-label"></label>
-                <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control" onchange="setInvestigationServices(this)" asp-items="ViewBag.InvestigationServiceTypeId">
+                <select id="InvestigationServiceTypeId" asp-for="InvestigationServiceTypeId" class="form-control remarks" onchange="setInvestigationServices(this)" asp-items="ViewBag.InvestigationServiceTypeId">
                     <option>--- SELECT SERVICE ---</option>
                 </select>
             </div>
             <div class="form-group">
                 <label asp-for="ReportTemplateId" class="control-label"></label>
-                <select asp-for="ReportTemplateId" class ="form-control" asp-items="ViewBag.ReportTemplateId">
+                <select asp-for="ReportTemplateId" class ="form-control remarks" asp-items="ViewBag.ReportTemplateId">
                     <option>--- SELECT TEMPLATE ---</option>
                 </select>
             </div>

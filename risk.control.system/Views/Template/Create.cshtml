@@ -14,26 +14,26 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control remarks" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DigitalIdReportId" class="control-label"></label>
-                <select asp-for="DigitalIdReportId" class ="form-control" asp-items="ViewBag.DigitalIdReportId">
+                <select asp-for="DigitalIdReportId" class ="form-control remarks" asp-items="ViewBag.DigitalIdReportId">
                     <option value="">--- SELECT ---</option>
 
                 </select>
             </div>
             <div class="form-group">
                 <label asp-for="DocumentIdReportId" class="control-label"></label>
-                <select asp-for="DocumentIdReportId" class ="form-control" asp-items="ViewBag.DocumentIdReportId">
+                <select asp-for="DocumentIdReportId" class ="form-control remarks" asp-items="ViewBag.DocumentIdReportId">
                     <option value="">--- SELECT ---</option>
 
                 </select>
             </div>
             <div class="form-group">
                 <label asp-for="ReportQuestionaireId" class="control-label"></label>
-                <select asp-for="ReportQuestionaireId" class ="form-control" asp-items="ViewBag.ReportQuestionaireId">
+                <select asp-for="ReportQuestionaireId" class ="form-control remarks" asp-items="ViewBag.ReportQuestionaireId">
                     <option value="">--- SELECT ---</option>
 
                 </select>

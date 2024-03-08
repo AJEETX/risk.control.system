@@ -21,36 +21,36 @@
 
                                     <div class="form-group">
                                         <label asp-for="Email" class="control-label"></label>
-                                        <input asp-for="Email" class="form-control" />
+                                        <input asp-for="Email" class="form-control remarks" />
                                         <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="FirstName" class="control-label"></label>
-                                        <input asp-for="FirstName" class="form-control" />
+                                        <input asp-for="FirstName" class="form-control remarks" />
                                         <span asp-validation-for="FirstName" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="LastName" class="control-label"></label>
-                                        <input asp-for="LastName" class="form-control" />
+                                        <input asp-for="LastName" class="form-control remarks" />
                                         <span asp-validation-for="LastName" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="Password" class="control-label"></label>
-                                        <input asp-for="Password" type="password" class="form-control" />
+                                        <input asp-for="Password" type="password" class="form-control remarks" />
                                         <span asp-validation-for="Password" class="text-danger"></span>
                                     </div>
 
 
                                     <div class="form-group">
                                         <label asp-for="PhoneNumber" class="control-label"></label>
-                                        <input type="text" asp-for="PhoneNumber" class="form-control" required maxlength="14" value="" placeholder="Phone # with country code"
+                                        <input type="text" asp-for="PhoneNumber" class="form-control remarks" required maxlength="14" value="" placeholder="Phone # with country code"
                                                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="ProfileImage" class="control-label"></label>
                                         <img id="ProfileImage" class="form-Image">
-                                        <input asp-for="ProfileImage" class="form-control" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -59,28 +59,28 @@
 
                                     <div class="form-group">
                                         <label asp-for="CountryId" class="control-label"></label>
-                                        <select asp-for="CountryId" class="form-control" asp-items="ViewBag.CountryId" onchange="loadState(this)">
+                                        <select asp-for="CountryId" class="form-control remarks" asp-items="ViewBag.CountryId" onchange="loadState(this)">
                                             <option>--- SELECT COUNTRY ---</option>
                                         </select>
                                         <span asp-validation-for="CountryId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="StateId" class="control-label"></label>
-                                        <select id="StateId" asp-for="StateId" class="form-control" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
+                                        <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
                                             <option>--- SELECT STATE ---</option>
                                         </select>
                                         <span asp-validation-for="StateId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="DistrictId" class="control-label"></label>
-                                        <select id="DistrictId" asp-for="DistrictId" class="form-control" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
+                                        <select id="DistrictId" asp-for="DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)">
                                             <option>--- SELECT DISTRICT ---</option>
                                         </select>
                                         <span asp-validation-for="DistrictId" class="text-danger"></span>
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="PinCodeId" class="control-label"></label>
-                                        <select id="PinCodeId" asp-for="PinCodeId" class="form-control" asp-items="ViewBag.PinCodeId">
+                                        <select id="PinCodeId" asp-for="PinCodeId" class="form-control remarks" asp-items="ViewBag.PinCodeId">
                                             <option>--- SELECT PINCODE ---</option>
                                         </select>
                                     </div>
