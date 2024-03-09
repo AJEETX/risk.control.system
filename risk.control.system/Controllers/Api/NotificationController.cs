@@ -76,15 +76,6 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpGet("mms")]
-        public async Task<IActionResult> SendMMS(string mobile = "+61432854196", string message = "Testing fom iCheckify")
-        {
-            string attachments = "https://example.com/images/footer-logo.png,https://example.com/downloads/sms-gateway/images/section/create-chat-bot.png";
-            Dictionary<string, object> response = SMS.API.SendSingleMessage(mobile, message, "0", null, true, attachments, true);
-            return Ok(response);
-        }
-
-        [AllowAnonymous]
         [HttpPost("sms")]
         public async Task<IActionResult> SendSingleSMS(string mobile = "61432854196", string message = "SMS fom iCheckify team")
         {

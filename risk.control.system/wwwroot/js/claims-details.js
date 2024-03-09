@@ -85,7 +85,7 @@ function GetLoc() {
 
 async function success(position) {
     const image =
-        "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+        "/images/beachflag.png";
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     // The location of Uluru
     var element = document.getElementById("pop-face-map");
