@@ -195,6 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="onboard\" />
+    <Folder Include="wwwroot\agency\" />
     <Folder Include="wwwroot\download-ftp\" />
     <Folder Include="wwwroot\fonts\" />
     <Folder Include="wwwroot\company\" />
