@@ -40,7 +40,7 @@
                                             }
                                             else
                                             {
-                                                <img id="ProfileImage" class="form-Image" src="/img/no-policy.jpg">
+                                                <img id="ProfileImage" class="form-Image" src=@Applicationsettings.NO_POLICY_IMAGE>
                                             }
                                             <input asp-for="DocumentImage" type="file" class="form-control remarks" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
                                         </div>

@@ -76,10 +76,12 @@
             //Enable the submit button.
             $('#submit-case').attr("disabled", false);
             $('#questionaire').css('background-color', 'green');
+            $('#questionaire-border').addClass('border-success');
         } else {
             //If it is not checked, disable the button.
             $('#submit-case').attr("disabled", true);
             $('#questionaire').css('background-color', 'grey');
+            $('#questionaire-border').removeClass('border-success');
         }
     });
 
@@ -89,11 +91,13 @@
             //Enable the submit button.
             $('#submit-case').attr("disabled", false);
             $('#questionaire').css('background-color', 'green');
+            $('#questionaire-border').addClass('border-success');
 
         } else {
             //If it is not checked, disable the button.
             $('#submit-case').attr("disabled", true);
             $('#questionaire').css('background-color', 'grey');
+            $('#questionaire-border').removeClass('border-success');
         }
     })
     $('#remarks').on('blur', function () {
@@ -102,10 +106,13 @@
             //Enable the submit button.
             $('#submit-case').attr("disabled", false);
             $('#questionaire').css('background-color', 'green');
+            $('#questionaire-border').addClass('border-success');
+
         } else {
             //If it is not checked, disable the button.
             $('#submit-case').attr("disabled", true);
             $('#questionaire').css('background-color', 'grey');
+            $('#questionaire-border').removeClass('border-success');
 
         }
     })
