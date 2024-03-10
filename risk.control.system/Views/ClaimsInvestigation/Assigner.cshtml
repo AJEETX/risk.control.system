@@ -9,10 +9,7 @@
                 <div id="fullpage" class="card border-secondary card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Assign <span class="badge badge-light">manual</span></h3>
-                        <h3 id="view-type" class="card-title">
-                            <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
-                            <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
-                        </h3>
+                        
                     </div>
                     <form id="radioButtons" asp-action="EmpanelledVendors" method="get" enctype="multipart/form-data">
                         <div class="card-body">
@@ -74,7 +71,5 @@
     </div>
 </section>
 @section Scripts    {
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script src="~/js/map-list.js"></script>
     <script src="~/js/company-assigner.js"></script>
 }

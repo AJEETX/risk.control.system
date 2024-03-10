@@ -15,14 +15,14 @@
                     </div>
                     <form id="radioButtons" asp-action="SelectVendorAgent" method="get" enctype="multipart/form-data">
                         <div class="card-body">
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                        </div>
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <div class="table-responsive mailbox-messages">
                                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
+                                    <thead>
+                                        <tr>
+                                            <th></th>
                                             <th><img class="action-image" src="~/headers/policy-doc.gif" title="Policy Document" alt="Policy Document" /></th>
                                             <th><img class="action-image" src="~/headers/policy-num.gif" title="Policy Number" alt="Policy Number" /></th>
                                             <th><img class="action-image" src="~/headers/amount.gif" title="Insured Amount" alt="Insured Amount" /></th>
@@ -40,17 +40,17 @@
                                                 <img class="action-image" src="~/headers/timer.gif" title="Days since Allocated" />
                                             </th>
                                             <th><img class="action-image" src="~/headers/action.gif" title="Action" /></th>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                    
+                                        </tr>
+                                    </thead>
+                                </table>
+
                             </div>
-                        <div id="maps" class="col-md-12">
-                            <div id="map"></div>
-                            
+                            <div id="maps" class="col-md-12">
+                                <div id="map"></div>
+
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-footer">
+                        <div class="card-footer">
                             <div class="row">
                                 <div class="col-md-12">
                                     <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
@@ -61,22 +61,19 @@
                                     </button>
                                 </div>
                             </div>
-                    </div>
+                        </div>
                     </form>
-
-
-
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-@section Scripts    {
+@section Scripts {
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="~/js/all.js"></script>
     <script src="~/js/agency-claims.js"></script>
     <script src="~/js/map-list.js">
-        </script>
-    
+    </script>
+
 }

@@ -16,9 +16,9 @@
                     </div>
                     <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
                         <div class="card-body">
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                        </div>
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <div class="table-responsive mailbox-messages">
                                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
@@ -43,23 +43,19 @@
                                     </thead>
                                 </table>
                             </div>
-                        <div id="maps" class="col-md-12">
-                            <div id="map"></div>
-                            
+                            <div id="maps" class="col-md-12">
+                                <div id="map"></div>
+                            </div>
                         </div>
-                    </div>
-
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
 </section>
-@section Scripts    {
+@section Scripts {
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
     <script src="~/js/all.js"></script>
-    <script src="~/js/map-list.js"></script>
     <script src="~/js/agency-completed.js"></script>
-
+    <script src="~/js/map-list.js"></script>
 }

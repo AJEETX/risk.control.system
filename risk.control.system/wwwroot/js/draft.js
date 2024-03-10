@@ -320,5 +320,3 @@ function Delete(userId, status) {
         }
     });
 }
-
-initMap("/api/CompanyDraftClaims/GetAssignMap");

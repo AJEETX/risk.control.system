@@ -1,6 +1,4 @@
 ﻿$(document).ready(function () {
-
-
     $('#allocatedcase').on('click', function (event) {
         $("body").addClass("submit-progress-bg");
 
@@ -15,10 +13,7 @@
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
-
     });
-
-
 
     $('#view-type a').on('click', function () {
         var id = this.id;
@@ -175,7 +170,6 @@
         });
     });
 
-    initMap("/api/ClaimsVendor/GetNewMap");
 });
 
 function showdetails() {

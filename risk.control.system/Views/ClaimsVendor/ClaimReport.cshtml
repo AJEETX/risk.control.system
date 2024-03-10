@@ -9,10 +9,7 @@
                 <div class="card border-secondary card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="far fa-file-archive"></i> Agent Report</h3>
-                        <h3 id="view-type" class="card-title">
-                            <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
-                            <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
-                        </h3>
+                        
                     </div>
                     <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
                         <div class="card-body">
@@ -75,9 +72,5 @@
 </section>
 
 @section Scripts    {
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script src="~/js/all.js"></script>
     <script src="~/js/report.js"></script>
-    <script src="~/js/map-list.js"></script>
-
 }
