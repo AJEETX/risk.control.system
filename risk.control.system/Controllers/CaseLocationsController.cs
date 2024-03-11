@@ -106,10 +106,10 @@ namespace risk.control.system.Controllers
             ViewData["BeneficiaryRelationId"] = new SelectList(_context.BeneficiaryRelation, "BeneficiaryRelationId", "Name");
 
             var beneRelationId = _context.BeneficiaryRelation.FirstOrDefault().BeneficiaryRelationId;
-            var countryId = _context.Country.FirstOrDefault().CountryId;
-            var stateId = _context.State.Include(s => s.Country).FirstOrDefault(s => s.Country.CountryId == countryId).StateId;
-            var districtId = _context.District.Include(d => d.State).FirstOrDefault(d => d.StateId == stateId).DistrictId;
-            var pinCodeId = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.DistrictId == districtId).PinCodeId;
+            var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+            var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.DistrictId == pinCode.District.DistrictId);
+            var state = _context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == district.State.StateId);
+            var country = _context.Country.FirstOrDefault(c => c.CountryId == state.Country.CountryId);
             var random = new Random();
 
             var model = new CaseLocation
@@ -121,16 +121,16 @@ namespace risk.control.system.Controllers
                 BeneficiaryIncome = Income.MEDIUUM_INCOME,
                 BeneficiaryName = NameGenerator.GenerateName(),
                 BeneficiaryRelationId = beneRelationId,
-                CountryId = countryId,
-                StateId = stateId,
-                DistrictId = districtId,
-                PinCodeId = pinCodeId,
+                CountryId = country.CountryId,
+                StateId = state.StateId,
+                DistrictId = district.DistrictId,
+                PinCodeId = pinCode.PinCodeId,
                 BeneficiaryContactNumber = random.NextInt64(5555555555, 9999999999),
             };
 
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == countryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == stateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == districtId).OrderBy(d => d.Name);
+            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == country.CountryId).OrderBy(d => d.Name);
+            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == state.StateId).OrderBy(d => d.Name);
+            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == district.DistrictId).OrderBy(d => d.Name);
 
             ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name", model.CountryId);
             ViewData["DistrictId"] = new SelectList(districts.OrderBy(s => s.Code), "DistrictId", "Name", model.DistrictId);

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models;
@@ -38,10 +39,10 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var country = _context.Country.FirstOrDefault();
-            var state = _context.State.Include(s => s.Country).FirstOrDefault(s => s.Country.CountryId == country.CountryId);
-            var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.StateId == state.StateId);
-            var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(p => p.DistrictId == district.DistrictId);
+            var pinCode = _context.PinCode.Include(p => p.District).FirstOrDefault(s => s.Code == Applicationsettings.CURRENT_PINCODE2);
+            var district = _context.District.Include(d => d.State).FirstOrDefault(d => d.DistrictId== pinCode.District.DistrictId);
+            var state = _context.State.Include(s => s.Country).FirstOrDefault(s => s.StateId == district.State.StateId);
+            var country = _context.Country.FirstOrDefault(c=>c.CountryId == state.Country.CountryId);
             var random = new Random();
             claimsInvestigation.CustomerDetail = new CustomerDetail
             {

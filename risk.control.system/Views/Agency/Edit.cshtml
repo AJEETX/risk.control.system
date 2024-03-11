@@ -14,13 +14,14 @@
                         </div>
  
                         <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="VendorId" />
                             <div class="submit-progress hidden">
                                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                             </div>
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                    <input type="hidden" asp-for="VendorId" />
+                                
+                                <div class="col-sm-4">
                                     <div class="form-group">
                                         <span class="input-group-label"> Domain:</span>
                                         <div class="input-group mb-3">
@@ -30,6 +31,36 @@
                                             <input readonly asp-for="Email" class="form-control readonly-input" />
                                         </div>
                                     </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Agreement Date: </span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="AgreementDate"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input readonly type="date" asp-for="AgreementDate" class="form-control remarks" required placeholder="Agreement Date">
+                                            <span asp-validation-for="AgreementDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Activated Date: </span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="ActivatedDate"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input readonly type="date" asp-for="ActivatedDate" class="form-control remarks" required placeholder="Agreement Date">
+                                            <span asp-validation-for="ActivatedDate" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    
+                                    
                                     <div class="form-group">
                                         <span class="input-group-label"> Document:</span>
                                         <div class="input-group mb-3">
@@ -124,26 +155,6 @@
                                 </div>
                                 <div class="col-sm-6">
 
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Agreement Date: </span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="AgreementDate"><i class="far fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input readonly type="date" asp-for="AgreementDate" class="form-control remarks" required placeholder="Agreement Date">
-                                            <span asp-validation-for="AgreementDate" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Activated Date: </span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="ActivatedDate"> <i class="fas fa-calendar-check"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input readonly type="date" asp-for="ActivatedDate" class="form-control remarks" required placeholder="Agreement Date">
-                                            <span asp-validation-for="ActivatedDate" class="text-danger"></span>
-                                        </div>
-                                    </div>
                                     <div class="form-group">
                                         <span class="input-group-label"> Country:</span>
                                         <div class="input-group mb-3">
