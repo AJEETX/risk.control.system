@@ -175,7 +175,7 @@ namespace risk.control.system.Controllers
         }
 
         // GET: ClientCompanies/Edit/5
-        [Breadcrumb(title: "Edit ", FromAction = "Details")]
+        [Breadcrumb(title: "Edit Company", FromAction = "Details")]
         public async Task<IActionResult> Edit(long id)
         {
             if (id == 0 || _context.ClientCompany == null)
