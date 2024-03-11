@@ -42,7 +42,7 @@ namespace risk.control.system.Services
                     LineOfBusinessId = lineOfBusinessId,
                     CaseEnablerId = _context.CaseEnabler.FirstOrDefault().CaseEnablerId,
                     CauseOfLoss = "LOST IN ACCIDENT",
-                    ClaimType = ClaimType.DEATH,
+                    ClaimType = ClaimType.HEALTH,
                     ContractIssueDate = DateTime.UtcNow.AddDays(-10),
                     CostCentreId = _context.CostCentre.FirstOrDefault().CostCentreId,
                     DateOfIncident = DateTime.UtcNow.AddDays(-3),
@@ -121,6 +121,7 @@ namespace risk.control.system.Services
             };
             return model;
         }
+
         private string GetElapsedTime(List<InvestigationTransaction> caseLogs)
         {
             var orderedLogs = caseLogs.OrderBy(l => l.Created);
