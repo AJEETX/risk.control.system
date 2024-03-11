@@ -14,11 +14,12 @@
                             <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
                         </h3>
                     </div>
-                    <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
-                        <div class="card-body">
-                            <div class="submit-progress hidden">
-                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                            </div>
+                    <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
+                        <form id="checkboxes" asp-action="Assign" method="post" enctype="multipart/form-data">
+
                             <div class="table-responsive mailbox-messages">
                                 <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>
@@ -43,11 +44,13 @@
                                     </thead>
                                 </table>
                             </div>
-                            <div id="maps" class="col-md-12">
-                                <div id="map"></div>
-                            </div>
+                        </form>
+                        <div id="maps" class="col-md-12">
+                            <div id="map"></div>
                         </div>
-                    </form>
+
+                    </div>
+                    
                 </div>
             </div>
         </div>

@@ -162,5 +162,6 @@
             }
         });
     });
+    initMap("/api/ClaimsVendor/GetReportMap");
 
 });

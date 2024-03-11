@@ -8,7 +8,10 @@
                 <div id="fullpage" class="card border-secondary card-secondary">
                     <div class="card-header">
                         <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Assign </h3>
-                        
+                        <h3 id="view-type" class="card-title">
+                            <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
+                            <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
+                        </h3>
                     </div>
                     <article>
                         <div class="bb-blog-inner">
@@ -71,12 +74,12 @@
                         </div>
                     </article>
 
-                    <form id="checkboxes" asp-action="Assign" asp-controller="ClaimsInvestigationPost" method="post" enctype="multipart/form-data">
 
                         <div class="card-body ">
                             <div class="submit-progress hidden">
                                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                             </div>
+                    <form id="checkboxes" asp-action="Assign" asp-controller="ClaimsInvestigationPost" method="post" enctype="multipart/form-data">
 
                             <div class="table-responsive mailbox-messages">
 
@@ -109,23 +112,27 @@
                                 </table>
 
                             </div>
+
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+                                        <button id="managevendors" type="submit" class="btn btn-warning">
+                                            <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+
                             <div id="maps" class="col-md-12">
                                 <div id="map"></div>
 
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-
-                                    <button id="managevendors" type="submit" class="btn btn-warning">
-                                        <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                        
 
                 </div>
             </div>
@@ -133,6 +140,8 @@
     </div>
 </section>
 @section Scripts {
-
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="~/js/all.js"></script>
     <script src="~/js/draft.js"></script>
+    <script src="~/js/map-list.js"></script>
 }

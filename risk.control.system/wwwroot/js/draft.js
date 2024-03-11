@@ -1,12 +1,10 @@
 ﻿$(document).ready(function () {
-
     $('#postedFile').on("change", function () {
         var val = $(this).val(),
             fbtn = $('#UploadFileButton');
         var uploadType = $('#uploadtype').val();
         val.endsWith('.zip') && (uploadType == "0" || uploadType == "1") ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
-
 
     $('#uploadtype').on("change", function () {
         var val = $(this).val(),
@@ -210,13 +208,12 @@
                             }, 1);
                             $('#managevendors').attr('disabled', 'disabled');
                             $('#managevendors').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Assign");
-                            
+
                             $('#checkboxes').submit();
                             var nodes = document.getElementById("fullpage").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }
-                            
                         }
                     },
                     cancel: {
@@ -230,16 +227,15 @@
 
     $('#UploadFileButton').on('click', function (event) {
         $("body").addClass("submit-progress-bg");
-    // Wrap in setTimeout so the UI
-    // can update the spinners
-    setTimeout(function () {
-        $(".submit-progress").removeClass("hidden");
-    }, 1);
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
 
         $(this).attr('disabled', 'disabled');
         $(this).html("<i class='fas fa-sync fa-spin'></i> Upload");
 
-        
         $('#upload-claims').submit();
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
@@ -250,6 +246,8 @@
             nodes[i].disabled = true;
         }
     });
+    initMap("/api/CompanyDraftClaims/GetAssignMap");
+
 });
 
 function showedit(id) {
@@ -260,7 +258,7 @@ function showedit(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn *').attr('disabled', 'disabled');
-    $('a#edit' + id +'.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
+    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
@@ -275,7 +273,7 @@ function getdetails(id) {
         $(".submit-progress").removeClass("hidden");
     }, 1);
     $('a.btn *').attr('disabled', 'disabled');
-    $('a#details' + id +'.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {

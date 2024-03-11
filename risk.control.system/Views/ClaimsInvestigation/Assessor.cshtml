@@ -11,65 +11,64 @@
                     <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
                 </h3>
             </div>
-            <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
-                <div class="card-body">
+            <div class="card-body">
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
+                <form id="checkboxes" asp-action="GetInvestigateReport" method="get" enctype="multipart/form-data">
                     <div class="table-responsive mailbox-messages">
 
-                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                <thead>
-                                    <tr>
-                                <tr>
-                                    <th></th>
-                                    <th><img class="action-image" src="~/headers/policy-doc.gif" title="Policy Document" alt="Policy Document" /></th>
-                                    <th><img class="action-image" src="~/headers/policy-num.gif" title="Policy Number" alt="Policy Number" /></th>
-                                    <th><img class="action-image" src="~/headers/amount.gif" title="Insured Amount" alt="Insured Amount" /></th>
-                                    <th><img class="action-image" src="~/headers/portrait.gif" title="Customer Photo" alt="Customer Photo" /></th>
-                                    <th><img class="action-image" src="~/headers/customer.gif" title="Customer Name" alt="Customer Name" /></th>
-                                    <th><img class="action-image" src="~/headers/portrait.gif" title="Beneficiary Photo" alt="Beneficiary Photo" /></th>
-                                    <th><img class="action-image" src="~/headers/customer.gif" title="Beneficiary Name" alt="Beneficiary Name" /></th>
-                                    <th><img class="action-image" src="~/headers/claim-type.gif" title="Claim Type" alt="Claim Type" /></th>
-                                    <th><img class="action-image" src="~/headers/service.gif" title="Service" alt="Service" /></th>
+                    <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                            <tr>
+                                <th></th>
+                                <th><img class="action-image" src="~/headers/policy-doc.gif" title="Policy Document" alt="Policy Document" /></th>
+                                <th><img class="action-image" src="~/headers/policy-num.gif" title="Policy Number" alt="Policy Number" /></th>
+                                <th><img class="action-image" src="~/headers/amount.gif" title="Insured Amount" alt="Insured Amount" /></th>
+                                <th><img class="action-image" src="~/headers/portrait.gif" title="Customer Photo" alt="Customer Photo" /></th>
+                                <th><img class="action-image" src="~/headers/customer.gif" title="Customer Name" alt="Customer Name" /></th>
+                                <th><img class="action-image" src="~/headers/portrait.gif" title="Beneficiary Photo" alt="Beneficiary Photo" /></th>
+                                <th><img class="action-image" src="~/headers/customer.gif" title="Beneficiary Name" alt="Beneficiary Name" /></th>
+                                <th><img class="action-image" src="~/headers/claim-type.gif" title="Claim Type" alt="Claim Type" /></th>
+                                <th><img class="action-image" src="~/headers/service.gif" title="Service" alt="Service" /></th>
 
-                                    <th><img class="action-image" src="~/headers/pincode.gif" title="Pincode" alt="Pincode" /></th>
-                                    <th><img class="action-image" src="~/headers/status.gif" title="Status" alt="Status" /></th>
-                                    <th><img class="action-image" src="~/headers/created.gif" title="Created date" alt="Created Date" /></th>
-                                    <th>
-                                        <img class="action-image" src="~/headers/timer.gif" title="Days since Assigned" />
-                                    </th>
-                                    </tr>
-                                </thead>
-                            </table>
-                            
-                    </div>
-                <div id="maps" class="col-md-12">
-                    <div id="map"></div>
-                    
-                </div>
-            </div>
-            <div class="card-footer">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                                <th><img class="action-image" src="~/headers/pincode.gif" title="Pincode" alt="Pincode" /></th>
+                                <th><img class="action-image" src="~/headers/status.gif" title="Status" alt="Status" /></th>
+                                <th><img class="action-image" src="~/headers/created.gif" title="Created date" alt="Created Date" /></th>
+                                <th>
+                                    <img class="action-image" src="~/headers/timer.gif" title="Days since Assigned" />
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
 
-                            <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                                <span class="badge badge-light"> <i class="fas fa-glasses" aria-hidden="true"></i> </span>
-                                Assess
-                            </button>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+                                <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                                    <span class="badge badge-light"> <i class="fas fa-glasses" aria-hidden="true"></i> </span>
+                                    Assess
+                                </button>
+                            </div>
+                        </div>
                         </div>
                     </div>
+
+                </form>
+                <div id="maps" class="col-md-12">
+                    <div id="map"></div>
+                </div>
             </div>
-            </form>
-
-
         </div>
     </div>
 </section>
 
-@section Scripts    {
+@section Scripts {
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script src="~/js/map-list.js"></script>
+    <script src="~/js/all.js"></script>
     <script src="~/js/assessor-claims.js"></script>
+    <script src="~/js/map-list.js"></script>
 }

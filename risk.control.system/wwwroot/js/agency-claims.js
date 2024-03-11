@@ -169,6 +169,7 @@
             }
         });
     });
+    initMap("/api/ClaimsVendor/GetNewMap");
 
 });
 
