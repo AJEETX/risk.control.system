@@ -93,7 +93,7 @@ namespace risk.control.system.Controllers
 
         // GET: PinCodes/Edit/5
         [Breadcrumb("Edit ", FromAction = "Profile")]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(long id)
         {
             if (id == null || _context.PinCode == null)
             {
@@ -171,7 +171,7 @@ namespace risk.control.system.Controllers
         // POST: PinCodes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             if (_context.PinCode == null)
             {

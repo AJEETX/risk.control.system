@@ -15,36 +15,65 @@
                         <form id="create-form" asp-action="Create">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group">
-                                <label asp-for="CountryId" class="control-label"></label>
-                                <select asp-for="CountryId" class="form-control remarks" asp-items="ViewBag.CountryId" onchange="loadState(this)">
-                                    <option>--- SELECT COUNTRY ---</option>
-                                </select>
-                                <span asp-validation-for="CountryId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="StateId" class="control-label"></label>
-                                <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)">
-                                    <option>--- SELECT STATE ---</option>
-                                </select>
-                                <span asp-validation-for="StateId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="DistrictId" class="control-label"></label>
-                                <select id="DistrictId" asp-for="DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId">
-                                    <option>--- SELECT DISTRICT ---</option>
-                                </select>
-                                <span asp-validation-for="DistrictId" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="Name" class="control-label"></label>
-                                <input asp-for="Name" class="form-control remarks" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
+                                <span class="input-group-label"> Country:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>    <select asp-for="CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
+                                        <option value="">--- SELECT ---</option>
+                                    </select>
+                                    <span asp-validation-for="CountryId" class="text-danger"></span>
+
+                                </div>
                             </div>
 
                             <div class="form-group">
-                                <label asp-for="Code" class="control-label"></label>
-                                <input asp-for="Code" class="form-control remarks" />
-                                <span asp-validation-for="Code" class="text-danger"></span>
+                                <span class="input-group-label"> State:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
+                                        <option value="">--- SELECT ---</option>
+                                    </select>
+
+                                    <span asp-validation-for="StateId" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <span class="input-group-label"> District:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <select id="DistrictId" asp-for="DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" required>
+                                        <option value="">--- SELECT ---</option>
+                                    </select>
+
+                                    <span asp-validation-for="DistrictId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <span class="input-group-label"> Pincode:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="Name"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Pincode Name" value="" maxlength="20">
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <span class="input-group-label"> Code:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Pincode Code" value="" maxlength="5">
+                                    <span asp-validation-for="Code" class="text-danger"></span>
+                                </div>
                             </div>
                             <div class="form-group text-right">
                                 <a id="back" asp-action="Index" class="btn btn-secondary">

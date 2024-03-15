@@ -144,12 +144,21 @@ namespace risk.control.system.Controllers
             }
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
         [AllowAnonymous]
-        public IActionResult Forgot(string useremail, long mobile)
+        public async Task<IActionResult> Forgot(string useremail, long mobile)
         {
-            accountService.ForgotPassword(useremail, mobile);
+            notifyService.Information("Hecking Password...");
+            var smsSent = accountService.ForgotPassword(useremail, mobile);
+            if (smsSent)
+            {
+                notifyService.Success("Password sent to mobile");
+            }
+            else
+            {
+                notifyService.Error("Incorrect details. Try Again");
+            }
+            await Task.Delay(8000);
             return RedirectToAction("login");
         }
 

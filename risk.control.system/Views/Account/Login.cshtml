@@ -83,21 +83,21 @@
 
                     <div class="title">Forgot Password</div>
                     @Html.AntiForgeryToken()
-                    <form action="Forgot" method="post">
+                    <form id="reset-form" action="Forgot" method="get">
                         <div class="input-boxes">
                             <div class="input-box">
                                 <i class="fas fa-envelope left-padd"></i>
-                                <input name="useremail" id="useremail" class="form-control remarks" type="email" placeholder="Enter your email" autocomplete="off" required>
+                                <input name="useremail" id="useremail" class="form-control remarks" type="email" placeholder="Your email" autocomplete="off" required>
                             </div>
                             <div class="input-box">
                                 <i class="fa fa-mobile left-padd" aria-hidden="true"></i>
-                                <input id="mobile" name="mobile" class="form-control remarks" maxlength="14" type="text" placeholder="Phone # with country code"
+                                <input id="mobile" name="mobile" class="form-control remarks" maxlength="14" type="text" placeholder="Phone (61432854196)"
                                        oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
                             </div>
                             <p class="account">By clicking Reset, you agree to our <a href="#">Terms & Conditions!</a></p>
 
                             <div class="button input-box">
-                                <button type="submit" class="btn btn-secondary btn-block"> Reset Password</button>
+                                <button id="reset-pwd" type="submit" class="btn btn-secondary btn-block"> Reset Password</button>
                             </div>
                             <div class="text">Already member? <label for="flip" class="login-link">Login now</label></div>
                         </div>
