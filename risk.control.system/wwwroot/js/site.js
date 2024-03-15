@@ -668,7 +668,13 @@ $(document).ready(function () {
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('Provide Policy note!!!');
+                            $.alert({
+                                title: 'Provide Policy note !!!',
+                                closeIcon: true,
+                                type: 'red',
+                                icon: 'far fa-file-powerpoint',
+                                content: 'Provide Policy note !!!'
+                            });
                             return false;
                         }
                         $.alert('Policy note is ' + name);
@@ -714,7 +720,15 @@ $(document).ready(function () {
                     action: function (e) {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('Enter message!!!');
+                            $.alert({
+                                title: 'Enter message !!!',
+                                closeIcon: true,
+                                type: 'red',
+                                icon: 'fa fa-user-plus',
+                                content :'Please enter message'
+                                });
+                            var input = this.$content.find('.name.form-control.remarks');
+                            input.focus();
                             return false;
                         }
                         return $.ajax({
@@ -723,6 +737,9 @@ $(document).ready(function () {
                         }).done(function (response) {
                             $.alert({
                                 title: 'Message Status!',
+                                closeIcon: true,
+                                type: 'green',
+                                icon: 'fa fa-user-plus',
                                 content: 'Status: ' + response.message,
                             });
                         }).fail(function () {
@@ -731,7 +748,7 @@ $(document).ready(function () {
                                 content: 'Status: failed',
                             });
                         }).always(function () {
-                            location.reload();
+                            
                         });
                     }
                 },
@@ -778,7 +795,13 @@ $(document).ready(function () {
                     action: function () {
                         var name = this.$content.find('.name').val();
                         if (!name) {
-                            $.alert('Enter message!!!');
+                            $.alert({
+                                title: 'Enter message !!!',
+                                closeIcon: true,
+                                type: 'red',
+                                icon: 'fas fa-user-tie',
+                                content: 'Please enter message'
+                            });
                             return false;
                         }
                         var self = this;
@@ -788,12 +811,15 @@ $(document).ready(function () {
                         }).done(function (response) {
                             $.alert({
                                 title: 'Message Status!',
+                                closeIcon: true,
+                                type: 'green',
+                                icon: 'fa fa-user-tie',
                                 content: 'Status: ' + response.message,
                             });
                         }).fail(function () {
                             self.setContent('Something went wrong.');
                         }).always(function () {
-                            location.reload();
+                            //location.reload();
                         });
                     }
                 },

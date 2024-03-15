@@ -148,7 +148,6 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Forgot(string useremail, long mobile)
         {
-            notifyService.Information("Hecking Password...");
             var smsSent = accountService.ForgotPassword(useremail, mobile);
             if (smsSent)
             {
@@ -158,8 +157,7 @@ namespace risk.control.system.Controllers
             {
                 notifyService.Error("Incorrect details. Try Again");
             }
-            await Task.Delay(8000);
-            return RedirectToAction("login");
+            return RedirectToLocal("login");
         }
 
         [HttpGet]

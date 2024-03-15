@@ -13,7 +13,7 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 
 namespace risk.control.system.Controllers
 {
-    [Breadcrumb("Profile ")]
+    [Breadcrumb("User Profile ")]
     public class AgencyUserProfileController : Controller
     {
         public List<UsersViewModel> UserList;
@@ -55,7 +55,7 @@ namespace risk.control.system.Controllers
             return View(vendorUser);
         }
 
-        [Breadcrumb("Edit ")]
+        [Breadcrumb("Edit Profile")]
         public async Task<IActionResult> Edit(long? userId)
         {
             if (userId == null || _context.VendorApplicationUser == null)

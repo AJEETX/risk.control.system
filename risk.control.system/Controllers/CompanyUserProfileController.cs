@@ -59,7 +59,7 @@ namespace risk.control.system.Controllers
             return View(companyUser);
         }
 
-        [Breadcrumb("Edit ")]
+        [Breadcrumb("Edit Profile")]
         public async Task<IActionResult> Edit(long? userId)
         {
             if (userId == null || _context.ClientCompanyApplicationUser == null)
