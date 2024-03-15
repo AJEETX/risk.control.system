@@ -14,15 +14,27 @@
                         <form id="create-form" asp-action="Create">
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <div class="form-group">
-                                <label asp-for="Name" class="control-label">Name</label>
-                                <input asp-for="Name" class="form-control remarks" type="text" placeholder="Enter Name" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
+                                <span class="input-group-label"> Reason Name:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="Name"><i class="fas fa-puzzle-piece"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Reason Name" value="" maxlength="20">
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label asp-for="Code" class="control-label">Code</label>
-                                <input asp-for="Code" class="form-control remarks" type="text" maxlength="5" placeholder="Enter Code" />
-                                <span asp-validation-for="Code" class="text-danger"></span>
+                                <span class="input-group-label"> Reason Code:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Reason Code" value="" maxlength="5">
+                                    <span asp-validation-for="Code" class="text-danger"></span>
+                                </div>
                             </div>
+
                             <div class="form-group text-right">
                                 <a id="back" asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
                                 <button type="submit" class="btn btn-success"> <i class="fas fa-puzzle-piece"></i>  @Applicationsettings.CREATE New </button>

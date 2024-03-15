@@ -16,16 +16,28 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                             <input type="hidden" asp-for="LineOfBusinessId" />
                             <div class="form-group">
-                                <label asp-for="Name" class="control-label"></label>
-                                <input asp-for="Name" class="form-control remarks" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
+                                <span class="input-group-label"> Line of Business:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="Name"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Line of Business Name" maxlength="20">
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label asp-for="Code" class="control-label"></label>
-                                <input asp-for="Code" class="form-control remarks" />
-                                <span asp-validation-for="Code" class="text-danger"></span>
+                                <span class="input-group-label"> Line of Business Code:</span>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                    </div>
+                                    <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Line of Business Code" maxlength="5">
+                                    <span asp-validation-for="Code" class="text-danger"></span>
+                                </div>
                             </div>
-                            
+
+
                             <div class="form-group text-right">
                                 <a id="back" asp-action="Index" class="btn btn-secondary">
                                     <i class="fa fa-window-close"></i>
