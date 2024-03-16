@@ -1,0 +1,44 @@
+﻿@model ForgotPassword
+<section class="content pt-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card border-secondary card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-pen"></i>  Password processed</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="submit-progress hidden">
+                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                        </div>
+                        <h4>
+                            @Model.Message
+                        </h4>
+                    </div>
+                    <div class="card-footer">
+                        @if(Model.Reset)
+                        {
+                            <a id="back" asp-controller="Account" asp-action="Login" class="btn btn-success">
+                                <i class="fa fa-key"></i>
+                                Login Now !
+                            </a>
+                        }
+                        else
+                        {
+                            <a id="back" asp-controller="Account" asp-action="Login" class="btn btn-danger">
+                                <i class="fa fa-key"></i>
+                                Try Again
+                            </a>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

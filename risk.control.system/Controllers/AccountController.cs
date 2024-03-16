@@ -148,16 +148,24 @@ namespace risk.control.system.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Forgot(string useremail, long mobile)
         {
+            string message = string.Empty;
             var smsSent = accountService.ForgotPassword(useremail, mobile);
             if (smsSent)
             {
-                notifyService.Success("Password sent to mobile");
+                message = "Password sent to mobile: " + mobile;
+                notifyService.Success(message);
             }
             else
             {
-                notifyService.Error("Incorrect details. Try Again");
+                message = "Incorrect details. Try Again";
+                notifyService.Error(message);
             }
-            return RedirectToLocal("login");
+            ForgotPassword model = new ForgotPassword
+            {
+                Message = message,
+                Reset = smsSent
+            };
+            return View(model);
         }
 
         [HttpGet]

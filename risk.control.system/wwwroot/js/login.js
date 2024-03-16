@@ -44,7 +44,7 @@ $(document).ready(function () {
         $('html *').css('cursor', 'not-allowed');
         $('#reset-form').attr('disabled', 'disabled');
 
-        var nodes = document.getElementById("login-form").getElementsByTagName('*');
+        var nodes = document.getElementById("reset-pwd").getElementsByTagName('*');
         for (var i = 0; i < nodes.length; i++) {
             nodes[i].disabled = true;
         }
