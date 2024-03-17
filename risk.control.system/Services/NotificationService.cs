@@ -345,7 +345,10 @@ namespace risk.control.system.Services
                 agencyUser = (VendorApplicationUser)user;
                 company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
             }
-
+            if(!isInsurerUser && !isVendorUser)
+            {
+                return string.Empty;
+            }
             var message = $"Dear {claim.CustomerDetail.CustomerName}";
             message += "                                                                                ";
             message += $"{sms}";
@@ -398,6 +401,10 @@ namespace risk.control.system.Services
             {
                 agencyUser = (VendorApplicationUser)user;
                 company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
+            }
+            if (!isInsurerUser && !isVendorUser)
+            {
+                return string.Empty;
             }
             var message = $"Dear {beneficiary.BeneficiaryName}";
             message += "                                                                                ";

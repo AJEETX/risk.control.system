@@ -35,8 +35,12 @@ namespace risk.control.system.Controllers
         {
             var currentUser = HttpContext.User.Identity.Name;
             var customerName = notificationService.SendSms2Customer(currentUser, claimId, name);
+            if(string.IsNullOrEmpty(customerName))
+            {
+                return BadRequest("Error !!!");
+            }
 
-            await Task.Delay(4000);
+            await Task.Delay(1000);
             return Ok(new { message = "Message Sent: Success", customerName = customerName });
         }
 
@@ -46,7 +50,11 @@ namespace risk.control.system.Controllers
         {
             var currentUser = HttpContext.User.Identity.Name;
             var customerName = notificationService.SendSms2Beneficiary(currentUser, claimId, name);
-            await Task.Delay(4000);
+            if (string.IsNullOrEmpty(customerName))
+            {
+                return BadRequest("Error !!!");
+            }
+            await Task.Delay(000);
             return Ok(new { message = "Message Sent: Success", customerName = customerName });
         }
     }
