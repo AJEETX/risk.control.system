@@ -329,15 +329,34 @@ namespace risk.control.system.Services
             var mobile = claim.CustomerDetail.ContactNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
 
+            var isInsurerUser = user is ClientCompanyApplicationUser;
+            var isVendorUser = user is VendorApplicationUser;
+
+            string company = string.Empty;
+            ClientCompanyApplicationUser insurerUser;
+            VendorApplicationUser agencyUser;
+            if (isInsurerUser)
+            {
+                insurerUser = (ClientCompanyApplicationUser)user;
+                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == insurerUser.ClientCompanyId)?.Name;
+            }
+            else if (isVendorUser)
+            {
+                agencyUser = (VendorApplicationUser)user;
+                company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
+            }
+
             var message = $"Dear {claim.CustomerDetail.CustomerName}";
             message += "                                                                                ";
-            message += $"Message from:";
+            message += $"{sms}";
+            message += "                                                                                ";
+            message += $"Thanks";
             message += "                                                                                ";
             message += $"{user.FirstName} {user.LastName}";
             message += "                                                                                ";
-            message += $"Message content:";
+            message += $"Policy #:{claim.PolicyDetail.ContractNumber}";
             message += "                                                                                ";
-            message += $"{sms}";
+            message += $"{company}";
             message += "                                                                                ";
             message += $"{logo}";
 
@@ -358,21 +377,39 @@ namespace risk.control.system.Services
 
         public string SendSms2Beneficiary(string currentUser, string claimId, string sms)
         {
-            var beneficiary = context.CaseLocation
+            var beneficiary = context.CaseLocation.Include(b => b.ClaimsInvestigation).ThenInclude(c => c.PolicyDetail)
                .FirstOrDefault(c => c.ClaimsInvestigationId == claimId);
 
             var mobile = beneficiary.BeneficiaryContactNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
+            
+            var isInsurerUser = user is ClientCompanyApplicationUser;
+            var isVendorUser = user is VendorApplicationUser;
 
+            string company = string.Empty;
+            ClientCompanyApplicationUser insurerUser;
+            VendorApplicationUser agencyUser;
+            if (isInsurerUser)
+            {
+                insurerUser = (ClientCompanyApplicationUser)user;
+                company = context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == insurerUser.ClientCompanyId)?.Name;
+            }
+            else if (isVendorUser)
+            {
+                agencyUser = (VendorApplicationUser)user;
+                company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
+            }
             var message = $"Dear {beneficiary.BeneficiaryName}";
             message += "                                                                                ";
-            message += $"Message from:";
+            message += $"{sms}";
+            message += "                                                                                ";
+            message += $"Thanks";
             message += "                                                                                ";
             message += $"{user.FirstName} {user.LastName}";
             message += "                                                                                ";
-            message += $"Message content:";
+            message += $"Policy #:{beneficiary.ClaimsInvestigation.PolicyDetail.ContractNumber}";
             message += "                                                                                ";
-            message += $"{sms}";
+            message += $"{company}";
             message += "                                                                                ";
             message += $"{logo}";
 
