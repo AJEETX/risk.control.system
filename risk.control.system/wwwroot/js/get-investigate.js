@@ -19,26 +19,50 @@
         $('#documentIdLatitude').val(coordinates.latitude);
         $('#documentIdLongitude').val(coordinates.longitude);
     }
+    let askFaceUploadConfirmation = true;
     $('#UploadFaceImageButton').click(function (e) {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $('body').attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin'></i> Uploading");
+        if (askFaceUploadConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm Photo Image Upload",
+                content: "Are you sure to upload?",
+                icon: 'fa fa-upload',
+                columnClass: 'medium',
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askFaceUploadConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#UploadFaceImageButton').attr('disabled', 'disabled');
+                            $('#UploadFaceImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
 
-        $('#upload-face').submit();
-        $('html *').css('cursor', 'not-allowed');
-        $('#back').attr('disabled', 'disabled');
+                            $('#upload-face').submit();
+                            $('html *').css('cursor', 'not-allowed');
+                            $('#back').attr('disabled', 'disabled');
 
-        $('html a *, html button *').css('pointer-events', 'none');
+                            $('html a *, html button *').css('pointer-events', 'none');
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
         }
+        
     });
 
     $('#panImage').on("change", function () {
@@ -47,26 +71,53 @@
         val ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
     });
 
+    let askPanUploadConfirmation = true;
+
     $('#UploadPanImageButton').click(function (e) {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
-        $(this).attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin'></i> Uploading");
+        if (askPanUploadConfirmation) {
+            e.preventDefault();
+            $.confirm({
+                title: "Confirm PAN Image Upload",
+                content: "Are you sure to upload?",
+                icon: 'fa fa-upload',
+                columnClass: 'medium',
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askPanUploadConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
+                            $('#UploadPanImageButton').attr('disabled', 'disabled');
+                            $('#UploadPanImageButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
 
-        $('#upload-pan').submit();
-        $('#back').attr('disabled', 'disabled');
+                            $('#upload-pan').submit();
+                            $('#back').attr('disabled', 'disabled');
 
-        $('html *').css('cursor', 'not-allowed');
-        $('html a *, html button *').css('pointer-events', 'none')
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').css('pointer-events', 'none')
 
-        var nodes = document.getElementById("article").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
         }
+        
     });
 
     $('#terms_and_conditions').click(function () {
