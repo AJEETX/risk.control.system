@@ -471,11 +471,15 @@ namespace risk.control.system.Controllers
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
-            result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
-                Where(x => x.Selected).Select(y => y.RoleName));
+            var newRoles = model.VendorUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName);
+            result = await userManager.AddToRolesAsync(user, newRoles);
+
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
-            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user role edited. Email : " + user.Email);
+
+            var isAgent = newRoles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
+
+            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user role edited. Email : " + user.Email, isAgent);
 
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(AgencyController.User), "Agency");

@@ -397,6 +397,24 @@ namespace risk.control.system.Controllers
             return View();
         }
 
+        [Breadcrumb(title: " Detail", FromAction = "Allocate")]
+        public async Task<IActionResult> CaseDetail(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(currentUserEmail))
+            {
+                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                return RedirectToAction(nameof(Index));
+            }
+            var model = await vendorService.GetClaimsDetails(currentUserEmail, id);
+            return View(model);
+        }
+
         [Breadcrumb(title: " Detail", FromAction = "Open")]
         public async Task<IActionResult> Detail(string id)
         {

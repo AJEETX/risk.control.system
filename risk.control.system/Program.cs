@@ -93,7 +93,7 @@ builder.Services.AddNotyf(config =>
 {
     config.DurationInSeconds = 3;
     config.IsDismissable = true;
-    config.Position = NotyfPosition.TopRight;
+    config.Position = NotyfPosition.TopCenter;
 });
 
 var isProd = builder.Configuration.GetSection("IsProd").Value;
@@ -106,7 +106,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-edlwess.db"));
+                        options.UseSqlite("Data Source=x-edlweiss.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

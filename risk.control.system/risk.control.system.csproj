@@ -72,4 +72,10 @@
     <Folder Include="wwwroot\upload-file\" />
     <Folder Include="wwwroot\upload-ftp\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="Views\ClaimsVendor\CaseDetail.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
