@@ -413,9 +413,20 @@ namespace risk.control.system.Controllers
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
+            var newRoles = model.VendorUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName);
+
             result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
                 Where(x => x.Selected).Select(y => y.RoleName));
+            var isAgent = newRoles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
+            System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + Applicationsettings.APP_URL);
+            System.Net.WebClient client = new System.Net.WebClient();
+            string tinyUrl = client.DownloadString(address);
+            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User update. Email : " + user.Email, isAgent);
 
+            if (isAgent)
+            {
+                var onboard = SmsService.SendSingleMessage(user.PhoneNumber, tinyUrl, isAgent);
+            }
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction("Users", "Vendors", new { id = model.VendorId });
         }

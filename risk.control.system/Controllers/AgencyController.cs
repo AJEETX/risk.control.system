@@ -483,7 +483,7 @@ namespace risk.control.system.Controllers
             System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + Applicationsettings.APP_URL);
             System.Net.WebClient client = new System.Net.WebClient();
             string tinyUrl = client.DownloadString(address);
-            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User update. Email : " + user.Email, isAgent);
+            //var response = SmsService.SendSingleMessage(user.PhoneNumber, "User update. Email : " + user.Email, isAgent);
 
             if (isAgent)
             {
