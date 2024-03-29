@@ -100,7 +100,10 @@ namespace risk.control.system.Controllers
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            return View();
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u=>u.Email == currentUserEmail);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+            var isBulkUpload = company.IFSCCode  == "ifsc1";
+            return View(isBulkUpload);
         }
 
         [HttpPost]

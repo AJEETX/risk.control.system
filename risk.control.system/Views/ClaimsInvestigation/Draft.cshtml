@@ -1,5 +1,11 @@
-﻿@{
+﻿@model bool
+@{
     ViewData["Title"] = "Index";
+    var displayBulkUpload = "none";
+    if(Model)
+    {
+        displayBulkUpload = "block";
+    }
 }
 <section class="content pt-2">
     <div class="container-fluid">
@@ -13,7 +19,7 @@
                             <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
                         </h3>
                     </div>
-                    <article>
+                    <article id="show-bulk" style="display:@displayBulkUpload">
                         <div class="bb-blog-inner">
                             <div class="card card-light collapsed-card">
                                 <div class="card-header">
