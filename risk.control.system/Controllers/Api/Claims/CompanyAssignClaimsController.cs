@@ -51,7 +51,7 @@ namespace risk.control.system.Controllers.Api.Claims
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null
             || c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId || 
-            (c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !company.AutoAllocation)
+            (c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
             ) ||
             (a.IsReviewCase && a.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId));
 
@@ -61,7 +61,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
                     && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId ||
-            (c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId && !company.AutoAllocation) ||
+            (c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId) ||
                         (item.IsReviewCase && item.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
                     )?.ToList();
                 if (item.CaseLocations.Any())
