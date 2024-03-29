@@ -46,9 +46,9 @@ builder.Services.AddCors(opt =>
 // For FileUpload
 builder.Services.Configure<FormOptions>(x =>
 {
-    x.MultipartBodyLengthLimit = 15000000; // In case of multipart
-    x.ValueLengthLimit = 15000000; //not recommended value
-    x.MemoryBufferThreshold = 15000000;
+    x.MultipartBodyLengthLimit = 5000000; // In case of multipart
+    x.ValueLengthLimit = 5000000; //not recommended value
+    x.MemoryBufferThreshold = 5000000;
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -106,7 +106,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-edlweiss1_0.db"));
+                        options.UseSqlite("Data Source=x-edlweiss_1_0_0_0.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -132,24 +132,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Events.OnRedirectToLogin = (context) =>
-        {
-            context.Response.StatusCode = 401;
-            return Task.CompletedTask;
-        };
-        options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
-        options.SlidingExpiration = true;
-        options.LoginPath = "/Account/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-        options.Cookie.HttpOnly = true;
-        // Only use this when the sites are on different domains
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.Domain = "check.azurewebsites.com";
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        //options.CookieManager = new CookieManager();
-    });
+    .AddCookie();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -220,13 +203,7 @@ app.Use(async (context, next) =>
 
     await next();
 });
-app.UseCookiePolicy(
-    new CookiePolicyOptions
-    {
-        Secure = CookieSecurePolicy.Always,
-        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
-        MinimumSameSitePolicy = SameSiteMode.Strict
-    });
+app.UseCookiePolicy();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

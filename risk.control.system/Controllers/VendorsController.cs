@@ -418,14 +418,24 @@ namespace risk.control.system.Controllers
             result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
                 Where(x => x.Selected).Select(y => y.RoleName));
             var isAgent = newRoles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
-            System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + Applicationsettings.APP_URL);
+            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
+
+            System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
             System.Net.WebClient client = new System.Net.WebClient();
             string tinyUrl = client.DownloadString(address);
             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User update. Email : " + user.Email, isAgent);
-
+            var message = $"Dear {user.FirstName}";
+            message += "                                                                                ";
+            message += $"Please click on the link below to install the mobile";
+            message += "                                                                                ";
+            message += $"{tinyUrl}";
+            message += "                                                                                ";
+            message += $"Thanks";
+            message += "                                                                                ";
+            message += $"https://icheckify.co.in";
             if (isAgent)
             {
-                var onboard = SmsService.SendSingleMessage(user.PhoneNumber, tinyUrl, isAgent);
+                var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, isAgent);
             }
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction("Users", "Vendors", new { id = model.VendorId });
