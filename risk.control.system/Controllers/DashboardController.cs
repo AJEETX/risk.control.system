@@ -38,7 +38,6 @@ namespace risk.control.system.Controllers
                 if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString())
                                 || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString())
                                 || userRole.Value.Contains(AppRoles.Creator.ToString())
-                                || userRole.Value.Contains(AppRoles.Assigner.ToString())
                                 )
                 {
                     Dictionary<string, int> monthlyExpense = dashboardService.CalculateAgencyCaseStatus(userEmail);

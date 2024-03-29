@@ -88,7 +88,7 @@
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-    initMap("/api/CompanyCompletedClaims/GetReportMap");
+    //initMap("/api/CompanyCompletedClaims/GetReportMap");
 });
 
 function getdetails(id) {

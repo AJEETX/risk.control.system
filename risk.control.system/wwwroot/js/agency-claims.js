@@ -169,7 +169,7 @@
             }
         });
     });
-    initMap("/api/ClaimsVendor/GetNewMap");
+    //initMap("/api/ClaimsVendor/GetNewMap");
 
 });
 

@@ -7,5 +7,7 @@
         public VendorInvoice? VendorInvoice { get; set; }
         public List<InvestigationTransaction> Log { get; set; }
         public string? TimeTaken { get; set; }
+        public bool Assigned { get; set; } = false;
+        public bool AutoAllocation { get; set; } = false;
     }
 }

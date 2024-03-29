@@ -9,31 +9,31 @@
         <form id="create-form" asp-action="Edit" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card border-secondary bg-light card-secondary">
+                    <div class="card border-secondary card-secondary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-building"></i> @Applicationsettings.EDIT Company</h3>
                         </div>
-                        <div class="card-body">
-                            <div class="submit-progress hidden">
-                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                            </div>
-                            <div class="row">
+                        <article>
+                            <div class="bb-blog-inner">
+                                <div class="submit-progress hidden">
+                                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                                </div>
+                                <div class="card card-light collapsed-card">
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Company Detail</span></h3>
 
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-footer">
-                                        <i class="fas fa-building"></i> Company Details
-                                    </div>
-                                    <div class="progress">
-                                        <i class="far fa-bookmark bookmark-green"></i>
-                                        <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
-                                            <i class="fas fa-building"></i>
+                                        <div class="card-tools">
+                                            <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light"><i class="fas fa-building"></i></span>
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body pb-0">
+                                        <input type="hidden" asp-for="ClientCompanyId" />
+                                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                         <div class="row">
                                             <div class="col-sm-6">
-                                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                                <input type="hidden" asp-for="ClientCompanyId" />
 
                                                 <div class="form-group">
                                                     <span class="input-group-label"> Domain:</span>
@@ -244,20 +244,25 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card bg-light d-flex flex-fill">
-                                    <div class="card-footer">
-                                        <i class="fas fa-building"></i> Api Details
-                                    </div>
-                                    <div class="progress">
-                                        <i class="far fa-bookmark bookmark-green"></i>
-                                        <div class="progress-bar" role="progressbar" style="width:100%;background-color:green;">
-                                            <i class="fas fa-sitemap"></i>
+                            </div>
+                        </article>
+                        <article>
+                            <div class="bb-blog-inner">
+                                <div class="card card-light expand-card">
+
+                                    <div class="card-header">
+                                        <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Api Detail</span></h3>
+
+                                        <div class="card-tools">
+                                            <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light"><i class="fas fa-building"></i></span>
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
                                         </div>
                                     </div>
-                                    <div class="card-body">
+                                    <div class="card-body pb-0">
                                         <div class="row">
-                                            
-                                            <div class="col-sm-12">
+                                            <div class="col-sm-8">
                                                 <div class="form-group">
                                                     <span class="input-group-label"> Pan API:</span>
                                                     <div class="input-group mb-3">
@@ -310,6 +315,22 @@
                                                 </div>
 
                                                 <div class="form-group">
+                                                    <span class="input-group-label"> Mobile App Url:</span>
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text" id="MobileApiBaseUrl"><i class="fas fa-code-branch"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        </div>
+                                                        <input type="text" asp-for="MobileAppUrl" class="form-control remarks" placeholder="mobile app url" />
+                                                        <span asp-validation-for="MobileAppUrl" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+
+                                                
+
+
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
                                                     <span class="input-group-label">Auto Allocation:</span>
                                                     <div class="input-group mb-3">
                                                         <div class="input-group-prepend">
@@ -358,25 +379,41 @@
                                                         </span>
                                                     </div>
                                                 </div>
+                                                <div class="form-group">
+                                                    <span class="input-group-label">BulkUpload:</span>
+                                                    <div class="input-group mb-3">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text" id="bulk-upload"><i class="fa fa-upload"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                                        </div>
+                                                        <div class="input-group-prepend">
+                                                        </div>
+                                                        <div class="input-group-prepend">
+                                                        </div>
+                                                        <span class="checkbox">
+                                                            <input asp-for="BulkUpload" type="checkbox" data-toggle="toggle" data-on="<i class='fas fa-check'></i>  " data-off="<i class='fa fa-times'></i> " data-onstyle="success" data-offstyle="secondary">
 
-
-                                                <div class="form-group text-right">
-                                                    <span class="input-group-label">&nbsp; </span>
-
-                                                    <div>
-                                                        <a id="back" asp-action="Index" class="btn btn-secondary">
-                                                            <i class="fa fa-window-close"></i>
-                                                            @Applicationsettings.CANCEL
-                                                        </a>
-                                                        <button id="edit-company" type="submit" class="btn btn-warning">
-                                                            <i class="fas fa-building"></i>  @Applicationsettings.EDIT Company
-                                                        </button>
+                                                        </span>
                                                     </div>
-
                                                 </div>
+
+
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                        </article>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <a id="back" asp-action="Index" class="btn btn-secondary">
+                                        <i class="fa fa-window-close"></i>
+                                        @Applicationsettings.CANCEL
+                                    </a>
+                                    <button id="edit-company" type="submit" class="btn btn-warning">
+                                        <i class="fas fa-building"></i>  @Applicationsettings.EDIT Company
+                                    </button>
                                 </div>
                             </div>
                         </div>

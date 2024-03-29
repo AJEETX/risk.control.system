@@ -60,18 +60,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
                 claimsSubmitted = await applicationDbContext.ToListAsync();
             }
-            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a =>
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == reAssigned2AssignerStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
-                claimsSubmitted = await applicationDbContext.ToListAsync();
-            }
+            
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
@@ -172,18 +161,7 @@ namespace risk.control.system.Controllers.Api.Claims
                 applicationDbContext = applicationDbContext.Where(a => openStatusesIds.Contains(a.InvestigationCaseStatusId));
                 claimsSubmitted = await applicationDbContext.ToListAsync();
             }
-            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
-            {
-                var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
-                applicationDbContext = applicationDbContext.Where(a =>
-                openStatusesIds.Contains(a.InvestigationCaseStatusId) && a.InvestigationCaseSubStatusId == assignedToAssignerStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == submittededToSupervisorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == submittededToAssesssorStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == reAssigned2AssignerStatus.InvestigationCaseSubStatusId
-                || a.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId);
-                claimsSubmitted = await applicationDbContext.ToListAsync();
-            }
+            
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();

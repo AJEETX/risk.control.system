@@ -164,5 +164,5 @@ $(document).ready(function () {
         });
     });
 
-    initMap("/api/CompanyAssessClaims/GetAssessorMap");
+    //initMap("/api/CompanyAssessClaims/GetAssessorMap");
 });

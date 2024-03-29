@@ -91,7 +91,9 @@ namespace risk.control.system.Controllers
             {
                 return NotFound();
             }
-            var model = await investigationReportService.GetClaimDetails(id);
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var model = await investigationReportService.GetClaimDetails(currentUserEmail,id);
 
             if (model == null)
             {

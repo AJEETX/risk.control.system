@@ -89,7 +89,7 @@
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-    initMap("/api/ClaimsVendor/GetOpenMap");
+    //initMap("/api/ClaimsVendor/GetOpenMap");
 });
 
 function showdetails() {

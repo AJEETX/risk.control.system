@@ -44,11 +44,7 @@
                 roleCode = @Applicationsettings.CREATOR.CODE;
                 <span class="badge badge-primary">@roleCode</span>
             }
-            else if (User.IsInRole(AppRoles.Assigner.ToString()))
-            {
-                roleCode = @Applicationsettings.ASSIGNER.CODE;
-                <span class="badge badge-secondary">@roleCode</span>
-            }
+            
             else if (User.IsInRole(AppRoles.Assessor.ToString()))
             {
                 roleCode = @Applicationsettings.ASSESSOR.CODE;
