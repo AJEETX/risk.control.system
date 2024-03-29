@@ -6,7 +6,7 @@
 @inject UserManager<ApplicationUser> UserManager
 @model ClientCompany
 @{
-    if (User.IsInRole(AppRoles.Creator.ToString()) || User.IsInRole(AppRoles.Assigner.ToString()) || User.IsInRole(AppRoles.Assessor.ToString()))
+    if (User.IsInRole(AppRoles.Creator.ToString()) || User.IsInRole(AppRoles.Assessor.ToString()))
     {
         <li class="nav-item">
             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("ClaimsInvestigation","") @Url.MakeActiveClass("InsuranceClaims","") @Url.MakeActiveClass("InsurancePolicy","")
@@ -19,7 +19,6 @@
             </a>
         </li>
         <partial name="AdminLTE/_CompanySidebarClaimsCreator" />
-        <partial name="AdminLTE/_CompanySidebarClaimsAssigner" />
         <partial name="AdminLTE/_CompanySidebarClaimsAssessor" />
     
         <li class="nav-item">
@@ -42,7 +41,7 @@
             </a>
         </li>
     }
-    if (User.IsInRole(AppRoles.Creator.ToString()))
+    if (User.IsInRole(AppRoles.Creator.ToString()) && (Model.AutoAllocation))
     {
         <li class="nav-item">
             <a is-active-page asp-controller="Uploads" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("Uploads","Uploads")">

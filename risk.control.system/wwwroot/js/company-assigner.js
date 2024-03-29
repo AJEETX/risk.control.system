@@ -1,4 +1,17 @@
 ﻿$(document).ready(function () {
+    $('#postedFile').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadFileButton');
+        var uploadType = $('#uploadtype').val();
+        val.endsWith('.zip') && (uploadType == "0" || uploadType == "1") ? fbtn.removeAttr("disabled") : fbtn.attr("disabled");
+    });
+
+    $('#uploadtype').on("change", function () {
+        var val = $(this).val(),
+            fbtn = $('#UploadFileButton');
+        var uploadType = $('#postedFile').val();
+        (val == "0" || val == "1") && uploadType.endsWith('.zip') ? fbtn.removeAttr("disabled") : fbtn.attr('disabled', 'disabled');
+    });
     $('#view-type a').on('click', function () {
         var id = this.id;
         if (this.id == 'map-type') {
@@ -94,7 +107,8 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<a id="details' + row.id + '" onclick="showdata(`' + row.id + '`)" href="Detail?Id=' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-search"></i> Details</a>&nbsp;'
+                    buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)" href="Details?Id=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
+                    buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)" href="/InsurancePolicy/Delete?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete </a>'
                     return buttons;
                 }
             }
@@ -147,22 +161,60 @@
             nodes[i].disabled = true;
         }
     });
-    initMap("/api/CompanyAssignClaims/GetAssignerMap");
+
+    $('#UploadFileButton').on('click', function (event) {
+        $("body").addClass("submit-progress-bg");
+        // Wrap in setTimeout so the UI
+        // can update the spinners
+        setTimeout(function () {
+            $(".submit-progress").removeClass("hidden");
+        }, 1);
+
+        $(this).attr('disabled', 'disabled');
+        $(this).html("<i class='fas fa-sync fa-spin'></i> Upload");
+
+        $('#upload-claims').submit();
+        $('html *').css('cursor', 'not-allowed');
+        $('html a *, html button *').attr('disabled', 'disabled');
+        $('html a *, html button *').css('pointer-events', 'none')
+
+        var nodes = document.getElementById("body").getElementsByTagName('*');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].disabled = true;
+        }
+    });
+    //initMap("/api/CompanyAssignClaims/GetAssignerMap");
 });
 
-function showdata(id) {
+
+function showedit(id) {
     $("body").addClass("submit-progress-bg");
     // Wrap in setTimeout so the UI
     // can update the spinners
     setTimeout(function () {
         $(".submit-progress").removeClass("hidden");
     }, 1);
-    $('a.btn').attr('disabled', 'disabled');
-    var detailbtn = $('a#details' + id + '.btn.btn-xs.btn-info')
-    detailbtn.html("<i class='fas fa-sync fa-spin'></i> Details");
+    $('a.btn *').attr('disabled', 'disabled');
+    $('a#edit' + id + '.btn.btn-xs.btn-warning').html("<i class='fas fa-sync fa-spin'></i> Edit");
 
     var nodes = document.getElementById("body").getElementsByTagName('*');
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].disabled = true;
     }
 }
+function getdetails(id) {
+    $("body").addClass("submit-progress-bg");
+    // Wrap in setTimeout so the UI
+    // can update the spinners
+    setTimeout(function () {
+        $(".submit-progress").removeClass("hidden");
+    }, 1);
+    $('a.btn *').attr('disabled', 'disabled');
+    $('a#details' + id + '.btn.btn-xs.btn-danger').html("<i class='fas fa-sync fa-spin'></i> Delete");
+
+    var nodes = document.getElementById("body").getElementsByTagName('*');
+    for (var i = 0; i < nodes.length; i++) {
+        nodes[i].disabled = true;
+    }
+}
+

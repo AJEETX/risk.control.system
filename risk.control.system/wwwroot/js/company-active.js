@@ -101,7 +101,7 @@
 
 
 
-    initMap("/api/CompanyActiveClaims/GetActiveMap");
+    //initMap("/api/CompanyActiveClaims/GetActiveMap");
 });
 
 function getdetails(id) {

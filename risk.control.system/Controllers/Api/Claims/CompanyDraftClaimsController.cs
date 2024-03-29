@@ -56,12 +56,13 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
-            if (userRole.Value.Contains(AppRoles.PortalAdmin.ToString()) || userRole.Value.Contains(AppRoles.CompanyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Creator.ToString()))
+            if (userRole.Value.Contains(AppRoles.Creator.ToString()))
             {
                 applicationDbContext = applicationDbContext
                     .Include(c => c.CaseLocations)
                     .ThenInclude(c => c.PinCode)
-                    .Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => (c.VendorId == null && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
+                    .Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => (c.VendorId == null 
+                    && c.InvestigationCaseSubStatusId == createdStatus.InvestigationCaseSubStatusId)
                     ) || (a.IsReviewCase && a.InvestigationCaseSubStatusId == reAssignedStatus.InvestigationCaseSubStatusId));
 
                 var claimsAssigned = new List<ClaimsInvestigation>();
@@ -118,7 +119,6 @@ namespace risk.control.system.Controllers.Api.Claims
                         TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
                     })?
                     .ToList();
-                await Task.Delay(1000);
 
                 return Ok(response);
             }

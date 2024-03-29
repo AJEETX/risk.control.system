@@ -157,33 +157,33 @@ namespace risk.control.system.Controllers
                         }
                     }
 
-                    var assignerRole = roleManager.Roles.FirstOrDefault(r =>
-                            r.Name.Contains(AppRoles.Assigner.ToString()));
-                    var creatorRole = roleManager.Roles.FirstOrDefault(r =>
-                            r.Name.Contains(AppRoles.Creator.ToString()));
+                    //var assignerRole = roleManager.Roles.FirstOrDefault(r =>
+                    //        r.Name.Contains(AppRoles.Assigner.ToString()));
+                    //var creatorRole = roleManager.Roles.FirstOrDefault(r =>
+                    //        r.Name.Contains(AppRoles.Creator.ToString()));
 
-                    var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == companyUser.ClientCompanyId);
+                    //var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == companyUser.ClientCompanyId);
 
-                    string currentOwner = string.Empty;
-                    foreach (var companyuser in companyUsers)
-                    {
-                        var isCreator = await userManager.IsInRoleAsync(companyuser, creatorRole?.Name);
-                        if (isCreator)
-                        {
-                            currentOwner = companyuser.Email;
+                    //string currentOwner = string.Empty;
+                    //foreach (var companyuser in companyUsers)
+                    //{
+                    //    var isCreator = await userManager.IsInRoleAsync(companyuser, creatorRole?.Name);
+                    //    if (isCreator)
+                    //    {
+                    //        currentOwner = companyuser.Email;
 
-                            ClientCompanyApplicationUser user = await userManager.FindByEmailAsync(currentOwner);
+                    //        ClientCompanyApplicationUser user = await userManager.FindByEmailAsync(currentOwner);
 
-                            if (clientCompany.AutoAllocation)
-                            {
-                                var result = await userManager.AddToRoleAsync(user, assignerRole.Name);
-                            }
-                            else
-                            {
-                                var result = await userManager.RemoveFromRoleAsync(user, assignerRole.Name);
-                            }
-                        }
-                    }
+                    //        if (clientCompany.AutoAllocation)
+                    //        {
+                    //            var result = await userManager.AddToRoleAsync(user, assignerRole.Name);
+                    //        }
+                    //        else
+                    //        {
+                    //            var result = await userManager.RemoveFromRoleAsync(user, assignerRole.Name);
+                    //        }
+                    //    }
+                    //}
                     var currentUser = await userManager.FindByEmailAsync(userEmail);
                     await signInManager.RefreshSignInAsync(currentUser);
 
@@ -626,7 +626,6 @@ namespace risk.control.system.Controllers
             foreach (var role in roleManager.Roles.Where(r =>
                 r.Name.Contains(AppRoles.CompanyAdmin.ToString()) ||
                 r.Name.Contains(AppRoles.Creator.ToString()) ||
-                r.Name.Contains(AppRoles.Assigner.ToString()) ||
                 r.Name.Contains(AppRoles.Assessor.ToString())))
             {
                 var userRoleViewModel = new CompanyUserRoleViewModel

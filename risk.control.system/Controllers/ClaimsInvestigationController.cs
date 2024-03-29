@@ -79,7 +79,7 @@ namespace risk.control.system.Controllers
             return View();
         }
 
-        [Breadcrumb(" Assign (manual)", FromAction = "Index")]
+        [Breadcrumb(" Assign(manual)", FromAction = "Index")]
         public IActionResult Assigner()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -88,10 +88,51 @@ namespace risk.control.system.Controllers
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            return View();
-        }
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == currentUserEmail);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
 
-        [Breadcrumb(" Assign", FromAction = "Index")]
+            return View(company.BulkUpload);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Assigner(IFormFile postedFile, string uploadtype)
+        {
+            var userEmail = HttpContext.User.Identity.Name;
+            if (postedFile != null && !string.IsNullOrWhiteSpace(userEmail))
+            {
+                UploadType uploadType = (UploadType)Enum.Parse(typeof(UploadType), uploadtype, true);
+
+                if (uploadType == UploadType.FTP)
+                {
+                    await ftpService.DownloadFtpFile(userEmail, postedFile);
+
+                    notifyService.Custom($"Ftp download complete ", 3, "green", "far fa-file-powerpoint");
+
+                    return RedirectToAction("Draft", "ClaimsInvestigation");
+                }
+
+                if (uploadType == UploadType.FILE && Path.GetExtension(postedFile.FileName) == ".zip")
+                {
+                    try
+                    {
+                        await ftpService.UploadFile(userEmail, postedFile);
+
+                        notifyService.Custom($"File upload complete", 3, "green", "far fa-file-powerpoint");
+
+                        return RedirectToAction("Assigner", "ClaimsInvestigation");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+
+            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+
+            return RedirectToAction("Draft", "ClaimsInvestigation");
+        }
+        [Breadcrumb(" Assign(auto)", FromAction = "Index")]
         public IActionResult Draft()
         {
             var currentUserEmail = HttpContext.User?.Identity?.Name;
@@ -100,7 +141,11 @@ namespace risk.control.system.Controllers
                 toastNotification.AddAlertToastMessage("OOPs !!!..");
                 return RedirectToAction(nameof(Index), "Dashboard");
             }
-            return View();
+
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u=>u.Email == currentUserEmail);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
+            return View(company.BulkUpload);
         }
 
         [HttpPost]
@@ -269,7 +314,7 @@ namespace risk.control.system.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var model = await investigationReportService.GetClaimDetails(id);
+            var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
 
             return View(model);
         }

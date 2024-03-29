@@ -135,8 +135,8 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var caseLocations = claimsInvestigation.CaseLocations.Where(c =>
-            ((!c.VendorId.HasValue) && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId) ||
-            (claimsInvestigation.IsReviewCase && claimsInvestigation.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)
+            ((!c.VendorId.HasValue)) ||
+            (claimsInvestigation.IsReviewCase)
             )?.ToList();
 
             claimsInvestigation.CaseLocations = caseLocations;

@@ -25,14 +25,29 @@
                 </p>
             </a>
         </li>
+        if(Model.AutoAllocation)
+        {
+            <li class="nav-item">
+                <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft") ">
+                    <i class="fas fa-external-link-alt nav-icon"></i>
+                    <p>
+                        <span class="badge badge-warning">ASSIGN</span><span class="badge badge-light">auto</span>
+                    </p>
+                </a>
+            </li>
+        }
+        
         <li class="nav-item">
-            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Draft" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Draft") ">
+            <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assigner")
+                                                @Url.MakeActiveClass("ClaimsInvestigation","AllocateToVendor")
+                                @Url.MakeActiveClass("ClaimsInvestigation","Detail")
+                    @Url.MakeActiveClass("ClaimsInvestigation", "VendorDetail")
+                                                @Url.MakeActiveClass("ClaimsInvestigation","EmpanelledVendors")">
                 <i class="fas fa-external-link-alt nav-icon"></i>
                 <p>
-                    <span class="badge badge-warning">ASSIGN</span>
+                    <span class="badge badge-danger">ASSIGN</span><span class="badge badge-light">manual</span>
                 </p>
             </a>
         </li>
-
     }
 }

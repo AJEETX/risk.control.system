@@ -49,7 +49,6 @@ namespace risk.control.system.Controllers
             foreach (var role in roleManager.Roles.Where(r =>
                 r.Name.Contains(AppRoles.CompanyAdmin.ToString()) ||
                 r.Name.Contains(AppRoles.Creator.ToString()) ||
-                r.Name.Contains(AppRoles.Assigner.ToString()) ||
                 r.Name.Contains(AppRoles.Assessor.ToString())))
             {
                 var userRoleViewModel = new CompanyUserRoleViewModel

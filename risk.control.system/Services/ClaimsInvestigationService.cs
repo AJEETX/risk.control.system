@@ -532,30 +532,15 @@ namespace risk.control.system.Services
                 var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == currentUser.ClientCompanyId);
                 string currentOwner = string.Empty;
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+                //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
-                if (currentUser.ClientCompany.AutoAllocation)
+                foreach (var companyUser in companyUsers)
                 {
-                    foreach (var companyUser in companyUsers)
+                    var isCeatorr = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
+                    if (isCeatorr)
                     {
-                        var isCeatorr = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
-                        if (isCeatorr)
-                        {
-                            currentOwner = companyUser.Email;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var companyUser in companyUsers)
-                    {
-                        var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
-                        if (isAssigner)
-                        {
-                            currentOwner = companyUser.Email;
-                            break;
-                        }
+                        currentOwner = companyUser.Email;
+                        break;
                     }
                 }
                 var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
@@ -616,32 +601,17 @@ namespace risk.control.system.Services
 
             string currentOwner = string.Empty;
             var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
-            var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+            //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
             var assigned = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
 
-            if (company.AutoAllocation)
+            foreach (var companyUser in companyUsers)
             {
-                foreach (var companyUser in companyUsers)
+                var isCeatorr = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
+                if (isCeatorr)
                 {
-                    var isCeatorr = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
-                    if (isCeatorr)
-                    {
-                        currentOwner = companyUser.Email;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var companyUser in companyUsers)
-                {
-                    var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
-                    if (isAssigner)
-                    {
-                        currentOwner = companyUser.Email;
-                        break;
-                    }
+                    currentOwner = companyUser.Email;
+                    break;
                 }
             }
             claimsInvestigation.PolicyDetail.Comments = model.ClaimsInvestigation.PolicyDetail.Comments;
@@ -1081,29 +1051,14 @@ namespace risk.control.system.Services
             var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == currentUser.ClientCompanyId);
             string currentOwner = string.Empty;
             var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
-            var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
-            if (currentUser.ClientCompany.AutoAllocation)
+            //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+            foreach (var companyUser in companyUsers)
             {
-                foreach (var companyUser in companyUsers)
+                var isAssigner = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
+                if (isAssigner)
                 {
-                    var isAssigner = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
-                    if (isAssigner)
-                    {
-                        currentOwner = companyUser.Email;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var companyUser in companyUsers)
-                {
-                    var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
-                    if (isAssigner)
-                    {
-                        currentOwner = companyUser.Email;
-                        break;
-                    }
+                    currentOwner = companyUser.Email;
+                    break;
                 }
             }
 

@@ -195,7 +195,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Assign",
+                        text: "Assign <span class='badge badge-light'> auto</span>",
                         btnClass: 'btn-warning',
                         action: function () {
                             askConfirmation = true;
@@ -246,7 +246,7 @@
             nodes[i].disabled = true;
         }
     });
-    initMap("/api/CompanyDraftClaims/GetAssignMap");
+    //initMap("/api/CompanyDraftClaims/GetAssignMap");
 
 });
 

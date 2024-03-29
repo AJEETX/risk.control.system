@@ -67,20 +67,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
             }
-            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
-                        && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsAssigned.Add(item);
-                    }
-                }
-            }
+            
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
@@ -171,20 +158,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
             }
-            else if (userRole.Value.Contains(AppRoles.Assigner.ToString()))
-            {
-                applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId == null));
-
-                foreach (var item in applicationDbContext)
-                {
-                    item.CaseLocations = item.CaseLocations.Where(c => !c.VendorId.HasValue
-                        && c.InvestigationCaseSubStatusId == assignedStatus.InvestigationCaseSubStatusId)?.ToList();
-                    if (item.CaseLocations.Any())
-                    {
-                        claimsAssigned.Add(item);
-                    }
-                }
-            }
+            
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));

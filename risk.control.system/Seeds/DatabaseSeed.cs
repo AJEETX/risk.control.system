@@ -33,7 +33,7 @@ namespace risk.control.system.Seeds
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.CompanyAdmin.ToString().Substring(0, 2).ToUpper(), AppRoles.CompanyAdmin.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.AgencyAdmin.ToString().Substring(0, 2).ToUpper(), AppRoles.AgencyAdmin.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.Creator.ToString().Substring(0, 2).ToUpper(), AppRoles.Creator.ToString()));
-            await roleManager.CreateAsync(new ApplicationRole(AppRoles.Assigner.ToString().Substring(0, 2).ToUpper(), AppRoles.Assigner.ToString()));
+            //await roleManager.CreateAsync(new ApplicationRole(AppRoles.Assigner.ToString().Substring(0, 2).ToUpper(), AppRoles.Assigner.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.Assessor.ToString().Substring(0, 2).ToUpper(), AppRoles.Assessor.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.Supervisor.ToString().Substring(0, 2).ToUpper(), AppRoles.Supervisor.ToString()));
             await roleManager.CreateAsync(new ApplicationRole(AppRoles.Agent.ToString().Substring(0, 2).ToUpper(), AppRoles.Agent.ToString()));

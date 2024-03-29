@@ -26,7 +26,7 @@
                         bool beneficiaryExist = Model.Location != null;
                         string customerProgressbarMessage = "add customer";
                         string beneficiaryProgressbarMessage = "beneficiary";
-                        if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail !=null)
+                        if (Model.ClaimsInvestigation != null && Model.ClaimsInvestigation.CustomerDetail != null)
                         {
                             address = @Model.ClaimsInvestigation?.CustomerDetail.Addressline + " " + @Model.ClaimsInvestigation?.CustomerDetail.District.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.State.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.Country.Name + " " + @Model.ClaimsInvestigation?.CustomerDetail.PinCode.Code;
                             baddress = @Model.Location != null ? @Model.Location?.Addressline + " " +
@@ -55,7 +55,7 @@
                         }
                         string customerProgressColor = "steps2";
                         string customerLineColor = "line";
-                        if(Model.ClaimsInvestigation.PolicyDetail !=null)
+                        if (Model.ClaimsInvestigation.PolicyDetail != null)
                         {
                             customerLineColor = "line0";
                         }
@@ -77,21 +77,22 @@
                             benficiaryProgressColor = "steps";
                             beneficiaryLineColor = "line1";
                         }
-                        <div class="container d-flex justify-content-center align-items-center">
-                            <div class="progresses">
-                                <div class="steps">
-                                    <span> <i class="far fa-file-powerpoint"></i></span>
-                                </div>
-                                <span class="@customerLineColor"></span>
-                                <div class="@customerProgressColor">
-                                    <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
-                                </div>
-                                <span class="@beneficiaryLineColor"></span>
-                                <div class="@benficiaryProgressColor">
-                                    <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                        
+                            <div class="container d-flex justify-content-center align-items-center">
+                                <div class="progresses">
+                                    <div class="steps">
+                                        <span> <i class="far fa-file-powerpoint"></i></span>
+                                    </div>
+                                    <span class="@customerLineColor"></span>
+                                    <div class="@customerProgressColor">
+                                        <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
+                                    </div>
+                                    <span class="@beneficiaryLineColor"></span>
+                                    <div class="@benficiaryProgressColor">
+                                        <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch flex-column">
@@ -122,7 +123,7 @@
                                                             </span>
                                                             Claim Type: <i class="fas fa-rupee-sign"></i>@Model.ClaimsInvestigation?.PolicyDetail.ClaimType
                                                         </li>
-                                                    <li class="small">
+                                                        <li class="small">
                                                             <span class="fa-li">
                                                                 <i class="fas fa-money-bill-wave"></i>
                                                             </span>
@@ -211,8 +212,29 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-input">
-                                        <a id="assign-list" asp-action="Draft" class="btn btn-warning"><span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign</a>
-                                        <a id="active-list" asp-action="Active" class="btn btn-primary"><span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Active </a>
+                                        @if (customerExist && beneficiaryExist && !Model.Assigned && Model.AutoAllocation)
+                                        {
+
+                                            <a id="assign-list" asp-action="Draft" class="btn btn-warning"><span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span> Assign
+                                                <span class="badge badge-light">auto</span>
+                                            </a>
+                                            <a id="assign-manual-list" asp-action="Assigner" class="btn btn-danger">
+                                                <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>
+                                                Assign <span class="badge badge-light">manual</span>
+                                            </a>
+                                        }
+                                        else if (customerExist && beneficiaryExist && Model.Assigned || (customerExist && beneficiaryExist && !Model.AutoAllocation))
+                                        {
+
+                                            <a id="assign-manual-list" asp-action="Assigner" class="btn btn-danger">
+                                                <span class="badge badge-light"> <i class="fas fa-external-link-alt"></i> </span>
+                                                Assign <span class="badge badge-light">manual</span>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a id="active-list" asp-action="Active" class="btn btn-primary"><span class="badge badge-light"> <i class="fa fa-toggle-on"></i> </span> Active </a>
+                                        }
                                     </div>
                                 </div>
                             </div>

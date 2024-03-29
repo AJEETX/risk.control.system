@@ -157,13 +157,13 @@ namespace risk.control.system.Services
 
             var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
 
-            var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+            //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
             var companyUsers = _context.ClientCompanyApplicationUser.Where(u => u.ClientCompanyId == clientCompanyUser.ClientCompanyId);
 
             foreach (var companyUser in companyUsers)
             {
-                var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
+                var isAssigner = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
                 if (isAssigner)
                 {
                     userEmailsToSend.Add(companyUser);
@@ -247,30 +247,16 @@ namespace risk.control.system.Services
 
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
 
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+                //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
                 List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
 
-                if (company.AutoAllocation)
+                foreach (var companyUser in companyUsers)
                 {
-                    foreach (var companyUser in companyUsers)
+                    var isCeatorr = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
+                    if (isCeatorr)
                     {
-                        var isCeatorr = await userManager.IsInRoleAsync(companyUser, creatorRole?.Name);
-                        if (isCeatorr)
-                        {
-                            users.Add(companyUser);
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var companyUser in companyUsers)
-                    {
-                        var isAssigner = await userManager.IsInRoleAsync(companyUser, assignerRole?.Name);
-                        if (isAssigner)
-                        {
-                            users.Add(companyUser);
-                        }
+                        users.Add(companyUser);
                     }
                 }
 
@@ -482,7 +468,7 @@ namespace risk.control.system.Services
 
                 var clientAdminrRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.CompanyAdmin.ToString()));
                 var creatorRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Creator.ToString()));
-                var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
+                //var assignerRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Assigner.ToString()));
 
                 List<ClientCompanyApplicationUser> users = new List<ClientCompanyApplicationUser>();
                 foreach (var user in companyUsers)
@@ -494,21 +480,10 @@ namespace risk.control.system.Services
                     }
                     if (claimsInvestigation.IsReviewCase)
                     {
-                        if (company.AutoAllocation)
+                        var isCreator = await userManager.IsInRoleAsync(user, creatorRole?.Name);
+                        if (isCreator)
                         {
-                            var isCreator = await userManager.IsInRoleAsync(user, creatorRole?.Name);
-                            if (isCreator)
-                            {
-                                users.Add(user);
-                            }
-                        }
-                        else
-                        {
-                            var isAssigner = await userManager.IsInRoleAsync(user, assignerRole?.Name);
-                            if (isAssigner)
-                            {
-                                users.Add(user);
-                            }
+                            users.Add(user);
                         }
                     }
                 }

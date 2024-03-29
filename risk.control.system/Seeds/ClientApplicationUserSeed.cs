@@ -136,55 +136,55 @@ namespace risk.control.system.Seeds
             }
 
             //Seed client assigner
-            string assignerEmailwithSuffix = Applicationsettings.ASSIGNER.CODE + "@" + company.Email;
-            var asMailBox = new Mailbox
-            {
-                Name = assignerEmailwithSuffix
-            };
-            string assignerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assigner.jpeg");
+            //string assignerEmailwithSuffix = Applicationsettings.ASSIGNER.CODE + "@" + company.Email;
+            //var asMailBox = new Mailbox
+            //{
+            //    Name = assignerEmailwithSuffix
+            //};
+            //string assignerImagePath = Path.Combine(webHostEnvironment.WebRootPath, "img", "assigner.jpeg");
 
-            var assignerImage = File.ReadAllBytes(assignerImagePath);
+            //var assignerImage = File.ReadAllBytes(assignerImagePath);
 
-            if (assignerImage == null)
-            {
-                assignerImage = File.ReadAllBytes(noUserImagePath);
-            }
+            //if (assignerImage == null)
+            //{
+            //    assignerImage = File.ReadAllBytes(noUserImagePath);
+            //}
 
-            var clientAssigner = new ClientCompanyApplicationUser()
-            {
-                Mailbox = asMailBox,
-                UserName = assignerEmailwithSuffix,
-                Email = assignerEmailwithSuffix,
-                FirstName = ASSIGNER.FIRST_NAME,
-                LastName = ASSIGNER.LAST_NAME,
-                Active = true,
-                EmailConfirmed = true,
-                ClientCompany = clientCompany,
-                PhoneNumberConfirmed = true,
-                Password = Password,
-                IsSuperAdmin = false,
-                IsClientAdmin = false,
-                Addressline = "453 Main Road",
-                PhoneNumber = Applicationsettings.MOBILE,
-                IsVendorAdmin = false,
-                CountryId = countryId,
-                DistrictId = district?.DistrictId ?? default!,
-                StateId = state?.StateId ?? default!,
-                PinCodeId = pinCode?.PinCodeId ?? default!,
-                ProfilePictureUrl = ASSIGNER.PROFILE_IMAGE,
-                ProfilePicture = assignerImage
-            };
-            if (userManager.Users.All(u => u.Id != clientAssigner.Id))
-            {
-                var user = await userManager.FindByEmailAsync(clientAssigner.Email);
-                if (user == null)
-                {
-                    await userManager.CreateAsync(clientAssigner, Password);
-                    await userManager.AddToRoleAsync(clientAssigner, AppRoles.Assigner.ToString());
-                    //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
-                    //clientAssigner.ApplicationRoles.Add(clientAssignerRole);
-                }
-            }
+            //var clientAssigner = new ClientCompanyApplicationUser()
+            //{
+            //    Mailbox = asMailBox,
+            //    UserName = assignerEmailwithSuffix,
+            //    Email = assignerEmailwithSuffix,
+            //    FirstName = ASSIGNER.FIRST_NAME,
+            //    LastName = ASSIGNER.LAST_NAME,
+            //    Active = true,
+            //    EmailConfirmed = true,
+            //    ClientCompany = clientCompany,
+            //    PhoneNumberConfirmed = true,
+            //    Password = Password,
+            //    IsSuperAdmin = false,
+            //    IsClientAdmin = false,
+            //    Addressline = "453 Main Road",
+            //    PhoneNumber = Applicationsettings.MOBILE,
+            //    IsVendorAdmin = false,
+            //    CountryId = countryId,
+            //    DistrictId = district?.DistrictId ?? default!,
+            //    StateId = state?.StateId ?? default!,
+            //    PinCodeId = pinCode?.PinCodeId ?? default!,
+            //    ProfilePictureUrl = ASSIGNER.PROFILE_IMAGE,
+            //    ProfilePicture = assignerImage
+            //};
+            //if (userManager.Users.All(u => u.Id != clientAssigner.Id))
+            //{
+            //    var user = await userManager.FindByEmailAsync(clientAssigner.Email);
+            //    if (user == null)
+            //    {
+            //        await userManager.CreateAsync(clientAssigner, Password);
+            //        await userManager.AddToRoleAsync(clientAssigner, AppRoles.Assigner.ToString());
+            //        //var clientAssignerRole = new ApplicationRole(AppRoles.Assigner.ToString(), AppRoles.Assigner.ToString());
+            //        //clientAssigner.ApplicationRoles.Add(clientAssignerRole);
+            //    }
+            //}
 
             //Seed client assessor
             string assessorEmailwithSuffix = Applicationsettings.ASSESSOR.CODE + "@" + company.Email;

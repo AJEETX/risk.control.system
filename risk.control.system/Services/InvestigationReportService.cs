@@ -13,7 +13,7 @@ namespace risk.control.system.Services
 
         Task<ClaimTransactionModel> GetApprovedReport(string selectedcase);
 
-        Task<ClaimTransactionModel> GetClaimDetails(string id);
+        Task<ClaimTransactionModel> GetClaimDetails(string currentUserEmail, string id);
 
         Task<ClaimsInvestigation> GetAssignDetails(string id);
 
@@ -149,7 +149,7 @@ namespace risk.control.system.Services
             return claimsInvestigation;
         }
 
-        public async Task<ClaimTransactionModel> GetClaimDetails(string id)
+        public async Task<ClaimTransactionModel> GetClaimDetails(string currentUserEmail, string id)
         {
             var caseLogs = await _context.InvestigationTransaction
                 .Include(i => i.InvestigationCaseStatus)
@@ -201,12 +201,19 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
 
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();
+            var assignedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(i =>
+                i.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER);
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u=>u.Email == currentUserEmail);
+            var company = _context.ClientCompany.FirstOrDefault(c => c.ClientCompanyId == companyUser.ClientCompanyId);
+
 
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claimsInvestigation,
                 Log = caseLogs,
-                Location = location
+                Location = location,
+                Assigned = claimsInvestigation.InvestigationCaseSubStatus == assignedStatus,
+                AutoAllocation = company.AutoAllocation
             };
 
             return model;
