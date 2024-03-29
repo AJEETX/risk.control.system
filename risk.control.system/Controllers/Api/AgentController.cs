@@ -84,8 +84,7 @@ namespace risk.control.system.Controllers.Api
                 }
                 if (request.CheckUid)
                 {
-                    var mobileUidExist = _context.VendorApplicationUser.Any(
-                                    v => v.MobileUId == request.Uid);
+                    var mobileUidExist = _context.VendorApplicationUser.Any(v => v.MobileUId == request.Uid);
                     if (mobileUidExist)
                     {
                         return BadRequest($"{nameof(request.Uid)} {request.Uid} exists");
@@ -93,32 +92,28 @@ namespace risk.control.system.Controllers.Api
                 }
 
                 var agentRole = _context.ApplicationRole.FirstOrDefault(r => r.Name.Contains(AppRoles.Agent.ToString()));
-                var user2Onboards = _context.VendorApplicationUser.Where(
-                    u => u.PhoneNumber == request.Mobile);
-                foreach (var user2Onboard in user2Onboards)
+                var user2Onboard = _context.VendorApplicationUser.FirstOrDefault(u => u.PhoneNumber == request.Mobile && u.Active);
+                var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
+
+                if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId))
                 {
-                    var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
-
-                    if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId))
+                    user2Onboard.MobileUId = request.Uid;
+                    user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
+                    _context.VendorApplicationUser.Update(user2Onboard);
+                    _context.SaveChanges();
+                    if (request.SendSMS)
                     {
-                        user2Onboard.MobileUId = request.Uid;
-                        user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
-                        _context.VendorApplicationUser.Update(user2Onboard);
-                        _context.SaveChanges();
-                        if (request.SendSMS)
-                        {
-                            //SEND SMS
-                            string device = "0";
-                            long? timestamp = null;
-                            bool isMMS = false;
-                            string? attachments = null;
-                            bool priority = false;
-                            string message = $"Pin : {user2Onboard.SecretPin}";
-                            var response = SMS.API.SendSingleMessage("+" + request.Mobile, message, device, timestamp, isMMS, attachments, priority);
-                        }
-
-                        return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
+                        //SEND SMS
+                        string device = "0";
+                        long? timestamp = null;
+                        bool isMMS = false;
+                        string? attachments = null;
+                        bool priority = false;
+                        string message = $"Pin : {user2Onboard.SecretPin}";
+                        var response = SMS.API.SendSingleMessage("+" + request.Mobile, message, device, timestamp, isMMS, attachments, priority);
                     }
+
+                    return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
                 }
                 return BadRequest($"Err");
             }

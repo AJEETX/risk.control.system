@@ -13,7 +13,7 @@
                 <a is-active-page asp-controller="ClaimsVendor" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","Index")
                                 @Url.MakeActiveClass("ClaimsVendor","AllocateToVendorAgent") @Url.MakeActiveClass("ClaimsVendor","SelectVendorAgent") 
                                         @Url.MakeActiveClass("ClaimsVendor","Allocate") @Url.MakeActiveClass("ClaimsVendor","CaseDetail")
-                                    @Url.MakeActiveClass("ClaimsVendor","ReSelectVendorAgent")">
+                                    ">
                     <i class="fas fa-external-link-alt nav-icon"></i>
                     <p>
                         <span class="badge badge-danger">ALLOCATE</span>
@@ -23,7 +23,7 @@
         }
         <li class="nav-item">
             <a is-active-page asp-controller="ClaimsVendor" asp-action="ClaimReport" class="actual-link nav-link @Url.MakeActiveClass("ClaimsVendor","ClaimReport")
-                                                @Url.MakeActiveClass("ClaimsVendor","GetInvestigateReport")">
+                                                    @Url.MakeActiveClass("ClaimsVendor","GetInvestigateReport") @Url.MakeActiveClass("ClaimsVendor","ReSelectVendorAgent")">
                 <i class="far fa-file-archive nav-icon"></i>
                 <p>
                     <span class="badge badge-info">AGENT REPORT</span>

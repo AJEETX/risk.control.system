@@ -14,6 +14,7 @@
         public static readonly int TokenTimeoutMinutes = 5;
         public static readonly string GMAPData = "AIzaSyDXQq3xhrRFxFATfPD4NcWlHLE8NPkzH2s";
         public static readonly string SGKData = "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";
+        public const string APP_URL = "https://apkichck.s3.ap-southeast-2.amazonaws.com/ichck/app-release_20242901-002101_dev.apk";
         //WEBSITE SETTINGS
 
         public const string WEBSITE_SITE_MENU_BRAND = "aby";

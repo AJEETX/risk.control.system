@@ -103,7 +103,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpGet]
-        [Breadcrumb("ReAllocate")]
+        [Breadcrumb("ReAllocate", FromAction = "ClaimReport")]
         public async Task<IActionResult> ReSelectVendorAgent(string selectedcase)
         {
             if (string.IsNullOrWhiteSpace(selectedcase))

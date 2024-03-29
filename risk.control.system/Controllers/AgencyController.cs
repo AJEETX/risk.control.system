@@ -1,4 +1,6 @@
-﻿using AspNetCoreHero.ToastNotification.Abstractions;
+﻿using System.Net;
+
+using AspNetCoreHero.ToastNotification.Abstractions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -478,9 +480,15 @@ namespace risk.control.system.Controllers
             await signInManager.RefreshSignInAsync(currentUser);
 
             var isAgent = newRoles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
+            System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + Applicationsettings.APP_URL);
+            System.Net.WebClient client = new System.Net.WebClient();
+            string tinyUrl = client.DownloadString(address);
+            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User update. Email : " + user.Email, isAgent);
 
-            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user role edited. Email : " + user.Email, isAgent);
-
+            if (isAgent)
+            {
+                var onboard = SmsService.SendSingleMessage(user.PhoneNumber, tinyUrl, isAgent);
+            }
             notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
             return RedirectToAction(nameof(AgencyController.User), "Agency");
         }
