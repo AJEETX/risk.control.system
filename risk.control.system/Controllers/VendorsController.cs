@@ -330,11 +330,36 @@ namespace risk.control.system.Controllers
                                 var createdUser = await userManager.FindByEmailAsync(user.Email);
                                 var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
                                 var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
-
+                                var roles = await userManager.GetRolesAsync(user);
+                                var onboardAgent = roles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {
-                                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
-                                    notifyService.Custom($"User edited and unlocked.", 3, "green", "fas fa-user-check");
+                                    var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
+
+                                    System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
+                                    System.Net.WebClient client = new System.Net.WebClient();
+                                    string tinyUrl = client.DownloadString(address);
+
+                                    var message = $"Dear {user.FirstName}";
+                                    message += "                                                                                ";
+                                    message += $"Click on link below to install the mobile app";
+                                    message += "                                                                                ";
+                                    message += $"{tinyUrl}";
+                                    message += "                                                                                ";
+                                    message += $"Thanks";
+                                    message += "                                                                                ";
+                                    message += $"https://icheckify.co.in";
+
+                                    if (onboardAgent)
+                                    {
+                                        var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
+                                        notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
+                                    }
+                                    else
+                                    {
+                                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                                        notifyService.Custom($"User edited.", 3, "green", "fas fa-user-check");
+                                    }
                                 }
                             }
                             return RedirectToAction(nameof(Users), "Vendors", new { id = applicationUser.VendorId });
@@ -417,13 +442,12 @@ namespace risk.control.system.Controllers
 
             result = await userManager.AddToRolesAsync(user, model.VendorUserRoleViewModel.
                 Where(x => x.Selected).Select(y => y.RoleName));
-            var isAgent = newRoles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
+            var onboardAgent = newRoles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId) && user.Active;
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
 
             System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
             System.Net.WebClient client = new System.Net.WebClient();
             string tinyUrl = client.DownloadString(address);
-            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User update. Email : " + user.Email, isAgent);
             var message = $"Dear {user.FirstName}";
             message += "                                                                                ";
             message += $"Please click on the link below to install the mobile";
@@ -433,11 +457,15 @@ namespace risk.control.system.Controllers
             message += $"Thanks";
             message += "                                                                                ";
             message += $"https://icheckify.co.in";
-            if (isAgent)
+            if (onboardAgent)
             {
-                var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, isAgent);
+                var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
+                notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
             }
-            notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
+            else
+            {
+                notifyService.Custom($"User role(s) updated successfully.", 3, "orange", "fas fa-user-cog");
+            }
             return RedirectToAction("Users", "Vendors", new { id = model.VendorId });
         }
 

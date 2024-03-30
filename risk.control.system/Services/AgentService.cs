@@ -59,13 +59,13 @@ namespace risk.control.system.Services
             if (sendSMS)
             {
                 //SEND SMS
-                string device = "0";
-                long? timestamp = null;
-                bool isMMS = false;
-                string? attachments = null;
-                bool priority = false;
-                string message = $"Uid reset for mobile: {user2Onboard.PhoneNumber}";
-                var response = SMS.API.SendSingleMessage("+" + mobile, message, device, timestamp, isMMS, attachments, priority);
+                string message = $"Dear {user2Onboard.Email}";
+                message += $"Uid reset for mobile: {user2Onboard.PhoneNumber}";
+                message += $"                                          ";
+                message += $"Thanks";
+                message += $"                                          ";
+                message += $"https://icheckify.co.in";
+                var response = SmsService.SendSingleMessage(mobile, message, sendSMS);
             }
             return user2Onboard;
         }

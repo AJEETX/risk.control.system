@@ -99,7 +99,7 @@ namespace risk.control.system.Controllers.Api
                 {
                     var isAgent = await userVendorManager.IsInRoleAsync(user2Onboard, agentRole?.Name);
 
-                    if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId))
+                    if (isAgent && string.IsNullOrWhiteSpace(user2Onboard.MobileUId) && user2Onboard.Active)
                     {
                         user2Onboard.MobileUId = request.Uid;
                         user2Onboard.SecretPin = randomNumber.Next(1000, 9999).ToString();
@@ -108,13 +108,15 @@ namespace risk.control.system.Controllers.Api
                         if (request.SendSMS)
                         {
                             //SEND SMS
-                            string device = "0";
-                            long? timestamp = null;
-                            bool isMMS = false;
-                            string? attachments = null;
-                            bool priority = false;
-                            string message = $"Pin : {user2Onboard.SecretPin}";
-                            var response = SMS.API.SendSingleMessage("+" + request.Mobile, message, device, timestamp, isMMS, attachments, priority);
+                            string message = $"Dear : {user2Onboard.Email}";
+                            message += $"icheckify App Pin";
+                            message += $"                                          ";
+                            message += $"{user2Onboard.SecretPin}";
+                            message += $"                                          ";
+                            message += $"Thanks";
+                            message += $"                                          ";
+                            message += $"https://icheckify.co.in";
+                            var response = SmsService.SendSingleMessage(request.Mobile, message, request.SendSMS);
                         }
 
                         return Ok(new { Email = user2Onboard.Email, Pin = user2Onboard.SecretPin });
