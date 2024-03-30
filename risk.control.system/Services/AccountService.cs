@@ -1,5 +1,6 @@
 ﻿using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 
 namespace risk.control.system.Services
 {
@@ -24,7 +25,17 @@ namespace risk.control.system.Services
             if (user != null)
             {
                 var passwordString = $"Your password is: {Applicationsettings.Password}";
-                SMS.API.SendSingleMessage(user.PhoneNumber, passwordString);
+
+
+                string message = $"Dear {useremail}";
+                message += $"                                          ";
+                message += $"Uid reset for mobile: {user.PhoneNumber}";
+                message += $"                                          ";
+                message += $"Thanks";
+                message += $"                                          ";
+                message += $"https://icheckify.co.in";
+                var response = SmsService.SendSingleMessage(user.PhoneNumber, message, true);
+
                 return true;
             }
             //SEND SMS
