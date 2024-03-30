@@ -14,6 +14,9 @@
                     </div>
                     <form id="checkboxes" asp-controller="ContactMessage" asp-action="OutboxDelete" method="post" id="listForm">
                         <div class="card-body">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <div class="table-responsive mailbox-messages">
                                 <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
                                     <thead>

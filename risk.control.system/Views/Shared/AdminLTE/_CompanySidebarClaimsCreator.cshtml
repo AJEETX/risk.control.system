@@ -14,7 +14,7 @@
         <li class="nav-item">
             <a is-active-page asp-controller="InsuranceClaims" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("InsuranceClaims","Index")
                                                     @Url.MakeActiveClass("InsurancePolicy","CreatePolicy") @Url.MakeActiveClass("ClaimsInvestigation","Details")
-                                                    @Url.MakeActiveClass("ClaimsInvestigation","Delete")
+                                                            @Url.MakeActiveClass("InsurancePolicy","Delete") @Url.MakeActiveClass("InsurancePolicy","DeleteManual")
                                                     @Url.MakeActiveClass("CaseLocations","Details")@Url.MakeActiveClass("CaseLocations","Delete")
                                                             @Url.MakeActiveClass("InsurancePolicy","EditPolicy")
                                                                 @Url.MakeActiveClass("CustomerInsurancePolicy","CreateCustomer") @Url.MakeActiveClass("CustomerInsurancePolicy","EditCustomer")
@@ -39,7 +39,7 @@
         
         <li class="nav-item">
             <a is-active-page asp-controller="ClaimsInvestigation" asp-action="Assigner" class="actual-link nav-link @Url.MakeActiveClass("ClaimsInvestigation","Assigner")
-                                                @Url.MakeActiveClass("ClaimsInvestigation","AllocateToVendor")
+                                                    @Url.MakeActiveClass("ClaimsInvestigation","AllocateToVendor") 
                                 @Url.MakeActiveClass("ClaimsInvestigation","Detail")
                     @Url.MakeActiveClass("ClaimsInvestigation", "VendorDetail")
                                                 @Url.MakeActiveClass("ClaimsInvestigation","EmpanelledVendors")">
