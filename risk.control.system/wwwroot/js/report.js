@@ -8,7 +8,7 @@
             $(".submit-progress").removeClass("hidden");
         }, 1);
         
-        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Agent Report");
+        $('#allocatedcase').html("<i class='fas fa-sync fa-spin' aria-hidden='true'></i> Verify <span class='badge badge-light'>report</span>");
         $('html *').css('cursor', 'not-allowed');
         $('html a *, html button *').attr('disabled', 'disabled');
         $('html a *, html button *').css('pointer-events', 'none')
