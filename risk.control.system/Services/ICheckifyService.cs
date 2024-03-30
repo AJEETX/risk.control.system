@@ -90,7 +90,7 @@ namespace risk.control.system.Services
                     {
                         var image = Convert.FromBase64String(data.LocationImage);
 
-                        using MemoryStream stream = new MemoryStream(image);
+                        //using MemoryStream stream = new MemoryStream(image);
                         //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
                         //if (!Directory.Exists(path))
                         //{
@@ -253,7 +253,7 @@ namespace risk.control.system.Services
             {
                 var byteimage = Convert.FromBase64String(data.OcrImage);
 
-                MemoryStream stream = new MemoryStream(byteimage);
+                //MemoryStream stream = new MemoryStream(byteimage);
                 //string path = Path.Combine(webHostEnvironment.WebRootPath, "verify");
                 //if (!Directory.Exists(path))
                 //{

@@ -128,7 +128,6 @@ namespace risk.control.system.Controllers.Api
             }
         }
         [AllowAnonymous]
-        [RequestSizeLimit(100_000_000)]
         [HttpPost("VerifyId")]
         public async Task<IActionResult> VerifyId(VerifyIdRequest request)
         {
@@ -183,7 +182,6 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [RequestSizeLimit(100_000_000)]
         [HttpPost("VerifyDocument")]
         public async Task<IActionResult> VerifyDocument(VerifyDocumentRequest request)
         {
@@ -329,7 +327,7 @@ namespace risk.control.system.Controllers.Api
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Active);
 
             if (vendorUser != null)
             {
@@ -438,7 +436,7 @@ namespace risk.control.system.Controllers.Api
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Active);
 
             if (vendorUser != null)
             {
@@ -586,7 +584,6 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [RequestSizeLimit(100_000_000)]
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
@@ -604,7 +601,6 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [RequestSizeLimit(100_000_000)]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {

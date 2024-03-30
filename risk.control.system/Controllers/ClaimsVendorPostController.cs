@@ -27,7 +27,6 @@ namespace risk.control.system.Controllers
         private readonly IToastNotification toastNotification;
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private static HttpClient httpClient = new();
 
         public ClaimsVendorPostController(
             IClaimsInvestigationService claimsInvestigationService,
@@ -56,68 +55,84 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AllocateToVendorAgent(string selectedcase, string claimId, long caseLocationId)
         {
-            if (string.IsNullOrWhiteSpace(selectedcase) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+            try
             {
-                notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
+                if (string.IsNullOrWhiteSpace(selectedcase) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+                {
+                    notifyService.Error($"No case selected!!!. Please select case to be allocate.", 3);
+                    return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                }
+
+                var userEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    toastNotification.AddAlertToastMessage("OOPs !!!..");
+                    notifyService.Error($"OOPs !!!..Err", 3);
+                    return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                }
+                var vendorAgent = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
+
+                var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, userEmail, vendorAgent.VendorId.Value, claimId);
+
+                await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, caseLocationId);
+
+                notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
+
                 return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
             }
-
-            var userEmail = HttpContext.User?.Identity?.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
+            catch (Exception)
             {
-                toastNotification.AddAlertToastMessage("OOPs !!!..");
-                notifyService.Error($"OOPs !!!..Err", 3);
-                return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var vendorAgent = _context.VendorApplicationUser.FirstOrDefault(c => c.Id.ToString() == selectedcase);
-
-            var claim = await claimsInvestigationService.AssignToVendorAgent(vendorAgent.Email, userEmail, vendorAgent.VendorId.Value, claimId);
-
-            await mailboxService.NotifyClaimAssignmentToVendorAgent(userEmail, claimId, vendorAgent.Email, vendorAgent.VendorId.Value, caseLocationId);
-
-            notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber} tasked to {vendorAgent.Email}", 3, "green", "far fa-file-powerpoint");
-
-            return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitReport(string remarks, string question1, string question2, string question3, string question4, string claimId, long caseLocationId)
         {
-            if (string.IsNullOrWhiteSpace(remarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+            try
             {
-                notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
-                return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
+                if (string.IsNullOrWhiteSpace(remarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+                {
+                    notifyService.Error($"No Agent remarks entered!!!. Please enter remarks.", 3);
+                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), "\"ClaimsVendor\"", new { selectedcase = claimId });
+                }
+
+                string userEmail = HttpContext?.User?.Identity.Name;
+
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    toastNotification.AddAlertToastMessage("OOPs !!!..");
+                    return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                }
+
+                //END : POST FACE IMAGE AND DOCUMENT
+
+                if (!string.IsNullOrWhiteSpace(question1))
+                {
+                    DwellType question1Enum = (DwellType)Enum.Parse(typeof(DwellType), question1, true);
+                    question1 = question1Enum.GetEnumDisplayName();
+                }
+
+                if (!string.IsNullOrWhiteSpace(question2))
+                {
+                    Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
+                    question2 = question2Enum.GetEnumDisplayName();
+                }
+                var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks, question1, question2, question3, question4);
+
+                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
+
+                notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber}  report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
+
+                return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
             }
-
-            string userEmail = HttpContext?.User?.Identity.Name;
-
-            if (string.IsNullOrWhiteSpace(userEmail))
+            catch (Exception)
             {
-                toastNotification.AddAlertToastMessage("OOPs !!!..");
-                return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-
-            //END : POST FACE IMAGE AND DOCUMENT
-
-            if (!string.IsNullOrWhiteSpace(question1))
-            {
-                DwellType question1Enum = (DwellType)Enum.Parse(typeof(DwellType), question1, true);
-                question1 = question1Enum.GetEnumDisplayName();
-            }
-
-            if (!string.IsNullOrWhiteSpace(question2))
-            {
-                Income question2Enum = (Income)Enum.Parse(typeof(Income), question2, true);
-                question2 = question2Enum.GetEnumDisplayName();
-            }
-            var claim = await claimsInvestigationService.SubmitToVendorSupervisor(userEmail, caseLocationId, claimId, remarks, question1, question2, question3, question4);
-
-            await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(userEmail, claimId, caseLocationId);
-
-            notifyService.Custom($"Claim #{claim.PolicyDetail.ContractNumber}  report submitted to supervisor", 3, "green", "far fa-file-powerpoint");
-
-            return RedirectToAction(nameof(ClaimsVendorController.Agent), "ClaimsVendor");
         }
 
         [HttpPost]
@@ -128,14 +143,14 @@ namespace risk.control.system.Controllers
             {
                 if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
                 {
-                    toastNotification.AddAlertToastMessage("No Supervisor remarks entered!!!. Please enter remarks.");
+                    notifyService.Error("No Supervisor remarks entered!!!. Please enter remarks.");
                     return RedirectToAction(nameof(ClaimsVendorController.GetInvestigateReport), new { selectedcase = claimId });
                 }
                 string userEmail = HttpContext?.User?.Identity.Name;
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
-                    toastNotification.AddAlertToastMessage("OOPs !!!..");
-                    return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+                    notifyService.Error("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
 
                 var reportUpdateStatus = SupervisorRemarkType.OK;
@@ -153,9 +168,10 @@ namespace risk.control.system.Controllers
                 }
                 return RedirectToAction(nameof(ClaimsVendorController.ClaimReport), "ClaimsVendor");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
 
@@ -163,51 +179,67 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReAllocateReport(string supervisorRemarks, string supervisorRemarkType, string claimId, long caseLocationId)
         {
-            if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+            try
             {
-                toastNotification.AddAlertToastMessage("No remarks entered!!!. Please enter remarks.");
-                return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), new { selectedcase = claimId });
-            }
-            string userEmail = HttpContext?.User?.Identity.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
-            {
-                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                if (string.IsNullOrWhiteSpace(supervisorRemarks) || string.IsNullOrWhiteSpace(claimId) || caseLocationId < 1)
+                {
+                    notifyService.Error("No remarks entered!!!. Please enter remarks.");
+                    return RedirectToAction(nameof(ClaimsVendorController.GetInvestigate), new { selectedcase = claimId });
+                }
+                string userEmail = HttpContext?.User?.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                var reportUpdateStatus = SupervisorRemarkType.REVIEW;
+
+                var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
+
+                if (success != null)
+                {
+                    await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
+                    notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "green", "far fa-file-powerpoint");
+                }
+                else
+                {
+                    notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
+                }
                 return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
             }
-
-            var reportUpdateStatus = SupervisorRemarkType.REVIEW;
-
-            var success = await claimsInvestigationService.ProcessAgentReport(userEmail, supervisorRemarks, caseLocationId, claimId, reportUpdateStatus);
-
-            if (success != null)
+            catch (Exception)
             {
-                await mailboxService.NotifyClaimReportSubmitToCompany(userEmail, claimId, caseLocationId);
-                notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "green", "far fa-file-powerpoint");
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            else
-            {
-                notifyService.Custom($"Claim #{success.PolicyDetail.ContractNumber}  report sent to review", 3, "orange", "far fa-file-powerpoint");
-            }
-            return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> WithdrawCase(ClaimTransactionModel model, string claimId)
         {
-            string userEmail = HttpContext?.User?.Identity.Name;
-            if (string.IsNullOrWhiteSpace(userEmail))
+            try
             {
-                toastNotification.AddAlertToastMessage("OOPs !!!..");
+                string userEmail = HttpContext?.User?.Identity.Name;
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    notifyService.Error("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
+
+                await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
+
+                notifyService.Custom($"Claim #{model.ClaimsInvestigation.PolicyDetail.ContractNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
+
                 return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
             }
-            await claimsInvestigationService.WithdrawCase(userEmail, model, claimId);
-
-            await mailboxService.NotifyClaimWithdrawlToCompany(userEmail, claimId);
-
-            notifyService.Custom($"Claim #{model.ClaimsInvestigation.PolicyDetail.ContractNumber}  withdrawn successfully", 3, "green", "far fa-file-powerpoint");
-
-            return RedirectToAction(nameof(ClaimsVendorController.Index), "ClaimsVendor");
+            catch (Exception)
+            {
+                notifyService.Error("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
     }
 }

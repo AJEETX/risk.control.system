@@ -68,6 +68,7 @@ namespace risk.control.system.Services
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                throw ex;
             }
         }
 
@@ -361,6 +362,7 @@ namespace risk.control.system.Services
                                 catch (Exception ex)
                                 {
                                     Console.WriteLine(ex.StackTrace);
+                                    throw ex;
                                 }
                             }
                         }
