@@ -35,6 +35,7 @@ namespace risk.control.system.Services
 
     public class MailboxService : IMailboxService
     {
+        private const string TEST_PHONE = "61432854196";
         private static string BaseUrl = string.Empty;
         private static string AgencyBaseUrl = string.Empty;
         private string FilePath = string.Empty;
@@ -43,7 +44,6 @@ namespace risk.control.system.Services
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ClientCompanyApplicationUser> userManager;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
-        private static HttpClient client = new HttpClient();
 
         public MailboxService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, IWebHostEnvironment webHostEnvironment, UserManager<ClientCompanyApplicationUser> userManager, UserManager<VendorApplicationUser> userVendorManager)
         {
@@ -133,7 +133,16 @@ namespace risk.control.system.Services
                 //SEND SMS
                 if (company.SendSMS)
                 {
-                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, "Claim(s) allocated (" + userEmailToSend.Email + "): Policy #" + policy + " ", true);
+                    string message = $"Dear {userEmailToSend.Email},";
+                    message += $"                                          ";
+                    message += $"Policy # {policy} allocated";
+                    message += $"                                          ";
+                    message += $"Thanks";
+                    message += $"                                          ";
+                    message += $"{clientCompanyUser.Email}";
+                    message += $"                                          ";
+                    message += $"https://icheckify.co.in";
+                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, message, company.SendSMS);
                 }
                 //SMS ::END
             }
@@ -220,7 +229,17 @@ namespace risk.control.system.Services
                 //SEND SMS
                 if (company.SendSMS)
                 {
-                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigations.Count() + " ");
+                    string message = $"Dear {userEmailToSend.Email},";
+                    var policies =string.Join(",", claimsInvestigations.Select(c => c.PolicyDetail.ContractNumber)?.ToArray());
+                    message += $"                                          ";
+                    message += $"Assigned Policy(s) {policies} ";
+                    message += $"                                          ";
+                    message += $"Thanks";
+                    message += $"                                          ";
+                    message += $"{applicationUser.Email}";
+                    message += $"                                          ";
+                    message += $"https://icheckify.co.in";
+                    var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, message, company.SendSMS);
                 }
                 //SMS ::END
             }
@@ -303,7 +322,16 @@ namespace risk.control.system.Services
                     _context.Mailbox.Update(recepientMailbox);
                     if (company.SendSMS)
                     {
-                        var result = SmsService.SendSingleMessage(user.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                        string message = $"Dear {user.Email},";
+                        message += $"                                          ";
+                        message += $"Policy # {claimsInvestigation.PolicyDetail.ContractNumber} Withdrawn";
+                        message += $"                                          ";
+                        message += $"Thanks";
+                        message += $"                                          ";
+                        message += $"{senderUserEmail})";
+                        message += $"                                           ";
+                        message += $"https://icheckify.co.in";
+                        var result = SmsService.SendSingleMessage(user.PhoneNumber, message,company.SendSMS);
                     }
                 }
                 try
@@ -368,7 +396,16 @@ namespace risk.control.system.Services
                 var rows = await _context.SaveChangesAsync();
                 if (company.SendSMS)
                 {
-                    var result = SmsService.SendSingleMessage(recepientUser.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                    string message = $"Dear {recepientUser.Email},";
+                    message += $"                                          ";
+                    message += $"Policy # {claimsInvestigation.PolicyDetail.ContractNumber} allocated";
+                    message += $"                                          ";
+                    message += $"Thanks";
+                    message += $"                                          ";
+                    message += $"{userEmail}";
+                    message += $"                                          ";
+                    message += $"https://icheckify.co.in";
+                    var result = SmsService.SendSingleMessage(recepientUser.PhoneNumber, message, company.SendSMS);
                 }
             }
             catch (Exception ex)
@@ -526,7 +563,16 @@ namespace risk.control.system.Services
                     _context.Mailbox.Update(recepientMailbox);
                     if (company.SendSMS)
                     {
-                        var result = SmsService.SendSingleMessage(user.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                        string message = $"Dear {user.Email},";
+                        message += $"                                          ";
+                        message += $"Policy # {claimsInvestigation.PolicyDetail.ContractNumber} processed";
+                        message += $"                                          ";
+                        message += $"Thanks";
+                        message += $"                                          ";
+                        message += $"{senderUserEmail}";
+                        message += $"                                          ";
+                        message += $"https://icheckify.co.in";
+                        var result = SmsService.SendSingleMessage(user.PhoneNumber, message,company.SendSMS);
                     }
                 }
                 try
@@ -603,7 +649,17 @@ namespace risk.control.system.Services
                     _context.Mailbox.Update(recepientMailbox);
                     if (company.SendSMS)
                     {
-                        var result = SmsService.SendSingleMessage(user.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                        string message = $"Dear {user.Email},";
+                        
+                        message += $"                                          ";
+                        message += $"Policy # {claimsInvestigation.PolicyDetail.ContractNumber} submitted";
+                        message += $"                                          ";
+                        message += $"Thanks";
+                        message += $"                                          ";
+                        message += $"{senderUserEmail}";
+                        message += $"                                          ";
+                        message += $"https://icheckify.co.in";
+                        var result = SmsService.SendSingleMessage(user.PhoneNumber, message, company.SendSMS);
                     }
                 }
                 try
@@ -678,7 +734,17 @@ namespace risk.control.system.Services
                 _context.Mailbox.Update(recepientMailbox);
                 if (company.SendSMS)
                 {
-                    var result = SmsService.SendSingleMessage(user.PhoneNumber, "Claim(s) allocated: Policy #" + claimsInvestigation.PolicyDetail.ContractNumber + " ");
+                    string message = $"Dear {user.Email},";
+                    
+                    message += $"                                          ";
+                    message += $"Policy # {claimsInvestigation.PolicyDetail.ContractNumber} report submitted";
+                    message += $"                                          ";
+                    message += $"Thanks";
+                    message += $"                                          ";
+                    message += $"{senderUserEmail}";
+                    message += $"                                          ";
+                    message += $"https://icheckify.co.in";
+                    var result = SmsService.SendSingleMessage(user.PhoneNumber, message, company.SendSMS);
                 }
             }
             try

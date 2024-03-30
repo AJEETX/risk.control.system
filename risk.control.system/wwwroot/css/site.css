@@ -341,9 +341,9 @@ a.table-link {
 
 .report-disclaimer {
     overflow-y: scroll;
-    height: 20rem;
+    height: 10rem;
     border: .1rem inset #ddd;
-    background-color: white;
+    background-color: whitesmoke;
 }
 
 .disclaimer-body {

@@ -178,7 +178,7 @@ namespace risk.control.system.Controllers
                 }
             }
 
-            notifyService.Custom($"Upload Error. Pls try again", 3, "red", "far fa-file-powerpoint");
+            notifyService.Custom($"Upload Error. Contact IT support", 3, "red", "far fa-file-powerpoint");
 
             return RedirectToAction("Draft", "ClaimsInvestigation");
         }

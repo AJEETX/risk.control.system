@@ -70,13 +70,14 @@ namespace risk.control.system.Services
             var noDataImagefilePath = Path.Combine(webHostEnvironment.WebRootPath, "agency", "pan.jpg");
 
             var noDataimage = image != null ? image : await File.ReadAllBytesAsync(noDataImagefilePath);
+            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
 
             var data = new DocumentData
             {
                 Email = userEmail,
                 ClaimId = claimId,
                 OcrImage = Convert.ToBase64String(noDataimage),
-                OcrLongLat = $"{latitude}/{longitude}"
+                OcrLongLat = locationLongLat
             };
             var result = await checkifyService.GetDocumentId(data);
             return result;
@@ -98,13 +99,13 @@ namespace risk.control.system.Services
             //        longitude = address.lat.ToString();
             //    }
             //}
-
+            var locationLongLat = string.IsNullOrWhiteSpace(latitude) || string.IsNullOrWhiteSpace(longitude) ? string.Empty : $"{latitude}/{longitude}";
             var data = new FaceData
             {
                 Email = userEmail,
                 ClaimId = claimId,
                 LocationImage = Convert.ToBase64String(noDataimage),
-                LocationLongLat = $"{latitude}/{longitude}"
+                LocationLongLat = locationLongLat
             };
             var result = await checkifyService.GetFaceId(data);
             return result;
