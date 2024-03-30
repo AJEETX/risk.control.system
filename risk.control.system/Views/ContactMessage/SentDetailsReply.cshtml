@@ -15,6 +15,9 @@
 
                         <input type="hidden" asp-for="SentMessageId" />
                         <div class="card-body">
+                            <div class="submit-progress hidden">
+                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                            </div>
                             <div class="form-group">
                                 <input id="receipient-email" class="form-control remarks" asp-for="ReceipientEmail" value="@Model.ReceipientEmail">
                             </div>

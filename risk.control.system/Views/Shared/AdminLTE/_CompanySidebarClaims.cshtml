@@ -41,7 +41,7 @@
             </a>
         </li>
     }
-    if (User.IsInRole(AppRoles.Creator.ToString()) && (Model.AutoAllocation))
+    if (User.IsInRole(AppRoles.Creator.ToString()) && (Model.BulkUpload))
     {
         <li class="nav-item">
             <a is-active-page asp-controller="Uploads" asp-action="Uploads" class="actual-link nav-link @Url.MakeActiveClass("Uploads","Uploads")">

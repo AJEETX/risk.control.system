@@ -103,6 +103,44 @@ namespace risk.control.system.Controllers
             return View(model);
         }
 
+        [Breadcrumb(title: " Delete", FromAction = "Index", FromController = typeof(InsuranceClaimsController))]
+        public async Task<IActionResult> DeleteManual(string id)
+        {
+            if (id == null || _context.ClaimsInvestigation == null)
+            {
+                return NotFound();
+            }
+            var currentUserEmail = HttpContext.User?.Identity?.Name;
+
+            var model = await investigationReportService.GetClaimDetails(currentUserEmail, id);
+
+            if (model == null)
+            {
+                return NotFound();
+            }
+
+            return View(model);
+        }
+
+        [HttpPost, ActionName("DeleteManual")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteManualConfirmed(ClaimTransactionModel model)
+        {
+            if (model is null)
+            {
+                toastNotification.AddAlertToastMessage(string.Format("<i class='far fa-file-powerpoint'></i> Err to delete !"));
+                return RedirectToAction(nameof(ClaimsInvestigationController.Draft), "ClaimsInvestigation");
+            }
+            var claimsInvestigation = await _context.ClaimsInvestigation.FindAsync(model.ClaimsInvestigation.ClaimsInvestigationId);
+            string userEmail = HttpContext?.User?.Identity.Name;
+            claimsInvestigation.Updated = DateTime.UtcNow;
+            claimsInvestigation.UpdatedBy = userEmail;
+            claimsInvestigation.Deleted = true;
+            _context.ClaimsInvestigation.Update(claimsInvestigation);
+            await _context.SaveChangesAsync();
+            notifyService.Custom("Claim deleted", 3, "red", "far fa-file-powerpoint");
+            return RedirectToAction(nameof(ClaimsInvestigationController.Assigner), "ClaimsInvestigation");
+        }
         // POST: ClaimsInvestigation/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
