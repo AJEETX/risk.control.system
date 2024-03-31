@@ -25,7 +25,7 @@ namespace risk.control.system.Services
 
         Task AssignToAssigner(string userEmail, List<string> claimsInvestigations);
 
-        Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId);
+        Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId, bool AutoAllocated = true);
 
         Task<ClaimsInvestigation> AssignToVendorAgent(string vendorAgentEmail, string currentUser, long vendorId, string claimsInvestigationId);
 
@@ -652,7 +652,7 @@ namespace risk.control.system.Services
             _context.SaveChanges();
         }
 
-        public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId)
+        public async Task<ClaimsInvestigation> AllocateToVendor(string userEmail, string claimsInvestigationId, long vendorId, long caseLocationId, bool AutoAllocated = true)
         {
             var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorId);
             var currentUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u => u.Email == userEmail);
@@ -694,6 +694,7 @@ namespace risk.control.system.Services
                 existinCaseLocation.InvestigationCaseSubStatusId = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR).InvestigationCaseSubStatusId;
                 claimsCaseToAllocateToVendor.Vendors.Add(vendor);
+                claimsCaseToAllocateToVendor.AutoAllocated = AutoAllocated;
                 _context.ClaimsInvestigation.Update(claimsCaseToAllocateToVendor);
                 var lastLog = _context.InvestigationTransaction.Where(i =>
                 i.ClaimsInvestigationId == claimsCaseToAllocateToVendor.ClaimsInvestigationId).OrderByDescending(o => o.Created)?.FirstOrDefault();

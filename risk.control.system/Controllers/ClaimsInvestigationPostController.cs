@@ -143,11 +143,12 @@ namespace risk.control.system.Controllers
         [HttpPost]
         public async Task<IActionResult> CaseAllocatedToVendor(long selectedcase, string claimId, long caseLocationId)
         {
+            //set claim as manual assigned
             try
             {
                 var userEmail = HttpContext.User?.Identity?.Name;
 
-                var policy = await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId);
+                var policy = await claimsInvestigationService.AllocateToVendor(userEmail, claimId, selectedcase, caseLocationId, false);
 
                 await mailboxService.NotifyClaimAllocationToVendor(userEmail, policy.PolicyDetail.ContractNumber, claimId, selectedcase, caseLocationId);
 

@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Threading.RateLimiting;
 
 using AspNetCoreHero.ToastNotification;
 using AspNetCoreHero.ToastNotification.Extensions;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -50,7 +52,16 @@ builder.Services.Configure<FormOptions>(x =>
     x.ValueLengthLimit = 5000000; //not recommended value
     x.MemoryBufferThreshold = 5000000;
 });
-
+builder.Services.AddRateLimiter(_ => _
+    .AddFixedWindowLimiter(policyName: "fixed", options =>
+    {
+        options.PermitLimit = 10;
+        options.Window = TimeSpan.FromSeconds(12);
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 2;
+    }));
+builder.Services.AddResponseCaching();
+builder.Services.AddResponseCompression();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
@@ -91,7 +102,7 @@ builder.Services.AddControllersWithViews()
 );
 builder.Services.AddNotyf(config =>
 {
-    config.DurationInSeconds = 3;
+    config.DurationInSeconds = 2;
     config.IsDismissable = true;
     config.Position = NotyfPosition.TopCenter;
 });
@@ -106,7 +117,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-edlweiss_1_0_0_1.db"));
+                        options.UseSqlite("Data Source=x-edlweiss_1_0_0_2.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -131,9 +142,25 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.RequireUniqueEmail = true;
 });
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie();
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Events.OnRedirectToLogin = (context) =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+        options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
+        options.SlidingExpiration = true;
+        options.LoginPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+        options.Cookie.HttpOnly = true;
+        // Only use this when the sites are on different domains
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.Domain = "check.azurewebsites.com";
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -170,10 +197,20 @@ app.UseHttpsRedirection();
 await DatabaseSeed.SeedDatabase(app);
 
 //app.UseHttpLogging();
-
+//app.UseResponseCaching();
+//app.UseResponseCompression();
 app.UseStaticFiles();
 
+app.UseCookiePolicy(
+    new CookiePolicyOptions
+    {
+        Secure = CookieSecurePolicy.Always,
+        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+        MinimumSameSitePolicy = SameSiteMode.Strict
+    });
+
 app.UseRouting();
+app.UseRateLimiter();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
@@ -203,26 +240,12 @@ app.Use(async (context, next) =>
 
     await next();
 });
-app.UseCookiePolicy();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseNToastNotify();
 app.UseNotyf();
-app.Use(async (context, next) =>
-{
-    var path = context.Request.Path;
-    if (path.Value.Contains("/swagger/", StringComparison.OrdinalIgnoreCase))
-    {
-        if (!context.User.Identity.IsAuthenticated)
-        {
-            context.Response.Redirect("/account/login");
-            return;
-        }
-    }
 
-    await next();
-});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");

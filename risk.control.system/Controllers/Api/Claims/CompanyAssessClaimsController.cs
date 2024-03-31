@@ -67,7 +67,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
             }
-            
+
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));
@@ -86,6 +86,7 @@ namespace risk.control.system.Controllers.Api.Claims
             .Select(a => new ClaimsInvesgationResponse
             {
                 Id = a.ClaimsInvestigationId,
+                AutoAllocated = a.AutoAllocated,
                 PolicyId = a.PolicyDetail.ContractNumber,
                 Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                 AssignedToAgency = a.AssignedToAgency,
@@ -158,7 +159,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     }
                 }
             }
-            
+
             else if (userRole.Value.Contains(AppRoles.Assessor.ToString()))
             {
                 applicationDbContext = applicationDbContext.Where(a => a.CaseLocations.Count > 0 && a.CaseLocations.Any(c => c.VendorId != null));

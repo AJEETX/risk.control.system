@@ -53,29 +53,20 @@ $(document).ready(function () {
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
+                        document.getElementById('profileImage').src = '/img/no-user.png';
+                        document.getElementById('documentImageInput').value = '';
                         $.alert(
                             {
-                                title: "Image size limit exceeded !",
-                                content: "Image size limit exceeded. Max file size is " + MaxSizeInBytes + ' bytes!',
+                                title: " Image UPLOAD issue !",
+                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. Max file size is 2 MB!",
                                 icon: 'fas fa-exclamation-triangle',
                                 columnClass: 'medium',
                                 type: 'red',
                                 closeIcon: true,
                                 buttons: {
                                     cancel: {
-                                        text: "OK",
-                                        btnClass: 'btn-danger',
-                                        action: function () {
-                                            document.getElementById('profileImage').src = '/img/no-user.png';
-                                            document.getElementById('documentImageInput').value = '';
-                                            $.alert({
-                                                title: 'FILE UPLOAD !',
-                                                content: 'Max image size allowed :' + MaxSizeInBytes + ' bytes!',
-                                                icon: 'fa fa-upload',
-                                                columnClass: 'medium',
-                                                closeIcon: true,
-                                            });
-                                        }
+                                        text: "CLOSE",
+                                        btnClass: 'btn-danger'
                                     }
                                 }
                             }
@@ -94,10 +85,8 @@ $(document).ready(function () {
                         closeIcon: true,
                         buttons: {
                             cancel: {
-                                text: "OK",
-                                btnClass: 'btn-danger', action: function () {
-                                    $.alert('Try on modern browser!');
-                                }
+                                text: "CLOSE",
+                                btnClass: 'btn-danger'
                             }
                         }
                     }
@@ -114,19 +103,8 @@ $(document).ready(function () {
                     closeIcon: true,
                     buttons: {
                         cancel: {
-                            text: "OK",
-                            btnClass: 'btn-danger',
-                            action: function () {
-                                document.getElementById('profileImage').src = '/img/no-user.png';
-                                document.getElementById('documentImageInput').value = '';
-                                $.alert({
-                                    title: 'FILE UPLOAD TYPE!',
-                                    content: 'Pls select only image with extension jpg, png,gif !',
-                                    icon: 'fa fa-upload',
-                                    columnClass: 'medium',
-                                    closeIcon: true,
-                                });
-                            }
+                            text: "CLOSE",
+                            btnClass: 'btn-danger'
                         }
                     }
                 }

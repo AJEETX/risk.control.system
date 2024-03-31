@@ -80,12 +80,34 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     if (row.assignedToAgency) {
+                        buttons += '<span class="checkbox">';
+                        if (row.autoAllocated) {
+                            buttons += '<input type="checkbox" checked disabled />';
+                        } else {
+                            buttons += '<input type="checkbox" disabled/>';
+                        }
+                        buttons += '</span>';
+                    } else {
+                        buttons += '<span class="badge badge-light">...</span>';
+                    }
+                    
+                    return buttons;
+                }
+            },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    if (row.assignedToAgency) {
                         buttons += '<a id="details' + row.id + '" onclick="getdetails(`' + row.id + '`)"  href="ActiveDetail?Id=' + row.id + '" class="active-claims btn btn-xs btn-info"><i class="fa fa-search"></i> Detail</a>&nbsp;'
                     }
                     else {
                         buttons += '<a id="edit' + row.id + '" onclick="showedit(`' + row.id + '`)"  href="Details?Id=' + row.id + '" class="active-claims btn btn-xs btn-warning"><i class="fas fa-pencil-alt"></i> Edit</a>&nbsp;'
                     }
+                    if (row.autoAllocated) {
 
+                    }
                     //if (row.withdrawable) {
                     //    buttons += '<a href="withdraw?Id=' + row.id + '" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Withdraw</a>&nbsp;'
                     //}

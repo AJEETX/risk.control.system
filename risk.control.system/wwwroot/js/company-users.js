@@ -42,13 +42,13 @@
                 "bSortable": false,
                 "mRender": function (data, type, row) {
                     var buttons = "";
-                    buttons += '<span class="checkbox">'
+                    buttons += '<span class="checkbox">';
                     if (row.active) {
-                        buttons += '<input type="checkbox" checked disabled />'
+                        buttons += '<input type="checkbox" checked disabled />';
                     } else {
-                        buttons += '<input type="checkbox" disabled/>'
+                        buttons += '<input type="checkbox" disabled/>';
                     }
-                    buttons += '</span>'
+                    buttons += '</span>';
                     return buttons;
                 }
             },

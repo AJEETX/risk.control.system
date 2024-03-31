@@ -54,6 +54,7 @@ namespace risk.control.system.Models
 
         public bool IsReviewCase { get; set; } = false;
         public bool IsReady2Assign { get; set; } = false;
+        public bool AutoAllocated { get; set; } = true;
         public bool Deleted { get; set; } = false;
     }
 

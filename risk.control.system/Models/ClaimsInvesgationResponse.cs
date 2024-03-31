@@ -30,5 +30,7 @@
         public string? Agency { get; set; }
         public double TimeElapsed { get; set; }
         public string? Company { get; set; }
+        public bool AutoAllocated { get; set; }
+
     }
 }

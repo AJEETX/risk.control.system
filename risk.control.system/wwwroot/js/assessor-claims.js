@@ -88,6 +88,22 @@ $(document).ready(function () {
             },
             { "data": "location" },
             { "data": "created" },
+            {
+                "sDefaultContent": "",
+                "bSortable": false,
+                "mRender": function (data, type, row) {
+                    var buttons = "";
+                    buttons += '<span class="checkbox">';
+                    if (row.autoAllocated) {
+                        buttons += '<input type="checkbox" checked disabled />';
+                    } else {
+                        buttons += '<input type="checkbox" disabled/>';
+                    }
+                    buttons += '</span>';
+
+                    return buttons;
+                }
+            },
             { "data": "timePending" },
         ],
         error: function (xhr, status, error) { alert('err ' + error) }

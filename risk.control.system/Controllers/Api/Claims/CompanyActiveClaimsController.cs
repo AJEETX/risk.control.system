@@ -82,6 +82,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     .Select(a => new ClaimsInvesgationResponse
                     {
                         Id = a.ClaimsInvestigationId,
+                        AutoAllocated = a.AutoAllocated,
                         CustomerFullName = string.IsNullOrWhiteSpace(a.CustomerDetail?.CustomerName) ? "" : a.CustomerDetail.CustomerName,
                         BeneficiaryFullName = a.CaseLocations.Count == 0 ? "" : a.CaseLocations.FirstOrDefault().BeneficiaryName,
                         PolicyId = a.PolicyDetail.ContractNumber,
