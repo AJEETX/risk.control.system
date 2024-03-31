@@ -111,13 +111,13 @@
                                             @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
                                             {
 
-                                                <input accept="image/*" asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                <input accept="image/*" asp-for="ProfileImage" class="form-control remarks" type="file" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
                                             }
                                             else
                                             {
                                                 <i class="fa fa-asterisk asterik-style"></i>
 
-                                                <input accept="image/*" asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
+                                                <input accept="image/*" asp-for="ProfileImage" class="form-control remarks" type="file" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
 
                                             }
                                         </div>
