@@ -69,7 +69,7 @@
 
                                             <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
 
-                                            <input asp-for="DocumentImage" class="form-control remarks" type="file" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                            <input asp-for="DocumentImage" class="form-control remarks" type="file" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
 
                                         </div>
                                     </div>

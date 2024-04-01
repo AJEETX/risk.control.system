@@ -70,13 +70,13 @@
                                                     <div class="input-group mb-3">
                                                         @if (Model?.DocumentUrl is not null)
                                                         {
-                                                            <img id="ProfileImage" class="form-Image" src="@Model?.DocumentUrl">
+                                                            <img id="profileImage" class="form-Image" src="@Model?.DocumentUrl">
                                                         }
                                                         else
                                                         {
-                                                            <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
+                                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_IMAGE">
                                                         }
-                                                        <input asp-for="DocumentImage" type="file" class="form-control remarks" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                        <input asp-for="DocumentImage" type="file" class="form-control remarks" id="documentImageInput"/>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -251,10 +251,10 @@
                                 <div class="card card-light expand-card">
 
                                     <div class="card-header">
-                                        <h3 class="card-title"><i class="fas fa-building"></i> <span class="badge badge-light"> Api Detail</span></h3>
+                                        <h3 class="card-title"><i class="fas fa-sitemap"></i> <span class="badge badge-light"> Api Detail</span></h3>
 
                                         <div class="card-tools">
-                                            <span data-toggle="tooltip" title="Company Profile @Model.Name" class="badge badge-light"><i class="fas fa-building"></i></span>
+                                            <span data-toggle="tooltip" title="Company Api Detail" class="badge badge-light"><i class="fas fa-sitemap"></i></span>
                                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                                 <i class="fas fa-minus"></i>
                                             </button>

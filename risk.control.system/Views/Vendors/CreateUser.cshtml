@@ -69,9 +69,9 @@
                                         <span asp-for="ProfileImage" class="control-label">Profile Photo</span>
                                         <div class="input-group mb-3">
                                             
-                                            <img id="ProfileImage" class="form-Image" src="@Applicationsettings.NO_USER">
+                                            <img id="profileImage" class="form-Image" src="@Applicationsettings.NO_USER">
 
-                                            <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                            <input asp-for="ProfileImage" class="form-control remarks" type="file" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
 
                                         </div>
                                     </div>
@@ -239,7 +239,7 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="~/js/create-vendor.js">
+    <script src="~/js/create-vendor-user.js">
 
     </script>
 }

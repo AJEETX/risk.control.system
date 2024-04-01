@@ -151,10 +151,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.Response.StatusCode = 401;
             return Task.CompletedTask;
         };
-        options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
-        options.SlidingExpiration = true;
+        //options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
+        //options.SlidingExpiration = true;
         options.LoginPath = "/Account/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
         options.Cookie.HttpOnly = true;
         // Only use this when the sites are on different domains
         options.Cookie.SameSite = SameSiteMode.Strict;
@@ -240,6 +240,7 @@ app.Use(async (context, next) =>
 
     await next();
 });
+
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -58,9 +58,8 @@ $(document).ready(function () {
                         $.alert(
                             {
                                 title: " Image UPLOAD issue !",
-                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. Max file size is 2 MB!",
+                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
                                 icon: 'fas fa-exclamation-triangle',
-                                columnClass: 'medium',
                                 type: 'red',
                                 closeIcon: true,
                                 buttons: {

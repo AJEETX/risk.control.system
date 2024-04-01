@@ -28,14 +28,14 @@
                                         <span asp-for="ProfileImage" class="control-label">Profile Photo</span>
                                         @if (Model?.ProfilePictureUrl is not null)
                                         {
-                                            <img id="ProfileImage" class="profile-image" src="@Model?.ProfilePictureUrl">
+                                            <img id="profileImage" class="profile-image" src="@Model?.ProfilePictureUrl">
                                         }
                                         else
                                         {
-                                            <img id="ProfileImage" class="profile-image" src="@Applicationsettings.NO_USER">
+                                            <img id="profileImage" class="profile-image" src="@Applicationsettings.NO_USER">
                                         }
 
-                                        <input asp-for="ProfileImage" class="form-control remarks" type="file" onchange="document.getElementById('ProfileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                        <input asp-for="ProfileImage" class="form-control remarks" type="file" id="documentImageInput"/>
                                     </div>
                                     <div class="form-group">
                                         <span class="input-group-label"> Email Address:</span>

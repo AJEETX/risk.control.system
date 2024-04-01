@@ -118,7 +118,7 @@
                                             }
                                             @if (Model.ClaimsInvestigation.PolicyDetail.ClaimType == ClaimType.HEALTH)
                                             {
-                                                <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                                <input asp-for="ProfileImage" type="file" class="form-control remarks" id="documentImageInput" />
                                             }
                                             else
                                             {

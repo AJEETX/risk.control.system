@@ -21,7 +21,7 @@ namespace risk.control.system.Controllers
         private readonly INotyfService notifyService;
         private readonly IToastNotification toastNotification;
         private readonly IHttpClientService httpClientService;
-        private static HttpClient _httpClient = new ();
+        private static HttpClient _httpClient = new();
         private Regex longLatRegex = new Regex("(?<lat>[-|+| ]\\d+.\\d+)\\s* \\/\\s*(?<lon>\\d+.\\d+)");
 
         public ReportController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment,
@@ -326,6 +326,7 @@ namespace risk.control.system.Controllers
                 using var stream = new FileStream(filePath, FileMode.Open);
                 await stream.CopyToAsync(memory);
                 memory.Position = 0;
+                notifyService.Success($"Policy {policy.ContractNumber} Report download success !!!");
                 return File(memory, "application/pdf", filename);
             }
             catch (Exception)

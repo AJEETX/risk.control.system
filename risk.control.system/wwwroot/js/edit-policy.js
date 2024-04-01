@@ -38,6 +38,7 @@ $.validator.setDefaults({
 });
 $(document).ready(function () {
     $("#create-form").validate();
+    var currentImage = document.getElementById('policyImage').src;
     $("#documentImageInput").on('change', function () {
         var MaxSizeInBytes = 2097152;
         //Get count of selected files
@@ -53,14 +54,16 @@ $(document).ready(function () {
                 for (var i = 0; i < countFiles; i++) {
                     var fileSize = $(this)[0].files[i].size;
                     if (fileSize > MaxSizeInBytes) {
-                        document.getElementById('policyImage').src = '/img/no-policy.jpg';
-                        document.getElementById('documentImageInput').value = '';
+                        if (currentImage.startsWith('https://') && currentImage.endsWith('/img/no-policy.jpg')) {
+                            document.getElementById('policyImage').src = '/img/no-policy.jpg';
+                            document.getElementById('documentImageInput').value = '';
+                        }
+                        
                         $.alert(
                             {
                                 title: " Image UPLOAD issue !",
-                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. Max file size is 2 MB!",
+                                content: " <i class='fa fa-upload'></i> Upload Image size limit exceeded. <br />Max file size is 2 MB!",
                                 icon: 'fas fa-exclamation-triangle',
-                                columnClass: 'medium',
                                 type: 'red',
                                 closeIcon: true,
                                 buttons: {
@@ -71,6 +74,9 @@ $(document).ready(function () {
                                 }
                             }
                         );
+                    }
+                    else {
+                        document.getElementById('policyImage').src = window.URL.createObjectURL($(this)[0].files[i]);
                     }
                 }
 
