@@ -1,51 +1,45 @@
 ﻿@{
     ViewData["Title"] = "Index";
 }
-<section class="content pt-2">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="far fa-file-excel"></i> Re Allocate </h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="checkboxes" asp-action="GetInvestigateReportReview" method="get" enctype="multipart/form-data">
-                            <div class="col-md-12">
-                                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                    <thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>Id</th>
-                                            <th>Policy #</th>
-                                            <th>Document</th>
-                                            <th>Customer</th>
-                                            <th>Customer Name</th>
-                                            <th>Beneficiary</th>
-                                            <th>Beneficiary Name</th>
-                                            <th>Claim Type</th>
-                                            <th>Status</th>
-                                            <th>Stage</th>
-                                            <th><img class="timer-image" src="~/headers/created.gif" title="Created date" alt="Created Date" /></th>
-                                            <th>
-                                                <img class="timer-image" src="~/headers/timer.gif" title="Days since Submitted" />
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
-                                            <i class="far fa-file-excel" aria-hidden="true"></i>
-                                            Re Allocate
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+<section class="content">
+    <div class="card card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="far fa-file-excel"></i> Re Allocate </h3>
+        </div>
+        <div class="card-body">
+            <form id="checkboxes" asp-action="GetInvestigateReportReview" method="get" enctype="multipart/form-data">
+                <div class="col-md-12">
+                    <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Id</th>
+                                <th>Policy #</th>
+                                <th>Document</th>
+                                <th>Customer</th>
+                                <th>Customer Name</th>
+                                <th>Beneficiary</th>
+                                <th>Beneficiary Name</th>
+                                <th>Claim Type</th>
+                                <th>Status</th>
+                                <th>Stage</th>
+                                <th><img class="timer-image" src="~/headers/created.gif" title="Created date" alt="Created Date" /></th>
+                                <th>
+                                    <img class="timer-image" src="~/headers/timer.gif" title="Days since Submitted" />
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button disabled id="allocatedcase" type="submit" class="btn btn-danger">
+                                <i class="far fa-file-excel" aria-hidden="true"></i>
+                                Re Allocate
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </section>

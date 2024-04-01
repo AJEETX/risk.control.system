@@ -4,12 +4,10 @@
     ViewData["Title"] = @Applicationsettings.SERVICE;
 }
 
-<section class="content pt-2">
-    <div class="container-fluid">
-        <partial name="_ReviewClaimsPolicy" model="@Model" />
-        <div class="submit-progress hidden">
-            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-        </div>
+<section class="content">
+    <partial name="_ReviewClaimsPolicy" model="@Model" />
+    <div class="submit-progress hidden">
+        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
     </div>
 </section>
 

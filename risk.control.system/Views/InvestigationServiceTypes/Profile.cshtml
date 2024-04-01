@@ -5,75 +5,68 @@
 @{
     ViewData["Title"] = "Type of Service";
 }
-<section class="content pt-2">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary border-secondary">
-                    <div class="submit-progress hidden">
-                        <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                    </div>
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-tools"></i> Type of Service</h3>
-                        
-                    </div>
-                    <div class="card-body">
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        Service Name
-                                    </th>
-                                    <th>
-                                        Service Code
-                                    </th>
-                                    <th>
-                                        Line Of Business
-                                    </th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Code)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
-                                        </td>
-                                        <td>
+<section class="content">
+    <div class="card card-secondary border-secondary">
+        <div class="submit-progress hidden">
+            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+        </div>
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-tools"></i> Type of Service</h3>
 
-                                            <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationServiceTypeId">
-                                                <i class="fas fa-tools"></i>  @Applicationsettings.EDIT
-                                            </a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationServiceTypeId">
-                                                <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                    <a class="btn btn-success" asp-controller="InvestigationServiceTypes" asp-action="Create"><i class="fas fa-tools"></i> Add New</a>
+        </div>
+        <div class="card-body">
+            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                <thead>
+                    <tr>
+                        <th>
+                            Service Name
+                        </th>
+                        <th>
+                            Service Code
+                        </th>
+                        <th>
+                            Line Of Business
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LineOfBusiness.Name)
+                            </td>
+                            <td>
 
-                                </div>
-                            </div>
-                        </div>
+                                <a class="btn btn-xs btn-warning" asp-action="Edit" asp-route-id="@item.InvestigationServiceTypeId">
+                                    <i class="fas fa-tools"></i>  @Applicationsettings.EDIT
+                                </a> &nbsp;
+                                <a class="btn btn-xs btn-danger" asp-action="Delete" asp-route-id="@item.InvestigationServiceTypeId">
+                                    <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                        <a class="btn btn-success" asp-controller="InvestigationServiceTypes" asp-action="Create"><i class="fas fa-tools"></i> Add New</a>
+
                     </div>
                 </div>
             </div>
         </div>
-        
     </div>
 </section>

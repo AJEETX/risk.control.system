@@ -4,80 +4,74 @@
     ViewData["Title"] = "Claim: Report ";
 }
 
-<section class="content pt-2">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="ProcessCaseReport">
-                    <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
-                    <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
-                    <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
-                    <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
-                    <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
-                    <input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
-                    <div id="article" class="card border-secondary card-secondary">
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-newspaper"></i> Report</h3>
-                        </div>
-                            <partial name="_PolicyDetails" model="@Model" />
-                            
-                            <partial name="_AgencyReport" model="@Model" />
-                            @{
-                                foreach (var item in Model.Location?.PreviousClaimReports)
-                                {
-                                    <a href="@Url.Action("PreviousReports", new { id = item.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
-                                }
-                            }
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                        </div>
-                    </div>
-                   
-                    <div class="card border-secondary card-secondary">
-                       
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fas fa-user-check"></i> Assessor Remarks</h3>
-                        </div>
-                        <div class="card-body">
-                            
-                            <div class="row">
-                                <div class="col-md-12">
+<section class="content">
+    <form id="create-form" method="post" asp-controller="ClaimsInvestigationPost" asp-action="ProcessCaseReport">
+        <input type="hidden" id="claimId" name="claimId" value="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
+        <input type="hidden" id="CaseLocationId" name="CaseLocationId" value="@Model.Location.CaseLocationId" />
+        <input type="hidden" id="policyDetailId" value="@Model.ClaimsInvestigation?.PolicyDetail.PolicyDetailId" />
+        <input type="hidden" id="customerDetailId" value="@Model.ClaimsInvestigation?.CustomerDetail.CustomerDetailId" />
+        <input type="hidden" id="beneficiaryId" value="@Model.Location?.CaseLocationId" />
+        <input type="hidden" id="assessorRemarkType" name="assessorRemarkType" value="OK" />
+        <div id="article" class="card card-secondary">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-newspaper"></i> Report</h3>
+            </div>
+            <partial name="_PolicyDetails" model="@Model" />
 
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Remarks :</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required />
-
-                                            <span asp-validation-for="Location.ClaimReport.SupervisorRemarks" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            
-                            <div class="row">
-                                <div class="col-md-12 float-right">
-                                    <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
-                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back 
-                                    </a>
-                                    <button id="review-case" type="submit" class="btn btn-danger">
-                                        <i class="fas fa-sync" aria-hidden="true"></i> Review
-                                    </button>
-                                    <button id="approve-case" type="submit" class="btn btn-success">
-                                        <i class="far fa-thumbs-up" aria-hidden="true"></i> Approve
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <partial name="_AgencyReport" model="@Model" />
+            @{
+                foreach (var item in Model.Location?.PreviousClaimReports)
+                {
+                    <a href="@Url.Action("PreviousReports", new { id = item.PreviousClaimReportId })"> <i class="fas fa-newspaper"></i> Previous Report</a>
+                }
+            }
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
         </div>
-    </div>
+
+        <div class="card card-secondary">
+
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-user-check"></i> Assessor Remarks</h3>
+            </div>
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Remarks :</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="Location.ClaimReport.AgentRemarks"><i class="far fa-comment"></i>  <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input required maxlength="100" name="assessorRemarks" id="assessorRemarks" type="text" class="form-control remarks" autocomplete="off" required />
+
+                                <span asp-validation-for="Location.ClaimReport.SupervisorRemarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+
+                <div class="row">
+                    <div class="col-md-12 float-right">
+                        <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-outline-secondary" asp-action="Assessor">
+                            <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+                        </a>
+                        <button id="review-case" type="submit" class="btn btn-danger">
+                            <i class="fas fa-sync" aria-hidden="true"></i> Review
+                        </button>
+                        <button id="approve-case" type="submit" class="btn btn-success">
+                            <i class="far fa-thumbs-up" aria-hidden="true"></i> Approve
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </section>
 
 @section Scripts    {

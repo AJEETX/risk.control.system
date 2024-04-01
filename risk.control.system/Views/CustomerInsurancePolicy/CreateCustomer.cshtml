@@ -4,256 +4,250 @@
     ViewData["Title"] = @Applicationsettings.CREATE;
     var hasClientCompany = @Model.HasClientCompany ? "none" : "";
 }
-<section class="content pt-2">
-    <div class="container-fluid ">
-        <div class="row">
-            <div class="col-md-12">
-                <form id="create-form" asp-action="CreateCustomer" asp-controller="ClaimsInvestigationPost" method="post" enctype="multipart/form-data">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div id="article" class="card  bg-light border-secondary card-secondary">
-                         <input type="hidden" asp-for="ClaimsInvestigationId" value="@Model.ClaimsInvestigationId" />
-                        <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
-                        <div class="card-header">
-                            <h3 class="card-title"><i class="fa fa-user-plus"></i> Add Customer </h3>
-                        </div>
-                        <div class="container d-flex justify-content-center align-items-center">
-                            <div class="progresses">
-                                <div class="steps2">
-                                    <span> <i class="far fa-file-powerpoint"></i></span>
+<section class="content">
+    <form id="create-form" asp-action="CreateCustomer" asp-controller="ClaimsInvestigationPost" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div id="article" class="card  bg-light card-secondary">
+            <input type="hidden" asp-for="ClaimsInvestigationId" value="@Model.ClaimsInvestigationId" />
+            <input type="hidden" asp-for="PolicyDetail.LineOfBusinessId" value="@Model.PolicyDetail.LineOfBusinessId" />
+            <div class="card-header">
+                <h3 class="card-title"><i class="fa fa-user-plus"></i> Add Customer </h3>
+            </div>
+            <div class="container d-flex justify-content-center align-items-center">
+                <div class="progresses">
+                    <div class="steps2">
+                        <span> <i class="far fa-file-powerpoint"></i></span>
+                    </div>
+
+                    <span class="line0"></span>
+
+                    <div class="steps">
+                        <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
+                    </div>
+
+                    <span class="line"></span>
+
+                    <div class="steps3">
+                        <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-0">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Customer Name:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="CustomerName"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-
-                                <span class="line0"></span>
-
-                                <div class="steps">
-                                    <span class="font-weight-bold"><i class="fa fa-user-plus"></i></span>
-                                </div>
-
-                                <span class="line"></span>
-
-                                <div class="steps3">
-                                    <span class="font-weight-bold"><i class="fas fa-user-tie"></i></span>
-                                </div>
+                                <input id="customer-name" required asp-for="CustomerDetail.CustomerName" class="form-control remarks title-name" type="text" placeholder="Customer Name" maxlength="20" />
+                                <span asp-validation-for="CustomerDetail.CustomerName" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="card-body pt-0">
-                            <div class="submit-progress hidden">
-                                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-6">
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Customer Name:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="CustomerName"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input id="customer-name" required asp-for="CustomerDetail.CustomerName" class="form-control remarks title-name" type="text" placeholder="Customer Name" maxlength="20" />
-                                            <span asp-validation-for="CustomerDetail.CustomerName" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Date Of Birth:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="CustomerDateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input required asp-for="CustomerDetail.CustomerDateOfBirth" id="dateCustomerId" class="form-control remarks" type="date" />
-                                            <span asp-validation-for="CustomerDetail.CustomerDateOfBirth" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Gender:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="Gender"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select required asp-for="CustomerDetail.Gender" class="form-control remarks" asp-items="Html.GetEnumSelectList<Gender>()">
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="CustomerDetail.Gender" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Customer Type:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="CustomerType"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select id="customer-type" required asp-for="CustomerDetail.CustomerType" class="form-control remarks" asp-items="Html.GetEnumSelectList<CustomerType>()">
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="CustomerDetail.CustomerType" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Phone #:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="ContactNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-
-                                            <input type="text" asp-for="CustomerDetail.ContactNumber" class="form-control remarks" required maxlength="14" placeholder="Phone # with country code"
-                                                   oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
-                                            <span asp-validation-for="CustomerDetail.ContactNumber" class="text-danger field-validation-valid"></span>
-
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Income:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="CustomerIncome"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select required asp-for="CustomerDetail.CustomerIncome" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="CustomerDetail.CustomerIncome" class="text-danger"></span>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Occupation:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="CustomerOccupation"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select required asp-for="CustomerDetail.CustomerOccupation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Occupation>()">
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="CustomerDetail.CustomerOccupation" class="text-danger"></span>
-
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Education:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" asp-for="CustomerEducation"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select required asp-for="CustomerDetail.CustomerEducation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Education>()">
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="CustomerDetail.CustomerEducation" class="text-danger"></span>
-
-                                        </div>
-                                    </div>
-
+                        <div class="form-group">
+                            <span class="input-group-label"> Date Of Birth:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="CustomerDateOfBirth"><i class="far fa-calendar-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Country:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select asp-for="CustomerDetail.CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="CustomerDetail.CountryId" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> State:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select id="StateId" asp-for="CustomerDetail.StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="CustomerDetail.StateId" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> District:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select id="DistrictId" asp-for="CustomerDetail.DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-
-                                            <span asp-validation-for="CustomerDetail.DistrictId" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Pincode:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" for="PinCodeId"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <select id="PinCodeId" asp-for="CustomerDetail.PinCodeId" class="form-control remarks" asp-items="ViewBag.PinCodeId" required>
-                                                <option value="">--- SELECT ---</option>
-                                            </select>
-                                            <span asp-validation-for="CustomerDetail.PinCodeId" class="text-danger"></span>
-
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Address:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input type="text" asp-for="CustomerDetail.Addressline" class="form-control remarks title-name" type="text" required placeholder="Address" maxlength="20" />
-                                            <span asp-validation-for="CustomerDetail.Addressline" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Note:</span>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text" id="Description"><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                            </div>
-                                            <input required asp-for="CustomerDetail.Description" class="form-control remarks" type="text" placeholder="Note" maxlength="20" />
-                                            <span asp-validation-for="CustomerDetail.Description" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <span class="input-group-label"> Customer Photo:</span>
-                                        <div class="input-group mb-3">
-                                            <img class="form-Image" id="profileImage" src="@Applicationsettings.NO_USER">
-                                            @if (Model.PolicyDetail.ClaimType == ClaimType.HEALTH)
-                                            {
-                                                <i class="fa fa-asterisk asterik-style"></i>
-                                                <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
-                                            }
-                                            else
-                                            {
-                                                <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
+                                <input required asp-for="CustomerDetail.CustomerDateOfBirth" id="dateCustomerId" class="form-control remarks" type="date" />
+                                <span asp-validation-for="CustomerDetail.CustomerDateOfBirth" class="text-danger"></span>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <div class="text-right">
-                                <a id="back" asp-controller="ClaimsInvestigation" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
-                                    <i class="fa fa-window-close"></i>
-                                    @Applicationsettings.CANCEL
-                                </a>
-                                <button id="create-cust" type="submit" class="btn btn-success">
-                                    <i class="fas fa-user-plus"></i> Add Customer
-                                </button>
+                        <div class="form-group">
+                            <span class="input-group-label"> Gender:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="Gender"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select required asp-for="CustomerDetail.Gender" class="form-control remarks" asp-items="Html.GetEnumSelectList<Gender>()">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CustomerDetail.Gender" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Customer Type:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="CustomerType"><i class="fa fa-user-plus"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select id="customer-type" required asp-for="CustomerDetail.CustomerType" class="form-control remarks" asp-items="Html.GetEnumSelectList<CustomerType>()">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CustomerDetail.CustomerType" class="text-danger"></span>
+                            </div>
+                        </div>
 
+                        <div class="form-group">
+                            <span class="input-group-label"> Phone #:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="ContactNumber"><i class="fas fa-phone"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+
+                                <input type="text" asp-for="CustomerDetail.ContactNumber" class="form-control remarks" required maxlength="14" placeholder="Phone # with country code"
+                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" />
+                                <span asp-validation-for="CustomerDetail.ContactNumber" class="text-danger field-validation-valid"></span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Income:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="CustomerIncome"><i class="far fa-money-bill-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select required asp-for="CustomerDetail.CustomerIncome" class="form-control remarks" asp-items="Html.GetEnumSelectList<Income>()">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CustomerDetail.CustomerIncome" class="text-danger"></span>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Occupation:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="CustomerOccupation"><i class="fas fa-business-time"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select required asp-for="CustomerDetail.CustomerOccupation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Occupation>()">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CustomerDetail.CustomerOccupation" class="text-danger"></span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Education:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="CustomerEducation"><i class="fas fa-graduation-cap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select required asp-for="CustomerDetail.CustomerEducation" class="form-control remarks" asp-items="Html.GetEnumSelectList<Education>()">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CustomerDetail.CustomerEducation" class="text-danger"></span>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <span class="input-group-label"> Country:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select asp-for="CustomerDetail.CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CustomerDetail.CountryId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> State:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select id="StateId" asp-for="CustomerDetail.StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CustomerDetail.StateId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> District:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" for="DistrictId"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select id="DistrictId" asp-for="CustomerDetail.DistrictId" class="form-control remarks" asp-items="ViewBag.DistrictId" onchange="loadPinCode(this)" required>
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+
+                                <span asp-validation-for="CustomerDetail.DistrictId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Pincode:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" for="PinCodeId"><i class="fas fa-map-pin"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select id="PinCodeId" asp-for="CustomerDetail.PinCodeId" class="form-control remarks" asp-items="ViewBag.PinCodeId" required>
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="CustomerDetail.PinCodeId" class="text-danger"></span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <span class="input-group-label"> Address:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="Addressline"><i class="fa fa-home"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input type="text" asp-for="CustomerDetail.Addressline" class="form-control remarks title-name" type="text" required placeholder="Address" maxlength="20" />
+                                <span asp-validation-for="CustomerDetail.Addressline" class="text-danger"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Note:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="Description"><i class="fas fa-pencil-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <input required asp-for="CustomerDetail.Description" class="form-control remarks" type="text" placeholder="Note" maxlength="20" />
+                                <span asp-validation-for="CustomerDetail.Description" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <span class="input-group-label"> Customer Photo:</span>
+                            <div class="input-group mb-3">
+                                <img class="form-Image" id="profileImage" src="@Applicationsettings.NO_USER">
+                                @if (Model.PolicyDetail.ClaimType == ClaimType.HEALTH)
+                                {
+                                    <i class="fa fa-asterisk asterik-style"></i>
+                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" required />
+                                }
+                                else
+                                {
+                                    <input accept="image/*" asp-for="CustomerDetail.ProfileImage" type="file" class="form-control remarks" id="documentImageInput" onchange="document.getElementById('profileImage').src = window.URL.createObjectURL(this.files[0])" />
+                                }
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="text-right">
+                    <a id="back" asp-controller="ClaimsInvestigation" asp-action="Details" asp-route-id="@Model.ClaimsInvestigationId" class="btn btn-secondary">
+                        <i class="fa fa-window-close"></i>
+                        @Applicationsettings.CANCEL
+                    </a>
+                    <button id="create-cust" type="submit" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Add Customer
+                    </button>
+
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 </section>
 
 

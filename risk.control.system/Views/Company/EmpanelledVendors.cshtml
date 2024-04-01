@@ -2,75 +2,69 @@
     ViewData["Title"] = @Applicationsettings.SERVICE;
 }
 
-<section class="content pt-2">
-    <div class="container-fluid">
+<section class="content">
+    <div class="card card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-handshake"></i> Empanelled Agencies</h3>
 
-        <div class="row">
-            <div class="col-md-12">
+        </div>
+        <form id="checkboxes" method="post" asp-action="EmpanelledVendors">
+            <div class="card-body">
                 <div class="submit-progress hidden">
                     <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
                 </div>
-                <div class="card border-secondary card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-handshake"></i> Empanelled Agencies</h3>
-                        
-                    </div>
-                    <div class="card-body">
-                        
-                        <form id="checkboxes" method="post" asp-action="EmpanelledVendors">
-                            <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                                <thead>
-                                    <tr>
-                                        <th><input type="checkbox" name="select_all" id="checkall" value="0" /></th>
-                                       <th>
-                                            Document
-                                        </th>
-                                        <th>
-                                            Domain
-                                        </th>
-                                        <th>
-                                            Name
-                                        </th>
-                                        <th>
-                                            Code
-                                        </th>
-                                        <th>
-                                            Phone
-                                        </th>
 
-                                        <th>
-                                            Address
-                                        </th>
-                                        <th>
-                                            District
-                                        </th>
-                                        <th>
-                                            State
-                                        </th>
-                                        <th>
-                                            Country
-                                        </th>
-                                    </tr>
-                                </thead>
-                            </table>
-                            <div class="card-footer">
-                                <div class="col-md-12">
-                                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+                <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="select_all" id="checkall" value="0" /></th>
+                            <th>
+                                Document
+                            </th>
+                            <th>
+                                Domain
+                            </th>
+                            <th>
+                                Name
+                            </th>
+                            <th>
+                                Code
+                            </th>
+                            <th>
+                                Phone
+                            </th>
 
-                                    <button id="manage-vendors" type="submit" class="btn btn-danger">
-                                        <i class="fas fa-hand-pointer" aria-hidden="true"></i> Depanel
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                            <th>
+                                Address
+                            </th>
+                            <th>
+                                District
+                            </th>
+                            <th>
+                                State
+                            </th>
+                            <th>
+                                Country
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+                
+            </div>
+            <div class="card-footer">
+                <div class="col-md-12">
+                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left"></i> Back</a>
+
+                    <button id="manage-vendors" type="submit" class="btn btn-danger">
+                        <i class="fas fa-hand-pointer" aria-hidden="true"></i> Depanel
+                    </button>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </section>
-@section Scripts    {
+@section Scripts {
     <script src="~/js/empanelled-vendors.js">
 
     </script>
-    }
+}

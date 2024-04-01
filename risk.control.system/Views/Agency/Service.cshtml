@@ -1,47 +1,40 @@
 ﻿@{
     ViewData["Title"] = @Applicationsettings.DETAILS;
 }
-<section class="content pt-2">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="submit-progress hidden">
-                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                </div>
-                <div class="card border-secondary card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-truck"></i> Manage Services</h3>
-                        
-                    </div>
-                    <div class="card-body">
-                       
-                        <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>CaseType</th>
-                                    <th>ServiceType</th>
-                                    <th>Rate</th>
-                                    <th>District</th>
-                                    <th>State</th>
-                                    <th>Country</th>
-                                    <th>Pincodes</th>
-                                    <th>UpdatedBy</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <a id="back" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+<section class="content">
+    <div class="card card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-truck"></i> Manage Services</h3>
 
-                                    <a class="create-agency-service btn btn-success" href='#'><i class="fas fa-truck"></i> @Applicationsettings.CREATE Service</a>
-                                </div>
-                            </div>
-                        </div>
+        </div>
+        <div class="card-body">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <table id="customerTable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>CaseType</th>
+                        <th>ServiceType</th>
+                        <th>Rate</th>
+                        <th>District</th>
+                        <th>State</th>
+                        <th>Country</th>
+                        <th>Pincodes</th>
+                        <th>UpdatedBy</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <a id="back" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+
+                        <a class="create-agency-service btn btn-success" href='#'><i class="fas fa-truck"></i> @Applicationsettings.CREATE Service</a>
                     </div>
                 </div>
             </div>

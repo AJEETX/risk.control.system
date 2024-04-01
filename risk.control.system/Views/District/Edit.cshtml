@@ -3,79 +3,73 @@
 @{
     ViewData["Title"] = @Applicationsettings.EDIT;
 }
-<section class="content pt-2">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card border-secondary bg-light card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"> <i class="fas fa-city"></i> @Applicationsettings.EDIT </h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="create-form" asp-action="Edit">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <input type="hidden" asp-for="DistrictId" />
-                            <div class="form-group">
-                                <span class="input-group-label"> Country:</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>    <select asp-for="CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
-                                        <option value="">--- SELECT ---</option>
-                                    </select>
-                                    <span asp-validation-for="CountryId" class="text-danger"></span>
+<section class="content">
+    <div class="card bg-light card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"> <i class="fas fa-city"></i> @Applicationsettings.EDIT </h3>
+        </div>
+        <div class="card-body">
+            <form id="create-form" asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="DistrictId" />
+                <div class="form-group">
+                    <span class="input-group-label"> Country:</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" for="CountryId"><i class="fas fa-map-marked-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>    <select asp-for="CountryId" class="form-control remarks" id="CountryId" asp-items="ViewBag.CountryId" onchange="loadState(this)" required>
+                            <option value="">--- SELECT ---</option>
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
 
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <span class="input-group-label"> State:</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
-                                        <option value="">--- SELECT ---</option>
-                                    </select>
-
-                                    <span asp-validation-for="StateId" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <span class="input-group-label"> Distict:</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Name"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="District Name" maxlength="20">
-                                    <span asp-validation-for="Name" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <span class="input-group-label"> Distict Code:</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="District Code" maxlength="5">
-                                    <span asp-validation-for="Code" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group text-right">
-                                <a id="back" asp-action="Index" class="btn btn-secondary">
-                                    <i class="fa fa-window-close"></i>
-                                    @Applicationsettings.CANCEL
-                                </a>
-                                <button type="submit" class="btn btn-warning">
-                                    <i class="fas fa-city"></i>  @Applicationsettings.EDIT
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <span class="input-group-label"> State:</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" for="StateId"><i class="fas fa-map-marker-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <select id="StateId" asp-for="StateId" class="form-control remarks" asp-items="ViewBag.StateId" onchange="loadDistrict(this)" required>
+                            <option value="">--- SELECT ---</option>
+                        </select>
+
+                        <span asp-validation-for="StateId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <span class="input-group-label"> Distict:</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="Name"><i class="fas fa-city"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="District Name" maxlength="20">
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <span class="input-group-label"> Distict Code:</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="District Code" maxlength="5">
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group text-right">
+                    <a id="back" asp-action="Index" class="btn btn-secondary">
+                        <i class="fa fa-window-close"></i>
+                        @Applicationsettings.CANCEL
+                    </a>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-city"></i>  @Applicationsettings.EDIT
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </section>

@@ -2,46 +2,40 @@
 @{
     ViewData["Title"] = @Applicationsettings.CREATE;
 }
-<section class="content pt-2">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card border-secondary bg-light card-secondary">
-                    <div class="card-header">
-                        <h3 class="card-title"><i class="fas fa-money-check-alt"></i> @Applicationsettings.CREATE New</h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="create-form" asp-action="Create">
-                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                            <div class="form-group">
-                                <span class="input-group-label"> Budget Centre:</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Name"><i class="fas fa-money-check-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Budget Centre" value="" maxlength="20">
-                                    <span asp-validation-for="Name" class="text-danger"></span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <span class="input-group-label"> Budget Centre Code:</span>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
-                                    </div>
-                                    <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Budget Centre Code" value="" maxlength="5">
-                                    <span asp-validation-for="Code" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group text-right">
-                                <a id="back" asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
-                                <button type="submit" class="btn btn-success"> <i class="fas fa-money-check-alt"></i> @Applicationsettings.CREATE New</button>
-                            </div>
-                        </form>
+<section class="content">
+    <div class="card bg-light card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-money-check-alt"></i> @Applicationsettings.CREATE New</h3>
+        </div>
+        <div class="card-body">
+            <form id="create-form" asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <span class="input-group-label"> Budget Centre:</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="Name"><i class="fas fa-money-check-alt"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input type="text" asp-for="Name" class="form-control remarks title-name" required placeholder="Budget Centre" value="" maxlength="20">
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                 </div>
-            </div>
+
+                <div class="form-group">
+                    <span class="input-group-label"> Budget Centre Code:</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="Code"><i class="fas fa-code"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                        </div>
+                        <input type="text" asp-for="Code" class="form-control remarks title-name" required placeholder="Budget Centre Code" value="" maxlength="5">
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group text-right">
+                    <a id="back" asp-action="Index" class="btn btn-secondary"><i class="fa fa-window-close"></i> @Applicationsettings.CANCEL</a> &nbsp;
+                    <button type="submit" class="btn btn-success"> <i class="fas fa-money-check-alt"></i> @Applicationsettings.CREATE New</button>
+                </div>
+            </form>
         </div>
     </div>
 </section>

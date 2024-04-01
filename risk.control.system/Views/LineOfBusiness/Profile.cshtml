@@ -3,73 +3,67 @@
 @{
     ViewData["Title"] = @Applicationsettings.LINE_OF_BUSINESS;
 }
-<section class="content pt-2">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-secondary border-secondary">
-                    <div class="card-header">
-                        <div class="submit-progress hidden">
-                            <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-                        </div>
-                        <h3 class="card-title"><i class="fas fa-business-time"></i> Line of business</h3>
-                        
-                    </div>
-                    <div class="card-body">
+<section class="content">
+    <div class="card card-secondary border-secondary">
+        <div class="card-header">
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <h3 class="card-title"><i class="fas fa-business-time"></i> Line of business</h3>
 
-                        <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        Name
-                                    </th>
+        </div>
+        <div class="card-body">
 
-                                    <th>
-                                        Services
-                                    </th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
+            <table id="datatable" class="table table-bordered table-hover dt-responsive nowrap w-100">
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Services
+                        </th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var masterData = item.MasterData ? "none" : "";
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+
+                            <td>
+                                @foreach (var InvestigationServiceType in item.InvestigationServiceTypes)
                                 {
-                                    var masterData = item.MasterData ? "none" : "";
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Name)
-                                        </td>
-
-                                        <td>
-                                            @foreach (var InvestigationServiceType in item.InvestigationServiceTypes)
-                                            {
-                                                <span class="badge badge-light">@InvestigationServiceType.Name</span>
-                                                <br />
-                                            }
-                                        </td>
-                                        <td>
-
-                                            <a class="btn btn-xs btn-warning" style="pointer-events:@masterData" asp-action="Edit" asp-route-id="@item.LineOfBusinessId">
-                                                <i class="fas fa-business-time"></i>  @Applicationsettings.EDIT
-                                            </a> &nbsp;
-                                            <a class="btn btn-xs btn-danger" style="pointer-events:@masterData" asp-action="Delete" asp-route-id="@item.LineOfBusinessId">
-                                                <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
-                                            </a>
-                                        </td>
-                                    </tr>
+                                    <span class="badge badge-light">@InvestigationServiceType.Name</span>
+                                    <br />
                                 }
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
-                                    <a class="btn btn-success" as-controller="LineOfbusiness" asp-action="Create"> <i class="fas fa-business-time"></i> Add  New </a>
+                            </td>
+                            <td>
 
-                                </div>
-                            </div>
-                        </div>
+                                <a class="btn btn-xs btn-warning" style="pointer-events:@masterData" asp-action="Edit" asp-route-id="@item.LineOfBusinessId">
+                                    <i class="fas fa-business-time"></i>  @Applicationsettings.EDIT
+                                </a> &nbsp;
+                                <a class="btn btn-xs btn-danger" style="pointer-events:@masterData" asp-action="Delete" asp-route-id="@item.LineOfBusinessId">
+                                    <i class="fas fa-trash"></i>  @Applicationsettings.DELETE
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <a id="back" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                        <a class="btn btn-success" as-controller="LineOfbusiness" asp-action="Create"> <i class="fas fa-business-time"></i> Add  New </a>
+
                     </div>
                 </div>
             </div>
