@@ -332,8 +332,8 @@ namespace risk.control.system.Controllers.Api
 
             var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => 
             c.Email == email && 
-            c.Active && !string.IsNullOrWhiteSpace(c.MobileUId) && 
-            !string.IsNullOrWhiteSpace(c.SecretPin));
+            c.Active
+            );
 
             if (vendorUser != null)
             {
@@ -394,7 +394,7 @@ namespace risk.control.system.Controllers.Api
                 });
                 return Ok(claim2Agent);
             }
-            return Unauthorized();
+            return Unauthorized("UnAuthenticated User !!!");
         }
 
         [AllowAnonymous]

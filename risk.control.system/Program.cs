@@ -278,8 +278,10 @@ app.Use(async (context, next) =>
 //    }
 //    await next.Invoke(context);
 //});
-
-app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"]);
+if (prod)
+{
+    app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"]);
+}
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

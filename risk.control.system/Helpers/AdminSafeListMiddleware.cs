@@ -28,7 +28,7 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.Request.Method != HttpMethod.Get.Method || context.Request.Method == HttpMethod.Get.Method)
+            if (!context.Request.Path.Value.Contains("api/agent"))
             {
                 var remoteIp = context.Connection.RemoteIpAddress;
                 _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
