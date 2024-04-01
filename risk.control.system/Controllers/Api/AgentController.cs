@@ -113,7 +113,7 @@ namespace risk.control.system.Controllers.Api
                             message += $"icheckify App Pin";
                             message += $"                                          ";
                             message += $"{user2Onboard.SecretPin}";
-                            message += $"                                          ";
+                            message += $"                                               ";
                             message += $"Thanks";
                             message += $"                                          ";
                             message += $"https://icheckify.co.in";
@@ -330,7 +330,10 @@ namespace risk.control.system.Controllers.Api
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
 
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == email && c.Active);
+            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => 
+            c.Email == email && 
+            c.Active && !string.IsNullOrWhiteSpace(c.MobileUId) && 
+            !string.IsNullOrWhiteSpace(c.SecretPin));
 
             if (vendorUser != null)
             {

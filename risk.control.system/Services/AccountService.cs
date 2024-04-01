@@ -34,13 +34,11 @@ namespace risk.control.system.Services
                 message += $"Thanks";
                 message += $"                                          ";
                 message += $"https://icheckify.co.in";
-                var response = SmsService.SendSingleMessage(user.PhoneNumber, message, true);
-
-                return true;
+                var response = SmsService.SendSingleMessage(user.PhoneNumber, message, user != null);
             }
             //SEND SMS
 
-            return false;
+            return user != null;
         }
     }
 }

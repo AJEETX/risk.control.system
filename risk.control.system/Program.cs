@@ -1,3 +1,4 @@
+using System.Net;
 using System.Reflection;
 using System.Threading.RateLimiting;
 
@@ -7,6 +8,7 @@ using AspNetCoreHero.ToastNotification.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,7 @@ using Microsoft.OpenApi.Models;
 using NToastNotify;
 
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Permission;
@@ -84,7 +87,7 @@ builder.Services.AddScoped<ITrashMailService, TrashMailService>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-
+builder.Services.AddTransient<CustomCookieAuthenticationEvents>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 //builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
@@ -152,15 +155,30 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             return Task.CompletedTask;
         };
         //options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
-        //options.SlidingExpiration = true;
+        options.SlidingExpiration = true;
         options.LoginPath = "/Account/Login";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
         options.Cookie.HttpOnly = true;
         // Only use this when the sites are on different domains
         options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.Domain = "check.azurewebsites.com";
+        options.Cookie.Domain = "azurewebsites.com";
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.MaxAge = options.ExpireTimeSpan;
+        options.EventsType = typeof(CustomCookieAuthenticationEvents);
     });
+
+builder.Services.AddRequestTimeouts(options => {
+    options.DefaultPolicy =
+        new RequestTimeoutPolicy 
+        { 
+            Timeout = TimeSpan.FromMilliseconds(9900), 
+            TimeoutStatusCode = 500,
+            WriteTimeoutResponse = async (HttpContext context) => {
+                context.Response.ContentType = "text/plain";
+                await context.Response.WriteAsync("Timeout !!!");
+            }
+        };
+});
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -182,7 +200,14 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+builder.Services.AddDistributedMemoryCache();
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 var app = builder.Build();
 app.UseSwagger();
 
@@ -241,9 +266,24 @@ app.Use(async (context, next) =>
     await next();
 });
 
+//app.Use(async (context, next) =>
+//{
+//    IPAddress remoteIpAddress = context.Connection.RemoteIpAddress;
+//    var whiteListIPList = new List<string> { "192.168.0.5", "192.168.1.6", "::1" };
+//    if (!whiteListIPList.Contains(remoteIpAddress.ToString()))
+//    {
+//        Console.WriteLine("Request from {RemoteIp} is forbidden.", remoteIpAddress);
+//        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+//        return;
+//    }
+//    await next.Invoke(context);
+//});
+
+app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"]);
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 app.UseNToastNotify();
 app.UseNotyf();
 
