@@ -265,8 +265,10 @@ app.Use(async (context, next) =>
 
     await next();
 });
+var whitelist = builder.Configuration.GetSection("isWhitelist").Value;
+var isWhitelist = bool.Parse(whitelist);
 
-if (prod)
+if (isWhitelist)
 {
     app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"]);
 }
