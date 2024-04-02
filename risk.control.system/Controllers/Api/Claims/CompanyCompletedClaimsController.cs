@@ -77,7 +77,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 Agency = a.Vendor?.Name,
                 TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
             })?.ToList();
-            await Task.Delay(1000);
 
             return Ok(response);
         }

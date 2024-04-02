@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
@@ -28,6 +29,7 @@ namespace risk.control.system.Controllers.Api
                 var ipAddressWithoutPort = ipAddress?.Split(':')[0];
 
                 var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct);
+                var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "/" + ipApiResponse?.lon.GetValueOrDefault().ToString();
 
                 var response = new
                 {
@@ -39,6 +41,7 @@ namespace risk.control.system.Controllers.Api
                     PostCode = ipApiResponse?.zip,
                     Longitude = ipApiResponse?.lon.GetValueOrDefault(),
                     Latitude = ipApiResponse?.lat.GetValueOrDefault(),
+                    mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}"
                 };
 
                 return Ok(response);

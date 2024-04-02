@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement.Mvc;
 
 using NToastNotify;
 
@@ -49,6 +50,7 @@ namespace risk.control.system.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
+        [FeatureGate(FeatureFlags.BaseVersion)]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)

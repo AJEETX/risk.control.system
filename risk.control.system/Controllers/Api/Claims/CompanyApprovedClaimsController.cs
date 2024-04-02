@@ -101,7 +101,6 @@ namespace risk.control.system.Controllers.Api.Claims
                 TimeElapsed = DateTime.UtcNow.Subtract(a.Created).TotalSeconds
             })?.ToList();
 
-            await Task.Delay(1000);
             return Ok(response);
         }
 
