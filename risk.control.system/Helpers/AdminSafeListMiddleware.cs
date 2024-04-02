@@ -12,7 +12,6 @@ namespace risk.control.system.Helpers
         private readonly RequestDelegate _next;
         private readonly ILogger<AdminSafeListMiddleware> _logger;
         private readonly byte[][] _safelist;
-
         public AdminSafeListMiddleware(RequestDelegate next, ILogger<AdminSafeListMiddleware> logger, string safelist)
         {
             var ips = safelist.Split(';');
@@ -28,7 +27,7 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
-            if (!context.Request.Path.Value.Contains("api/agent"))
+            if (!context.Request.Path.Value.Contains("api/agent") && !context.Request.Path.Value.Contains("api/Notification/GetClientIp"))
             {
                 var remoteIp = context.Connection.RemoteIpAddress;
                 _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
@@ -48,6 +47,7 @@ namespace risk.control.system.Helpers
                 {
                     _logger.LogWarning( "Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);
                     context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    context.Response.Redirect("/page/ip.html");
                     return;
                 }
             }

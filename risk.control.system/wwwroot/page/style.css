@@ -27,7 +27,7 @@
     font-size: 16px;
 }
 
-    .info-item:last-child {
+.info-item:last-child {
         border-bottom: none;
     }
 

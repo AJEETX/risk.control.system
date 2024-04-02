@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>IP Address</title>
+    <title>icheckify: Your IP Address</title>
     <link href="style.css" rel="stylesheet" type="text/css">
 
 </head>
 <body>
-    <h1>IP Address details</h1>
+    <div class="info-data"> <img class="login-logo" src="/img/iCheckifyLogo.png" />™️</div>
+    <h1>Your IP Address Info</h1>
+
     <div id="ipInfo">
         <div id="ipAddress" class="info-item"><span class="info-title">IP Address:</span> <span class="info-data">Loading...</span></div>
         <div id="country" class="info-item"><span class="info-title">Country:</span> <span class="info-data">Loading...</span></div>
@@ -18,6 +20,8 @@
         <div id="longitude" class="info-item"><span class="info-title">Longitude:</span> <span class="info-data">Loading...</span></div>
         <div id="latitude" class="info-item"><span class="info-title">Latitude:</span> <span class="info-data">Loading...</span></div>
     </div>
+
+    <h3> <a href="https://icheckify.co.in">icheckify™️</a> </h3>
 
     <script>
         async function fetchIpInfo() {
