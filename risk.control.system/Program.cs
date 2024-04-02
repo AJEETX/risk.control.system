@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Http.Timeouts;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -63,8 +64,12 @@ builder.Services.AddRateLimiter(_ => _
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
         options.QueueLimit = 2;
     }));
-builder.Services.AddResponseCaching();
-builder.Services.AddResponseCompression();
+// forward headers configuration for reverse proxy
+builder.Services.Configure<ForwardedHeadersOptions>(options => {
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IAgentService, AgentService>();
@@ -154,14 +159,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             context.Response.StatusCode = 401;
             return Task.CompletedTask;
         };
-        //options.Cookie.Name = Guid.NewGuid().ToString() + "authCookie";
-        options.SlidingExpiration = true;
+        options.Cookie.Name = "AspNetCore.Identity.Application";
+        options.SlidingExpiration = false;
         options.LoginPath = "/Account/Login";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+        options.ExpireTimeSpan = TimeSpan.FromSeconds(10);
         options.Cookie.HttpOnly = true;
         // Only use this when the sites are on different domains
         options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.Domain = "azurewebsites.com";
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.MaxAge = options.ExpireTimeSpan;
         options.EventsType = typeof(CustomCookieAuthenticationEvents);
@@ -171,7 +175,7 @@ builder.Services.AddRequestTimeouts(options => {
     options.DefaultPolicy =
         new RequestTimeoutPolicy 
         { 
-            Timeout = TimeSpan.FromMilliseconds(9900), 
+            Timeout = TimeSpan.FromMilliseconds(15000), 
             TimeoutStatusCode = 500,
             WriteTimeoutResponse = async (HttpContext context) => {
                 context.Response.ContentType = "text/plain";
@@ -200,7 +204,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
 {
@@ -221,9 +224,6 @@ app.UseHttpsRedirection();
 
 await DatabaseSeed.SeedDatabase(app);
 
-//app.UseHttpLogging();
-//app.UseResponseCaching();
-//app.UseResponseCompression();
 app.UseStaticFiles();
 
 app.UseCookiePolicy(
@@ -266,18 +266,6 @@ app.Use(async (context, next) =>
     await next();
 });
 
-//app.Use(async (context, next) =>
-//{
-//    IPAddress remoteIpAddress = context.Connection.RemoteIpAddress;
-//    var whiteListIPList = new List<string> { "192.168.0.5", "192.168.1.6", "::1" };
-//    if (!whiteListIPList.Contains(remoteIpAddress.ToString()))
-//    {
-//        Console.WriteLine("Request from {RemoteIp} is forbidden.", remoteIpAddress);
-//        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-//        return;
-//    }
-//    await next.Invoke(context);
-//});
 if (prod)
 {
     app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"]);
@@ -288,6 +276,7 @@ app.UseAuthorization();
 app.UseSession();
 app.UseNToastNotify();
 app.UseNotyf();
+app.UseFileServer();
 
 app.MapControllerRoute(
     name: "default",

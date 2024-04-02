@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IP Address</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+    <h1>IP Address details</h1>
+    <div id="ipInfo">
+        <div id="ipAddress" class="info-item"><span class="info-title">IP Address:</span> <span class="info-data">Loading...</span></div>
+        <div id="country" class="info-item"><span class="info-title">Country:</span> <span class="info-data">Loading...</span></div>
+        <div id="region" class="info-item"><span class="info-title">Region:</span> <span class="info-data">Loading...</span></div>
+        <div id="city" class="info-item"><span class="info-title">City:</span> <span class="info-data">Loading...</span></div>
+        <div id="district" class="info-item"><span class="info-title">District:</span> <span class="info-data">Loading...</span></div>
+        <div id="postCode" class="info-item"><span class="info-title">Post Code:</span> <span class="info-data">Loading...</span></div>
+        <div id="longitude" class="info-item"><span class="info-title">Longitude:</span> <span class="info-data">Loading...</span></div>
+        <div id="latitude" class="info-item"><span class="info-title">Latitude:</span> <span class="info-data">Loading...</span></div>
+    </div>
+
+    <script>
+        async function fetchIpInfo() {
+            try {
+                const response = await fetch('/api/Notification/GetClientIp');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+
+                // Update each element with the respective data
+                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+                document.querySelector('#country .info-data').textContent = data.country || 'Not available';
+                document.querySelector('#region .info-data').textContent = data.region || 'Not available';
+                document.querySelector('#city .info-data').textContent = data.city || 'Not available';
+                document.querySelector('#district .info-data').textContent = data.district || 'Not available';
+                document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
+                document.querySelector('#longitude .info-data').textContent = data.longitude ? data.longitude.toFixed(2) : 'Not available';
+                document.querySelector('#latitude .info-data').textContent = data.latitude ? data.latitude.toFixed(2) : 'Not available';
+            } catch (error) {
+                console.error('There has been a problem with your fetch operation:', error);
+            }
+        }
+
+        window.onload = fetchIpInfo;
+    </script>
+</body>
+</html>

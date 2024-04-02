@@ -1,0 +1,47 @@
+﻿body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e9ecef;
+    text-align: center;
+    margin: 0;
+    padding: 40px 0;
+    color: #495057;
+}
+
+#ipInfo {
+    background-color: #fff;
+    margin: auto;
+    max-width: 600px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    border: 1px solid #dee2e6;
+}
+
+.info-item {
+    margin: 10px 0;
+    padding: 12px 20px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+}
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+.info-title {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.info-data {
+    font-weight: 400;
+    color: #6c757d;
+}
+
+h1 {
+    color: #343a40;
+    margin-bottom: 30px;
+}
