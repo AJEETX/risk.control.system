@@ -42,8 +42,10 @@ namespace risk.control.system.Services
         {
             var route = $"{IP_BASE_URL}/json/{ipAddress}";
             var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
-            if (response != null && !isAuthenticated)
+            if (response != null)
             {
+                response.user = userEmail;
+                response.isAuthenticated = isAuthenticated;
                 context.IpApiResponse.Add(response);
                 await context.SaveChangesAsync();
             }

@@ -21,5 +21,7 @@ namespace risk.control.system.Models.ViewModel
         public double? lon { get; set; }
         public string? isp { get; set; }
         public string? query { get; set; }
+        public string? user { get; set; }
+        public bool? isAuthenticated { get; set; }
     }
 }

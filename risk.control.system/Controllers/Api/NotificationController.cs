@@ -32,7 +32,7 @@ namespace risk.control.system.Controllers.Api
 
                 var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, user, isAuthenticated);
                 var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "," + ipApiResponse?.lon.GetValueOrDefault().ToString();
-                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=10&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
+                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=12&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
                 var response = new
                 {
                     IpAddress = string.IsNullOrWhiteSpace(ipAddressWithoutPort) ? ipApiResponse?.query : ipAddressWithoutPort,
@@ -41,6 +41,7 @@ namespace risk.control.system.Controllers.Api
                     City = ipApiResponse?.city,
                     District = ipApiResponse?.district,
                     PostCode = ipApiResponse?.zip,
+                    Isp = ipApiResponse?.isp,
                     Longitude = ipApiResponse?.lon.GetValueOrDefault(),
                     Latitude = ipApiResponse?.lat.GetValueOrDefault(),
                     mapUrl = mapUrl

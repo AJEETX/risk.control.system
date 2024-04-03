@@ -49,10 +49,15 @@ h1 {
     height: 40px;
 }
 .login {
-    background: green;
+    background: gray;
     color:white;
-    border: 1px solid #0A5712;
+    border: 1px solid darkgray;
     padding: 10px 20px;
     border-radius:.5rem;
     text-decoration:none;
+}
+#maps{
+    max-width:560px;
+    overflow-x:auto;
+    min-height:300px;
 }

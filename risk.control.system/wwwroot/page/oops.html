@@ -11,6 +11,7 @@
     <div class="info-data"><a href="https://icheckify.co.in" target="_blank"> <img class="login-logo" src="/img/iCheckifyLogo.png" />™️</a></div>
     <h4> OOPS !!! This IP address not Whitelisted !!!</h4>
     <div id="ipInfo">
+        <div id="isp" class="info-item"><span class="info-title">ISP:</span> <span class="info-data">Loading...</span></div>
         <div id="ipAddress" class="info-item"><span class="info-title">IP Address:</span> <span class="info-data">Loading...</span></div>
         <div id="country" class="info-item"><span class="info-title">Country:</span> <span class="info-data">Loading...</span></div>
         <div id="region" class="info-item"><span class="info-title">Region:</span> <span class="info-data">Loading...</span></div>
@@ -26,30 +27,6 @@
         </div>
     </div>
 
-    <script>
-        async function fetchIpInfo() {
-            try {
-                const response = await fetch('/api/Notification/GetClientIp');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                // Update each element with the respective data
-                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-                document.querySelector('#country .info-data').textContent = data.country || 'Not available';
-                document.querySelector('#region .info-data').textContent = data.region || 'Not available';
-                document.querySelector('#city .info-data').textContent = data.city || 'Not available';
-                document.querySelector('#district .info-data').textContent = data.district || 'Not available';
-                document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
-                document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude.toFixed(2) + "/" + data.longitude.toFixed(2) : 'Not available';
-                document.querySelector('#maps .info-data #location-map').src = data.mapUrl || '/img/no-map.jpeg';
-
-            } catch (error) {
-                console.error('There has been a problem with your fetch operation:', error);
-            }
-        }
-
-        window.onload = fetchIpInfo;
-    </script>
+    <script src="ip-site.js"></script>
 </body>
 </html>
