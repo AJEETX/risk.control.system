@@ -3,6 +3,19 @@ function focusLogin() {
     pwd.select();
 }
 focusLogin();
+    async function fetchIpInfo() {
+        try {
+            const response = await fetch('/api/Notification/GetClientIp');
+            if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+            const data = await response.json();
+            document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+
+            } catch (error) {
+            console.error('There has been a problem with your fetch operation:', error);
+            }
+        }
 
 $(document).ready(function () {
     $('#login').on('click', function (event) {
@@ -49,4 +62,5 @@ $(document).ready(function () {
             nodes[i].disabled = true;
         }
     });
+    fetchIpInfo();
 });

@@ -25,15 +25,17 @@ namespace risk.control.system.Controllers.Api
         {
             try
             {
+                var user = HttpContext.User.Identity.Name;
+                var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                 var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
                 var ipAddressWithoutPort = ipAddress?.Split(':')[0];
 
-                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct);
-                var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "/" + ipApiResponse?.lon.GetValueOrDefault().ToString();
-
+                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, user, isAuthenticated);
+                var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "," + ipApiResponse?.lon.GetValueOrDefault().ToString();
+                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=10&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
                 var response = new
                 {
-                    IpAddress = ipAddressWithoutPort,
+                    IpAddress = string.IsNullOrWhiteSpace(ipAddressWithoutPort) ? ipApiResponse?.query : ipAddressWithoutPort,
                     Country = ipApiResponse?.country,
                     Region = ipApiResponse?.regionName,
                     City = ipApiResponse?.city,
@@ -41,7 +43,7 @@ namespace risk.control.system.Controllers.Api
                     PostCode = ipApiResponse?.zip,
                     Longitude = ipApiResponse?.lon.GetValueOrDefault(),
                     Latitude = ipApiResponse?.lat.GetValueOrDefault(),
-                    mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=18&size=300x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}"
+                    mapUrl = mapUrl
                 };
 
                 return Ok(response);

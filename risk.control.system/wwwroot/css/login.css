@@ -39,7 +39,10 @@ div .error-message {
 .signup-form form {
     padding-top: 3rem;
 }
-
+#ipAddress {
+    padding: 1rem 6rem;
+    font-size:.6rem;
+}
 .container .cover {
     position: absolute;
     top: 0;

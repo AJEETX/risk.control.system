@@ -9,6 +9,7 @@
 </head>
 <body>
     <div class="info-data"><a href="https://icheckify.co.in" target="_blank"> <img class="login-logo" src="/img/iCheckifyLogo.png" />™️</a></div>
+    <h4> OOPS !!! This IP address not Whitelisted !!!</h4>
     <div id="ipInfo">
         <div id="ipAddress" class="info-item"><span class="info-title">IP Address:</span> <span class="info-data">Loading...</span></div>
         <div id="country" class="info-item"><span class="info-title">Country:</span> <span class="info-data">Loading...</span></div>
@@ -24,7 +25,6 @@
 
         </div>
     </div>
-    <h4> <a class="login" href="/" >Login</a> </h4>
 
     <script>
         async function fetchIpInfo() {
@@ -41,7 +41,7 @@
                 document.querySelector('#city .info-data').textContent = data.city || 'Not available';
                 document.querySelector('#district .info-data').textContent = data.district || 'Not available';
                 document.querySelector('#postCode .info-data').textContent = data.postCode || 'Not available';
-                document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude +"/"+ data.longitude : 'Not available';
+                document.querySelector('#latLong .info-data').textContent = data.longitude ? data.latitude.toFixed(2) + "/" + data.longitude.toFixed(2) : 'Not available';
                 document.querySelector('#maps .info-data #location-map').src = data.mapUrl || '/img/no-map.jpeg';
 
             } catch (error) {

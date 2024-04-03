@@ -13,7 +13,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> ReplyVerifySchedule(string id, string confirm = "N");
 
-        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct);
+        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string userEmail= "", bool isAuthenticated=false);
 
         Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
@@ -38,10 +38,15 @@ namespace risk.control.system.Services
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct)
+        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string userEmail= "", bool isAuthenticated = false)
         {
             var route = $"{IP_BASE_URL}/json/{ipAddress}";
             var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
+            if (response != null && !isAuthenticated)
+            {
+                context.IpApiResponse.Add(response);
+                await context.SaveChangesAsync();
+            }
             return response;
         }
 

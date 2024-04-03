@@ -45,3 +45,14 @@ h1 {
     color: #343a40;
     margin-bottom: 30px;
 }
+.login-logo {
+    height: 40px;
+}
+.login {
+    background: green;
+    color:white;
+    border: 1px solid #0A5712;
+    padding: 10px 20px;
+    border-radius:.5rem;
+    text-decoration:none;
+}
