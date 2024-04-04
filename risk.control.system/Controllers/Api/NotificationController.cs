@@ -22,8 +22,8 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpGet("GetClientIp/{url}")]
-        public async Task<ActionResult> GetClientIp(CancellationToken ct, string url)
+        [HttpGet("GetClientIp")]
+        public async Task<ActionResult> GetClientIp(CancellationToken ct, string url = "")
         {
             try
             {

@@ -5,7 +5,8 @@ function focusLogin() {
 focusLogin();
     async function fetchIpInfo() {
         try {
-            const url = "/api/Notification/GetClientIp/"+ encodeURIComponent(window.location.pathname);
+            const url = "/api/Notification/GetClientIp?url="+ encodeURIComponent(window.location.pathname);
+                //const url = "/api/Notification/GetClientIp";
             const response = await fetch(url);
             if (!response.ok) {
                     throw new Error('Network response was not ok');

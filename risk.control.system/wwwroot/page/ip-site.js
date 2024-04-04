@@ -1,11 +1,22 @@
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(success);
-}
-else {
-    fetchIpInfo();
+//loadScript();
+//function initialize() {
+
+//    if (navigator.geolocation) {
+//        navigator.geolocation.getCurrentPosition(success);
+//    }
+//    else {
+//        fetchIpInfo();
+//    }
+//}
+var hexData = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
+
+function loadScript() {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = "https://maps.googleapis.com/maps/api/js?key=" + hexData + "&sensor=false&callback=initialize";
+    document.body.appendChild(script);
 }
 async function success(position) {
-    var hexData = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
     const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
     var bounds = new google.maps.LatLngBounds();
@@ -45,7 +56,8 @@ async function success(position) {
 }
 async function fetchIpInfo() {
     try {
-        const url = "/api/Notification/GetClientIp/"+ encodeURIComponent(window.location.pathname);
+        const url = "/api/Notification/GetClientIp?url="+ encodeURIComponent(window.location.pathname);
+        //const url = "/api/Notification/GetClientIp";
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error('Network response was not ok');
