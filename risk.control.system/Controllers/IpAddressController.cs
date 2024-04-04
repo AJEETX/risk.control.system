@@ -18,7 +18,7 @@ namespace risk.control.system.Controllers
         {
             return RedirectToAction("Active");
         }
-        [Breadcrumb("Ip Whitelist")]
+        [Breadcrumb("Ip Tracking")]
         public ActionResult Active()
         {
             return View();

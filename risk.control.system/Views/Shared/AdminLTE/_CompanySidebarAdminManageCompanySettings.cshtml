@@ -11,7 +11,8 @@
         <li class="nav-item">
             <a is-active-page class="navlink-border nav-link @Url.MakeActiveClass("LineOfBusiness","") @Url.MakeActiveClass("InvestigationServiceTypes","")
                                 @Url.MakeActiveClass("InvestigationCaseStatus","") @Url.MakeActiveClass("CaseEnabler","") @Url.MakeActiveClass("Costcentre","")
-                                            @Url.MakeActiveClass("InvestigationCaseOutcome","")
+                                                @Url.MakeActiveClass("InvestigationCaseOutcome","")
+                                                    @Url.MakeActiveClass("IpAddress","")
                                         @Url.MakeActiveClass("BeneficiaryRelation","")">
                 <i class="nav-icon fas fa-cog"></i>
                 <p class="sidebar-menu-header-label">
@@ -20,14 +21,14 @@
                 </p>
             </a>
         </li>
-        // <li class="nav-item">
-        //     <a is-active-page asp-controller="IpAddress" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("IpAddress","")">
-        //         <i class="fas fa-sitemap nav-icon"></i>
-        //         <p>
-        //             IP Whitelist
-        //         </p>
-        //     </a>
-        // </li>
+        <li class="nav-item">
+            <a is-active-page asp-controller="IpAddress" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("IpAddress","")">
+                <i class="fas fa-sitemap nav-icon"></i>
+                <p>
+                    IP Tracking
+                </p>
+            </a>
+        </li>
         <li class="nav-item">
             <a is-active-page asp-controller="LineOfBusiness" asp-action="Index" class="actual-link nav-link @Url.MakeActiveClass("LineOfBusiness","")">
                 <i class="fas fa-business-time nav-icon"></i>

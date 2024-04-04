@@ -3,10 +3,10 @@
     $('a.create').attr("href", "/IpAddress/Create");
     $("#customerTable").DataTable({
         ajax: {
-            url: '/api/MasterData/GetWhitelist',
+            url: '/api/MasterData/GetIpAddress',
             dataSrc: ''
         },
-        order: [[3, 'asc']],
+        order: [[12, 'asc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -17,18 +17,19 @@
         columns: [
             /* Name of the keys from
             data file source */
-            {
-                "sDefaultContent": "",
-                "bSortable": false,
-                "mRender": function (data, type, row) {
-                    var img = '<img alt="' + row.ipAddressId + '" title="' + row.ipAddressId + ' class="doc-profile-image" data-toggle="tooltip"/>';
-                    return img;
-                }
-            },
-       
-            { "data": "address" },
-            { "data": "updatedBy" },
-            { "data": "updated" },
+            { "data": "ipApiResponseId",visible:false },
+            { "data": "country" },
+            { "data": "regionName" },
+            { "data": "city" },
+            { "data": "district" },
+            { "data": "zip" },
+            { "data": "lat" },
+            { "data": "lon" },
+            { "data": "isp" },
+            { "data": "query" },
+            { "data": "user" },
+            { "data": "isAuthenticated" },
+            { "data": "created" },
      
         ],
         error: function (xhr, status, error) { alert('err ' + error) }
@@ -36,33 +37,5 @@
     $('#customerTable').on('draw.dt', function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
-    var askConfirmation = true;
-    $('#create-form').submit(function (e) {
-        if (askConfirmation) {
-            e.preventDefault();
-            $.confirm({
-                title: "Confirm  Add New",
-                columnClass: 'medium',
-                content: "Are you sure to add?",
-                icon: 'fas fa-sitemap',
-                type: 'green',
-                closeIcon: true,
-                buttons: {
-                    confirm: {
-                        text: " Add New",
-                        btnClass: 'btn-success',
-                        action: function () {
-                            askConfirmation = false;
-                            $('#create-form').submit();
-                        }
-                    },
-                    cancel: {
-                        text: "Cancel",
-                        btnClass: 'btn-default'
-                    }
-                }
-            });
-        }
-    })
 });
 
