@@ -84,6 +84,9 @@ namespace risk.control.system.Models
         public bool SendSMS { get; set; } = false;
         public string MobileAppUrl { get; set; } = "https://apkichck.s3.ap-southeast-2.amazonaws.com/ichck/app-release_20242901-002101_dev.apk";
         public bool BulkUpload { get; set; } = false;
+        public string WhitelistIpAddress { get; set; } = "127.0.0.1;192.168.1.5;::1;202.7.251.21;101.115.143.75;101.115.134.238;120.21.2.126";
+        public string? WhitelistIpAddressRange { get; set; } = default!;
+
     }
 
     public enum CompanyStatus

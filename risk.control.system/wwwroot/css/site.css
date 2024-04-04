@@ -1178,3 +1178,7 @@ a#back-button {
 .remarks{
     background-color:lightgoldenrodyellow;
 }
+.ipaddress {
+    padding: 0 4rem;
+    font-weight:bold;
+}
