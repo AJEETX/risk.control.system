@@ -129,7 +129,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-trial-05Apr0055.db"));
+                        options.UseSqlite("Data Source=x-trial-05Apr0724.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -269,13 +269,7 @@ app.Use(async (context, next) =>
 
     await next();
 });
-var whitelist = builder.Configuration.GetSection("isWhitelist").Value;
-var isWhitelist = bool.Parse(whitelist);
-
-if (isWhitelist)
-{
-    app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"]);
-}
+app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"]);
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

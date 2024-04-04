@@ -35,7 +35,7 @@ namespace risk.control.system.Controllers.Api
 
                 var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl,user, isAuthenticated);
                 var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "," + ipApiResponse?.lon.GetValueOrDefault().ToString();
-                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=12&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
+                var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
                 var response = new
                 {
                     IpAddress = string.IsNullOrWhiteSpace(ipAddressWithoutPort) ? ipApiResponse?.query : ipAddressWithoutPort,

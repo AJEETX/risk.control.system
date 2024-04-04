@@ -14,7 +14,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> ReplyVerifySchedule(string id, string confirm = "N");
 
-        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail= "", bool isAuthenticated=false);
+        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false);
 
         Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
@@ -41,18 +41,27 @@ namespace risk.control.system.Services
             this.featureManager = featureManager;
         }
 
-        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail= "", bool isAuthenticated = false)
+        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail = "", bool isAuthenticated = false)
         {
+            var curTimeZone = TimeZone.CurrentTimeZone;
+
             var route = $"{IP_BASE_URL}/json/{ipAddress}";
-            page = page == "/" ? "dashboard":page;
+            page = page == "/" ? "dashboard" : page;
             var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
+            var longLatString = response?.lat.GetValueOrDefault().ToString() + "," + response?.lon.GetValueOrDefault().ToString();
+            var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=6&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
+
             if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
             {
-                response.page = page;
-                response.user = userEmail;
-                response.isAuthenticated = isAuthenticated;
-                context.IpApiResponse.Add(response);
-                await context.SaveChangesAsync();
+                if ((isAuthenticated && !string.IsNullOrWhiteSpace(userEmail) && !userEmail.StartsWith("admin")) || !isAuthenticated)
+                {
+                    response.page = page;
+                    response.user = userEmail;
+                    response.isAuthenticated = isAuthenticated;
+                    response.MapUrl = mapUrl;
+                    context.IpApiResponse.Add(response);
+                    await context.SaveChangesAsync();
+                }
             }
             return response;
         }
@@ -357,7 +366,7 @@ namespace risk.control.system.Services
                 agencyUser = (VendorApplicationUser)user;
                 company = context.Vendor.FirstOrDefault(v => v.VendorId == agencyUser.VendorId).Name;
             }
-            if(!isInsurerUser && !isVendorUser)
+            if (!isInsurerUser && !isVendorUser)
             {
                 return string.Empty;
             }
@@ -397,7 +406,7 @@ namespace risk.control.system.Services
 
             var mobile = beneficiary.BeneficiaryContactNumber.ToString();
             var user = context.ApplicationUser.FirstOrDefault(u => u.Email == currentUser);
-            
+
             var isInsurerUser = user is ClientCompanyApplicationUser;
             var isVendorUser = user is VendorApplicationUser;
 

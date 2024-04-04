@@ -24,7 +24,8 @@ namespace risk.control.system.Models.ViewModel
         public string? page { get; set; } = "dashboard";
         public string? user { get; set; }
         public bool? isAuthenticated { get; set; }
+        public string? MapUrl { get; set; }
         [NotMapped]
-        public string Dated { get { return Created.ToString("dd-MMM-yyyy HH:mm"); } }
+        public string Dated => Created.ToString("dd-MMM-yyyy HH:mm");
     }
 }

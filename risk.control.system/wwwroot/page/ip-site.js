@@ -1,6 +1,9 @@
-//if (navigator.geolocation) {
-//    navigator.geolocation.getCurrentPosition(success);
-//}
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success);
+}
+else {
+    fetchIpInfo();
+}
 async function success(position) {
     var hexData = 'AIzaSyDH8T9FvJ8n2LNwxkppRAeOq3Mx7I3qi1E';
     const { Map, InfoWindow } = await google.maps.importLibrary("maps");
@@ -15,12 +18,6 @@ async function success(position) {
     const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${hexData}`);
     const mapUrlData = await response.json();
 
-    //var locresponse = $.ajax({
-    //    type: "GET",
-    //    url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&sensor=false&key=${hexData}`,
-    //    async: false
-    //}).responseText;
-    //current_data = JSON.parse(locresponse);
 
     var LatLng = new google.maps.LatLng(lat, long);
     var mapOptions = {

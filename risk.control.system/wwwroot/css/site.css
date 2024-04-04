@@ -1179,6 +1179,6 @@ a#back-button {
     background-color:lightgoldenrodyellow;
 }
 .ipaddress {
-    padding: 0 4rem;
-    font-weight:bold;
+    padding: 0 1rem;
+    font-weight:bolder;
 }

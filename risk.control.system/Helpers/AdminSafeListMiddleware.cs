@@ -29,7 +29,7 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
-            if(await featureManager.IsEnabledAsync(FeatureFlags.IPTracking))
+            if(await featureManager.IsEnabledAsync(FeatureFlags.IPRestrict))
             {
                 if (!context.Request.Path.Value.Contains("api/agent") && !context.Request.Path.Value.Contains("api/Notification/GetClientIp"))
                 {

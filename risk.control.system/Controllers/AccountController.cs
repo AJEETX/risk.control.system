@@ -50,7 +50,8 @@ namespace risk.control.system.Controllers
         [TempData]
         public string ErrorMessage { get; set; }
 
-        //[FeatureGate(FeatureFlags.BaseVersion)]
+        [FeatureGate(FeatureFlags.TrialVersion)]
+        [FeatureGate(FeatureFlags.ON)]
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)
