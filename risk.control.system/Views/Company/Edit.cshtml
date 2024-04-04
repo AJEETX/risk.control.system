@@ -322,8 +322,26 @@
                                         </div>
                                     </div>
 
-
-
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Whitelist IP Addresses:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="WhitelistIpAddress"><i class="fas fa-sitemap"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="WhitelistIpAddress" class="form-control remarks title-name ipaddress" required placeholder="Whitelist IP Addresses">
+                                            <span asp-validation-for="WhitelistIpAddress" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <span class="input-group-label"> Whitelist IP AddressRange:</span>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text" id="WhitelistIpAddressRange"><i class="fas fa-sitemap"></i> <i class="fa fa-asterisk asterik-style" style="color:#e9ecef;"></i></span>
+                                            </div>
+                                            <input type="text" asp-for="WhitelistIpAddressRange" class="form-control remarks title-name" placeholder="202.7.251.21/24">
+                                            <span asp-validation-for="WhitelistIpAddressRange" class="text-danger"></span>
+                                        </div>
+                                    </div>
 
                                 </div>
                                 <div class="col-sm-4">

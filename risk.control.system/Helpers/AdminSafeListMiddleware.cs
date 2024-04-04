@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Options;
 using Microsoft.FeatureManagement;
 
+using NetTools;
+
+using risk.control.system.Data;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
 
@@ -16,16 +19,9 @@ namespace risk.control.system.Helpers
         private readonly RequestDelegate _next;
         private readonly ILogger<AdminSafeListMiddleware> _logger;
         private readonly IFeatureManager featureManager;
-        private readonly byte[][] _safelist;
+        private byte[][] _safelist;
         public AdminSafeListMiddleware(RequestDelegate next, ILogger<AdminSafeListMiddleware> logger, string safelist, IFeatureManager featureManager)
         {
-            var ips = safelist.Split(';');
-            _safelist = new byte[ips.Length][];
-            for (var i = 0; i < ips.Length; i++)
-            {
-                _safelist[i] = IPAddress.Parse(ips[i]).GetAddressBytes();
-            }
-
             _next = next;
             _logger = logger;
             this.featureManager = featureManager;
@@ -42,28 +38,73 @@ namespace risk.control.system.Helpers
 
                     var bytes = remoteIp.GetAddressBytes();
                     var badIp = true;
-                    foreach (var address in _safelist)
+                    var ipRange = IPAddressRange.Parse("202.7.251.21/255.255.255.0");
+                    ipRange.Contains(remoteIp); // is True.
+                    
+                    var dbContext = context.RequestServices.GetRequiredService<ApplicationDbContext>();
+                    var ipAddressRanges = dbContext.ClientCompany.Where(c => !string.IsNullOrWhiteSpace(c.WhitelistIpAddressRange)).Select(c => c.WhitelistIpAddressRange).ToList();
+                    if (ipAddressRanges.Any())
                     {
-                        if (address.SequenceEqual(bytes))
+                        foreach (var ipAddressRange in ipAddressRanges)
                         {
-                            badIp = false;
-                            break;
+                            var inRange = IPAddressRange.Parse(ipAddressRange);
+                            if (inRange.Contains(remoteIp))
+                            {
+                                badIp = false;
+                                break;
+                            }
+                        }
+                        var userAuthenticated = context.Request.HttpContext.User?.Identity?.IsAuthenticated ?? false;
+                        if (badIp && userAuthenticated)
+                        {
+                            _logger.LogWarning("Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);
+                            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                            context.Response.Redirect("/page/ip.html");
+                            return;
+                        }
+                        else if (badIp && !userAuthenticated)
+                        {
+
+                            context.Response.Redirect("/page/oops.html");
+                            return;
                         }
                     }
-                    var userAuthenticated = context.Request.HttpContext.User?.Identity?.IsAuthenticated ?? false;
-                    if (badIp && userAuthenticated)
+                    var ipAddresses = dbContext.ClientCompany.Where(c=>!string.IsNullOrWhiteSpace(c.WhitelistIpAddress)).Select(c=>c.WhitelistIpAddress).ToList();
+                    
+                    if (ipAddresses.Any())
                     {
-                        _logger.LogWarning("Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);
-                        context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                        context.Response.Redirect("/page/ip.html");
-                        return;
+                        var safelist = string.Join(";", ipAddresses);
+                        var ips = safelist.Split(';');
+                        _safelist = new byte[ips.Length][];
+                        for (var i = 0; i < ips.Length; i++)
+                        {
+                            _safelist[i] = IPAddress.Parse(ips[i]).GetAddressBytes();
+                        }
+                        foreach (var address in _safelist)
+                        {
+                            if (address.SequenceEqual(bytes))
+                            {
+                                badIp = false;
+                                break;
+                            }
+                        }
+                        var userAuthenticated = context.Request.HttpContext.User?.Identity?.IsAuthenticated ?? false;
+                        if (badIp && userAuthenticated)
+                        {
+                            _logger.LogWarning("Forbidden Request from Remote IP address: {RemoteIp}", remoteIp);
+                            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                            context.Response.Redirect("/page/ip.html");
+                            return;
+                        }
+                        else if (badIp && !userAuthenticated)
+                        {
+                            context.Response.Redirect("/page/oops.html");
+                            return;
+                        }
                     }
-                    else if (badIp && !userAuthenticated)
-                    {
-
-                        context.Response.Redirect("/page/oops.html");
-                        return;
-                    }
+                    
+                    
+                    
                 }
             }
             

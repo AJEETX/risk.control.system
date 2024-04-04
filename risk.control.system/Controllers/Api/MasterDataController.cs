@@ -163,5 +163,11 @@ namespace risk.control.system.Controllers.Api
             }
             return Ok(applicationUsers?.Select(a => a.Email).OrderBy(s => s).ToList());
         }
+        [HttpGet("GetWhitelist")]
+        public async Task<IActionResult> GetWhitelist()
+        {
+            var whitelistAddresses = context.IpAddress.ToList();
+            return Ok(whitelistAddresses);
+        }
     }
 }
