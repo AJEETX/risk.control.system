@@ -6,7 +6,7 @@
         public const string TestPassword = "R1$kcontrol";
         public const string PERMISSION = "Permission";
         public static readonly string ADMIN_MOBILE = "61404723089";
-        public static readonly string MOBILE = "61432854196";
+        public static readonly string PORTAL_ADMIN_MOBILE = "61432854196";
         public static readonly string USER_MOBILE = "61400000000";
         public static readonly string HEXdATA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         public static readonly string ValidIssuer = "icheckify";

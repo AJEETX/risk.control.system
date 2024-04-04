@@ -49,7 +49,7 @@ namespace risk.control.system.Seeds
                 IsClientAdmin = true,
                 IsVendorAdmin = true,
                 PhoneNumberConfirmed = true,
-                PhoneNumber = Applicationsettings.MOBILE,
+                PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                 CountryId = indiaCountry.Entity.CountryId,
                 DistrictId = district?.DistrictId ?? default!,
                 StateId = state?.StateId ?? default!,

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net.Mail;
+using System.Reflection;
 using System.Security.Claims;
 using System.Web;
 
@@ -9,14 +11,19 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement;
 using Microsoft.FeatureManagement.Mvc;
 
 using NToastNotify;
+
+using NuGet.Packaging.Signing;
 
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
+
+using static risk.control.system.AppConstant.Applicationsettings;
 
 namespace risk.control.system.Controllers
 {
@@ -28,6 +35,7 @@ namespace risk.control.system.Controllers
         private readonly IToastNotification toastNotification;
         private readonly IAccountService accountService;
         private readonly ILogger _logger;
+        private readonly IFeatureManager featureManager;
         private readonly INotyfService notifyService;
         private readonly ApplicationDbContext _context;
 
@@ -38,6 +46,7 @@ namespace risk.control.system.Controllers
             IToastNotification toastNotification,
             IAccountService accountService,
             ILogger<AccountController> logger,
+            IFeatureManager featureManager,
             INotyfService notifyService,
             ApplicationDbContext context)
         {
@@ -48,6 +57,7 @@ namespace risk.control.system.Controllers
             this.accountService = accountService;
             this._context = context;
             _logger = logger;
+            this.featureManager = featureManager;
             this.notifyService = notifyService;
         }
 
@@ -70,8 +80,11 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(CancellationToken ct,LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(CancellationToken ct, LoginViewModel model, string returnUrl = null)
         {
+            var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+            var ipAddressWithoutPort = ipAddress?.Split(':')[0];
+
             if (ModelState.IsValid || !model.Email.ValidateEmail())
             {
                 ViewData["ReturnUrl"] = returnUrl == "dashboard";
@@ -105,14 +118,43 @@ namespace risk.control.system.Controllers
                                 return Ok();
                             }
                             var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                            var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-                            var ipAddressWithoutPort = ipAddress?.Split(':')[0];
 
-                            var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login", model.Email, isAuthenticated);
+                            var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated);
+                            if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+                            {
+                                var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                                string message = $"Dear {admin.Email}";
+                                message += $"                                       ";
+                                message += $"                       ";
+                                message += $"User {user.Email} logged in from IP address {ipApiResponse.query}";
+                                message += $"                                       ";
+                                message += $"Thanks                                         ";
+                                message += $"                                       ";
+                                message += $"                                       ";
+                                message += $"https://icheckify.co.in";
+                                SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                            }
+
                             notifyService.Success("Login successful");
                             return RedirectToLocal(returnUrl);
                         }
                     }
+
+                    var ipApiFailedResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, false);
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN) && !user.Email.StartsWith("admin"))
+                    {
+                        var adminForFailed = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                        string failedMessage = $"Dear {adminForFailed.Email}";
+                        failedMessage += $"                         ";
+                        failedMessage += $"Locked user {user.Email} logged in from IP address {ipApiFailedResponse.query}";
+                        failedMessage += $"                                       ";
+                        failedMessage += $"Thanks                                       ";
+                        failedMessage += $"                                       ";
+                        failedMessage += $"                                       ";
+                        failedMessage += $"https://icheckify.co.in";
+                        SMS.API.SendSingleMessage("+" + adminForFailed.PhoneNumber, failedMessage);
+                    }
+
                     _logger.LogWarning("User account locked out.");
                     model.Error = "User account locked out.";
                     return RedirectToAction("login", model);
@@ -120,10 +162,21 @@ namespace risk.control.system.Controllers
                 else if (result.IsLockedOut)
                 {
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
-
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login", model.Email, isAuthenticated);
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-locked", model.Email, isAuthenticated);
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                    {
+                        var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                        string message = $"Dear {admin.Email}";
+                        message += $"                           ";
+                        message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
+                        message += $"                                       ";
+                        message += $"Thanks                                         ";
+                        message += $"                                       ";
+                        message += $"                                       ";
+                        message += $"https://icheckify.co.in";
+                        SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                    }
+                        
                     if (model.Mobile)
                     {
                         return BadRequest();
@@ -138,10 +191,22 @@ namespace risk.control.system.Controllers
                 else
                 {
                     var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
-                    var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
-                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
 
-                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login", model.Email, isAuthenticated);
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-failed", model.Email, isAuthenticated);
+                    if (await featureManager.IsEnabledAsync(FeatureFlags.SMS4ADMIN))
+                    {
+                        var admin = _context.ApplicationUser.FirstOrDefault(u => u.IsSuperAdmin);
+                        string message = $"Dear {admin.Email}";
+                        message += $"                          ";
+                        message += $"{model.Email} failed login attempt from IP address {ipApiResponse.query}";
+                        message += $"                                       ";
+                        message += $"Thanks                                         ";
+                        message += $"                                       ";
+                        message += $"                                       ";
+                        message += $"https://icheckify.co.in";
+                        SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
+                    }
+                        
                     if (model.Mobile)
                     {
                         return BadRequest();
@@ -153,7 +218,7 @@ namespace risk.control.system.Controllers
                         return View(model);
                     }
                 }
-                
+
             }
             if (model.Mobile)
             {

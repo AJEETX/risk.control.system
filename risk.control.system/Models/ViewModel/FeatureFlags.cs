@@ -6,5 +6,6 @@
         public const string ON = "ON";
         public const string IPRestrict = "IPRestrict";
         public const string TrialVersion = "TrialVersion";
+        public const string SMS4ADMIN = "SMS4ADMIN";
     }
 }

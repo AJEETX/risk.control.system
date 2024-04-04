@@ -106,7 +106,7 @@ namespace risk.control.system.Seeds
                 Active = true,
                 PhoneNumberConfirmed = true,
                 Password = Password,
-                PhoneNumber = Applicationsettings.MOBILE,
+                PhoneNumber = Applicationsettings.PORTAL_ADMIN_MOBILE,
                 Vendor = vendor,
                 IsSuperAdmin = false,
                 IsClientAdmin = false,
