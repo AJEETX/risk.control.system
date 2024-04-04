@@ -129,7 +129,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-edlweiss_1_0_0_5.db"));
+                        options.UseSqlite("Data Source=x-trial-05Apr0055.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>

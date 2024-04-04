@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Web;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,17 +22,18 @@ namespace risk.control.system.Controllers.Api
         }
 
         [AllowAnonymous]
-        [HttpGet("GetClientIp")]
-        public async Task<ActionResult> GetClientIp(CancellationToken ct)
+        [HttpGet("GetClientIp/{url}")]
+        public async Task<ActionResult> GetClientIp(CancellationToken ct, string url)
         {
             try
             {
+                var decodedUrl = HttpUtility.UrlDecode(url);
                 var user = HttpContext.User.Identity.Name;
                 var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
                 var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
                 var ipAddressWithoutPort = ipAddress?.Split(':')[0];
 
-                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, user, isAuthenticated);
+                var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, decodedUrl,user, isAuthenticated);
                 var longLatString = ipApiResponse?.lat.GetValueOrDefault().ToString() + "," + ipApiResponse?.lon.GetValueOrDefault().ToString();
                 var mapUrl = $"https://maps.googleapis.com/maps/api/staticmap?center={longLatString}&zoom=12&size=560x300&maptype=roadmap&markers=color:red%7Clabel:S%7C{longLatString}&key={Applicationsettings.GMAPData}";
                 var response = new

@@ -7,7 +7,8 @@
     }
     public static class FeatureFlags
     {
-        public const string BaseVersion = "BaseVersion";
+        public const string IPTracking = "IPTracking";
         public const string TrialVersion = "TrialVersion";
+        public const string BaseVersion = "BaseVersion";
     }
 }

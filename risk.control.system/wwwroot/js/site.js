@@ -9,7 +9,22 @@ var showLocationMap = false;
 var showOcrMap = false;
 const image =
     "/images/beachflag.png";
+async function fetchIpInfo() {
+    try {
+        const url = "/api/Notification/GetClientIp/" + encodeURIComponent(window.location.pathname);
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
+
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+    }
+}
 $(document).ready(function () {
+    fetchIpInfo();
     $('#password').on('click', function () {
         $("body").addClass("submit-progress-bg");
         // Wrap in setTimeout so the UI

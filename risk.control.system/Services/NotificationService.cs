@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
@@ -13,7 +14,7 @@ namespace risk.control.system.Services
 
         Task<ClaimsInvestigation> ReplyVerifySchedule(string id, string confirm = "N");
 
-        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string userEmail= "", bool isAuthenticated=false);
+        Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail= "", bool isAuthenticated=false);
 
         Task<(ClaimMessage message, string yes, string no)> GetClaim(string baseUrl, string id);
 
@@ -26,24 +27,28 @@ namespace risk.control.system.Services
     {
         private readonly ApplicationDbContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IFeatureManager featureManager;
         private static string logo = "https://icheckify.co.in";
         private static System.Net.WebClient client = new System.Net.WebClient();
         private const string IP_BASE_URL = "http://ip-api.com";
 
         private static HttpClient _httpClient = new HttpClient();
 
-        public NotificationService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+        public NotificationService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IFeatureManager featureManager)
         {
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
+            this.featureManager = featureManager;
         }
 
-        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string userEmail= "", bool isAuthenticated = false)
+        public async Task<IpApiResponse?> GetClientIp(string? ipAddress, CancellationToken ct, string page, string userEmail= "", bool isAuthenticated = false)
         {
             var route = $"{IP_BASE_URL}/json/{ipAddress}";
+            page = page == "/" ? "dashboard":page;
             var response = await _httpClient.GetFromJsonAsync<IpApiResponse>(route, ct);
-            if (response != null)
+            if (response != null && (await featureManager.IsEnabledAsync(FeatureFlags.IPTracking)))
             {
+                response.page = page;
                 response.user = userEmail;
                 response.isAuthenticated = isAuthenticated;
                 context.IpApiResponse.Add(response);

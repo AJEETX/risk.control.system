@@ -6,7 +6,7 @@
             url: '/api/MasterData/GetIpAddress',
             dataSrc: ''
         },
-        order: [[12, 'asc']],
+        order: [[10, 'desc']],
         fixedHeader: true,
         processing: true,
         paging: true,
@@ -17,19 +17,17 @@
         columns: [
             /* Name of the keys from
             data file source */
-            { "data": "ipApiResponseId",visible:false },
             { "data": "country" },
             { "data": "regionName" },
             { "data": "city" },
-            { "data": "district" },
             { "data": "zip" },
             { "data": "lat" },
             { "data": "lon" },
             { "data": "isp" },
             { "data": "query" },
             { "data": "user" },
-            { "data": "isAuthenticated" },
-            { "data": "created" },
+            { "data": "page" },
+            { "data": "dated" }
      
         ],
         error: function (xhr, status, error) { alert('err ' + error) }

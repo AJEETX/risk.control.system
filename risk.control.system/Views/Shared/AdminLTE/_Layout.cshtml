@@ -88,23 +88,5 @@
     @RenderSection("Scripts", required: false)
     @await Component.InvokeAsync("NToastNotify")
     @await Component.InvokeAsync("Notyf")
-    <script>
-        async function fetchIpInfo() {
-            try {
-                const url = '/api/Notification/GetClientIp';
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                document.querySelector('#ipAddress .info-data').textContent = data.ipAddress || 'Not available';
-
-            } catch (error) {
-                console.error('There has been a problem with your fetch operation:', error);
-            }
-        }
-
-        window.onload = fetchIpInfo;
-    </script>
 </body>
 </html>

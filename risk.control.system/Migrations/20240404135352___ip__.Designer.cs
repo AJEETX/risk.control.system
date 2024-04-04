@@ -11,7 +11,7 @@ using risk.control.system.Data;
 namespace risk.control.system.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240404111414___ip__")]
+    [Migration("20240404135352___ip__")]
     partial class __ip__
     {
         /// <inheritdoc />
@@ -2941,6 +2941,9 @@ namespace risk.control.system.Migrations
 
                     b.Property<double?>("lon")
                         .HasColumnType("REAL");
+
+                    b.Property<string>("page")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("query")
                         .HasColumnType("TEXT");

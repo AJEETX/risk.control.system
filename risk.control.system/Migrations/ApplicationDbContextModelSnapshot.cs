@@ -2939,6 +2939,9 @@ namespace risk.control.system.Migrations
                     b.Property<double?>("lon")
                         .HasColumnType("REAL");
 
+                    b.Property<string>("page")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("query")
                         .HasColumnType("TEXT");
 

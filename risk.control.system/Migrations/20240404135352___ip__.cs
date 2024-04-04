@@ -207,6 +207,7 @@ namespace risk.control.system.Migrations
                     lon = table.Column<double>(type: "REAL", nullable: true),
                     isp = table.Column<string>(type: "TEXT", nullable: true),
                     query = table.Column<string>(type: "TEXT", nullable: true),
+                    page = table.Column<string>(type: "TEXT", nullable: true),
                     user = table.Column<string>(type: "TEXT", nullable: true),
                     isAuthenticated = table.Column<bool>(type: "INTEGER", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),

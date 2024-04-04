@@ -29,7 +29,7 @@ namespace risk.control.system.Helpers
 
         public async Task Invoke(HttpContext context)
         {
-            if(await featureManager.IsEnabledAsync(FeatureFlags.BaseVersion))
+            if(await featureManager.IsEnabledAsync(FeatureFlags.IPTracking))
             {
                 if (!context.Request.Path.Value.Contains("api/agent") && !context.Request.Path.Value.Contains("api/Notification/GetClientIp"))
                 {
@@ -102,12 +102,8 @@ namespace risk.control.system.Helpers
                             return;
                         }
                     }
-                    
-                    
-                    
                 }
             }
-            
 
             await _next.Invoke(context);
         }
