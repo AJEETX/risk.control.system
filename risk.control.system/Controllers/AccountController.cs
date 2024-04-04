@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 using System.Web;
 
 using AspNetCoreHero.ToastNotification.Abstractions;
@@ -23,6 +24,7 @@ namespace risk.control.system.Controllers
     {
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
+        private readonly INotificationService service;
         private readonly IToastNotification toastNotification;
         private readonly IAccountService accountService;
         private readonly ILogger _logger;
@@ -32,6 +34,7 @@ namespace risk.control.system.Controllers
         public AccountController(
             UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
+            INotificationService service,
             IToastNotification toastNotification,
             IAccountService accountService,
             ILogger<AccountController> logger,
@@ -40,6 +43,7 @@ namespace risk.control.system.Controllers
         {
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
+            this.service = service;
             this.toastNotification = toastNotification ?? throw new ArgumentNullException();
             this.accountService = accountService;
             this._context = context;
@@ -66,7 +70,7 @@ namespace risk.control.system.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(CancellationToken ct,LoginViewModel model, string returnUrl = null)
         {
             if (ModelState.IsValid || !model.Email.ValidateEmail())
             {
@@ -92,14 +96,19 @@ namespace risk.control.system.Controllers
                             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                                 new AuthenticationProperties
                                 {
-                                    IsPersistent = false,
-                                    AllowRefresh = true,
+                                    IsPersistent = true,
+                                    AllowRefresh = false,
                                     ExpiresUtc = DateTime.UtcNow.AddSeconds(10)
                                 });
                             if (model.Mobile)
                             {
                                 return Ok();
                             }
+                            var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+                            var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                            var ipAddressWithoutPort = ipAddress?.Split(':')[0];
+
+                            var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login", model.Email, isAuthenticated);
                             notifyService.Success("Login successful");
                             return RedirectToLocal(returnUrl);
                         }
@@ -110,6 +119,11 @@ namespace risk.control.system.Controllers
                 }
                 else if (result.IsLockedOut)
                 {
+                    var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+                    var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
+
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login", model.Email, isAuthenticated);
                     if (model.Mobile)
                     {
                         return BadRequest();
@@ -123,6 +137,11 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
+                    var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
+                    var ipAddress = HttpContext.GetServerVariable("HTTP_X_FORWARDED_FOR") ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                    var ipAddressWithoutPort = ipAddress?.Split(':')[0];
+
+                    var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login", model.Email, isAuthenticated);
                     if (model.Mobile)
                     {
                         return BadRequest();
@@ -134,6 +153,7 @@ namespace risk.control.system.Controllers
                         return View(model);
                     }
                 }
+                
             }
             if (model.Mobile)
             {
