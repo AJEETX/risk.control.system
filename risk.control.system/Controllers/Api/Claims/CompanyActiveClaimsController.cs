@@ -88,9 +88,9 @@ namespace risk.control.system.Controllers.Api.Claims
                         PolicyId = a.PolicyDetail.ContractNumber,
                         Amount = String.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
                         AssignedToAgency = a.AssignedToAgency,
-                        Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
-                        string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
-                        string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
+                        Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
                         Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                         Document = a.PolicyDetail?.DocumentImage != null ?

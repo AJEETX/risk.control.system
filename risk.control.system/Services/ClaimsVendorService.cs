@@ -426,7 +426,7 @@ namespace risk.control.system.Services
                 .FirstOrDefault(c => c.ClaimsInvestigationId == selectedcase);
             var assignedToAgentStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
-
+            
             if (claimsInvestigation.IsReviewCase)
             {
                 claimCase.ClaimReport.SupervisorRemarks = null;
@@ -436,18 +436,6 @@ namespace risk.control.system.Services
 
         public async Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase)
         {
-            var caseLogs = await _context.InvestigationTransaction
-                .Include(i => i.InvestigationCaseStatus)
-                .Include(i => i.InvestigationCaseSubStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.CaseLocations)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseStatus)
-                .Include(c => c.ClaimsInvestigation)
-                .ThenInclude(i => i.InvestigationCaseSubStatus)
-                .Where(t => t.ClaimsInvestigationId == selectedcase)
-                .OrderByDescending(c => c.HopCount)?.ToListAsync();
-
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
@@ -490,12 +478,13 @@ namespace risk.control.system.Services
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
 
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();
-
+            var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
             var model = new ClaimTransactionModel
             {
                 ClaimsInvestigation = claimsInvestigation,
-                Log = caseLogs,
-                Location = location
+                Location = location,
+                NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
             };
             return model;
         }

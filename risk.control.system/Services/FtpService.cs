@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 
@@ -155,7 +156,7 @@ namespace risk.control.system.Services
 
         private async Task ProcessFile(string userEmail, ZipArchive archive)
         {
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+            var companyUser = _context.ClientCompanyApplicationUser.Include(u=>u.ClientCompany).FirstOrDefault(c => c.Email == userEmail);
             var innerFile = archive.Entries.FirstOrDefault(e => Path.GetExtension(e.FullName).Equals(".csv"));
             using (var ss = innerFile.Open())
             {
@@ -209,6 +210,8 @@ namespace risk.control.system.Services
                                         IsReady2Assign = true,
                                         IsReviewCase = false,
                                         SelectedToAssign = false,
+                                        UserEmailActioned = userEmail,
+                                        UserRoleActionedTo = $"{AppRoles.Creator.GetEnumDisplayName()}({companyUser.ClientCompany.Email})"
                                     };
 
                                     var servicetype = _context.InvestigationServiceType.FirstOrDefault(s => s.Code.ToLower() == (rowData[4].Trim().ToLower()));
@@ -349,6 +352,8 @@ namespace risk.control.system.Services
                                     var log = new InvestigationTransaction
                                     {
                                         ClaimsInvestigationId = claim.ClaimsInvestigationId,
+                                        UserEmailActioned = claim.UserEmailActioned,
+                                        UserRoleActionedTo = claim.UserRoleActionedTo,
                                         CurrentClaimOwner = userEmail,
                                         Created = DateTime.UtcNow,
                                         HopCount = 0,

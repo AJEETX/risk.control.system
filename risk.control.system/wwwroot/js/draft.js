@@ -224,27 +224,53 @@
             });
         }
     });
+    let askFileUploadConfirmation = true;
 
     $('#UploadFileButton').on('click', function (event) {
-        $("body").addClass("submit-progress-bg");
-        // Wrap in setTimeout so the UI
-        // can update the spinners
-        setTimeout(function () {
-            $(".submit-progress").removeClass("hidden");
-        }, 1);
+        if (askFileUploadConfirmation) {
+            event.preventDefault();
+            $.confirm({
+                title: "Confirm File Upload",
+                content: "Are you sure to Upload ?",
+                icon: 'fa fa-upload',
+                columnClass: 'medium',
+                type: 'green',
+                closeIcon: true,
+                buttons: {
+                    confirm: {
+                        text: "File Upload",
+                        btnClass: 'btn-success',
+                        action: function () {
+                            askFileUploadConfirmation = false;
+                            $("body").addClass("submit-progress-bg");
+                            // Wrap in setTimeout so the UI
+                            // can update the spinners
+                            setTimeout(function () {
+                                $(".submit-progress").removeClass("hidden");
+                            }, 1);
 
-        $(this).attr('disabled', 'disabled');
-        $(this).html("<i class='fas fa-sync fa-spin'></i> Upload");
+                            $(this).attr('disabled', 'disabled');
+                            $(this).html("<i class='fas fa-sync fa-spin'></i> Upload");
 
-        $('#upload-claims').submit();
-        $('html *').css('cursor', 'not-allowed');
-        $('html a *, html button *').attr('disabled', 'disabled');
-        $('html a *, html button *').css('pointer-events', 'none')
+                            $('#upload-claims').submit();
+                            $('html *').css('cursor', 'not-allowed');
+                            $('html a *, html button *').attr('disabled', 'disabled');
+                            $('html a *, html button *').css('pointer-events', 'none')
 
-        var nodes = document.getElementById("body").getElementsByTagName('*');
-        for (var i = 0; i < nodes.length; i++) {
-            nodes[i].disabled = true;
+                            var nodes = document.getElementById("body").getElementsByTagName('*');
+                            for (var i = 0; i < nodes.length; i++) {
+                                nodes[i].disabled = true;
+                            }
+                        }
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        btnClass: 'btn-default'
+                    }
+                }
+            });
         }
+        
     });
     //initMap("/api/CompanyDraftClaims/GetAssignMap");
 

@@ -9,5 +9,6 @@
         public string? TimeTaken { get; set; }
         public bool Assigned { get; set; } = false;
         public bool AutoAllocation { get; set; } = false;
+        public bool NotWithdrawable { get; set; }
     }
 }

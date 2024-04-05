@@ -191,7 +191,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Upload",
+                        text: "Face Image Upload",
                         btnClass: 'btn-success',
                         action: function () {
                             askFaceUploadConfirmation = false;
@@ -244,7 +244,7 @@
                 closeIcon: true,
                 buttons: {
                     confirm: {
-                        text: "Upload",
+                        text: "PAN Image Upload",
                         btnClass: 'btn-success',
                         action: function () {
                             askPanUploadConfirmation = false;

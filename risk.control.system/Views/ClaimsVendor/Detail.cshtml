@@ -18,9 +18,10 @@
                 <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
             </div>
             <partial name="_PolicyDetailsWithdraw" model="@data" />
-
+            if (!@Model.NotWithdrawable)
+            {
             <div class="card-footer">
-
+               
                 <form id="create-form" method="post" asp-action="WithdrawCase" asp-controller="ClaimsVendorPost">
                     <div class="row">
                         <input type="hidden" name="claimId" asp-for="@Model.ClaimsInvestigation.ClaimsInvestigationId" />
@@ -39,7 +40,21 @@
                         </div>
                     </div>
                 </form>
+                
+
             </div>
+            }
+            else
+            {
+                <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a id="back" asp-action="Open" class="btn btn-outline-secondary"><i class="fas fa-arrow-left"></i> @Applicationsettings.BACK</a>
+                    </div>
+                    </div>
+                </div>
+
+            }
         }
     </div>
 </section>
@@ -50,6 +65,6 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="~/js/claims-details.js">
- 
+
     </script>
 }

@@ -84,9 +84,9 @@ namespace risk.control.system.Controllers.Api.Claims
                        AssignedToAgency = a.AssignedToAgency,
                        PolicyId = a.PolicyDetail.ContractNumber,
                        Amount = string.Format(new CultureInfo("hi-IN"), "{0:C}", a.PolicyDetail.SumAssuredValue),
-                       Agent = !string.IsNullOrWhiteSpace(a.CurrentClaimOwner) ?
-                        string.Join("", "<span class='badge badge-light'>" + a.CurrentClaimOwner + "</span>") :
-                        string.Join("", "<span class='badge badge-light'>" + a.UpdatedBy + "</span>"),
+                       Agent = !string.IsNullOrWhiteSpace(a.UserEmailActionedTo) ?
+                        string.Join("", "<span class='badge badge-light'>" + a.UserEmailActionedTo + "</span>") :
+                        string.Join("", "<span class='badge badge-light'>" + a.UserRoleActionedTo + "</span>"),
                        Pincode = ClaimsInvestigationExtension.GetPincode(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        PincodeName = ClaimsInvestigationExtension.GetPincodeName(a.PolicyDetail.ClaimType, a.CustomerDetail, a.CaseLocations?.FirstOrDefault()),
                        Company = a.PolicyDetail.ClientCompany.Name,
@@ -570,7 +570,7 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
             }
-            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == vendorUser.Email && t.UserRoleActionedTo == AppRoles.Assessor.GetEnumDisplayName()))?.Select(c => c.ClaimsInvestigationId);
+            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == vendorUser.Email))?.Select(c => c.ClaimsInvestigationId);
 
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             var claimsSubmitted = new List<ClaimsInvestigation>();
