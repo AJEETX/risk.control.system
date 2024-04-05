@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
@@ -11,6 +12,7 @@ namespace risk.control.system.Services
         ClaimsInvestigation AddClaimPolicy(string userEmail);
 
         Task<ClaimTransactionModel> GetClaimDetail(string id);
+        Task<ClaimTransactionModel> GetClaimSummary(string userEmail, string id);
     }
 
     public class ClaimPolicyService : IClaimPolicyService
@@ -120,6 +122,74 @@ namespace risk.control.system.Services
                 TimeTaken = GetElapsedTime(caseLogs)
             };
             return model;
+        }
+
+        public async Task<ClaimTransactionModel> GetClaimSummary(string userEmail, string id)
+        {
+            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(u=>u.Email == userEmail);
+
+            var caseLogs = await _context.InvestigationTransaction
+                 .Include(i => i.InvestigationCaseStatus)
+                 .Include(i => i.InvestigationCaseSubStatus)
+                 .Include(c => c.ClaimsInvestigation)
+                 .ThenInclude(i => i.CaseLocations)
+                 .Include(c => c.ClaimsInvestigation)
+                 .ThenInclude(i => i.InvestigationCaseStatus)
+                 .Include(c => c.ClaimsInvestigation)
+                 .ThenInclude(i => i.InvestigationCaseSubStatus)
+                 .Where(t => t.ClaimsInvestigationId == id)
+                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
+
+            var claimsInvestigation = await _context.ClaimsInvestigation
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.ClientCompany)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CaseEnabler)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.PinCode)
+               .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.District)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.State)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.Vendor)
+                .Include(c => c.CaseLocations)
+                .ThenInclude(c => c.BeneficiaryRelation)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.CostCentre)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.Country)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.District)
+                .Include(c => c.InvestigationCaseStatus)
+                .Include(c => c.InvestigationCaseSubStatus)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.InvestigationServiceType)
+                .Include(c => c.PolicyDetail)
+                .ThenInclude(c => c.LineOfBusiness)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.PinCode)
+                .Include(c => c.CustomerDetail)
+                .ThenInclude(c => c.State)
+                .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == id);
+            var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
+            var location = claimsInvestigation.CaseLocations.FirstOrDefault();
+            if (caseLogs.Any(l => l.UserEmailActioned == companyUser.Email || l.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId))
+            {
+                return new ClaimTransactionModel
+                {
+                    ClaimsInvestigation = claimsInvestigation,
+                    Log = caseLogs,
+                    Location = location,
+                    TimeTaken = GetElapsedTime(caseLogs)
+                };
+            }
+            return null!;
         }
 
         private string GetElapsedTime(List<InvestigationTransaction> caseLogs)

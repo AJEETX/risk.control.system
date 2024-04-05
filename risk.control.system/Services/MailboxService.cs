@@ -54,8 +54,8 @@ namespace risk.control.system.Services
             var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
             var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
 
-            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/ClaimsInvestigation/Detail/";
-            AgencyBaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/ClaimsVendor/Detail/";
+            BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/InsuranceClaims/Summary4Insurer/";
+            AgencyBaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/InsuranceClaims/Summary4Agency/";
             this.userManager = userManager;
             this.userVendorManager = userVendorManager;
         }

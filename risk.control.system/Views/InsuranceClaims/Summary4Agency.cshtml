@@ -1,0 +1,41 @@
+﻿@model ClaimTransactionModel
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+<section class="content">
+    <div id="article" class="card card-secondary">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-newspaper"></i> Detail</h3>
+        </div>
+        @{
+            var data = new ClaimsInvestigationVendorsModel
+            {
+                Location = Model.Location,
+                ClaimsInvestigation = Model.ClaimsInvestigation,
+            };
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
+            <partial name="_PolicyDetailsWithdraw" model="@data" />
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-md-12">
+                        <a onclick="window.close()" class="btn btn-outline-secondary"><i class="fas fa-close"></i> Close</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/claims-details.js">
+
+    </script>
+}

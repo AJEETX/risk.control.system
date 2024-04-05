@@ -226,6 +226,76 @@
     });
     let askFileUploadConfirmation = true;
 
+    $("#postedFile").on('change', function () {
+        var MaxSizeInBytes = 1097152;
+        //Get count of selected files
+        var countFiles = $(this)[0].files.length;
+
+        var imgPath = $(this)[0].value;
+        var extn = imgPath.substring(imgPath.lastIndexOf('.') + 1).toLowerCase();
+
+        if (extn == "zip") {
+            if (typeof (FileReader) != "undefined") {
+
+                //loop for each file selected for uploaded.
+                for (var i = 0; i < countFiles; i++) {
+                    var fileSize = $(this)[0].files[i].size;
+                    if (fileSize > MaxSizeInBytes) {
+                        $.alert(
+                            {
+                                title: " UPLOAD issue !",
+                                content: " <i class='fa fa-upload'></i> Upload File size limit exceeded. <br />Max file size is 1 MB!",
+                                icon: 'fas fa-exclamation-triangle',
+                                type: 'red',
+                                closeIcon: true,
+                                buttons: {
+                                    cancel: {
+                                        text: "CLOSE",
+                                        btnClass: 'btn-danger'
+                                    }
+                                }
+                            }
+                        );
+                    }
+                }
+
+            } else {
+                $.alert(
+                    {
+                        title: "Outdated Browser !",
+                        content: "This browser does not support FileReader. Try on modern browser!",
+                        icon: 'fas fa-exclamation-triangle',
+                        columnClass: 'medium',
+                        type: 'red',
+                        closeIcon: true,
+                        buttons: {
+                            cancel: {
+                                text: "CLOSE",
+                                btnClass: 'btn-danger'
+                            }
+                        }
+                    }
+                );
+            }
+        } else {
+            $.alert(
+                {
+                    title: "FILE UPLOAD TYPE !!",
+                    content: "Pls only select file with extension zip ! ",
+                    icon: 'fas fa-exclamation-triangle',
+                    columnClass: 'medium',
+                    type: 'red',
+                    closeIcon: true,
+                    buttons: {
+                        cancel: {
+                            text: "CLOSE",
+                            btnClass: 'btn-danger'
+                        }
+                    }
+                }
+            );
+        }
+    });
     $('#UploadFileButton').on('click', function (event) {
         if (askFileUploadConfirmation) {
             event.preventDefault();
@@ -252,10 +322,10 @@
                             $(this).attr('disabled', 'disabled');
                             $(this).html("<i class='fas fa-sync fa-spin'></i> Upload");
 
-                            $('#upload-claims').submit();
                             $('html *').css('cursor', 'not-allowed');
                             $('html a *, html button *').attr('disabled', 'disabled');
                             $('html a *, html button *').css('pointer-events', 'none')
+                            $('#upload-claims').submit();
 
                             var nodes = document.getElementById("body").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {

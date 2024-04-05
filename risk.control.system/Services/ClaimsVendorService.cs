@@ -436,6 +436,8 @@ namespace risk.control.system.Services
 
         public async Task<ClaimTransactionModel> GetClaimsDetails(string userEmail, string selectedcase)
         {
+            var agencyUser = _context.VendorApplicationUser.FirstOrDefault(u=>u.Email == userEmail);
+
             var claimsInvestigation = await _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
@@ -476,17 +478,52 @@ namespace risk.control.system.Services
                 .Include(c => c.CaseLocations)
                     .ThenInclude(c => c.ClaimReport.ServiceReportTemplate.ReportTemplate.ReportQuestionaire)
                 .FirstOrDefaultAsync(m => m.ClaimsInvestigationId == selectedcase);
-
+            var caseLogs = await _context.InvestigationTransaction
+                 .Include(i => i.InvestigationCaseStatus)
+                 .Include(i => i.InvestigationCaseSubStatus)
+                 .Include(c => c.ClaimsInvestigation)
+                 .ThenInclude(i => i.CaseLocations)
+                 .Include(c => c.ClaimsInvestigation)
+                 .ThenInclude(i => i.InvestigationCaseStatus)
+                 .Include(c => c.ClaimsInvestigation)
+                 .ThenInclude(i => i.InvestigationCaseSubStatus)
+                 .Where(t => t.ClaimsInvestigationId == selectedcase)
+                 .OrderByDescending(c => c.HopCount)?.ToListAsync();
             var location = claimsInvestigation.CaseLocations.FirstOrDefault();
             var submittedStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
-            var model = new ClaimTransactionModel
+
+            var assignedToAgency = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                       i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR);
+            var userIsAgent = agencyUser.Active && agencyUser.UserRole == AgencyRole.Agent;
+            if(userIsAgent)
             {
-                ClaimsInvestigation = claimsInvestigation,
-                Location = location,
-                NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
-            };
-            return model;
+                if(!string.IsNullOrWhiteSpace(claimsInvestigation.UserEmailActionedTo) && claimsInvestigation.UserEmailActionedTo.Equals(agencyUser.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    return new ClaimTransactionModel
+                    {
+                        ClaimsInvestigation = claimsInvestigation,
+                        Location = location,
+                        NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
+                    };
+                }
+                else
+                {
+                    return null!;
+                }
+            }
+
+            if(caseLogs.Any(l=>l.UserEmailActioned == agencyUser.Email || 
+            ( claimsInvestigation.InvestigationCaseSubStatusId == assignedToAgency.InvestigationCaseSubStatusId)  && claimsInvestigation.CaseLocations.Any(l=>l.VendorId == agencyUser.VendorId)))
+            {
+                return new ClaimTransactionModel
+                {
+                    ClaimsInvestigation = claimsInvestigation,
+                    Location = location,
+                    NotWithdrawable = claimsInvestigation.InvestigationCaseSubStatusId == submittedStatus.InvestigationCaseSubStatusId
+                };
+            }
+            return null!;
         }
 
         public async Task<List<VendorUserClaim>> GetAgentLoad(string userEmail)
