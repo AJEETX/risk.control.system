@@ -57,7 +57,8 @@ namespace risk.control.system.Seeds
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = AGENCY_ADMIN.PROFILE_IMAGE,
-                ProfilePicture = adminImage
+                ProfilePicture = adminImage,
+                UserRole = AgencyRole.AgencyAdmin,
             };
             if (userManager.Users.All(u => u.Id != vendorAdmin.Id))
             {
@@ -117,7 +118,8 @@ namespace risk.control.system.Seeds
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = SUPERVISOR.PROFILE_IMAGE,
-                ProfilePicture = supervisorImage
+                ProfilePicture = supervisorImage,
+                UserRole = AgencyRole.Supervisor
             };
             if (userManager.Users.All(u => u.Id != vendorSupervisor.Id))
             {
@@ -171,7 +173,8 @@ namespace risk.control.system.Seeds
                 StateId = state?.StateId ?? default!,
                 PinCodeId = pinCode?.PinCodeId ?? default!,
                 ProfilePictureUrl = AGENT.PROFILE_IMAGE,
-                ProfilePicture = agentImage
+                ProfilePicture = agentImage,
+                UserRole = AgencyRole.Agent,
             };
             if (userManager.Users.All(u => u.Id != vendorAgent.Id))
             {

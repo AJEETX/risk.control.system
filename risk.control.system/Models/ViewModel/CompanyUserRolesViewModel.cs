@@ -1,4 +1,6 @@
-﻿namespace risk.control.system.Models.ViewModel
+﻿using risk.control.system.AppConstant;
+
+namespace risk.control.system.Models.ViewModel
 {
     public class CompanyUserRolesViewModel
     {
@@ -6,6 +8,7 @@
         public string UserName { get; set; }
         public long CompanyId { get; set; }
         public string Company { get; set; }
+        public CompanyRole? UserRole { get; set; }
         public List<CompanyUserRoleViewModel> CompanyUserRoleViewModel { get; set; }
     }
 

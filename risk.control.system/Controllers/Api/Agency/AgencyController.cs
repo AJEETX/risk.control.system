@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 using risk.control.system.AppConstant;
 using risk.control.system.Data;
+using risk.control.system.Helpers;
 using risk.control.system.Models;
 using risk.control.system.Models.ViewModel;
 using risk.control.system.Services;
@@ -67,9 +68,8 @@ namespace risk.control.system.Controllers.Api.Agency
                     State = u.State.Name,
                     Country = u.Country.Name,
                     Pincode = u.PinCode.Code,
-                    Roles = string.Join(",", GetUserRoles(u).Result)
+                    Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                 });
-            await Task.Delay(1000);
 
             return Ok(result?.ToArray());
         }
@@ -102,7 +102,6 @@ namespace risk.control.system.Controllers.Api.Agency
                 })
                 ?.OrderBy(a => a.Name);
 
-            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -147,7 +146,6 @@ namespace risk.control.system.Controllers.Api.Agency
                     UpdatedBy = s.UpdatedBy,
                 });
 
-            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -185,10 +183,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     State = u.State.Name,
                     Country = u.Country.Name,
                     Pincode = u.PinCode.Code,
-                    Roles = string.Join(",", GetUserRoles(u).Result)
+                    Roles = u.UserRole != null ? $"<span class=\"badge badge-light\">{u.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                 });
 
-            await Task.Delay(1000);
             return Ok(result?.ToArray());
         }
 
@@ -257,10 +254,9 @@ namespace risk.control.system.Controllers.Api.Agency
                     Country = u.AgencyUser.Country.Name,
                     Pincode = u.AgencyUser.PinCode.Code,
                     Active = u.AgencyUser.Active,
-                    Roles = string.Join(",", GetUserRoles(u.AgencyUser).Result),
+                    Roles = u.AgencyUser.UserRole != null ? $"<span class=\"badge badge-light\">{u.AgencyUser.UserRole.GetEnumDisplayName()}</span>" : "<span class=\"badge badge-light\">...</span>",
                     Count = u.CurrentCaseCount
                 });
-            await Task.Delay(1000);
             return Ok(agentWithLoad?.ToArray());
         }
 

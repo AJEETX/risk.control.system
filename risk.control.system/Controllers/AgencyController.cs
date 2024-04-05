@@ -240,6 +240,11 @@ namespace risk.control.system.Controllers
             IdentityResult result = await userManager.CreateAsync(user, user.Password);
             if (result.Succeeded)
             {
+                var roles = await userManager.GetRolesAsync(user);
+                var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
+                var currentUser = await userManager.GetUserAsync(HttpContext.User);
+                await signInManager.RefreshSignInAsync(currentUser);
                 if (!user.Active)
                 {
                     var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -372,6 +377,9 @@ namespace risk.control.system.Controllers
                     var result = await userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
+                        var roles = await userManager.GetRolesAsync(user);
+                        var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                        await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                         if (!user.Active)
                         {
                             var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -390,7 +398,6 @@ namespace risk.control.system.Controllers
                             var createdUser = await userManager.FindByEmailAsync(user.Email);
                             var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, false);
                             var lockDate = await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
-                            var roles = await userManager.GetRolesAsync(user);
                             var onboardAgent = roles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
 
                             if (lockUser.Succeeded && lockDate.Succeeded)

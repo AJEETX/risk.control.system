@@ -39,10 +39,10 @@ namespace risk.control.system.Controllers.Api.Claims
             }
 
             var userRole = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            var openStatuses = _context.InvestigationCaseStatus.Where(i => !i.Name.Contains(CONSTANTS.CASE_STATUS.FINISHED)).ToList();
             var openSubstatusesForSupervisor = _context.InvestigationCaseSubStatus.Where(i =>
             i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ALLOCATED_TO_VENDOR) ||
             i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT) ||
+            i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR) ||
             i.Name.Contains(CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR)
             ).Select(s => s.InvestigationCaseSubStatusId).ToList();
 
@@ -52,11 +52,16 @@ namespace risk.control.system.Controllers.Api.Claims
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_AGENT);
             var submittedToVendorSupervisorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
                         i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_SUPERVISOR);
+            var submittedToAssesssorStatus = _context.InvestigationCaseSubStatus.FirstOrDefault(
+                        i => i.Name.ToUpper() == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.SUBMITTED_TO_ASSESSOR);
 
-            var openStatusesIds = openStatuses.Select(i => i.InvestigationCaseStatusId).ToList();
             if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
-                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId));
+                applicationDbContext = applicationDbContext.Where(a => openSubstatusesForSupervisor.Contains(a.InvestigationCaseSubStatusId) && 
+                ( a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == assignedToAgentStatus) ||
+                ( a.UserEmailActioned == vendorUser.Email && a.InvestigationCaseSubStatus == submittedToAssesssorStatus) ||
+                (a.InvestigationCaseSubStatus == submittedToVendorSupervisorStatus && a.UserRoleActionedTo == AppRoles.Agent.GetEnumDisplayName())
+                );
 
                 var claimsAllocated = new List<ClaimsInvestigation>();
 
@@ -65,6 +70,7 @@ namespace risk.control.system.Controllers.Api.Claims
                     item.CaseLocations = item.CaseLocations.Where(c => (c.VendorId.HasValue
                         && c.InvestigationCaseSubStatusId == allocateToVendorStatus.InvestigationCaseSubStatusId)
                         || c.InvestigationCaseSubStatusId == assignedToAgentStatus.InvestigationCaseSubStatusId
+                        || c.InvestigationCaseSubStatusId == submittedToAssesssorStatus.InvestigationCaseSubStatusId
                         || c.InvestigationCaseSubStatusId == submittedToVendorSupervisorStatus.InvestigationCaseSubStatusId)?.ToList();
                     if (item.CaseLocations.Any())
                     {
@@ -564,15 +570,21 @@ namespace risk.control.system.Controllers.Api.Claims
             {
                 applicationDbContext = applicationDbContext.Where(i => i.CaseLocations.Any(c => c.VendorId == vendorUser.VendorId));
             }
+            var userAttendedClaims = _context.InvestigationTransaction.Where(t => (t.UserEmailActioned == vendorUser.Email && t.UserRoleActionedTo == AppRoles.Assessor.GetEnumDisplayName()))?.Select(c => c.ClaimsInvestigationId);
+
             // SHOWING DIFFERRENT PAGES AS PER ROLES
             var claimsSubmitted = new List<ClaimsInvestigation>();
             if (userRole.Value.Contains(AppRoles.AgencyAdmin.ToString()) || userRole.Value.Contains(AppRoles.Supervisor.ToString()))
             {
+
                 foreach (var item in applicationDbContext)
                 {
                     if (item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED && item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR)
                     {
-                        claimsSubmitted.Add(item);
+                        if(userAttendedClaims.Contains(item.ClaimsInvestigationId))
+                        {
+                            claimsSubmitted.Add(item);
+                        }
                     }
                 }
             }

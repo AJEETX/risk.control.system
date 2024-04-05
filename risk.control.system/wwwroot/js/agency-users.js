@@ -78,7 +78,7 @@
                 "mRender": function (data, type, row) {
                     var buttons = "";
                     buttons += '<a id=edit' + row.id + ' onclick="showedit(' + row.id + ')"  href="/Agency/EditUser?userId=' + row.id + '" class="btn btn-xs btn-warning"><i class="fas fa-pen"></i> Edit</a>&nbsp;'
-                    buttons += '<a id=role' + row.id + ' onclick="showroles(' + row.id + ')" href="/Agency/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Role</a>'
+                    //buttons += '<a id=role' + row.id + ' onclick="showroles(' + row.id + ')" href="/Agency/UserRoles?userId=' + row.id + '"  class="btn btn-xs btn-info"><i class="fas fa-pen"></i> Role</a>'
                     return buttons;
                 }
             }

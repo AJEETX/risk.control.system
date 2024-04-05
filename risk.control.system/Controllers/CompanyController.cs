@@ -261,6 +261,12 @@ namespace risk.control.system.Controllers
 
             if (result.Succeeded)
             {
+                user.SecurityStamp = Guid.NewGuid().ToString();
+                var roles = await userManager.GetRolesAsync(user);
+                var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
+                var currentUser = await userManager.GetUserAsync(HttpContext.User);
+                await signInManager.RefreshSignInAsync(currentUser);
                 if (!user.Active)
                 {
                     var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -397,11 +403,18 @@ namespace risk.control.system.Controllers
                         user.Updated = DateTime.UtcNow;
                         user.Comments = applicationUser.Comments;
                         user.PhoneNumber = applicationUser.PhoneNumber;
+                        user.UserRole = applicationUser.UserRole;
                         user.UpdatedBy = HttpContext.User?.Identity?.Name;
                         user.SecurityStamp = DateTime.UtcNow.ToString();
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
+                            var roles = await userManager.GetRolesAsync(user);
+                            var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                            await userManager.AddToRoleAsync(user, user.UserRole.ToString());
+
+                            var currentUser = await userManager.GetUserAsync(HttpContext.User);
+                            await signInManager.RefreshSignInAsync(currentUser);
                             if (!user.Active)
                             {
                                 var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -622,6 +635,7 @@ namespace risk.control.system.Controllers
                 toastNotification.AddErrorToastMessage("user not found!");
                 return NotFound();
             }
+            string selectedRole = string.Empty;
             //ViewBag.UserName = user.UserName;
             foreach (var role in roleManager.Roles.Where(r =>
                 r.Name.Contains(AppRoles.CompanyAdmin.ToString()) ||
@@ -636,6 +650,7 @@ namespace risk.control.system.Controllers
                 if (await userManager.IsInRoleAsync(user, role?.Name))
                 {
                     userRoleViewModel.Selected = true;
+                    selectedRole = role.Name;
                 }
                 else
                 {
@@ -648,7 +663,8 @@ namespace risk.control.system.Controllers
                 UserId = userId,
                 CompanyId = user.ClientCompanyId.Value,
                 UserName = user.UserName,
-                CompanyUserRoleViewModel = userRoles
+                CompanyUserRoleViewModel = userRoles,
+                 UserRole = !string.IsNullOrWhiteSpace(selectedRole) ? (CompanyRole)Enum.Parse(typeof(CompanyRole), selectedRole, true) : null,
             };
 
             //var companyPage = new MvcBreadcrumbNode("Index", "Company", "Company");
@@ -674,7 +690,7 @@ namespace risk.control.system.Controllers
             user.UpdatedBy = HttpContext.User?.Identity?.Name;
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
-            result = await userManager.AddToRolesAsync(user, model.CompanyUserRoleViewModel.Where(x => x.Selected).Select(y => y.RoleName));
+            result = await userManager.AddToRolesAsync(user, new List<string> { model.UserRole.ToString()});
             var currentUser = await userManager.GetUserAsync(HttpContext.User);
             await signInManager.RefreshSignInAsync(currentUser);
             var response = SmsService.SendSingleMessage(user.PhoneNumber, "User role edited . Email : " + user.Email);

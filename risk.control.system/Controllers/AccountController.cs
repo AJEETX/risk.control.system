@@ -109,9 +109,7 @@ namespace risk.control.system.Controllers
                             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                                 new AuthenticationProperties
                                 {
-                                    IsPersistent = true,
-                                    AllowRefresh = false,
-                                    ExpiresUtc = DateTime.UtcNow.AddSeconds(10)
+                                    
                                 });
                             if (model.Mobile)
                             {

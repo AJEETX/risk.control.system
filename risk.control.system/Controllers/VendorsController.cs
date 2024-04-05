@@ -173,6 +173,10 @@ namespace risk.control.system.Controllers
 
             if (result.Succeeded)
             {
+                var roles = await userManager.GetRolesAsync(user);
+                var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
+               
                 if (!user.Active)
                 {
                     var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -187,7 +191,35 @@ namespace risk.control.system.Controllers
                 }
                 else
                 {
+
                     var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
+
+                    var onboardAgent = roles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
+                    var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == user.VendorId);
+
+                    System.Uri address = new System.Uri("http://tinyurl.com/api-create.php?url=" + vendor.MobileAppUrl);
+                    System.Net.WebClient client = new System.Net.WebClient();
+                    string tinyUrl = client.DownloadString(address);
+
+                    var message = $"Dear {user.FirstName}";
+                    message += "                                                                                ";
+                    message += $"Click on link below to install the mobile app";
+                    message += "                                                                                ";
+                    message += $"{tinyUrl}";
+                    message += "                                                                                ";
+                    message += $"Thanks";
+                    message += "                                                                                ";
+                    message += $"https://icheckify.co.in";
+
+                    if (onboardAgent)
+                    {
+                        var onboard = SmsService.SendSingleMessage(user.PhoneNumber, message, onboardAgent);
+                        notifyService.Custom($"Agent onboarding initiated.", 3, "green", "fas fa-user-check");
+                    }
+                    else
+                    {
+                        SmsService.SendSingleMessage(user.PhoneNumber, "Agency user edited and unlocked. Email : " + user.Email);
+                    }
                     notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
                 }
                 return RedirectToAction(nameof(Users), "Vendors", new { id = user.VendorId });
@@ -313,6 +345,9 @@ namespace risk.control.system.Controllers
                         var result = await userManager.UpdateAsync(user);
                         if (result.Succeeded)
                         {
+                            var roles = await userManager.GetRolesAsync(user);
+                            var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                            await userManager.AddToRoleAsync(user, user.UserRole.ToString());
                             if (!user.Active)
                             {
                                 var createdUser = await userManager.FindByEmailAsync(user.Email);
@@ -330,7 +365,6 @@ namespace risk.control.system.Controllers
                                 var createdUser = await userManager.FindByEmailAsync(user.Email);
                                 var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
                                 var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.Now);
-                                var roles = await userManager.GetRolesAsync(user);
                                 var onboardAgent = roles.Any(r => AppConstant.AppRoles.Agent.ToString().Contains(r)) && string.IsNullOrWhiteSpace(user.MobileUId);
                                 if (lockUser.Succeeded && lockDate.Succeeded)
                                 {

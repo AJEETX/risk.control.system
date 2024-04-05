@@ -129,7 +129,7 @@ if (prod)
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlite("Data Source=x-trial-05Apr1035.db"));
+                        options.UseSqlite("Data Source=x-trial-05Apr1605.db"));
 }
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -164,29 +164,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             return Task.CompletedTask;
         };
         options.Cookie.Name = "AspNetCore.Identity.Application";
-        options.SlidingExpiration = false;
+        options.SlidingExpiration = true;
         options.LoginPath = "/Account/Login";
         options.ExpireTimeSpan = TimeSpan.FromSeconds(10);
-        options.Cookie.HttpOnly = true;
-        // Only use this when the sites are on different domains
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.MaxAge = options.ExpireTimeSpan;
-        options.EventsType = typeof(CustomCookieAuthenticationEvents);
+        options.Cookie.MaxAge = TimeSpan.FromSeconds(10);
     });
 
-builder.Services.AddRequestTimeouts(options => {
-    options.DefaultPolicy =
-        new RequestTimeoutPolicy 
-        { 
-            Timeout = TimeSpan.FromMilliseconds(15000), 
-            TimeoutStatusCode = 500,
-            WriteTimeoutResponse = async (HttpContext context) => {
-                context.Response.ContentType = "text/plain";
-                await context.Response.WriteAsync("Timeout !!!");
-            }
-        };
-});
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
@@ -209,12 +192,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromSeconds(10);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
 var app = builder.Build();
 app.UseSwagger();
 
@@ -229,14 +206,6 @@ app.UseHttpsRedirection();
 await DatabaseSeed.SeedDatabase(app);
 
 app.UseStaticFiles();
-
-app.UseCookiePolicy(
-    new CookiePolicyOptions
-    {
-        Secure = CookieSecurePolicy.Always,
-        HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
-        MinimumSameSitePolicy = SameSiteMode.Strict
-    });
 
 app.UseRouting();
 app.UseRateLimiter();
@@ -273,7 +242,6 @@ app.UseMiddleware<AdminSafeListMiddleware>(builder.Configuration["AdminSafeList"
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 app.UseNToastNotify();
 app.UseNotyf();
 app.UseFileServer();

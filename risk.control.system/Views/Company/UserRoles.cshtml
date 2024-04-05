@@ -13,7 +13,7 @@
                 <input hidden asp-for="@Model.UserId" />
                 <input hidden asp-for="@Model.CompanyId" />
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-12 user-role-disabled">
                         @for (int i = 0; i < Model.CompanyUserRoleViewModel.Count; i++)
                         {
                             <div class="form-radio m-1">
@@ -27,6 +27,20 @@
                         }
                         <div asp-validation-summary="All" class="text-danger"></div>
 
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <span class="input-group-label"> Role:</span>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" asp-for="ClaimType"><i class="nav-icon fas fa-file-invoice"></i> <i class="fa fa-asterisk asterik-style"></i></span>
+                                </div>
+                                <select required asp-for="@Model.UserRole" class="form-control remarks" asp-items="Html.GetEnumSelectList<CompanyRole>()">
+                                    <option value="">--- SELECT ---</option>
+                                </select>
+                                <span asp-validation-for="@Model.UserRole" class="text-danger"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
