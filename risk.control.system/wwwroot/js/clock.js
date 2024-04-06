@@ -19,15 +19,15 @@ function startTimer(duration, display) {
 				$.alert(
 					{
 						title: "Idle Session timeout!",
-						content: `Your idle time out to expire! <br /> Click refresh to continue... `,
-						icon: 'fas fa-spinner  fa-spin',
+						content: `Your idle time out to expire! <br /> Click <b> REFRESH </b> to continue... `,
+						icon: 'fas fa-hourglass-end fa-spin',
 						type: 'orange',
 						closeIcon: true,
 						autoClose: `cancel|` + alertImeMilliSeconds + ``,
 						buttons: {
 							confirm: {
-								text: "REGRESH",
-								btnClass: 'btn-success',
+								text: "REFRESH",
+								btnClass: 'btn-warning',
 								action: function () {
 									window.location.href = window.location.pathname;
 								}

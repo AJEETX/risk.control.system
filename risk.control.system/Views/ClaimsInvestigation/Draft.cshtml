@@ -11,6 +11,9 @@
     <div id="fullpage" class="card card-secondary">
         <div class="card-header">
             <h3 class="card-title"><i class="fas fa-external-link-alt"></i> Assign(auto)</h3>
+            <div class="submit-progress hidden">
+                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+            </div>
             @* <h3 id="view-type" class="card-title">
             <a href="#" id="map-type" class="input-group-label"> <i class="far fa-map"></i> Map</a>
             <a href="#" id="list-type" class="input-group-label"> <i class="fas fa-server"></i> List</a>
@@ -77,9 +80,7 @@
 
 
         <div class="card-body ">
-            <div class="submit-progress hidden">
-                <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
-            </div>
+            
             <form id="checkboxes" asp-action="Assign" asp-controller="ClaimsInvestigationPost" method="post" enctype="multipart/form-data">
 
                 <div class="table-responsive mailbox-messages">

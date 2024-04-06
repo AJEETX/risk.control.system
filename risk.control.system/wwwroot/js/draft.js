@@ -312,22 +312,23 @@
                         btnClass: 'btn-success',
                         action: function () {
                             askFileUploadConfirmation = false;
+                           
                             $("body").addClass("submit-progress-bg");
                             // Wrap in setTimeout so the UI
                             // can update the spinners
                             setTimeout(function () {
                                 $(".submit-progress").removeClass("hidden");
                             }, 1);
+                            $('#UploadFileButton').attr('disabled', 'disabled');
+                            $('#UploadFileButton').html("<i class='fas fa-sync fa-spin'></i> Uploading");
 
-                            $(this).attr('disabled', 'disabled');
-                            $(this).html("<i class='fas fa-sync fa-spin'></i> Upload");
+                            $('#upload-claims').submit();
+                            $('#back').attr('disabled', 'disabled');
 
                             $('html *').css('cursor', 'not-allowed');
-                            $('html a *, html button *').attr('disabled', 'disabled');
                             $('html a *, html button *').css('pointer-events', 'none')
-                            $('#upload-claims').submit();
 
-                            var nodes = document.getElementById("body").getElementsByTagName('*');
+                            var nodes = document.getElementById("article").getElementsByTagName('*');
                             for (var i = 0; i < nodes.length; i++) {
                                 nodes[i].disabled = true;
                             }

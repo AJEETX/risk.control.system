@@ -290,7 +290,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("agent")]
         public async Task<IActionResult> Index(string email = "agent@verify.com")
         {
-            IQueryable< ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
