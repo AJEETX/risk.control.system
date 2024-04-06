@@ -45,6 +45,7 @@ builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
     options.TagClasses = "";
     options.OlClasses = "breadcrumb";
     options.LiClasses = "breadcrumb-item";
+    options.SeparatorElement = ":";
     options.ActiveLiClasses = "breadcrumb-item active";
 });
 

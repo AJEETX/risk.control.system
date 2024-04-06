@@ -1185,3 +1185,10 @@ a#back-button {
 .user-role-disabled{
     
 }
+#time {
+    font-size: .8rem;
+    font-weight:bold;
+    width: 40px;
+    text-align: center;
+    border-radius: 4px;
+}

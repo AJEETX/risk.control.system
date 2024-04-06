@@ -18,6 +18,7 @@ using NToastNotify;
 
 using NuGet.Packaging.Signing;
 
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 using risk.control.system.Models.ViewModel;
@@ -31,6 +32,7 @@ namespace risk.control.system.Controllers
     {
         private readonly UserManager<Models.ApplicationUser> _userManager;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly INotificationService service;
         private readonly IToastNotification toastNotification;
         private readonly IAccountService accountService;
@@ -42,6 +44,7 @@ namespace risk.control.system.Controllers
         public AccountController(
             UserManager<Models.ApplicationUser> userManager,
             SignInManager<Models.ApplicationUser> signInManager,
+             IHttpContextAccessor httpContextAccessor,
             INotificationService service,
             IToastNotification toastNotification,
             IAccountService accountService,
@@ -52,6 +55,7 @@ namespace risk.control.system.Controllers
         {
             _userManager = userManager ?? throw new ArgumentNullException();
             _signInManager = signInManager ?? throw new ArgumentNullException();
+            this.httpContextAccessor = httpContextAccessor;
             this.service = service;
             this.toastNotification = toastNotification ?? throw new ArgumentNullException();
             this.accountService = accountService;
@@ -89,6 +93,9 @@ namespace risk.control.system.Controllers
                 var email = HttpUtility.HtmlEncode(model.Email);
                 var pwd = HttpUtility.HtmlEncode(model.Password);
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByEmailAsync(model.Email);
@@ -109,10 +116,6 @@ namespace risk.control.system.Controllers
                                 {
                                     
                                 });
-                            if (model.Mobile)
-                            {
-                                return Ok();
-                            }
                             var isAuthenticated = HttpContext.User.Identity.IsAuthenticated;
 
                             var ipApiResponse = await service.GetClientIp(ipAddressWithoutPort, ct, "login-success", model.Email, isAuthenticated);
@@ -127,7 +130,7 @@ namespace risk.control.system.Controllers
                                 message += $"Thanks                                         ";
                                 message += $"                                       ";
                                 message += $"                                       ";
-                                message += $"https://icheckify.co.in";
+                                message += $"{BaseUrl}";
                                 SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
                             }
 
@@ -147,7 +150,7 @@ namespace risk.control.system.Controllers
                         failedMessage += $"Thanks                                       ";
                         failedMessage += $"                                       ";
                         failedMessage += $"                                       ";
-                        failedMessage += $"https://icheckify.co.in";
+                        failedMessage += $"{BaseUrl}";
                         SMS.API.SendSingleMessage("+" + adminForFailed.PhoneNumber, failedMessage);
                     }
 
@@ -169,7 +172,7 @@ namespace risk.control.system.Controllers
                         message += $"Thanks                                         ";
                         message += $"                                       ";
                         message += $"                                       ";
-                        message += $"https://icheckify.co.in";
+                        message += $"{BaseUrl}";
                         SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
                     }
                         
@@ -199,7 +202,7 @@ namespace risk.control.system.Controllers
                         message += $"Thanks                                         ";
                         message += $"                                       ";
                         message += $"                                       ";
-                        message += $"https://icheckify.co.in";
+                        message += $"{BaseUrl}";
                         SMS.API.SendSingleMessage("+" + admin.PhoneNumber, message);
                     }
                         

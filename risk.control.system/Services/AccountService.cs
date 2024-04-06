@@ -1,4 +1,6 @@
-﻿using risk.control.system.AppConstant;
+﻿using Microsoft.AspNetCore.Http;
+
+using risk.control.system.AppConstant;
 using risk.control.system.Data;
 using risk.control.system.Helpers;
 
@@ -12,10 +14,14 @@ namespace risk.control.system.Services
     public class AccountService : IAccountService
     {
         private readonly ApplicationDbContext context;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public AccountService(ApplicationDbContext context)
+        public AccountService(ApplicationDbContext context,
+             IHttpContextAccessor httpContextAccessor
+            )
         {
             this.context = context;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public bool ForgotPassword(string useremail, long mobile)
@@ -25,7 +31,9 @@ namespace risk.control.system.Services
             if (user != null)
             {
                 var passwordString = $"Your password is: {Applicationsettings.Password}";
-
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
 
                 string message = $"Dear {useremail}";
                 message += $"                                          ";
@@ -33,7 +41,7 @@ namespace risk.control.system.Services
                 message += $"                                          ";
                 message += $"Thanks";
                 message += $"                                          ";
-                message += $"https://icheckify.co.in";
+                message += $"{BaseUrl}"; 
                 var response = SmsService.SendSingleMessage(user.PhoneNumber, message, user != null);
             }
             //SEND SMS

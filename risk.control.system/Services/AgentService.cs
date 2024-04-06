@@ -16,11 +16,15 @@ namespace risk.control.system.Services
     public class AgentService : IAgentService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHttpContextAccessor httpContextAccessor;
         private readonly UserManager<VendorApplicationUser> userVendorManager;
 
-        public AgentService(ApplicationDbContext context, UserManager<VendorApplicationUser> userVendorManager)
+        public AgentService(ApplicationDbContext context,
+             IHttpContextAccessor httpContextAccessor,
+            UserManager<VendorApplicationUser> userVendorManager)
         {
             this._context = context;
+            this.httpContextAccessor = httpContextAccessor;
             this.userVendorManager = userVendorManager;
         }
 
@@ -58,13 +62,16 @@ namespace risk.control.system.Services
 
             if (sendSMS)
             {
+                var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
+                var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
+                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
                 //SEND SMS
                 string message = $"Dear {user2Onboard.Email}";
                 message += $"Uid reset for mobile: {user2Onboard.PhoneNumber}";
                 message += $"                                          ";
                 message += $"Thanks";
                 message += $"                                          ";
-                message += $"https://icheckify.co.in";
+                message += $"{BaseUrl}";
                 var response = SmsService.SendSingleMessage(mobile, message, sendSMS);
             }
             return user2Onboard;

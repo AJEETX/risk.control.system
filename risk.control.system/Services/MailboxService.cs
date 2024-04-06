@@ -141,7 +141,7 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{clientCompanyUser.Email}";
                     message += $"                                          ";
-                    message += $"https://icheckify.co.in";
+                    message += $"{BaseUrl}";
                     var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, message, company.SendSMS);
                 }
                 //SMS ::END
@@ -238,7 +238,7 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{applicationUser.Email}";
                     message += $"                                          ";
-                    message += $"https://icheckify.co.in";
+                    message += $"{BaseUrl}";
                     var result = SmsService.SendSingleMessage(userEmailToSend.PhoneNumber, message, company.SendSMS);
                 }
                 //SMS ::END
@@ -330,7 +330,7 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail})";
                         message += $"                                           ";
-                        message += $"https://icheckify.co.in";
+                        message += $"{BaseUrl}";
                         var result = SmsService.SendSingleMessage(user.PhoneNumber, message,company.SendSMS);
                     }
                 }
@@ -404,7 +404,7 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{userEmail}";
                     message += $"                                          ";
-                    message += $"https://icheckify.co.in";
+                    message += $"{BaseUrl}";
                     var result = SmsService.SendSingleMessage(recepientUser.PhoneNumber, message, company.SendSMS);
                 }
             }
@@ -571,7 +571,7 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
-                        message += $"https://icheckify.co.in";
+                        message += $"{BaseUrl}";
                         var result = SmsService.SendSingleMessage(user.PhoneNumber, message,company.SendSMS);
                     }
                 }
@@ -658,7 +658,7 @@ namespace risk.control.system.Services
                         message += $"                                          ";
                         message += $"{senderUserEmail}";
                         message += $"                                          ";
-                        message += $"https://icheckify.co.in";
+                        message += $"{BaseUrl}";
                         var result = SmsService.SendSingleMessage(user.PhoneNumber, message, company.SendSMS);
                     }
                 }
@@ -743,7 +743,7 @@ namespace risk.control.system.Services
                     message += $"                                          ";
                     message += $"{senderUserEmail}";
                     message += $"                                          ";
-                    message += $"https://icheckify.co.in";
+                    message += $"{BaseUrl}";
                     var result = SmsService.SendSingleMessage(user.PhoneNumber, message, company.SendSMS);
                 }
             }
