@@ -1,4 +1,7 @@
 var askConfirmation = true;
+var alertTimeInSeconds = 15;
+var alertImeMilliSeconds = alertTimeInSeconds * 1000;
+var idleTimeDuration = 60;
 
 function startTimer(duration, display) {
 	var timer = duration, minutes, seconds;
@@ -11,26 +14,22 @@ function startTimer(duration, display) {
 
 		display.textContent = minutes + ":" + seconds;
 		if (askConfirmation) {
-			if (--timer < 10) {
+			if (--timer < alertTimeInSeconds) {
 				askConfirmation = false;
 				$.alert(
 					{
-						title: "Inactivity Session timeout!",
-						content: `<i class='fas fa-sync fa-spin'></i> Inactivity session timeout. <br /> <b>` + duration + `</b> seconds!`,
-						icon: 'fas fa-exclamation-triangle',
-						type: 'red',
+						title: "Idle Session timeout!",
+						content: `Your idle time out to expire! <br /> Click refresh to continue... `,
+						icon: 'fas fa-spinner  fa-spin',
+						type: 'orange',
 						closeIcon: true,
-						autoClose: 'cancel|2000',
-						onClose: function () {
-							// before the modal is hidden.
-							window.location.href = "/Dashboard/Index";
-						},
+						autoClose: `cancel|`+alertImeMilliSeconds+``,
 						buttons: {
 							confirm: {
 								text: "REGRESH",
 								btnClass: 'btn-success',
 								action: function () {
-									window.location.href = "/Dashboard/Index";
+									window.location.href = window.location.pathname;
 								}
 							},
 							cancel: {
@@ -55,9 +54,8 @@ function startTimer(duration, display) {
 }
 
 window.onload = function () {
-	var fiveMinutes = 60*5,
-		display = document.querySelector('#time');
-	startTimer(fiveMinutes, display);
+	var display = document.querySelector('#time');
+	startTimer(idleTimeDuration, display);
 };
 
 
@@ -96,9 +94,9 @@ function showTime() {
 		am_pm;
 
 	// Displaying the time
-	document.getElementById(
-		"clock"
-	).innerHTML = currentTime;
+	var clockTime = document.getElementById("clock");
+	// Displaying the time
+	clockTime.innerHTML = currentTime;
 }
 
 showTime();
