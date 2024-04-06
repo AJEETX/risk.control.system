@@ -2,6 +2,8 @@
 using System.Text.Json.Serialization;
 using System.Web;
 
+using AspNetCoreHero.ToastNotification.Notyf;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -127,34 +129,42 @@ namespace risk.control.system.Controllers
             ViewBag.ActionType = actiontype;
             return View(userMessage);
         }
-
+            //
+        //
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> InboxDetailsReply(OutboxMessage contactMessage)
         {
-            contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
-
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
+            try
             {
-                return NotFound();
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
+
+                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
+
+                var mailSent = await inboxMailService.SendReplyMessage(contactMessage, currentUserEmail, messageDocument);
+
+                if (mailSent)
+                {
+                    toastNotification.AddSuccessToastMessage("mail sent successfully!");
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
+                    return RedirectToAction(nameof(Create));
+                }
             }
-
-            IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-
-            var mailSent = await inboxMailService.SendReplyMessage(contactMessage, userEmail, messageDocument);
-
-            if (mailSent)
+            catch (Exception)
             {
-                toastNotification.AddSuccessToastMessage("mail sent successfully!");
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
-                return RedirectToAction(nameof(Create));
+                toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
         }
 
@@ -314,31 +324,40 @@ namespace risk.control.system.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> SentDetailsReply(SentMessage contactMessage)
         {
-            contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
-
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
+            try
             {
-                return NotFound();
-            }
-            IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
 
-            var mailSent = await sentMailService.SendReplyMessage(contactMessage, userEmail, messageDocument);
+                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
 
-            if (mailSent)
-            {
-                toastNotification.AddSuccessToastMessage("mail sent successfully!");
-                return RedirectToAction(nameof(Index));
+                var mailSent = await sentMailService.SendReplyMessage(contactMessage, currentUserEmail, messageDocument);
+
+                if (mailSent)
+                {
+                    toastNotification.AddSuccessToastMessage("mail sent successfully!");
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
+                    return RedirectToAction(nameof(Create));
+                }
             }
-            else
+            catch (Exception)
             {
-                toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
-                return RedirectToAction(nameof(Create));
+                toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
+            
         }
 
         [Breadcrumb("Delete", FromAction = "SentDetails")]
@@ -496,32 +515,41 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> Create(OutboxMessage contactMessage)
         {
-            contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
 
-            var userEmail = HttpContext.User.Identity.Name;
-
-            var applicationUser = _context.ApplicationUser.Where(u => u.Email == userEmail).FirstOrDefault();
-            if (applicationUser == null)
+            try
             {
-                return NotFound();
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                contactMessage.Message = HttpUtility.HtmlEncode(contactMessage.RawMessage);
+
+                IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
+
+                var mailSent = await inboxMailService.SendReplyMessage(contactMessage, currentUserEmail, messageDocument);
+
+                if (mailSent)
+                {
+                    toastNotification.AddSuccessToastMessage("mail sent successfully!");
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
+                    return RedirectToAction(nameof(Create));
+                }
             }
-
-            IFormFile? messageDocument = Request.Form?.Files?.FirstOrDefault();
-
-            var mailSent = await inboxMailService.SendReplyMessage(contactMessage, userEmail, messageDocument);
-
-            if (mailSent)
+            catch (Exception)
             {
-                toastNotification.AddSuccessToastMessage("mail sent successfully!");
-                return RedirectToAction(nameof(Index));
+                toastNotification.AddErrorToastMessage("OOPs !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            else
-            {
-                toastNotification.AddErrorToastMessage("Error: recepient email incorrect!");
-                return RedirectToAction(nameof(Create));
-            }
+            
         }
     }
 }

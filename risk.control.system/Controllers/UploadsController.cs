@@ -85,6 +85,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FaceUpload(string selectedcase, IFormFile digitalImage, string digitalIdLatitude, string digitalIdLongitude)
         {
@@ -114,6 +115,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PanUpload(string selectedclaim, IFormFile panImage, string documentIdLatitude, string documentIdLongitude)
         {
@@ -144,6 +146,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> FileUpload(IFormFile postedFile, string uploadtype)
         {

@@ -141,6 +141,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(string claimId, CaseLocation caseLocation)
         {
@@ -231,6 +232,7 @@ namespace risk.control.system.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> Edit(long id, CaseLocation ecaseLocation)
         {
             if (id != ecaseLocation.CaseLocationId)

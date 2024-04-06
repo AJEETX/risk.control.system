@@ -579,7 +579,9 @@ namespace risk.control.system.Controllers.Api.Claims
 
                 foreach (var item in applicationDbContext)
                 {
-                    if (item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED && item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR)
+                    if ((item.InvestigationCaseStatus.Name == CONSTANTS.CASE_STATUS.FINISHED && 
+                        item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.APPROVED_BY_ASSESSOR) ||
+                        (item.InvestigationCaseSubStatus.Name == CONSTANTS.CASE_STATUS.CASE_SUBSTATUS.ASSIGNED_TO_ASSIGNER) && item.IsReviewCase)
                     {
                         if(userAttendedClaims.Contains(item.ClaimsInvestigationId))
                         {

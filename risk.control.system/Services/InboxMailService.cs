@@ -175,52 +175,63 @@ namespace risk.control.system.Services
             contactMessage.Updated = DateTime.UtcNow;
             contactMessage.UpdatedBy = userEmail;
             contactMessage.SenderEmail = userEmail;
+            contactMessage.Document =null;
+
+
             if (recepientMailbox is not null)
             {
-                //add to sender's sent box
-                var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
-                SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
-
-                if (messageDocument is not null)
+                try
                 {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
+                    //add to sender's sent box
+                    var jsonMessage = JsonSerializer.Serialize(contactMessage, options);
+                    SentMessage sentMessage = JsonSerializer.Deserialize<SentMessage>(jsonMessage, options);
 
-                    sentMessage.Document = messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await sentMessage.Document.CopyToAsync(dataStream);
-                    sentMessage.Attachment = dataStream.ToArray();
-                    sentMessage.FileType = messageDocument.ContentType;
-                    sentMessage.Extension = extension;
-                    sentMessage.AttachmentName = messageDocumentFileName;
+                    if (messageDocument is not null)
+                    {
+                        var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
+                        var extension = Path.GetExtension(messageDocument.FileName);
+
+                        sentMessage.Document = messageDocument;
+                        using var dataStream = new MemoryStream();
+                        await sentMessage.Document.CopyToAsync(dataStream);
+                        sentMessage.Attachment = dataStream.ToArray();
+                        sentMessage.FileType = messageDocument.ContentType;
+                        sentMessage.Extension = extension;
+                        sentMessage.AttachmentName = messageDocumentFileName;
+                    }
+                    userMailbox.Sent.Add(sentMessage);
+                    _context.Mailbox.Attach(userMailbox);
+                    _context.Mailbox.Update(userMailbox);
+
+                    //add to receiver's inbox
+                    InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
+
+                    if (messageDocument is not null)
+                    {
+                        var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
+                        var extension = Path.GetExtension(messageDocument.FileName);
+
+                        inboxMessage.Document = messageDocument;
+                        using var dataStream = new MemoryStream();
+                        await inboxMessage.Document.CopyToAsync(dataStream);
+                        inboxMessage.Attachment = dataStream.ToArray();
+                        inboxMessage.FileType = messageDocument.ContentType;
+                        inboxMessage.Extension = extension;
+                        inboxMessage.AttachmentName = messageDocumentFileName;
+                    }
+                    recepientMailbox.Inbox.Add(inboxMessage);
+                    _context.Mailbox.Attach(recepientMailbox);
+                    _context.Mailbox.Update(recepientMailbox);
+
+                    var rows = await _context.SaveChangesAsync();
+
+                    return true;
                 }
-                userMailbox.Sent.Add(sentMessage);
-                _context.Mailbox.Attach(userMailbox);
-                _context.Mailbox.Update(userMailbox);
-
-                //add to receiver's inbox
-                InboxMessage inboxMessage = JsonSerializer.Deserialize<InboxMessage>(jsonMessage, options);
-
-                if (messageDocument is not null)
+                catch (Exception ex)
                 {
-                    var messageDocumentFileName = Path.GetFileNameWithoutExtension(messageDocument.FileName);
-                    var extension = Path.GetExtension(messageDocument.FileName);
-
-                    inboxMessage.Document = messageDocument;
-                    using var dataStream = new MemoryStream();
-                    await inboxMessage.Document.CopyToAsync(dataStream);
-                    inboxMessage.Attachment = dataStream.ToArray();
-                    inboxMessage.FileType = messageDocument.ContentType;
-                    inboxMessage.Extension = extension;
-                    inboxMessage.AttachmentName = messageDocumentFileName;
+                    throw;
                 }
-                recepientMailbox.Inbox.Add(inboxMessage);
-                _context.Mailbox.Attach(recepientMailbox);
-                _context.Mailbox.Update(recepientMailbox);
-
-                var rows = await _context.SaveChangesAsync();
-
-                return true;
+                
             }
             else
             {

@@ -59,6 +59,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationUser user)
         {
@@ -152,6 +153,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [FromForm] ApplicationUser applicationUser)
         {

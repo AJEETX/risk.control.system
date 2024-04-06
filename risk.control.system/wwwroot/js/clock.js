@@ -53,12 +53,6 @@ function startTimer(duration, display) {
 	}, 1000);
 }
 
-window.onload = function () {
-	var display = document.querySelector('#time');
-	startTimer(idleTimeDuration, display);
-};
-
-
 // Calling showTime function at every second
 var logoutTimer = setInterval(showTime, 1000);
 
@@ -98,5 +92,8 @@ function showTime() {
 	// Displaying the time
 	clockTime.innerHTML = currentTime;
 }
-
-showTime();
+window.onload = function () {
+	var display = document.querySelector('#time');
+	startTimer(idleTimeDuration, display);
+	showTime();
+}

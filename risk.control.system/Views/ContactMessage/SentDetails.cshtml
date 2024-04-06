@@ -59,7 +59,6 @@
         <div class="card-footer bg-white">
             <ul class="mailbox-attachments d-flex align-items-stretch clearfix">
                 <li style="display:@hasAttachment">
-                    <span class="mailbox-attachment-icon"><i class="@fileIcon"></i></span>
                     <div class="mailbox-attachment-info">
                         <a asp-controller="Download" asp-action="SentDetailsDownloadFileAttachment" asp-route-id="@Model.SentMessageId" class="mailbox-attachment-name"><i class="fas fa-paperclip"></i> @Model.AttachmentName</a>
                         <span class="mailbox-attachment-size clearfix mt-1">
@@ -73,7 +72,7 @@
 
         <div class="card-footer">
             <div class="float-right">
-                <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Reply" class="btn btn-default"><i class="fas fa-reply"></i> Reply</a>
+                <a asp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Reply" class="btn btn-default"><i class="far fa-paper-plane"></i> Reply</a>
                 <a sp-action="SentDetailsReply" asp-route-id="@Model.SentMessageId" asp-route-actiontype="Forward" class="btn btn-default"><i class="fas fa-share"></i> Forward</a>
             </div>
             <a asp-action="SentDetailsDelete" asp-route-id="@Model.SentMessageId" class="btn btn-default"><i class="far fa-trash-alt"></i> Delete</a>

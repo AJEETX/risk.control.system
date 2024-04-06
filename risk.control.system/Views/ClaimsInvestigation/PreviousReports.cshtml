@@ -22,8 +22,10 @@
                 </div>
                 <i class="far fa-bookmark" style="font-size:1.1rem;"></i>
             </div>
-            <div class="card-body pb-0">
-
+            <div class="card-body">
+                <div class="submit-progress hidden">
+                    <i class="fas fa-sync fa-spin fa-4x fa-fw"></i>
+                </div>
                 <div class="row">
                     @{
                         if (@Model.DigitalIdReport?.DigitalIdImageData != null &&
@@ -323,23 +325,23 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12 d-flex align-items-stretch flex-column">
-                        <div class="card bg-light d-flex flex-fill">
-                            <div class="card-header text-muted border-bottom-0">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <a asp-controller="ClaimsInvestigation" class="btn btn-default" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.CaseLocation.ClaimsInvestigationId">
-                                            <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
-                                        </a>
-                                    </div>
+                
+            </div>
+            <div class="card-footer">
+                <div class="col-12 d-flex align-items-stretch flex-column">
+                    <div class="card bg-light d-flex flex-fill">
+                        <div class="card-header text-muted border-bottom-0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <a id="back" asp-controller="ClaimsInvestigation" class="btn btn-secondary" asp-action="GetInvestigateReport" asp-route-selectedcase="@Model.CaseLocation.ClaimsInvestigationId">
+                                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
         </div>
     </div>
 </article>

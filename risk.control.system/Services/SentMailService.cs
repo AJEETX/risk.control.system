@@ -117,6 +117,7 @@ namespace risk.control.system.Services
             contactMessage.SenderEmail = userEmail;
             contactMessage.SendDate = DateTime.UtcNow;
             contactMessage.Read = false;
+            contactMessage.Document = null;
 
             if (recepientMailbox is not null)
             {

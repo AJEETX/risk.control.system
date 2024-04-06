@@ -129,6 +129,7 @@ namespace risk.control.system.Controllers
 
         }
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Assigner(IFormFile postedFile, string uploadtype)
         {
@@ -186,6 +187,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Draft(IFormFile postedFile, string uploadtype)
         {

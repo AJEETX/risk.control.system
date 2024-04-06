@@ -34,10 +34,10 @@
                 <div class="form-group">
                     <div class="btn btn-default btn-file">
                         <i class="fas fa-paperclip"></i> Attachment
-                        <img class="file-image" id="documentImage" src="@Applicationsettings.NO_USER">
-                        <input asp-for="Attachment" type="file" class="form-control remarks" onchange="document.getElementById('documentImage').src = window.URL.createObjectURL(this.files[0])" />
+                        <img class="file-image doc-profile-image" id="documentImage0" src=@Applicationsettings.NO_IMAGE>
+                        <input id="document" name="document" asp-for="Attachment" type="file" accept="*.png, *.jpeg" class="form-control remarks" />
                     </div>
-                    <p class="help-block">Max. 10MB</p>
+                    <span class="help-block">Max. 2MB</span>
 
                 </div>
             </div>
@@ -45,9 +45,8 @@
             <div class="card-footer">
                 <div class="float-right">
                     @*<button type="submit" asp-action="Draft" class="btn btn-secondary"><i class="fas fa-pencil-alt"></i> Draft</button>*@
-                    <button type="submit" asp-action="SentDetailsReply" class="btn btn-success"><i class="far fa-envelope"></i> Reply</button>
+                    <button id="send-email" type="submit" asp-action="SentDetailsReply" class="btn btn-success"><i class="far fa-envelope"></i> Reply</button>
                 </div>
-                <button type="reset" class="btn btn-secondary"><i class="fas fa-times"></i> @Applicationsettings.CANCEL</button>
             </div>
 
         </div>
@@ -58,5 +57,7 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="~/js/compose-mail.js">
+        </script>
     }
 }

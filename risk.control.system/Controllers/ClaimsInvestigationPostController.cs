@@ -228,6 +228,7 @@ namespace risk.control.system.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreatePolicy(ClaimsInvestigation claimsInvestigation)
         {
@@ -272,6 +273,7 @@ namespace risk.control.system.Controllers
         }
 
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [HttpPost]
         public async Task<IActionResult> EditPolicy(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation)
         {
@@ -316,6 +318,7 @@ namespace risk.control.system.Controllers
 
         [ValidateAntiForgeryToken]
         [HttpPost]
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         public async Task<IActionResult> CreateCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)
         {
             try
@@ -365,6 +368,7 @@ namespace risk.control.system.Controllers
             }
         }
 
+        [RequestSizeLimit(2_000_000)] // Checking for 2 MB
         [ValidateAntiForgeryToken]
         [HttpPost]
         public async Task<IActionResult> EditCustomer(string claimsInvestigationId, ClaimsInvestigation claimsInvestigation, bool create = true)

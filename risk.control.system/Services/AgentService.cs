@@ -64,7 +64,7 @@ namespace risk.control.system.Services
             {
                 var host = httpContextAccessor?.HttpContext?.Request.Host.ToUriComponent();
                 var pathBase = httpContextAccessor?.HttpContext?.Request.PathBase.ToUriComponent();
-                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}/{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
+                var BaseUrl = $"{httpContextAccessor?.HttpContext?.Request.Scheme}://{host}{pathBase}{Applicationsettings.WEBSITE_SITE_MENU_LOGO}";
                 //SEND SMS
                 string message = $"Dear {user2Onboard.Email}";
                 message += $"Uid reset for mobile: {user2Onboard.PhoneNumber}";
