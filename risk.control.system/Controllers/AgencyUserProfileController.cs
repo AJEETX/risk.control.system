@@ -44,53 +44,69 @@ namespace risk.control.system.Controllers
 
         public IActionResult Index()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser
-                .Include(u => u.PinCode)
-                .Include(u => u.Country)
-                .Include(u => u.State)
-                .Include(u => u.District)
-                .FirstOrDefault(c => c.Email == userEmail);
+            try
+            {
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var vendorUser = _context.VendorApplicationUser
+                    .Include(u => u.PinCode)
+                    .Include(u => u.Country)
+                    .Include(u => u.State)
+                    .Include(u => u.District)
+                    .FirstOrDefault(c => c.Email == userEmail);
 
-            return View(vendorUser);
+                return View(vendorUser);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb("Edit Profile")]
         public async Task<IActionResult> Edit(long? userId)
         {
-            if (userId == null || _context.VendorApplicationUser == null)
+            try
             {
-                notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                toastNotification.AddErrorToastMessage("agency not found");
-                return NotFound();
-            }
+                if (userId == null || _context.VendorApplicationUser == null)
+                {
+                    notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
+                    toastNotification.AddErrorToastMessage("agency not found");
+                    return NotFound();
+                }
 
-            var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
-            if (vendorApplicationUser == null)
+                var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
+                if (vendorApplicationUser == null)
+                {
+                    notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
+                    return NotFound();
+                }
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
+
+                if (vendor == null)
+                {
+                    notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
+                    return NotFound();
+                }
+                vendorApplicationUser.Vendor = vendor;
+
+                var country = _context.Country.OrderBy(o => o.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
+
+                return View(vendorApplicationUser);
+            }
+            catch (Exception)
             {
-                notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                return NotFound();
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
-
-            if (vendor == null)
-            {
-                notifyService.Custom($"No user not found.", 3, "red", "fas fa-user");
-                return NotFound();
-            }
-            vendorApplicationUser.Vendor = vendor;
-
-            var country = _context.Country.OrderBy(o => o.Name);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", vendorApplicationUser.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
-
-            return View(vendorApplicationUser);
         }
 
         // POST: ClientCompanyApplicationUser/Edit/5
@@ -101,13 +117,13 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, VendorApplicationUser applicationUser)
         {
-            if (id != applicationUser.Id.ToString())
-            {
-                toastNotification.AddErrorToastMessage("agency not found!");
-                return NotFound();
-            }
             try
             {
+                if (id != applicationUser.Id.ToString())
+                {
+                    notifyService.Error("OOPS !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
@@ -163,34 +179,36 @@ namespace risk.control.system.Controllers
                     }
                     Errors(result);
                 }
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!VendorApplicationUserExists(applicationUser.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
 
-            notifyService.Custom($"Error to create edit user.", 3, "red", "fas fa-user");
-            return RedirectToAction(nameof(Index), "Dashboard");
+                notifyService.Custom($"Error to create edit user.", 3, "red", "fas fa-user");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [HttpGet]
         [Breadcrumb("Change Password ")]
         public IActionResult ChangePassword()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            if (vendorUser != null)
+            try
             {
-                return View();
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                if (vendorUser != null)
+                {
+                    return View();
+                }
             }
-            toastNotification.AddErrorToastMessage("Error to create Agency user!");
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            notifyService.Error("OOPS !!!..Contact IT support");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
@@ -198,51 +216,65 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var user = await userManager.GetUserAsync(User);
-                if (user == null)
-                {
-                    return RedirectToAction("/Account/Login");
-                }
 
-                var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-
-                if (!result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    foreach (var error in result.Errors)
+                    var user = await userManager.GetUserAsync(User);
+                    if (user == null)
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        return RedirectToAction("/Account/Login");
                     }
-                    return View();
+
+                    var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View();
+                    }
+
+                    await signInManager.RefreshSignInAsync(user);
+                    return View("ChangePasswordConfirmation");
                 }
 
-                await signInManager.RefreshSignInAsync(user);
-                return View("ChangePasswordConfirmation");
+                return View(model);
             }
-
-            return View(model);
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [HttpGet]
         [Breadcrumb("Password Change Succees")]
         public IActionResult ChangePasswordConfirmation()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            if (vendorUser != null)
+            try
             {
-                notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
-                return View();
+
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                if (vendorUser != null)
+                {
+                    notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
+                    return View();
+                }
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
             toastNotification.AddErrorToastMessage("Error to create Agency user!");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
-        private bool VendorApplicationUserExists(long id)
-        {
-            return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
 
         private void Errors(IdentityResult result)
         {

@@ -48,50 +48,68 @@ namespace risk.control.system.Controllers
 
         public IActionResult Index()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser
-                .Include(u => u.PinCode)
-                .Include(u => u.Country)
-                .Include(u => u.State)
-                .Include(u => u.District)
-                .FirstOrDefault(c => c.Email == userEmail);
+            try
+            {
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var companyUser = _context.ClientCompanyApplicationUser
+                    .Include(u => u.PinCode)
+                    .Include(u => u.Country)
+                    .Include(u => u.State)
+                    .Include(u => u.District)
+                    .FirstOrDefault(c => c.Email == userEmail);
 
-            return View(companyUser);
+                return View(companyUser);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            
         }
 
         [Breadcrumb("Edit Profile")]
         public async Task<IActionResult> Edit(long? userId)
         {
-            if (userId == null || _context.ClientCompanyApplicationUser == null)
+            try
             {
-                toastNotification.AddErrorToastMessage("company not found");
-                return NotFound();
-            }
+                if (userId == null || _context.ClientCompanyApplicationUser == null)
+                {
+                    notifyService.Error("USER NOT FOUND");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-            var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(userId);
-            if (clientCompanyApplicationUser == null)
+                var clientCompanyApplicationUser = await _context.ClientCompanyApplicationUser.FindAsync(userId);
+                if (clientCompanyApplicationUser == null)
+                {
+                    notifyService.Error("USER NOT FOUND");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var clientCompany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
+
+                if (clientCompany == null)
+                {
+                    notifyService.Error("COMPANY NOT FOUND");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                clientCompanyApplicationUser.ClientCompany = clientCompany;
+                var country = _context.Country.OrderBy(o => o.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompanyApplicationUser.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
+                return View(clientCompanyApplicationUser);
+            }
+            catch (Exception)
             {
-                toastNotification.AddErrorToastMessage("company not found");
-                return NotFound();
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var clientCompany = _context.ClientCompany.FirstOrDefault(v => v.ClientCompanyId == clientCompanyApplicationUser.ClientCompanyId);
-
-            if (clientCompany == null)
-            {
-                toastNotification.AddErrorToastMessage("company not found");
-                return NotFound();
-            }
-            clientCompanyApplicationUser.ClientCompany = clientCompany;
-            var country = _context.Country.OrderBy(o => o.Name);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == clientCompanyApplicationUser.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == clientCompanyApplicationUser.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == clientCompanyApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-            ViewData["CountryId"] = new SelectList(country.OrderBy(c => c.Name), "CountryId", "Name", clientCompanyApplicationUser.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", clientCompanyApplicationUser.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", clientCompanyApplicationUser.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", clientCompanyApplicationUser.PinCodeId);
-            return View(clientCompanyApplicationUser);
+            
         }
 
         // POST: ClientCompanyApplicationUser/Edit/5
@@ -102,85 +120,72 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, ClientCompanyApplicationUser applicationUser)
         {
-            if (id != applicationUser.Id.ToString())
+            try
             {
-                toastNotification.AddErrorToastMessage("company not found!");
-                return NotFound();
-            }
-
-            if (applicationUser is not null)
-            {
-                try
+                if (id != applicationUser.Id.ToString() || applicationUser is null)
                 {
-                    var user = await userManager.FindByIdAsync(id);
-                    if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
-                    {
-                        string newFileName = user.Email + Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
-                        newFileName += fileExtension;
-                        string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
-                        applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                        applicationUser.ProfilePictureUrl = "/company/" + newFileName;
-                        using var dataStream = new MemoryStream();
-                        applicationUser.ProfileImage.CopyTo(dataStream);
-                        applicationUser.ProfilePicture = dataStream.ToArray();
-                    }
-
-                    if (user != null)
-                    {
-                        user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
-                        user.ProfilePicture = applicationUser?.ProfilePicture;
-                        user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
-                        user.FirstName = applicationUser?.FirstName;
-                        user.LastName = applicationUser?.LastName;
-                        if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
-                        {
-                            user.Password = applicationUser.Password;
-                        }
-                        user.Email = applicationUser.Email;
-                        user.UserName = applicationUser.Email;
-                        user.EmailConfirmed = true;
-                        user.Country = applicationUser.Country;
-                        user.CountryId = applicationUser.CountryId;
-                        user.State = applicationUser.State;
-                        user.StateId = applicationUser.StateId;
-                        user.PinCode = applicationUser.PinCode;
-                        user.PinCodeId = applicationUser.PinCodeId;
-                        user.Updated = DateTime.UtcNow;
-                        user.Comments = applicationUser.Comments;
-                        user.PhoneNumber = applicationUser.PhoneNumber;
-                        user.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        user.SecurityStamp = DateTime.UtcNow.ToString();
-                        var result = await userManager.UpdateAsync(user);
-                        if (result.Succeeded)
-                        {
-                            notifyService.Custom($"User profile edited successfully.", 3, "green", "fas fa-user");
-                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "User edited . Email : " + user.Email);
-                            return RedirectToAction(nameof(Index), "Dashboard");
-                        }
-                        toastNotification.AddErrorToastMessage("Error !!. The user can't be edited!");
-                        Errors(result);
-                    }
+                    notifyService.Error("OOPS !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
                 }
-                catch (DbUpdateConcurrencyException)
+                var user = await userManager.FindByIdAsync(id);
+                if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
-                    if (!VendorApplicationUserExists(applicationUser.Id))
+                    string newFileName = user.Email + Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(applicationUser.ProfileImage.FileName);
+                    newFileName += fileExtension;
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, "company");
+                    if (!Directory.Exists(path))
                     {
-                        return NotFound();
+                        Directory.CreateDirectory(path);
                     }
-                    else
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "company", newFileName);
+                    applicationUser.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    applicationUser.ProfilePictureUrl = "/company/" + newFileName;
+                    using var dataStream = new MemoryStream();
+                    applicationUser.ProfileImage.CopyTo(dataStream);
+                    applicationUser.ProfilePicture = dataStream.ToArray();
+                }
+
+                if (user != null)
+                {
+                    user.ProfilePictureUrl = applicationUser?.ProfilePictureUrl ?? user.ProfilePictureUrl;
+                    user.ProfilePicture = applicationUser?.ProfilePicture;
+                    user.PhoneNumber = applicationUser?.PhoneNumber ?? user.PhoneNumber;
+                    user.FirstName = applicationUser?.FirstName;
+                    user.LastName = applicationUser?.LastName;
+                    if (!string.IsNullOrWhiteSpace(applicationUser?.Password))
                     {
-                        throw;
+                        user.Password = applicationUser.Password;
+                    }
+                    user.Email = applicationUser.Email;
+                    user.UserName = applicationUser.Email;
+                    user.EmailConfirmed = true;
+                    user.Country = applicationUser.Country;
+                    user.CountryId = applicationUser.CountryId;
+                    user.State = applicationUser.State;
+                    user.StateId = applicationUser.StateId;
+                    user.PinCode = applicationUser.PinCode;
+                    user.PinCodeId = applicationUser.PinCodeId;
+                    user.Updated = DateTime.UtcNow;
+                    user.Comments = applicationUser.Comments;
+                    user.PhoneNumber = applicationUser.PhoneNumber;
+                    user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    user.SecurityStamp = DateTime.UtcNow.ToString();
+                    var result = await userManager.UpdateAsync(user);
+                    if (result.Succeeded)
+                    {
+                        notifyService.Custom($"User profile edited successfully.", 3, "green", "fas fa-user");
+                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "User edited . Email : " + user.Email);
+                        return RedirectToAction(nameof(Index), "Dashboard");
                     }
                 }
             }
-
-            toastNotification.AddErrorToastMessage("Error to create Company user!");
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            notifyService.Error("OOPS !!!..Contact IT support");
             return RedirectToAction(nameof(Index), "Dashboard");
         }
 
@@ -188,48 +193,66 @@ namespace risk.control.system.Controllers
         [HttpGet]
         public IActionResult ChangePassword()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            if (companyUser != null)
+            try
             {
+                var userEmail = HttpContext.User?.Identity?.Name;
+                if(string.IsNullOrEmpty(userEmail))
+                {
+                    notifyService.Error("OOPS !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var companyUser = _context.ClientCompanyApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                if (companyUser == null)
+                {
+                    notifyService.Error("OOPS !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
                 return View();
+
             }
-            toastNotification.AddErrorToastMessage("Error to create Company user!");
-            return RedirectToAction(nameof(Index), "Dashboard");
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var user = await userManager.GetUserAsync(User);
-                if (user == null)
-                {
-                    return RedirectToAction("/Account/Login");
-                }
 
-                // ChangePasswordAsync changes the user password
-                var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-
-                // The new password did not meet the complexity rules or
-                // the current password is incorrect. Add these errors to
-                // the ModelState and rerender ChangePassword view
-                if (!result.Succeeded)
+                if (ModelState.IsValid)
                 {
-                    foreach (var error in result.Errors)
+                    var user = await userManager.GetUserAsync(User);
+                    if (user == null)
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        return RedirectToAction("/Account/Login");
                     }
-                    return View();
+
+                    var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View();
+                    }
+
+                    await signInManager.RefreshSignInAsync(user);
+                    return View("ChangePasswordConfirmation");
                 }
 
-                // Upon successfully changing the password refresh sign-in cookie
-                await signInManager.RefreshSignInAsync(user);
-                return View("ChangePasswordConfirmation");
+                return View(model);
             }
-
-            return View(model);
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [HttpGet]
@@ -238,17 +261,6 @@ namespace risk.control.system.Controllers
         {
             notifyService.Custom($"Password edited successfully.", 3, "orange", "fas fa-user");
             return View();
-        }
-
-        private bool VendorApplicationUserExists(long id)
-        {
-            return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-
-        private void Errors(IdentityResult result)
-        {
-            foreach (IdentityError error in result.Errors)
-                ModelState.AddModelError("", error.Description);
         }
     }
 }

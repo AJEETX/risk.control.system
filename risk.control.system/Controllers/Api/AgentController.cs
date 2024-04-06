@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Net;
+using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -289,7 +290,7 @@ namespace risk.control.system.Controllers.Api
         [HttpGet("agent")]
         public async Task<IActionResult> Index(string email = "agent@verify.com")
         {
-            IQueryable<ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
+            IQueryable< ClaimsInvestigation> applicationDbContext = _context.ClaimsInvestigation
                 .Include(c => c.PolicyDetail)
                 .ThenInclude(c => c.ClientCompany)
                 .Include(c => c.PolicyDetail)
@@ -593,35 +594,51 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("faceid")]
         public async Task<IActionResult> FaceId(FaceData data)
         {
-            if (data == null ||
-                string.IsNullOrWhiteSpace(data.LocationImage) ||
-                !data.LocationImage.IsBase64String() ||
-                string.IsNullOrEmpty(data.LocationLongLat))
+            try
             {
-                return BadRequest();
+
+                if (data == null ||
+                    string.IsNullOrWhiteSpace(data.LocationImage) ||
+                    !data.LocationImage.IsBase64String() ||
+                    string.IsNullOrEmpty(data.LocationLongLat))
+                {
+                    return BadRequest();
+                }
+
+                var response = await iCheckifyService.GetFaceId(data);
+
+                return Ok(response);
             }
-
-            var response = await iCheckifyService.GetFaceId(data);
-
-            return Ok(response);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [AllowAnonymous]
         [HttpPost("documentid")]
         public async Task<IActionResult> DocumentId(DocumentData data)
         {
-            if (data == null
-                || string.IsNullOrWhiteSpace(data.OcrImage)
-                || !data.OcrImage.IsBase64String()
-                || string.IsNullOrEmpty(data.OcrLongLat)
-                )
+            try
             {
-                return BadRequest();
+
+                if (data == null
+                    || string.IsNullOrWhiteSpace(data.OcrImage)
+                    || !data.OcrImage.IsBase64String()
+                    || string.IsNullOrEmpty(data.OcrLongLat)
+                    )
+                {
+                    return BadRequest();
+                }
+
+                var response = await iCheckifyService.GetDocumentId(data);
+
+                return Ok(response);
             }
-
-            var response = await iCheckifyService.GetDocumentId(data);
-
-            return Ok(response);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [AllowAnonymous]
@@ -657,19 +674,27 @@ namespace risk.control.system.Controllers.Api
         [HttpPost("submit")]
         public async Task<IActionResult> Submit(SubmitData data)
         {
-            if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || string.IsNullOrWhiteSpace(data.ClaimId) || data.BeneficiaryId < 1)
+            try
             {
-                throw new ArgumentNullException("Argument(s) can't be null");
+                if (data == null || string.IsNullOrWhiteSpace(data.Email) || string.IsNullOrWhiteSpace(data.Remarks) || string.IsNullOrWhiteSpace(data.ClaimId) || data.BeneficiaryId < 1)
+                {
+                    throw new ArgumentNullException("Argument(s) can't be null");
+                }
+
+                await claimsInvestigationService.SubmitToVendorSupervisor(
+                    data.Email, data.BeneficiaryId,
+                    data.ClaimId,
+                    data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
+
+                await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
+
+                return Ok(new { data });
             }
-
-            await claimsInvestigationService.SubmitToVendorSupervisor(
-                data.Email, data.BeneficiaryId,
-                data.ClaimId,
-                data.Remarks, data.Question1, data.Question2, data.Question3, data.Question4);
-
-            await mailboxService.NotifyClaimReportSubmitToVendorSupervisor(data.Email, data.ClaimId, data.BeneficiaryId);
-
-            return Ok(new { data });
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            
         }
     }
 }

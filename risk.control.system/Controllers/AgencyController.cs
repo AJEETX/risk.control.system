@@ -53,7 +53,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Admin Settings ")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return RedirectToAction("Profile");
         }
@@ -61,59 +61,91 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Agency Profile ", FromAction = "Index")]
         public async Task<IActionResult> Profile()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            var vendor = await _context.Vendor
-                .Include(v => v.ratings)
-                .Include(v => v.Country)
-                .Include(v => v.PinCode)
-                .Include(v => v.State)
-                .Include(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.PincodeServices)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.State)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.District)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.LineOfBusiness)
-                .Include(v => v.VendorInvestigationServiceTypes)
-                .ThenInclude(v => v.InvestigationServiceType)
-                .FirstOrDefaultAsync(m => m.VendorId == vendorUser.VendorId);
-            if (vendor == null)
+            try
             {
-                return NotFound();
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("User Not Found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+
+                var vendor = await _context.Vendor
+                    .Include(v => v.ratings)
+                    .Include(v => v.Country)
+                    .Include(v => v.PinCode)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.PincodeServices)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.State)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.District)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.LineOfBusiness)
+                    .Include(v => v.VendorInvestigationServiceTypes)
+                    .ThenInclude(v => v.InvestigationServiceType)
+                    .FirstOrDefaultAsync(m => m.VendorId == vendorUser.VendorId);
+                if (vendor == null)
+                {
+                    notifyService.Error("Agency Not Found! Contact ");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(vendor);
+            }
+            catch (Exception ex)
+            {
+                notifyService.Error("OOPs !!!...Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
 
-            return View(vendor);
         }
 
         // GET: Vendors/Edit/5
         [Breadcrumb("Edit Agency", FromAction = "Profile")]
         public async Task<IActionResult> Edit()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            var vendor = await _context.Vendor.FindAsync(vendorUser.VendorId);
-            if (vendor == null)
+            try
             {
-                notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("User Not found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                if (vendorUser == null)
+                {
+                    notifyService.Error("User Not found !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendor = await _context.Vendor.FindAsync(vendorUser.VendorId);
+                if (vendor == null)
+                {
+                    notifyService.Custom($"Agency Not found.", 3, "red", "fas fa-building");
+                    return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                }
+
+                var country = _context.Country.OrderBy(c => c.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendor.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendor.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
+
+                return View(vendor);
             }
-
-            var country = _context.Country.OrderBy(c => c.Name);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendor.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendor.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendor.DistrictId).OrderBy(d => d.Name);
-
-            ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendor.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendor.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendor.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendor.PinCodeId);
-
-            return View(vendor);
+            catch (Exception ex)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         // POST: Vendors/Edit/5
@@ -124,87 +156,125 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Vendor vendor)
         {
-            if (vendor == null || vendor.VendorId == 0)
+            try
             {
-                notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
-                return RedirectToAction(nameof(AgencyController.Index), "Agency");
-            }
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            if (vendor is not null)
-            {
-                try
+                if (vendor == null || vendor.VendorId == 0)
                 {
-                    IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
-                    if (vendorDocument is not null)
-                    {
-                        string newFileName = vendor.Email + Guid.NewGuid().ToString();
-                        string fileExtension = Path.GetExtension(vendorDocument.FileName);
-                        newFileName += fileExtension;
-                        string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                        }
-                        var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-
-                        using var dataStream = new MemoryStream();
-                        vendorDocument.CopyTo(dataStream);
-                        vendor.DocumentImage = dataStream.ToArray();
-                        vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
-                        vendor.DocumentUrl = "/agency/" + newFileName;
-                    }
-                    else
-                    {
-                        var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
-                        if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
-                        {
-                            vendor.DocumentImage = existingVendor.DocumentImage;
-                            vendor.DocumentUrl = existingVendor.DocumentUrl;
-                        }
-                    }
-                    vendor.Updated = DateTime.UtcNow;
-                    vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
-                    _context.Vendor.Update(vendor);
-                    await _context.SaveChangesAsync();
-
-                    var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
+                    notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
+                    return RedirectToAction(nameof(AgencyController.Index), "Agency");
                 }
-                catch (DbUpdateConcurrencyException)
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
                 {
-                    if (!VendorExists(vendor.VendorId))
+                    notifyService.Error("User Not found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                if (vendorUser == null)
+                {
+                    notifyService.Error("User Not found !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                IFormFile? vendorDocument = Request.Form?.Files?.FirstOrDefault();
+                if (vendorDocument is not null)
+                {
+                    string newFileName = vendor.Email + Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(vendorDocument.FileName);
+                    newFileName += fileExtension;
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
+                    if (!Directory.Exists(path))
                     {
-                        return NotFound();
+                        Directory.CreateDirectory(path);
                     }
-                    else
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
+
+                    using var dataStream = new MemoryStream();
+                    vendorDocument.CopyTo(dataStream);
+                    vendor.DocumentImage = dataStream.ToArray();
+                    vendorDocument.CopyTo(new FileStream(upload, FileMode.Create));
+                    vendor.DocumentUrl = "/agency/" + newFileName;
+                }
+                else
+                {
+                    var existingVendor = await _context.Vendor.AsNoTracking().FirstOrDefaultAsync(c => c.VendorId == vendorUser.VendorId);
+                    if (existingVendor.DocumentImage != null || existingVendor.DocumentUrl != null)
                     {
-                        throw;
+                        vendor.DocumentImage = existingVendor.DocumentImage;
+                        vendor.DocumentUrl = existingVendor.DocumentUrl;
                     }
                 }
+                vendor.Updated = DateTime.UtcNow;
+                vendor.UpdatedBy = HttpContext.User?.Identity?.Name;
+                _context.Vendor.Update(vendor);
+                await _context.SaveChangesAsync();
+
+                var response = SmsService.SendSingleMessage(vendor.PhoneNumber, "Agency account created. Domain : " + vendor.Email);
+
                 notifyService.Custom($"Agency edited successfully.", 3, "green", "fas fa-building");
                 return RedirectToAction(nameof(AgencyController.Index), "Agency");
             }
-            return Problem();
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
         }
 
         [Breadcrumb("Manage Users ")]
         public async Task<IActionResult> User()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("User Not found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                return View();
 
-            return View();
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb("Add User")]
         public IActionResult CreateUser()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
-            var model = new VendorApplicationUser { Vendor = vendor };
-            ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name");
-            return View(model);
+            try
+            {
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("User Not found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                if (vendorUser == null)
+                {
+                    notifyService.Error("User Not found !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+                if (vendor == null)
+                {
+                    notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
+                    return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                }
+                var model = new VendorApplicationUser { Vendor = vendor };
+                ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name");
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+
         }
 
         [HttpPost]
@@ -212,112 +282,137 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateUser(VendorApplicationUser user, string emailSuffix)
         {
-            if (user.ProfileImage != null && user.ProfileImage.Length > 0)
+            try
             {
-                string newFileName = Guid.NewGuid().ToString();
-                string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
-                newFileName += fileExtension;
-                string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
-                if (!Directory.Exists(path))
+                if (user.ProfileImage != null && user.ProfileImage.Length > 0)
                 {
-                    Directory.CreateDirectory(path);
-                }
-                var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
-                user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
-                user.ProfilePictureUrl = "/agency/" + newFileName;
-
-                using var dataStream = new MemoryStream();
-                user.ProfileImage.CopyTo(dataStream);
-                user.ProfilePicture = dataStream.ToArray();
-            }
-            var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
-            //DEMO
-            user.Password = Applicationsettings.Password;
-            user.Email = userFullEmail;
-            user.EmailConfirmed = true;
-            user.UserName = userFullEmail;
-            user.Mailbox = new Mailbox { Name = userFullEmail };
-            user.Updated = DateTime.UtcNow;
-            user.UpdatedBy = HttpContext.User?.Identity?.Name;
-            IdentityResult result = await userManager.CreateAsync(user, user.Password);
-            if (result.Succeeded)
-            {
-                var roles = await userManager.GetRolesAsync(user);
-                var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
-                roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
-                var currentUser = await userManager.GetUserAsync(HttpContext.User);
-                await signInManager.RefreshSignInAsync(currentUser);
-                if (!user.Active)
-                {
-                    var createdUser = await userManager.FindByEmailAsync(user.Email);
-                    var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
-                    var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
-
-                    if (lockUser.Succeeded && lockDate.Succeeded)
+                    string newFileName = Guid.NewGuid().ToString();
+                    string fileExtension = Path.GetExtension(user.ProfileImage.FileName);
+                    newFileName += fileExtension;
+                    string path = Path.Combine(webHostEnvironment.WebRootPath, "agency");
+                    if (!Directory.Exists(path))
                     {
-                        notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
-                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+                        Directory.CreateDirectory(path);
+                    }
+                    var upload = Path.Combine(webHostEnvironment.WebRootPath, "agency", newFileName);
+                    user.ProfileImage.CopyTo(new FileStream(upload, FileMode.Create));
+                    user.ProfilePictureUrl = "/agency/" + newFileName;
 
+                    using var dataStream = new MemoryStream();
+                    user.ProfileImage.CopyTo(dataStream);
+                    user.ProfilePicture = dataStream.ToArray();
+                }
+                var userFullEmail = user.Email.Trim().ToLower() + "@" + emailSuffix;
+                //DEMO
+                user.Password = Applicationsettings.Password;
+                user.Email = userFullEmail;
+                user.EmailConfirmed = true;
+                user.UserName = userFullEmail;
+                user.Mailbox = new Mailbox { Name = userFullEmail };
+                user.Updated = DateTime.UtcNow;
+                user.UpdatedBy = HttpContext.User?.Identity?.Name;
+                IdentityResult result = await userManager.CreateAsync(user, user.Password);
+                if (result.Succeeded)
+                {
+                    var roles = await userManager.GetRolesAsync(user);
+                    var roleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                    roleResult = await userManager.AddToRolesAsync(user, new List<string> { user.UserRole.ToString() });
+                    var currentUser = await userManager.GetUserAsync(HttpContext.User);
+                    await signInManager.RefreshSignInAsync(currentUser);
+                    if (!user.Active)
+                    {
+                        var createdUser = await userManager.FindByEmailAsync(user.Email);
+                        var lockUser = await userManager.SetLockoutEnabledAsync(createdUser, true);
+                        var lockDate = await userManager.SetLockoutEndDateAsync(createdUser, DateTime.MaxValue);
+
+                        if (lockUser.Succeeded && lockDate.Succeeded)
+                        {
+                            notifyService.Custom($"User created and locked.", 3, "orange", "fas fa-user-lock");
+                            var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created and locked. Email : " + user.Email);
+
+                            return RedirectToAction(nameof(AgencyController.User), "Agency");
+                        }
+                    }
+                    else
+                    {
+                        notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
+                        var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
                         return RedirectToAction(nameof(AgencyController.User), "Agency");
                     }
                 }
                 else
                 {
-                    notifyService.Custom($"User created successfully.", 3, "green", "fas fa-user-plus");
-                    var response = SmsService.SendSingleMessage(user.PhoneNumber, "Agency user created. Email : " + user.Email);
-                    return RedirectToAction(nameof(AgencyController.User), "Agency");
+                    foreach (IdentityError error in result.Errors)
+                        ModelState.AddModelError("", error.Description);
                 }
+                GetCountryStateEdit(user);
+                notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
+                return View(user);
             }
-            else
+            catch (Exception)
             {
-                foreach (IdentityError error in result.Errors)
-                    ModelState.AddModelError("", error.Description);
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            GetCountryStateEdit(user);
-            notifyService.Custom($"Error to create user.", 3, "red", "fas fa-user-plus");
-            return View(user);
         }
 
         [Breadcrumb("Edit User", FromAction = "User")]
         public async Task<IActionResult> EditUser(long? userId)
         {
-            if (userId == null || _context.VendorApplicationUser == null)
+            try
             {
-                toastNotification.AddErrorToastMessage("agency not found");
-                return RedirectToAction(nameof(AgencyController.User), "Agency");
-            }
+                if (userId == null || userId < 1)
+                {
+                    notifyService.Error("User not found!!!..Contact IT support");
+                    return RedirectToAction(nameof(AgencyController.User), "Agency");
+                }
 
-            var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
-            if (vendorApplicationUser == null)
+                var vendorApplicationUser = await _context.VendorApplicationUser.FindAsync(userId);
+                if (vendorApplicationUser == null)
+                {
+                    notifyService.Error("User not found!!!..Contact IT support");
+                    return RedirectToAction(nameof(AgencyController.User), "Agency");
+                }
+                var currentUserEmail = HttpContext.User?.Identity?.Name;
+                if (string.IsNullOrWhiteSpace(currentUserEmail))
+                {
+                    notifyService.Error("User Not found!!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == currentUserEmail);
+                if (vendorUser == null)
+                {
+                    notifyService.Error("User Not found !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+                if (vendor == null)
+                {
+                    notifyService.Custom($"No agency not found.", 3, "red", "fas fa-building");
+                    return RedirectToAction(nameof(AgencyController.Index), "Agency");
+                }
+
+                ViewBag.Show = vendorApplicationUser.Email == vendorUser.Email ? false : true;
+
+                vendorApplicationUser.Vendor = vendor;
+
+                var country = _context.Country.OrderBy(o => o.Name);
+                var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
+                var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorApplicationUser.CountryId);
+                ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
+                ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
+
+                return View(vendorApplicationUser);
+            }
+            catch (Exception)
             {
-                toastNotification.AddErrorToastMessage("agency not found");
-                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-
-            ViewBag.Show = vendorApplicationUser.Email == vendorUser.Email ? false : true;
-
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorApplicationUser.VendorId);
-
-            if (vendor == null)
-            {
-                toastNotification.AddErrorToastMessage("agency not found");
-                return RedirectToAction(nameof(AgencyController.User), "Agency");
-            }
-            vendorApplicationUser.Vendor = vendor;
-
-            var country = _context.Country.OrderBy(o => o.Name);
-            var relatedStates = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorApplicationUser.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorApplicationUser.StateId).OrderBy(d => d.Name);
-            var pincodes = _context.PinCode.Include(d => d.District).Where(d => d.District.DistrictId == vendorApplicationUser.DistrictId).OrderBy(d => d.Name);
-
-            ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorApplicationUser.CountryId);
-            ViewData["StateId"] = new SelectList(relatedStates, "StateId", "Name", vendorApplicationUser.StateId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorApplicationUser.DistrictId);
-            ViewData["PinCodeId"] = new SelectList(pincodes, "PinCodeId", "Code", vendorApplicationUser.PinCodeId);
-
-            return View(vendorApplicationUser);
         }
 
         // POST: ClientCompanyApplicationUser/Edit/5
@@ -328,13 +423,13 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditUser(string id, VendorApplicationUser applicationUser)
         {
-            if (id != applicationUser.Id.ToString())
-            {
-                toastNotification.AddErrorToastMessage("Err !!!");
-                return RedirectToAction(nameof(AgencyController.User), "Agency");
-            }
             try
             {
+                if (id != applicationUser.Id.ToString())
+                {
+                    notifyService.Error("Err !!! bad Request");
+                    return RedirectToAction(nameof(AgencyController.User), "Agency");
+                }
                 var user = await userManager.FindByIdAsync(id);
                 if (applicationUser?.ProfileImage != null && applicationUser.ProfileImage.Length > 0)
                 {
@@ -441,12 +536,11 @@ namespace risk.control.system.Controllers
             }
             catch (Exception)
             {
-                notifyService.Error("Error !!. The user can't be edited!");
-                return RedirectToAction(nameof(AgencyController.User), "Agency");
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-
-            notifyService.Error($"Error to create Agency user.", 3);
-            return RedirectToAction(nameof(AgencyController.User), "Agency");
+            notifyService.Error("OOPS !!!..Contact IT support");
+            return RedirectToAction(nameof(Index), "Dashboard");
         }
 
         [Breadcrumb("Edit Role", FromAction = "User")]
@@ -539,7 +633,7 @@ namespace risk.control.system.Controllers
         }
 
         [Breadcrumb("Manage Service")]
-        public async Task<IActionResult> Service()
+        public IActionResult Service()
         {
             return View();
         }
@@ -547,14 +641,22 @@ namespace risk.control.system.Controllers
         [Breadcrumb("Add Service")]
         public IActionResult CreateService()
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+            try
+            {
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
 
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
-            ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
-            var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
-            return View(model);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name");
+                ViewData["CountryId"] = new SelectList(_context.Country, "CountryId", "Name");
+                var model = new VendorInvestigationServiceType { SelectedMultiPincodeId = new List<long>(), Vendor = vendor, PincodeServices = new List<ServicedPinCode>() };
+                return View(model);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [HttpPost]
@@ -562,85 +664,102 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateService(VendorInvestigationServiceType vendorInvestigationServiceType)
         {
-            var userEmail = HttpContext.User?.Identity?.Name;
-            var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
-            var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
-
-            if (vendorInvestigationServiceType is not null)
+            try
             {
-                var pincodesServiced = await _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
-                var servicePinCodes = pincodesServiced.Select(p =>
-                new ServicedPinCode
+
+                var userEmail = HttpContext.User?.Identity?.Name;
+                var vendorUser = _context.VendorApplicationUser.FirstOrDefault(c => c.Email == userEmail);
+                var vendor = _context.Vendor.FirstOrDefault(v => v.VendorId == vendorUser.VendorId);
+
+                if (vendorInvestigationServiceType is not null)
                 {
-                    Name = p.Name,
-                    Pincode = p.Code,
-                    VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId,
-                    VendorInvestigationServiceType = vendorInvestigationServiceType,
-                }).ToList();
-                vendorInvestigationServiceType.PincodeServices = servicePinCodes;
-                vendorInvestigationServiceType.Updated = DateTime.UtcNow;
-                vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
-                vendorInvestigationServiceType.Created = DateTime.UtcNow;
-                vendorInvestigationServiceType.VendorId = vendor.VendorId;
-                _context.Add(vendorInvestigationServiceType);
-                await _context.SaveChangesAsync();
-                notifyService.Custom($"Service created successfully.", 3, "green", "fas fa-truck");
+                    var pincodesServiced = await _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId)).ToListAsync();
+                    var servicePinCodes = pincodesServiced.Select(p =>
+                    new ServicedPinCode
+                    {
+                        Name = p.Name,
+                        Pincode = p.Code,
+                        VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId,
+                        VendorInvestigationServiceType = vendorInvestigationServiceType,
+                    }).ToList();
+                    vendorInvestigationServiceType.PincodeServices = servicePinCodes;
+                    vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                    vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    vendorInvestigationServiceType.Created = DateTime.UtcNow;
+                    vendorInvestigationServiceType.VendorId = vendor.VendorId;
+                    _context.Add(vendorInvestigationServiceType);
+                    await _context.SaveChangesAsync();
+                    notifyService.Custom($"Service created successfully.", 3, "green", "fas fa-truck");
 
-                return RedirectToAction(nameof(AgencyController.Service), "Agency");
+                    return RedirectToAction(nameof(AgencyController.Service), "Agency");
+                }
+                ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name", vendorInvestigationServiceType.CountryId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
+                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
+                ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return View(vendorInvestigationServiceType);
             }
-            ViewData["CountryId"] = new SelectList(_context.Country.OrderBy(c => c.Name), "CountryId", "Name", vendorInvestigationServiceType.CountryId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
-            toastNotification.AddErrorToastMessage("Error to create vendor service!");
-
-            return View(vendorInvestigationServiceType);
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb("Edit Service", FromAction = "Service")]
         public async Task<IActionResult> EditService(long id)
         {
-            if (id == 0 || _context.VendorInvestigationServiceType == null)
+            try
             {
-                return NotFound();
-            }
-
-            var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
-            if (vendorInvestigationServiceType == null)
-            {
-                return NotFound();
-            }
-            var services = _context.VendorInvestigationServiceType
-                .Include(v => v.Vendor)
-                .Include(v => v.PincodeServices)
-                .First(v => v.VendorInvestigationServiceTypeId == id);
-
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType
-                .Include(i => i.LineOfBusiness)
-                .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
-                "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
-
-            var country = _context.Country.OrderBy(o => o.Name);
-            var states = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(d => d.Name);
-            var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorInvestigationServiceType.StateId).OrderBy(d => d.Name);
-
-            ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorInvestigationServiceType.CountryId);
-            ViewData["StateId"] = new SelectList(states, "StateId", "Name", vendorInvestigationServiceType.StateId);
-            ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
-            ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
-
-            ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
-                .Select(x => new SelectListItem
+                if (id == 0 || _context.VendorInvestigationServiceType == null)
                 {
-                    Text = x.Name + " - " + x.Code,
-                    Value = x.PinCodeId.ToString()
-                }).ToList();
+                    return NotFound();
+                }
 
-            var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
-            services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
+                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
+                if (vendorInvestigationServiceType == null)
+                {
+                    return NotFound();
+                }
+                var services = _context.VendorInvestigationServiceType
+                    .Include(v => v.Vendor)
+                    .Include(v => v.PincodeServices)
+                    .First(v => v.VendorInvestigationServiceTypeId == id);
 
-            return View(services);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType
+                    .Include(i => i.LineOfBusiness)
+                    .Where(i => i.LineOfBusiness.LineOfBusinessId == vendorInvestigationServiceType.LineOfBusinessId),
+                    "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
+
+                var country = _context.Country.OrderBy(o => o.Name);
+                var states = _context.State.Include(s => s.Country).Where(s => s.Country.CountryId == vendorInvestigationServiceType.CountryId).OrderBy(d => d.Name);
+                var districts = _context.District.Include(d => d.State).Where(d => d.State.StateId == vendorInvestigationServiceType.StateId).OrderBy(d => d.Name);
+
+                ViewData["CountryId"] = new SelectList(country, "CountryId", "Name", vendorInvestigationServiceType.CountryId);
+                ViewData["StateId"] = new SelectList(states, "StateId", "Name", vendorInvestigationServiceType.StateId);
+                ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
+                ViewData["DistrictId"] = new SelectList(districts, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
+
+                ViewBag.PinCodeId = _context.PinCode.Where(p => p.District.DistrictId == vendorInvestigationServiceType.DistrictId)
+                    .Select(x => new SelectListItem
+                    {
+                        Text = x.Name + " - " + x.Code,
+                        Value = x.PinCodeId.ToString()
+                    }).ToList();
+
+                var selected = services.PincodeServices.Select(s => s.Pincode).ToList();
+                services.SelectedMultiPincodeId = _context.PinCode.Where(p => selected.Contains(p.Code)).Select(p => p.PinCodeId).ToList();
+
+                return View(services);
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
+            
         }
 
         // POST: VendorService/Edit/5
@@ -651,85 +770,86 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditService(long vendorInvestigationServiceTypeId, VendorInvestigationServiceType vendorInvestigationServiceType)
         {
-            if (vendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
+            try
             {
-                return NotFound();
-            }
+                if (vendorInvestigationServiceTypeId != vendorInvestigationServiceType.VendorInvestigationServiceTypeId)
+                {
+                    notifyService.Error("OOPS !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-            if (vendorInvestigationServiceType is not null)
+                if (vendorInvestigationServiceType.SelectedMultiPincodeId.Count > 0)
+                {
+                    var existingServicedPincodes = _context.ServicedPinCode.Where(s => s.VendorInvestigationServiceTypeId == vendorInvestigationServiceType.VendorInvestigationServiceTypeId);
+                    _context.ServicedPinCode.RemoveRange(existingServicedPincodes);
+
+                    var pinCodeDetails = _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId));
+
+                    var pinCodesWithId = pinCodeDetails.Select(p => new ServicedPinCode
+                    {
+                        Pincode = p.Code,
+                        Name = p.Name,
+                        VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId
+                    }).ToList();
+                    _context.ServicedPinCode.AddRange(pinCodesWithId);
+
+                    vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
+                    vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                    vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    _context.Update(vendorInvestigationServiceType);
+                    await _context.SaveChangesAsync();
+                    notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
+                    return RedirectToAction(nameof(AgencyController.Service), "Agency");
+                }
+                ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
+                ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
+                ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
+                ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
+                ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
+                return View(vendorInvestigationServiceType);
+            }
+            catch (Exception)
             {
-                try
-                {
-                    if (vendorInvestigationServiceType.SelectedMultiPincodeId.Count > 0)
-                    {
-                        var existingServicedPincodes = _context.ServicedPinCode.Where(s => s.VendorInvestigationServiceTypeId == vendorInvestigationServiceType.VendorInvestigationServiceTypeId);
-                        _context.ServicedPinCode.RemoveRange(existingServicedPincodes);
-
-                        var pinCodeDetails = _context.PinCode.Where(p => vendorInvestigationServiceType.SelectedMultiPincodeId.Contains(p.PinCodeId));
-
-                        var pinCodesWithId = pinCodeDetails.Select(p => new ServicedPinCode
-                        {
-                            Pincode = p.Code,
-                            Name = p.Name,
-                            VendorInvestigationServiceTypeId = vendorInvestigationServiceType.VendorInvestigationServiceTypeId
-                        }).ToList();
-                        _context.ServicedPinCode.AddRange(pinCodesWithId);
-
-                        vendorInvestigationServiceType.PincodeServices = pinCodesWithId;
-                        vendorInvestigationServiceType.Updated = DateTime.UtcNow;
-                        vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
-                        _context.Update(vendorInvestigationServiceType);
-                        await _context.SaveChangesAsync();
-                        notifyService.Custom($"Service updated successfully.", 3, "orange", "fas fa-truck");
-                        return RedirectToAction(nameof(AgencyController.Service), "Agency");
-                    }
-                }
-                catch (DbUpdateConcurrencyException ex)
-                {
-                    if (!VendorInvestigationServiceTypeExists(vendorInvestigationServiceType.VendorInvestigationServiceTypeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                notifyService.Error($"Err Service updated.", 3);
-                return RedirectToAction(nameof(AgencyController.Service), "Agency");
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-            ViewData["InvestigationServiceTypeId"] = new SelectList(_context.InvestigationServiceType, "InvestigationServiceTypeId", "Name", vendorInvestigationServiceType.InvestigationServiceTypeId);
-            ViewData["LineOfBusinessId"] = new SelectList(_context.LineOfBusiness, "LineOfBusinessId", "Name", vendorInvestigationServiceType.LineOfBusinessId);
-            ViewData["StateId"] = new SelectList(_context.State, "StateId", "Name", vendorInvestigationServiceType.StateId);
-            ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", vendorInvestigationServiceType.DistrictId);
-            ViewData["VendorId"] = new SelectList(_context.Vendor, "VendorId", "Name", vendorInvestigationServiceType.VendorId);
-            return View(vendorInvestigationServiceType);
+            
         }
 
         // GET: VendorService/Delete/5
         [Breadcrumb("Delete Service", FromAction = "Service")]
         public async Task<IActionResult> DeleteService(long id)
         {
-            if (id == null || _context.VendorInvestigationServiceType == null)
+            try
             {
-                return NotFound();
-            }
 
-            var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
-                .Include(v => v.InvestigationServiceType)
-                .Include(v => v.LineOfBusiness)
-                .Include(v => v.PincodeServices)
-                .Include(v => v.Country)
-                .Include(v => v.State)
-                .Include(v => v.District)
-                .Include(v => v.Vendor)
-                .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
-            if (vendorInvestigationServiceType == null)
+                if (id == null || _context.VendorInvestigationServiceType == null)
+                {
+                    return NotFound();
+                }
+
+                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
+                    .Include(v => v.InvestigationServiceType)
+                    .Include(v => v.LineOfBusiness)
+                    .Include(v => v.PincodeServices)
+                    .Include(v => v.Country)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.Vendor)
+                    .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
+                if (vendorInvestigationServiceType == null)
+                {
+                    notifyService.Error("OOPS !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(vendorInvestigationServiceType);
+            }
+            catch (Exception)
             {
-                return NotFound();
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-
-            return View(vendorInvestigationServiceType);
         }
 
         // POST: VendorService/Delete/5
@@ -737,68 +857,70 @@ namespace risk.control.system.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            if (_context.VendorInvestigationServiceType == null)
+            try
             {
-                return Problem("Entity set 'ApplicationDbContext.VendorInvestigationServiceType'  is null.");
-            }
-            var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
-            if (vendorInvestigationServiceType != null)
-            {
-                vendorInvestigationServiceType.Updated = DateTime.UtcNow;
-                vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
-                _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
-            }
+                if (_context.VendorInvestigationServiceType == null)
+                {
+                    return Problem("Entity set 'ApplicationDbContext.VendorInvestigationServiceType'  is null.");
+                }
+                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType.FindAsync(id);
+                if (vendorInvestigationServiceType != null)
+                {
+                    vendorInvestigationServiceType.Updated = DateTime.UtcNow;
+                    vendorInvestigationServiceType.UpdatedBy = HttpContext.User?.Identity?.Name;
+                    _context.VendorInvestigationServiceType.Remove(vendorInvestigationServiceType);
+                }
 
-            await _context.SaveChangesAsync();
-            notifyService.Error($"Service deleted successfully.", 3);
-            return RedirectToAction("Service", "Agency");
+                await _context.SaveChangesAsync();
+                notifyService.Error($"Service deleted successfully.", 3);
+                return RedirectToAction("Service", "Agency");
+            }
+            catch (Exception)
+            {
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
+            }
         }
 
         [Breadcrumb("Services", FromAction = "Service")]
         public async Task<IActionResult> ServiceDetail(long id)
         {
-            if (id == 0 || _context.VendorInvestigationServiceType == null)
+            try
             {
-                return NotFound();
-            }
+                if (id == 0 || _context.VendorInvestigationServiceType == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
 
-            var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
-                .Include(v => v.InvestigationServiceType)
-                .Include(v => v.LineOfBusiness)
-                .Include(v => v.PincodeServices)
-                .Include(v => v.State)
-                .Include(v => v.District)
-                .Include(v => v.Country)
-                .Include(v => v.Vendor)
-                .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
-            if (vendorInvestigationServiceType == null)
+                var vendorInvestigationServiceType = await _context.VendorInvestigationServiceType
+                    .Include(v => v.InvestigationServiceType)
+                    .Include(v => v.LineOfBusiness)
+                    .Include(v => v.PincodeServices)
+                    .Include(v => v.State)
+                    .Include(v => v.District)
+                    .Include(v => v.Country)
+                    .Include(v => v.Vendor)
+                    .FirstOrDefaultAsync(m => m.VendorInvestigationServiceTypeId == id);
+                if (vendorInvestigationServiceType == null)
+                {
+                    notifyService.Error("NOT FOUND !!!..Contact IT support");
+                    return RedirectToAction(nameof(Index), "Dashboard");
+                }
+
+                return View(vendorInvestigationServiceType);
+            }
+            catch (Exception)
             {
-                return NotFound();
+                notifyService.Error("OOPS !!!..Contact IT support");
+                return RedirectToAction(nameof(Index), "Dashboard");
             }
-
-            return View(vendorInvestigationServiceType);
         }
 
         [Breadcrumb("Agent Load", FromAction = "User")]
-        public async Task<IActionResult> AgentLoad()
+        public IActionResult AgentLoad()
         {
             return View();
-        }
-
-        private bool VendorInvestigationServiceTypeExists(long id)
-        {
-            return (_context.VendorInvestigationServiceType?.Any(e => e.VendorInvestigationServiceTypeId == id)).GetValueOrDefault();
-        }
-
-        private bool VendorApplicationUserExists(long id)
-        {
-            return (_context.VendorApplicationUser?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-
-        private void Errors(IdentityResult result)
-        {
-            foreach (IdentityError error in result.Errors)
-                ModelState.AddModelError("", error.Description);
         }
 
         private void GetCountryStateEdit(VendorApplicationUser? user)
@@ -807,11 +929,6 @@ namespace risk.control.system.Controllers
             ViewData["DistrictId"] = new SelectList(_context.District, "DistrictId", "Name", user?.DistrictId);
             ViewData["StateId"] = new SelectList(_context.State.Where(s => s.CountryId == user.CountryId), "StateId", "Name", user?.StateId);
             ViewData["PinCodeId"] = new SelectList(_context.PinCode.Where(s => s.StateId == user.StateId), "PinCodeId", "Name", user?.PinCodeId);
-        }
-
-        private bool VendorExists(long id)
-        {
-            return (_context.Vendor?.Any(e => e.VendorId == id)).GetValueOrDefault();
         }
     }
 }
