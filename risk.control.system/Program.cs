@@ -175,7 +175,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             var url = context.RedirectUri;
             UriHelper.FromAbsolute(url, out var scheme, out var host, out var path, out var query, out var fragment);
             url = UriHelper.BuildAbsolute(scheme, host, path);
-            context.RedirectUri = url;
+            context.RedirectUri = "/Account/Login";
             return Task.CompletedTask;
         };
         options.AccessDeniedPath = "/Account/Login";

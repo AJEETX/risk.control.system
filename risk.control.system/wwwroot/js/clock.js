@@ -13,8 +13,8 @@ function startTimer(duration, display) {
 		seconds = seconds < 10 ? "0" + seconds : seconds;
 
 		display.textContent = minutes + ":" + seconds;
-		if (askConfirmation) {
-			if (--timer < alertTimeInSeconds) {
+		if (--timer < alertTimeInSeconds) {
+			if (askConfirmation) {
 				askConfirmation = false;
 				$.alert(
 					{
@@ -23,7 +23,7 @@ function startTimer(duration, display) {
 						icon: 'fas fa-spinner  fa-spin',
 						type: 'orange',
 						closeIcon: true,
-						autoClose: `cancel|`+alertImeMilliSeconds+``,
+						autoClose: `cancel|` + alertImeMilliSeconds + ``,
 						buttons: {
 							confirm: {
 								text: "REGRESH",
@@ -42,14 +42,13 @@ function startTimer(duration, display) {
 						}
 					}
 				);
-
 			}
-		}
-		
-		if (--timer < 0) {
+				
+		} else if (timer < 0) {
 			timer = duration;
 			window.location.href = "/account/login";
 		}
+		
 	}, 1000);
 }
 

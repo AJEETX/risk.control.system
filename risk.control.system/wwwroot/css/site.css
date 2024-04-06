@@ -1190,5 +1190,6 @@ a#back-button {
     font-weight:bold;
     width: 40px;
     text-align: center;
+    border:1px solid #ccc;
     border-radius: 4px;
 }
